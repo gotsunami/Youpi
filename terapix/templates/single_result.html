@@ -1,0 +1,38 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+<!-- Javascript treeview -->
+<script type="text/javascript" src="/media/js/common.js"></script>
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript">
+var currentReturnedData = null;
+var guistyle = '{{ user.get_profile.guistyle }}';
+
+{# Load custom plugin's javascript code if available #}
+{% include plugin.jsSource %}
+
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block branding %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<img class="/media/{{ user.get_profile.guistyle }}/img/misc/goback.gif" style="cursor: pointer" onclick="window.location.replace('/spica2/results/');"/>
+<div align="center">
+	<div id="infopanel" style="width: 75%"></div>
+</div>
+<script type="text/javascript">
+	{# in js/common.js #}
+	results_showDetails('{{ pid }}', '{{ tid }}', false);
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+
+{# Skeleton template #}
+
+<div class="tip" style="width: 300px;">
+	<p>This plugin is a kind of <i>Hello, world!</i> demo which provides skeletons that may be used as a base for processing plugin development.</p>
+	<p>By clicking on the 'Add to cart' button on the right, one item will be added to the shopping cart, allowing you to queue <b>five</b> <tt>/usr/bin/uptime</tt> 
+	jobs on the cluster.</p>
+
+	<div style="text-align: center; padding: 10px;">
+		<img src="/media/{{ user.get_profile.guistyle }}/img/misc/" + {{plugin_.name}} + ".png" style="float: left"/>
+		<img style="cursor: pointer" src="/media/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}_addSelectionToCart();"/>
+	</div>
+</div>

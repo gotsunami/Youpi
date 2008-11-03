@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title|escape }} | {% trans 'SPICA users' %}{% endblock %}
+
+{% block branding %}
+{% if Debug %}
+{# Show API links #}
+<div class="apidoc">
+	<i>Project API documentation</i>: <a href="/spica2/api/python/" target="_blank">Python</a> - <a href="/spica2/api/javascript/" target="_blank">Javascript</a>
+</div>
+{% endif %}
+
+<div style="float:left;"><font color="white">SPICA<br></font><font COLOR="lightblue">Software PIpeline for Ccd Analysis</font></div>
+ <div align="right"><font color="white">TERAPIX Team</font><br><font color="lightblue">Institut d'astrophysique de Paris</font></div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

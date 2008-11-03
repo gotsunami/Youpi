@@ -1,0 +1,174 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/history.css"></script>
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+
+<!-- Auto-completion code -->
+<script type="text/javascript" src="/media/js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js"></script>
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
+
+<!-- Javascript treeview -->
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/tafelTree/css/tree.css"/>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/prototype.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/scriptaculous.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
+
+<!-- Tooltip code -->
+<script type="text/javascript" src="/media/js/tooltip.js"></script>
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/tooltip.css"></script>
+
+<!-- Ingestion-related Javascript code -->
+<script type="text/javascript" src="/media/js/spica2Ingestion.js"></script>
+
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+<script type="text/javascript" src="/media/js/common.js"></script>
+<script type="text/javascript" src="/media/js/filebrowser.js"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+
+function ingestion_history() {
+	/*
+	 * Arg 1: container id
+	 * Arg 2: select id (for limiting results)
+	 * Arg 3: path to server-side script for async Ajax query
+	 *
+	 */
+	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/spica2/history/ingestion/');
+}
+</script>
+{% endblock %}
+
+<!-- Main body -->
+{% block content %}
+	<p class="number_ingested">Number of ingested Images: {{ ingested }}</p>
+	<div align="center">
+	<table class="preingestion">
+		<tr>
+			<td>
+				<div id="pre_submenu">
+					<ul class="smart_tabnav" id="tabnav2">
+						<li class="enabled"><a href="#" id="link_ingest" onclick="swap_display(this.id, 'menuitem_ingest', 'tabnav2', 'menuitem_')">Run ingestion</a></li>
+						<li class="disabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_'); ingestion_history();">History</a></li>
+					</ul>
+				</div>
+			</td>
+		</tr>
+
+		<tr id="data">
+			<td align="center">
+				<div id="menuitem_ingest">
+					<form id="form_ingestion" name="form_ingestion" method="post" onsubmit="return process_form();">
+						<table>
+							<tr>
+								<td>
+									<div id="ingestion" style="float: left; height: 200px; width: 400px"></div>
+								</td>
+								<td>
+									<div style="width: 600px">
+										<table class="flatmask">
+											<tr>
+												<th>Ingestion Type</th>
+												<td class="ingestion_type">
+													<select id="select_type" onchange="ingestionType();">
+														<option name="b" id="condor" value="condor">Cluster ingestion (through Condor)</option>
+													</select>
+												</td>
+											</tr>
+											<tr>
+												<th>Ingestion ID</th>
+												<td>
+													<input id="input_ingestion_id" type="text" name="ingestion_id" size="50"/>
+												</td>
+											</tr>
+											<tr>
+												<th>Send report to</th>
+												<td>
+													<input id="input_email" type="text" name="report_email" value="{{ user.email }}" size="50"/>
+												</td>
+											</tr>
+											<tr>
+												<th>Options</th>
+												<td width="100%">
+													<input id="check_verify" onclick="force_fitsverify()" type="checkbox" name="check_skip_fitsverify" value="yes" checked="checked"/>
+													<label>Skip ingestion for non fitsverify compliant images</label>
+													<div style="width: 90%">
+														<div id ="warn" class="warning" style="display:none"></div>
+													</div>
+													<br/>
+													<input id="check_qso_status" onclick="force_qso_status()" type="checkbox" name="check_skip_qso_status" value="yes" checked="checked"/>
+													<label>Skip ingestion when <strong>QSO status</strong> does not match <q>validated</q></label>
+													<div style="width: 90%">
+														<div align="center" id ="warn2" class="warning" style="display:none"></div>
+													</div>
+													<br/>
+													<input id="check_allow_several_times" onclick="force_check_allow_several_times()" type="checkbox" name="check_several_ingestions" value="yes" checked="checked"/>
+													<label>Allow images to be ingested several times</label>
+													<div style="width: 90%">
+														<div align="center" id="warn3" class="warning" style="display:none"></div> 
+													</div>
+												</td>
+											</tr>
+										</table>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td/>
+								<td>
+									<div id="cluster_log_div" style="margin-top: 30px;"></div>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+
+				<div id="menuitem_history" style="display: none">
+					<table width="100%">
+						<tr>
+							<td style="text-align: left">
+								<p>History of ingestions (<a href="#" onclick="ingestion_history();">refresh</a>):</p>
+							</td>
+							<td style="text-align: right">
+								<span>Display 
+									<select id="select_history_limit" onchange="ingestion_history();">
+										<option value="0">all results</option>
+										<option value="10" selected="true">last 10 results</option>
+										<option value="20">last 20 results</option>
+										<option value="50">last 50 results</option>
+									</select>
+								</span>
+							</td>
+						</tr>
+					</table>
+					<div align="center" id="div_result"></div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	</div>
+
+	<script type="text/javascript">
+		ingestionType();
+
+		try {
+			var options = {
+				{# IngestionName is the keyword needed by the server-side script to know what to query #}
+				script: '/spica2/autocompletion/IngestionName/',
+				varname: 'Value',
+				json: true,
+				maxresults: 20,
+				timeout: 3000
+			};
+			var as = new _bsn.AutoSuggest('input_ingestion_id', options);
+		} catch(e) {}
+	</script>
+
+{% endblock %}

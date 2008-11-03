@@ -1,0 +1,170 @@
+<HEAD></HEAD>
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<script language="javascript" type="text/javascript" src="/media/js/javascript.js"></script>
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+<script type="text/javascript" src="/media/js/common.js"></script>
+<!-- Menu handling -->
+<script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/progressbar/js/prototype/prototype.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/progressbar/js/bramus/jsProgressBarHandler.js"></script>
+<script type="text/javascript" src="/media/js/homeindex.js"></script>
+
+
+<script type="text/javascript" src="/media/js/sqlform.js"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block content %}
+	<div id="pre_submenu">
+				<ul class="smart_tabnav" id="tabnav2">
+					<li class="enabled"><a href="#" id="link_globstat" onclick="swap_display(this.id, 'menuitem_globstat', 'tabnav2', 'menuitem_');">Global stats</a></li>
+					<li class="disabled"><a href="#" id="link_ingstat" onclick="swap_display(this.id, 'menuitem_ingstat', 'tabnav2', 'menuitem_');">Ingestion stats</a></li>
+					<li class="disabled"><a href="#" id="link_procstat" onclick="swap_display(this.id, 'menuitem_procstat', 'tabnav2', 'menuitem_')">Processing stats</a></li>
+				</ul>
+	</div>
+
+	<div id="menuitem_globstat">
+
+		<div id="globstat" >
+
+			<div id "main_div">
+					<div style="margin-left:10px">
+						<table class="FileBrowser" style="width:400px">
+							<tr>
+                   			    <td>Survey :</td>
+            		            <td id="survey_name"></td>
+        		            </tr>
+							<tr>
+								<td>Comment :</td>
+								<td id="survey_comment"></td>
+							</tr>
+            		       	<tr>
+   			                    <td>Link :</td>
+		                        <td>
+									<a id="survey_link"  target="_blank" ></a>
+								</td>
+		                  	</tr>
+						</table>
+					</div>
+					 <div style="float:left; margin-left:10px">
+                        <table class="FileBrowser">
+                            <tr>
+                                <th colspan="2" id="user_count">
+                                Users
+                                </th>
+                           </tr>
+                            <tr id ="user">
+                                <td id="user_list">
+                                    <div id="div_user_list">
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+					<div  style="float:left; margin-left:10px">
+						<table class="FileBrowser">
+							<tr>
+		                        <th colspan="2"  id="instrument_number">
+		                        </th>
+        		            </tr>
+		                    <tr>
+	                        <td id="instrument"></td>
+		                    </tr>
+						</table>
+					</div>
+
+					<div style="margin-left:10px; width:400px">
+						<table class="FileBrowser">
+							<tr>
+								<th colspan="2"  id="run_number">
+								Runs
+	            	            </th>
+	        	            </tr>
+							<tr id="run">
+   			                     <td id="run_list">
+									<div id="div_run_list">
+									Select one Instrument
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="disp" style="display:none">
+
+			<div id "disp_div" style="width:800px; margin-left:10px">
+	                <table  class="FileBrowser" id="disp_div_table" style="float:right">
+						<tr>
+	                    	<th>
+	                    	Instrument 
+							</th>
+						</tr>
+						<tr id="display_instrument">
+							<td>
+								<div id="display_instrument_info">
+								</div>
+							</td>
+						</tr>
+					</table>
+					<table  class="FileBrowser"  style="float:right">
+						<tr>
+	                        <th>
+	                        Run
+	                        </th>
+    	                </tr>
+	
+						<tr id="display_run" style="display:none">
+							<td>                        
+	                            <div id="display_run_info">
+	                            </div>
+	                        </td>
+						</tr>
+					<table  class="FileBrowser"  style="float:right">					
+						<tr>
+    	                    <th>
+       		                 Images
+							</th>
+                	    </tr>
+      		            <tr>
+							<td><center><img src="/media/{{ user.get_profile.guistyle }}/img/34x34/warning.png"></img>images from multiple ingestion are not counted</center></td>
+						</tr>
+						<tr id="display_image" style="display:none">
+                    	    <td>
+	                            <div id="display_image_info">
+	                            </div>
+	                        </td>
+    	                </tr>
+					</table>					
+				</table>
+                </div>
+            </div>
+
+		</div>
+
+
+	<div id="menuitem_ingstat">
+		<div id="ingstat" align="center"></div>
+	</div>
+
+	<div id="menuitem_procstat"></div>
+
+	<script type="text/javascript">globstat();display_user();</script>
+
+{% endblock %}
+	
+</body>

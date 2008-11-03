@@ -1,0 +1,200 @@
+digraph G {
+	size="10,10";
+	node [style=filled, color=lightblue2];
+	rankdir="LR";
+	root="cluster_user";
+	splines=polyline;
+
+	subgraph cluster_plugin {
+		label="PLUGIN FACILITIES";
+		style=rounded;
+
+		subgraph cluster_plugin_js {
+			label="plugin_MYPLUGIN.js";
+			color=blue;
+			jaddSelectionToCart [label="addSelectionToCart"];
+			jrun [label="run"];
+			jsaveItemForLater [label="saveItemForLater"];
+			jshowSavedItems [label="showSavedItems"];
+			jdelSavedItem [label="delSavedItem"];
+			jresultsShowEntryDetails [label="resultsShowEntryDetails"];
+			jdelCartSavedItem [label="Delete shopping cart\nsaved item", shape=house, color=orange];
+			jrenderOutputDirStats [label="renderOutputDirStats"];
+			jreprocessAllFailedProcessings [label="reprocessAllFailedProcessings"];
+
+			jdelCartSavedItem -> jdelSavedItem;
+		}
+
+		subgraph cluster_plugin_py {
+			label="MYPLUGIN.py";
+			color=green;
+			process [label="process"];
+			csf [label="getCondorSubmissionFile"];
+			saveCartItem [label="saveCartItem"];
+			getSavedItems [label="getSavedItems"];
+			deleteCartItem [label="deleteCartItem"];
+			getTaskInfo [label="getTaskInfo"];
+			getResultEntryDescription [label="getResultEntryDescription"];
+			getOutputDirStats [label="getOutputDirStats"];
+			reprocessAllFailedProcessings [label="reprocessAllFailedProcessings"];
+
+			process -> csf;
+		}
+
+		subgraph cluster_plugin_item_cart_html {
+			label="plugin_MYPLUGIN_item_cart.html";
+			color=red;
+			hrun [label="Submit cart item\nto the cluster", shape=house, color=orange];
+			hsaveItemForLater [label="Save cart item into\nDB for later use", shape=house, color=orange];
+			hdisplayCustomCartHtml [label="Display custom\ncart item\nHTML rendering", shape=house, color=orange];
+		}
+
+		subgraph cluster_plugin_html {
+			label="plugin_MYPLUGIN.html";
+			color=red;
+			haddSelectionToCart [label="Add selection\nto cart", shape=house, color=orange];
+			hdisplayCustomHtml [label="Display custom\nHTML rendering", shape=house, color=orange];
+		}
+
+		haddSelectionToCart -> jaddSelectionToCart;
+	}
+
+	subgraph cluster_core {
+		label="CORE FUNCTIONALITIES";
+		style=rounded;
+		engine [label="Rendering\nEngine", shape=doublecircle];
+		session [label="HTTP\n session\ndata", shape=Mdiamond];
+
+		subgraph cluster_results_html {
+			label="results.html";
+			color=red;
+			hshowOneResult [label="Detail one\nprocessing\nresult", shape=house, color=orange];
+			hdisplayAllResults [label="Display all\nprocessing results", shape=house, color=orange];
+			hviewStats [label="View statistics\nper output dir", shape=house, color=orange];
+			hreprocessFailedProcessings [label="Reprocess failed\nprocessings", shape=house, color=orange];
+			japplyFilter [label="apply_filter"];
+			jgetStats [label="get_stats"];
+			hfilterResults [label="Filter results", shape=house, color=orange];
+
+			hdisplayAllResults -> japplyFilter;
+		}
+
+		subgraph cluster_processing_html {
+			label="processing.html";
+			color=red;
+			hprocRendering [label="Dynamic HTML\nrendering", shape=house, color=orange];
+		}
+
+		subgraph cluster_shopping_cart_html {
+			label="shoppingcart.html";
+			color=red;
+			hdelete [label="Delete cart item", shape=house, color=orange];
+			hsavedItems [label="Show all shopping\ncart saved items", shape=house, color=orange];
+			hremoveItemFromCart [label="removeItemFromCart"];
+			hshowSavedItems [label="showSavedItems"];
+		}
+
+		subgraph cluster_common_js {
+			label="common.js";
+			color=blue;
+			jresultsShowDetails [label="results_showDetails"];
+		}
+
+		subgraph cluster_shopping_cart_js {
+			label="shoppingcart.js";
+			color=blue;
+			addProcessing [label="addProcessing"];
+			addItem [label="addItem"];
+			delItem [label="deletePluginItem"];
+			render [label="render"];
+	
+			addProcessing -> addItem[style=dotted];
+		}
+	
+		subgraph cluster_cart_py {
+			label="shoppingcart.py";
+			color=green;
+			cartAddItem [label="cart_add_item"];
+			cartDeleteItem [label="cart_delete_item"];
+			cartCookieCheck [label="cart_cookie_check"];
+			cartItemsCount [label="cart_items_count"];
+		}
+
+		subgraph cluster_condor_py {
+			label="condor.py";
+			color=green;
+			taskFilter [label="task_filter"];
+			dirStats [label="dir_stats"];
+		}
+
+		engine -> hsavedItems;
+		engine -> hdisplayCustomCartHtml;
+		engine -> hprocRendering;
+		taskFilter -> getResultEntryDescription;
+		hfilterResults -> japplyFilter;
+		hprocRendering -> hdisplayCustomHtml;
+		japplyFilter -> taskFilter;
+		render -> cartItemsCount;
+	}
+
+	condor [label="Condor", shape=Mdiamond];
+	db [label="Database", shape=component];
+	user [label="User", shape=doublecircle];
+
+	hdelete-> hremoveItemFromCart;
+	hremoveItemFromCart -> delItem;
+	hreprocessFailedProcessings -> jreprocessAllFailedProcessings;
+	hrun -> jrun;
+	hsaveItemForLater -> jsaveItemForLater;
+	hshowOneResult -> jresultsShowDetails;
+	hshowSavedItems -> jshowSavedItems;
+	hsavedItems -> hshowSavedItems;
+	hviewStats -> jgetStats;
+
+	jaddSelectionToCart -> addProcessing;
+	jdelSavedItem -> deleteCartItem;
+	jgetStats -> dirStats;
+	jgetStats -> jrenderOutputDirStats[style=dotted];
+	jreprocessAllFailedProcessings -> reprocessAllFailedProcessings;
+	jreprocessAllFailedProcessings -> addProcessing;
+	jresultsShowDetails -> jresultsShowEntryDetails[style=dotted];
+	jrun -> process;
+	jrun ->hremoveItemFromCart[style=dotted];
+	jshowSavedItems -> getSavedItems;
+	jsaveItemForLater -> jshowSavedItems[style=dotted];
+	jsaveItemForLater -> saveCartItem;
+	jresultsShowDetails -> getTaskInfo;
+
+	deleteCartItem -> db;
+	getOutputDirStats -> db;
+	getResultEntryDescription -> db;
+	getSavedItems -> db;
+	getTaskInfo -> db;
+	reprocessAllFailedProcessings -> db;
+	saveCartItem -> db;
+	taskFilter -> db;
+
+	cartAddItem -> session;
+	cartCookieCheck -> session;
+	cartDeleteItem -> session;
+	cartItemsCount -> session;
+
+	addItem -> cartAddItem;
+	addItem -> render[style=dotted];
+	addProcessing -> cartCookieCheck;
+	delItem -> cartDeleteItem;
+	delItem ->render[style=dotted];
+	dirStats -> getOutputDirStats;
+	process -> condor[style=dotted, label="submitted to"];
+
+	user -> hrun;
+	user -> hsaveItemForLater;
+	user -> hdelete;
+	user -> hdisplayAllResults;
+	user -> hfilterResults;
+	user -> hreprocessFailedProcessings;
+	user -> haddSelectionToCart;
+	user -> hshowOneResult;
+	user -> jdelCartSavedItem;
+	user -> hviewStats;
+}

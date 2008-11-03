@@ -1,0 +1,83 @@
+div.presubmenu {
+	width: 100%;
+}
+
+ul.smart_tabnav {
+   font: bold 11px verdana, arial, sans-serif;
+   list-style: none;
+   padding-bottom: 24px;
+   margin: 0;
+   border-bottom: 1px solid #5b80b2;
+}
+
+ul.smart_tabnav li {
+   float: left;
+   height: 21px;
+   margin: 2px 2px 0 2px;
+   background-color: #FFF;
+   -moz-border-radius-topleft: 5px;
+   -moz-border-radius-topright: 5px;
+}
+
+ul.smart_tabnav li.enabled {
+   border: 1px solid #5b80b2;
+   border-bottom: 1px solid lightblue;
+   background-color: lightblue;
+}
+
+ul.smart_tabnav li.enabled a {
+   color: black;
+}
+
+ul.smart_tabnav li.enabled_apart {
+   border: 1px solid #5b80b2;
+   border-bottom: 1px solid lightblue;
+   background-color: lightblue;
+   float: right;
+}
+
+ul.smart_tabnav li.enabled_apart a {
+   color: black;
+}
+
+ul.smart_tabnav li.disabled {
+   background-color: lightgray;
+   border: 1px solid gray;
+   border-bottom: 1px solid #5b80b2;
+}
+
+ul.smart_tabnav li.disabled a {
+   color: grey;
+}
+
+ul.smart_tabnav li.disabled_apart {
+   background-color: lightgray;
+   border: 1px solid gray;
+   border-bottom: 1px solid #5b80b2;
+   float: right;
+}
+
+ul.smart_tabnav li.disabled_apart a {
+   color: grey;
+}
+
+
+.smart_tabnav a {
+   float: left;
+   display: block;
+   color: #000;
+   text-decoration: none;
+   padding: 4px;
+}
+
+.smart_tabnav a:hover {
+   background: none;
+}
+
+table.preingestion {
+	width: 94%;
+}
+
+table.preingestion td {
+   border-bottom: none;
+}

@@ -1,0 +1,27 @@
+
+Django devel setup
+------------------
+
+Mathias:
+
+$ export PYTHONPATH=$PYTHONPATH:/home/nis/monnerville/spica2
+$ django-admin.py runserver \
+ 	--settings=settings_dev_mat \
+	--pythonpath=/home/nis/monnerville/spica2/terapix \
+	--adminmedia=/home/nis/monnerville/spica2/terapix/media \
+	194.57.221.40:8000 &
+
+Greg:
+
+$ export PYTHONPATH=$PYTHONPATH:/home/nis/semah/spica2
+$ django-admin.py runserver \
+ 	--settings=settings_dev_greg \
+	--pythonpath=/home/nis/semah/spica2/terapix \
+	--adminmedia=/home/nis/semah/spica2/terapix/media \
+	194.57.221.40:8888 &
+
+
+Production: as defined in clix:/etc/apache2/httpd.conf
+
+Warning: ln -s settings_local_site.py settings.py
+example: ln -s settings_dev_greg.py settings.py

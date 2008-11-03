@@ -1,0 +1,14 @@
+
+How to generate API documentation
+---------------------------------
+
+Javascript doc:
+	naturaldocs -i ~/spica2/terapix/media/js/ -i ~/spica2/terapix/templates/ -o HTML ~/tmp/spica2/api/js/ -p ~/tmp/spica2/api/prj/
+
+Python doc:
+	doxygen config.doxy
+
+	Note: Python doc uses doxypy, an input filter for Doxygen. It preprocesses python files so that docstrings of 
+	classes and functions are reformatted into Doxygen conform documentation blocks. 
+
+	http://code.foosel.org/doxypy

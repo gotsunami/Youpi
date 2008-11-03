@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+<script type="text/javascript" src="/media/js/shoppingcart.js"></script>
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}{{ user.get_profile.guistyle }}/css/base.css{% endblock %}" />
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% admin_media_prefix %}css/rtl.css{% endblock %}" />{% endif %}
+{% block extrastyle %}{% endblock %}
+{% block extrahead %}
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+</script>
+{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+</head>
+{% load i18n %}
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+
+<!-- Container -->
+<div id="container">
+
+    {% if not is_popup %}
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+        {% block branding %}{% endblock %}
+        </div>
+        {% block nav-global %}{% endblock %}
+    </div>
+    <!-- END Header -->
+    <div class="breadcrumbs">
+		{% block breadcrumbs %}
+		{% if user.is_authenticated %}
+			{# and user.is_staff #}
+			<div>
+			{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>
+			{% block userlinks %}
+				[ <a href="{% url django.contrib.auth.views.password_change %}">{% trans 'Change password' %}</a>
+				- <a href="/spica2/accounts/logout/">{% trans 'Log out' %}</a> ]
+			{% endblock %}
+	        </div>
+			<div id="spica2_cart_id" style="float: right"></div>
+			<script type="text/javascript">
+					// Global cart
+					var s_cart;
+					s_cart = new ShoppingCart('spica2_cart_id', 's_cart');
+			</script>
+			<div style="height: 20px;">It is {% now "jS F Y H:i" %}</div>
+        {% endif %}
+		{% endblock %}
+	</div>
+    {% endif %}
+
+	{% block spicamenu %}
+	<!-- Spica's main menu comes here -->
+	<div>
+		<ul class="smart_tabnav">
+		{% for entry in menu.normal %}
+			{% ifequal entry.id selected_entry_id %}
+			<li class="enabled"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
+			{% else %}
+			<li class="disabled"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
+			{% endifequal %}
+		{% endfor %}
+		{% for entry in menu.apart %}
+			{% ifequal entry.id selected_entry_id %}
+			<li class="enabled_apart"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
+			{% else %}
+			<li class="disabled_apart"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
+			{% endifequal %}
+		{% endfor %}
+	</ul>
+</div>
+	{% endblock %}
+	<br/>
+
+	{% if messages %}
+		<ul class="messagelist">{% for message in messages %}<li>{{ message|escape }}</li>{% endfor %}</ul>
+	{% endif %}
+
+    <!-- Content -->
+	<div id="content" class="{% block coltype %}colM{% endblock %}">
+		{% block pretitle %}{% endblock %}
+		{% block content_title %}{% if title %}<h1>{{ title|escape }}</h1>{% endif %}{% endblock %}
+		{% block content %}
+			{% block object-tools %}{% endblock %}
+			{{ content }}
+		{% endblock %}
+		{% block sidebar %}{% endblock %}
+		<br class="clear" />
+	</div>
+	<!-- END Content -->
+
+	{% block footer %}<div id="footer"></div>{% endblock %}
+</div>
+<!-- END Container -->
+
+</body>
+</html>

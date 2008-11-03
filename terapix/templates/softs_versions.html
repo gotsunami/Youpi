@@ -1,0 +1,276 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+<!-- Javascript treeview -->
+<script type="text/javascript" src="/media/js/common.js"></script>
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript">
+
+var guistyle = '{{ user.get_profile.guistyle }}';
+var all_nodes;
+var all_softs;
+
+function get_cluster_nodes() {
+	var container = document.getElementById('cluster_nodes_div');
+	container.innerHTML = getLoadingHTML("Gathering information about cluster's nodes");
+
+	var xhr = new HttpRequest(
+		null,
+		null, // Use default error handler
+		// Custom handler for results
+		function(resp) {
+			container.innerHTML = '';
+			var img = document.createElement('img');
+			img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif');
+			container.appendChild(img);
+			container.appendChild(document.createTextNode('Found ' + resp['Hosts'].length + ' nodes attached to the cluster.'));
+
+			all_nodes = resp['Hosts'];
+			// Run check 2
+			get_cluster_softs(resp['Hosts']);
+		}
+	);
+
+	// Send HTTP POST request
+	xhr.send('/spica2/cluster/nodes/', '');
+}
+
+function fill_versions(res) {
+	for (var m=0; m < all_nodes.length; m++) {
+		var found = false;
+		for (var k=0; k < res.length; k++) {
+			if (res[k][0] == all_nodes[m]) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) continue;
+
+		tr = document.getElementById('tr_node_' + m);
+		var tds = tr.getElementsByTagName('td');
+		// Skip first td
+		for (var y=1; y < tds.length-1; y++) {
+			var td = tds[y];
+			td.innerHTML = '';
+			td.appendChild(document.createTextNode(res[k][1][all_softs[y-1]]));
+		}
+	}
+}
+
+function get_versions_node(idx, handler) {
+	if (idx > all_nodes.length - 1)
+		return;
+
+	var handler = handler ? handler : null;
+	var container = document.getElementById('td_loading_' + idx);
+	container.innerHTML = getLoadingHTML('Refreshing');
+
+	// Sends a query for each cluster node
+	var xhr = new HttpRequest(
+		null,
+		null, // Use default error handler
+		// Custom handler for results
+		function(resp) {
+			if (resp['Versions'] == 0) {
+				container.innerHTML = getLoadingHTML("Job already queued, please wait");
+				// Call custom handler specifying to continue monitoring that entry
+				if (handler) handler(false);
+				return;
+			}
+
+			container.innerHTML = '';
+
+			var res = resp['Versions'];
+			fill_versions(res);
+
+			// Call custom handler specifying to stop monitoring that entry
+			if (handler) handler(true);
+		}
+	);
+
+	post = 'Node=' + all_nodes[idx];
+	// Send HTTP POST request
+	xhr.send('/spica2/cluster/softwares/versions/refresh/', post);
+}
+
+/*
+ * Basic job scheduler which handles the queue
+ *
+ */
+var queue_nodes;
+function queue_jobs(idx) {
+	var idx = idx ? idx : 0;
+
+	if (idx > queue_nodes.length - 1)
+		idx = 0;
+
+	get_versions_node(queue_nodes[idx], function(done) {
+		var done = done ? true : false;
+		var next;
+		if (done) {
+			// No needs to monitor it anymore, can be safely removed
+			var dup = new Array();
+			var j = 0;
+			for (var k=0; k < queue_nodes.length; k++) {
+				if (k != idx) {
+					dup[j++] = queue_nodes[k];
+				}
+			}
+			queue_nodes = dup;
+			next = idx;
+		}
+		else {
+			next = idx+1;
+		}
+
+		setTimeout("queue_jobs(" + next + ");", 2500);
+	});
+}
+
+// Check if versions in DB, otherwise send Condor job
+function get_versions() {
+	// Sends a query for each cluster node
+	var xhr = new HttpRequest(
+		null,
+		null, // Use default error handler
+		// Custom handler for results
+		function(resp) {
+			var res = resp['Versions'];
+			fill_versions(res);
+
+			// Search missing info
+			var missing = new Array();
+			var j = 0;
+			for (var y=0; y < all_nodes.length; y++) {
+				var found = false;
+				for (var k=0; k < res.length; k++) {
+					if (all_nodes[y] == res[k][0])
+						found = true;
+				}
+				if (!found)
+					missing[j++] = y;
+			}
+
+			// Run Condor job on missing data
+			queue_nodes = missing;
+			if (missing.length) queue_jobs();
+		}
+	);
+
+	// Send HTTP POST request
+	xhr.send('/spica2/cluster/softwares/versions/', '');
+}
+
+function get_cluster_softs(nodes) {
+	var container = document.getElementById('cluster_softs_div');
+	container.innerHTML = getLoadingHTML("Gathering information about softwares on the cluster");
+
+	var xhr = new HttpRequest(
+		null,
+		null, // Use default error handler
+		// Custom handler for results
+		function(resp) {
+			container.innerHTML = '';
+			container.appendChild(document.createElement('br'));
+			var img = document.createElement('img');
+			img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif');
+			container.appendChild(img);
+			container.appendChild(document.createTextNode('Found ' + resp['Softs'].length + ' softs.'));
+
+			all_softs = resp['Softs'];
+
+			// Now renders table
+			var tdiv = document.getElementById('cluster_versions_div');
+			var tab = document.createElement('table');
+			tab.setAttribute('class', 'versions_check');
+			var tr, td;
+
+			tr = document.createElement('tr');
+			td = document.createElement('td');
+			tr.appendChild(td);
+			for (var j=0; j < resp['Softs'].length; j++) {
+				td = document.createElement('td');
+				td.setAttribute('class', 'software');
+				td.appendChild(document.createTextNode(resp['Softs'][j]));
+				tr.appendChild(td);
+			}
+			tab.appendChild(tr);
+
+			for (var k=0; k < nodes.length; k++) {
+				tr = document.createElement('tr');
+				tr.setAttribute('id', 'tr_node_' + k);
+				td = document.createElement('td');
+				td.setAttribute('class', 'node');
+				td.appendChild(document.createTextNode(nodes[k]));
+				tr.appendChild(td);
+
+				for (var j=0; j < resp['Softs'].length; j++) {
+					td = document.createElement('td');
+					td.setAttribute('class', 'version');
+					td.appendChild(document.createTextNode('-'));
+					tr.appendChild(td);
+				}
+				// Holds 'loading data...'
+				td = document.createElement('td');
+				td.setAttribute('id', 'td_loading_' + k);
+				td.setAttribute('class', 'loading');
+				tr.appendChild(td);
+				tab.appendChild(tr);
+			}
+
+			tdiv.appendChild(tab);
+			
+			// Run version checks
+			get_versions();
+		}
+	);
+
+	// Send HTTP POST request
+	xhr.send('/spica2/cluster/softwares/', '');
+}
+
+function force_reload() {
+	var xhr = new HttpRequest(
+		null,
+		null, // Use default error handler
+		// Custom handler for results
+		function(resp) {
+			window.location.reload();
+		}
+	);
+
+	// Send HTTP POST request
+	xhr.send('/spica2/cluster/softwares/versions/delete/', '');
+}
+
+function run_checks() {
+	get_cluster_nodes();
+}
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block content %}
+<div align="center">
+	<div style="text-align: left; width: 90%;">
+		<h1>Software version check</h1>
+		<div class="tip" style="width: 400px;">
+			<div id="cluster_nodes_div" style="margin: 0px;"></div>
+			<div id="cluster_softs_div" style="margin: 0px;"></div>
+		</div>
+		<div>[ <a href="#" onclick="force_reload();">Force refresh</a> ]</div>
+		<div id="cluster_versions_div"></div>
+	</div>
+</div>
+<script type="text/javascript">
+	run_checks();
+</script>
+{% endblock %}

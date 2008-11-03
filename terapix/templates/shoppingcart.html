@@ -1,0 +1,168 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/history.css"/>
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+
+<script type="text/javascript" src="/media/js/common.js"></script>
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+<script type="text/javascript" src="/media/js/condorpanel.js"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+
+// trNode: parent TR node
+function removeItemFromCart(rid, force) {
+	var silent = force == true ? true : false;
+	
+	if (!silent) {
+		var r = confirm('Are you sure you want to delete this item from the cart?');
+		if (!r) return;
+	}
+
+	var trNode = document.getElementById(rid);
+	var pluginName = rid.substr(0, rid.search(/_\d+$/));
+
+	var trs = document.getElementsByTagName('tr');
+	var trid, idx, j=0;
+	var cartItemsCount = 0;
+
+	for (var k=0; k < trs.length; k++) {
+		trid = 	trs[k].getAttribute('id');
+		if (!trid) continue;
+		if (trid.search(pluginName) == 0) {
+			cartItemsCount++;
+			if (trs[k] == trNode) {
+				idx = j
+				break;
+			}
+			j++;
+		}
+	}
+
+	// Ask for item deletion
+	s_cart.deletePluginItem(
+		{'plugin_name' : pluginName, 'idx' : idx},
+		// Custom handler called when item deletion is complete
+		function() {
+			if (cartItemsCount == 1) {
+				// No data left in cart, force a page reload
+				window.location.reload();
+			}
+			else {
+				// Removes from DOM on successful deletion
+				trNode.parentNode.removeChild(trNode);
+			}
+		}
+	);
+}
+
+function showSavedItems() {
+{% for plugin in plugins %}
+	var z = null;
+	try {
+		z = {{ plugin.id }}_showSavedItems; 
+	} catch(e) {}
+
+	if (z) z();
+{% endfor %}
+}
+
+function proceed_cart() {
+	alert('TODO...');
+}
+
+{# Load custom plugin's javascript code if available #}
+{% for plugin in plugins %}
+	{% include plugin.jsSource %}
+{% endfor %}
+
+</script>
+
+{% endblock %}
+
+<!-- Main body -->
+{% block content %}
+
+{% if cartHasData %}
+<div class="shoppingCartPanel">
+	<table class="box">
+		<tr>
+			<th>Item prefix name</th>
+		<tr>
+		<tr>
+			<td>You can define a short name that <i>will prefix all items' IDs</i> at processing time. It is useful 
+			if you want to monitor only jobs with a specific prefix ID.
+			</td>
+		</tr>
+		<tr>
+			<td><input type="text" id="prefix"/>
+			</td>
+		</tr>
+	</table>
+
+	<div id="condor_panel_div"></div>
+</div>
+
+<div align="center">
+	<p class="shoppingCartWelcome">Welcome to your cart !</p>
+	<table width="50%" class="shoppingCart">
+	{% for plugin in plugins %}
+		{% if plugin.hasItemsInCart %}
+		<tr>
+			<th>
+				<img src="/media/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}_runAll()"/>
+			</th>
+			<th colspan="2">{{ plugin.optionLabel }} ({{ plugin.description }}) related items</th>
+		</tr>
+			{% for data in plugin.getData %}
+				{# Invoke custom template rendering #}
+		<tr id="{{ plugin.id }}_{{ forloop.counter }}">
+			<td style="text-align: right">
+				<p style="text-align: right; font-size: 80%">Item <b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> added on {{ data.date }}</p>
+				<img src="/media/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
+			</td>
+			<td width="100%" colspan="2">
+				{% include plugin.itemCartTemplate %}
+			</td>
+		</tr>
+			{% endfor %}
+		{% endif %}
+	{% endfor %}
+		<!--
+		<tr>
+			<td colspan="3" style="text-align: right; border: none">
+				<img src="/media/{{ user.get_profile.guistyle }}/img/misc/proceed.gif"/>
+			</td>
+		</tr>
+		-->
+	</table>
+</div>
+{% else %}
+<div style="padding: 5px;">
+	{# No data in cart ! #}
+	<div style="text-align: center">
+		<h1>Your cart is currently empty</h1>
+	</div>
+</div>
+{% endif %}
+
+<div id="saved_items_div" align="center">
+<hr style="border: 3px solid #5b80b2; margin-top: 20px; width: 80%"/>
+<h2 style="margin-bottom: 20px">Saved items</h2>
+<script type="text/javascript">
+	showSavedItems();
+	if (document.getElementById('condor_panel_div')) {
+		var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
+		condorPanel.render();
+	}
+</script>
+</div>
+
+{% endblock %}

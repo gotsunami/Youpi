@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HEAD><META HTTP-EQUIV="refresh" CONTENT="30;"></HEAD>
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block extrahead %}{{ block.super }}
+<script language="javascript" type="text/javascript" src="/media/js/javascript.js"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+ 
+{% block content %}
+{% for name in names %}
+{{name}}<BR>
+{% endfor %}
+
+{% endblock %}

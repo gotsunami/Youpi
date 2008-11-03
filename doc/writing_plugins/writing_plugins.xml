@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE article [
+	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
+	<!ENTITY ami			 			"<acronym>AMI</acronym>">
+	<!ENTITY api			 			"<acronym>API</acronym>">
+	<!ENTITY appname			 	"Youpi">
+	<!ENTITY appname_accro 	"<acronym>YOUpi is your processing PIpeline</acronym>">
+	<!ENTITY author 				SYSTEM "author.xml">
+	<!ENTITY csf 						"Condor submission file">
+	<!ENTITY dj	 						"Django">
+	<!ENTITY dom 						"<acronym>DOM	</acronym>">
+	<!ENTITY forth		 			"<acronym>FORTH</acronym>">
+	<!ENTITY get			 			"<acronym>GET</acronym>">
+	<!ENTITY html 					"<acronym>HTML</acronym>">
+	<!ENTITY http 					"<acronym>HTTP</acronym>">
+	<!ENTITY hr		 					"<classname>HttpRequest</classname>">
+	<!ENTITY installcfgf 		"<filename>install.cfg</filename>">
+	<!ENTITY json			 			"<acronym>JSON</acronym>">
+	<!ENTITY lastmodified 	SYSTEM "update">
+	<!ENTITY pm	 						"plugin manager">
+	<!ENTITY post			 			"<acronym>POST</acronym>">
+	<!ENTITY url 						"<acronym>URL</acronym>">
+	<!ENTITY xhr		 				"<classname>XMLHttpRequest</classname>">
+	<!ENTITY xml 						"<acronym>XML</acronym>">
+]>
+<article lang="en">
+	<!-- $Id$ -->
+	<!-- vim: set ts=2 -->
+	<articleinfo>
+		<title>Writing plugins for &appname;</title>
+		&author;
+		<copyright>
+			<year>2008</year>
+			<holder>Terapix, IAP</holder>
+		</copyright>
+		<!-- releaseinfo elements -->
+		&lastmodified;
+		<abstract>
+			<para>
+				&appname; (stands for &appname_accro;) is a web application providing high level 
+				functionnalities to perform data reduction on scientific <emphasis role="strong">FITS</emphasis> images. 
+				This article is focusing on the processing capabilities of &appname; and aims to be 
+				a short guideline - by providing useful background information - to the software developper 
+				that needs to understand, improve and write processing plugins for &appname;.
+			</para>
+		</abstract>
+	</articleinfo>
+
+	<sect1>
+		<title>Plugin Concept Overview</title>
+		<para>
+			Plugins are computer programs that interact with a host application to provide 
+			specific on-demand new features. In order to be a rather generic pipeline for 
+			processing astronomical data, &appname; - which is powered by &dj;, an open source 
+			web application framework that uses the Python programming language - has been designed 
+			to allow custom programs to operate a wide range of processings on data. 
+		</para>
+		<para>
+			For this purpose, &appname; comes with an easy and convenient API allowing third-party 
+			developpers to extend its standard functionalities.
+		</para>
+		<para>
+			Basically, a &appname; processing plugin is made of four distinct files. One of them is a 
+			Python script used for all server-side actions, such as (but not limited to) database 
+			interactions, variables or constants you would like &dj; to substitute in your &html; 
+			templates, and class member methods you would like to be available to the public interface 
+			of your plugin (so you can call them using &ajax; calls from your Javascript files). 
+			The remaining three files are client-side related: a Javascript file holding all your 
+			client-side routines and two &html; templates files for rendering the plugin on the 
+			processing page and rendering the plugin related items in the shopping cart respectively.
+		</para>
+		<para id="def:pm">
+			Finally, when you are done writting your new plugin, the &pm; will find, register and load 
+			your code into &appname;'s processing part. Let's begin with a simple example.
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Hello, world!</title>
+		<para>Todo...
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Naming Conventions</title>
+		<para>
+			Before we continue with a concrete example in the next section, let us have a brief discussion 
+			about naming policy related to &appname; plugin development. All your plugins related files 
+			should live in two places (only those paths will be searched for file inclusion): 
+			<itemizedlist>
+				<listitem>
+					<para>
+						The <filename>templates</filename> directory, which should hold all your &html; and JavaScript client-side 
+						template files. Let <emphasis>myplugin</emphasis> be your new plugin's name. In order to respect &appname; 
+						naming policy, you should prepend file names with the <quote><filename>plugin_</filename></quote> keyword 
+						(note the underscore). So, you should create and use the following files:
+						<programlisting>
+templates/plugin_myplugin_item_cart.html
+templates/plugin_myplugin.html
+templates/plugin_myplugin.js</programlisting>
+					</para>
+					<para>
+						Files in this directory get substituted by &dj; before client-side rendering. One might wonder why every 
+						plugin's JavaScript file is in there and why it needs to be substituted. The reason for this rather unexpected 
+						location (it should preferably belong to the <filename>media/js</filename> directory, defined to be the location 
+						holding all JavaScript-related files) is that server-side &dj; substitution may help with the lack of robust 
+						namespacing support in JavaScript. Let us consider the rendering of the &html; processing page, as defined in the 
+						<filename>templates/processing.html</filename> file. Two parts are of interest:
+							<example>
+								<title>&html; rendering of the processing page</title>
+								<programlisting language="html" linenumbering="numbered">
+&lt;script type="text/javascript">
+  {# Load custom plugin's javascript code if available #}
+  {% for plugin in plugins %}
+  {% include plugin.jsSource %} <co id="co-jsplugin"/>
+  {% endfor %}
+&lt;/script>
+...
+{% for plugin in plugins %}
+{% if forloop.first %}
+&lt;div id="menuitem_{{ plugin.id }}">
+  {% else %}
+&lt;div id="menuitem_{{ plugin.id }}" style="display: none">
+  {% endif %}
+  &lt;table width="100%">
+    &lt;tr>
+      &lt;td>
+        &lt;p>Plugin description: {{ plugin.description }}, version {{ plugin.version }}&lt;/p>
+        &lt;div align="center">{% include plugin.template %}&lt;/div> <co id="co-ptemplate"/>
+      &lt;/td>
+    &lt;/tr>
+  &lt;/table>
+&lt;/div>
+{% endfor %}</programlisting>
+							<calloutlist>
+								<callout arearefs="co-jsplugin">
+									<para>
+										Includes each registered plugin's javascript code. The <code>include</code> statement 
+										is a &dj;'s built-in template tag which loads a template file and renders it <emphasis>with 
+										the current context</emphasis>, thus making the <varname>plugin</varname> variable available into your 
+										JavaScript <filename>jsSource</filename> file too.
+									</para>
+								</callout>
+								<callout arearefs="co-ptemplate">
+									<para>
+										Shows how plugin &html; template data is included into the final &html; document.
+									</para>
+								</callout>
+							</calloutlist>
+						</example>
+					</para>
+					<para>
+						Since the <varname>plugin</varname> variable is a Python object (which inherits the 
+						<classname>Spica2Plugin</classname> class), &dj;'s template system is able to access all 
+						its data members. Context variable lookup can get around this namespacing issue by, for 
+						example, prefixing function and variable names with the plugin's unique identifier 
+						(See <xref linkend="mandvar:id"/> variable definition). Therefore, instead of writing this:
+						<programlisting language="html">
+function my_plugin_function() {}
+var my_global_var;
+&lt;div id="my_unique_id">&lt;/div></programlisting>
+					</para>
+					<para>
+						do write instead:
+						<programlisting language="html">
+function {{ plugin.id }}_my_plugin_function() {}
+var {{ plugin.id }}_my_global_var;
+&lt;div id="{{ plugin.id }}_my_unique_id">&lt;/div></programlisting>
+					</para>
+					<para>
+						Let <varname>myid</varname> be your plugin's unique identifier. After rendering, final &html; data will look like this:
+						<programlisting language="html">
+function <emphasis role="strong">myid</emphasis>_my_plugin_function() {}
+var <emphasis role="strong">myid</emphasis>_my_global_var;
+&lt;div id="<emphasis role="strong">myid</emphasis>_my_unique_id">&lt;/div></programlisting>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The <filename>spica2/plugins/</filename> directory, which should hold your server-side Python 
+						ascript. There is no particular naming policy since all Python files that belongs to this 
+						directory are parsed by the &pm; at registration time (see <xref linkend="def:pm"/>). For example, 
+						default plugin Python filenames are among the following:
+						<programlisting>
+spica2/plugins/qualityfitsin.py
+spica2/plugins/qualityfitsout.py
+spica2/plugins/sextractor.py
+spica2/plugins/scamp.py
+spica2/plugins/swarp.py</programlisting>
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</sect1>
+	
+	<sect1>
+		<title>About &ajax; calls</title>
+		<para>
+			For enhanced client-server interactions, you will certainly want to use the usefull 
+			&xhr; facility provided by JavaScript. Sending asynchronous queries to a server allows 
+			to do powerful things inside your client scripts, such as manipulating the &dom;
+			<footnote><para>The Document Object Model is fully implemented in recent versions of 
+			JavaScript and is supported in almost all today's web browsers</para></footnote> 
+			according to the response received by the &xhr; query.
+		</para>
+		<para>
+			If you are dealing with &ajax; calls in &appname;, your are advised to use the simple 
+			&hr; object defined in file <filename>media/js/xhr.js</filename> that works as a wrapper 
+			with convenient methods. It provides a very simple &api; with some useful callback 
+			mechanisms for error and result handling. As you can see in <xref linkend="ex_xhr_use"/>, 
+			its use is rather straightforward:
+			<example id="ex_xhr_use">
+				<title>Basic &hr; object use</title>
+				<programlisting language="html">
+&lt;script type="text/javascript" src="/media/js/xhr.js">&lt;/script>
+&lt;div id="container">&lt;/div> <co id="co-div_cont"/>
+
+&lt;script type="text/javascript">
+  var r = new HttpRequest(
+    'container', <co id="co-dom_id"/>
+    null, <co id="co-no_custom"/>
+    function(resp) { <co id="co-handler_func"/>
+      var data = resp['result']; <co id="co-resp_data"/>
+    }
+  );
+
+  var post = 'Key1=' + value1 + '&amp;Key2=' + value2; <co id="co-post_param"/>
+  r.send('/url/to/server/script/', post); <co id="co-post_send"/>
+&lt;/script></programlisting>
+				<calloutlist>
+					<callout arearefs="co-div_cont">
+						<para>
+							Sets an &html; <code>div</code> element which acts like a block container. It is 
+							only used to display some kind of <quote>Data loading, please wait...</quote> message
+							while waiting for incoming data.
+							<footnote><para>Set this parameter to <varname>null</varname> if you want no 
+							<quote>loading...</quote> message displayed.</para></footnote>
+						</para>
+					</callout>
+					<callout arearefs="co-dom_id">
+						<para>Id of the &dom; container. This parameter can be a &dom; unique identifier or a &dom; object.</para>
+					</callout>
+					<callout arearefs="co-no_custom">
+						<para>
+							The <varname>null</varname> parameter indicates that no custom error handler 
+							is defined, so the default one (displaying an error message embedded into the <code>div</code> 
+							container) will be used instead.
+						</para>
+					</callout>
+					<callout arearefs="co-handler_func">
+						<para>
+							The last argument is about handling results. You should define a callback function with only 
+							one argument. This function prototype has to be used every time you want to access your results.
+							Once the &hr; object gets a successful response from the server, it passes an evaluation of the 
+							returned data to your custom handler code. Your data, if any, will always be accessible through 
+							the content of <code>resp['result']</code> and can be of any supported JavaScript type.
+						</para>
+					</callout>
+					<callout arearefs="co-resp_data">
+						<para>Handle your response here.</para>
+					</callout>
+					<callout arearefs="co-post_param">
+						<para>Defines some parameters to be sent as &post; data.</para>
+					</callout>
+					<callout arearefs="co-post_send">
+						<para>Finally, call the <function>send()</function> method to send the &post; &http; query.</para>
+					</callout>
+				</calloutlist>
+			</example>
+		</para>
+		<para>
+			&appname;'s &hr; object only supports &post; &http; requests; the <code>Content-type</code>'s 
+			request header is always set to <code>application/x-www-form-urlencoded</code>. Thus, you can 
+			submit optional &post; data as a second parameter to its <function>send()</function> function, 
+			the only one that effectively issues the query.
+		</para>
+		<para>
+			When you are writing a processing plugin for &appname;, you have to write both client-side - 
+			your &html; template file(s) and your JavaScript <filename>jsSource</filename> file - and 
+			server-side code (your Python class that inherits <classname>Spica2Plugin</classname>). Because 
+			all your plugin's server-side code have to be a part of your Python class, &appname; provides a 
+			way to call a specific member method from your plugin's JavaScript code. A dedicated &dj;'s &url; 
+			has been defined and serves as a unique entry point, so that you can use it to access any member 
+			method of any available plugin. Have a look at its definition in <filename>urls.py</filename>:
+			<programlisting language="python">
+(r'^spica2/process/plugin/$', 'processing_plugin')</programlisting>
+		</para>
+		<para>
+			This line explicitely maps the <filename>/spica2/process/plugin/</filename> &url; to the 
+			server-side &dj;'s callback function <function>processing_plugin()</function> defined in 
+			<filename>views.py</filename>:
+			<programlisting language="python">
+def processing_plugin(request):
+  try:
+    pluginName = request.POST['Plugin'] <co id="co-req1"/>
+    method = request.POST['Method'] <co id="co-req2"/>
+  except Exception, e:
+    return HttpResponseBadRequest('Incorrect POST data')
+
+  plugin = manager.getPluginByName(pluginName) <co id="co-pmanager"/>
+  try:
+    res = eval('plugin.' + method + '(request)') <co id="co-execreq"/>
+  except AttributeError:
+    raise PluginError, "Plugin '%s' has no method '%s'" % (plugin.id, method)
+
+  # Response must be a JSON-like object
+  return HttpResponse(str({'result' : res}), mimetype = 'text/plain') <co id="co-respreturn"/></programlisting>
+				<calloutlist>
+					<callout arearefs="co-req1 co-req2">
+						<para>
+							<varname>Plugin</varname> and <varname>Method</varname> are required &post; parameters. 
+							The former is the plugin's identifier (see <xref linkend="mandvar:id"/> description), the latter your 
+							plugin's method member that is to be executed. 
+						</para>
+					</callout>
+					<callout arearefs="co-pmanager">
+						<para>
+							Asks the &pm; which plugin matches this <varname>pluginName</varname> string identifier; it 
+							raises a <classname>PluginManagerError</classname> Python exception if no plugin with this 
+							name has been found.
+						</para>
+					</callout>
+					<callout arearefs="co-execreq">
+						<para>
+							Executes the requested method. As you can see, the <varname>request</varname> variable is 
+							passed to every plugin method so that you can access easily request parameters from your plugin
+							code. 
+						</para>
+					</callout>
+					<callout arearefs="co-respreturn">
+						<para>
+							Finally, the function returns a Python dictionary that matches the &json;<footnote><para>
+							JavaScript Object Notation data-interchange format</para></footnote> format.
+						</para>
+					</callout>
+				</calloutlist>
+		</para>
+		<para>
+			The <function>processing_plugin()</function> function is defined as a &dj; <emphasis>view function</emphasis> 
+			which is a Python function that takes a web request - an <classname>HttpRequest</classname> object - as argument 
+			and returns a web response. The <varname>request</varname> variable is an <classname>HttpRequest</classname> 
+			instance that holds really useful information such as the &http; method used in the request, &get; or &post; data 
+			parameters, all &http; headers, session and currently logged-in user data. 
+		</para>
+		<para>
+			The &json; response is well suited for transmitting structured data over a network connection and can be natively 
+			processed by JavaScript within your callback response handler:
+			<programlisting language="html">
+function myHandler(resp) {
+  var data = resp['result'];
+  // Now data is (should be) a JSON object ready for processing
+}</programlisting>
+			Thus, in order for your response to be parsed and processed successfully at client-side level, every plugin's 
+			method have to return a JSON-aware Python dictionary.
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Integrating With &appname;'s Active Monitoring Interface (&ami;)</title>
+		<para>
+			&appname; comes with a built-in job monitoring web interface, the <emphasis>Active Monitoring 
+			Interface</emphasis> (&ami; for short), that allows realtime monitoring of all &appname;-related 
+			jobs running on the Condor cluster. Each entry (one entry per job) gives information about
+			<itemizedlist>
+				<listitem>
+					<para>the <emphasis>Condor job's ID</emphasis> which identifies a job uniquely on the cluster</para>
+				</listitem>
+				<listitem>
+					<para>
+						the <emphasis>&appname;'s job owner</emphasis> which is the username of the &appname;'s 
+						account that initiated the job. Please note that this is <emphasis>not</emphasis> the 
+						same as the <acronym>UNIX</acronym> user that executes Condor jobs on the cluster. 
+						&appname;'s job owner is the login name - stored in the database - of the registered 
+						account that submitted the job through the web interface.
+					</para>
+				</listitem>
+				<listitem>
+					<para>the kind of processing being made with a <emphasis>short one-line description</emphasis></para>
+				</listitem>
+				<listitem>
+					<para>the <emphasis>remote cluster host</emphasis> where the job is running</para>
+				</listitem>
+				<listitem>
+					<para><emphasis>elapsed time</emphasis> since job submission</para>
+				</listitem>
+				<listitem>
+					<para>
+						the <emphasis>Condor job's status</emphasis> on the cluster. A job can be marked as 
+						<quote><code>Idle</code></quote> if it is part of the queue, waiting for available 
+						resources (that matches its execution requirements) in order to run, or marked as 
+						<quote><code>Running</code></quote> if it is effectively executing on a node, or 
+						marked as <quote><code>Hold</code></quote> if Condor caught some exception while 
+						trying to terminate and release the job. A job that terminates with errors will not 
+						be part of Condor's queue anymore and will disappear from &appname;'s &ami; too. 
+						There will be <emphasis>no error reporting</emphasis> through the &ami;. In such 
+						cases, the user will have to check Condor's error log files manually, which is not 
+						very user-friendly. Therefore, suitable error handling should be added to your code 
+						to catch exceptions and avoid this situation.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<para>
+			The &ami; periodically monitors the &xml; output of the <command>condor_q</command> command. 
+			Almost all previously mentionned information is retreived while parsing the &xml; data except 
+			for the <emphasis>&appname;'s job owner</emphasis> and the <emphasis>short one-line description</emphasis>
+			fields, which are not Condor-related information but instead &appname;-related user data. Thus, 
+			in order to make your plugin support the &ami;, special care must be taken when dealing with 
+			&csf; generation within your scripts.
+		</para>
+		<para>
+			Passing extra user data to Condor is achieve by defining the <varname>SPICA_USER_DATA</varname> 
+			environment variable in the &csf;. Its content has to be a base64-encoded serialized Python dictionary 
+			with at least the two mandatory keys <varname>Descr</varname> that stands for <quote>description</quote> 
+			and <varname>UserID</varname>, which is the &dj;'s unique user identifier (in fact, there is a third 
+			mandatory key, <varname>Kind</varname>, that we will discuss shortly):
+			<programlisting language="python">
+userData = {
+  'Descr' : "%s of" % self.optionLabel,
+  'UserId': request.user.id,
+  # This dictionary can contain any kind of Python data
+  'OtherData' : [] 
+}
+
+# CSF generation
+csf = """
+executable  = mybin
+universe    = vanilla
+environment = SPICA_USER_DATA=%s
+...
+""" % base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+
+# Submit the job on Condor
+pipe = os.popen("%s/condor_submit %s 2>&amp;1" % (CONDOR_PATH, csf))
+data = pipe.readlines()
+pipe.close() </programlisting> 
+		</para>
+		<para>
+			Also, note that the presence of the <varname>SPICA_USER_DATA</varname> environment variable 
+			ensures that only &appname; related jobs are filtered and monitored. Other Condor jobs will 
+			not be monitored by the &ami;.
+		</para>
+	</sect1>
+
+	<sect1>
+		<title>Wrap Your Cluster Code!</title>
+		<para>
+			Every built-in &appname; plugin that initiates jobs on the Condor cluster keeps track of various 
+			processing information by storing it into the database. The <varname>spica2_processing_task</varname> 
+			MySQL table holds information about a job exit status, the user that initiated the job, the kind of 
+			processing performed, start and end times, the cluster node used for processing data and the complete 
+			error log content if <varname>success</varname> is null: 
+			<programlisting language="sql">
+mysql> desc spica2_processing_task;
++------------+--------------+------+-----+---------+----------------+
+| Field      | Type         | Null | Key | Default | Extra          |
++------------+--------------+------+-----+---------+----------------+
+| id         | int(11)      | NO   | PRI | NULL    | auto_increment | 
+| success    | tinyint(1)   | NO   |     |         |                | 
+| user_id    | int(11)      | NO   | MUL |         |                | 
+| kind_id    | int(11)      | NO   | MUL |         |                | 
+| start_date | datetime     | NO   |     |         |                | 
+| end_date   | datetime     | NO   |     |         |                | 
+| error_log  | longtext     | YES  |     | NULL    |                | 
+| hostname   | varchar(255) | YES  |     | NULL    |                | 
++------------+--------------+------+-----+---------+----------------+</programlisting>
+		</para>
+		<para>
+			If your plugin is designed to send jobs to the Condor cluster, you may find useful to use the 
+			<filename>wrapper_processing.py</filename> wrapper script provided with the distribution. Without 
+			it, it would be rather difficult to get accurate information about a processing task executing on 
+			a cluster's node. Moreover, getting the task's exit code would not be easy either as you would have 
+			to parse Condor log files. 
+		</para>
+		<para>
+			The <filename>wrapper_processing.py</filename> script will help you by encapsulating your processing 
+			task. It is the one that will be executed on the target node, taking control over your processing task 
+			execution, performing the following actions:
+			<itemizedlist>
+				<listitem>
+					<para>
+						The wrapper script first performs some sanity checks. It looks for the <varname>Kind</varname> 
+						dictionary key into its first argument, which must be a <emphasis>base64-encoded serialized Python 
+						dictionary</emphasis> (remember the <varname>SPICA_USER_DATA</varname> variable in the previous 
+						section?). If not found, a <classname>WrapperError</classname> Python exception is raised, thus 
+						terminating the processing. This keyword is mandatory because it allows the wrapper script to 
+						take special action depending on <varname>Kind</varname>'s associated value. &appname;'s built-in 
+						plugins use the <varname>Plugin.id</varname> data member for the <varname>Kind</varname> keyword.
+					</para>
+					<para>
+						In order to know if a <emphasis>processing kind</emphasis> is available, &appname; maintains a 
+						<varname>spica2_processing_kind</varname> table with some information about registered plugins
+						<footnote><para>TODO: improve this part</para></footnote>. Again, if <varname>Kind</varname>'s 
+						associated value does not match any of that table's entries, a <classname>WrapperError</classname> 
+						Python Exception is raised; the wrapper script is aborted.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The wrapper script then call its <function>process()</function> function, passing it the <varname>userData</varname> 
+						Python dictionary and the remaining command line arguments. This function
+						<orderedlist>
+							<listitem>
+								<para>
+									inserts an entry in the <varname>spica2_processing_task</varname> table, filling the information 
+									related to the node's hostname, the &dj;'s user ID, the processing kind and starting date.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									executes the command line arguments - your real processing stuff - in a subshell and waits for 
+									the shell to finish executing the command. It then saves the exit status of the shell.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									performs some custom actions depending on your <varname>Kind</varname>'s keyword value. This is 
+									where you can enhance the wrapper script to <emphasis>add support for your plugin</emphasis>.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									updates the <varname>spica2_processing_task</varname> table with the error log content if the 
+									processing was not successful (content is compressed and base64-encoded), fills the <varname>end_date</varname> 
+									and <varname>success</varname> data fields.
+								</para>
+							</listitem>
+						</orderedlist>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Once your processing is over, the wrapper script exits, the job terminates and is removed from Condor's queue.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<figure>
+			<title>Plugin function calls</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="figures/function_calls.eps" format="EPS" scalefit="1"/>
+				</imageobject>
+				<imageobject>
+					<imagedata fileref="figures/function_calls.svg" format="SVG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+	</sect1>
+
+	<sect1>
+		<title>Mandatory Data Members</title>
+		<para>
+			Before you can start writing your brand new plugin, you must be aware that some variables 
+			- your class' data members - are needed in order to make &appname; behave the way you expected. 
+		</para>
+		<para>
+			For example, to prevent registration of non plugin-related code, some sanity checks are 
+			performed to ensure that imported modules are conforming to the expected plugin infrastructure. 
+			Those sanity checks need to access specific data members in every plugin's code, thus making 
+			some data members mandatory at plugin's registration time. 
+		</para>
+		<para>
+			Other mandatory data members are accessed by core - mainly &html; templates - files. 
+			<xref linkend="fig:reqvars"/> provides some information about those dependencies. Core &appname; 
+			files (with rounded diamond shape) need some Python data members, thus making their definition 
+			at plugin level mandatory.
+		</para>
+		<figure id="fig:reqvars">
+			<title>Plugin data members dependencies</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="figures/mandatory_vars.eps" format="EPS" scale="120"/>
+				</imageobject>
+				<imageobject>
+					<imagedata fileref="figures/mandatory_vars.svg" format="SVG" scale="150"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+		<para>
+			<variablelist>
+				<title>Mandatory Python data members are</title>
+				<varlistentry>
+					<term><varname>enable</varname></term>
+					<listitem>
+						<para>
+							Boolean that states whether a plugin should be registered by the &pm;, 
+							making it available for the entire application. Set <varname>enable</varname> 
+							to <varname>False</varname> if you want to disable a plugin.
+						</para>
+						<para>
+							Every plugin inherits the <classname>Spica2Plugin</classname> class (defined in 
+							<filename>pluginmanager.py</filename>) which defines an <varname>enable</varname> 
+							data member with a value that defaults to <varname>True</varname>.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry id="mandvar:id">
+					<term><varname>id</varname></term>
+					<listitem>
+						<para>
+							String that identifies a plugin uniquely. Two plugins can't have the same id. If some 
+							internal names collide, the &pm; aborts plugins loading and raises a <classname>PluginManagerError</classname>
+							Python exception. If you dive into some parts of the code of existing plugins, you may 
+							see that this <varname>id</varname> string is used quite intensively in templates<footnote>
+							<para>Files whose content is dynamically substituted at runtime by &dj;.</para></footnote> 
+							for prefixing variable or function names. This is useful when dealing with Javascript code 
+							since this technique allows to easily deal with the lack of robust native namespace support. 
+							The only file referencing the <varname>id</varname> variable is <filename>pluginmanager.py</filename>.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><varname>index</varname></term>
+					<listitem>
+						<para>
+							Integer used by the &pm; at loadtime to visually sort submenus (one submenu per plugin) on 
+							the processing web page. The plugin that comes with the smaller index gets displayed first 
+							(from left to right) on the screen. Note that two plugins may have the same index but this 
+							will have no effect on the resulting order (the sort algorithm is fairly simple and does not 
+							do anything special in that case). Again, the only file referencing the <varname>index</varname> 
+							variable is <filename>pluginmanager.py</filename>.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><varname>optionLabel</varname></term>
+					<listitem>
+						<para>
+							String used by the &pm; to set a plugin's menu item title on the processing page. Note that 
+							no particular checks are performed so that plugins with the same <varname>optionLabel</varname> 
+							value will have the same menu title, which is not what you might want. This variable is referenced 
+							by three template files: <filename>processing.html</filename>, <filename>plugin_default.html</filename> 
+							and <filename>shoppingcart.html</filename>.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><varname>description</varname></term>
+					<listitem>
+						<para>
+							Short inline string used to display some plugin's general action. &appname; uses this variable to 
+							name the low-level program that really does the job. While the <varname>optionLabel</varname> variable 
+							should hold a rather general option name, the <varname>description</varname> data member should be used 
+							to define more accurate, lower level kind of information. This variable is referenced by the templates 
+							files <filename>processing.html</filename> and <filename>shoppingcart.html</filename>.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><varname>itemPrefix</varname></term>
+					<listitem>
+						<para>
+							String used at the shopping cart level to add a custom prefix to items' names in the cart. The only file 
+							referencing this variable is the <filename>shoppingcart.html</filename> template.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><varname>template</varname></term>
+					<listitem>
+						<para>
+							String used to specify the &dj;'s template file to use for custom &html; rendering on the processing page. 
+							This file is the critical part of any plugin's client-side code. Since its content is processed by the &dj;'s 
+							template rendering engine, any template tags and filters can be used within the file and, of course, server-side 
+							context variables are substituted before rendering. The only file referencing this variable is the 
+							<filename>processing.html</filename> template.
+						</para>
+						<para>
+							Please note that, technically speaking, the <varname>template</varname> data member is not mandatory. When 
+							&dj; renders the <filename>processing.html</filename> template, it tries to include - for every registered 
+							plugin - the &html; template referenced by the <varname>template</varname> plugin's data member. In 
+							<filename>processing.html</filename>, the (simplified) substitution code looks like the following:
+							<programlisting language="html">
+{% for plugin in plugins %}
+  &lt;div>{% include plugin.template %}&lt;/div>
+{% endfor %}</programlisting>
+						</para>
+						<para>
+							The <classname>Spica2Plugin</classname> class defines a generic <varname>template</varname> data member with 
+							a value that defaults to the file <filename>plugin_default.html</filename>. So if you forget to provide a 
+							<varname>template</varname> data member to your custom plugin, this default &html; template will be used instead, 
+							reminding you that you certainly missed something. 
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><varname>itemCartTemplate</varname></term>
+					<listitem>
+						<para>
+							String defining a &dj; &html; template that will be included into the shopping cart template for custom 
+							rendering. This is where you decide what your plugin's related items will look like and behave on the 
+							shopping cart page. The only file referencing this variable is the <filename>shoppingcart.html</filename> 
+							template.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><varname>jsSource</varname></term>
+					<listitem>
+						<para>
+							String used to specify a filename containing some custom JavaScript source code for your plugin. Even if 
+							you don't have any JavaScript code to put into this file right now, it is a good practice to create an empty 
+							file and set up your <varname>jsSource</varname> data member accordingly. Indeed, core templates files such as 
+							<filename>shoppingcart.html</filename> <emphasis>will</emphasis> try to include every plugin's external 
+							JavaScript code:
+							<programlisting language="html">
+{# Load custom plugin's javascript code when needed #}
+{% for plugin in plugins %}
+	{% include plugin.jsSource %}
+{% endfor %}</programlisting>
+						</para>
+						<para>
+							The <varname>jsSource</varname> variable is referenced by three template files: <filename>shoppingcart.html</filename>, 
+							<filename>results.html</filename> and <filename>single_results.html</filename>.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</para>
+	</sect1>
+</article>

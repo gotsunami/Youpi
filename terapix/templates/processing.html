@@ -1,0 +1,107 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block extrahead %}
+<!-- Javascript treeview -->
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/tafelTree/css/tree.css"/>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/prototype.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/scriptaculous.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
+<script type="text/javascript" src="/media/js/common.js"></script>
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+
+<script type="text/javascript" src="/media/js/sqlform.js"></script>
+<script type="text/javascript" src="/media/js/imageselector.js"></script>
+<script type="text/javascript" src="/media/js/filebrowser.js"></script>
+<script type="text/javascript" src="/media/js/configfilewidget.js"></script>
+<script type="text/javascript" src="/media/js/pathselectorwidget.js"></script>
+
+<!-- Grid widget -->
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/dhtmlxGrid/codebase/dhtmlxgrid.css"/>
+<script type="text/javascript" src="/media/js/3rdParty/dhtmlxGrid/codebase/dhtmlxcommon.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+
+<!-- Auto-completion code -->
+<script type="text/javascript" src="/media/js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js"></script>
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+
+function build_menu(colCount) {
+	var plugin_data = new Array();
+{% for plugin in plugins %}
+	plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description }}', '{{ plugin.optionLabel }}'];
+{% endfor %}
+
+	var container = document.getElementById('plugin_menu_div');
+	var tab = document.createElement('table');
+	tab.setAttribute('class', 'plugin_menu');
+
+	var tr, td, pdiv, tdiv;
+	var i = 0;
+	tr = document.createElement('tr');
+	tab.appendChild(tr);
+
+	for(var k=0; k < plugin_data.length; k++) {
+		if (i >= colCount) {
+			tr = document.createElement('tr');
+			tab.appendChild(tr);
+			i = 0;
+		}
+		td = document.createElement('td');
+		pdiv = document.createElement('div');
+		pdiv.setAttribute('onclick', 'location.href="/spica2/processing/' + plugin_data[k][0] + '/"');
+		pdiv.setAttribute('class', "processing_menu_entry");
+
+		var img = document.createElement('img');
+		img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/48x48/' + plugin_data[k][0] + '.png');
+		img.setAttribute('style', 'margin-right: 10px;');
+
+		tdiv = document.createElement('div');
+		tdiv.setAttribute('style', "padding: 2px;");
+
+		var desc = document.createElement('span');
+		desc.setAttribute('class', 'desc');
+		desc.appendChild(document.createTextNode(plugin_data[k][1]));
+		var label = document.createElement('span');
+		label.setAttribute('class', 'label');
+		label.appendChild(document.createTextNode(plugin_data[k][2]));
+
+		tdiv.appendChild(desc);
+		tdiv.appendChild(document.createElement('br'));
+		tdiv.appendChild(label);
+
+		pdiv.appendChild(img);
+		pdiv.appendChild(tdiv);
+		td.appendChild(pdiv);
+		tr.appendChild(td);
+		i++;
+	}
+	container.appendChild(tab);
+}
+</script>
+{% endblock %}
+
+<!-- Main body -->
+{% block content %}
+
+<div style="margin-top: 40px;" align="center">
+	<p style="color: brown;">Please select a type of processing:</p>
+	<div id="plugin_menu_div" style="margin-top: 10px;"></div>
+</div>
+
+<script type="text/javascript">
+build_menu(3);
+</script>
+{% endblock %}
+

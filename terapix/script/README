@@ -1,0 +1,8 @@
+
+This directory contains scripts which are parts of the pipeline.
+
+ichannel.py
+iimage.py
+iinst.py
+ingestion.py		Deals with the ingestion of FITS images
+irun.py

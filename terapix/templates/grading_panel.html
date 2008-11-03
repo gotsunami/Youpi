@@ -1,0 +1,131 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/dashboard.css"/>
+		<script type="text/javascript" src="/media/js/xhr.js"></script>
+		<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
+		<script type="text/javascript">
+			var guistyle = '{{ user.get_profile.guistyle }}';
+		</script>
+	</head>
+	<body>
+		<div class="result_panel_main">
+			<table class="result_panel" cellspacing="0" cellpadding="0">
+				<tr>
+					<td>
+						<div style="padding: 0px;">
+							<u>Previous Release Grade</u>:<br/>
+							<div style="overflow: auto; height: 60px; margin-top: 1px;">
+								{% for i in prev_releaseinfo %}
+									{% if not i.prevrelgrade %}
+								<font color="red"><p>No Grade.</p></font>
+									{% else %}
+								<p>Grade : <font color="red">{{ i.prevrelgrade }}</font></p>
+									{% endif %}
+									{% ifequal  i.prevrelgrade  'A' %}
+								<p>Comment : <font color="red">Perfect image</font></p>
+									{% else %}
+										{% if not i.prevrelcomment %}
+								<font color="red"><p>Comment unknown.</p></font>
+                                    	{% else %}
+								<p>Comment : <font color="red">{{ i.prevrelcomment }}</font></p>
+										{% endif %}
+                                    {% endifequal %}
+								{% endfor %}
+                            </div>
+                        </div>
+					</td>
+					<td nowrap="nowrap">
+						<div style="padding: 0px;">
+							<u>Grading history{% if evals %} ({{ evals.count }}){% endif %}</u>:<br/>
+							<div style="width: 100%; overflow: auto; height: 60px; margin-top: 1px;">
+							{% if evals %}
+								<table class="result_panel_history">
+								{% for ev in evals %}
+									<tr>
+										<td nowrap="nowrap">
+											<div id="grade_div_{{ forloop.counter }}"></div>
+											<script type="text/javascript">
+												var gradwid = new GradingWidget('grade_div_{{ forloop.counter }}', 'gradwid');
+												gradwid.setLegendEnabled(false);
+												gradwid.setActive(false);
+												gradwid.setCharGrade('{{ ev.grade }}');
+											</script>
+										</td>
+										<td class="char">{{ ev.grade }}</td>
+										<td class="date">{{ ev.date }}</td>	
+										<td class="user">{{ ev.user.username }}</td>
+									</tr>
+								{% endfor %}
+								</table>
+							{% else %}
+								NONE. Image never graded yet.
+							{% endif %}
+							</div>
+						</div>
+					</td>
+					<td>
+						<div style="padding: 0px; width: 300px">
+							<u>Your grade</u>{% if userGrade %} (<a href="/spica2/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a>){% endif %}:<br/>
+							<div id="current_grade_div" style="margin-top: 10px;"></div>
+							<script type="text/javascript">
+								var mygrade = new GradingWidget('current_grade_div', 'mygrade');
+								{% if userGrade %}
+								mygrade.setCharGrade('{{ userGrade }}');
+								{% endif %}
+								mygrade.setCommitHandler(function() {
+									var r = new HttpRequest(
+										mygrade.getCommitDiv().getAttribute('id'),
+										null,	
+										// Custom handler for results
+										function(resp) {
+											var div = mygrade.getCommitDiv();
+											div.innerHTML = '';
+											div.appendChild(document.createTextNode('Committed, thanks !'));
+											window.location.assign('/spica2/grading/panel/{{ pluginId }}/{{ fitsId }}/');
+										}
+									);
+
+									var sel = document.getElementById('predefined_comment_select');
+									var prCommentId = sel.options[sel.selectedIndex].value;
+									var customComment = document.getElementById('custom_comment_input').value;
+
+									var post = 'Plugin={{ pluginId }}&Method=grade&Grade=' + mygrade.getGrade() 
+										+ '&FitsId={{ fitsId }}'
+										+ '&PredefinedCommentId=' + prCommentId
+										+ '&CustomComment=' + customComment;
+									r.send('/spica2/process/plugin/', post);
+								});
+							</script>
+						</div>
+					</td>
+					<td>
+						<div style="padding: 0px;">
+							<u>Your comment</u>:
+							<div style="margin-top: 5px">
+								Predefined: 
+								<select id="predefined_comment_select" onchange="if (mygrade.isGraded()) mygrade.showCommitButton();">
+								{% for c in comments %}
+									{% ifequal userPCommentId c.id %}
+									<option value="{{ c.id }}" selected="selected">{{ c.comment }}</option>
+									{% else %}
+									<option value="{{ c.id }}">{{ c.comment }}</option>
+									{% endifequal %}
+								{% endfor %}
+								</select>
+							</div>
+							<div style="margin-top: 5px">
+								Custom: 
+								{% if customComment %}
+								<input type="text" size="70" value="{{ customComment }}" onkeydown="if (mygrade.isGraded()) mygrade.showCommitButton();" id="custom_comment_input"/>
+								{% else %}
+								<input type="text" size="70" onkeydown="if(mygrade.isGraded()) mygrade.showCommitButton();" id="custom_comment_input"/>
+								{% endif %}
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+	</body>
+</html>

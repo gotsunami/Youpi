@@ -1,0 +1,36 @@
+digraph G {
+	size="5,5";
+	plugm 	[label="pluginmanager.py", style=rounded, shape=diamond];
+	proc 	[label="processing.html", style=rounded, shape=diamond];
+	plug 	[label="plugin_default.html", style=rounded, shape=diamond];
+	shop 	[label="shoppingcart.html", style=rounded, shape=diamond];
+	res 	[label="results.html", style=rounded, shape=diamond];
+	sres 	[label="single_result.html", style=rounded, shape=diamond];
+	templ 	[label="template"];
+	desc 	[label="description"];
+	optl 	[label="optionLabel"];
+	js		[label="jsSource"];
+	ict 	[label="itemCartTemplate"];
+	ip		[label="itemPrefix"];
+	id		[label="id"];
+	index	[label="index"];
+
+	plugm -> enable;
+	plugm -> id;
+	plugm -> index;
+	proc -> templ;
+	proc -> desc;
+	proc -> optl;
+	proc -> id;
+	plug -> optl;
+	shop -> optl;
+
+	shop -> js;
+	res  -> js;
+	sres -> js;
+
+	shop -> ict;
+	shop -> ip;
+	shop -> desc;
+	shop -> id;
+}

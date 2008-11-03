@@ -1,0 +1,250 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+<!-- Javascript treeview -->
+<script type="text/javascript" src="/media/js/common.js"></script>
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript">
+
+// Global vars
+var guistyle = '{{ user.get_profile.guistyle }}';
+// Next page to display (used by monitorJobs())
+var gNextPage = 1;
+
+/*
+ * Condor job monitoring
+ *
+ */
+function monitorJobs() {
+	var container = document.getElementById('monitor_div');
+
+	var r = new HttpRequest(
+		null,
+		null,
+		// Custom handler for results
+		function(resp) {
+			r = resp['results'];
+			var div = document.createElement('div');
+			div.setAttribute('align', 'center');
+
+			if (r.length == 0) {
+				var n = getMessageNode('Nothing to monitor. No Spica job is actually running or queued on the cluster.', 'warning');
+				div.appendChild(n);
+				removeAllChildrenNodes(container);
+				container.appendChild(div);
+
+				setTimeout("monitorJobs('" + container.id + "')", 2000);
+				return;
+			}
+
+			var bdiv = document.createElement('div');
+			bdiv.setAttribute('style', 'width: 90%; text-align: left;');
+			var cbut = document.createElement('input');
+			cbut.setAttribute('type', 'button');
+			cbut.setAttribute('onclick', "cancelAllJobs('allmine');");
+			cbut.setAttribute('value', 'Cancel all my jobs!');
+			bdiv.appendChild(cbut);
+			div.appendChild(bdiv);
+
+			var table = document.createElement('table');
+			table.setAttribute('class', 'jobMonitor');
+			var tr, th, td, cls;
+
+			// Page info
+			if (resp['PageCount'] > 1) {
+				gNextPage = resp['nextPage'];
+				var pdiv = document.createElement('div');
+				pdiv.appendChild(document.createTextNode('Show page: '));
+				var a;
+				for (var p=0; p < resp['PageCount']; p++) {
+					if (gNextPage == p+1) {
+						pdiv.appendChild(document.createTextNode(' ' + (p+1) + ' '));
+						continue;
+					}
+
+					a = document.createElement('a');
+					a.setAttribute('href', '#');
+					a.setAttribute('onclick', 'gNextPage=' + (p+1) + "; document.getElementById('current_page_div').innerHTML = getLoadingHTML('Loading page " + (p+1) + "');");
+					a.appendChild(document.createTextNode(' ' + (p+1) + ' '));
+					pdiv.appendChild(a);
+				}
+				div.appendChild(pdiv);
+				pdiv = document.createElement('div');
+				pdiv.setAttribute('id', 'current_page_div');
+				pdiv.setAttribute('class', 'currentPage');
+				pdiv.appendChild(document.createTextNode('Page ' + gNextPage + ' / ' + resp['PageCount']));
+				div.appendChild(pdiv);
+			}
+
+			// Table header
+			tr = document.createElement('tr');
+			tr.setAttribute('class', 'jobHeader');
+			var header = ['Job ID', 'Owner', 'Description', 'Remote host', 'Run time', 'Status', 'Action'];
+			for (var j=0; j < header.length; j++) {
+				th = document.createElement('th');
+				th.appendChild(document.createTextNode(header[j]));
+				tr.appendChild(th);
+			}
+			table.appendChild(tr);
+
+			// Various divs
+			var tabi, tabitr, tabitd;
+			for (var j=0; j < r.length; j++) {
+				tr = document.createElement('tr');
+
+				// Job Id
+				td = document.createElement('td');
+				td.setAttribute('class', 'jobId');
+				td.appendChild(document.createTextNode(r[j]['ClusterId'] + '.' + r[j]['ProcId']));
+				tr.appendChild(td);
+
+				// Owner
+				td = document.createElement('td');
+				td.setAttribute('class', 'jobRemoteHost');
+				td.appendChild(document.createTextNode(r[j]['UserData']['Owner']));
+				tr.appendChild(td);
+
+				// Description
+				td = document.createElement('td');
+				td.setAttribute('class', 'jobRemoteHost');
+				var txt = r[j]['UserData']['Descr'];
+				//txt += r[j]['FitsFile'] ?  ' ' + r[j]['FitsFile'] : '';
+				td.appendChild(document.createTextNode(txt));
+				tr.appendChild(td);
+
+				// Remote host
+				td = document.createElement('td');
+				td.setAttribute('class', 'jobRemoteHost');
+				td.appendChild(document.createTextNode(r[j]['RemoteHost'] ? r[j]['RemoteHost'] : '-'));
+				tr.appendChild(td);
+
+				// Duration
+				td = document.createElement('td');
+				td.setAttribute('class', 'jobDuration');
+				td.appendChild(document.createTextNode(r[j]['JobDuration'] ? r[j]['JobDuration'] : '-'));
+				tr.appendChild(td);
+
+				// Status
+				td = document.createElement('td');
+				td.setAttribute('class', 'jobCurrentStatus');
+
+				var st = r[j]['JobStatus'];
+				var status;
+				switch (st) {
+					case '2':
+						status = 'Running';
+						cls = 'jobRunning';
+						break;
+					case '5':
+						status = 'Hold';
+						cls = 'jobHold';
+						break;
+					default:
+						status = 'Idle';
+						cls = 'jobIdle';
+						break;
+				}
+				tr.setAttribute('class', cls);
+
+				td.appendChild(document.createTextNode(status));
+				tr.appendChild(td);
+
+				// Cancel action
+				td = document.createElement('td');
+				var tdid = 'td_job_cancel_' + j;
+				td.setAttribute('class', 'jobActions');
+				td.setAttribute('id', tdid);
+
+				if (r[j]['UserData']['UserID'] == '{{ user.id }}') {
+					img = document.createElement('img');
+					td.appendChild(img);
+					img.setAttribute('style', 'cursor: pointer');
+					img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/16x16/cancel.png');
+					img.setAttribute('onclick', "cancelJob('" + tdid + "'," + r[j]['ClusterId'] + "," + r[j]['ProcId'] + ");");
+				}
+				else {
+					td.appendChild(document.createTextNode('-'));
+				}
+				tr.appendChild(td);
+				table.appendChild(tr);
+			}
+			div.appendChild(table);
+			removeAllChildrenNodes(container);
+			container.appendChild(div);
+
+			setTimeout("monitorJobs('" + container.id + "')", 2500);
+		}
+	);
+
+	var post = 'NextPage=' + gNextPage;
+	r.send('/spica2/monitoring/live/', post);
+}
+
+function cancelJob(container_id, clusterId, procId) {
+	var r = new HttpRequest(
+		'container_id',
+		null,
+		// Custom handler for results
+		function(resp) {
+			var container = document.getElementById(container_id);
+			container.setAttribute('style', 'color: red');
+			r = resp['result'];
+			container.innerHTML = getLoadingHTML('Cancelling');
+		}
+	);
+
+	var post = 'ClusterId=' + clusterId + '&ProcId=' + procId;
+	r.send('/spica2/condor/cancel/', post);
+}
+
+function cancelAllJobs(what) {
+	var what = what ? what : null;
+	if (what != 'allmine' && what != 'all')
+		return;
+
+	var r = confirm('Are you sure you want to delete all your processing jobs?');
+	if (!r) return;
+
+	var r = new HttpRequest(
+		null,
+		null,
+		// Custom handler for results
+		function(resp) {
+			var count = resp['CancelCount'];
+			if (count == 0) {
+				alert('You have no running jobs on the cluster!');
+			}
+			else {
+				alert(count + ' job' + (count > 1 ? 's are' : ' is') + ' being cancelled. Please wait a few sec.');
+			}
+		}
+	);
+
+	var post = 'What=' + what;
+	r.send('/spica2/condor/cancel/', post);
+}
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block content %}
+<div align="center">
+<div id="software_div" class="tip" style="width: 300px;">To know the version of softwares running on the cluster, you can <a href="/spica2/monitoring/softwares/">run a software version check</a>.</div>
+<div id="monitor_div"></div>
+</div>
+
+<script type="text/javascript">
+	var d = document.getElementById('monitor_div');
+	d.innerHTML = getLoadingHTML('Loading cluster data, please wait');
+	monitorJobs();
+</script>
+
+{% endblock %}

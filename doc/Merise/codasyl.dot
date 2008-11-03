@@ -1,0 +1,76 @@
+/*
+ * Spica2's CODASYL logical model
+ *
+ */
+digraph codasyl { 
+	rankdir = LR;
+	node [shape = box, style = filled];
+
+	/* Standalone records */
+	"FITS Tables";
+
+	/* Linked records */
+	calib [label="Calibration Kit"];
+	imgac [label="AstrophotoCalibration-Image Relation"];
+	imgsel [label="Image Selections"];
+	astro [label="Astrophoto calibration"];
+	task [label="Processing Task"];
+	relri [label="Run-Image Relation"];
+	carti [label="Cart Item"];
+	relsi [label="Survey-Instrument Relation"];
+	relit [label="Image-Task Relation"];
+	kind [label="Processing Kind"];
+	plugfitsin [label="FITSin Plugin"];
+	plugfitsout [label="FITSout Plugin"];
+	plugscamp [label="SCAMP Plugin"];
+	plugother [label="Other Plugin", style=dotted];
+	user [label="Django User", style=dashed];
+	miscdata [label="Misc Data"];
+	configfile [label="Config File"];
+	ingrading [label="First Quality Evaluation"];
+	outgrading [label="Final Quality Evaluation"];
+	incomment [label="First Quality Comment"];
+	outcomment [label="Final Quality Comment"];
+
+	/* Sets */
+	calib -> Image;
+	Channel -> Image;
+	Ingestion -> Image;
+	Instrument -> Image;
+	Image -> imgac;
+	astro -> imgac;
+	Image -> Coaddition;
+	Image -> Coaddition;
+	Image -> relri;
+	Image -> relit;
+	task -> plugfitsin;
+	task -> plugfitsout;
+	task -> plugscamp;
+	task -> plugother[style=dotted];
+	Run -> relri;
+
+	user -> carti[style=dashed];
+	user -> task[style=dashed];
+	user -> Ingestion[style=dashed];
+	user -> imgsel[style=dashed];
+	user -> miscdata[style=dashed];
+	user -> configfile[style=dashed];
+	user -> ingrading[style=dashed];
+	user -> outgrading[style=dashed];
+	plugfitsin -> ingrading[style=dashed];
+	plugfitsout -> outgrading[style=dashed];
+	
+	Instrument -> Channel;
+	Instrument -> Run;
+	Survey -> relsi;
+	Instrument -> relsi;
+
+	kind -> task;
+	kind -> configfile;
+	kind -> carti;
+
+	task -> relit;
+
+	incomment -> ingrading;
+	outcomment -> outgrading;
+} 

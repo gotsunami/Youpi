@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<title>JS TESTS</title>
+		<script type="text/javascript" src="/media/js/imageselector.js"></script>
+		<script type="text/javascript" src="/media/js/common.js"></script>
+		<script type="text/javascript" src="/media/js/xhr.js"></script>
+		<!--
+		<script type="text/javascript" src="/media/js/dhtmlxGrid/codebase/ext/dhtmlxgrid_srnd.js"></script>
+		-->
+
+		<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/dashboard.css"></script>
+		<link rel="stylesheet" type="text/css" href="/media/js/dhtmlxGrid/codebase/dhtmlxgrid.css"></script>
+		<script type="text/javascript" src="/media/js/3rdParty/dhtmlxGrid/codebase/dhtmlxcommon.js"></script>
+		<script type="text/javascript" src="/media/js/3rdParty/dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+		<script type="text/javascript" src="/media/js/3rdParty/dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+	</head>
+	<body>
+		<div id="container" width="60%" align="center" style="height:250px; margin-right: 20px;"></div>
+		<script type="text/javascript">
+			var imgsel = new ImageSelector('container', 'imgsel');
+			imgsel.setResultHandler(customRenderer);
+			// Registers custom handlers
+			imgsel.setSelectAllHandler(selectAll);
+			imgsel.setUnselectAllHandler(unselectAll);
+
+			var mygrid;
+
+			function toggleSelectAll(on) {
+				on = on == true ? '1' : '0';
+				for (var j=0; j < mygrid.getRowsNum(); j++) {
+					mygrid.cells(j, 0).setValue(on);
+				}
+			}
+
+			function unselectAll() {
+				toggleSelectAll(false);
+			}
+
+			function selectAll() {
+				toggleSelectAll(true);
+			}
+
+			function customRenderer(resp, containerNode) {
+				var idList = new Array();
+				for (var j=0; j < resp['data'].length; j++) {
+					idList[j] = resp['data'][j][0];
+				}
+
+				mygrid = new dhtmlXGridObject(containerNode.getAttribute('id'));
+				mygrid.setImagePath("/media/js/3rdParty/dhtmlxGrid/codebase/imgs/");
+				mygrid.enableMultiline(false);
+				//mygrid.enableBuffering(30);
+				mygrid.init();
+				// Send POST HTTP query
+				mygrid.loadXML('/spica2/process/query/imgsFromIdList/' + idList);
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,12 @@
+<!DOCTYPE batch [
+	<!ELEMENT batch (selection*)>
+	<!ELEMENT selection (label, alpha, delta, radius, filter?)>
+	<!ELEMENT label (#PCDATA)>
+	<!ELEMENT alpha (#PCDATA)>
+	<!ELEMENT delta (#PCDATA)>
+	<!ELEMENT filter (#PCDATA)>
+	<!ELEMENT radius (#PCDATA)>
+
+	<!-- Attributes -->
+	<!ATTLIST batch version CDATA #REQUIRED>
+]>

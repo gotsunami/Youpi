@@ -1,0 +1,12 @@
+
+Coding style:
+
+- La valeur de l'indentation (touche tab) = 4 espaces
+- Toujours documenter une nouvelle classe ou fonction (docstrings)
+- Toujours un espace apres une virgule
+- Pas d'espaces apres (, {
+- Pour les dictionnaires, aligner les clefs et les valeurs. Laisser un espace apres les : pour 
+afficher la valeur
+- Toujours laisser un espace avant et apres =
+- Utiliser des noms de variables, fonctions, classes explicites
+- Toujours un espace apres le # (commentaire)
