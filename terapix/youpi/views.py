@@ -57,7 +57,7 @@ app_menu = { 	'normal' :
 @profile
 def index(request):
 	"""
-	This is the main entry point (root) of the spica2 web application.
+	This is the main entry point (root) of the web application.
 	This is a callback function (as defined in django's urls.py file).
 	"""
 	return render_to_response('index.html', 
