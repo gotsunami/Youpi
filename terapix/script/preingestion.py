@@ -37,7 +37,7 @@ def preingest_table(g, fitstable, path):
 	print 'Processing', fitstable
 
 	g.begin()
-	g.setTableName('spica2_fitstables')
+	g.setTableName('youpi_fitstables')
 
 	
 
@@ -109,7 +109,7 @@ def preingest_table(g, fitstable, path):
 				sys.exit(1)
 
 			# Try update query
-			res = g.execute("SELECT id FROM spica2_fitstables WHERE name='%s' AND run='%s' AND channel='%s'" %
+			res = g.execute("SELECT id FROM youpi_fitstables WHERE name='%s' AND run='%s' AND channel='%s'" %
 				(name, run, channel))
 			id = res[0][0]
 			try:

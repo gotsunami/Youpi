@@ -1,22 +1,22 @@
 
-INSERT INTO spica2_survey (name) VALUES('CFHTLS'); 
+INSERT INTO youpi_survey (name) VALUES('CFHTLS'); 
 SET @surid = LAST_INSERT_ID();
 
-INSERT INTO spica2_instrument(name) VALUES('STACK');
-INSERT INTO spica2_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID());
+INSERT INTO youpi_instrument(name) VALUES('STACK');
+INSERT INTO youpi_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID());
 
-INSERT INTO spica2_instrument(name) VALUES('MEGACAM');
-INSERT INTO spica2_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID());
+INSERT INTO youpi_instrument(name) VALUES('MEGACAM');
+INSERT INTO youpi_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID());
 
-INSERT INTO spica2_instrument(name) VALUES('WIRCAM');
-INSERT INTO spica2_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID());
+INSERT INTO youpi_instrument(name) VALUES('WIRCAM');
+INSERT INTO youpi_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID());
 
-INSERT INTO spica2_calibrationkit(name) VALUES('cal1');
-INSERT INTO spica2_calibrationkit(name) VALUES('cal2');
+INSERT INTO youpi_calibrationkit(name) VALUES('cal1');
+INSERT INTO youpi_calibrationkit(name) VALUES('cal2');
 
-INSERT INTO spica2_processing_kind(name) VALUES('fitsin');
+INSERT INTO youpi_processing_kind(name) VALUES('fitsin');
 
-INSERT INTO spica2_firstqcomment(comment) VALUES ('---'),
+INSERT INTO youpi_firstqcomment(comment) VALUES ('---'),
 		('Poor seeing (>1.2)'),
 		('Astrometric keyword problem: some CCDs off'),
 		('D3-i rejection'),

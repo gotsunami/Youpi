@@ -54,7 +54,7 @@ class Scamp(Spica2Plugin):
 
 	def __saveDefaultConfigFileToDB(self, request):
 		"""
-		Looks into DB (spica2_configfiles table) if an entry for a default configuration file 
+		Looks into DB (youpi_configfiles table) if an entry for a default configuration file 
 		for scamp exits. If not creates one with the embedded default content.
 		"""
 

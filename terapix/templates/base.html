@@ -40,11 +40,11 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				- <a href="/youpi/accounts/logout/">{% trans 'Log out' %}</a> ]
 			{% endblock %}
 	        </div>
-			<div id="spica2_cart_id" style="float: right"></div>
+			<div id="youpi_cart_id" style="float: right"></div>
 			<script type="text/javascript">
 					// Global cart
 					var s_cart;
-					s_cart = new ShoppingCart('spica2_cart_id', 's_cart');
+					s_cart = new ShoppingCart('youpi_cart_id', 's_cart');
 			</script>
 			<div style="height: 20px;">It is {% now "jS F Y H:i" %}</div>
         {% endif %}

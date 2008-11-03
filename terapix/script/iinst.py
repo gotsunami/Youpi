@@ -6,12 +6,12 @@ connectionObject = MySQLdb.connect(host='dbterapix.iap.fr', user='semah', passwd
 if(connectionObject):
 	print "connected to database";
 	c = connectionObject.cursor()
-	#spica2_instrument DATABASE INGESTION
+	#youpi_instrument DATABASE INGESTION
 	c.execute("""set autocommit=0""");
 	c.execute("""start transaction""");
-	c.execute(""" insert into spica2_instrument set name='STACK'""");
-	c.execute(""" insert into spica2_instrument set name='MEGACAM'""");
-	tes=c.execute(""" insert into spica2_instrument set name='WIRCAM'""");
+	c.execute(""" insert into youpi_instrument set name='STACK'""");
+	c.execute(""" insert into youpi_instrument set name='MEGACAM'""");
+	tes=c.execute(""" insert into youpi_instrument set name='WIRCAM'""");
 	if(tes):
 		connectionObject.commit();
 		print 'transaction done';

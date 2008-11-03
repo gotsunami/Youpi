@@ -957,7 +957,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		// Build custom query
-		var data = 'Distinct=&Table=spica2_image&DisplayField=object&Lines=0&Line0Field=object&Line0Cond=contains&Line0Text=&Hide=&OrderBy=object';
+		var data = 'Distinct=&Table=youpi_image&DisplayField=object&Lines=0&Line0Field=object&Line0Cond=contains&Line0Text=&Hide=&OrderBy=object';
 		// Send POST HTTP query
 		xhr.send('/youpi/process/preingestion/query/', data);
 	}
@@ -1028,7 +1028,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		// Build custom query
-		var data = 'Distinct=&Table=spica2_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=contains&Line0Text=&Hide=&OrderBy=label';
+		var data = 'Distinct=&Table=youpi_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=contains&Line0Text=&Hide=&OrderBy=label';
 		// Send POST HTTP query
 		xhr.send('/youpi/process/preingestion/query/', data);
 	}
@@ -1064,7 +1064,7 @@ function ImageSelector(container_id, varName)
 	 */ 
 	function getIngestionIdSQLParams() {
 		// ftable: foreign SQL table
-		return {'ftable' 		: 'spica2_ingestion',
+		return {'ftable' 		: 'youpi_ingestion',
 				'ftable_field' 	: 'label',
 				'fkid'			: 'ingestion_id',
 				'ftable_id' 	: 'id' };
@@ -1101,7 +1101,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		// Build custom query
-		var data = 'Distinct=&Table=spica2_channel&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
+		var data = 'Distinct=&Table=youpi_channel&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 		// Send POST HTTP query
 		xhr.send('/youpi/process/preingestion/query/', data);
 	}
@@ -1136,7 +1136,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function getChannelSQLParams() {
-		return {'ftable' 		: 'spica2_channel',
+		return {'ftable' 		: 'youpi_channel',
 				'ftable_field' 	: 'name',
 				'fkid'			: 'channel_id',
 				'ftable_id' 	: 'id' };
@@ -1173,7 +1173,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		// Build custom query
-		var data = 'Distinct=&Table=spica2_instrument&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
+		var data = 'Distinct=&Table=youpi_instrument&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 
 		// Send POST HTTP query
 		xhr.send('/youpi/process/preingestion/query/', data);
@@ -1209,7 +1209,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function getInstrumentSQLParams() {
-		return {'ftable' 		: 'spica2_instrument',
+		return {'ftable' 		: 'youpi_instrument',
 				'ftable_field' 	: 'name',
 				'fkid'			: 'instrument_id',
 				'ftable_id' 	: 'id' };
@@ -1246,7 +1246,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		// Build custom query
-		var data = 'Distinct=&Table=spica2_run&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
+		var data = 'Distinct=&Table=youpi_run&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 
 		// Send POST HTTP query
 		xhr.send('/youpi/process/preingestion/query/', data);
@@ -1282,7 +1282,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function getRunSQLParams() {
-		return {'ftable' 		: 'spica2_run',
+		return {'ftable' 		: 'youpi_run',
 				'ftable_field' 	: 'name',
 				'fkid'			: 'run_id',
 				'ftable_id' 	: 'id' };
@@ -2065,7 +2065,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		// Get name of all saved selections
-		post = 'Table=spica2_imageselections&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=is equal to&Line0Text=' + name + '&Hide=&OrderBy=id';
+		post = 'Table=youpi_imageselections&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=is equal to&Line0Text=' + name + '&Hide=&OrderBy=id';
 
 		// Send HTTP POST request
 		xhr.send('/youpi/process/preingestion/query/', post);
@@ -2481,7 +2481,7 @@ function ImageSelector(container_id, varName)
 		// Replace any '*' wildcard by '%'
 		valueText = valueText.replace(/%/g, '%25').replace(/\*/g, '%25');
 
-		post = 'Table=spica2_image&DisplayField=id&Lines=0&Line0Field=' + params['field'] + 
+		post = 'Table=youpi_image&DisplayField=id&Lines=0&Line0Field=' + params['field'] + 
 			'&Line0Cond=' + getCondText(row) + '&Line0Text=' + valueText + '&Hide=&OrderBy=id';
 
 		if (multiSel.length > 0) {

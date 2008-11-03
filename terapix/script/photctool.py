@@ -36,7 +36,7 @@ def get_report(g, csvFile):
 		photcs[name] = photc
 		
 	names = names[:-1] + ')'
-	res = g.execute("SELECT  name, flat, photc FROM spica2_image WHERE name IN %s" % names)
+	res = g.execute("SELECT  name, flat, photc FROM youpi_image WHERE name IN %s" % names)
 
 	info.append(('DB Entries', len(res)))
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 		if ans in ('y', 'Y', 'yes', 'YES'):
 			start = time.time()
 			g.begin()
-			g.setTableName('spica2_image')
+			g.setTableName('youpi_image')
 
 			try:
 				update = 0

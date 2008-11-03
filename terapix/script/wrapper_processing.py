@@ -36,7 +36,7 @@ def ingestQFitsInResults(fitsinId, g):
 	"""
 
 	imgName = g.execute("""
-SELECT i.name FROM spica2_rel_it AS r, spica2_image AS i, spica2_plugin_fitsin AS f 
+SELECT i.name FROM youpi_rel_it AS r, youpi_image AS i, youpi_plugin_fitsin AS f 
 WHERE r.task_id=f.task_id 
 AND f.id=%s 
 AND r.image_id=i.id;
@@ -122,7 +122,7 @@ AND r.image_id=i.id;
 
 	# Stores results ingestion log
 	try:
-		g.setTableName('spica2_plugin_fitsin')
+		g.setTableName('youpi_plugin_fitsin')
 		#
 		# QF results ingestion log serialization: base64 encoding over zlib compression
 		# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
@@ -137,7 +137,7 @@ AND r.image_id=i.id;
 		return
 
 	try:
-		q = 'UPDATE spica2_plugin_fitsin SET '
+		q = 'UPDATE youpi_plugin_fitsin SET '
 		for field, value in fxdata.iteritems():
 			if value:
 				q += "%s=\"%s\"," % (field, value)
@@ -165,14 +165,14 @@ def task_start_log(userData, start, kind_id = None):
 
 	if not kind_id:
 		try:
-			res = g.execute("SELECT id FROM spica2_processing_kind WHERE name='%s'" % kind)
+			res = g.execute("SELECT id FROM youpi_processing_kind WHERE name='%s'" % kind)
 			kind_id = res[0][0]
 		except Exception, e:
 			raise WrapperError, e
 
 	try:
 		g.begin()
-		g.setTableName('spica2_processing_task')
+		g.setTableName('youpi_processing_task')
 		g.insert(	user_id = int(user_id),
 					kind_id = int(kind_id),
 					start_date = start,
@@ -187,7 +187,7 @@ def task_start_log(userData, start, kind_id = None):
 	# Fill this table only if the processing is image related
 	try:
 		imgID = userData['ImgID']
-		g.setTableName('spica2_rel_it')
+		g.setTableName('youpi_rel_it')
 
 		if type(imgID) is ListType:
 			imgName = None
@@ -195,7 +195,7 @@ def task_start_log(userData, start, kind_id = None):
 				g.insert(	image_id = img_id,
 							task_id = task_id )
 		else:
-			imgName = g.execute("SELECT name FROM spica2_image WHERE id='%s'" % imgID)[0][0]
+			imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % imgID)[0][0]
 			g.insert(	image_id = imgID,
 						task_id = task_id )
 	except Exception, e:
@@ -212,7 +212,7 @@ def task_end_log(g, task_error_log, task_id, success, kind):
 
 		# Stores error log into DB
 		try:
-			g.setTableName('spica2_processing_task')
+			g.setTableName('youpi_processing_task')
 			g.update(	error_log = base64.encodestring(zlib.compress(content, 9)).replace('\n', ''),
 						wheres = {'id': task_id} )
 		except Exception, e:
@@ -222,7 +222,7 @@ def task_end_log(g, task_error_log, task_id, success, kind):
 		if kind == 'fitsin':
 			# Stores results of QF into DB when unsuccessful (stores at least flat, mask, reg paths and QF config content)
 			try:
-				g.setTableName('spica2_plugin_fitsin')
+				g.setTableName('youpi_plugin_fitsin')
 				g.insert(	task_id = int(task_id),
 							flat = userData['Flat'],
 							mask = userData['Mask'],
@@ -238,7 +238,7 @@ def task_end_log(g, task_error_log, task_id, success, kind):
 
 	print "DEBUG: SUCCESS:", success
 	try:
-		g.setTableName('spica2_processing_task')
+		g.setTableName('youpi_processing_task')
 		g.update(	end_date = getNowDateTime(time.time()),
 					success = success,
 					wheres = {'id': task_id} )
@@ -287,7 +287,7 @@ def process(userData, kind_id, argv):
 
 			# Stores results of QF into DB when successful (stores at least flat, mask, reg paths and QF config content)
 			try:
-				g.setTableName('spica2_plugin_fitsin')
+				g.setTableName('youpi_plugin_fitsin')
 				g.insert(	task_id = int(task_id),
 							flat = userData['Flat'],
 							mask = userData['Mask'],
@@ -321,7 +321,7 @@ def process(userData, kind_id, argv):
 			success = 1
 
 			try:
-				g.setTableName('spica2_plugin_scamp')
+				g.setTableName('youpi_plugin_scamp')
 				g.insert(	task_id = int(task_id),
 							#
 							# Scamp config file serialization: base64 encoding over zlib compression
@@ -375,7 +375,7 @@ def init_job(userData):
 		pass
 
 	# Check that argv[1] (processing kind) exists in DB or raise error
-	res = g.execute("SELECT id FROM spica2_processing_kind WHERE name='%s'" % userData['Kind'])
+	res = g.execute("SELECT id FROM youpi_processing_kind WHERE name='%s'" % userData['Kind'])
 	username = g.execute("SELECT username FROM auth_user WHERE id=%s" % userData['UserID'])[0][0]
 	g.con.close()
 

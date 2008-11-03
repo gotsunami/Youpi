@@ -34,7 +34,7 @@ def process(userData):
 	user_id = userData['UserID']
 	node = userData['Node']
 	key = 'software_version'
-	res = g.execute("SELECT id, data FROM spica2_miscdata WHERE `key`=\"%s\"" % key)
+	res = g.execute("SELECT id, data FROM youpi_miscdata WHERE `key`=\"%s\"" % key)
 
 	versions = {}
 	for soft in SOFTS:
@@ -52,7 +52,7 @@ def process(userData):
 			data[node] = versions
 
 			g.begin()
-			g.setTableName('spica2_miscdata')
+			g.setTableName('youpi_miscdata')
 			g.update(	data = base64.encodestring(marshal.dumps(data)).replace('\n', ''),
 						wheres = {'id': res[0][0]})
 			g.con.commit()
@@ -62,7 +62,7 @@ def process(userData):
 		# No data related to versions
 		try:
 			g.begin()
-			g.setTableName('spica2_miscdata')
+			g.setTableName('youpi_miscdata')
 			g.insert(	key = key,
 						user_id = user_id,
 						data = base64.encodestring(marshal.dumps({node : versions})).replace('\n', ''))

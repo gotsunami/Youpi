@@ -446,12 +446,12 @@ pipe.close() </programlisting>
 		<title>Wrap Your Cluster Code!</title>
 		<para>
 			Every built-in &appname; plugin that initiates jobs on the Condor cluster keeps track of various 
-			processing information by storing it into the database. The <varname>spica2_processing_task</varname> 
+			processing information by storing it into the database. The <varname>youpi_processing_task</varname> 
 			MySQL table holds information about a job exit status, the user that initiated the job, the kind of 
 			processing performed, start and end times, the cluster node used for processing data and the complete 
 			error log content if <varname>success</varname> is null: 
 			<programlisting language="sql">
-mysql> desc spica2_processing_task;
+mysql> desc youpi_processing_task;
 +------------+--------------+------+-----+---------+----------------+
 | Field      | Type         | Null | Key | Default | Extra          |
 +------------+--------------+------+-----+---------+----------------+
@@ -489,7 +489,7 @@ mysql> desc spica2_processing_task;
 					</para>
 					<para>
 						In order to know if a <emphasis>processing kind</emphasis> is available, &appname; maintains a 
-						<varname>spica2_processing_kind</varname> table with some information about registered plugins
+						<varname>youpi_processing_kind</varname> table with some information about registered plugins
 						<footnote><para>TODO: improve this part</para></footnote>. Again, if <varname>Kind</varname>'s 
 						associated value does not match any of that table's entries, a <classname>WrapperError</classname> 
 						Python Exception is raised; the wrapper script is aborted.
@@ -502,7 +502,7 @@ mysql> desc spica2_processing_task;
 						<orderedlist>
 							<listitem>
 								<para>
-									inserts an entry in the <varname>spica2_processing_task</varname> table, filling the information 
+									inserts an entry in the <varname>youpi_processing_task</varname> table, filling the information 
 									related to the node's hostname, the &dj;'s user ID, the processing kind and starting date.
 								</para>
 							</listitem>
@@ -520,7 +520,7 @@ mysql> desc spica2_processing_task;
 							</listitem>
 							<listitem>
 								<para>
-									updates the <varname>spica2_processing_task</varname> table with the error log content if the 
+									updates the <varname>youpi_processing_task</varname> table with the error log content if the 
 									processing was not successful (content is compressed and base64-encoded), fills the <varname>end_date</varname> 
 									and <varname>success</varname> data fields.
 								</para>

@@ -433,17 +433,17 @@ def local_ingestion(request):
 			# RUN DATABASE INGESTION
 			#
 			c.execute('start transaction')
-			test = c.execute("select Name from spica2_run where name='%s'" % runame)
+			test = c.execute("select Name from youpi_run where name='%s'" % runame)
 			if test == 0:
 				if (detector == 'MegaCam' or  telescope == 'CFHT 3.6m' or instrname == 'MegaPrime'):
-					test1 = c.execute("insert into spica2_run set Name='%s', instrument_id=2" % runame)
+					test1 = c.execute("insert into youpi_run set Name='%s', instrument_id=2" % runame)
 					if test1:
 						connectionObject.commit()
 					else:
 						connectionObject.rollback()
 	
 				elif (detector == 'WIRCam' or telescope == 'CFHT 3.6m' or instrname == 'WIRCam'):
-					test2 = c.execute("insert into spica2_run set Name='%s', instrument_id=3" % runame)
+					test2 = c.execute("insert into youpi_run set Name='%s', instrument_id=3" % runame)
 					if test2:
 						connectionObject.commit()
 					else:
@@ -456,11 +456,11 @@ def local_ingestion(request):
 			# CHANNEL DATABASE INGESTION
 			#
 			c.execute('start transaction')
-			tust = c.execute("select Name from spica2_channel where name='%s'" % chaname)
+			tust = c.execute("select Name from youpi_channel where name='%s'" % chaname)
 			if (tust == 0):
 				
 				if (detector == 'MegaCam' and  telescope == 'CFHT 3.6m' and instrname == 'MegaPrime'):
-					test3 = c.execute("insert into spica2_channel set Name='%s', instrument_id=2" % chaname)
+					test3 = c.execute("insert into youpi_channel set Name='%s', instrument_id=2" % chaname)
 					if test3:
 						connectionObject.commit()
 					else:
@@ -468,7 +468,7 @@ def local_ingestion(request):
 	
 					
 				elif (detector == 'WIRCam' and telescope == 'CFHT 3.6m' and instrname == 'WIRCam'):
-					test4 = c.execute("insert into spica2_channel set Name='%s', instrument_id=3" % chaname)
+					test4 = c.execute("insert into youpi_channel set Name='%s', instrument_id=3" % chaname)
 					if test4:
 						connectionObject.commit()
 					else:
@@ -509,7 +509,7 @@ def local_ingestion(request):
 			runame = h1['runid']
 			c.execute('start transaction')
 			mj = fitsfile.replace('.fits', '')
-			tast = c.execute("select name from spica2_image where name='%s'" % mj)
+			tast = c.execute("select name from youpi_image where name='%s'" % mj)
 	
 			if tast == 1:
 				break
@@ -518,27 +518,27 @@ def local_ingestion(request):
 				if weight:
 					break
 	
-				testa = c.execute("select Name from spica2_run where name='%s'" % runame)
+				testa = c.execute("select Name from youpi_run where name='%s'" % runame)
 				m = fitsfile.replace('.fits', '')
 	
 				if testa == 1:
 					if (det == 'MegaCam' or  t == 'CFHT 3.6m' or i == 'MegaPrime'):
-						c.execute("select id from spica2_run where instrument_id = 2 and Name='%s'" % runame)
+						c.execute("select id from youpi_run where instrument_id = 2 and Name='%s'" % runame)
 						rows = c.fetchone()
 
-						c.execute("select id from spica2_channel where instrument_id = 2 and Name='%s'" % chaname)
+						c.execute("select id from youpi_channel where instrument_id = 2 and Name='%s'" % chaname)
 						row = c.fetchone()
 						
-						c.execute("insert into spica2_image set run_id='%s', calibrationkit_id=1, instrument_id=2, channel_id='%s', Name='%s', object='%s', airmass='%s', exptime='%s', dateobs='%s', equinox='%s', checksum='%s'" % (rows[0], row[0], m, o, a, e, d, eq, checksum))
+						c.execute("insert into youpi_image set run_id='%s', calibrationkit_id=1, instrument_id=2, channel_id='%s', Name='%s', object='%s', airmass='%s', exptime='%s', dateobs='%s', equinox='%s', checksum='%s'" % (rows[0], row[0], m, o, a, e, d, eq, checksum))
 			
 					elif (det == 'WIRCam' or t == 'CFHT 3.6m' or i == 'WIRCam'):
-						c.execute("select id from spica2_run where instrument_id=3 and Name='%s'" % runame)
+						c.execute("select id from youpi_run where instrument_id=3 and Name='%s'" % runame)
 						rows = c.fetchone()
 						
-						c.execute("select id from spica2_channel where instrument_id=3 and Name='%s'" % chaname)
+						c.execute("select id from youpi_channel where instrument_id=3 and Name='%s'" % chaname)
 						row = c.fetchone()
 	
-						c.execute("insert into spica2_image set run_id='%s', calibrationkit_id=2, instrument_id=3, channel_id='%s', Name='%s', object='%s', airmass='%s', exptime='%s', dateobs='%s', equinox='%s', checksum='%s'" % (rows[0],row[0],m,o,a,e,d,eq,checksum))
+						c.execute("insert into youpi_image set run_id='%s', calibrationkit_id=2, instrument_id=3, channel_id='%s', Name='%s', object='%s', airmass='%s', exptime='%s', dateobs='%s', equinox='%s', checksum='%s'" % (rows[0],row[0],m,o,a,e,d,eq,checksum))
 			
 			connectionObject.commit()
 	else:
@@ -556,7 +556,7 @@ def aff_img(request,image_name):
 
 	db = MySQLdb.connect(host = DATABASE_HOST, user = DATABASE_USER, passwd = DATABASE_PASSWORD, db = DATABASE_NAME)
 	cursor = db.cursor()
-	cursor.execute("SELECT * FROM spica2_image where name='%s'" % image_name)
+	cursor.execute("SELECT * FROM youpi_image where name='%s'" % image_name)
 	list_param = []
 	for rows in cursor.fetchall():
 		list_param.append({'rows':rows})
@@ -841,7 +841,7 @@ def processing_imgs_from_idlist(request, ids):
 	g = DBGeneric(db.con)
 	query = """
 SELECT a.id, a.name, b.name, a.object, c.name, a.alpha, a.delta 
-FROM spica2_image AS a, spica2_run AS b, spica2_channel AS c
+FROM youpi_image AS a, youpi_run AS b, youpi_channel AS c
 WHERE a.id IN (%s)
 AND a.run_id = b.id
 AND a.channel_id = c.id
@@ -897,7 +897,7 @@ def processing_imgs_from_idlist_post(request):
 	g = DBGeneric(db.con)
 	query = """
 SELECT a.id, a.name, b.name, a.object, c.name, a.alpha, a.delta 
-FROM spica2_image AS a, spica2_run AS b, spica2_channel AS c
+FROM youpi_image AS a, youpi_run AS b, youpi_channel AS c
 WHERE a.id IN (%s)
 AND a.run_id = b.id
 AND a.channel_id = c.id

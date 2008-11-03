@@ -12,7 +12,7 @@ from DBGeneric import *
 g = None
 
 def doit():
-	qfitsins = g.execute("SELECT id FROM spica2_plugin_fitsin")
+	qfitsins = g.execute("SELECT id FROM youpi_plugin_fitsin")
 	print "Total: %d images have been successfully qualityFITSed (first quality evaluation)" % len(qfitsins)
 
 	i = 1

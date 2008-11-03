@@ -54,7 +54,7 @@ while k <> 0:
                                         print is_phot
 
                                 g.begin()
-                                g.setTableName('spica2_fitstables')
+                                g.setTableName('youpi_fitstables')
 
                                 try:
                                         g.insert(       name = name,

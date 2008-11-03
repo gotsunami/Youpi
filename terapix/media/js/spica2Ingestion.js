@@ -214,7 +214,7 @@ function process_form() {
 			}
 		);
 
-		post = 	'Table=spica2_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=is equal to&Line0Text=' + iid +
+		post = 	'Table=youpi_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=is equal to&Line0Text=' + iid +
 				'&Hide=&OrderBy=id';
 
 		// Send HTTP POST request

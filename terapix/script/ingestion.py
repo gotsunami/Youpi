@@ -90,7 +90,7 @@ def sendmail(status, to, start, end, runame):
 	# Updates end time
 	try:
 		g.begin()
-		g.setTableName('spica2_ingestion')
+		g.setTableName('youpi_ingestion')
 		g.update(	end_ingestion_date = getNowDateTime(end),
 					exit_code = status,
 					wheres = {'id': ingestionId} )
@@ -160,7 +160,7 @@ Elapsed time: %.02f seconds
 	# Stores report into DB (base64 over zlib compression
 	try:
 		g.begin()
-		g.setTableName('spica2_ingestion')
+		g.setTableName('youpi_ingestion')
 		g.update(	report = base64.encodestring(zlib.compress(msg, 9)).replace('\n', ''),
 					wheres = {'id' : ingestionId} )
 		g.con.commit()
@@ -217,7 +217,7 @@ def freshImageName(nameWithoutExt, g):
 	newName = nameWithoutExt
 	
 	try:
-		res = g.execute("select name from spica2_image where name like '" + nameWithoutExt + '%\';')
+		res = g.execute("select name from youpi_image where name like '" + nameWithoutExt + '%\';')
 	except MySQLdb.DatabaseError, e:
 		debug(e, FATAL)
 		sendmail(1, email, time.time(), time.time(), 'freshImageName() error')
@@ -269,10 +269,10 @@ def run_ingestion():
 
 	# 
 	# Due to integrity constraints, entries have to created into
-	# spica2_ingestion
+	# youpi_ingestion
 	#
 
-	# Add a new entry into spica2_ingestion table
+	# Add a new entry into youpi_ingestion table
 	vars = [['skip_fitsverify', 0], ['skip_qso_status', 0], ['allow_several_ingestions', 0]]
 
 	for i in vars:
@@ -281,7 +281,7 @@ def run_ingestion():
 
 	try:
 		g.begin()
-		g.setTableName('spica2_ingestion')
+		g.setTableName('youpi_ingestion')
 		g.insert(	start_ingestion_date = getNowDateTime(duration_stime),
 					end_ingestion_date = getNowDateTime(duration_stime),
 					email = email,
@@ -304,7 +304,7 @@ def run_ingestion():
 	# Get instruments
 	#
 	try:
-		res = g.execute("""select id, name from spica2_instrument;""")
+		res = g.execute("""select id, name from youpi_instrument;""")
 	except MySQLdb.DatabaseError, e:
 		debug(e, FATAL)
 		sendmail(1, email, duration_stime, time.time(), '')
@@ -402,7 +402,7 @@ def run_ingestion():
 		# RUN DATABASE INGESTION
 		#
 		try:
-			res = g.execute("""select Name from spica2_run where name="%s";""" % runame)
+			res = g.execute("""select Name from youpi_run where name="%s";""" % runame)
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			sendmail(1, email, duration_stime, time.time(), runame)
@@ -427,7 +427,7 @@ def run_ingestion():
 		if not res:
 			if detector == 'MegaCam' or i == 'MegaPrime':
 				try:
-					g.setTableName('spica2_run')
+					g.setTableName('youpi_run')
 					g.insert(	name = runame,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
@@ -438,7 +438,7 @@ def run_ingestion():
 
 			elif (detector == 'WIRCam' or i == 'WIRCam'):
 				try:
-					g.setTableName('spica2_run')
+					g.setTableName('youpi_run')
 					g.insert(	name = runame,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
@@ -456,7 +456,7 @@ def run_ingestion():
 		# CHANNEL DATABASE INGESTION
 		#
 		try:
-			res = g.execute("""select Name from spica2_channel where name="%s";""" % chaname)
+			res = g.execute("""select Name from youpi_channel where name="%s";""" % chaname)
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			sendmail(1, email, duration_stime, time.time(), runame)
@@ -465,7 +465,7 @@ def run_ingestion():
 		if not res:
 			if detector == 'MegaCam' and t == 'CFHT 3.6m' and i == 'MegaPrime':
 				try:
-					g.setTableName('spica2_channel')
+					g.setTableName('youpi_channel')
 					g.insert(	name = chaname,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
@@ -476,7 +476,7 @@ def run_ingestion():
 				
 			elif detector == 'WIRCam' and t == 'CFHT 3.6m' and i == 'WIRCam':
 				try:
-					g.setTableName('spica2_channel')
+					g.setTableName('youpi_channel')
 					g.insert(	name = chaname,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
@@ -502,7 +502,7 @@ def run_ingestion():
 			continue
 
 		try:
-			res = g.execute("""select name from spica2_image where name = "%s";""" % fitsNoExt);
+			res = g.execute("""select name from youpi_image where name = "%s";""" % fitsNoExt);
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			sendmail(1, email, duration_stime, time.time(), runame)
@@ -532,7 +532,7 @@ def run_ingestion():
 		# Image not yet ingested
 		# Check QSO status part
 		#
-		res = g.execute("""select QSOstatus from spica2_fitstables where name ="%s" and run="%s";""" %(old,runame))
+		res = g.execute("""select QSOstatus from youpi_fitstables where name ="%s" and run="%s";""" %(old,runame))
 		
 		if not res :
 			debug("%s is not present in Pre-ingestion step. Using default QSOStatus: OBSERVED" % fitsfile)
@@ -588,7 +588,7 @@ def run_ingestion():
 		try:
 			q = """
 			SELECT run.id, chan.id, i.id
-			FROM spica2_run AS run, spica2_channel AS chan, spica2_instrument AS i
+			FROM youpi_run AS run, youpi_channel AS chan, youpi_instrument AS i
 			WHERE run.name = '%s'
 			AND chan.name = '%s'
 			AND i.name = '%s';""" % (runame, chaname, iname)
@@ -605,7 +605,7 @@ def run_ingestion():
 
 		# Then insert image into db
 		try:
-			g.setTableName('spica2_image')
+			g.setTableName('youpi_image')
 			g.insert(	run_id = res[0][0],
 				name = fitsNoExt,
 				object = o,
@@ -641,11 +641,11 @@ def run_ingestion():
 			sendmail(1, email, duration_stime, time.time(), runame)
 			sys.exit(1)
 
-		# Filling spica2_rel_ri table
+		# Filling youpi_rel_ri table
 		# Warning: this block of code uses the last_insert_id() feature thus should not be
 		# moved
 		try:
-			g.setTableName('spica2_rel_ri')
+			g.setTableName('youpi_rel_ri')
 			g.insert( run_id = res[0][0], image_id = g.con.insert_id() )
 	
 		except MySQLdb.DatabaseError, e:
@@ -698,7 +698,7 @@ def run_ingestion():
 		
 		try:
 			g.begin()
-			g.execute("""UPDATE spica2_image SET skyfootprint=%s WHERE name="%s";""" % (q, fitsNoExt))
+			g.execute("""UPDATE youpi_image SET skyfootprint=%s WHERE name="%s";""" % (q, fitsNoExt))
 			g.con.commit()
 		except Exception, e:
 			debug(e, FATAL)
@@ -708,7 +708,7 @@ def run_ingestion():
 #preparing data to insert centerfield point
 		cf = "GeomFromText('POINT(%s %s)')" % (ra, de)
 
-		qu = """UPDATE spica2_image SET centerfield=%s WHERE name="%s";""" % (cf, fitsNoExt)
+		qu = """UPDATE youpi_image SET centerfield=%s WHERE name="%s";""" % (cf, fitsNoExt)
 		try:
 			g.begin()
 			g.execute(qu)
