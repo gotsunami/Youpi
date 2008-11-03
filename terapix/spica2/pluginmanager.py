@@ -4,10 +4,10 @@ from django.contrib.sessions.models import Session
 from terapix.spica2.models import *
 import glob, sys, types, re, os
 import marshal, base64
-from settings import *
 from types import *
+from settings import *
 
-PLUGIN_DIRS = os.path.join(TRUNK, 'terapix', 'spica2', 'plugins')
+PLUGIN_DIRS = os.path.join(HOME, 'youpi', 'terapix', 'spica2', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 

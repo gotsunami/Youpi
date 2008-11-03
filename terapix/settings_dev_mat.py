@@ -6,7 +6,7 @@ import os
 # Local configuration file (site specific)
 #
 HOME 			= '/home/nis/monnerville/'
-TRUNK 			= os.path.join(HOME, 'youpi', 'trunk')
+TRUNK 			= os.path.join(HOME, 'youpi')
 APP_URL_PREFIX  = '/youpi'
 AUP				= APP_URL_PREFIX 	# For short
 CONDORFILE 		= '/tmp/condor.mathias'
