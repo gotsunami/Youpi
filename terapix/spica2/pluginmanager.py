@@ -7,7 +7,7 @@ import marshal, base64
 from settings import *
 from types import *
 
-PLUGIN_DIRS = os.path.join(HOME, 'spica2', 'terapix', 'spica2', 'plugins')
+PLUGIN_DIRS = os.path.join(TRUNK, 'terapix', 'spica2', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 

@@ -388,7 +388,7 @@ function ImageSelector(container_id, varName)
 			// Custom handler for results
 			function(resp) {
 				_tableWidget.setRowIdsFromColumn(0);
-				_tableWidget.loadDataFromQuery(	'/spica2/process/query/imgsFromIdList/', 	// path
+				_tableWidget.loadDataFromQuery(	'/youpi/process/query/imgsFromIdList/', 	// path
 												'Ids=' + resp['mapList'],					// POST data
 												function() {								// Custom handler
 													if (handler && typeof handler == 'function')
@@ -401,7 +401,7 @@ function ImageSelector(container_id, varName)
 
 		// Send HTTP POST request
 		var post = 'IdList=' + idList;
-		xhr.send('/spica2/process/query/remapIds/', post);
+		xhr.send('/youpi/process/query/remapIds/', post);
 	}
 
 	/*
@@ -509,7 +509,7 @@ function ImageSelector(container_id, varName)
 		batch_div.setAttribute('id', id + '_batch_sel_div');
 
 		var form = document.createElement('form');
-		form.setAttribute('action', '/spica2/uploadFile/');
+		form.setAttribute('action', '/youpi/uploadFile/');
 		form.setAttribute('enctype', 'multipart/form-data');
 		form.setAttribute('method', 'post');
 		form.setAttribute('onsubmit', "return " + _instance_name + ".getAIM().submit(this, {'onStart' : " + _instance_name + ".getFileUploadStartHandler(), 'onComplete' : " + _instance_name + ".getFileUploadCompleteHandler()});");
@@ -733,7 +733,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		// Send HTTP POST request
-		xhr.send('/spica2/ingestion/imgCount/');
+		xhr.send('/youpi/ingestion/imgCount/');
 	}
 
 	/*
@@ -898,7 +898,7 @@ function ImageSelector(container_id, varName)
 			// Add auto-completion capabilities
 			if (_bsn) {
 				var options = {
-					script: '/spica2/autocompletion/ImageSelections/',
+					script: '/youpi/autocompletion/ImageSelections/',
 					varname: 'Value',
 					json: true,
 					maxresults: 20,
@@ -959,7 +959,7 @@ function ImageSelector(container_id, varName)
 		// Build custom query
 		var data = 'Distinct=&Table=spica2_image&DisplayField=object&Lines=0&Line0Field=object&Line0Cond=contains&Line0Text=&Hide=&OrderBy=object';
 		// Send POST HTTP query
-		xhr.send('/spica2/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', data);
 	}
 
 	/*
@@ -1030,7 +1030,7 @@ function ImageSelector(container_id, varName)
 		// Build custom query
 		var data = 'Distinct=&Table=spica2_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=contains&Line0Text=&Hide=&OrderBy=label';
 		// Send POST HTTP query
-		xhr.send('/spica2/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', data);
 	}
 
 	/*
@@ -1103,7 +1103,7 @@ function ImageSelector(container_id, varName)
 		// Build custom query
 		var data = 'Distinct=&Table=spica2_channel&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 		// Send POST HTTP query
-		xhr.send('/spica2/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', data);
 	}
 
 	/*
@@ -1176,7 +1176,7 @@ function ImageSelector(container_id, varName)
 		var data = 'Distinct=&Table=spica2_instrument&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 
 		// Send POST HTTP query
-		xhr.send('/spica2/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', data);
 	}
 
 	/*
@@ -1249,7 +1249,7 @@ function ImageSelector(container_id, varName)
 		var data = 'Distinct=&Table=spica2_run&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 
 		// Send POST HTTP query
-		xhr.send('/spica2/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', data);
 	}
 
 	/*
@@ -1334,7 +1334,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		var post = 'Mode=Single';
-		xhr.send('/spica2/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', post);
 	}
 
 	/*
@@ -1757,7 +1757,7 @@ function ImageSelector(container_id, varName)
 		);
 	
 		var post = 'Mode=Batch';
-		xhr.send('/spica2/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', post);
 	}
 
 	/*
@@ -1805,7 +1805,7 @@ function ImageSelector(container_id, varName)
 
 		post = 'Name=' + name + '&Mode=Batch';
 		xhr.setBusyMsg("Loading content for list '" + name + "'");
-		xhr.send('/spica2/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', post);
 	}
 
 	/*
@@ -1898,7 +1898,7 @@ function ImageSelector(container_id, varName)
 		);
 
 		var post = 'Mode=' + (_selectionMode == _singleMode ? 'Single' : 'Batch');
-		xhr.send('/spica2/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', post);
 	}
 
 	/*
@@ -1957,7 +1957,7 @@ function ImageSelector(container_id, varName)
 
 		post = 'Name=' + name.replace('+', '%2B');
 		// Send HTTP POST request
-		xhr.send('/spica2/process/db/delSelection/', post);
+		xhr.send('/youpi/process/db/delSelection/', post);
 	}
 
 	/*
@@ -2021,7 +2021,7 @@ function ImageSelector(container_id, varName)
 
 		// Get all selections
 		var post = 'Mode=' + (_selectionMode == _singleMode ? 'Single' : 'Batch');
-		xhr.send('/spica2/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', post);
 	}
 
 	/*
@@ -2068,7 +2068,7 @@ function ImageSelector(container_id, varName)
 		post = 'Table=spica2_imageselections&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=is equal to&Line0Text=' + name + '&Hide=&OrderBy=id';
 
 		// Send HTTP POST request
-		xhr.send('/spica2/process/preingestion/query/', post);
+		xhr.send('/youpi/process/preingestion/query/', post);
 	}
 
 	/*
@@ -2103,7 +2103,7 @@ function ImageSelector(container_id, varName)
 		post = 'Name=' + name + '&IdList=' + _getListsOfSelections();
 
 		// Send HTTP POST request
-		xhr.send('/spica2/process/db/saveSelection/', post);
+		xhr.send('/youpi/process/db/saveSelection/', post);
 	}
 
 	/*
@@ -2474,7 +2474,7 @@ function ImageSelector(container_id, varName)
 		/** SPECIAL CASE **/
 		if (params['special']) {
 			post = 'Name=' + valueText + '&Mode=Single';
-			xhr.send('/spica2/process/db/getSelections/', post);
+			xhr.send('/youpi/process/db/getSelections/', post);
 			return;
 		}
 
@@ -2510,7 +2510,7 @@ function ImageSelector(container_id, varName)
 		}
 	
 		// Send POST HTTP query
-		xhr.send('/spica2/process/preingestion/query/', post);
+		xhr.send('/youpi/process/preingestion/query/', post);
 	}
 
 	/*
@@ -2636,7 +2636,7 @@ function ImageSelector(container_id, varName)
 		log.appendChild(document.createTextNode('('));
 		var a = document.createElement('a');
 		a.setAttribute('target', '_blank');
-		a.setAttribute('href', '/spica2/uploadFile/batch/viewContent/' + fileName + '/');
+		a.setAttribute('href', '/youpi/uploadFile/batch/viewContent/' + fileName + '/');
 		a.appendChild(document.createTextNode('View file content'));
 		log.appendChild(a);
 		log.appendChild(document.createTextNode(')'));
@@ -2696,7 +2696,7 @@ function ImageSelector(container_id, varName)
 
 		// Send HTTP POST request
 		xhr.setBusyMsg('Parsing XML content');
-		xhr.send('/spica2/uploadFile/batch/parseContent/', post);
+		xhr.send('/youpi/uploadFile/batch/parseContent/', post);
 	}
 
 	/*
@@ -2750,7 +2750,7 @@ function ImageSelector(container_id, varName)
 
 		// Send HTTP POST request
 		xhr2.setBusyMsg('Loading sky visualization');
-		xhr2.send('/spica2/plot/sky/selections/', post);
+		xhr2.send('/youpi/plot/sky/selections/', post);
 	}
 
 	/*
@@ -2791,7 +2791,7 @@ function ImageSelector(container_id, varName)
 
 		// Send HTTP POST request
 		xhr.setBusyMsg('Retreiving selection content');
-		xhr.send('/spica2/uploadFile/batch/viewSelection/', post);
+		xhr.send('/youpi/uploadFile/batch/viewSelection/', post);
 	}
 
 	/*

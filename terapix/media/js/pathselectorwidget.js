@@ -143,7 +143,7 @@ function PathSelectorWidget(container_id, varName, pluginId)
 		);
 
 		var post = 'Plugin=' + plugin_id + '&Method=getMiscDataPaths&Keys=' + tr_prefix;
-		r.send('/spica2/process/plugin/', post);
+		r.send('/youpi/process/plugin/', post);
 	}
 
 	this.savePath = function(prefix) {
@@ -170,7 +170,7 @@ function PathSelectorWidget(container_id, varName, pluginId)
 		);
 	
 		var post = 'Plugin=' + plugin_id + '&Method=saveMiscDataPath&Path=' + path + '&Key=' + prefix;
-		r.send('/spica2/process/plugin/', post);
+		r.send('/youpi/process/plugin/', post);
 	}
 
 	this.deletePath = function(prefix) {
@@ -196,7 +196,7 @@ function PathSelectorWidget(container_id, varName, pluginId)
 		);
 
 		var post = 'Plugin=' + plugin_id + '&Method=deleteMiscDataPath&Path=' + path + '&Key=' + prefix;
-		r.send('/spica2/process/plugin/', post);
+		r.send('/youpi/process/plugin/', post);
 	}
 	
 	this.onPathChange = function(prefix, selid) {

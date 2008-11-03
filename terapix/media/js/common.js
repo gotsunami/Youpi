@@ -308,7 +308,7 @@ function results_showDetails(pname, id, fullpage) {
 			div.innerHTML = '';
 			if (fullpage) {
 				var a = document.createElement('a');
-				a.setAttribute('href', '/spica2/results/' + pname + '/' + id + '/');
+				a.setAttribute('href', '/youpi/results/' + pname + '/' + id + '/');
 				a.appendChild(document.createTextNode("Click here to see a full page result for '" + resp['result']['Title'] + "'"));
 				div.appendChild(document.createTextNode('[ '));
 				div.appendChild(a);
@@ -321,7 +321,7 @@ function results_showDetails(pname, id, fullpage) {
 	);
 
 	var post = 'Plugin=' + pname + '&Method=getTaskInfo&TaskId=' + id;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 /*

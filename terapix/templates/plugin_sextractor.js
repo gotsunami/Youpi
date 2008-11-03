@@ -165,7 +165,7 @@ function {{ plugin.id }}_run(trid, silent) {
 	);
 
 	var post = 'Plugin={{ plugin.id }}&Method=process&CondorHosts=' + condorHosts;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 
@@ -191,7 +191,7 @@ function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, flag, weight, ps
 				'&PsfPath=' + psf + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
 				'&Config=' + config;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 
@@ -454,7 +454,7 @@ function {{ plugin.id }}_showSavedItems() {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_addToCart(idList, config, flagPath, weightPath, psfPath, resultsOutputDir) {
@@ -496,7 +496,7 @@ function {{ plugin.id }}_delSavedItem(trid, name) {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=deleteCartItem&Name=' + name;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_getTabId(ul_id) {
@@ -556,7 +556,7 @@ function {{ plugin.id }}_cancelJob(container_id, clusterId, procId) {
 	);
 
 	var post = 'Plugin={{ plugin.id }}&Method=cancelJob&ClusterId=' + clusterId + '&ProcId=' + procId;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 /*
@@ -775,7 +775,7 @@ function monitorJobs() {
 	);
 
 	var post = 'Plugin={{ plugin.id }}&Method=jobStatus&NextPage=' + {{ plugin.id }}_gNextPage;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function doit() {

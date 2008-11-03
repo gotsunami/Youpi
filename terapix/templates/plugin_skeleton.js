@@ -79,7 +79,7 @@ function {{ plugin.id }}_run(trid, resultsOutputDir, silent) {
 	var post = 	'Plugin={{ plugin.id }}&Method=process' +
 				'&CondorHosts=' + condorHosts +
 				'&ResultsOutputDir=' + resultsOutputDir;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
@@ -162,7 +162,7 @@ function {{ plugin.id }}_saveItemForLater(trid, itemId, resultsOutputDir) {
 	var post = 	'Plugin={{ plugin.id }}&Method=saveCartItem' + 
 				'&ItemID=' + prefix + itemId +
 				'&ResultsOutputDir=' + resultsOutputDir;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 /*
@@ -353,7 +353,7 @@ function {{ plugin.id }}_showSavedItems() {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_delSavedItem(trid, name) {
@@ -380,7 +380,7 @@ function {{ plugin.id }}_delSavedItem(trid, name) {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=deleteCartItem&Name=' + name;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_addToCart(resultsOutputDir) {

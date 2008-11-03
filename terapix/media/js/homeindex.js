@@ -42,7 +42,7 @@ function globstat()
 		}
 	);
 	var post = 'globstat=toto';
-	xhr.send('/spica2/newindex/',post);
+	xhr.send('/youpi/newindex/',post);
 }
 
 
@@ -141,7 +141,7 @@ function display1(name)
 	);
 	
 	var post = 'Kind=' + name;
-    xhr.send('/spica2/newindex/', post);
+    xhr.send('/youpi/newindex/', post);
 }
 
 function display2(info)
@@ -339,7 +339,7 @@ function display2(info)
         }
     );
     var post = 'Kind2=' + info;
-    xhr.send('/spica2/newindex/', post);	
+    xhr.send('/youpi/newindex/', post);	
 }
 
 
@@ -402,7 +402,7 @@ function display_user()
 	}
 	);
 	var post = 'Kind3=titi'; 
-	xhr.send('/spica2/newindex/',post);
+	xhr.send('/youpi/newindex/',post);
 }
 
 
@@ -416,7 +416,7 @@ function display3()
     }
     );
     var post = 'ingstat=titi';
-    xhr.send('/spica2/newindex/',post);
+    xhr.send('/youpi/newindex/',post);
 }
 
 function display4()
@@ -429,5 +429,5 @@ function display4()
     }
     );
     var post = 'ingstat=titi';
-    xhr.send('/spica2/newindex/',post);
+    xhr.send('/youpi/newindex/',post);
 }

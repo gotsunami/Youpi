@@ -37,7 +37,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>
 			{% block userlinks %}
 				[ <a href="{% url django.contrib.auth.views.password_change %}">{% trans 'Change password' %}</a>
-				- <a href="/spica2/accounts/logout/">{% trans 'Log out' %}</a> ]
+				- <a href="/youpi/accounts/logout/">{% trans 'Log out' %}</a> ]
 			{% endblock %}
 	        </div>
 			<div id="spica2_cart_id" style="float: right"></div>

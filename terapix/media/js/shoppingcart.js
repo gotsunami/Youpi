@@ -39,7 +39,7 @@ function ShoppingCart(container_id, varName)
 				var div = document.createElement('div');
 				div.setAttribute('id', 'shoppingCart');
 				div.setAttribute('class', 'nonempty');
-				div.setAttribute('onclick', 'location.href="/spica2/cart/";');
+				div.setAttribute('onclick', 'location.href="/youpi/cart/";');
 
 				var img = document.createElement('img');
 				img.setAttribute('src', '/media/' + guistyle + '/img/misc/minicart.gif');
@@ -51,7 +51,7 @@ function ShoppingCart(container_id, varName)
 		);
 
 		// Count items
-		xhr.send('/spica2/cart/itemsCount/');
+		xhr.send('/youpi/cart/itemsCount/');
 	}
 
 	// Refresh display
@@ -95,7 +95,7 @@ function ShoppingCart(container_id, varName)
 
 		var post = 'plugin=' + json['plugin_name'] + '&userData=' + escape(json['userData']);
 		// Check for cookie
-		xhr.send('/spica2/cart/additem/', post);
+		xhr.send('/youpi/cart/additem/', post);
 	}
 
 	// json: { 'plugin_name' : 'name', 'userData' : data }
@@ -112,7 +112,7 @@ function ShoppingCart(container_id, varName)
 		);
 
 		// Check for cookie
-		xhr.send('/spica2/cart/cookiecheck/');
+		xhr.send('/youpi/cart/cookiecheck/');
 	}
 
 	/*
@@ -137,7 +137,7 @@ function ShoppingCart(container_id, varName)
 
 		var post = 'plugin=' + json['plugin_name'] + '&idx=' + json['idx'];
 		// Check for cookie
-		xhr.send('/spica2/cart/delitem/', post);
+		xhr.send('/youpi/cart/delitem/', post);
 	}
 
 	/*
@@ -161,7 +161,7 @@ function ShoppingCart(container_id, varName)
 
 		var post = 'plugin=' + plugin_name;
 		// Check for cookie
-		xhr.send('/spica2/cart/delitem/', post);
+		xhr.send('/youpi/cart/delitem/', post);
 	}
 
 	// Main entry point

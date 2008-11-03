@@ -48,7 +48,7 @@ function get_stats() {
 	post = 	'ResultsOutputDir=' + dir;
 
 	// Send HTTP POST request
-	xhr.send('/spica2/results/stats/', post);
+	xhr.send('/youpi/results/stats/', post);
 }
 
 // Results filtering
@@ -177,7 +177,7 @@ function apply_filter() {
 
 	// Send HTTP POST request
 	xhr.setBusyMsg('Please wait while filtering processing data');
-	xhr.send('/spica2/results/filter/', post);
+	xhr.send('/youpi/results/filter/', post);
 }
 
 function filter_text_handler(event) {

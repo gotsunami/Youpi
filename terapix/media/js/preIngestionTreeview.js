@@ -20,7 +20,7 @@ preIng_treeview = {
 			'canhavechildren'	: true,
 		//	'tooltip'			: '<h3>Test</h3>',
 			'onopenpopulate' 	: preIng_treeview.branchPopulate,
-			'openlink'			: '/spica2/populate/' + preIng_treeview.behaviour + '/' + preIng_treeview.name + preIng_treeview.init_path + '/'
+			'openlink'			: '/youpi/populate/' + preIng_treeview.behaviour + '/' + preIng_treeview.name + preIng_treeview.init_path + '/'
 		}
 		];
 

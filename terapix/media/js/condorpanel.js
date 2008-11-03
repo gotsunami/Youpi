@@ -198,12 +198,12 @@ function CondorPanel(container_id, varName) {
 						}	
 					}
 				);
-				ry.send('/spica2/profile/loadCondorNodeSelection/');
+				ry.send('/youpi/profile/loadCondorNodeSelection/');
 			}
 		);
 
 		// Send POST HTTP query
-		xhr.send('/spica2/cluster/status/');
+		xhr.send('/youpi/cluster/status/');
 	}
 
 	/*
@@ -287,7 +287,7 @@ function CondorPanel(container_id, varName) {
 				}
 			);
 			var post = 'SelectedHosts=' + hosts;
-			r.send('/spica2/profile/saveCondorNodeSelection/', post);
+			r.send('/youpi/profile/saveCondorNodeSelection/', post);
 		}
 
 		return hosts;

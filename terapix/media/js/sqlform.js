@@ -116,7 +116,7 @@ function SqlForm(container_id, tableName, varName, forbiddenFields)
 		);
 
 		// Send POST request
-		xhr.send('/spica2/process/preingestion/tablefields/', 'table=' + table);
+		xhr.send('/youpi/process/preingestion/tablefields/', 'table=' + table);
 	}
 
 	function removeAllChildrenNodes(node)
@@ -246,7 +246,7 @@ function SqlForm(container_id, tableName, varName, forbiddenFields)
 		}
 
 		var data = 'Table=' + table + '&DisplayField=' + df + '&Lines=' + lineNumbers.substr(0, lineNumbers.length-1) + lines + '&Hide=' + forbFields.toString();
-		xhr.send('/spica2/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', data);
 	}
 
 	/*

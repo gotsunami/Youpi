@@ -89,7 +89,7 @@ function {{ plugin.id }}_run(trid, idList, itemId, flat, mask, reg, config, resu
 				'&FitsinId=' + fitsinId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
 				'&Config=' + config;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 var {{ plugin.id }}_itemIdx = 0;
@@ -119,7 +119,7 @@ function {{ plugin.id }}_sendAll(data) {
 	);
 	var post = 'Plugin={{ plugin.id }}&Method=process&IdList=' + 
 				data[{{ plugin.id }}_itemIdx][1] + '&ItemID=' + data[{{ plugin.id }}_itemIdx][2];
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_runAll() {
@@ -170,7 +170,7 @@ function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, flat, mask, reg,
 				'&RegPath=' + reg + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
 				'&Config=' + config;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 // Mandatory function
@@ -340,7 +340,7 @@ function {{ plugin.id }}_showSavedItems() {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_addToCart(idList, config, flatPath, maskPath, regPath, resultsOutputDir) {
@@ -382,7 +382,7 @@ function {{ plugin.id }}_delSavedItem(trid, name) {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=deleteCartItem&Name=' + name;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 // Units are in data[z][2], if any
@@ -452,7 +452,7 @@ function {{ plugin.id }}_reprocess_image(fitsinId) {
 	);
 
 	var post = 'Plugin={{ plugin.id }}&Method=getReprocessingParams&FitsinId=' + fitsinId;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 /*
@@ -522,7 +522,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		var a = document.createElement('a');
 		if (resp['GradingCount'] > 0) {
 			gdiv.setAttribute('class', 'notgraded');
-			a.setAttribute('href', "/spica2/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
+			a.setAttribute('href', "/youpi/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
 			a.appendChild(document.createTextNode('Image graded ' + resp['GradingCount'] + ' time' + (resp['GradingCount'] > 1 ? 's' : '')));
 			gdiv.appendChild(a);
 		}
@@ -530,7 +530,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 			gdiv.setAttribute('class', 'notgraded');
 			gdiv.appendChild(document.createTextNode('Image not graded yet'));
 			gdiv.appendChild(document.createElement('br'));
-			a.setAttribute('href', "/spica2/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
+			a.setAttribute('href', "/youpi/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
 			a.appendChild(document.createTextNode('Grade it now !'));
 			gdiv.appendChild(a);
 		}
@@ -618,7 +618,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		// Date-time, duration
 		td = document.createElement('td');
 		var a = document.createElement('a');
-		a.setAttribute('href', '/spica2/results/{{ plugin.id }}/' + hist[k]['TaskId'] + '/');
+		a.setAttribute('href', '/youpi/results/{{ plugin.id }}/' + hist[k]['TaskId'] + '/');
 		a.appendChild(document.createTextNode(hist[k]['Start'] + ' (' + hist[k]['Duration'] + ')'));
 		td.appendChild(a);
 		tr.appendChild(td);
@@ -911,7 +911,7 @@ function {{ plugin.id }}_cancelJob(container_id, clusterId, procId) {
 	);
 
 	var post = 'Plugin={{ plugin.id }}&Method=cancelJob&ClusterId=' + clusterId + '&ProcId=' + procId;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 /*
@@ -1130,7 +1130,7 @@ function monitorJobs() {
 	);
 
 	var post = 'Plugin={{ plugin.id }}&Method=jobStatus&NextPage=' + {{ plugin.id }}_gNextPage;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function doit() {
@@ -1294,7 +1294,7 @@ function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
 										// Custom handler
 										function() {
 											container.innerHTML = "<img src=\"/media/{{ user.get_profile.guistyle }}/img/admin/icon-yes.gif\"/> Done. A cart item for reprocessing all " + 
-												tasksList.split(',').length + " images at once has been<br/>added to your <a href=\"/spica2/cart/\">shopping cart</a>.";
+												tasksList.split(',').length + " images at once has been<br/>added to your <a href=\"/youpi/cart/\">shopping cart</a>.";
 										}
 				);
 			}
@@ -1303,7 +1303,7 @@ function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
 
 	var post = 'Plugin={{ plugin.id }}&Method=reprocessAllFailedProcessings&TasksList=' + tasksList;
 	r.setBusyMsg('Adding new cart item for reprocessing ' + tasksList.split(',').length + ' images');
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_renderOutputDirStats(container_id) {
@@ -1450,5 +1450,5 @@ function {{ plugin.id }}_getTaskLog(container_id, taskId) {
 
 	var post = 'Plugin={{ plugin.id }}&Method=getTaskLog&TaskId=' + taskId; 
 	r.setBusyMsg('Please wait while loading error log file content');
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }

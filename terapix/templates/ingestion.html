@@ -41,7 +41,7 @@ function ingestion_history() {
 	 * Arg 3: path to server-side script for async Ajax query
 	 *
 	 */
-	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/spica2/history/ingestion/');
+	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/youpi/history/ingestion/');
 }
 </script>
 {% endblock %}
@@ -161,7 +161,7 @@ function ingestion_history() {
 		try {
 			var options = {
 				{# IngestionName is the keyword needed by the server-side script to know what to query #}
-				script: '/spica2/autocompletion/IngestionName/',
+				script: '/youpi/autocompletion/IngestionName/',
 				varname: 'Value',
 				json: true,
 				maxresults: 20,

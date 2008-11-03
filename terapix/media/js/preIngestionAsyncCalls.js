@@ -30,7 +30,7 @@ function process_step() {
 	}
 	var percent;
 
-	ireq.open('post', '/spica2/process/preingestion/run/', true);
+	ireq.open('post', '/youpi/process/preingestion/run/', true);
 	ireq.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
 	ireq.onreadystatechange = function() {
@@ -101,7 +101,7 @@ function process_preingestion() {
 	// Handles progress bar
 	myJsProgressBarHandler.setPercentage('process_bar', '0');
 
-	xreq.open('post', '/spica2/process/preingestion/tablescount/', true);
+	xreq.open('post', '/youpi/process/preingestion/tablescount/', true);
 	xreq.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
 	xreq.onreadystatechange = function() {

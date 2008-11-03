@@ -6,6 +6,9 @@ import os
 # Local configuration file (site specific)
 #
 HOME 			= '/home/nis/semah/'
+TRUNK 			= os.path.join(HOME, 'youpi', 'trunk')
+APP_URL_PREFIX  = '/youpi'
+AUP				= APP_URL_PREFIX 	# For short
 CONDORFILE 		= '/tmp/condor.greg'
 CONDOR_OUTPUT 	= '/tmp/condor.greg.out'
 CONDOR_ERROR 	= '/tmp/condor.greg.error'
@@ -82,8 +85,8 @@ DATABASE_HOST = 'dbterapix.iap.fr'             # Set to empty string for localho
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Custom login/logout URLS
-LOGIN_URL = '/spica2/accounts/login/'
-LOGOUT_URL = '/spica2/accounts/logout/'
+LOGIN_URL = '/youpi/accounts/login/'
+LOGOUT_URL = '/youpi/accounts/logout/'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -104,7 +107,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(HOME, 'spica2', 'terapix', 'media')
+MEDIA_ROOT = os.path.join(TRUNK, 'terapix', 'media')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -135,15 +138,15 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'terapix.urls'
 
-TEMPLATE_DIRS = os.path.join(HOME, 'spica2', 'terapix','templates')
+TEMPLATE_DIRS = os.path.join(TRUNK, 'terapix','templates')
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-	    'django.contrib.admin',
-	     'terapix.spica2',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.sites',
+	'django.contrib.admin',
+	'terapix.spica2',
 )
 
 SESSION_SAVE_EVERY_REQUEST = True

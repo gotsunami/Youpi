@@ -4,20 +4,20 @@ Django devel setup
 
 Mathias:
 
-$ export PYTHONPATH=$PYTHONPATH:/home/nis/monnerville/spica2
+$ export PYTHONPATH=$PYTHONPATH:/home/nis/monnerville/youpi
 $ django-admin.py runserver \
  	--settings=settings_dev_mat \
-	--pythonpath=/home/nis/monnerville/spica2/terapix \
-	--adminmedia=/home/nis/monnerville/spica2/terapix/media \
+	--pythonpath=/home/nis/monnerville/youpi/terapix \
+	--adminmedia=/home/nis/monnerville/youpi/terapix/media \
 	194.57.221.40:8000 &
 
 Greg:
 
-$ export PYTHONPATH=$PYTHONPATH:/home/nis/semah/spica2
+$ export PYTHONPATH=$PYTHONPATH:/home/nis/semah/youpi
 $ django-admin.py runserver \
  	--settings=settings_dev_greg \
-	--pythonpath=/home/nis/semah/spica2/terapix \
-	--adminmedia=/home/nis/semah/spica2/terapix/media \
+	--pythonpath=/home/nis/semah/youpi/terapix \
+	--adminmedia=/home/nis/semah/youpi/terapix/media \
 	194.57.221.40:8888 &
 
 

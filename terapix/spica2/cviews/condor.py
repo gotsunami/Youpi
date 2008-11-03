@@ -84,9 +84,9 @@ def image_grading(request, pluginName, fitsId):
 		try:
 			path = plugin.getUrlToGradingData(request, fitsId)
 		except IndexError:
-			return HttpResponseRedirect('/spica2/results/')
+			return HttpResponseRedirect(AUP + '/results/')
 	else:
-		return HttpResponseRedirect('/spica2/results/')
+		return HttpResponseRedirect(AUP + '/results/')
 
 	return render_to_response('grading.html', {'www' : path, 'pluginName' : pluginName, 'Debug' : DEBUG, 'fitsId' : fitsId}, context_instance = RequestContext(request))
 
@@ -521,7 +521,7 @@ def query_condor_node_for_versions(request):
 				'UserID' 		: str(request.user.id)}
 
  	# Generates CSF
-	submit_file_path = os.path.join(HOME, 'spica2', 'terapix')
+	submit_file_path = os.path.join(TRUNK, 'terapix')
 	condor_submit_file = """
 #
 # Condor submission file
@@ -633,7 +633,7 @@ def condor_ingestion(request):
 	userData = { 'Descr' 		: str("Ingestion (%s) of FITS images " % ingestionId),
 				'UserID' 		: str(request.user.id)}
 
-	submit_file_path = os.path.join(HOME, 'spica2', 'terapix')
+	submit_file_path = os.path.join(TRUNK, 'terapix')
 
 	f = open(CONDORFILE + '_' + ingestionId, 'w')
 	f.write("""

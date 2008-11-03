@@ -65,7 +65,7 @@
 					</td>
 					<td>
 						<div style="padding: 0px; width: 300px">
-							<u>Your grade</u>{% if userGrade %} (<a href="/spica2/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a>){% endif %}:<br/>
+							<u>Your grade</u>{% if userGrade %} (<a href="/youpi/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a>){% endif %}:<br/>
 							<div id="current_grade_div" style="margin-top: 10px;"></div>
 							<script type="text/javascript">
 								var mygrade = new GradingWidget('current_grade_div', 'mygrade');
@@ -81,7 +81,7 @@
 											var div = mygrade.getCommitDiv();
 											div.innerHTML = '';
 											div.appendChild(document.createTextNode('Committed, thanks !'));
-											window.location.assign('/spica2/grading/panel/{{ pluginId }}/{{ fitsId }}/');
+											window.location.assign('/youpi/grading/panel/{{ pluginId }}/{{ fitsId }}/');
 										}
 									);
 
@@ -93,7 +93,7 @@
 										+ '&FitsId={{ fitsId }}'
 										+ '&PredefinedCommentId=' + prCommentId
 										+ '&CustomComment=' + customComment;
-									r.send('/spica2/process/plugin/', post);
+									r.send('/youpi/process/plugin/', post);
 								});
 							</script>
 						</div>

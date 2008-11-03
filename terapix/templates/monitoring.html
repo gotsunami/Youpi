@@ -182,7 +182,7 @@ function monitorJobs() {
 	);
 
 	var post = 'NextPage=' + gNextPage;
-	r.send('/spica2/monitoring/live/', post);
+	r.send('/youpi/monitoring/live/', post);
 }
 
 function cancelJob(container_id, clusterId, procId) {
@@ -199,7 +199,7 @@ function cancelJob(container_id, clusterId, procId) {
 	);
 
 	var post = 'ClusterId=' + clusterId + '&ProcId=' + procId;
-	r.send('/spica2/condor/cancel/', post);
+	r.send('/youpi/condor/cancel/', post);
 }
 
 function cancelAllJobs(what) {
@@ -226,7 +226,7 @@ function cancelAllJobs(what) {
 	);
 
 	var post = 'What=' + what;
-	r.send('/spica2/condor/cancel/', post);
+	r.send('/youpi/condor/cancel/', post);
 }
 </script>
 {% endblock %}
@@ -237,7 +237,7 @@ function cancelAllJobs(what) {
 
 {% block content %}
 <div align="center">
-<div id="software_div" class="tip" style="width: 300px;">To know the version of softwares running on the cluster, you can <a href="/spica2/monitoring/softwares/">run a software version check</a>.</div>
+<div id="software_div" class="tip" style="width: 300px;">To know the version of softwares running on the cluster, you can <a href="/youpi/monitoring/softwares/">run a software version check</a>.</div>
 <div id="monitor_div"></div>
 </div>
 

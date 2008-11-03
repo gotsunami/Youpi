@@ -328,14 +328,14 @@ NTHREADS               0               # Number of simultaneous threads for
 		# Builds Condor requirements string
 		req = self.getCondorRequirementString(condorHosts)
 
-		submit_file_path = os.path.join(HOME, 'spica2', 'terapix')
+		submit_file_path = os.path.join(TRUNK, 'terapix')
 
 	 	# Generates CSF
 		condor_submit_file = """
 #
 # Condor submission file
 # Please not that this file has been generated automatically by Spica2
-# http://clix.iap.fr/spica2/
+# http://clix.iap.fr/youpi/
 #
 executable              = %s/wrapper_processing.py
 universe                = vanilla

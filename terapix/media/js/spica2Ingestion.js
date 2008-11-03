@@ -218,7 +218,7 @@ function process_form() {
 				'&Hide=&OrderBy=id';
 
 		// Send HTTP POST request
-		xhr.send('/spica2/process/preingestion/query/', post);
+		xhr.send('/youpi/process/preingestion/query/', post);
 	}
 
 	return false;
@@ -310,5 +310,5 @@ function submitIngestion(ingestionId) {
 
 	// Send HTTP POST request
 	xhr.setBusyMsg('Preparing ingestion of ' + path);
-	xhr.send('/spica2/ingestion/ingestion2/', post);
+	xhr.send('/youpi/ingestion/ingestion2/', post);
 }

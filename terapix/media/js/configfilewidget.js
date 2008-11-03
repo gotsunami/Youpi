@@ -171,7 +171,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		);
 	
 		var post = 'Plugin=' + plugin_id + '&Method=getConfigFileContent&Name=' + configName;
-		r.send('/spica2/process/plugin/', post);
+		r.send('/youpi/process/plugin/', post);
 	}
 
 	this.saveConfigFileAs = function() {
@@ -205,7 +205,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 			// Add auto-completion capabilities
 			try {
 				var options = {
-					script: '/spica2/autocompletion/ConfigFile/',
+					script: '/youpi/autocompletion/ConfigFile/',
 					varname: 'Value',
 					json: true,
 					maxresults: 20,
@@ -265,7 +265,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		post = 	'Kind=' + plugin_id + '&Name=' + name;
 	
 		// Send HTTP POST request
-		xhr.send('/spica2/process/checkConfigFileExists/', post);
+		xhr.send('/youpi/process/checkConfigFileExists/', post);
 	}
 
 	function saveConfigToDB(name) {
@@ -294,7 +294,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 	
 		var post = 'Plugin=' + plugin_id + '&Method=saveConfigFile&Name=' + escape(name) + 
 			'&Content=' + escape(area.value);
-		r.send('/spica2/process/plugin/', post);
+		r.send('/youpi/process/plugin/', post);
 	}
 
 	function setConfigFile() {
@@ -321,7 +321,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		);
 	
 		var post = 'Plugin=' + plugin_id + '&Method=getConfigFileNames';
-		r.send('/spica2/process/plugin/', post);
+		r.send('/youpi/process/plugin/', post);
 	}
 
 	this.deleteConfigFile = function() {
@@ -348,7 +348,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		);
 	
 		var post = 'Plugin=' + plugin_id + '&Method=deleteConfigFile&Name=' + txt;
-		r.send('/spica2/process/plugin/', post);
+		r.send('/youpi/process/plugin/', post);
 	}
 
 	// Constructor

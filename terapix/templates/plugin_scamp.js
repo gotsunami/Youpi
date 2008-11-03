@@ -157,7 +157,7 @@ function {{ plugin.id }}_checkForSelectionLDACData(container) {
 				'IdList=' + idList;
 	// Send query
 	r.setBusyMsg('Checking selection ' + ({{ plugin.id }}_curSelectionIdx+1) + ' (' + idList.length + ' images)');
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_do_addSelectionToCart(selIds) {
@@ -346,7 +346,7 @@ function {{ plugin.id }}_renderLDACSelection(idx) {
 	);
 
 	var post = 'Plugin={{ plugin.id }}&Method=getLDACPathsFromImageSelection&IdList=' + selArr[idx];
-	xhr.send('/spica2/process/plugin/', post);
+	xhr.send('/youpi/process/plugin/', post);
 }
 
 /*
@@ -398,7 +398,7 @@ function {{ plugin.id }}_run(trid, idList, itemId, config, resultsOutputDir, sca
 				'&ScampId=' + scampId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
 				'&Config=' + config;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
@@ -484,7 +484,7 @@ function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, resultsOutputDir
 				'&ItemID=' + prefix + itemId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
 				'&Config=' + config;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 /*
@@ -627,7 +627,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		// Date-time, duration
 		td = document.createElement('td');
 		var a = document.createElement('a');
-		a.setAttribute('href', '/spica2/results/{{ plugin.id }}/' + hist[k]['TaskId'] + '/');
+		a.setAttribute('href', '/youpi/results/{{ plugin.id }}/' + hist[k]['TaskId'] + '/');
 		a.appendChild(document.createTextNode(hist[k]['Start'] + ' (' + hist[k]['Duration'] + ')'));
 		td.appendChild(a);
 		tr.appendChild(td);
@@ -854,7 +854,7 @@ function {{ plugin.id }}_showSavedItems() {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_delSavedItem(trid, name) {
@@ -881,7 +881,7 @@ function {{ plugin.id }}_delSavedItem(trid, name) {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=deleteCartItem&Name=' + name;
-	r.send('/spica2/process/plugin/', post);
+	r.send('/youpi/process/plugin/', post);
 }
 
 function {{ plugin.id }}_addToCart(idList, config, resultsOutputDir) {

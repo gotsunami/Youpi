@@ -37,19 +37,19 @@ from terapix.spica2.cviews.processing import *
 
 app_menu = { 	'normal' : 
 				( 	
-					{'title' : 'Home', 				'id' : 'home', 			'href' : '/spica2/'},
-					{'title' : 'Pre-ingestion',		'id' : 'preingestion',	'href' : '/spica2/preIngestion/'},
-					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : '/spica2/ingestion/'},
-					{'title' : 'Processing', 		'id' : 'processing', 	'href' : '/spica2/processing/'},
-					{'title' : 'Processing Results','id' : 'results',	 	'href' : '/spica2/results/'},
-					{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : '/spica2/monitoring/'}
+					{'title' : 'Home', 				'id' : 'home', 			'href' : AUP},
+					{'title' : 'Pre-ingestion',		'id' : 'preingestion',	'href' : AUP + '/preIngestion/'},
+					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : AUP + '/ingestion/'},
+					{'title' : 'Processing', 		'id' : 'processing', 	'href' : AUP + '/processing/'},
+					{'title' : 'Processing Results','id' : 'results',	 	'href' : AUP + '/results/'},
+					{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : AUP + '/monitoring/'}
 				),
 				'apart' :
 				( 	
 					# Display order is inverted
-					{'title' : 'Documentation', 	'id' : 'documentation', 'href' : '/spica2/documentation/'},
-					{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : '/spica2/preferences/'},
-					{'title' : 'Shopping cart',		'id' : 'shoppingcart', 	'href' : '/spica2/cart/'}
+					{'title' : 'Documentation', 	'id' : 'documentation', 'href' : AUP + '/documentation/'},
+					{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : AUP + '/preferences/'},
+					{'title' : 'Shopping cart',		'id' : 'shoppingcart', 	'href' : AUP + '/cart/'}
 				)
 			}
 
@@ -272,7 +272,7 @@ def single_result(request, pluginId, taskId):
 def logout(request):
 	auth.logout(request)
 	# Redirect to home page
-	return HttpResponseRedirect('/spica2/')
+	return HttpResponseRedirect(AUP)
 
 def browse_api(request, type):
 	if type == 'py' or type == 'python':
@@ -627,7 +627,7 @@ def open_populate(request, behaviour, tv_name, path):
 			'canhavechildren' : 1,
 			'onopenpopulate' : str(tv_name) + '.branchPopulate',
 			'syspath' : "/%s/%s/" % (str(path), label),
-			'openlink' : "/spica2/populate/%s/%s/%s/%s/" % (str(behaviour), str(tv_name), str(path), label),
+			'openlink' : AUP + "/populate/%s/%s/%s/%s/" % (str(behaviour), str(tv_name), str(path), label),
 			'num_fits_children' : len(fitsFiles)
 		})
 			
@@ -706,7 +706,7 @@ def open_populate_generic(request, patterns, fb_name, path):
 			'canhavechildren' : 1,
 			'onopenpopulate' : str(fb_name) + '.getResultHandler()',
 			'syspath' : "/%s/%s/" % (str(path), label),
-			'openlink' : "/spica2/populate_generic/%s/%s/%s/%s/" % (str(patterns), str(fb_name), str(path), label),
+			'openlink' : AUP + "/populate_generic/%s/%s/%s/%s/" % (str(patterns), str(fb_name), str(path), label),
 			'num_children' : len(files)
 		})
 			
@@ -757,7 +757,7 @@ def history_ingestion(request):
 							header[5] 	: [ing.check_QSO_status, 'check'],
 							header[6]	: [ing.check_multiple_ingestion, 'check'],
 							header[7]	: [ing.exit_code, 'exit'],
-							header[8]	: ['View log', 'link', str("/spica2/history/ingestion/report/%d/" % ing.id)]
+							header[8]	: ['View log', 'link', str(AUP + "/history/ingestion/report/%d/" % ing.id)]
 			})
 
 	# Be aware that JS code WILL search for data and header keys

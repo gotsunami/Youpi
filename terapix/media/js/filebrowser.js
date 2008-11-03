@@ -429,10 +429,10 @@ function FileBrowser(container_id, varName) {
 	//		'tooltip'			: '<h3>Test</h3>',
 			'onopenpopulate' 	: _resultHandler,
 			/*
-			 * Server-side URL: /spica2/populate/file_pattern/_instance_name/path/to/data/
+			 * Server-side URL: /youpi/populate/file_pattern/_instance_name/path/to/data/
 			 *
 			 */
-			'openlink'			: '/spica2/populate_generic/' + _filteringPatterns + '/' + _instance_name + '/' + _rootDataPath + '/'
+			'openlink'			: '/youpi/populate_generic/' + _filteringPatterns + '/' + _instance_name + '/' + _rootDataPath + '/'
 		} ];
 
 		if (_tree) delete _tree;

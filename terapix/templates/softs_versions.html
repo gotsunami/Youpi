@@ -37,7 +37,7 @@ function get_cluster_nodes() {
 	);
 
 	// Send HTTP POST request
-	xhr.send('/spica2/cluster/nodes/', '');
+	xhr.send('/youpi/cluster/nodes/', '');
 }
 
 function fill_versions(res) {
@@ -95,7 +95,7 @@ function get_versions_node(idx, handler) {
 
 	post = 'Node=' + all_nodes[idx];
 	// Send HTTP POST request
-	xhr.send('/spica2/cluster/softwares/versions/refresh/', post);
+	xhr.send('/youpi/cluster/softwares/versions/refresh/', post);
 }
 
 /*
@@ -163,7 +163,7 @@ function get_versions() {
 	);
 
 	// Send HTTP POST request
-	xhr.send('/spica2/cluster/softwares/versions/', '');
+	xhr.send('/youpi/cluster/softwares/versions/', '');
 }
 
 function get_cluster_softs(nodes) {
@@ -231,7 +231,7 @@ function get_cluster_softs(nodes) {
 	);
 
 	// Send HTTP POST request
-	xhr.send('/spica2/cluster/softwares/', '');
+	xhr.send('/youpi/cluster/softwares/', '');
 }
 
 function force_reload() {
@@ -245,7 +245,7 @@ function force_reload() {
 	);
 
 	// Send HTTP POST request
-	xhr.send('/spica2/cluster/softwares/versions/delete/', '');
+	xhr.send('/youpi/cluster/softwares/versions/delete/', '');
 }
 
 function run_checks() {
