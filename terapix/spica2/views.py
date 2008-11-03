@@ -10,8 +10,8 @@ from django.db.models import Q
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 #
-from terapix.spica2.forms import *
-from terapix.spica2.models import *
+from terapix.youpi.forms import *
+from terapix.youpi.models import *
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 from terapix.script.ingestion import getNowDateTime
@@ -28,12 +28,12 @@ from copy import deepcopy
 from settings import *
 
 # Custom views
-from terapix.spica2.pluginmanager import PluginManagerError, PluginError
-from terapix.spica2.cviews.shoppingcart import *
-from terapix.spica2.cviews.condor import *
-from terapix.spica2.cviews.preingestion import *
-from terapix.spica2.cviews.plot import *
-from terapix.spica2.cviews.processing import *
+from terapix.youpi.pluginmanager import PluginManagerError, PluginError
+from terapix.youpi.cviews.shoppingcart import *
+from terapix.youpi.cviews.condor import *
+from terapix.youpi.cviews.preingestion import *
+from terapix.youpi.cviews.plot import *
+from terapix.youpi.cviews.processing import *
 
 app_menu = { 	'normal' : 
 				( 	

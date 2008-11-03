@@ -1,8 +1,8 @@
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from terapix.spica2.pluginmanager import PluginManager
-from terapix.spica2.models import SiteProfile
+from terapix.youpi.pluginmanager import PluginManager
+from terapix.youpi.models import SiteProfile
 
 manager = PluginManager()
 

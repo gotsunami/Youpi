@@ -146,10 +146,10 @@ INSTALLED_APPS = (
 	'django.contrib.sessions',
 	'django.contrib.sites',
 	'django.contrib.admin',
-	'terapix.spica2',
+	'terapix.youpi',
 )
 
 SESSION_SAVE_EVERY_REQUEST = True
 
-AUTH_PROFILE_MODULE = 'spica2.siteprofile'
+AUTH_PROFILE_MODULE = 'youpi.siteprofile'
 

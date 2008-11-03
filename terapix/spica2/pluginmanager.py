@@ -1,13 +1,13 @@
 # vim: set ts=4
 
 from django.contrib.sessions.models import Session
-from terapix.spica2.models import *
+from terapix.youpi.models import *
 import glob, sys, types, re, os
 import marshal, base64
 from types import *
 from settings import *
 
-PLUGIN_DIRS = os.path.join(HOME, 'youpi', 'terapix', 'spica2', 'plugins')
+PLUGIN_DIRS = os.path.join(HOME, 'youpi', 'terapix', 'youpi', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 

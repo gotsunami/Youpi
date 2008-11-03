@@ -4,7 +4,7 @@ import sys, os.path, re, time, string
 import marshal, base64, zlib
 import xml.dom.minidom as dom
 from pluginmanager import Spica2Plugin, PluginError
-from terapix.spica2.models import *
+from terapix.youpi.models import *
 #
 from terapix.settings import *
 

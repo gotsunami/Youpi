@@ -14,12 +14,12 @@ from django.db.models import get_models
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 #
-from terapix.spica2.forms import *
-from terapix.spica2.models import *
+from terapix.youpi.forms import *
+from terapix.youpi.models import *
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
-from terapix.spica2.cviews import *
-from terapix.spica2.pluginmanager import PluginManagerError, PluginError
+from terapix.youpi.cviews import *
+from terapix.youpi.pluginmanager import PluginManagerError, PluginError
 #
 from terapix.settings import *
 

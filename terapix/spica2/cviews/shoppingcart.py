@@ -8,8 +8,8 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbi
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 #
-from terapix.spica2.models import *
-from terapix.spica2.cviews import *
+from terapix.youpi.models import *
+from terapix.youpi.cviews import *
 #
 from settings import *
 

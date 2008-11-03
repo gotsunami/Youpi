@@ -5,7 +5,7 @@ import xml.dom.minidom as dom
 import marshal, base64, zlib
 from types import *
 from pluginmanager import Spica2Plugin, PluginError
-from terapix.spica2.models import *
+from terapix.youpi.models import *
 #
 from terapix.settings import *
 

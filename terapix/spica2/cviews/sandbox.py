@@ -3,8 +3,8 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
 from django.template import Template, Context
 #
-from terapix.spica2.forms import *
-from terapix.spica2.cviews import *
+from terapix.youpi.forms import *
+from terapix.youpi.cviews import *
 #
 from terapix.settings import *
 

@@ -3,12 +3,12 @@
 #
 
 from django.contrib.auth.views import login
-from terapix.spica2.views import logout
+from terapix.youpi.views import logout
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns(
 	# Module that handles queries
-	'terapix.spica2.views',
+	'terapix.youpi.views',
 	
 	# Callback functions depending on urls matches
 	(r'^youpi/$', 'index'),
