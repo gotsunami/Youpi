@@ -1124,7 +1124,7 @@ Include /etc/apache2/vhosts.d/*.conf
 	PythonHandler django.core.handlers.modpython
 	SetEnv DJANGO_SETTINGS_MODULE terapix.settings_prod
 	PythonDebug On
-	PythonPath "['/home/nis/semah/spica2PROD/spica2', '/home/nis/semah/spica2PROD/spica2/terapix'] + sys.path"
+	PythonPath "['/home/nis/semah/spica2PROD/spica2', '/home/nis/semah/spica2PROD/youpi/terapix'] + sys.path"
 </Location>
 
-alias /media "/home/nis/semah/spica2PROD/spica2/terapix/media/"
+alias /media "/home/nis/semah/spica2PROD/youpi/terapix/media/"

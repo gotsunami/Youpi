@@ -9,7 +9,7 @@ if(connectionObject):
 	c = connectionObject.cursor();
 	c.execute("""set autocommit=0""");
 
-	os.chdir('/home/semah/spica2/image');
+	os.chdir('/home/semah/youpi/image');
 	k = glob.glob('*.fits');#creation de la liste repondant au format FITS
 	#print k
 	while k <> []:

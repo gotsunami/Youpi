@@ -177,16 +177,16 @@ var <emphasis role="strong">myid</emphasis>_my_global_var;
 				</listitem>
 				<listitem>
 					<para>
-						The <filename>spica2/plugins/</filename> directory, which should hold your server-side Python 
+						The <filename>youpi/plugins/</filename> directory, which should hold your server-side Python 
 						ascript. There is no particular naming policy since all Python files that belongs to this 
 						directory are parsed by the &pm; at registration time (see <xref linkend="def:pm"/>). For example, 
 						default plugin Python filenames are among the following:
 						<programlisting>
-spica2/plugins/qualityfitsin.py
-spica2/plugins/qualityfitsout.py
-spica2/plugins/sextractor.py
-spica2/plugins/scamp.py
-spica2/plugins/swarp.py</programlisting>
+youpi/plugins/qualityfitsin.py
+youpi/plugins/qualityfitsout.py
+youpi/plugins/sextractor.py
+youpi/plugins/scamp.py
+youpi/plugins/swarp.py</programlisting>
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -283,10 +283,10 @@ spica2/plugins/swarp.py</programlisting>
 			has been defined and serves as a unique entry point, so that you can use it to access any member 
 			method of any available plugin. Have a look at its definition in <filename>urls.py</filename>:
 			<programlisting language="python">
-(r'^spica2/process/plugin/$', 'processing_plugin')</programlisting>
+(r'^youpi/process/plugin/$', 'processing_plugin')</programlisting>
 		</para>
 		<para>
-			This line explicitely maps the <filename>/spica2/process/plugin/</filename> &url; to the 
+			This line explicitely maps the <filename>/youpi/process/plugin/</filename> &url; to the 
 			server-side &dj;'s callback function <function>processing_plugin()</function> defined in 
 			<filename>views.py</filename>:
 			<programlisting language="python">

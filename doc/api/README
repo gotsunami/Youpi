@@ -3,7 +3,7 @@ How to generate API documentation
 ---------------------------------
 
 Javascript doc:
-	naturaldocs -i ~/spica2/terapix/media/js/ -i ~/spica2/terapix/templates/ -o HTML ~/tmp/spica2/api/js/ -p ~/tmp/spica2/api/prj/
+	naturaldocs -i ~/youpi/terapix/media/js/ -i ~/youpi/terapix/templates/ -o HTML ~/tmp/youpi/api/js/ -p ~/tmp/youpi/api/prj/
 
 Python doc:
 	doxygen config.doxy

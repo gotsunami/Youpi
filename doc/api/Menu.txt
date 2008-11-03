@@ -44,8 +44,8 @@ Timestamp: Updated month day, year
 
 Group: Core Javascript  {
 
-   File: ImageSelector  (/home/nis/monnerville/spica2/terapix/media/js/imageselector.js)
-   File: ShoppingCart  (/home/nis/monnerville/spica2/terapix/media/js/shoppingcart.js)
+   File: ImageSelector  (/home/nis/monnerville/youpi/terapix/media/js/imageselector.js)
+   File: ShoppingCart  (/home/nis/monnerville/youpi/terapix/media/js/shoppingcart.js)
    }  # Group: Core Javascript
 
 Group: Plugins  {
@@ -53,8 +53,8 @@ Group: Plugins  {
    Group: Python  {
 
       Text: Server-side code
-      File: QualityFitsIn  (/home/nis/monnerville/spica2/terapix/spica2/plugins/qualityfitsin.py)
-      File: Scamp  (/home/nis/monnerville/spica2/terapix/spica2/plugins/scamp.py)
+      File: QualityFitsIn  (/home/nis/monnerville/youpi/terapix/youpi/plugins/qualityfitsin.py)
+      File: Scamp  (/home/nis/monnerville/youpi/terapix/youpi/plugins/scamp.py)
       }  # Group: Python
 
    }  # Group: Plugins

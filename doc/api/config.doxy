@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = SPICA2
 PROJECT_NUMBER         = SVN
-OUTPUT_DIRECTORY       = /home/nis/monnerville/tmp/spica2/api/py/
+OUTPUT_DIRECTORY       = /home/nis/monnerville/tmp/youpi/api/py/
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
 BRIEF_MEMBER_DESC      = YES
@@ -77,7 +77,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = /home/nis/monnerville/spica2/terapix/
+INPUT                  = /home/nis/monnerville/youpi/terapix/
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.py
 RECURSIVE              = YES
