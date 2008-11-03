@@ -1,9 +1,9 @@
 
-if (!Spica2)
-	var Spica2 = {};
+if (!Youpi)
+	var Youpi = {};
 
-Spica2.ImageSelector = {};
-Spica2.ImageSelector.currentId = 1;
+Youpi.ImageSelector = {};
+Youpi.ImageSelector.currentId = 1;
 
 /*
  * Class: ImageSelector
@@ -109,8 +109,8 @@ function ImageSelector(container_id, varName)
 	 * Unique instance identifier
 	 *
 	 */ 
-	var id = varName + '_imgSel_' + Spica2.ImageSelector.currentId;
-	Spica2.ImageSelector.currentId++;
+	var id = varName + '_imgSel_' + Youpi.ImageSelector.currentId;
+	Youpi.ImageSelector.currentId++;
 
 
 	// Group: Variables

@@ -1,15 +1,15 @@
 # vim: set ts=4
 
 import sys
-from pluginmanager import Spica2Plugin
+from pluginmanager import ProcessingPlugin
 
-class Swarp(Spica2Plugin):
+class Swarp(ProcessingPlugin):
 	"""
 	Plugin for Swarp.
 
 	"""
 	def __init__(self):
-		Spica2Plugin.__init__(self)
+		ProcessingPlugin.__init__(self)
 
 		#
 		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)

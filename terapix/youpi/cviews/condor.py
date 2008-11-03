@@ -345,8 +345,8 @@ def autocomplete(request, key, value):
 def get_live_monitoring(request, nextPage = -1):
 	"""
 	Parses XML output from Condor and returns a JSON object.
-	Only Spica's related job are monitored. A Spica job must have 
-	an environment variable named SPICA_USER_DATA which can contain
+	Only Youpi's related job are monitored. A Youpi job must have 
+	an environment variable named YOUPI_USER_DATA which can contain
 	serialized base64-encoded data to be parsed.
 
 	nextPage: id of the page of 'limit' results to display. If nextPage == -1
@@ -365,7 +365,7 @@ def get_live_monitoring(request, nextPage = -1):
 	doc = dom.parseString(string.join(data[3:]))
 	jNode = doc.getElementsByTagName('c')
 
-	# Spica Condor job count
+	# Youpi Condor job count
 	jobCount = 0
 
 	for job in jNode:
@@ -400,11 +400,11 @@ def get_live_monitoring(request, nextPage = -1):
 				jobData['JobDuration'] = "%02d:%02d:%02d" % (h, m, s)
 
 			elif a.getAttribute('n') == 'Env':
-				# Try to look for SPICA_USER_DATA environment variable
-				# If this is variable is found then this is a Spica's job so we can keep it
+				# Try to look for YOUPI_USER_DATA environment variable
+				# If this is variable is found then this is a Youpi's job so we can keep it
 				env = str(a.firstChild.firstChild.nodeValue)
-				if env.find('SPICA_USER_DATA') >= 0:
-					m = re.search('SPICA_USER_DATA=(.*?)$', env)
+				if env.find('YOUPI_USER_DATA') >= 0:
+					m = re.search('YOUPI_USER_DATA=(.*?)$', env)
 					userData = m.groups(0)[0]	
 					c = userData.find(';')
 					if c > 0:
@@ -515,7 +515,7 @@ def query_condor_node_for_versions(request):
 			return HttpResponse(str({'Versions' : 0}), mimetype = 'text/plain')
 
 
-	# Content of SPICA_USER_DATA env variable passed to Condor
+	# Content of YOUPI_USER_DATA env variable passed to Condor
 	userData = {'Descr' 		: descr,
 				'Node' 			: str(node),
 				'UserID' 		: str(request.user.id)}
@@ -525,7 +525,7 @@ def query_condor_node_for_versions(request):
 	condor_submit_file = """
 #
 # Condor submission file
-# Please not that this file has been generated automatically by Spica2
+# Please not that this file has been generated automatically by Youpi
 #
 executable              = %s/soft_version_check.py
 universe                = vanilla
@@ -535,8 +535,8 @@ when_to_transfer_output = ON_EXIT
 transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
-# SPICA_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; SPICA_USER_DATA=%s
+# YOUPI_USER_DATA = %s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
 arguments               = "%s"
 log                     = /tmp/VCHECK.log.$(Cluster).$(Process)
 error                   = /tmp/VCHECK.err.$(Cluster).$(Process)
@@ -629,7 +629,7 @@ def condor_ingestion(request):
 					'host' : machine
 	}
 
-	# Content of SPICA_USER_DATA env variable passed to Condor
+	# Content of YOUPI_USER_DATA env variable passed to Condor
 	userData = { 'Descr' 		: str("Ingestion (%s) of FITS images " % ingestionId),
 				'UserID' 		: str(request.user.id)}
 
@@ -652,8 +652,8 @@ transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
 # Logs
-# SPICA_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; SPICA_USER_DATA=%s
+# YOUPI_USER_DATA = %s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
 output                  = %s
 error                   = %s
 log                     = %s

@@ -151,7 +151,7 @@ templates/plugin_myplugin.js</programlisting>
 					</para>
 					<para>
 						Since the <varname>plugin</varname> variable is a Python object (which inherits the 
-						<classname>Spica2Plugin</classname> class), &dj;'s template system is able to access all 
+						<classname>ProcessingPlugin</classname> class), &dj;'s template system is able to access all 
 						its data members. Context variable lookup can get around this namespacing issue by, for 
 						example, prefixing function and variable names with the plugin's unique identifier 
 						(See <xref linkend="mandvar:id"/> variable definition). Therefore, instead of writing this:
@@ -277,7 +277,7 @@ youpi/plugins/swarp.py</programlisting>
 		<para>
 			When you are writing a processing plugin for &appname;, you have to write both client-side - 
 			your &html; template file(s) and your JavaScript <filename>jsSource</filename> file - and 
-			server-side code (your Python class that inherits <classname>Spica2Plugin</classname>). Because 
+			server-side code (your Python class that inherits <classname>ProcessingPlugin</classname>). Because 
 			all your plugin's server-side code have to be a part of your Python class, &appname; provides a 
 			way to call a specific member method from your plugin's JavaScript code. A dedicated &dj;'s &url; 
 			has been defined and serves as a unique entry point, so that you can use it to access any member 
@@ -409,7 +409,7 @@ function myHandler(resp) {
 			&csf; generation within your scripts.
 		</para>
 		<para>
-			Passing extra user data to Condor is achieve by defining the <varname>SPICA_USER_DATA</varname> 
+			Passing extra user data to Condor is achieve by defining the <varname>YOUPI_USER_DATA</varname> 
 			environment variable in the &csf;. Its content has to be a base64-encoded serialized Python dictionary 
 			with at least the two mandatory keys <varname>Descr</varname> that stands for <quote>description</quote> 
 			and <varname>UserID</varname>, which is the &dj;'s unique user identifier (in fact, there is a third 
@@ -426,7 +426,7 @@ userData = {
 csf = """
 executable  = mybin
 universe    = vanilla
-environment = SPICA_USER_DATA=%s
+environment = YOUPI_USER_DATA=%s
 ...
 """ % base64.encodestring(marshal.dumps(userData)).replace('\n', '')
 
@@ -436,7 +436,7 @@ data = pipe.readlines()
 pipe.close() </programlisting> 
 		</para>
 		<para>
-			Also, note that the presence of the <varname>SPICA_USER_DATA</varname> environment variable 
+			Also, note that the presence of the <varname>YOUPI_USER_DATA</varname> environment variable 
 			ensures that only &appname; related jobs are filtered and monitored. Other Condor jobs will 
 			not be monitored by the &ami;.
 		</para>
@@ -481,7 +481,7 @@ mysql> desc youpi_processing_task;
 					<para>
 						The wrapper script first performs some sanity checks. It looks for the <varname>Kind</varname> 
 						dictionary key into its first argument, which must be a <emphasis>base64-encoded serialized Python 
-						dictionary</emphasis> (remember the <varname>SPICA_USER_DATA</varname> variable in the previous 
+						dictionary</emphasis> (remember the <varname>YOUPI_USER_DATA</varname> variable in the previous 
 						section?). If not found, a <classname>WrapperError</classname> Python exception is raised, thus 
 						terminating the processing. This keyword is mandatory because it allows the wrapper script to 
 						take special action depending on <varname>Kind</varname>'s associated value. &appname;'s built-in 
@@ -589,7 +589,7 @@ mysql> desc youpi_processing_task;
 							to <varname>False</varname> if you want to disable a plugin.
 						</para>
 						<para>
-							Every plugin inherits the <classname>Spica2Plugin</classname> class (defined in 
+							Every plugin inherits the <classname>ProcessingPlugin</classname> class (defined in 
 							<filename>pluginmanager.py</filename>) which defines an <varname>enable</varname> 
 							data member with a value that defaults to <varname>True</varname>.
 						</para>
@@ -677,7 +677,7 @@ mysql> desc youpi_processing_task;
 {% endfor %}</programlisting>
 						</para>
 						<para>
-							The <classname>Spica2Plugin</classname> class defines a generic <varname>template</varname> data member with 
+							The <classname>ProcessingPlugin</classname> class defines a generic <varname>template</varname> data member with 
 							a value that defaults to the file <filename>plugin_default.html</filename>. So if you forget to provide a 
 							<varname>template</varname> data member to your custom plugin, this default &html; template will be used instead, 
 							reminding you that you certainly missed something. 

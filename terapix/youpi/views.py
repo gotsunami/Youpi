@@ -542,7 +542,7 @@ def local_ingestion(request):
 			
 			connectionObject.commit()
 	else:
-		print 'Not connected to spica Database'
+		print 'Not connected to the Database'
 	rows = open('/tmp/verify.log', 'r').readlines()
 	return render_to_response('popup.htm', {'names': rows})
 

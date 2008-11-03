@@ -15,17 +15,17 @@
 
 import sys, os.path, re, time, string
 import marshal, base64, zlib
-from pluginmanager import Spica2Plugin, PluginError
+from pluginmanager import ProcessingPlugin, PluginError
 from terapix.youpi.models import *
 #
 from terapix.settings import *
 
-class Skeleton(Spica2Plugin):
+class Skeleton(ProcessingPlugin):
 	"""
 	This plugin does nothing but can serve as a base for writing processing plugins
 	"""
 	def __init__(self):
-		Spica2Plugin.__init__(self)
+		ProcessingPlugin.__init__(self)
 		#
 		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)
 		#
@@ -112,7 +112,7 @@ class Skeleton(Spica2Plugin):
 		# Condor submission file
 		csfPath = "/tmp/skel-%s.txt" % now
 
-		# Content of SPICA_USER_DATA env variable passed to Condor
+		# Content of YOUPI_USER_DATA env variable passed to Condor
 		# At least those 3 keys
 		userData = {'Descr' 			: str("%s trying %s" % (self.optionLabel, self.command)),		# Mandatory for Active Monitoring Interface (AMI)
 					'Kind'	 			: self.id,													# Mandatory for AMI, Wrapper Processing (WP)
@@ -141,7 +141,7 @@ class Skeleton(Spica2Plugin):
 		condor_submit_file = """
 #
 # Condor submission file
-# Please not that this file has been generated automatically by Spica2
+# Please not that this file has been generated automatically by Youpi
 # http://clix.iap.fr/youpi/
 #
 
@@ -155,8 +155,8 @@ when_to_transfer_output = ON_EXIT
 transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
-# SPICA_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; SPICA_USER_DATA=%s
+# YOUPI_USER_DATA = %s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
 log                     = /tmp/SKEL.log.$(Cluster).$(Process)
 error                   = /tmp/SKEL.err.$(Cluster).$(Process)
 output                  = /tmp/SKEL.out.$(Cluster).$(Process)

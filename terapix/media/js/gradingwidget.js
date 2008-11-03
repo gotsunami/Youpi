@@ -1,9 +1,9 @@
 
-if (!Spica2)
-	var Spica2 = {};
+if (!Youpi)
+	var Youpi = {};
 
-Spica2.GradingWidget = {};
-Spica2.GradingWidget.currentId = 1;
+Youpi.GradingWidget = {};
+Youpi.GradingWidget.currentId = 1;
 
 /*
  * Class: GradingWidget
@@ -27,8 +27,8 @@ function GradingWidget(container_id, varName, starsCount)
 	var instance_name = varName;
 	var container = document.getElementById(container_id);
 
-	var id = varName + '_gradw_' + Spica2.GradingWidget.currentId;
-	Spica2.GradingWidget.currentId++;
+	var id = varName + '_gradw_' + Youpi.GradingWidget.currentId;
+	Youpi.GradingWidget.currentId++;
 
 	var starsCount = starsCount ? starsCount : 4;
 	

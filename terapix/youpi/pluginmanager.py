@@ -14,8 +14,8 @@ sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 class PluginError(Exception): pass
 class PluginManagerError(Exception): pass
 
-class Spica2Plugin: 
-	type = 'SPICA2PLUGIN'
+class ProcessingPlugin: 
+	type = 'YOUPIPLUGIN'
 
 	def __init__(self):
 		self.enable = True
@@ -216,14 +216,14 @@ class PluginManager:
 		try:
 			for file in pyfiles:
 				module = __import__(os.path.basename(file)[:-3])
-				# Find class derived from Spica2Plugin
+				# Find class derived from ProcessingPlugin
 				for var in dir(module):
 					if type(eval('module.' + var)) == types.ClassType:
-						if var != Spica2Plugin.__name__:
+						if var != ProcessingPlugin.__name__:
 							obj = eval('module.' + var)()
 							# Don't know why isinstance and issubclass not working as expected
 							if hasattr(obj, 'type'):
-								if obj.type == 'SPICA2PLUGIN' and obj.enable:
+								if obj.type == 'YOUPIPLUGIN' and obj.enable:
 									self.plugins.append(obj)
 							
 							del obj

@@ -4,12 +4,12 @@ import sys, os.path, time, string
 import xml.dom.minidom as dom
 import marshal, base64, zlib
 from types import *
-from pluginmanager import Spica2Plugin, PluginError
+from pluginmanager import ProcessingPlugin, PluginError
 from terapix.youpi.models import *
 #
 from terapix.settings import *
 
-class Scamp(Spica2Plugin):
+class Scamp(ProcessingPlugin):
 	"""	
 	Class: Scamp
 	Plugin for Scamp.
@@ -19,7 +19,7 @@ class Scamp(Spica2Plugin):
 	- Computes astrometric/Photometric solution from FITS images sequence
 	"""	
 	def __init__(self):
-		Spica2Plugin.__init__(self)
+		ProcessingPlugin.__init__(self)
 
 		self.id = 'scamp'
 		self.optionLabel = 'Astro-Photo calibration'
@@ -309,7 +309,7 @@ NTHREADS               0               # Number of simultaneous threads for
 		csfPath = "/tmp/scamp-condor-%s.txt" % now
 
 		images = Image.objects.filter(id__in = idList)
-		# Content of SPICA_USER_DATA env variable passed to Condor
+		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'ItemID' 			: itemId, 
 					'ScampId' 			: str(scampId),
 					'Warnings' 			: {}, 
@@ -334,7 +334,7 @@ NTHREADS               0               # Number of simultaneous threads for
 		condor_submit_file = """
 #
 # Condor submission file
-# Please not that this file has been generated automatically by Spica2
+# Please not that this file has been generated automatically by Youpi
 # http://clix.iap.fr/youpi/
 #
 executable              = %s/wrapper_processing.py
@@ -395,8 +395,8 @@ requirements            = %s
 																		userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
 		condor_submit_entry = """
 arguments               = %s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %s %s -c %s 2>/dev/null
-# SPICA_USER_DATA = %s
-environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; SPICA_USER_DATA=%s
+# YOUPI_USER_DATA = %s
+environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
 queue""" %  (	encUserData, 
 				scamp_params,
 				string.join(ldac_files), 

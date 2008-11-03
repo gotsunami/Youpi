@@ -2,9 +2,9 @@
  * Simulates namespacing. This allows to add several SqlForm instances in one HTML document
  *
  */
-var Spica2 = {};
-Spica2.SQL = {};
-Spica2.SQL.currentFormId = 1;
+var Youpi = {};
+Youpi.SQL = {};
+Youpi.SQL.currentFormId = 1;
 
 /*
  * Class: SqlForm
@@ -44,8 +44,8 @@ function SqlForm(container_id, tableName, varName, forbiddenFields)
 	// Form top node
 	var topNode = null;
 
-	var id = 'sqlForm' + Spica2.SQL.currentFormId;
-	Spica2.SQL.currentFormId++;
+	var id = 'sqlForm' + Youpi.SQL.currentFormId;
+	Youpi.SQL.currentFormId++;
 	var debugID = 'debug_' + id;
 
 	// Constant strings

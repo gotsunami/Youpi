@@ -3,14 +3,14 @@
 import sys, os.path, re, time, string
 import xml.dom.minidom as dom
 import marshal, base64, zlib
-from pluginmanager import Spica2Plugin, PluginError
+from pluginmanager import ProcessingPlugin, PluginError
 from terapix.youpi.models import *
 from types import *
 from sets import Set
 #
 from terapix.settings import *
 
-class QualityFitsIn(Spica2Plugin):
+class QualityFitsIn(ProcessingPlugin):
 	"""
 	Plugin for QualityFitsIn.
 	
@@ -27,7 +27,7 @@ class QualityFitsIn(Spica2Plugin):
 	# Constructor	
 	#
 	def __init__(self):
-		Spica2Plugin.__init__(self)
+		ProcessingPlugin.__init__(self)
 
 		#
 		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)
@@ -342,7 +342,7 @@ class QualityFitsIn(Spica2Plugin):
 		csfPath = "/tmp/qcondor-%s.txt" % now
 
 		images = Image.objects.filter(id__in = idList)
-		# Content of SPICA_USER_DATA env variable passed to Condor
+		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'ItemID' 			: itemId, 
 					'FitsinId' 			: str(fitsinId),
 					'Warnings' 			: {}, 
@@ -370,7 +370,7 @@ class QualityFitsIn(Spica2Plugin):
 		condor_submit_file = """
 #
 # Condor submission file
-# Please not that this file has been generated automatically by Spica2
+# Please not that this file has been generated automatically by Youpi
 # http://clix.iap.fr/youpi/
 #
 executable              = %s/wrapper_processing.py
@@ -484,8 +484,8 @@ arguments                = %s /usr/local/bin/condor_transfert.pl /usr/local/bin/
 
 			# Add per-job custom environment variable
 			condor_submit_img_entries += """
-# SPICA_USER_DATA = %s
-environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; SPICA_USER_DATA=%s""" %  (	userData, 
+# YOUPI_USER_DATA = %s
+environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s""" %  (	userData, 
 																															FTP_URL + resultsOutputDir,
 																															base64.encodestring(marshal.dumps(userData)).replace('\n', '') ) 
 
@@ -650,8 +650,8 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 	def jobStatus(self, request):
 		"""
 		Parses XML output from Condor and returns a JSON object.
-		Only Spica's related job are monitored. A Spica job must have 
-		an environment variable named SPICA_USER_DATA which can contain
+		Only Youpi's related job are monitored. A Youpi job must have 
+		an environment variable named YOUPI_USER_DATA which can contain
 		serialized base64-encoded data to be parsed.
 
 		nextPage: id of the page of 'limit' results to display
@@ -674,7 +674,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		doc = dom.parseString(string.join(data[3:]))
 		jNode = doc.getElementsByTagName('c')
 
-		# Spica Condor job count
+		# Youpi Condor job count
 		jobCount = 0
 
 		for job in jNode:
@@ -713,11 +713,11 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 					jobData['JobDuration'] = "%02d:%02d:%02d" % (h, m, s)
 
 				elif a.getAttribute('n') == 'Env':
-					# Try to look for SPICA_USER_DATA environment variable
-					# If this is variable is found then this is a Spica's job so we can keep it
+					# Try to look for YOUPI_USER_DATA environment variable
+					# If this is variable is found then this is a Youpi's job so we can keep it
 					env = str(a.firstChild.firstChild.nodeValue)
-					if env.find('SPICA_USER_DATA') >= 0:
-						m = re.search('SPICA_USER_DATA=(.*?)$', env)
+					if env.find('YOUPI_USER_DATA') >= 0:
+						m = re.search('YOUPI_USER_DATA=(.*?)$', env)
 						userData = m.groups(0)[0]	
 						c = userData.find(';')
 						if c > 0:

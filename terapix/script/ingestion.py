@@ -121,12 +121,12 @@ def sendmail(status, to, start, end, runame):
 		status_msg = "with ERRORS, status code %d" % status
 
 	body = """
-This is an automated email from the Spica system on machine clix.iap.fr.
+This is an automated email from the Youpi system on machine clix.iap.fr.
 Please do not reply.
 
 The job has exited %s.
 
-The following options have been set from the Spica web interface:
+The following options have been set from the Youpi web interface:
 - Skip ingestion for non fitsverify compliant images: %s
 - Skip ingestion when QSO status does not match 'validated': %s
 - Allow images to be ingested several times: %s
@@ -148,7 +148,7 @@ Elapsed time: %.02f seconds
 				(end-start)									# Duration
 			)
 
-	msg = "Subject: [Spica] Report for ingestion %s [%d]\r\nFrom: spica_noreply@iap.fr\r\nTo: %s\r\n\n%s\n%s" % (script_args['ingestion_id'], status, email, body, log) 
+	msg = "Subject: [Youpi] Report for ingestion %s [%d]\r\nFrom: youpi_noreply@iap.fr\r\nTo: %s\r\n\n%s\n%s" % (script_args['ingestion_id'], status, email, body, log) 
 
 	if SEND_MAIL:
 		s = smtplib.SMTP('localhost')
@@ -244,7 +244,7 @@ def getFITSField(fitsheader, fieldname, default = NULLSTRING):
 
 def run_ingestion():
 	"""
-	Ingestion procedure of FITS images in the spica database
+	Ingestion procedure of FITS images in the database
 	"""
 
 	global log, email, script_args, ingestionId, g
@@ -492,7 +492,7 @@ def run_ingestion():
 		#
 	
 		#
-		# Spica does not (yet!) deal with weight maps generated 
+		# Youpi does not (yet!) deal with weight maps generated 
 		# by QFits
 		#
 		weight = re.search('_weight' + FITSEXT, fitsfile);

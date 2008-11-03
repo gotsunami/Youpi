@@ -1,7 +1,7 @@
 Format: 1.4
 
 
-Title: Spica2 API
+Title: Youpi API
 SubTitle: A web tool for reducing astronomical images
 
 Footer: Copyright (c) 2008 Terapix, IAP

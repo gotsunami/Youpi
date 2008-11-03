@@ -3,12 +3,12 @@
 import sys, os.path, re, time, string
 import marshal, base64, zlib
 import xml.dom.minidom as dom
-from pluginmanager import Spica2Plugin, PluginError
+from pluginmanager import ProcessingPlugin, PluginError
 from terapix.youpi.models import *
 #
 from terapix.settings import *
 
-class Sextractor(Spica2Plugin):
+class Sextractor(ProcessingPlugin):
 	"""
 	Sextractor plugin
 
@@ -17,7 +17,7 @@ class Sextractor(Spica2Plugin):
 	- Produce catalogs
 	"""
 	def __init__(self):
-		Spica2Plugin.__init__(self)
+		ProcessingPlugin.__init__(self)
 		#
 		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)
 		#
@@ -157,7 +157,7 @@ class Sextractor(Spica2Plugin):
 		# Condor submission file
 		csfPath = "/tmp/skel-%s.txt" % now
 
-		# Content of SPICA_USER_DATA env variable passed to Condor
+		# Content of YOUPI_USER_DATA env variable passed to Condor
 		# At least those 3 keys
 		userData = {'Descr' 		: str("%s trying /usr/bin/uptime" % self.optionLabel),		# Mandatory for Active Monitoring Interface (AMI)
 					'Kind'	 		: self.id,												# Mandatory for AMI
@@ -185,7 +185,7 @@ class Sextractor(Spica2Plugin):
 		condor_submit_file = """
 #
 # Condor submission file
-# Please not that this file has been generated automatically by Spica2
+# Please not that this file has been generated automatically by Youpi
 # http://clix.iap.fr/youpi/
 #
 
@@ -199,8 +199,8 @@ when_to_transfer_output = ON_EXIT
 transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
-# SPICA_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; SPICA_USER_DATA=%s
+# YOUPI_USER_DATA = %s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
 log                     = /tmp/SKEL.log.$(Cluster).$(Process)
 error                   = /tmp/SKEL.err.$(Cluster).$(Process)
 output                  = /tmp/SKEL.out.$(Cluster).$(Process)
@@ -305,8 +305,8 @@ requirements            = %s
 	def jobStatus(self, request):
 		"""
 		Parses XML output from Condor and returns a JSON object.
-		Only Spica's related job are monitored. A Spica job must have 
-		an environment variable named SPICA_USER_DATA which can contain
+		Only Youpi's related job are monitored. A Youpi job must have 
+		an environment variable named YOUPI_USER_DATA which can contain
 		serialized base64-encoded data to be parsed.
 
 		nextPage: id of the page of 'limit' results to display
@@ -329,7 +329,7 @@ requirements            = %s
 		doc = dom.parseString(string.join(data[3:]))
 		jNode = doc.getElementsByTagName('c')
 
-		# Spica Condor job count
+		# Youpi Condor job count
 		jobCount = 0
 
 		for job in jNode:
@@ -368,11 +368,11 @@ requirements            = %s
 					jobData['JobDuration'] = "%02d:%02d:%02d" % (h, m, s)
 
 				elif a.getAttribute('n') == 'Env':
-					# Try to look for SPICA_USER_DATA environment variable
-					# If this is variable is found then this is a Spica's job so we can keep it
+					# Try to look for YOUPI_USER_DATA environment variable
+					# If this is variable is found then this is a Youpi's job so we can keep it
 					env = str(a.firstChild.firstChild.nodeValue)
-					if env.find('SPICA_USER_DATA') >= 0:
-						m = re.search('SPICA_USER_DATA=(.*?)$', env)
+					if env.find('YOUPI_USER_DATA') >= 0:
+						m = re.search('YOUPI_USER_DATA=(.*?)$', env)
 						userData = m.groups(0)[0]	
 						c = userData.find(';')
 						if c > 0:

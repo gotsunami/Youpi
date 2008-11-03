@@ -1,5 +1,5 @@
 #
-# Urls and patterns for Spica2
+# Urls and patterns for Youpi
 #
 
 from django.contrib.auth.views import login

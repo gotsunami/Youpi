@@ -1,9 +1,9 @@
 # vim: set ts=4
 
 import sys
-from pluginmanager import Spica2Plugin
+from pluginmanager import ProcessingPlugin
 
-class QualityFitsIn(Spica2Plugin):
+class QualityFitsIn(ProcessingPlugin):
 	"""
 	Plugin for QualityFitsOut.
 
@@ -12,7 +12,7 @@ class QualityFitsIn(Spica2Plugin):
 	"""
 
 	def __init__(self):
-		Spica2Plugin.__init__(self)
+		ProcessingPlugin.__init__(self)
 
 		#
 		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)

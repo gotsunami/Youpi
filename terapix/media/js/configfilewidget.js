@@ -1,5 +1,5 @@
-if (!Spica2)
-	var Spica2 = {};
+if (!Youpi)
+	var Youpi = {};
 
 /*
  * Class: ConfigFileWidget
