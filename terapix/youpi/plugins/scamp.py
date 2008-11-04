@@ -35,6 +35,8 @@ class Scamp(ProcessingPlugin):
 		self.itemCartTemplate = 'plugin_scamp_item_cart.html'
 		# Custom javascript
 		self.jsSource = 'plugin_scamp.js'
+		# Scamp's output XML filename
+		self.XMLFile = 'scamp.xml'
 
 		# Decomment to disable the plugin
 		#self.enable = False
@@ -566,3 +568,68 @@ queue""" %  (	encUserData,
 					'History'			: history,
 			}
 
+	def checkIfXMLExists(self, request):
+		"""
+		Locates scamp.xml file path on cluster
+
+		@return Dictionary with filename or -1 if not found
+		"""
+
+		post = request.POST
+		try:
+			taskId = request.POST['TaskId']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
+		task = Processing_task.objects.filter(id = taskId)[0]
+
+		# FIXME: may not be self.XMLFile with custom conf file
+		filePath = str(os.path.join(task.results_output_dir, self.XMLFile))
+
+		if not os.path.exists(filePath):
+			filePath = -1
+
+		return { 'FilePath' : filePath }
+
+	def parseScampXML(self, request):
+		"""
+		"""
+
+		post = request.POST
+		try:
+			taskId = request.POST['TaskId']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
+		task = Processing_task.objects.filter(id = taskId)[0]
+		file = str(os.path.join(task.results_output_dir, self.XMLFile))
+
+		doc = dom.parse(file)
+		fields = []
+		ldac_list = []
+		td = []
+	
+		data = doc.getElementsByTagName('TABLE')[0]
+		fieldNodes = data.getElementsByTagName('FIELD')
+	
+		for node in fieldNodes:
+			fields.append([str(node.getAttribute('name')), str(node.getAttribute('datatype'))])
+	
+		return { 'Fields' : fields }
+
+#		ind = field.index(param)
+#		ind2 = field_type.index(param)
+#	
+#		return ind,ind2,field[ind],field_type[ind2]
+#		
+#		tabledata = doc.getElementsByTagName('TABLEDATA')
+#		tabledata = tabledata[0]
+#		table_tr = tabledata.getElementsByTagName('TR')
+#	
+#		for i in table_tr:
+#			table_td = i.getElementsByTagName('TD')
+#			td = []
+#			for j in table_td:
+#				td.append(str(j.firstChild.nodeValue))
+#	
+#		return ldac_list

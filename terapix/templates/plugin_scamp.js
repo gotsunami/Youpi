@@ -26,6 +26,7 @@ var advTable;
 var ldac_table;
 var ldac_table_active_selections = new Array();
 var ldac_selection_last_idx;
+var xmlParser;
 
 // Used in checkForSelectionLDACData()
 var {{ plugin.id }}_curSelectionIdx = 0;
@@ -737,7 +738,30 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		td.appendChild(cdiv);
 		tr.appendChild(td);
 		tab2.appendChild(tr);
+
+		return;
 	}
+
+	// XML Filtering 
+	tr = document.createElement('tr');
+	td = document.createElement('td');
+	td.setAttribute('colspan', '2');
+	td.setAttribute('class', 'qfits-result-header-title');
+	td.appendChild(document.createTextNode('XML Filtering'));
+	tr.appendChild(td);
+	tab2.appendChild(tr);
+
+	tr = document.createElement('tr');
+	td = document.createElement('td');
+	td.setAttribute('colspan', '2');
+	var d = document.createElement('div');
+	d.setAttribute('style', 'padding: 10px;');
+	d.setAttribute('id', '{{ plugin.id }}_xml_div');
+	td.appendChild(d);
+	tr.appendChild(td);
+	tab2.appendChild(tr);
+
+	xmlParser = new ScampXMLParser(resp['TaskId'], d, 'xmlParser');
 }
 
 function {{ plugin.id }}_showSavedItems() {
@@ -947,4 +971,288 @@ function {{ plugin.id }}_displayImageCount(imgList, container_id) {
 		selDiv.appendChild(document.createElement('br'));
 	}
 	container.appendChild(selDiv);
+}
+
+/*
+ * Class: ScampXMLParser
+ * Scamp XML Parser facilities
+ *
+ * Note:
+ *
+ * Please note that this page documents Javascript code. <FileBrowser> is a pseudo-class, 
+ * it provides encapsulation and basic public/private features.
+ *
+ * For convenience, private data member names (both variables and functions) start with an underscore.
+ *
+ * Constructor Parameters:
+ *
+ * taskId - string or int: processing task Id
+ * container - string, DOM node: parent container
+ * varName - string: global variable name of instance, used internally for public interface definition
+ *
+ */
+function ScampXMLParser(taskId, container, varName) {
+	// Group: Variables
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _rowIdx
+	 * Current row index in table
+	 *
+	 */
+	var _rowIdx = 0;
+
+
+	// Group: Constants
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _instance_name
+	 * Name of instance in global namespace
+	 *
+	 */
+	var _instance_name = varName;
+
+
+	// Group: Variables
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _container
+	 * Parent DOM container
+	 *
+	 */
+	var _container;
+	/*
+	 * Var: _taskId
+	 * Processing task Id
+	 *
+	 */
+	var _taskId;
+	/*
+	 * Var: _fields
+	 * Array of available FIELDS element in XML file
+	 *
+	 * Format:
+	 *  [['Field1', 'Type1'], ...]
+	 *
+	 */
+	var _fields;
+	/*
+	 * Var: _fieldNames
+	 * Array of available FIELDS (names only)
+	 *
+	 * Format:
+	 *  ['Field1', 'Field2', ...]
+	 *
+	 */
+	var _fieldNames;
+
+
+
+	// Group: Functions
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Function: _error
+	 * Displays custom error message
+	 *
+	 */ 
+	function _error(msg) {
+		alert('ScampXMLParser: ' + msg);
+	}
+
+	/*
+	 * Function: _renderFrom
+	 * Renders form when XML file has been found
+	 *
+	 */ 
+	function _renderForm() {
+		var xhr = new HttpRequest(
+			container,
+			null,	
+			// Custom handler for results
+			function(resp) {
+				var d = resp['result'];
+				_fields = d['Fields'];
+				_container.innerHTML = '';
+
+				_fieldNames = new Array();
+				for (var k=0; k < _fields.length; k++) {
+					_fieldNames[k] = _fields[k][0];
+				}
+
+				var tab = document.createElement('table');
+				tab.setAttribute('id', '{{ plugin.id }}_xml_fields_tab');
+				_container.appendChild(tab);
+
+				// Add first line
+				_addRow();
+
+				var div = document.createElement('div');
+				div.setAttribute('style', 'text-align: right;');
+				var but = document.createElement('input');
+				but.setAttribute('type', 'button');
+				but.setAttribute('value', 'Find Matches');
+				but.setAttribute('onclick', 'xmlParser.submitQuery()');
+				div.appendChild(but);
+				_container.appendChild(div);
+			}
+		);
+
+		var post = 'Plugin={{ plugin.id }}&Method=parseScampXML&TaskId=' + _taskId;
+		xhr.setBusyMsg('Build form widget');
+		xhr.send('/youpi/process/plugin/', post);
+	}
+
+	this.addRow = function() {
+		_addRow();
+	}
+
+	this.submitQuery = function() {
+		alert('Submitting...');
+	}
+
+	function _addRow() {
+		var tr, td;
+		var tab = document.getElementById('{{ plugin.id }}_xml_fields_tab');
+		var type = _fields[0][1];
+
+		tr = document.createElement('tr');
+		tab.appendChild(tr);
+		tr.setAttribute('id', '{{ plugin.id }}_xml_fields_tr_' + _rowIdx);
+
+		// - button
+		td = document.createElement('td');
+		if (_rowIdx > 0) {
+			var addb = document.createElement('input');
+			addb.setAttribute('type', 'button');
+			addb.setAttribute('value', '-');
+			addb.setAttribute('onclick', "xmlParser.removeRow(" + _rowIdx + ");");
+			td.appendChild(addb);
+		}
+		tr.appendChild(td);
+
+		// + button
+		td = document.createElement('td');
+		addb = document.createElement('input');
+		addb.setAttribute('type', 'button');
+		addb.setAttribute('value', '+');
+		addb.setAttribute('onclick', "xmlParser.addRow();");
+		td.appendChild(addb);
+		tr.appendChild(td);
+
+		td = document.createElement('td');
+		var sel = getSelect('{{ plugin.id }}_xml_fields_select_' + _rowIdx, _fieldNames);
+		sel.setAttribute('onchange', "xmlParser.selectionHasChanged(" + _rowIdx + ");");
+		td.appendChild(sel);
+		tr.appendChild(td);
+
+		// Condition
+		td = document.createElement('td');
+		td.setAttribute('id', '{{ plugin.id }}_xml_fields_cond_td_' + _rowIdx);
+		td.appendChild(_getTypeSelect(type));
+		tr.appendChild(td);
+
+		// Text field
+		td = document.createElement('td');
+		td.setAttribute('id', '{{ plugin.id }}_xml_fields_text_td_' + _rowIdx);
+		if (type != 'boolean') {
+			var txt = document.createElement('input');
+			txt.setAttribute('type', 'text');
+			txt.setAttribute('size', '30');
+			td.appendChild(txt);
+			txt.focus();
+		}
+		tr.appendChild(td);
+
+		_rowIdx++;
+	}
+
+	this.removeRow = function(rowIdx) {
+		var tr = document.getElementById('{{ plugin.id }}_xml_fields_tr_' + rowIdx);
+		tr.parentNode.removeChild(tr);
+	}
+
+	function _getTypeSelect(type) {
+		var id, data;
+		if (type == 'boolean') {
+			id = '{{ plugin.id }}_xml_fields_cond_bool_select_';
+			data = ['True', 'False'];
+		}
+		else if (type == 'int' || type == 'float' || type == 'double') {
+			id = '{{ plugin.id }}_xml_fields_cond_number_select_';
+			data = ['=', '<', '>', '<>'];
+		}
+		else if (type == 'char') {
+			id = '{{ plugin.id }}_xml_fields_cond_char_select_';
+			data = ['matches', 'is different from'];
+		}
+
+		return getSelect(id + _rowIdx, data);
+	}
+
+	this.selectionHasChanged = function(curRowIdx) {
+		var sel = document.getElementById('{{ plugin.id }}_xml_fields_select_' + curRowIdx);
+		var idx = sel.options[sel.selectedIndex].value;
+		var type = _fields[idx][1];
+
+		var cond = document.getElementById('{{ plugin.id }}_xml_fields_cond_td_' + curRowIdx);
+		removeAllChildrenNodes(cond);
+		cond.appendChild(_getTypeSelect(type));
+
+		var text = document.getElementById('{{ plugin.id }}_xml_fields_text_td_' + curRowIdx);
+		removeAllChildrenNodes(text);
+		if (type != 'boolean') {
+			var txt = document.createElement('input');
+			txt.setAttribute('type', 'text');
+			txt.setAttribute('size', '30');
+			text.appendChild(txt);
+			txt.focus();
+		}
+	}
+
+	/*
+	 * Function: _render
+	 * Renders widget
+	 *
+	 */ 
+	function _render() {
+		var xhr = new HttpRequest(
+			container,
+			null,	
+			// Custom handler for results
+			function(resp) {
+				var d = resp['result'];
+				filePath = d['FilePath'];
+				if (filePath == -1)
+					_container.innerHTML = 'NOT Found!';
+				else {
+					// Form can be rendered
+					_renderForm();
+				}
+			}
+		);
+
+		var post = 'Plugin={{ plugin.id }}&Method=checkIfXMLExists&TaskId=' + _taskId;
+		xhr.setBusyMsg('Looking for Scamp XML output file');
+		xhr.send('/youpi/process/plugin/', post);
+	}
+
+	function _main() {
+		if (typeof container == 'string') {
+			_container = document.getElementById(container);
+		}
+		else
+			_container = container;
+
+		_taskId = taskId;
+		_render();
+	}
+
+	_main();
 }
