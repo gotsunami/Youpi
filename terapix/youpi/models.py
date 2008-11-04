@@ -267,6 +267,7 @@ class Plugin_scamp(models.Model):
 	log = models.TextField(null = True)
 	ldac_files = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Scamp output HTML data")
+	thumbnails = models.BooleanField('Has image thumbnails', default = False)
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')

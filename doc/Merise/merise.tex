@@ -132,6 +132,8 @@ Full name & DB field name & Description & Unit & Type & Display Format\\
 Results ingestion log & {\tt log} & Results ingestion log & - & string & {\tt \%s}\\
 Scamp configuration & {\tt config} & Scamp configuration file serialized content (base64 encoding over zlib compression) & - & string & {\tt \%s}\\
 HTTP url & {\tt www} & URL to Scamp output data & - & string & {\tt \%s}\\
+LDAC Files & {\tt ldac\_files} & List of LDAC files used during processing (serialized data) & - & list & {\tt \%s}\\
+Thumbnails & {\tt thumbnails} & True if thumbnails of output images (only group \#1) have been created during processing (with convert utility) & - & boolean & {\tt \%s}\\
 \hline
 \end{tabular}}
 \caption{Data dictionnary of {\tt Scamp plugin} entity}
@@ -304,7 +306,7 @@ Here is the relationnal logical model of data used to design the database:
 \item Processing Task (\underline{Processing Task Id}, Django's User Id, Processing Kind Id, Start Date, End Date, Success, Error Log, Hostname, Results Output Directory)
 \item Run (\underline{Run Id}, Instrument Id, Name, PI, Url, Email, Process Request Date, Date Start, Date End, Date Download, Release Date)
 \item Run-Image Relation (\underline{R--I Id, Image Id, Run Id}) 
-\item SCAMP Plugin (\underline{SCAMP Id}, Processing Task Id, Config, Results Ingestion Log, HTTP Url)
+\item SCAMP Plugin (\underline{SCAMP Id}, Processing Task Id, Config, Results Ingestion Log, HTTP Url, LDAC Files, Thumbnails)
 \item Survey (\underline{Survey Id}, Name, Comment, Url)
 \item Survey-Instrument Relation (\underline{S--I Id, Survey Id, Instrument Id}) 
 \end{enumerate}

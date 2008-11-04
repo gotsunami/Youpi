@@ -13,6 +13,14 @@ CONDORFILE 		= '/tmp/condor.greg'
 CONDOR_OUTPUT 	= '/tmp/condor.greg.out'
 CONDOR_ERROR 	= '/tmp/condor.greg.error'
 CONDOR_LOG 		= '/tmp/condor.greg.log'
+#
+# ImageMagick support
+#
+HAS_CONVERT 		= True
+CMD_CONVERT			= '/usr/bin/convert'
+# Default thumbnail size width: 60px
+CONVERT_THUMB_OPT 	= '-resize 60x'
+CMD_CONVERT_THUMB	= "%s %s" % (CMD_CONVERT, CONVERT_THUMB_OPT)
 
 #
 # Software info (to get versioning information)

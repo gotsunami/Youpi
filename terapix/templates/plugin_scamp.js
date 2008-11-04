@@ -573,15 +573,18 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		tr.appendChild(td);
 
 		td = document.createElement('td');
-		var tns = [	'astr_chi2_1.png', 'astr_interror1d_1.png', 'astr_interror2d_1.png', 'astr_referror1d_1.png', 'astr_referror2d_1.png',
-					'distort_1.png', 'fgroups_1.png', 'psphot_error_1.png' ];
+		var tns = resp['Previews'];
 		var tn, imgpath;
 		for (var k=0; k < tns.length; k++) {
 			imgpath = resp['WWW'] + tns[k];
 			tn = document.createElement('img');
 			tn.setAttribute('src', imgpath);
-			tn.setAttribute('width', '70px');
-			tn.setAttribute('onclick', "window.open('" + imgpath + "');");
+			if (!resp['HasThumbnails']) {
+				tn.setAttribute('width', '60px');
+				tn.setAttribute('onclick', "window.open('" + imgpath + "');");
+			}
+			else
+				tn.setAttribute('onclick', "window.open('" + imgpath.replace(/tn_/, '') + "');");
 			tn.setAttribute('class', 'scamp-result-entry-tn');
 			td.appendChild(tn);
 		}

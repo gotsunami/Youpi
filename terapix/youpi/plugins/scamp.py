@@ -542,6 +542,11 @@ queue""" %  (	encUserData,
 							'TaskId'		: str(st.id),
 							})
 
+		thumbs = [	'astr_chi2_1.png', 'astr_interror1d_1.png', 'astr_interror2d_1.png', 'astr_referror1d_1.png', 'astr_referror2d_1.png',
+					'distort_1.png', 'fgroups_1.png', 'psphot_error_1.png' ];
+		if data.thumbnails:
+			thumbs = ['tn_' + thumb for thumb in thumbs]
+
 		return {	'TaskId'			: str(taskid),
 					'Title' 			: str("%s processing" % self.description),
 					'User' 				: str(task.user.username),
@@ -556,6 +561,8 @@ queue""" %  (	encUserData,
 					'Log' 				: log,
 					'ResultsLog'		: scamplog,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
+					'Previews'			: thumbs,
+					'HasThumbnails'		: data.thumbnails,
 					'History'			: history,
 			}
 

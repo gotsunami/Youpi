@@ -8,7 +8,7 @@ import os, os.path
 import sys, time, string
 import marshal, base64, zlib
 import xml.dom.minidom as dom
-import socket, shutil, re
+import socket, shutil, re, glob
 #
 sys.path.insert(0, '..')
 from settings import *
@@ -321,6 +321,10 @@ def process(userData, kind_id, argv):
 			success = 1
 
 			try:
+				if HAS_CONVERT:
+					convert = 1
+				else:
+					convert = 0
 				g.setTableName('youpi_plugin_scamp')
 				g.insert(	task_id = int(task_id),
 							#
@@ -331,7 +335,8 @@ def process(userData, kind_id, argv):
 							www = os.path.join(	WWW_SCAMP_PREFIX, 
 												username, 
 												userData['Kind'], 
-												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							thumbnails = convert
 				)
 				scamp_id = g.con.insert_id()
 			except Exception, e:
@@ -345,7 +350,18 @@ def process(userData, kind_id, argv):
 			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
 			shutil.copy(xslPath, userData['ResultsOutputDir'])
 
-			print xslPath
+			# Create thumbnails for group #1, if convert cmd available
+			if HAS_CONVERT:
+				olds = 	glob.glob(os.path.join(userData['ResultsOutputDir'], 'tn_*.png'))
+				for old in olds:
+					os.remove(old)
+				pngs = glob.glob(os.path.join(userData['ResultsOutputDir'], '*_1.png'))
+				for png in pngs:
+					os.system("%s %s %s" % (CMD_CONVERT_THUMB, 
+											# Source
+											png,
+											# Destination
+											os.path.join(os.path.dirname(png), 'tn_' + os.path.basename(png))))
 
 	elif kind == 'sex':
 		if exit_code == 0:

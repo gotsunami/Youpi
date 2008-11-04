@@ -26,7 +26,7 @@ graph mcd {
 	processingkind [label="{ Processing kind | [ Internal name ]\nLabel }"];
 	pluginfitsin [label="{ FITSin plugin | [ Id ]\nAstoffra\nAstoffde\nAststdevra\nAststdevde\nAstrom accuracy\nPsfwhm min\nPsfwhm\nPsfwhm max\nPsfhld min\nPsfhld\nPsfhld max\nPsfel min\nPsfel\nPsfel max\nPsfchi2 min\nPsfchi2\nPsfchi2 max\nPsfresi min\nPsfresi\nPsfresi max\nPsfasym min\nPsfasym\nPsfasym max\nNstars min\nNstars\nNstars max\nBkg\nBkgstdev\nSatlev\nFlat Path\nMask Path\nRegion Path\nQualityFITS config\nResults Ingestion Log\nHTTP Url\nPrevious Release Grade\nPrevious Release Comment }"];
 	pluginfitsout [label="{ FITSout plugin | [ Id ] }"];
-	pluginscamp [label="{ SCAMP plugin | [ Id ]\nConfig\nResults Ingestion Log\nHTTP Url\n }"];
+	pluginscamp [label="{ SCAMP plugin | [ Id ]\nConfig\nResults Ingestion Log\nHTTP Url\nLDAC Files\nThumbnails }"];
 	pluginother [label="{ Other plugin | [ Id ]\n... }",style=dotted];
 	firstqcomment [label="{ First Quality Comment | [ Comment ]}"];
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
