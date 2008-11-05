@@ -291,7 +291,7 @@ NTHREADS               0               # Number of simultaneous threads for
 		try:
 			if len(scampId):
 				config = Plugin_scamp.objects.filter(id = int(scampId))[0]
-				content = str(zlib.decompress(base64.decodestring(config.qfconfig)))
+				content = str(zlib.decompress(base64.decodestring(config.config)))
 			else:
 				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
 				content = config.content
@@ -617,19 +617,94 @@ queue""" %  (	encUserData,
 	
 		return { 'Fields' : fields }
 
-#		ind = field.index(param)
-#		ind2 = field_type.index(param)
-#	
-#		return ind,ind2,field[ind],field_type[ind2]
-#		
-#		tabledata = doc.getElementsByTagName('TABLEDATA')
-#		tabledata = tabledata[0]
-#		table_tr = tabledata.getElementsByTagName('TR')
-#	
-#		for i in table_tr:
-#			table_td = i.getElementsByTagName('TD')
-#			td = []
-#			for j in table_td:
-#				td.append(str(j.firstChild.nodeValue))
-#	
-#		return ldac_list
+	def processQueryOnXML(self, request):
+		post = request.POST
+		try:
+			query = request.POST['Query']
+			taskId = request.POST['TaskId']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
+		ldac_files = []
+
+		tmp = query.split(',')
+		query = []
+		for i in range(0, len(tmp), 3):
+			query.append(tmp[i:i+3])
+
+		fields = self.parseScampXML(request)['Fields']
+
+		task = Processing_task.objects.filter(id = taskId)[0]
+		data = Plugin_scamp.objects.filter(task__id = taskId)[0]
+		file = str(os.path.join(task.results_output_dir, self.XMLFile))
+
+		doc = dom.parse(file)
+		tabledata = doc.getElementsByTagName('TABLEDATA')[0]
+		trNodes = tabledata.getElementsByTagName('TR')
+
+		for trNode in trNodes:
+			match = True
+			tdNodes = trNode.getElementsByTagName('TD')
+			for param in query:
+				param = [int(param[0]), int(param[1]), param[2]]
+				paramValue = tdNodes[param[0]].firstChild.nodeValue
+				# Look for field type
+				paramType = fields[param[0]][1]
+
+				# Find LDAC files
+				if paramType == 'char':
+					conds =  ['matches', 'is different from']
+					cond = conds[param[1]]
+					if cond == conds[0] and paramValue.find(param[2]) == -1:
+						match = False
+					elif cond == conds[1] and paramValue.find(param[2]) != -1:
+						match = False
+				elif paramType == 'int' or paramType == 'float' or paramType == 'double':
+					conds = ['=', '<', '>', '<>']
+					cond = conds[param[1]]
+					if cond == conds[0] and float(paramValue) != float(param[2]):
+						match = False
+				elif paramType == 'boolean':
+					conds = ['T', 'F']
+					cond = conds[param[1]]
+					if cond != paramValue:
+						match = False
+
+			if match:
+				ldac = str(tdNodes[0].firstChild.nodeValue)
+				if ldac not in ldac_files:
+					ldac_files.append(ldac)
+
+		qfits_ldac_files = marshal.loads(base64.decodestring(data.ldac_files))
+
+		return {'LDACFiles' : ldac_files, 
+				'TaskId'	: int(task.id),
+				'DataPath' : str(os.path.dirname(qfits_ldac_files[0])) }
+
+
+	def getImgIdListFromLDACFiles(self, request):
+		post = request.POST
+		try:
+			ldac_files = request.POST['LDACFiles'].split(',')
+			taskId = request.POST['TaskId']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
+		imgFiles = [f[:f.find('.ldac')] for f in ldac_files]
+
+		rels = Rel_it.objects.filter(task__id = taskId)
+		task = Processing_task.objects.filter(id = taskId)[0]
+		data = Plugin_scamp.objects.filter(task__id = taskId)[0]
+
+		relsImgs = [(r.image.name, r.image.id) for r in rels]
+
+		idList = []
+		for img in relsImgs:
+			if img[0] in imgFiles:
+				idList.append(int(img[1]))
+
+		return {'IdList' : idList,
+				'ScampId' : int(data.id),
+				'ResultsOutputDir' : os.path.join(str(task.results_output_dir), 'subprocess/' )}
+
+

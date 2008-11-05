@@ -1101,6 +1101,11 @@ function ScampXMLParser(taskId, container, varName) {
 				but.setAttribute('onclick', 'xmlParser.submitQuery()');
 				div.appendChild(but);
 				_container.appendChild(div);
+
+				// Result div
+				rdiv = document.createElement('div');
+				rdiv.setAttribute('id', '{{ plugin.id }}_xml_fields_result_div');
+				_container.appendChild(rdiv);
 			}
 		);
 
@@ -1114,7 +1119,67 @@ function ScampXMLParser(taskId, container, varName) {
 	}
 
 	this.submitQuery = function() {
-		alert('Submitting...');
+		var container = document.getElementById('{{ plugin.id }}_xml_fields_result_div');
+		container.setAttribute('style', 'border-top: 3px solid #5b80b2; margin-top: 10px; padding-top: 5px;');
+		var tab = document.getElementById('{{ plugin.id }}_xml_fields_tab');
+		var trs = tab.getElementsByTagName('tr');
+		var query = new Array();
+		for (var k=0; k < trs.length; k++) {
+			var tds = trs[k].getElementsByTagName('td');
+			var sel = tds[2].firstChild;
+			var condSel = tds[3].firstChild;
+			var idx = sel.options[sel.selectedIndex].value;
+			var type = _fields[idx][1];
+
+			query[k] = new Array();
+			query[k][0] = sel.options[sel.selectedIndex].value;
+			query[k][1] = condSel.options[condSel.selectedIndex].value;
+			type != 'boolean' ? query[k][2] = tds[4].firstChild.value : query[k][2] = '';
+		}
+
+		var xhr = new HttpRequest(
+			container,
+			null,	
+			// Custom handler for results
+			function(resp) {
+				var d = resp['result'];
+				ldac_files = d['LDACFiles'];
+				if (!ldac_files.length) {
+					container.innerHTML = '';
+					var idiv = document.createElement('div');
+					idiv.setAttribute('class', 'tip');
+					idiv.setAttribute('style', 'width: 30%;');
+					idiv.appendChild(document.createTextNode('No LDAC files found matching\nthese criteria.'));
+					container.appendChild(idiv);
+					return;
+				}
+					
+				container.innerHTML = '';
+				log = new Logger(container);
+				log.msg_ok(ldac_files.length + ' LDAC file' + (ldac_files.length > 1 ? 's' : '') + ' matched');
+				var ldiv = document.createElement('div');
+				ldiv.setAttribute('style', 'height: 100px; overflow: auto; width: 500px;');
+				for (var k=0; k < ldac_files.length; k++) {
+					ldiv.appendChild(document.createTextNode(d['DataPath'] + '/' + ldac_files[k]));
+					ldiv.appendChild(document.createElement('br'));
+				}
+				container.appendChild(ldiv);
+
+				// Button div
+				var bdiv = document.createElement('div');
+				bdiv.setAttribute('style', 'text-align: right;');
+				var img = document.createElement('img');
+				img.setAttribute('style', 'cursor: pointer;');
+				img.setAttribute('onclick', "{{ plugin.id }}_reprocess_ldac_selection('" + ldac_files + "'," + d['TaskId'] + ");");
+				img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+				bdiv.appendChild(img);
+				container.appendChild(bdiv);
+			}
+		);
+
+		var post = 'Plugin={{ plugin.id }}&Method=processQueryOnXML&Query=' + query + '&TaskId=' + _taskId;
+		xhr.setBusyMsg('Sending query');
+		xhr.send('/youpi/process/plugin/', post);
 	}
 
 	function _addRow() {
@@ -1133,6 +1198,7 @@ function ScampXMLParser(taskId, container, varName) {
 			addb.setAttribute('type', 'button');
 			addb.setAttribute('value', '-');
 			addb.setAttribute('onclick', "xmlParser.removeRow(" + _rowIdx + ");");
+			td.appendChild(document.createTextNode('and '));
 			td.appendChild(addb);
 		}
 		tr.appendChild(td);
@@ -1256,3 +1322,48 @@ function ScampXMLParser(taskId, container, varName) {
 
 	_main();
 }
+
+function {{ plugin.id }}_reprocess_ldac_selection(ldac_files, taskId) {
+	var container = document.getElementById('{{ plugin.id }}_xml_fields_result_div');
+
+	var xhr = new HttpRequest(
+		container,
+		null,	
+		// Custom handler for results
+		function(resp) {
+			var d = resp['result'];
+			container.innerHTML = '';
+			var log = new Logger(container);
+			log.msg_status('Adding to shopping cart...');
+			var totalSels = d['IdList'].length;
+			var idList = '[[';
+			for (var k=0; k < d['IdList'].length; k++) {
+				idList += d['IdList'][k] + ',';
+			}
+			idList = idList.substr(0, idList.length-1) + ']]';
+
+			// Add to cart
+			p_data = {	'plugin_name' 	: 	'{{ plugin.id }}', 
+						'userData' 		: 	"{'config' : '" + 'The one used for the same processing' + 
+											"', 'imgList' : '" + idList + 
+											"', 'scampId' : '" + d['ScampId'] + 
+											"', 'resultsOutputDir' : '" + d['ResultsOutputDir'] +
+											"'}" };
+
+			// Add entry into the shopping cart
+			s_cart.addProcessing(	p_data,
+									// Custom handler
+									function() {
+										msg = totalSels + ' LDAC file' + (totalSels > 1 ? 's' : '') + ' ha' + 
+											(totalSels > 1 ? 've' : 's') + ' been\nadded to the cart.';
+										log.msg_ok(msg);
+									}
+			);
+		}
+	);
+
+	var post = 'Plugin={{ plugin.id }}&Method=getImgIdListFromLDACFiles&TaskId=' + taskId + '&LDACFiles=' + ldac_files;
+	xhr.setBusyMsg('Adding subselection to shopping cart');
+	xhr.send('/youpi/process/plugin/', post);
+}
+
