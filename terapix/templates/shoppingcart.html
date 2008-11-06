@@ -90,72 +90,92 @@ function proceed_cart() {
 <!-- Main body -->
 {% block content %}
 
-{% if cartHasData %}
-<div class="shoppingCartPanel">
-	<table class="box">
-		<tr>
-			<th>Item prefix name</th>
-		<tr>
-		<tr>
-			<td>You can define a short name that <i>will prefix all items' IDs</i> at processing time. It is useful 
-			if you want to monitor only jobs with a specific prefix ID.
-			</td>
-		</tr>
-		<tr>
-			<td><input type="text" id="prefix"/>
-			</td>
-		</tr>
-	</table>
-
-	<div id="condor_panel_div"></div>
-</div>
-
 <div align="center">
+<div style="text-align: center; width: 95%;">
 	<p class="shoppingCartWelcome">Welcome to your cart!</p>
-	<table width="50%" class="shoppingCart">
-	{% for plugin in plugins %}
-		{% if plugin.hasItemsInCart %}
-		<tr>
-			<th>
-				<img src="/media/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}_runAll()"/>
-			</th>
-			<th colspan="2">{{ plugin.optionLabel }} ({{ plugin.description }}) related items</th>
-		</tr>
-			{% for data in plugin.getData %}
-				{# Invoke custom template rendering #}
-		<tr id="{{ plugin.id }}_{{ forloop.counter }}">
-			<td style="text-align: right">
-				<p style="text-align: right; font-size: 80%">Item <b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> added on {{ data.date }}</p>
-				<img src="/media/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
-			</td>
-			<td width="100%" colspan="2">
-				{% include plugin.itemCartTemplate %}
-			</td>
-		</tr>
+	<div>
+		<ul class="smart_tabnav" id="menu">
+			<li class="enabled">
+				<a 	href="#" id="entry_0" 
+					onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Cart items</a>
+			</li>
+			<li class="disabled">
+				<a 	href="#" id="entry_1" 
+					onclick="swap_display(this.id, 'menuitem_sub_1', 'menu', 'menuitem_sub_');">Saved items</a>
+			</li>
+		</ul>
+		<div align="center" style="width: 100%" id="menuitem_sub_0">
+			{# Cart items #}
+			{% if cartHasData %}
+			<div class="shoppingCartPanel">
+				<table class="box">
+					<tr>
+						<th>Item prefix name</th>
+					<tr>
+					<tr>
+						<td>You can define a short name that <i>will prefix all items' IDs</i> at processing time. It is useful 
+						if you want to monitor only jobs with a specific prefix ID.
+						</td>
+					</tr>
+					<tr>
+						<td><input type="text" id="prefix"/>
+						</td>
+					</tr>
+				</table>
+	
+				<div id="condor_panel_div"></div>
+			</div>
+	
+			<div style="padding-top: 20px;">
+			<table width="50%" class="shoppingCart">
+			{% for plugin in plugins %}
+				{% if plugin.hasItemsInCart %}
+				<tr>
+					<th>
+						<img src="/media/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}_runAll()"/>
+					</th>
+					<th colspan="2">{{ plugin.optionLabel }} ({{ plugin.description }}) related items</th>
+				</tr>
+					{% for data in plugin.getData %}
+						{# Invoke custom template rendering #}
+				<tr id="{{ plugin.id }}_{{ forloop.counter }}">
+					<td style="text-align: right">
+						<p style="text-align: right; font-size: 80%">Item <b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> added on {{ data.date }}</p>
+						<img src="/media/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
+					</td>
+					<td width="100%" colspan="2">
+						{% include plugin.itemCartTemplate %}
+					</td>
+				</tr>
+					{% endfor %}
+				{% endif %}
 			{% endfor %}
-		{% endif %}
-	{% endfor %}
-		<!--
-		<tr>
-			<td colspan="3" style="text-align: right; border: none">
-				<img src="/media/{{ user.get_profile.guistyle }}/img/misc/proceed.gif"/>
-			</td>
-		</tr>
-		-->
-	</table>
-</div>
-{% else %}
-<div style="padding: 5px;">
-	{# No data in cart ! #}
-	<div style="text-align: center">
-		<h1>Your cart is currently empty</h1>
+				<!--
+				<tr>
+					<td colspan="3" style="text-align: right; border: none">
+						<img src="/media/{{ user.get_profile.guistyle }}/img/misc/proceed.gif"/>
+					</td>
+				</tr>
+				-->
+			</table>
+			</div>
+			{% else %}
+			<div style="padding: 5px;">
+				{# No data in cart ! #}
+				<div class="middle" style="height: 200px; vertical-align: middle;">
+					<h1>Your cart is currently empty</h1>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
+			{# Saved items #}
+			<div id="saved_items_div" align="center" style="margin-top: 20px;"></div>
+		</div>
 	</div>
 </div>
-{% endif %}
+</div>
 
-<div id="saved_items_div" align="center">
-<hr style="border: 3px solid #5b80b2; margin-top: 20px; width: 80%"/>
-<h2 style="margin-bottom: 20px">Saved items</h2>
 <script type="text/javascript">
 	showSavedItems();
 	if (document.getElementById('condor_panel_div')) {
@@ -163,6 +183,5 @@ function proceed_cart() {
 		condorPanel.render();
 	}
 </script>
-</div>
 
 {% endblock %}
