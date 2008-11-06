@@ -3,16 +3,6 @@
 <table class="cleantd">
 	<tr>
 		<td style="width: 100%; padding: 3px">
-			<img src="/media/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" onclick="{{ plugin.id }}_saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', 
-				'{{ data.userData.imgList }}', 
-				'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
-				'{{ data.userData.flatPath }}', 
-				'{{ data.userData.maskPath }}',
-				'{{ data.userData.regPath }}',
-				'{{ data.userData.resultsOutputDir }}',
-				'{{ data.userData.config }}');"/>
-			<br/><br/>
-
 			<div id="{{ plugin.id }}_{{ forloop.counter }}_selections_div"></div>
 			<script type="text/javascript">
 				{{ plugin.id }}_displayImageCount('{{ data.userData.imgList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
@@ -58,6 +48,15 @@
 														'{{ data.userData.fitsinId }}');"/>
 				</p>
 			</div>
+			<div>or</div>
+			<img src="/media/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" onclick="{{ plugin.id }}_saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', 
+				'{{ data.userData.imgList }}', 
+				'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
+				'{{ data.userData.flatPath }}', 
+				'{{ data.userData.maskPath }}',
+				'{{ data.userData.regPath }}',
+				'{{ data.userData.resultsOutputDir }}',
+				'{{ data.userData.config }}');"/>
 		</td>
 	</tr>
 </table>

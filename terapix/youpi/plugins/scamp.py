@@ -491,8 +491,8 @@ queue""" %  (	encUserData,
 		returned value: HTML tags allowed
 		"""
 
-		img = Rel_it.objects.filter(task = task)[0].image
-		return "%s of image <b>%s</b>" % (self.optionLabel, img.name)
+		rels = Rel_it.objects.filter(task = task)
+		return "%s of <b>%d LDAC files</b>" % (self.optionLabel, len(rels))
 
 	def getTaskInfo(self, request):
 		"""
