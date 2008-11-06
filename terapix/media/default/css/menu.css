@@ -81,3 +81,44 @@ table.preingestion {
 table.preingestion td {
    border-bottom: none;
 }
+
+/************************* Other navigation style *******************************/
+
+ul.icon_smart_tabnav {
+	list-style: none;
+	padding-bottom: 24px;
+	margin: 0;
+}
+
+ul.icon_smart_tabnav li {
+	width: 150px;
+	font: bold 9px verdana, arial, sans-serif;
+	margin: 2px 2px 0 2px;
+	background-color: #FFF;
+	-moz-border-radius: 5px;
+}
+
+ul.icon_smart_tabnav li.enabled {
+	border: 1px solid #5b80b2;
+	background-color: lightblue;
+}
+
+ul.icon_smart_tabnav li.enabled a {
+	color: black;
+}
+
+.icon_smart_tabnav a {
+	display: block;
+	color: #000;
+	text-decoration: none;
+	padding: 4px;
+}
+
+ul.icon_smart_tabnav li.disabled {
+	background-color: lightgray;
+	border: 1px solid gray;
+}
+
+ul.icon_smart_tabnav li.disabled a {
+	color: grey;
+}

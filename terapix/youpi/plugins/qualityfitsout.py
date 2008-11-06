@@ -33,7 +33,7 @@ class QualityFitsIn(ProcessingPlugin):
 		self.jsSource = 'plugin_qualityfitsout.js'
 
 		# Decomment to disable the plugin
-		#self.enable = False
+		self.enable = False
 
 	def process(self, post):
 		return 'OUT'

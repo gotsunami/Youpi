@@ -15,6 +15,7 @@
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/condorpanel.js"></script>
 <script type="text/javascript">
+// Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
 
 // trNode: parent TR node
@@ -68,7 +69,14 @@ function showSavedItems() {
 	var z = null;
 	try {
 		z = {{ plugin.id }}_showSavedItems; 
-	} catch(e) {}
+	} catch(e) {
+		// Not implemented in plugin
+		var countNode = document.getElementById('plugin_{{ plugin.id }}_saved_count');
+		countNode.innerHTML = '';
+		countNode.appendChild(document.createTextNode('No item'));
+		var content = document.getElementById('plugin_menuitem_sub_{{ plugin.id }}');
+		content.innerHTML = 'Not implemented yet.';
+	}
 
 	if (z) z();
 {% endfor %}
@@ -101,7 +109,7 @@ function proceed_cart() {
 			</li>
 			<li class="disabled">
 				<a 	href="#" id="entry_1" 
-					onclick="swap_display(this.id, 'menuitem_sub_1', 'menu', 'menuitem_sub_');">Saved items</a>
+					onclick="swap_display(this.id, 'menuitem_sub_1', 'menu', 'menuitem_sub_'); showSavedItems();">Saved items</a>
 			</li>
 		</ul>
 		<div align="center" style="width: 100%" id="menuitem_sub_0">
@@ -168,16 +176,44 @@ function proceed_cart() {
 			</div>
 			{% endif %}
 		</div>
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
+		<div class="cartSavedItems" align="center" id="menuitem_sub_1">
 			{# Saved items #}
-			<div id="saved_items_div" align="center" style="margin-top: 20px;"></div>
+			<p class="title">
+				Please select a type of processing in order to display relevant saved items:
+			</p>
+			<div class="menu">
+				<ul class="icon_smart_tabnav" id="saved_menu">
+			{% for plugin in plugins %}
+				{% if forloop.first %}
+					<li class="enabled">
+				{% else %}
+					<li class="disabled">
+				{% endif %}
+						<a 	href="#" id="plugin_entry_{{ forloop.counter0 }}" 
+							onclick="swap_display(this.id, 'plugin_menuitem_sub_{{ plugin.id }}', 'saved_menu', 'plugin_menuitem_sub_');">
+							<div style="background: transparent url(/media/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}.png) center left no-repeat; padding-left: 30px;">
+								{{ plugin.description }}
+								<div id="plugin_{{ plugin.id }}_saved_count" class="count"></div>
+							</div>
+						</a>
+					</li>
+			{% endfor %}
+				</ul>
+			</div>
+			{% for plugin in plugins %}
+				{% if forloop.first %}
+			<div class="content" align="center" id="plugin_menuitem_sub_{{ plugin.id }}">
+				{% else %}
+			<div clas="content" align="center" style="display: none;" id="plugin_menuitem_sub_{{ plugin.id }}">
+				{% endif %}
+			</div>
+			{% endfor %}
 		</div>
 	</div>
 </div>
 </div>
 
 <script type="text/javascript">
-	showSavedItems();
 	if (document.getElementById('condor_panel_div')) {
 		var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
 		condorPanel.render();

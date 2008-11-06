@@ -259,7 +259,8 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 }
 
 function {{ plugin.id }}_showSavedItems() {
-	var cdiv = document.getElementById('saved_items_div');
+	var cdiv = document.getElementById('plugin_menuitem_sub_{{ plugin.id }}');
+	cdiv.innerHTML = '';
 	var div = document.createElement('div');
 	div.setAttribute('class', 'savedItems');
 	div.setAttribute('id', '{{ plugin.id }}_saved_items_div');
@@ -273,6 +274,17 @@ function {{ plugin.id }}_showSavedItems() {
 				// Silently remove item from the cart
 				removeAllChildrenNodes(div);
 				removeAllChildrenNodes(div);
+
+				var total = resp['result'].length;
+				var countNode = document.getElementById('plugin_{{ plugin.id }}_saved_count');
+				countNode.innerHTML = '';
+				var txt;
+				if (total > 0)
+					txt = total + ' item' + (total > 1 ? 's' : '');
+				else
+					txt = 'No item';
+				countNode.appendChild(document.createTextNode(txt));
+
 				var table = document.createElement('table');
 				table.setAttribute('class', 'savedItems');
 				var tr, th;
