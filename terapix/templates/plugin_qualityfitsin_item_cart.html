@@ -43,19 +43,21 @@
 			</table>
 			<div id="{{ plugin.id }}_images_div_{{ forloop.counter }}" style="display: none;"></div>
 		</td>
-		<td>
-			<img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/>
-		</td>
 		<td style="text-align: center; vertical-align: middle">
-			<img src="/media/{{ user.get_profile.guistyle }}/img/misc/run.gif" onclick="{{ plugin.id }}_run('{{ plugin.id }}_{{ forloop.counter }}', 
-					'{{ data.userData.imgList }}', 
-					'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
-					'{{ data.userData.flatPath }}', 
-					'{{ data.userData.maskPath }}',
-					'{{ data.userData.regPath }}',
-					'{{ data.userData.config }}',
-					'{{ data.userData.resultsOutputDir }}',
-					'{{ data.userData.fitsinId }}');"/>
+			<div class="submitItem">
+				<p><img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
+				<p><img src="/media/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster" 
+						onclick="{{ plugin.id }}_run(	'{{ plugin.id }}_{{ forloop.counter }}', 
+														'{{ data.userData.imgList }}', 
+														'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
+														'{{ data.userData.flatPath }}', 
+														'{{ data.userData.maskPath }}',
+														'{{ data.userData.regPath }}',
+														'{{ data.userData.config }}',
+														'{{ data.userData.resultsOutputDir }}',
+														'{{ data.userData.fitsinId }}');"/>
+				</p>
+			</div>
 		</td>
 	</tr>
 </table>

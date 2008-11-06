@@ -12,13 +12,15 @@
 			<p>This is a <b>demo-related job</b>. 5 jobs will be sent to the Condor cluster if you click on the 'Run' button.</p>
 			<p>Each job will try to execute the <tt>/usr/bin/uptime</tt> command once on cluster node.</p>
 		</td>
-		<td>
-			<img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/>
-		</td>
 		<td style="text-align: center; vertical-align: middle">
 			{# Implement the _run() function so that an item can be process on the cluster #}
 			{# pluginId_forloop.counter is the tr element's id needed to remove the item from the cart once submitted #}
-			<img src="/media/{{ user.get_profile.guistyle }}/img/misc/run.gif" onclick="{{ plugin.id }}_run('{{ plugin.id }}_{{ forloop.counter }}', '{{ data.userData.resultsOutputDir }}');"/>
+			<div class="submitItem">
+				<p><img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
+				<p><img src="/media/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster" 
+						onclick="{{ plugin.id }}_run('{{ plugin.id }}_{{ forloop.counter }}', '{{ data.userData.resultsOutputDir }}');"/>
+				</p>
+			</div>
 		</td>
 	</tr>
 	<tr>

@@ -381,8 +381,8 @@ div.imageSelector div.modeOptions {
 	padding-bottom: 5px;
 	text-align: center;
 	border-top: 5px solid lightgray;
-   -moz-border-radius-bottomleft: 5px;
-   -moz-border-radius-bottomright: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
 }
 
 div.image_mode {
@@ -488,11 +488,30 @@ table.shoppingCart th {
 	background-color: lightblue;
 }
 
+table.shoppingCart th:first-child {
+	text-align: left;
+	background-color: lightblue;
+	-moz-border-radius-topleft: 5px;
+}
+
+table.shoppingCart th:last-child {
+	text-align: left;
+	background-color: lightblue;
+	-moz-border-radius-topright: 5px;
+}
+
 table.shoppingCart td {
 	border-bottom: solid black 1px;
 }
 table.shoppingCart img {
 	cursor: pointer;
+}
+
+table.shoppingCart div.submitItem {
+	background-color: lightyellow; 
+	border: 1px solid lightgray; 
+	padding: 15px; 
+	-moz-border-radius: 5px;
 }
 
 table.savedItems {

@@ -3,7 +3,8 @@
 <table class="cleantd">
 	<tr>
 		<td style="width: 100%; padding: 3px">
-			<img src="/media/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" onclick="{{ plugin.id }}_saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', 
+			<img src="/media/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" 
+				onclick="{{ plugin.id }}_saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', 
 				'{{ data.userData.imgList }}', 
 				'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
 				'{{ data.userData.resultsOutputDir }}',
@@ -26,16 +27,18 @@
 			</table>
 			<div id="{{ plugin.id }}_images_div_{{ forloop.counter }}" style="display: none;"></div>
 		</td>
-		<td>
-			<img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/>
-		</td>
 		<td style="text-align: center; vertical-align: middle">
-			<img src="/media/{{ user.get_profile.guistyle }}/img/misc/run.gif" onclick="{{ plugin.id }}_run('{{ plugin.id }}_{{ forloop.counter }}', 
-					'{{ data.userData.imgList }}', 
-					'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
-					'{{ data.userData.config }}',
-					'{{ data.userData.resultsOutputDir }}',
-					'{{ data.userData.scampId }}');"/>
+			<div class="submitItem">
+				<p><img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
+				<p><img src="/media/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster" 
+						onclick="{{ plugin.id }}_run(	'{{ plugin.id }}_{{ forloop.counter }}', 
+														'{{ data.userData.imgList }}', 
+														'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
+														'{{ data.userData.config }}',
+														'{{ data.userData.resultsOutputDir }}',
+														'{{ data.userData.scampId }}');"/>
+				</p>
+			</div>
 		</td>
 	</tr>
 </table>
