@@ -1,0 +1,14 @@
+<para>
+	This is Merise Analysis.
+</para>
+
+<sect1>
+	<title>Sect 1</title>
+	<para>
+		Plugins are computer programs that interact with a host application to provide 
+		specific on-demand new features. In order to be a rather generic pipeline for 
+		processing astronomical data, &appname; - which is powered by &dj;, an open source 
+		web application framework that uses the Python programming language - has been designed 
+		to allow custom programs to operate a wide range of processings on data. 
+	</para>
+</sect1>

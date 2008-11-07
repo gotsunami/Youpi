@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE book [
+	<!ENTITY author 				SYSTEM "author.xml">
+	<!ENTITY chap_writing_plugins	SYSTEM "chapter_writing_plugins.xml">
+	<!ENTITY chap_merise			SYSTEM "chapter_merise_analysis.xml">
+	<!ENTITY lastmodified 			SYSTEM "update">
+
 	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
 	<!ENTITY ami			 			"<acronym>AMI</acronym>">
 	<!ENTITY api			 			"<acronym>API</acronym>">
 	<!ENTITY appname			 	"Youpi">
 	<!ENTITY appname_accro 	"<acronym>YOUpi is your processing PIpeline</acronym>">
-	<!ENTITY author 				SYSTEM "author.xml">
-	<!ENTITY chap_writing_plugins	SYSTEM "chapter_writing_plugins.xml">
 	<!ENTITY csf 						"Condor submission file">
 	<!ENTITY dj	 						"Django">
 	<!ENTITY dom 						"<acronym>DOM	</acronym>">
@@ -17,7 +20,6 @@
 	<!ENTITY hr		 					"<classname>HttpRequest</classname>">
 	<!ENTITY installcfgf 		"<filename>install.cfg</filename>">
 	<!ENTITY json			 			"<acronym>JSON</acronym>">
-	<!ENTITY lastmodified 	SYSTEM "update">
 	<!ENTITY pm	 						"plugin manager">
 	<!ENTITY post			 			"<acronym>POST</acronym>">
 	<!ENTITY url 						"<acronym>URL</acronym>">
@@ -70,6 +72,10 @@
 
 	<part>
 		<title>Developers Corner</title>
+		<chapter>
+			<title>Merise Analysis</title>
+			&chap_merise;
+		</chapter>
 		<chapter>
 			<title>Writing Plugins for &appname;</title>
 			&chap_writing_plugins;
