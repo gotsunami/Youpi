@@ -1,50 +1,10 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<!DOCTYPE article [
-	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
-	<!ENTITY ami			 			"<acronym>AMI</acronym>">
-	<!ENTITY api			 			"<acronym>API</acronym>">
-	<!ENTITY appname			 	"Youpi">
-	<!ENTITY appname_accro 	"<acronym>YOUpi is your processing PIpeline</acronym>">
-	<!ENTITY author 				SYSTEM "author.xml">
-	<!ENTITY csf 						"Condor submission file">
-	<!ENTITY dj	 						"Django">
-	<!ENTITY dom 						"<acronym>DOM	</acronym>">
-	<!ENTITY forth		 			"<acronym>FORTH</acronym>">
-	<!ENTITY get			 			"<acronym>GET</acronym>">
-	<!ENTITY html 					"<acronym>HTML</acronym>">
-	<!ENTITY http 					"<acronym>HTTP</acronym>">
-	<!ENTITY hr		 					"<classname>HttpRequest</classname>">
-	<!ENTITY installcfgf 		"<filename>install.cfg</filename>">
-	<!ENTITY json			 			"<acronym>JSON</acronym>">
-	<!ENTITY lastmodified 	SYSTEM "update">
-	<!ENTITY pm	 						"plugin manager">
-	<!ENTITY post			 			"<acronym>POST</acronym>">
-	<!ENTITY url 						"<acronym>URL</acronym>">
-	<!ENTITY xhr		 				"<classname>XMLHttpRequest</classname>">
-	<!ENTITY xml 						"<acronym>XML</acronym>">
-]>
-<article lang="en">
-	<!-- $Id$ -->
-	<!-- vim: set ts=2 -->
-	<articleinfo>
-		<title>Writing plugins for &appname;</title>
-		&author;
-		<copyright>
-			<year>2008</year>
-			<holder>Terapix, IAP</holder>
-		</copyright>
-		<!-- releaseinfo elements -->
-		&lastmodified;
-		<abstract>
-			<para>
-				&appname; (stands for &appname_accro;) is a web application providing high level 
-				functionnalities to perform data reduction on scientific <emphasis role="strong">FITS</emphasis> images. 
-				This article is focusing on the processing capabilities of &appname; and aims to be 
-				a short guideline - by providing useful background information - to the software developper 
-				that needs to understand, improve and write processing plugins for &appname;.
-			</para>
-		</abstract>
-	</articleinfo>
+<para>
+	&appname; (stands for &appname_accro;) is a web application providing high level 
+	functionnalities to perform data reduction on scientific <emphasis role="strong">FITS</emphasis> images. 
+	This article is focusing on the processing capabilities of &appname; and aims to be 
+	a short guideline - by providing useful background information - to the software developper 
+	that needs to understand, improve and write processing plugins for &appname;.
+</para>
 
 	<sect1>
 		<title>Plugin Concept Overview</title>
@@ -151,7 +111,7 @@ templates/plugin_myplugin.js</programlisting>
 					</para>
 					<para>
 						Since the <varname>plugin</varname> variable is a Python object (which inherits the 
-						<classname>ProcessingPlugin</classname> class), &dj;'s template system is able to access all 
+						<classname>Spica2Plugin</classname> class), &dj;'s template system is able to access all 
 						its data members. Context variable lookup can get around this namespacing issue by, for 
 						example, prefixing function and variable names with the plugin's unique identifier 
 						(See <xref linkend="mandvar:id"/> variable definition). Therefore, instead of writing this:
@@ -177,16 +137,16 @@ var <emphasis role="strong">myid</emphasis>_my_global_var;
 				</listitem>
 				<listitem>
 					<para>
-						The <filename>youpi/plugins/</filename> directory, which should hold your server-side Python 
+						The <filename>spica2/plugins/</filename> directory, which should hold your server-side Python 
 						ascript. There is no particular naming policy since all Python files that belongs to this 
 						directory are parsed by the &pm; at registration time (see <xref linkend="def:pm"/>). For example, 
 						default plugin Python filenames are among the following:
 						<programlisting>
-youpi/plugins/qualityfitsin.py
-youpi/plugins/qualityfitsout.py
-youpi/plugins/sextractor.py
-youpi/plugins/scamp.py
-youpi/plugins/swarp.py</programlisting>
+spica2/plugins/qualityfitsin.py
+spica2/plugins/qualityfitsout.py
+spica2/plugins/sextractor.py
+spica2/plugins/scamp.py
+spica2/plugins/swarp.py</programlisting>
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -277,16 +237,16 @@ youpi/plugins/swarp.py</programlisting>
 		<para>
 			When you are writing a processing plugin for &appname;, you have to write both client-side - 
 			your &html; template file(s) and your JavaScript <filename>jsSource</filename> file - and 
-			server-side code (your Python class that inherits <classname>ProcessingPlugin</classname>). Because 
+			server-side code (your Python class that inherits <classname>Spica2Plugin</classname>). Because 
 			all your plugin's server-side code have to be a part of your Python class, &appname; provides a 
 			way to call a specific member method from your plugin's JavaScript code. A dedicated &dj;'s &url; 
 			has been defined and serves as a unique entry point, so that you can use it to access any member 
 			method of any available plugin. Have a look at its definition in <filename>urls.py</filename>:
 			<programlisting language="python">
-(r'^youpi/process/plugin/$', 'processing_plugin')</programlisting>
+(r'^spica2/process/plugin/$', 'processing_plugin')</programlisting>
 		</para>
 		<para>
-			This line explicitely maps the <filename>/youpi/process/plugin/</filename> &url; to the 
+			This line explicitely maps the <filename>/spica2/process/plugin/</filename> &url; to the 
 			server-side &dj;'s callback function <function>processing_plugin()</function> defined in 
 			<filename>views.py</filename>:
 			<programlisting language="python">
@@ -409,7 +369,7 @@ function myHandler(resp) {
 			&csf; generation within your scripts.
 		</para>
 		<para>
-			Passing extra user data to Condor is achieve by defining the <varname>YOUPI_USER_DATA</varname> 
+			Passing extra user data to Condor is achieve by defining the <varname>SPICA_USER_DATA</varname> 
 			environment variable in the &csf;. Its content has to be a base64-encoded serialized Python dictionary 
 			with at least the two mandatory keys <varname>Descr</varname> that stands for <quote>description</quote> 
 			and <varname>UserID</varname>, which is the &dj;'s unique user identifier (in fact, there is a third 
@@ -426,7 +386,7 @@ userData = {
 csf = """
 executable  = mybin
 universe    = vanilla
-environment = YOUPI_USER_DATA=%s
+environment = SPICA_USER_DATA=%s
 ...
 """ % base64.encodestring(marshal.dumps(userData)).replace('\n', '')
 
@@ -436,7 +396,7 @@ data = pipe.readlines()
 pipe.close() </programlisting> 
 		</para>
 		<para>
-			Also, note that the presence of the <varname>YOUPI_USER_DATA</varname> environment variable 
+			Also, note that the presence of the <varname>SPICA_USER_DATA</varname> environment variable 
 			ensures that only &appname; related jobs are filtered and monitored. Other Condor jobs will 
 			not be monitored by the &ami;.
 		</para>
@@ -446,12 +406,12 @@ pipe.close() </programlisting>
 		<title>Wrap Your Cluster Code!</title>
 		<para>
 			Every built-in &appname; plugin that initiates jobs on the Condor cluster keeps track of various 
-			processing information by storing it into the database. The <varname>youpi_processing_task</varname> 
+			processing information by storing it into the database. The <varname>spica2_processing_task</varname> 
 			MySQL table holds information about a job exit status, the user that initiated the job, the kind of 
 			processing performed, start and end times, the cluster node used for processing data and the complete 
 			error log content if <varname>success</varname> is null: 
 			<programlisting language="sql">
-mysql> desc youpi_processing_task;
+mysql> desc spica2_processing_task;
 +------------+--------------+------+-----+---------+----------------+
 | Field      | Type         | Null | Key | Default | Extra          |
 +------------+--------------+------+-----+---------+----------------+
@@ -481,7 +441,7 @@ mysql> desc youpi_processing_task;
 					<para>
 						The wrapper script first performs some sanity checks. It looks for the <varname>Kind</varname> 
 						dictionary key into its first argument, which must be a <emphasis>base64-encoded serialized Python 
-						dictionary</emphasis> (remember the <varname>YOUPI_USER_DATA</varname> variable in the previous 
+						dictionary</emphasis> (remember the <varname>SPICA_USER_DATA</varname> variable in the previous 
 						section?). If not found, a <classname>WrapperError</classname> Python exception is raised, thus 
 						terminating the processing. This keyword is mandatory because it allows the wrapper script to 
 						take special action depending on <varname>Kind</varname>'s associated value. &appname;'s built-in 
@@ -489,7 +449,7 @@ mysql> desc youpi_processing_task;
 					</para>
 					<para>
 						In order to know if a <emphasis>processing kind</emphasis> is available, &appname; maintains a 
-						<varname>youpi_processing_kind</varname> table with some information about registered plugins
+						<varname>spica2_processing_kind</varname> table with some information about registered plugins
 						<footnote><para>TODO: improve this part</para></footnote>. Again, if <varname>Kind</varname>'s 
 						associated value does not match any of that table's entries, a <classname>WrapperError</classname> 
 						Python Exception is raised; the wrapper script is aborted.
@@ -502,7 +462,7 @@ mysql> desc youpi_processing_task;
 						<orderedlist>
 							<listitem>
 								<para>
-									inserts an entry in the <varname>youpi_processing_task</varname> table, filling the information 
+									inserts an entry in the <varname>spica2_processing_task</varname> table, filling the information 
 									related to the node's hostname, the &dj;'s user ID, the processing kind and starting date.
 								</para>
 							</listitem>
@@ -520,7 +480,7 @@ mysql> desc youpi_processing_task;
 							</listitem>
 							<listitem>
 								<para>
-									updates the <varname>youpi_processing_task</varname> table with the error log content if the 
+									updates the <varname>spica2_processing_task</varname> table with the error log content if the 
 									processing was not successful (content is compressed and base64-encoded), fills the <varname>end_date</varname> 
 									and <varname>success</varname> data fields.
 								</para>
@@ -589,7 +549,7 @@ mysql> desc youpi_processing_task;
 							to <varname>False</varname> if you want to disable a plugin.
 						</para>
 						<para>
-							Every plugin inherits the <classname>ProcessingPlugin</classname> class (defined in 
+							Every plugin inherits the <classname>Spica2Plugin</classname> class (defined in 
 							<filename>pluginmanager.py</filename>) which defines an <varname>enable</varname> 
 							data member with a value that defaults to <varname>True</varname>.
 						</para>
@@ -677,7 +637,7 @@ mysql> desc youpi_processing_task;
 {% endfor %}</programlisting>
 						</para>
 						<para>
-							The <classname>ProcessingPlugin</classname> class defines a generic <varname>template</varname> data member with 
+							The <classname>Spica2Plugin</classname> class defines a generic <varname>template</varname> data member with 
 							a value that defaults to the file <filename>plugin_default.html</filename>. So if you forget to provide a 
 							<varname>template</varname> data member to your custom plugin, this default &html; template will be used instead, 
 							reminding you that you certainly missed something. 
@@ -719,4 +679,3 @@ mysql> desc youpi_processing_task;
 			</variablelist>
 		</para>
 	</sect1>
-</article>

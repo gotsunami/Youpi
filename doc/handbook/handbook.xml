@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE book [
+	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
+	<!ENTITY ami			 			"<acronym>AMI</acronym>">
+	<!ENTITY api			 			"<acronym>API</acronym>">
+	<!ENTITY appname			 	"Youpi">
+	<!ENTITY appname_accro 	"<acronym>YOUpi is your processing PIpeline</acronym>">
+	<!ENTITY author 				SYSTEM "author.xml">
+	<!ENTITY chap_writing_plugins	SYSTEM "chapter_writing_plugins.xml">
+	<!ENTITY csf 						"Condor submission file">
+	<!ENTITY dj	 						"Django">
+	<!ENTITY dom 						"<acronym>DOM	</acronym>">
+	<!ENTITY forth		 			"<acronym>FORTH</acronym>">
+	<!ENTITY get			 			"<acronym>GET</acronym>">
+	<!ENTITY html 					"<acronym>HTML</acronym>">
+	<!ENTITY http 					"<acronym>HTTP</acronym>">
+	<!ENTITY hr		 					"<classname>HttpRequest</classname>">
+	<!ENTITY installcfgf 		"<filename>install.cfg</filename>">
+	<!ENTITY json			 			"<acronym>JSON</acronym>">
+	<!ENTITY lastmodified 	SYSTEM "update">
+	<!ENTITY pm	 						"plugin manager">
+	<!ENTITY post			 			"<acronym>POST</acronym>">
+	<!ENTITY url 						"<acronym>URL</acronym>">
+	<!ENTITY xhr		 				"<classname>XMLHttpRequest</classname>">
+	<!ENTITY xml 						"<acronym>XML</acronym>">
+]>
+<book land="en">
+	<!-- vim: set ts=2 -->
+	<title>Youpi Handbook</title>
+	<bookinfo>
+		<legalnotice><para>No notice is required.</para></legalnotice>
+		&author;
+		<copyright>
+			<year>2008</year>
+			<holder>Terapix, IAP</holder>
+		</copyright>
+		&lastmodified;
+	</bookinfo>
+	<preface>
+		<title>Preface</title>
+		<para>
+			&appname; definition comes here.
+		</para>
+		<sect1>
+			<title>Organization of This Book</title>
+		</sect1>
+		<sect1>
+			<title>Getting This Book</title>
+		</sect1>
+		<sect1>
+			<title>Getting &appname;</title>
+		</sect1>
+		<sect1>
+			<title>Request for Comments</title>
+		</sect1>
+	</preface>
+
+	<part>
+		<title>Installation</title>
+		<chapter>
+			<title>Software dependencies</title>
+			<para>
+				At least one chapter, reference, part, or article is required in a book.
+			</para>
+			<sect1>
+				<title>TOTO</title>
+			</sect1>
+		</chapter>
+	</part>
+
+	<part>
+		<title>Developers Corner</title>
+		<chapter>
+			<title>Writing Plugins for &appname;</title>
+			&chap_writing_plugins;
+		</chapter>
+	</part>
+
+	<appendix>
+		<title>Appendix</title>
+		<sect1>
+			<title>Frequently Asked Questions (FAQ)</title>
+			<para>
+				TODO
+			</para>
+		</sect1>
+		<sect1>
+			<title>Resources</title>
+			<para>
+				TODO
+			</para>
+		</sect1>
+		<sect1>
+			<title>GNU Free Documentation License</title>
+			<para>
+				Appendixes are optional.
+			</para>
+		</sect1>
+	</appendix>
+</book>
