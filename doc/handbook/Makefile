@@ -11,7 +11,6 @@ DOCNAME=handbook
 FIGURES=figures
 # Custom options for XSLT processor, well suited for books
 XSL_OPTS=--stringparam chapter.autolabel 1 \
-		 --stringparam appendix.autolabel 0 \
 		 --stringparam section.autolabel 0
 		# --stringparam section.label.includes.component.label 1 \
 

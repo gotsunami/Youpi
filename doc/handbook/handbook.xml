@@ -3,6 +3,9 @@
 	<!ENTITY author 				SYSTEM "author.xml">
 	<!ENTITY chap_writing_plugins	SYSTEM "chapter_writing_plugins.xml">
 	<!ENTITY chap_merise			SYSTEM "chapter_merise_analysis.xml">
+	<!ENTITY app_faq				SYSTEM "appendix_faq.xml">
+	<!ENTITY app_resources			SYSTEM "appendix_resources.xml">
+	<!ENTITY app_license			SYSTEM "appendix_license.xml">
 	<!ENTITY lastmodified 			SYSTEM "update">
 
 	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
@@ -82,25 +85,10 @@
 		</chapter>
 	</part>
 
-	<appendix>
-		<title>Appendix</title>
-		<sect1>
-			<title>Frequently Asked Questions (FAQ)</title>
-			<para>
-				TODO
-			</para>
-		</sect1>
-		<sect1>
-			<title>Resources</title>
-			<para>
-				TODO
-			</para>
-		</sect1>
-		<sect1>
-			<title>GNU Free Documentation License</title>
-			<para>
-				Appendixes are optional.
-			</para>
-		</sect1>
-	</appendix>
+	<part>
+		<title>Appendixes</title>
+		&app_faq;
+		&app_resources;
+		&app_license;
+	</part>
 </book>
