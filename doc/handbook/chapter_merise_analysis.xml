@@ -3,12 +3,59 @@
 </para>
 
 <sect1>
-	<title>Sect 1</title>
-	<para>
-		Plugins are computer programs that interact with a host application to provide 
-		specific on-demand new features. In order to be a rather generic pipeline for 
-		processing astronomical data, &appname; - which is powered by &dj;, an open source 
-		web application framework that uses the Python programming language - has been designed 
-		to allow custom programs to operate a wide range of processings on data. 
-	</para>
+	<title>Data Dictionnaries</title>
+	<sect2>
+		<title>Image Entity</title>
+		<table frame="all">
+			<title>Image Entity</title>
+			<tgroup	cols="6" align="left" colsep="1">
+				<thead>
+					<row>
+						<entry>Full name</entry>
+						<entry>DB field name</entry>
+						<entry>Description</entry>
+						<entry>Unit</entry>
+						<entry>Type</entry>
+						<entry>Display format</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>Sky footprint</entry>
+						<entry>skyfootprint</entry>
+						<entry>Footprint of image on sky</entry>
+						<entry>deg</entry>
+						<entry>Multi-polygon</entry>
+						<entry>%8</entry>
+					</row>
+					<row>
+						<entry>Sky footprint</entry>
+						<entry>skyfootprint</entry>
+						<entry>Footprint of image on sky</entry>
+						<entry>deg</entry>
+						<entry>Multi-polygon</entry>
+						<entry>%8</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</sect2>
+	<sect2>
+		<title>FITSin Entity</title>
+	</sect2>
+	<sect2>
+		<title>Scamp Entity</title>
+	</sect2>
+	<sect2>
+		<title>Astrophoto Calibration Entity</title>
+	</sect2>
+	<sect2>
+		<title>Calibration Kit Entity</title>
+	</sect2>
+	<sect2>
+		<title>Instrument Entity</title>
+	</sect2>
+	<sect2>
+		<title>Channel Entity</title>
+	</sect2>
 </sect1>
