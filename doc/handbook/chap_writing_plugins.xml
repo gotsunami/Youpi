@@ -314,7 +314,7 @@ function myHandler(resp) {
 	</sect1>
 
 	<sect1>
-		<title>Integrating With &appname;'s Active Monitoring Interface (&ami;)</title>
+		<title>Active Monitoring Interface Integration</title>
 		<para>
 			&appname; comes with a built-in job monitoring web interface, the <emphasis>Active Monitoring 
 			Interface</emphasis> (&ami; for short), that allows realtime monitoring of all &appname;-related 
