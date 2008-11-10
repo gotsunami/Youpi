@@ -7,6 +7,9 @@
 	<!ENTITY app_resources			SYSTEM "appendix_resources.xml">
 	<!ENTITY app_license			SYSTEM "appendix_license.xml">
 	<!ENTITY lastmodified 			SYSTEM "update">
+	<!ENTITY dict_image 			SYSTEM "image.dict.xml">
+	<!ENTITY dict_fitsin 			SYSTEM "fitsin.dict.xml">
+	<!ENTITY dict_scamp 			SYSTEM "scamp.dict.xml">
 
 	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
 	<!ENTITY ami			 			"<acronym>AMI</acronym>">

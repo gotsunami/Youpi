@@ -1,0 +1,28 @@
+# Describe Image DB entity
+# Fields are ; separated
+# First line is table title
+# Second line defines table's header
+# Lines starting with # are comments (and ignored)
+
+Data dictionnary of Image entity
+Full name;DB field name;Description;Unit;Type;Display Format
+Sky footprint;skyfootprint;Footprint of image on sky;deg;Multi-polygon;%8f
+Image name;name;Image name (without the .fits extansion);-;string;%s
+Image path;path;Path of image file (cluster or local);-;string;%s
+Right ascension;alpha;Right ascension of field centre;deg;double;%02d:%02d:%05.2f
+Declination;delta;Declination of field centre;deg;double;%+02d:%02d:%04.1f
+Equinox;equinox;Equinox at time of observation;yr;double;%7.2f
+Object name;object;Object identifiant;-;string;%s
+Observation date;dateobs;Date and time at start of observation;-;datetime;date %c format
+Exposure time;exptime;Effective exposure time;s;double;%9.2f
+Magnitude zero-point;photc;Magnitude Zero-point for 1s exposure;mag;float;%+8.4f
+Extinction coefficient;photk;Extinction coefficient at airmass 1;mag;float;%7.4f
+Airmass;airmass;Airmass at start of observation;-;float;%8.4f
+Absorption;absorption;Absorption at start of observation;mag;float;%+7.4f
+Checksum;checksum;Image file checksum;-;unsigned long long;%0x
+Gain;gain;Detector conversion factor;e-/ADU;vector of floats;%8.2f
+Ingestion date;ingestion_date;Date and time at start of ingestion;-;datetime;date %c format
+Flatfield;flat;Flatfield filename;-;string;%s
+Mask;mask;Mask filename;-;string;%s
+Ds9 region file;reg;Ds9 region filename;-;string;%s
+Validation flag;QSOstatus;Image validation status;-;unsigned char;%c

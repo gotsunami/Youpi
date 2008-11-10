@@ -6,45 +6,15 @@
 	<title>Data Dictionnaries</title>
 	<sect2>
 		<title>Image Entity</title>
-		<table frame="all">
-			<title>Image Entity</title>
-			<tgroup	cols="6" align="left" colsep="1">
-				<thead>
-					<row>
-						<entry>Full name</entry>
-						<entry>DB field name</entry>
-						<entry>Description</entry>
-						<entry>Unit</entry>
-						<entry>Type</entry>
-						<entry>Display format</entry>
-					</row>
-				</thead>
-				<tbody>
-					<row>
-						<entry>Sky footprint</entry>
-						<entry>skyfootprint</entry>
-						<entry>Footprint of image on sky</entry>
-						<entry>deg</entry>
-						<entry>Multi-polygon</entry>
-						<entry>%8</entry>
-					</row>
-					<row>
-						<entry>Sky footprint</entry>
-						<entry>skyfootprint</entry>
-						<entry>Footprint of image on sky</entry>
-						<entry>deg</entry>
-						<entry>Multi-polygon</entry>
-						<entry>%8</entry>
-					</row>
-				</tbody>
-			</tgroup>
-		</table>
+		&dict_image;
 	</sect2>
 	<sect2>
 		<title>FITSin Entity</title>
+		&dict_fitsin;
 	</sect2>
 	<sect2>
 		<title>Scamp Entity</title>
+		&dict_scamp;
 	</sect2>
 	<sect2>
 		<title>Astrophoto Calibration Entity</title>

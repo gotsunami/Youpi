@@ -1,0 +1,14 @@
+# Describe Scamp DB entity
+# Fields are ; separated
+# First line is table title
+# Second line defines table's header
+# Lines starting with # are comments (and ignored)
+
+
+Data dictionnary of Scamp entity
+Full name;DB field name;Description;Unit;Type;Display Format
+Results ingestion log;log;Results ingestion log;-;string;%s
+Scamp configuration;config;Scamp configuration file serialized content (base64 encoding over zlib compression);-;string;%s
+HTTP url;www;URL to Scamp output data;-;string;%s
+LDAC Files;ldac_files;List of LDAC files used during processing (serialized data);-;list;%s
+Thumbnails;thumbnails;True if thumbnails of output images (only group #1) have been created during processing (with convert utility);-;boolean;%s
