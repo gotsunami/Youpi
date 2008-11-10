@@ -1,0 +1,30 @@
+<chapter>
+	<title>Installing &appname;</title>
+	<para>
+		At least one chapter, reference, part, or article is required in a book.
+	</para>
+	<sect1>
+		<title>Getting &appname;</title>
+	</sect1>
+	<sect1>
+		<title>Software dependencies</title>
+		<sect2>
+			<title>Mandatory packages</title>
+		</sect2>
+		<sect2>
+			<title>Optional packages</title>
+		</sect2>
+	</sect1>
+	<sect1>
+		<title>Installation</title>
+	</sect1>
+	<sect1>
+		<title>Configuration</title>
+	</sect1>
+	<sect1>
+		<title>Testing Your Installation</title>
+	</sect1>
+	<sect1>
+		<title>Upgrading to New Releases</title>
+	</sect1>
+</chapter>

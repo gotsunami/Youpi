@@ -1,7 +1,5 @@
 <para>
-	&appname; (stands for &appname_accro;) is a web application providing high level 
-	functionnalities to perform data reduction on scientific <emphasis role="strong">FITS</emphasis> images. 
-	This article is focusing on the processing capabilities of &appname; and aims to be 
+	This section is focusing on the processing capabilities of &appname; and aims to be 
 	a short guideline - by providing useful background information - to the software developper 
 	that needs to understand, improve and write processing plugins for &appname;.
 </para>

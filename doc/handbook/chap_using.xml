@@ -1,0 +1,23 @@
+<chapter>
+	<title>Using &appname;</title>
+	<para>TOTO
+	</para>
+	<sect1>
+		<title>Pre-ingestion of &fits; Tables</title>
+	</sect1>
+	<sect1>
+		<title>&fits; Data Ingestion</title>
+	</sect1>
+	<sect1>
+		<title>Processing Your Data</title>
+	</sect1>
+	<sect1>
+		<title>Processing Results</title>
+	</sect1>
+	<sect1>
+		<title>Live Monitoring of Processings</title>
+		</sect1>
+	<sect1>
+		<title>The Shopping Cart</title>
+	</sect1>
+</chapter>

@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE book [
-	<!ENTITY author 				SYSTEM "author.xml">
-	<!ENTITY chap_writing_plugins	SYSTEM "chapter_writing_plugins.xml">
-	<!ENTITY chap_merise			SYSTEM "chapter_merise_analysis.xml">
-	<!ENTITY app_faq				SYSTEM "appendix_faq.xml">
-	<!ENTITY app_resources			SYSTEM "appendix_resources.xml">
-	<!ENTITY app_license			SYSTEM "appendix_license.xml">
-	<!ENTITY lastmodified 			SYSTEM "update">
-	<!ENTITY dict_image 			SYSTEM "image.dict.xml">
-	<!ENTITY dict_fitsin 			SYSTEM "fitsin.dict.xml">
-	<!ENTITY dict_scamp 			SYSTEM "scamp.dict.xml">
+	<!ENTITY author 							SYSTEM "author.xml">
+	<!ENTITY chap_writing_plugins	SYSTEM "chap_writing_plugins.xml">
+	<!ENTITY chap_merise					SYSTEM "chap_merise.xml">
+	<!ENTITY chap_install					SYSTEM "chap_install.xml">
+	<!ENTITY chap_using						SYSTEM "chap_using.xml">
+	<!ENTITY app_faq							SYSTEM "appendix_faq.xml">
+	<!ENTITY app_resources				SYSTEM "appendix_resources.xml">
+	<!ENTITY app_license					SYSTEM "appendix_license.xml">
+	<!ENTITY lastmodified 				SYSTEM "update">
+	<!ENTITY dict_image 					SYSTEM "image.dict.xml">
+	<!ENTITY dict_fitsin 					SYSTEM "fitsin.dict.xml">
+	<!ENTITY dict_scamp 					SYSTEM "scamp.dict.xml">
 
 	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
 	<!ENTITY ami			 			"<acronym>AMI</acronym>">
@@ -19,6 +21,7 @@
 	<!ENTITY csf 						"Condor submission file">
 	<!ENTITY dj	 						"Django">
 	<!ENTITY dom 						"<acronym>DOM	</acronym>">
+	<!ENTITY fits			 			"<acronym>FITS</acronym>">
 	<!ENTITY forth		 			"<acronym>FORTH</acronym>">
 	<!ENTITY get			 			"<acronym>GET</acronym>">
 	<!ENTITY html 					"<acronym>HTML</acronym>">
@@ -36,14 +39,19 @@
 	<!-- vim: set ts=2 -->
 	<title>Youpi Handbook</title>
 	<bookinfo>
+		<abstract>
+			<para>Welcome to &appname;! This handbook covers the installation and day to day use of &appname;. 
+					Please note that this manual is a work in progress. As such, some sections may be incomplete. 
+				</para>
+		</abstract>
 		<legalnotice>
 			<para>
 				Permission is granted to copy, distribute and/or modify this document
 				under the terms of the GNU Free Documentation License, Version 1.1
 				or any later version published by the Free Software Foundation;
 				with no invariant sections, no Front-Cover Texts, and no Back-Cover 
-				Texts. A copy of the license is included in the section entitled "GNU
-				Free Documentation License".
+				Texts. A copy of the license is included in the section entitled <xref 
+				linkend="app:license"/>.
 			</para>
 		</legalnotice>
 		&author;
@@ -56,8 +64,8 @@
 	</bookinfo>
 	<preface>
 		<title>Preface</title>
-		<para>
-			&appname; definition comes here.
+		<para>&appname; (stands for &appname_accro;) is a web application providing high level 
+					functionnalities to perform data reduction on scientific <emphasis role="strong">FITS</emphasis> images. 
 		</para>
 		<sect1>
 			<title>Organization of This Book</title>
@@ -66,28 +74,36 @@
 			<title>Getting This Book</title>
 		</sect1>
 		<sect1>
-			<title>Getting &appname;</title>
-		</sect1>
-		<sect1>
 			<title>Request for Comments</title>
 		</sect1>
 	</preface>
 
 	<part>
-		<title>Installation</title>
+		<title>Getting Started</title>
+		&chap_install;
+		&chap_using;
+	</part>
+
+	<part>
+		<title>&appname; Administration</title>
 		<chapter>
-			<title>Software dependencies</title>
+			<title>Common Tasks</title>
 			<para>
-				At least one chapter, reference, part, or article is required in a book.
 			</para>
 			<sect1>
-				<title>TOTO</title>
+				<title>Managing Users And Groups</title>
+			</sect1>
+			<sect1>
+				<title>Database Backup</title>
+			</sect1>
+			<sect1>
+				<title>Handling Temporary Files</title>
 			</sect1>
 		</chapter>
 	</part>
 
 	<part>
-		<title>Developers Corner</title>
+		<title>Dive into &appname;</title>
 		<chapter>
 			<title>Merise Analysis</title>
 			&chap_merise;

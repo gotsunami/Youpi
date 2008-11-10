@@ -1,0 +1,73 @@
+<para>
+	This is Merise Analysis.
+</para>
+
+<sect1>
+	<title>Data Dictionnaries</title>
+	<sect2>
+		<title>Image Entity</title>
+		&dict_image;
+	</sect2>
+	<sect2>
+		<title>FITSin Entity</title>
+		&dict_fitsin;
+	</sect2>
+	<sect2>
+		<title>Scamp Entity</title>
+		&dict_scamp;
+	</sect2>
+	<sect2>
+		<title>Astrophoto Calibration Entity</title>
+	</sect2>
+	<sect2>
+		<title>Calibration Kit Entity</title>
+	</sect2>
+	<sect2>
+		<title>Instrument Entity</title>
+	</sect2>
+	<sect2>
+		<title>Channel Entity</title>
+	</sect2>
+</sect1>
+
+<sect1>
+	<title>The Conceptual Model of Data</title>
+	<para>Properties surrounded with brackets are entities identifiers. 
+		The <varname>User</varname>  entity (and its relations) is displayed with a 
+		dashed style because it is part of the standard Django's database model.
+	</para>
+	<figure>
+		<title>The conceptual model of data (MCD)</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="figures/mcd.eps" format="EPS"/>
+			</imageobject>
+			<imageobject>
+				<imagedata fileref="figures/mcd.svg" format="SVG" scale="160"/>
+			</imageobject>
+		</mediaobject>
+	</figure>
+</sect1>
+
+<sect1>
+	<title>The <acronym>Codasyl</acronym> Logical Model</title>
+	<para>The codasyl logical model resulting of transformation rules applied to the previous MCD model. 
+		The Django User record is displayed with a dashed style because it is part of the standard Django's 
+		database model.
+	</para>
+	<figure>
+		<title>The codasyl Logical Model</title>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="figures/codasyl.eps" format="EPS"/>
+			</imageobject>
+			<imageobject>
+				<imagedata fileref="figures/codasyl.svg" format="SVG" scale="98"/>
+			</imageobject>
+		</mediaobject>
+	</figure>
+</sect1>
+
+<sect1>
+	<title>The Relationnal Logical Model of Data</title>
+</sect1>
