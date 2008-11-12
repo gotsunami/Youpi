@@ -6,6 +6,7 @@
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/gradingwidget.js"></script>
+<script type="text/javascript" src="/media/js/processinghistorywidget.js"></script>
 
 <!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
@@ -50,145 +51,6 @@ function get_stats() {
 	// Send HTTP POST request
 	xhr.send('/youpi/results/stats/', post);
 }
-
-// Results filtering
-function apply_filter() {
-	try {
-		var ownerSel = document.getElementById('owner_select');
-		var statusSel = document.getElementById('status_select');
-		var kindSel = document.getElementById('kind_select');
-		var filter = document.getElementById('filter_text');
-	} catch(e) { return false; }
-
-	var owner = ownerSel.options[ownerSel.selectedIndex].value;
-	var status = statusSel.options[statusSel.selectedIndex].value;
-	var kind = kindSel.options[kindSel.selectedIndex].value;
-	var filterText = filter.value;
-
-	var container = document.getElementById('tasks_div');
-	var xhr = new HttpRequest(
-		container.id,
-		null, // Use default error handler
-		// Custom handler for results
-		function(resp) {
-			container.innerHTML = '';
-			var r = resp['results'];
-			var len = r.length;
-			var tab = document.createElement('table');
-			tab.setAttribute('class', 'results');
-
-			var tr, td, cls, stab, str, std, d, img, gdiv;
-
-			if (status == 'failed' && len && kind != 'all') {
-				var rdiv = document.createElement('div');
-				rdiv.setAttribute('id', 'reprocess_failed_div');
-				rdiv.setAttribute('class', 'reprocess');
-				var rimg = document.createElement('img');
-				rimg.setAttribute('onclick', kind + "_reprocess_all_failed_processings('" + resp['Stats']['TasksIds'] + "');");
-				rimg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
-				rdiv.appendChild(rimg);
-				rdiv.appendChild(document.createTextNode(' that current selection of processings that never succeeded'));
-				container.appendChild(rdiv);
-			}
-
-			// Updates stats
-			var spans = ['success', 'failed', 'total', 'big_total'];
-			for (var k=0; k < spans.length; k++) {
-				var node = document.getElementById(spans[k] + '_span');
-				node.innerHTML = '';
-				node.appendChild(document.createTextNode(resp['Stats']['nb_' + spans[k]]));
-			}
-
-			if (!len) {
-				tr = document.createElement('tr');	
-				td = document.createElement('td');	
-				td.setAttribute('style', 'color: grey; cursor: default;');
-				td.innerHTML = '<h2>No results found.</h2>';
-				tr.appendChild(td);
-				tab.appendChild(tr);
-				container.appendChild(tab);
-				return;
-			}
-
-			for (var k=0; k < len; k++) {
-				cls = r[k]['Success'] ?'success' : 'failure';
-				tr = document.createElement('tr');	
-				tr.setAttribute('id', 'res_' + r[k]['Id']);
-				tr.setAttribute('class', cls);
-				tr.setAttribute('onmouseover', "this.setAttribute('class', 'mouseover_" + cls + "');");
-				tr.setAttribute('onmouseout', "this.setAttribute('class', '" + cls + "');");
-				tr.setAttribute('onclick', "results_showDetails('" + r[k]['Name'] + "'," + r[k]['Id'] + ", true);");
-				tab.appendChild(tr);
-
-				// Description
-				td = document.createElement('td');	
-				td.innerHTML = r[k]['CustomDescr'];
-				d = document.createElement('div');	
-				td.appendChild(d);
-				tr.appendChild(td);
-
-				// Misc info
-				stab = document.createElement('table');
-				str = document.createElement('tr');	
-
-				std = document.createElement('td');	
-				std.setAttribute('nowrap', 'nowrap');
-				gdiv = document.createElement('div');	
-				gdiv.setAttribute('class', 'user');
-				gdiv.appendChild(document.createTextNode(r[k]['User']));
-				std.appendChild(gdiv);
-
-				gdiv = document.createElement('div');	
-				gdiv.setAttribute('class', 'node');
-				gdiv.appendChild(document.createTextNode(r[k]['Node']));
-				std.appendChild(gdiv);
-				str.appendChild(std);
-
-				std = document.createElement('td');	
-				std.setAttribute('nowrap', 'nowrap');
-				gdiv = document.createElement('div');	
-				gdiv.setAttribute('class', 'clock');
-				gdiv.appendChild(document.createTextNode(r[k]['Start']));
-				gdiv.appendChild(document.createElement('br'));
-				gdiv.appendChild(document.createTextNode(r[k]['Duration'] + ' sec'));
-				std.appendChild(gdiv);
-				str.appendChild(std);
-
-				std = document.createElement('td');	
-				std.setAttribute('class', 'exit');
-				str.appendChild(std);
-
-				stab.appendChild(str);
-				d.appendChild(stab);
-				tr.appendChild(td);
-
-				tab.appendChild(tr);
-			}
-
-			container.appendChild(tab);
-		}
-	);
-
-	// Checks if a selection of that name already exists
-	post = 	'Owner=' + owner + 
-			'&Status=' + status + 
-			'&Kind=' + kind +
-			'&FilterText=' + filterText;
-
-	// Send HTTP POST request
-	xhr.setBusyMsg('Please wait while filtering processing data');
-	xhr.send('/youpi/results/filter/', post);
-}
-
-function filter_text_handler(event) {
-	var filter = document.getElementById('filter_text');
-	// Return key pressed ?
-	if (event.which == 13) {
-		apply_filter();
-	}
-	return true;
-}
-
 </script>
 {% endblock %}
 
@@ -216,55 +78,7 @@ function filter_text_handler(event) {
 				<div id="menuitem_history">
 					<table style="width: 95%">
 					<tr><td>
-					<table class="fileBrowser" style="width: 450px">
-						<tr><th>Processing history</th></tr>
-						<tr>
-							<td>
-								<table class="results-filter">
-									<tr>
-										<td>
-											<img src="/media/{{ user.get_profile.guistyle }}/img/admin/selector-search.gif"/>
-											<input id="filter_text" type="text" title="Press Enter to filter tasks" onkeyup="return filter_text_handler(event);" size="40"/>
-											<img src="/media/{{ user.get_profile.guistyle }}/img/misc/reset.png" title="Reset field" style="cursor: pointer;" onclick="var t=document.getElementById('filter_text'); t.value=''; apply_filter(); t.focus();"/>
-										</td>
-										<td>
-											<img src="/media/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif"/><span id="success_span"></span>
-											<img src="/media/{{ user.get_profile.guistyle }}/img/admin/icon_error.gif"/><span id="failed_span"></span> (<span id="total_span"></span>/<span id="big_total_span"></span>)
-										</td>
-									</tr>
-									{% if plugins %}
-									<tr>
-										<td class="filter" nowrap="nowrap" colspan="2">
-											<form>
-												<img src="/media/{{ user.get_profile.guistyle }}/img/16x16/filter.png"/>
-												<label>Show</label>
-												<select id="owner_select" onchange="apply_filter();">
-													 <option selected="selected">all</option>
-													 <option>my</option>
-													 <option>others</option>
-												</select>
-												<select id="status_select" onchange="apply_filter();">
-													 <option>successful</option>
-													 <option>failed</option>
-													 <option selected="selected">finished</option>
-												</select>
-												<select id="kind_select" onchange="apply_filter();">
-													 <option value="all" selected="selected">processings (any type)</option>
-										{% for plugin in plugins %}
-													 <option value="{{ plugin.id }}">{{ plugin.optionLabel }} processings</option>
-										{% endfor %}
-												</select>
-												<img src="/media/{{ user.get_profile.guistyle }}/img/misc/reset.png" title="Reset filter" style="cursor: pointer;" onclick="this.parentNode.reset(); apply_filter(); document.getElementById('filter_text').focus();"/>
-											</form>
-										</td>
-									</tr>
-									{% endif %}
-								</table>
-								<div id="tasks_div" style="border-top: 1px #5b80b2 solid; height: 400px; overflow: auto">
-								</div>
-							</td>
-						</tr>
-					</table>
+					<div id="history_div"></div>
 					</td>
 					<td style="width: 100%; margin-right: 20px;">
 						<div style="width: 100%;" id="infopanel">
@@ -315,8 +129,12 @@ function filter_text_handler(event) {
 	</table>
 </div>
 <script type="text/javascript">
-	apply_filter();
-	document.getElementById('filter_text').focus();
+	var p = new ProcessingHistoryWidget('history_div', 'p');
+	var pInfo = new Array();
+	{% for plugin in plugins %}
+	pInfo[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.optionLabel }}'];
+	{% endfor %}
+	p.setActivePlugins(pInfo);
+	p.render();
 </script>
-
 {% endblock %}

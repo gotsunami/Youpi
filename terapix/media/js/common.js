@@ -63,8 +63,18 @@ function reduceString(msg, max) {
 }
 
 /*
- * Builds and returns a DOM select node with a supplied ID and 
- * and a list of options as parameters
+ * Function: getSelect
+ * Builds and returns a DOM select node
+ *
+ * with a supplied ID and a list of options as parameters
+ *
+ * Parameters:
+ *  id - string: unique element id
+ *  options - array of strings
+ *  size - integer: > 1 for multiple select (defaults to 1)
+ *
+ * Returns:
+ *  DOM select node
  *
  */
 function getSelect(id, options, size) {
@@ -391,6 +401,11 @@ function Logger(container)
 	 *
 	 */
 	var _log;
+
+
+	// Group: Functions
+	// -----------------------------------------------------------------------------------------------------------------------------
+
 
 	/*
 	 * Function: _init

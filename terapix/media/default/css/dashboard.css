@@ -212,6 +212,10 @@ table.results-filter td.filter * {
 	font-size: 10px;
 }
 
+table.results-filter td.filter select, label {
+	margin-right: 3px;
+}
+
 tr.qfits-result-entry-tn td.qfits-result-entry-complete-off {
 	background: white url('../img/misc/qfitspreview-off.png') no-repeat top center;
 	background-color: #fff3bb; 
