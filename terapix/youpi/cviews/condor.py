@@ -181,6 +181,10 @@ def task_filter(request):
 		status = request.POST['Status']
 		kindid = request.POST['Kind']
 		filterText = request.POST['FilterText'].strip().lower()
+		# Max results per page
+		maxPerPage = int(request.POST['Limit'])
+		# page # to return
+		targetPage = int(request.POST['Page'])
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
@@ -307,12 +311,25 @@ def task_filter(request):
 						'CustomDescr' 	: customDescr
 					})
 
+	# Pagination
+	if len(res) > maxPerPage:
+		pages = []
+		pageCount = len(res)/maxPerPage
+		if len(res) % maxPerPage > 0:
+			pageCount += 1
+		# Keep only page data
+		res = res[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
+	else:
+		pageCount = 1
+
 	return HttpResponse(str({	'results' : res, 
-								'Stats' : {	'nb_success' 	: str(nb_suc), 
-											'nb_failed' 	: str(nb_failed), 
-											'nb_total' 		: str(nb_suc + nb_failed),
+								'Stats' : {	'nb_success' 	: nb_suc, 
+											'nb_failed' 	: nb_failed, 
+											'nb_total' 		: nb_suc + nb_failed,
+											'pageCount'		: pageCount,
+											'curPage'		: targetPage,
 											'TasksIds' 		: tasksIds,
-											'nb_big_total' 	: str(len(allTasks)) }}), 
+											'nb_big_total' 	: int(len(allTasks)) }}), 
 											mimetype = 'text/plain')
 
 @login_required

@@ -963,3 +963,25 @@ div.cartSavedItems div.content {
 	width: 100%; 
 	margin-top: 20px;
 }
+
+/********************* PAGINATION STYLE FOR ProcessingHistoryWidget CLASS **********************************/
+
+div.pagination {
+	padding-top: 5px; 
+	padding-bottom: 6px;
+}
+
+div.pagination span, div.pagination a {
+	border: 1px solid rgb(91, 128, 178); 
+	padding: 2px; 
+	text-align: center; 
+	vertical-align: middle; 
+	margin-right: 3px;
+	font-weight: bold;
+}
+
+div.pagination a {
+	cursor: pointer; 
+	background-color: lightblue; 
+	font-weight: normal;
+}

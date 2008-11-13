@@ -66,6 +66,12 @@ function ProcessingHistoryWidget(container, varName) {
 	 *
 	 */
 	var _pluginInfos;
+	/*
+	 * Var: _maxPerPage
+	 * Max number of results per page
+	 *
+	 */
+	var _maxPerPage = 20;
 
 
 	// Group: Functions
@@ -213,7 +219,13 @@ function ProcessingHistoryWidget(container, varName) {
 		rtr.appendChild(rtd);
 		rtab.appendChild(rtr);
 
-		// End of rtab table, now results div
+		// Pages div
+		var pdiv = document.createElement('div');
+		pdiv.setAttribute('id', _instance_name + '_pages_div');
+		pdiv.setAttribute('class', 'pagination');
+		td.appendChild(pdiv);
+
+		// Results div
 		var rdiv = document.createElement('div');
 		rdiv.setAttribute('id', _instance_name + '_tasks_div');
 		rdiv.setAttribute('style', 'border-top: 1px #5b80b2 solid; height: 400px; overflow: auto;');
@@ -275,13 +287,59 @@ function ProcessingHistoryWidget(container, varName) {
 	 * Sends AJAX query along with search criterias; show results
 	 *
 	 */ 
-	function _applyFilter() {
+	function _updatePagesNavigation(curPage, pageCount) {
+		var pdiv = document.getElementById(_instance_name + '_pages_div');
+		pdiv.innerHTML = '';
+		pdiv.appendChild(document.createTextNode('Page '));
+
+		for (var k=1; k <= pageCount; k++) {
+			if (curPage == k) {
+				var p = document.createElement('span');
+				p.appendChild(document.createTextNode(k));
+				pdiv.appendChild(p);
+			}
+			else {
+				var a = document.createElement('a');
+				a.setAttribute('src', '#');
+				a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
+				a.appendChild(document.createTextNode(k));
+				pdiv.appendChild(a);
+			}
+		}
+
+		if (curPage > 1) {
+			a = document.createElement('a');
+			a.setAttribute('src', '#');
+			a.setAttribute('title', 'Show page ' + (curPage-1));
+			a.setAttribute('onclick', _instance_name + ".applyFilter(" + (curPage-1) + ");");
+			a.appendChild(document.createTextNode('<'));
+			pdiv.appendChild(a);
+		}
+		if (curPage < pageCount) {
+			a = document.createElement('a');
+			a.setAttribute('src', '#');
+			a.setAttribute('title', 'Show page ' + (curPage+1));
+			a.setAttribute('onclick', _instance_name + ".applyFilter(" + (curPage+1) + ");");
+			a.appendChild(document.createTextNode('>'));
+			pdiv.appendChild(a);
+		}
+	}
+
+	/*
+	 * Function: _applyFilter
+	 * Sends AJAX query along with search criterias; show results
+	 *
+	 */ 
+	function _applyFilter(pageNum) {
 		try {
 			var ownerSel = document.getElementById(_instance_name + '_owner_select');
 			var statusSel = document.getElementById(_instance_name + '_status_select');
 			var kindSel = document.getElementById(_instance_name + '_kind_select');
 			var filter = document.getElementById(_instance_name + '_filter_text');
 		} catch(e) { return false; }
+
+		if (!pageNum || typeof pageNum != 'number')
+			pageNum = 1;
 	
 		var owner = ownerSel.options[ownerSel.selectedIndex].text;
 		var status = statusSel.options[statusSel.selectedIndex].text;
@@ -294,8 +352,14 @@ function ProcessingHistoryWidget(container, varName) {
 			null, // Use default error handler
 			// Custom handler for results
 			function(resp) {
-				container.innerHTML = '';
 				var r = resp['results'];
+				var st = resp['Stats'];
+
+				// Display pages
+				_updatePagesNavigation(st['curPage'], st['pageCount']);
+
+				// Display results
+				container.innerHTML = '';
 				var len = r.length;
 				var tab = document.createElement('table');
 				tab.setAttribute('class', 'results');
@@ -396,6 +460,8 @@ function ProcessingHistoryWidget(container, varName) {
 		post = 	'Owner=' + owner + 
 				'&Status=' + status + 
 				'&Kind=' + kind +
+				'&Limit=' + _maxPerPage +
+				'&Page=' + pageNum +
 				'&FilterText=' + filterText;
 	
 		// Send HTTP POST request
@@ -408,8 +474,8 @@ function ProcessingHistoryWidget(container, varName) {
 	 * Public method for <_applyFilter>
 	 *
 	 */ 
-	this.applyFilter = function() {
-		_applyFilter();
+	this.applyFilter = function(pageNum) {
+		_applyFilter(pageNum);
 	}
 
 	/*
