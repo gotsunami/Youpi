@@ -1,12 +1,9 @@
 
 {# Sextractor template #}
 
-<div style="text-align: right">
-	<img style="cursor: pointer" src="/media/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}_addSelectionToCart();"/>
-</div>
-<div style="text-align: center; width: 95%;">
+<div style="text-align: center;">
 		<div>
-		<ul class="smart_tabnav" id="menu">
+		<ul class="smart_tabnav_sub" id="menu">
 			<li class="enabled">
 				<a 	href="#" id="entry_0" 
 					onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Select images</a>
@@ -28,6 +25,9 @@
                         onclick="swap_display(this.id, 'menuitem_sub_4', 'menu', 'menuitem_sub_'); var d=document.getElementById('menuitem_sub_4'); d.innerHTML=getLoadingHTML('Loading cluster data, please wait');monitorJobs('menuitem_sub_4');">Sextractor job monitoring</a>
             </li>
 		</ul>
+		<div style="margin-right: 10px; margin-top: 10px; text-align: right;">
+			<img style="cursor: pointer" src="/media/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}_addSelectionToCart();"/>
+		</div>
 		<div align="center" style="width: 100%" id="menuitem_sub_0"></div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
 			<div id="selector_div"></div>

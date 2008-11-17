@@ -1,12 +1,9 @@
 
 {# scamp template #}
 
-<div id="{{ plugin.id }}_add_to_cart_div" style="text-align: right">
-	<input type="button" onclick="swap_display('entry_5', 'menuitem_sub_5', 'menu', 'menuitem_sub_'); {{ plugin.id }}_addSelectionToCart();" value="Validate input data"/>
-</div>
-<div style="text-align: center; width: 95%;">
+<div style="text-align: center;">
 	<div>
-		<ul class="smart_tabnav" id="menu">
+		<ul class="smart_tabnav_sub" id="menu">
 			<li class="enabled">
 				<a 	href="#" id="entry_0" 
 					onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Select images</a>
@@ -24,6 +21,9 @@
 					onclick="swap_display(this.id, 'menuitem_sub_5', 'menu', 'menuitem_sub_');">Input data validation</a>
 			</li>
 		</ul>
+		<div id="{{ plugin.id }}_add_to_cart_div" style="margin-top: 10px; margin-right: 10px; text-align: right">
+			<input type="button" onclick="swap_display('entry_5', 'menuitem_sub_5', 'menu', 'menuitem_sub_'); {{ plugin.id }}_addSelectionToCart();" value="Validate input data"/>
+		</div>
 		<div align="center" style="width: 100%" id="menuitem_sub_0"></div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2">
 			<div style="width: 500px" id="config_file_div"></div>

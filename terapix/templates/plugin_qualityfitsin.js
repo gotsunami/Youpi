@@ -900,7 +900,7 @@ function selectImages() {
 	var div = document.createElement('div');
 	div.setAttribute('id', '{{ plugin.id }}_results_div');
 	div.setAttribute('align', 'center');
-	div.setAttribute('style', 'padding-top: 20px; width: 80%');
+	div.setAttribute('style', 'padding: 20px; width: 80%');
 	root.appendChild(div);
 
 	{{ plugin.id }}_ims = new ImageSelector('{{ plugin.id }}_results_div', '{{ plugin.id }}_ims');
