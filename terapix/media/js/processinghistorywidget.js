@@ -195,13 +195,10 @@ function ProcessingHistoryWidget(container, varName) {
 		sel = document.createElement('select');
 		sel.setAttribute('id', _instance_name + '_kind_select');
 		sel.setAttribute('onchange', _instance_name + '.applyFilter();');
-		var opt = document.createElement('option');
-		opt.setAttribute('value', 'all');
-		opt.setAttribute('selected', 'selected');
-		opt.appendChild(document.createTextNode('processings (any type)'));
-		sel.appendChild(opt);
 		for (var k=0; k < _pluginInfos.length; k++) {
 			opt = document.createElement('option');
+			if (k == 0)
+				opt.setAttribute('selected', 'selected');
 			opt.setAttribute('value', _pluginInfos[k][0]);
 			opt.appendChild(document.createTextNode(_pluginInfos[k][1] + ' processings'));
 			sel.appendChild(opt);
@@ -292,21 +289,6 @@ function ProcessingHistoryWidget(container, varName) {
 		pdiv.innerHTML = '';
 		pdiv.appendChild(document.createTextNode('Page '));
 
-		for (var k=1; k <= pageCount; k++) {
-			if (curPage == k) {
-				var p = document.createElement('span');
-				p.appendChild(document.createTextNode(k));
-				pdiv.appendChild(p);
-			}
-			else {
-				var a = document.createElement('a');
-				a.setAttribute('src', '#');
-				a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
-				a.appendChild(document.createTextNode(k));
-				pdiv.appendChild(a);
-			}
-		}
-
 		if (curPage > 1) {
 			a = document.createElement('a');
 			a.setAttribute('src', '#');
@@ -315,6 +297,73 @@ function ProcessingHistoryWidget(container, varName) {
 			a.appendChild(document.createTextNode('<'));
 			pdiv.appendChild(a);
 		}
+
+		if (pageCount < 6) {
+			for (var k=1; k <= pageCount; k++) {
+				if (curPage == k) {
+					var p = document.createElement('span');
+					p.appendChild(document.createTextNode(k));
+					pdiv.appendChild(p);
+				}
+				else {
+					var a = document.createElement('a');
+					a.setAttribute('src', '#');
+					a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
+					a.appendChild(document.createTextNode(k));
+					pdiv.appendChild(a);
+				}
+			}
+		}
+		else {
+			var surroundPageCount = 2;
+			var step, a;
+			if (curPage > surroundPageCount+1) {
+				// Last page
+				a = document.createElement('a');
+				a.setAttribute('src', '#');
+				a.setAttribute('onclick', _instance_name + ".applyFilter('1');");
+				a.appendChild(document.createTextNode('1'));
+				pdiv.appendChild(a);
+				// ...
+				pdiv.appendChild(document.createTextNode(' ... '));
+			}
+			if (curPage > 1) {
+				// Before
+				step = curPage-surroundPageCount > 0 ? curPage-surroundPageCount : curPage-1;
+				for (var k=step; k < curPage; k++) {
+					a = document.createElement('a');
+					a.setAttribute('src', '#');
+					a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
+					a.appendChild(document.createTextNode(k));
+					pdiv.appendChild(a);
+				}
+			}
+			var p = document.createElement('span');
+			p.appendChild(document.createTextNode(curPage));
+			pdiv.appendChild(p);
+			if (curPage < pageCount) {
+				// After
+				step = curPage <= (pageCount-surroundPageCount) ? curPage+surroundPageCount : curPage + 1;
+				for (var k=curPage+1; k <= step; k++) {
+					a = document.createElement('a');
+					a.setAttribute('src', '#');
+					a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
+					a.appendChild(document.createTextNode(k));
+					pdiv.appendChild(a);
+				}
+			}
+			if (curPage < pageCount-2) {
+				// ...
+				pdiv.appendChild(document.createTextNode(' ... '));
+				// Last page
+				a = document.createElement('a');
+				a.setAttribute('src', '#');
+				a.setAttribute('onclick', _instance_name + ".applyFilter(" + pageCount + ");");
+				a.appendChild(document.createTextNode(pageCount));
+				pdiv.appendChild(a);
+			}
+		}
+
 		if (curPage < pageCount) {
 			a = document.createElement('a');
 			a.setAttribute('src', '#');
@@ -372,7 +421,7 @@ function ProcessingHistoryWidget(container, varName) {
 					rdiv.setAttribute('class', 'reprocess');
 					var rimg = document.createElement('img');
 					rimg.setAttribute('onclick', kind + "_reprocess_all_failed_processings('" + resp['Stats']['TasksIds'] + "');");
-					rimg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+					rimg.setAttribute('src', '/media/' + guistyle + '/img/misc/reprocess.gif');
 					rdiv.appendChild(rimg);
 					rdiv.appendChild(document.createTextNode(' that current selection of processings that never succeeded'));
 					container.appendChild(rdiv);
@@ -409,7 +458,7 @@ function ProcessingHistoryWidget(container, varName) {
 	
 					// Description
 					td = document.createElement('td');	
-					td.innerHTML = r[k]['CustomDescr'];
+					td.innerHTML = r[k]['Title'];
 					d = document.createElement('div');	
 					td.appendChild(d);
 					tr.appendChild(td);

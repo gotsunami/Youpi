@@ -829,16 +829,23 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 
 		return name + ' deleted'
 
-	def getResultEntryDescription(self, task):
-		"""
-		Returns custom result entry description for a task.
-		task: django object
+#	def getResultEntryDescription(self, task):
+#		"""
+#		Returns custom result entry description for a task.
+#		task: django object
+#
+#		returned value: HTML tags allowed
+#		"""
+#
+#		img = Rel_it.objects.filter(task = task)[0].image
+#		return "%s of image <b>%s</b>" % (self.optionLabel, img.name)
 
+	def getResultEntryDescription(self, data):
+		"""
 		returned value: HTML tags allowed
 		"""
 
-		img = Rel_it.objects.filter(task = task)[0].image
-		return "%s of image <b>%s</b>" % (self.optionLabel, img.name)
+		return "%s of image <b>%s</b>" % (self.optionLabel, data['imgName'])
 
 	def __saveDefaultConfigFileToDB(self, request):
 		"""

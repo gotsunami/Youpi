@@ -22,7 +22,7 @@ graph mcd {
 	run [label="{ Run | [ Name ]\nPI\nUrl\nEmail\nProcess request date\nDate start\nDate end\nDate download\nRelease date }"];
 	survey [label="{ Survey | [ Name ]\nComment\nUrl}"];
 	authuser [label="{ User | (Django table auth_user) }", style=dashed];
-	task [label="{ Processing task | [ Id ]\nSuccess\nError Log\nHostname\nResults output directory }"];
+	task [label="{ Processing task | [ Id ]\nSuccess\nError Log\nHostname\nResults output directory\nTitle }"];
 	processingkind [label="{ Processing kind | [ Internal name ]\nLabel }"];
 	pluginfitsin [label="{ FITSin plugin | [ Id ]\nAstoffra\nAstoffde\nAststdevra\nAststdevde\nAstrom accuracy\nPsfwhm min\nPsfwhm\nPsfwhm max\nPsfhld min\nPsfhld\nPsfhld max\nPsfel min\nPsfel\nPsfel max\nPsfchi2 min\nPsfchi2\nPsfchi2 max\nPsfresi min\nPsfresi\nPsfresi max\nPsfasym min\nPsfasym\nPsfasym max\nNstars min\nNstars\nNstars max\nBkg\nBkgstdev\nSatlev\nFlat Path\nMask Path\nRegion Path\nQualityFITS config\nResults Ingestion Log\nHTTP Url\nPrevious Release Grade\nPrevious Release Comment }"];
 	pluginfitsout [label="{ FITSout plugin | [ Id ] }"];

@@ -206,6 +206,8 @@ table.results-filter td {
 	padding: 0px;
 	margin: 0px;
 	vertical-align: middle;
+	white-space: nowrap;
+	font-size: 10px;
 }
 
 table.results-filter td.filter * {

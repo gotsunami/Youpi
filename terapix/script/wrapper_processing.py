@@ -203,7 +203,7 @@ def task_start_log(userData, start, kind_id = None):
 
 	return (imgName, task_id, g)
 
-def task_end_log(g, task_error_log, task_id, success, kind):
+def task_end_log(userData, g, task_error_log, task_id, success, kind):
 	if not success:
 		try:
 			content = string.join(open(task_error_log, 'r').readlines(), '')
@@ -236,10 +236,10 @@ def task_end_log(g, task_error_log, task_id, success, kind):
 			except Exception, e:
 				raise WrapperError, e
 
-	print "DEBUG: SUCCESS:", success
 	try:
 		g.setTableName('youpi_processing_task')
 		g.update(	end_date = getNowDateTime(time.time()),
+					title = userData['Descr'],
 					success = success,
 					wheres = {'id': task_id} )
 		g.con.commit()
@@ -370,7 +370,7 @@ def process(userData, kind_id, argv):
 		# Put other processing stuff here
 		pass
 
-	task_end_log(g, storeLog, task_id, success, kind)
+	task_end_log(userData, g, storeLog, task_id, success, kind)
 
 
 def init_job(userData):
@@ -428,7 +428,7 @@ def init_job(userData):
 		error_msg += "\nResultsOutputDir=" + custom_dir
 		start = getNowDateTime(time.time())
 		imgName, task_id, g = task_start_log(userData, start)
-		task_end_log(g, error_msg, task_id, 0, userData['Kind'])
+		task_end_log(userData, g, error_msg, task_id, 0, userData['Kind'])
 		sys.exit(1)
 
 	# Run processing
@@ -454,7 +454,7 @@ if __name__ == '__main__':
 				error_msg = "Unable to start job\n%s" % e
 				start = getNowDateTime(time.time())
 				imgName, task_id, g = task_start_log(userData, start)
-				task_end_log(g, error_msg, task_id, 0, userData['Kind'])
+				task_end_log(userData, g, error_msg, task_id, 0, userData['Kind'])
 				sys.exit(1)
 		else:
 			print "Error %s: %s" % (code, msg)

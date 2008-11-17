@@ -189,10 +189,7 @@ def task_filter(request):
 		raise HttpResponseServerError('Bad parameters')
 
 	allTasks = Processing_task.objects.all().order_by('-end_date')
-	try:
-		kind = Processing_kind.objects.filter(name = kindid)[0]
-	except IndexError:
-		kind = None
+	kind = Processing_kind.objects.filter(name = kindid)[0]
 
 	anyStatus = False
 	if status == 'successful':
@@ -204,39 +201,21 @@ def task_filter(request):
 
 	if owner == 'all':
 		if anyStatus:
-			if kind:
-				tasks = Processing_task.objects.filter(kind = kind).order_by('-end_date')
-			else:
-				tasks = Processing_task.objects.all().order_by('-end_date')
+			tasks = Processing_task.objects.filter(kind = kind).order_by('-end_date')
 		else:
-			if kind:
-				tasks = Processing_task.objects.filter(success = success, kind = kind).order_by('-end_date')
-			else:
-				tasks = Processing_task.objects.filter(success = success).order_by('-end_date')
+			tasks = Processing_task.objects.filter(success = success, kind = kind).order_by('-end_date')
 
 	elif owner == 'my':
 		if anyStatus:
-			if kind:
-				tasks = Processing_task.objects.filter(user = request.user, kind = kind).order_by('-end_date')
-			else:
-				tasks = Processing_task.objects.filter(user = request.user).order_by('-end_date')
+			tasks = Processing_task.objects.filter(user = request.user, kind = kind).order_by('-end_date')
 		else:
-			if kind:
-				tasks = Processing_task.objects.filter(user = request.user, success = success, kind = kind).order_by('-end_date')
-			else:
-				tasks = Processing_task.objects.filter(user = request.user, success = success).order_by('-end_date')
+			tasks = Processing_task.objects.filter(user = request.user, success = success, kind = kind).order_by('-end_date')
 
 	elif owner == 'others':
 		if anyStatus:
-			if kind:
-				tasks = Processing_task.objects.exclude(user = request.user).filter(kind = kind).order_by('-end_date')
-			else:
-				tasks = Processing_task.objects.exclude(user = request.user).order_by('-end_date')
+			tasks = Processing_task.objects.exclude(user = request.user).filter(kind = kind).order_by('-end_date')
 		else:
-			if kind:
-				tasks = Processing_task.objects.exclude(user = request.user).filter(success = success, kind = kind).order_by('-end_date')
-			else:
-				tasks = Processing_task.objects.exclude(user = request.user).filter(success = success).order_by('-end_date')
+			tasks = Processing_task.objects.exclude(user = request.user).filter(success = success, kind = kind).order_by('-end_date')
 	else:
 		tasks = allTasks
 
@@ -244,83 +223,44 @@ def task_filter(request):
 	nb_suc = nb_failed = 0
 	tasksIds = []
 	for t in tasks:
-		imatches = False		# Matches Image data
-		tmatches = False		# Matches task data
-		try:
-			customDescr = str(manager.getPluginByName(t.kind.name).getResultEntryDescription(t))
-		except PluginManagerError:
-			# Plugin not registered
-			continue
-
-		# Is task-retated data matching FilterText string?
-		# Searches through Image information and Task data
-		try:
-			r = Rel_it.objects.filter(task = t)[0]
-			ims = Image.objects.filter(
-						Q(name__icontains = filterText) |
-						Q(path__icontains = filterText) |
-						Q(alpha__icontains = filterText) |
-						Q(delta__icontains = filterText) |
-						Q(equinox__icontains = filterText) |
-						Q(object__icontains = filterText) |
-						Q(airmass__icontains = filterText) |
-						Q(checksum__icontains = filterText) |
-						Q(gain__icontains = filterText) |
-						Q(ingestion_date__icontains = filterText) |
-						Q(flat__icontains = filterText) |
-						Q(mask__icontains = filterText) |
-						Q(reg__icontains = filterText) |
-						Q(instrument__name__icontains = filterText) |
-						Q(instrument__telescope__icontains = filterText) |
-						Q(run__name__icontains = filterText) |
-						Q(QSOstatus__icontains = filterText),
-						id = r.image.id
-					)
-			if ims:
-				imatches = True
-		except IndexError:
-			imatches = False
-
 		if (t.user.username.lower().find(filterText) >= 0 or
 			t.user.first_name.lower().find(filterText) >= 0 or
 			t.user.last_name.lower().find(filterText) >= 0 or
 			t.kind.name.lower().find(filterText) >= 0 or
 			t.hostname.lower().find(filterText) >= 0 or
+			t.title.lower().find(filterText) >= 0 or
 			("%s" % t.start_date).find(filterText) >= 0 or
-			("%s" % t.end_date).find(filterText) >= 0 or
-			customDescr.lower().find(filterText) >= 0):
-			tmatches = True
+			("%s" % t.end_date).find(filterText) >= 0):
 
-		if imatches or tmatches:
+			tasksIds.append(int(t.id))
+
 			if t.success:
 				nb_suc += 1
 			else:
 				nb_failed += 1
 
-			tasksIds.append(int(t.id))
-			res.append({'Success' 		: t.success,
-						'Name' 			: str(t.kind.name),
-						'Label' 		: str(t.kind.label),
-						'Id' 			: str(t.id),
-						'User' 			: str(t.user.username),
-						'Start' 		: str(t.start_date),
-						'End' 			: str(t.end_date),
-						'Duration' 		: str(t.end_date-t.start_date),
-						'Node' 			: str(t.hostname),
-						# Custom plugin description
-						'CustomDescr' 	: customDescr
-					})
-
-	# Pagination
-	if len(res) > maxPerPage:
-		pages = []
-		pageCount = len(res)/maxPerPage
-		if len(res) % maxPerPage > 0:
+	if len(tasksIds) > maxPerPage:
+		pageCount = len(tasksIds)/maxPerPage
+		if len(tasksIds) % maxPerPage > 0:
 			pageCount += 1
-		# Keep only page data
-		res = res[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
 	else:
 		pageCount = 1
+
+	tasksIds = tasksIds[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
+	for tid in tasksIds:
+		t = Processing_task.objects.filter(id = tid)[0]
+		res.append({'Success' 		: t.success,
+					'Name' 			: str(t.kind.name),
+					'Label' 		: str(t.kind.label),
+					'Id' 			: str(t.id),
+					'User' 			: str(t.user.username),
+					'Start' 		: str(t.start_date),
+					'End' 			: str(t.end_date),
+					'Duration' 		: str(t.end_date-t.start_date),
+					'Node' 			: str(t.hostname),
+					'Title'			: str(t.title)
+				})
+
 
 	return HttpResponse(str({	'results' : res, 
 								'Stats' : {	'nb_success' 	: nb_suc, 

@@ -973,6 +973,8 @@ div.pagination {
 
 div.pagination span, div.pagination a {
 	border: 1px solid rgb(91, 128, 178); 
+	background-color: rgb(91, 128, 178); 
+	color: white;
 	padding: 2px; 
 	text-align: center; 
 	vertical-align: middle; 
@@ -982,6 +984,12 @@ div.pagination span, div.pagination a {
 
 div.pagination a {
 	cursor: pointer; 
-	background-color: lightblue; 
-	font-weight: normal;
+	background-color: white; 
+	border: 1px solid lightgray;
+	color: rgb(91, 128, 178); 
+}
+
+div.pagination a:hover {
+	border: 1px solid gray;
+	color: darkred;
 }

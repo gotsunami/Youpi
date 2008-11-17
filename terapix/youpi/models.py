@@ -249,6 +249,7 @@ class Processing_task(models.Model):
 	# Serialized data (base64 encoding over zlib compression)
 	error_log = models.TextField(null=True)
 	results_output_dir = models.CharField(max_length = 255, null = False, help_text="Output directory for results")
+	title = models.CharField(max_length = 255, help_text="Processing task title")
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
