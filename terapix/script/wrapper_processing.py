@@ -177,6 +177,7 @@ def task_start_log(userData, start, kind_id = None):
 					kind_id = int(kind_id),
 					start_date = start,
 					end_date = getNowDateTime(),
+					title = userData['Descr'],
 					hostname = socket.getfqdn(),
 					results_output_dir = userData['ResultsOutputDir'],
 					success = 0 )
@@ -239,7 +240,6 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 	try:
 		g.setTableName('youpi_processing_task')
 		g.update(	end_date = getNowDateTime(time.time()),
-					title = userData['Descr'],
 					success = success,
 					wheres = {'id': task_id} )
 		g.con.commit()
