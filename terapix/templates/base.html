@@ -32,6 +32,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	{% block toplevelmenu %}
 	<!-- Youpi's main menu comes here -->
 	<div style="background-image: url(/media/{{ user.get_profile.guistyle }}/img/misc/grad.png); background-repeat: repeat-x;">
+		<div style="background-image: url(/media/{{ user.get_profile.guistyle }}/img/misc/youpi_star_alpha_512.png); background-repeat: no-repeat; background-position: center left;">
 		{% if user.is_authenticated %}
 			{# and user.is_staff #}
 			<div style="padding: 10px; font-size: 9px; color: gray; background-color: inherit;">
@@ -64,6 +65,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			{% endifequal %}
 		{% endfor %}
 		</ul>
+</div>
 	</div>
 	{% endblock %}
 	{% if messages %}

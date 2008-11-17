@@ -80,7 +80,7 @@ ul.smart_tabnav_sub {
    padding-bottom: 24px;
    padding-top: 24px;
    margin: 0;
-   border-bottom: 2px solid darkblue;
+   border-bottom: 2px solid brown;
    background-color: #5b80b2;
 }
 
@@ -94,9 +94,9 @@ ul.smart_tabnav_sub li {
 }
 
 ul.smart_tabnav_sub li.enabled {
-   border: 1px solid darkblue;
-   border-bottom: 1px solid darkblue;
-   background-color: darkblue;
+   border: 1px solid brown;
+   border-bottom: 1px solid brown;
+   background-color: brown;
 }
 
 ul.smart_tabnav_sub li.enabled a {

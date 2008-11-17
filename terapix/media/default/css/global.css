@@ -445,11 +445,17 @@ div.result_count_no_match {
 div.nonempty#shoppingCart {
 	vertical-align: middle; 
 	cursor: pointer;
+	font-size: 9px;
+	vertical-align: center;
+	margin-right: 10px;
 }
 
 div.empty#shoppingCart {
 	vertical-align: middle; 
 	cursor: default;
+	font-size: 9px;
+	vertical-align: center;
+	margin-right: 10px;
 }
 
 div.shoppingCartPanel {

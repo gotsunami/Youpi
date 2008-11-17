@@ -47,8 +47,8 @@ app_menu = { 	'normal' :
 				'apart' :
 				( 	
 					# Display order is inverted
-					{'title' : 'Documentation', 	'id' : 'documentation', 'href' : AUP + '/documentation/'},
 					{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : AUP + '/preferences/'},
+					{'title' : 'Condor Setup', 		'id' : 'condorsetup', 	'href' : AUP + '/condor/setup/'},
 					{'title' : 'Shopping cart',		'id' : 'shoppingcart', 	'href' : AUP + '/cart/'}
 				)
 			}
