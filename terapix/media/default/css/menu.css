@@ -6,8 +6,10 @@ ul.smart_tabnav {
    font: bold 11px verdana, arial, sans-serif;
    list-style: none;
    padding-bottom: 24px;
+   padding-top: 24px;
    margin: 0;
-   border-bottom: 1px solid #5b80b2;
+   border-bottom: 2px solid #5b80b2;
+   background-color: transparent;
 }
 
 ul.smart_tabnav li {
@@ -19,48 +21,37 @@ ul.smart_tabnav li {
    -moz-border-radius-topright: 5px;
 }
 
-ul.smart_tabnav li.enabled {
+ul.smart_tabnav li.enabled, li.enabled_apart {
    border: 1px solid #5b80b2;
-   border-bottom: 1px solid lightblue;
-   background-color: lightblue;
+   border-bottom: 1px solid #5b80b2;
+   background-color: #5b80b2;
 }
 
-ul.smart_tabnav li.enabled a {
-   color: black;
+ul.smart_tabnav li.enabled a, li.enabled_apart a {
+   color: white;
 }
 
 ul.smart_tabnav li.enabled_apart {
-   border: 1px solid #5b80b2;
-   border-bottom: 1px solid lightblue;
-   background-color: lightblue;
+   background-color: #5b80b2;
    float: right;
 }
 
-ul.smart_tabnav li.enabled_apart a {
-   color: black;
+ul.smart_tabnav li.disabled, li.disabled_apart {
+   background-color: transparent;
 }
 
-ul.smart_tabnav li.disabled {
-   background-color: lightgray;
-   border: 1px solid gray;
-   border-bottom: 1px solid #5b80b2;
-}
-
-ul.smart_tabnav li.disabled a {
+ul.smart_tabnav li.disabled a, li.disabled_apart a {
    color: grey;
+}
+
+ul.smart_tabnav li.disabled a:hover, li.disabled_apart a:hover {
+   color: brown;
 }
 
 ul.smart_tabnav li.disabled_apart {
-   background-color: lightgray;
-   border: 1px solid gray;
-   border-bottom: 1px solid #5b80b2;
    float: right;
+   background-color: transparent;
 }
-
-ul.smart_tabnav li.disabled_apart a {
-   color: grey;
-}
-
 
 .smart_tabnav a {
    float: left;
@@ -81,6 +72,62 @@ table.preingestion {
 table.preingestion td {
    border-bottom: none;
 }
+
+/************************* KK *******************************/
+ul.smart_tabnav_sub {
+   font: bold 11px verdana, arial, sans-serif;
+   list-style: none;
+   padding-bottom: 24px;
+   padding-top: 24px;
+   margin: 0;
+   border-bottom: 2px solid darkblue;
+   background-color: #5b80b2;
+}
+
+ul.smart_tabnav_sub li {
+   float: left;
+   height: 21px;
+   margin: 2px 2px 0 2px;
+   background-color: #FFF;
+   -moz-border-radius-topleft: 5px;
+   -moz-border-radius-topright: 5px;
+}
+
+ul.smart_tabnav_sub li.enabled {
+   border: 1px solid darkblue;
+   border-bottom: 1px solid darkblue;
+   background-color: darkblue;
+}
+
+ul.smart_tabnav_sub li.enabled a {
+   color: white;
+}
+
+ul.smart_tabnav_sub li.disabled {
+   background-color: transparent;
+}
+
+ul.smart_tabnav_sub li.disabled a {
+   color: black;
+}
+
+ul.smart_tabnav_sub li.disabled a:hover {
+   color: lightyellow;
+}
+
+.smart_tabnav_sub a {
+   float: left;
+   display: block;
+   color: #000;
+   text-decoration: none;
+   padding: 4px;
+}
+
+.smart_tabnav_sub a:hover {
+   background: none;
+}
+
+/************************* KK *******************************/
 
 /************************* Other navigation style *******************************/
 

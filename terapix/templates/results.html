@@ -60,19 +60,14 @@ function get_stats() {
 
 {% block content %}
 <div align="center">
+	<div id="pre_submenu">
+		<ul class="smart_tabnav_sub" id="tabnav2">
+			<li class="enabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_');">History</a></li>
+			<li class="disabled"><a href="#" id="link_stats" onclick="swap_display(this.id, 'menuitem_stats', 'tabnav2', 'menuitem_')">Statistics</a></li>
+			<li class="disabled"><a href="#" id="link_search" onclick="swap_display(this.id, 'menuitem_search', 'tabnav2', 'menuitem_')">Advanced Search</a></li>
+		</ul>
+	</div>
 	<table class="preingestion">
-		<tr>
-			<td>
-				<div id="pre_submenu">
-					<ul class="smart_tabnav" id="tabnav2">
-						<li class="enabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_');">History</a></li>
-						<li class="disabled"><a href="#" id="link_stats" onclick="swap_display(this.id, 'menuitem_stats', 'tabnav2', 'menuitem_')">Statistics</a></li>
-						<li class="disabled"><a href="#" id="link_search" onclick="swap_display(this.id, 'menuitem_search', 'tabnav2', 'menuitem_')">Advanced Search</a></li>
-					</ul>
-				</div>
-			</td>
-		</tr>
-
 		<tr id="data">
 			<td align="center">
 				<div id="menuitem_history">

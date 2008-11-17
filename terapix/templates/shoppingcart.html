@@ -99,10 +99,9 @@ function proceed_cart() {
 {% block content %}
 
 <div align="center">
-<div style="text-align: center; width: 95%;">
-	<p class="shoppingCartWelcome">Welcome to your cart!</p>
+<div style="text-align: center;">
 	<div>
-		<ul class="smart_tabnav" id="menu">
+		<ul class="smart_tabnav_sub" id="menu">
 			<li class="enabled">
 				<a 	href="#" id="entry_0" 
 					onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Cart items</a>
@@ -168,11 +167,9 @@ function proceed_cart() {
 			</table>
 			</div>
 			{% else %}
-			<div style="padding: 5px;">
+			<div style="margin-top: 70px; padding: 5px;">
 				{# No data in cart ! #}
-				<div class="middle" style="height: 200px; vertical-align: middle;">
-					<h1>Your cart is currently empty</h1>
-				</div>
+				<h1>Your cart is currently empty</h1>
 			</div>
 			{% endif %}
 		</div>

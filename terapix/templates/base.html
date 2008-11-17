@@ -21,20 +21,21 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 <div id="container">
 
     {% if not is_popup %}
-    <!-- Header -->
     <div id="header">
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>
         {% block nav-global %}{% endblock %}
     </div>
-    <!-- END Header -->
-    <div class="breadcrumbs">
-		{% block breadcrumbs %}
+    {% endif %}
+
+	{% block toplevelmenu %}
+	<!-- Youpi's main menu comes here -->
+	<div style="background-image: url(/media/{{ user.get_profile.guistyle }}/img/misc/grad.png); background-repeat: repeat-x;">
 		{% if user.is_authenticated %}
 			{# and user.is_staff #}
-			<div>
-			{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>
+			<div style="padding: 10px; font-size: 9px; color: gray; background-color: inherit;">
+			Logged in as <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>
 			{% block userlinks %}
 				[ <a href="{% url django.contrib.auth.views.password_change %}">{% trans 'Change password' %}</a>
 				- <a href="/youpi/accounts/logout/">{% trans 'Log out' %}</a> ]
@@ -46,15 +47,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					var s_cart;
 					s_cart = new ShoppingCart('youpi_cart_id', 's_cart');
 			</script>
-			<div style="height: 20px;">It is {% now "jS F Y H:i" %}</div>
         {% endif %}
-		{% endblock %}
-	</div>
-    {% endif %}
-
-	{% block toplevelmenu %}
-	<!-- Youpi's main menu comes here -->
-	<div>
 		<ul class="smart_tabnav">
 		{% for entry in menu.normal %}
 			{% ifequal entry.id selected_entry_id %}
@@ -70,11 +63,9 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			<li class="disabled_apart"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
 			{% endifequal %}
 		{% endfor %}
-	</ul>
-</div>
+		</ul>
+	</div>
 	{% endblock %}
-	<br/>
-
 	{% if messages %}
 		<ul class="messagelist">{% for message in messages %}<li>{{ message|escape }}</li>{% endfor %}</ul>
 	{% endif %}

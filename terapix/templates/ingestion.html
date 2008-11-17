@@ -48,17 +48,17 @@ function ingestion_history() {
 
 <!-- Main body -->
 {% block content %}
-	<p class="number_ingested">Number of ingested Images: {{ ingested }}</p>
 	<div align="center">
+		<div id="pre_submenu">
+			<ul class="smart_tabnav_sub" id="tabnav2">
+				<li class="enabled"><a href="#" id="link_ingest" onclick="swap_display(this.id, 'menuitem_ingest', 'tabnav2', 'menuitem_')">Run ingestion</a></li>
+				<li class="disabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_'); ingestion_history();">History</a></li>
+			</ul>
+		</div>
 	<table class="preingestion">
 		<tr>
 			<td>
-				<div id="pre_submenu">
-					<ul class="smart_tabnav" id="tabnav2">
-						<li class="enabled"><a href="#" id="link_ingest" onclick="swap_display(this.id, 'menuitem_ingest', 'tabnav2', 'menuitem_')">Run ingestion</a></li>
-						<li class="disabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_'); ingestion_history();">History</a></li>
-					</ul>
-				</div>
+				<p class="number_ingested">Number of ingested Images: {{ ingested }}</p>
 			</td>
 		</tr>
 

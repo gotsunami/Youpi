@@ -45,17 +45,14 @@ function preingestion_history()
 
 {% block content %}
 <div align="center">
+	<div id="pre_submenu">
+		<ul class="smart_tabnav_sub" id="tabnav2">
+			<li class="enabled"><a href="#" id="link_ingest" onclick="swap_display(this.id, 'menuitem_ingest', 'tabnav2', 'menuitem_')">
+				Ingest binary FITS tables</a>
+			</li>
+		</ul>
+	</div>
 <table class="preingestion">
-	<tr>
-		<td>
-			<div id="pre_submenu">
-				<ul class="smart_tabnav" id="tabnav2">
-					<li class="enabled"><a href="#" id="link_ingest" onclick="swap_display(this.id, 'menuitem_ingest', 'tabnav2', 'menuitem_')">Ingest binary FITS tables</a></li>
-
-				</ul>
-			</div>
-		</td>
-	</tr>
 	<tr id="data">
 		<td>
 			<div id="menuitem_ingest">
