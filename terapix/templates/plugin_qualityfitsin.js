@@ -47,6 +47,7 @@ function {{ plugin.id }}_run(trid, idList, itemId, flat, mask, reg, config, resu
 	var condorHosts = condorPanel.getSelectedHosts();
 	var prefix = document.getElementById('prefix').value.replace(/ /g, '');
 	var txt = '';
+	var reprocess_valid = !document.getElementById('reprocess_successful_checkbox').checked;
 
 	if (condorHosts.length == 0) {
 		alert('Please select at least a node on the cluster in the Condor panel on the left.');
@@ -76,7 +77,7 @@ function {{ plugin.id }}_run(trid, idList, itemId, flat, mask, reg, config, resu
 					alert('Done. Sent to cluster: ' + resp['result']['clusterId']);
 
 				// Silently remove item from the cart
-				removeItemFromCart(trid, true);
+//				removeItemFromCart(trid, true);
 			}
 	);
 
@@ -88,6 +89,7 @@ function {{ plugin.id }}_run(trid, idList, itemId, flat, mask, reg, config, resu
 				'&CondorHosts=' + condorHosts + 
 				'&FitsinId=' + fitsinId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
+				'&ReprocessValid=' + (reprocess_valid ?  1 : 0) + 
 				'&Config=' + config;
 	r.send('/youpi/process/plugin/', post);
 }

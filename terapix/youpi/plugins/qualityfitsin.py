@@ -307,6 +307,7 @@ class QualityFitsIn(ProcessingPlugin):
 			config = post['Config']
 			fitsinId = post['FitsinId']
 			resultsOutputDir = post['ResultsOutputDir']
+			reprocessValid = post['ReprocessValid']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -397,8 +398,28 @@ requirements            = %s
 
 		csf.write(condor_submit_file)
 
-		# One image per job
+		# Check if already successful processings
+		process_images = []
 		for img in images:
+			rels = Rel_it.objects.filter(image = img)
+			if rels:
+				reprocess_image = True
+				for r in rels:
+					if r.task.success:
+						# Check if same run parameters
+						fitsin = Plugin_fitsin.objects.filter(task = r.task)[0]
+						conf = str(zlib.decompress(base64.decodestring(fitsin.qfconfig)))
+						if 	conf == content or flatPath == fitsin.flat or maskPath == fitsin.mask or \
+							regPath == fitsin.reg or resultsOutputDir == r.task.results_output_dir:
+							reprocess_image = False
+
+				if reprocess_image:
+					process_images.append(img)
+			else:
+				process_images.append(img)
+
+		# One image per job
+		for img in process_images:
 			path = os.path.join(img.path, img.name + '.fits')
 			# FLAT checks
 			if os.path.isdir(flatPath):
