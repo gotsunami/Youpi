@@ -902,7 +902,6 @@ function selectImages() {
 	var div = document.createElement('div');
 	div.setAttribute('id', '{{ plugin.id }}_results_div');
 	div.setAttribute('align', 'center');
-	div.setAttribute('style', 'padding: 20px; width: 80%');
 	root.appendChild(div);
 
 	{{ plugin.id }}_ims = new ImageSelector('{{ plugin.id }}_results_div', '{{ plugin.id }}_ims');
@@ -1439,7 +1438,7 @@ function {{ plugin.id }}_renderOutputDirStats(container_id) {
 
 	var logdiv = document.createElement('div');
 	logdiv.setAttribute('id', '{{ plugin.id }}_stats_log_div');
-	logdiv.setAttribute('style', 'height: 300px; text-align: left; overflow: auto; background-color: black; color: white; padding-left: 5px;')
+	logdiv.setAttribute('style', 'width: 700px; height: 300px; text-align: left; overflow: auto; background-color: black; color: white; padding-left: 5px;')
 	bdiv.appendChild(logdiv);
 
 	imgSel.options[0].selected = true;

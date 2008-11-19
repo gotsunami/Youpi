@@ -36,6 +36,38 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 
 {# Load custom plugin's javascript code #}
 {% include plugin.jsSource %}
+
+// Displays both logo and 'About' menu tab
+function show_plugin_info() {
+	var ul = document.getElementById('menu');
+	ul.setAttribute('style', 	'background-repeat: no-repeat; background-position: center right;' + 
+								'background-image: url(/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png);');
+
+	var li = document.createElement('li');
+	li.setAttribute('class', 'disabled');
+
+	var a = document.createElement('a');
+	a.setAttribute('href', '#');
+	a.setAttribute('id', 'entry_about');
+	a.setAttribute('onclick', "swap_display(this.id, 'menuitem_sub_about', 'menu', 'menuitem_sub_');");
+	a.appendChild(document.createTextNode('About'));
+
+	var d = document.createElement('div');
+	d.setAttribute('id', 'menuitem_sub_about');
+	d.setAttribute('align', 'center');
+	d.setAttribute('style', 'width: 100%; display: none;');
+
+	var c = document.createElement('div');
+	c.setAttribute('style', 'margin: 30px; text-align: left; height: 60px; vertical-align: bottom; padding-left: 50px;');
+	c.innerHTML = 	"<img src=\"/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png\"/><br/>" + 
+					'<b>Plugin name</b>: {{ plugin.optionLabel }}<br/><b>Plugin description</b>: ' + 
+					'{{ plugin.description }}<br/><b>Version</b>: {{ plugin.version }}</div>';
+	d.appendChild(c);
+
+	li.appendChild(a);
+	ul.appendChild(li);
+	ul.parentNode.appendChild(d);
+}
 </script>
 {% endblock %}
 
@@ -44,6 +76,9 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 
 <div align="center">
 	{% include plugin.template %}
+	<script type="text/javascript">
+		show_plugin_info();
+	</script>
 	<!-- TODO: include 'About' submenu 
 <div>
 	<img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="float: left; margin-right: 10px;"/>

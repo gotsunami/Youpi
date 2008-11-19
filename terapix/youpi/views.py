@@ -80,6 +80,18 @@ def preferences(request):
 
 @login_required
 @profile
+def condor_setup(request):
+	"""
+	Condor cluster setup
+	"""
+	return render_to_response('condorsetup.html', 
+					{	'Debug' 			: DEBUG,
+						'menu'				: app_menu,
+						'selected_entry_id'	: 'condorsetup' }, 
+					context_instance = RequestContext(request))
+
+@login_required
+@profile
 def documentation(request):
 	"""
 	Documentation template

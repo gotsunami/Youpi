@@ -1,13 +1,23 @@
 
 {# Skeleton template #}
 
-<div class="tip" style="width: 300px;">
-	<p>This plugin is a kind of <i>Hello, world!</i> demo which provides skeletons that may be used as a base for processing plugin development.</p>
-	<p>By clicking on the 'Add to cart' button on the right, one item will be added to the shopping cart, allowing you to queue <b>five</b> <tt>/usr/bin/uptime</tt> 
-	jobs on the cluster.</p>
-
-	<div style="text-align: center; padding: 10px;">
-		<img src="/media/{{ user.get_profile.guistyle }}/img/misc/" + {{plugin_.name}} + ".png" style="float: left"/>
-		<img style="cursor: pointer" src="/media/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}_addSelectionToCart();"/>
+<div>
+	<ul class="smart_tabnav_sub" id="menu">
+		<li class="enabled">
+			<a 	href="#" id="entry_0" 
+				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">DEMO</a>
+		</li>
+	</ul>
+	<div align="center" style="width: 100%" id="menuitem_sub_0">
+		<div style="margin-top: 30px; width: 300px;" class="tip">
+			<p>This plugin is a kind of <i>Hello, world!</i> demo which provides skeletons that may be used as a base for processing plugin development.</p>
+			<p>By clicking on the 'Add to cart' button on the right, one item will be added to the shopping cart, allowing you to queue <b>five</b> <tt>/usr/bin/uptime</tt> 
+			jobs on the cluster.</p>
+	
+			<div style="text-align: center; padding: 10px;">
+				<img src="/media/{{ user.get_profile.guistyle }}/img/misc/" + {{plugin_.name}} + ".png" style="float: left"/>
+				<img style="cursor: pointer" src="/media/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}_addSelectionToCart();"/>
+			</div>
+		</div>
 	</div>
 </div>

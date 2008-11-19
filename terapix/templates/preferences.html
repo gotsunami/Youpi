@@ -19,5 +19,17 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 
 <!-- Main body -->
 {% block content %}
-prefs
+<div>
+	<ul class="smart_tabnav_sub" id="menu">
+		<li class="enabled">
+			<a 	href="#" id="entry_0" 
+				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Look 'n' Feel</a>
+		</li>
+	</ul>
+	<div align="center" style="width: 100%" id="menuitem_sub_0">
+		<div style="margin-top: 40px;" align="center">
+			prefs
+		</div>
+	</div>
+</div>
 {% endblock %}

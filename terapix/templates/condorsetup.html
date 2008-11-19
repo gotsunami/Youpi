@@ -1,0 +1,45 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block extrahead %}
+<!-- Javascript treeview -->
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/tafelTree/css/tree.css"/>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/prototype.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/scriptaculous.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
+<script type="text/javascript" src="/media/js/common.js"></script>
+<script type="text/javascript" src="/media/js/xhr.js"></script>
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+
+<!-- Auto-completion code -->
+<script type="text/javascript" src="/media/js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js"></script>
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+</script>
+{% endblock %}
+
+<!-- Main body -->
+{% block content %}
+<div>
+	<ul class="smart_tabnav_sub" id="menu">
+		<li class="enabled">
+			<a 	href="#" id="entry_0" 
+				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Requirements</a>
+		</li>
+	</ul>
+	<div align="center" style="width: 100%" id="menuitem_sub_0">
+		<div style="margin-top: 40px;" align="center">
+			TODO...
+		</div>
+	</div>
+</div>
+{% endblock %}
