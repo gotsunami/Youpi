@@ -438,7 +438,7 @@ function FileBrowser(container_id, varName) {
 		if (_tree) delete _tree;
 		_tree = new TafelTree(container_id + '_tree', _root, {
 			'generate'			: true,
-			'imgBase'			: '/media/themes/js/3rdParty/tafelTree/imgs/',
+			'imgBase'			: '/media/js/3rdParty/tafelTree/imgs/',
 			'height'			: _treeviewHeight,
 			'defaultImg'		: 'page.gif',
 			'defaultImgOpen'	: 'folderopen.gif',

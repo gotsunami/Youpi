@@ -39,6 +39,7 @@ urlpatterns = patterns(
 
 	# Prefs and docs
 	(r'^youpi/preferences/$', 'preferences'),
+	(r'^youpi/preferences/theme/set/$', 'set_current_theme'),
 	(r'^youpi/documentation/$', 'documentation'),
 
 	# Sandbox for testing django form processing
@@ -107,4 +108,3 @@ urlpatterns = patterns(
 	# API documentation
     (r'^youpi/api/(.*)/$', 'browse_api')
 )
-	

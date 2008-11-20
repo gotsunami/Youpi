@@ -14,6 +14,54 @@
 
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
+
+function set_current_theme(name) {
+	var xhr = new HttpRequest(
+			null,
+			null,	
+			// Custom handler for results
+			function(resp) {
+				window.location.reload();
+			}
+	);
+
+	var post = 'Name=' + name;
+	xhr.send('/youpi/preferences/theme/set/', post);
+}
+
+function show_available_themes() {
+	var d = document.getElementById('all_themes_div');
+	var tab = document.createElement('table');
+	var tr, td, img, meta;
+	var meta, name, desc;
+
+	tr = document.createElement('tr');
+	{% for theme in themes %}
+	td = document.createElement('td');
+	img = document.createElement('img');
+	img.setAttribute('src', '/media/themes/{{ theme.short_name }}/screenshot.png');
+	img.setAttribute('onclick', "set_current_theme('{{ theme.short_name }}');");
+	img.setAttribute('title', "Use {{ theme.name }} as default theme");
+	meta = document.createElement('div');
+
+	name = document.createElement('div');
+	name.setAttribute('class', 'name');
+	name.appendChild(document.createTextNode('{{ theme.name }}'));
+
+	desc = document.createElement('div');
+	desc.setAttribute('class', 'description');
+	desc.appendChild(document.createTextNode('{{ theme.description }}'));
+
+	meta.appendChild(name);
+	meta.appendChild(desc);
+	td.appendChild(img);
+	td.appendChild(meta);
+	tr.appendChild(td);
+	{% endfor %}
+
+	tab.appendChild(tr);
+	d.appendChild(tab);
+}
 </script>
 {% endblock %}
 
@@ -26,10 +74,31 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Theme</a>
 		</li>
 	</ul>
-	<div align="center" style="width: 100%" id="menuitem_sub_0">
-		<div style="margin-top: 40px;" align="center">
-			prefs
+	<div style="width: 100%" id="menuitem_sub_0">
+		<div id="current_theme_div" class="themes">
+			<h1>Current Theme</h1>
+			<div class="curtheme">
+				<table>
+					<tr>
+						<td>
+							<img src="/media/themes/{{ user.get_profile.guistyle }}/screenshot.png"/>
+						</td>
+						<td>
+							<div class="name">{{ current_theme.name }} <span class="version">{{ current_theme.version }}</span></div> 
+							by <a href="{{ current_theme.author_uri }}"><span class="author">{{ current_theme.author }}</span></a>
+							<div class="description">{{ current_theme.description }}</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+
+			<h1>Available Themes</h1>
+			<div id="all_themes_div" class="allthemes"></div>
 		</div>
 	</div>
 </div>
+
+<script type="text/javascript">
+	show_available_themes();
+</script>
 {% endblock %}

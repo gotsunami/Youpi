@@ -72,8 +72,40 @@ def preferences(request):
 	"""
 	Preferences template
 	"""
+	import ConfigParser
+	config = ConfigParser.RawConfigParser()
+
+	# Looks for themes
+	theme_dirs = glob.glob(os.path.join(MEDIA_ROOT, 'themes', '*'))
+	themes = []
+
+	for dir in theme_dirs:
+		try:
+			config.read(os.path.join(dir, 'META'))
+		except:
+			# No META data, theme not conform
+			pass
+
+		if not os.path.isfile(os.path.join(dir, 'screenshot.png')):
+			# No screenshot available, theme not conform
+			continue
+
+		themes.append({	'name' 			: config.get('Theme', 'Name'),
+						'author' 		: config.get('Theme', 'Author'),
+						'author_uri'	: config.get('Theme', 'Author URI'),
+						'description' 	: config.get('Theme', 'Description'),
+						'version' 		: config.get('Theme', 'Version'),
+						'short_name'	: os.path.basename(dir),
+						})
+
+	for k in range(len(themes)):
+		if themes[k]['short_name'] == request.user.get_profile().guistyle:
+			break
+
 	return render_to_response('preferences.html', 
 					{	'Debug' 			: DEBUG,
+						'themes'			: themes,
+						'current_theme'		: themes[k],
 						'menu'				: app_menu,
 						'selected_entry_id'	: 'preferences' }, 
 					context_instance = RequestContext(request))
@@ -1119,6 +1151,24 @@ def profile_load_condor_nodes_selection(request):
 	hosts = marshal.loads(base64.decodestring(str(pr.condornodesel)))
 
 	return HttpResponse(str({'SavedHosts' : [str(h) for h in hosts]}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def set_current_theme(request):
+	"""
+	Set default user theme
+	"""
+	try:
+		name = request.POST['Name']
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	p = request.user.get_profile()
+	p.guistyle = name
+	p.save()
+
+	return HttpResponse(str({'Default': str(name)}), mimetype = 'text/plain')
+
 
 
 if __name__ == '__main__':

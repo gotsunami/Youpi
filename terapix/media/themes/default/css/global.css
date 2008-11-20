@@ -999,3 +999,70 @@ div.pagination a:hover {
 	border: 1px solid gray;
 	color: darkred;
 }
+
+/***** themes prefs ******/
+
+div.themes {
+	margin-top: 40px;
+	margin-left: 20px;
+}
+
+div.allthemes {
+	margin-left: 30px;
+}
+
+div.allthemes table td {
+	border: 1px solid lightgray;
+	padding: 20px;
+	width: 200px;
+}
+
+div.themes h1 {
+	border-bottom: 1px solid lightgray;
+	padding-bottom: 7px;
+	margin-bottom: 20px;
+	width: 70%;
+}
+
+div.allthemes table img {
+	cursor: pointer;
+}
+
+div.allthemes table img, div.curtheme img {
+	border: 1px solid lightgray;
+}
+
+div.curtheme {
+	margin-bottom: 30px;
+}
+
+div.curtheme img {
+	width: 150px;
+}
+
+div.curtheme table td {
+	border: none;
+}
+
+div.curtheme div.name {
+	font-weight: bold;
+	font-size: 16px;
+	color: brown;
+}
+
+div.curtheme div.description {
+	margin-top: 10px;
+}
+
+div.allthemes table div.name {
+	font-weight: bold;
+	font-size: 16px;
+	color: brown;
+	text-decoration: underline;
+	margin-top: 10px;
+}
+
+div.allthemes table div.description {
+	margin-top: 10px;
+}
+
