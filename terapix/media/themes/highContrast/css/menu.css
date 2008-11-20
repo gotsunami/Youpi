@@ -1,0 +1,161 @@
+div.presubmenu {
+	width: 100%;
+}
+
+ul.smart_tabnav {
+   font: bold 20px verdana, arial, sans-serif;
+   list-style: none;
+   padding-bottom: 24px;
+   padding-top: 24px;
+   margin: 0;
+   background-color: transparent;
+}
+
+ul.smart_tabnav li {
+   margin: 2px 2px 0 2px;
+   background-color: #FFF;
+   width: 50%;
+}
+
+ul.smart_tabnav li.enabled, li.enabled_apart {
+   background-color: black;
+}
+
+ul.smart_tabnav li.enabled a, li.enabled_apart a {
+   color: white;
+   padding: 10px;
+}
+
+a {
+	font-size: 20px;
+}
+
+ul.smart_tabnav li.enabled_apart {
+   background-color: black;
+}
+
+ul.smart_tabnav li.disabled, li.disabled_apart {
+   background-color: transparent;
+}
+
+ul.smart_tabnav li.disabled a, li.disabled_apart a {
+   color: grey;
+}
+
+ul.smart_tabnav li.disabled a:hover, li.disabled_apart a:hover {
+   color: black;
+   font-size: 30px;
+}
+
+ul.smart_tabnav li.disabled_apart {
+   background-color: transparent;
+}
+
+.smart_tabnav a {
+   display: block;
+   color: #000;
+   text-decoration: none;
+   padding: 4px;
+}
+
+.smart_tabnav a:hover {
+   background: none;
+}
+
+table.preingestion {
+	width: 94%;
+}
+
+table.preingestion td {
+   border-bottom: none;
+}
+
+/************************* KK *******************************/
+ul.smart_tabnav_sub {
+   font: bold 20px verdana, arial, sans-serif;
+   list-style: none;
+   padding-bottom: 24px;
+   padding-top: 24px;
+   margin: 0;
+   background-color: white;
+}
+
+ul.smart_tabnav_sub li {
+   margin: 2px 2px 0 2px;
+   background-color: #FFF;
+   width: 50%;
+}
+
+ul.smart_tabnav_sub li.enabled {
+   border: 2px solid black;
+   background-color: white;
+}
+
+ul.smart_tabnav_sub li.enabled a {
+   color: black;
+   padding: 10px;
+}
+
+ul.smart_tabnav_sub li.disabled {
+   background-color: transparent;
+}
+
+ul.smart_tabnav_sub li.disabled a {
+   color: black;
+}
+
+ul.smart_tabnav_sub li.disabled a:hover {
+   color: red;
+   font-size: 30px;
+}
+
+.smart_tabnav_sub a {
+   display: block;
+   color: #000;
+   text-decoration: none;
+   padding: 4px;
+}
+
+.smart_tabnav_sub a:hover {
+   background: none;
+}
+
+/************************* Other navigation style *******************************/
+
+ul.icon_smart_tabnav {
+	list-style: none;
+	padding-bottom: 24px;
+	margin: 0;
+}
+
+ul.icon_smart_tabnav li {
+	width: 150px;
+	font: bold 20px verdana, arial, sans-serif;
+	margin: 2px 2px 0 2px;
+	background-color: #FFF;
+}
+
+ul.icon_smart_tabnav li.enabled {
+	border: 1px solid #5b80b2;
+	background-color: lightblue;
+}
+
+ul.icon_smart_tabnav li.enabled a {
+	color: black;
+}
+
+.icon_smart_tabnav a {
+	display: block;
+	color: #000;
+	text-decoration: none;
+	padding: 4px;
+}
+
+ul.icon_smart_tabnav li.disabled {
+	background-color: lightgray;
+	border: 1px solid gray;
+}
+
+ul.icon_smart_tabnav li.disabled a {
+	color: grey;
+}

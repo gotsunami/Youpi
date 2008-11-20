@@ -1,4 +1,4 @@
-body { margin:0; padding:0; font-size:12px; font-family:"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif; color:#000; background:#FFFFFF; }
+body { margin:0; padding:0; font-size:16px; font-family:"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif; color:#000; background:#FFFFFF; }
 
 /* LINKS */
 a:link, a:visited { color: #5b80b2; text-decoration:none; }
@@ -1066,20 +1066,3 @@ div.allthemes table div.description {
 	margin-top: 10px;
 }
 
-div.toplevelmenu {
-	background-image: url(../img/misc/grad.png); 
-	background-repeat: repeat-x;
-}
-
-div.toplevelmenu div.logo {
-	background-image: url(../img/misc/youpi_star_alpha_512.png); 
-	background-repeat: no-repeat; 
-	background-position: center left;
-}
-
-div.toplevelmenu div.user {
-	padding: 10px; 
-	font-size: 9px; 
-	color: gray; 
-	background-color: inherit;
-}

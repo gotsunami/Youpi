@@ -1,0 +1,45 @@
+
+/*
+ * Class for tooltip embedded in a div
+ *
+ */
+div.tooltip {
+	/* off-screen initial position */
+    visibility: hidden; 
+    position: absolute; 
+    top: 0;  
+    left: 0; 
+    z-index: 2; 
+
+	border: 2px solid #B0C4DE;
+	background-color: #F0F8FF;
+	color: #000000;
+	/* padding inside table area */
+	background: #F0F8FF url('../img/34x34/tip.png') no-repeat top left;
+	padding-left: 30px;
+}
+
+table.tooltip { 
+	width: 250px;
+}
+
+table.tooltip td { 
+    font: normal 8pt sans-serif; 
+	text-align: justify;
+	border: none;
+}
+
+table.intooltip { 
+	width: 70%;
+	padding: 0px;
+	margin: 0px;
+}
+
+table.intooltip td.number { 
+	text-align: center;
+}
+
+table.intooltip th { 
+	border-bottom: 1px solid #002699;
+    font: bold 8pt sans-serif; 
+}

@@ -1,0 +1,46 @@
+@import url('base.css');
+@import url('layout.css');
+
+/* LOGIN FORM */
+body.login { 
+	background-image: url(/media/themes/default/img/misc/page_bg_texture.png);
+	background-repeat: repeat;
+	background-color: lightgray;
+}
+
+.login #container { 
+	background: white; 
+	width: 28em; 
+	min-width: 300px; 
+	margin-left: auto; 
+	margin-right: auto; 
+	margin-top: 100px; 
+	-moz-border-radius: 5px;
+	padding-bottom: 5px;
+	border: 2px black solid;
+	background: white url(/media/themes/default/img/misc/youpi_star_alpha_512.png) center center no-repeat;
+}
+
+.login #content-main { width:100%; }
+.login form { margin-top:1em; }
+.login .form-row { padding:4px 0; float:left; width:100%; }
+.login .form-row label { float:left; width:9em; padding-right:0.5em; line-height:2em; text-align:right; font-size:1em; color:#333; }
+.login .form-row #id_username, .login .form-row #id_password { width:14em; }
+.login span.help { font-size:10px; display:block; }
+.login .submit-row { clear:both; padding:1em 0 0 9.4em; }
+.login div.links { margin-top: 10px; margin-bottom: 10px; font-size: 10px; }
+
+div#lheader, p.errornote {
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	background-color: transparent;
+}
+
+p.errornote {
+	margin: 3px;
+}
+
+div#lbranding {
+	background: url(/media/themes/default/img/misc/youpi_logo_small.png) center left no-repeat;
+	height: 100px;
+}

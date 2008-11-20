@@ -1,0 +1,588 @@
+@import url('base.css');
+
+/* DASHBOARD */
+.dashboard .module table th { width:100%; }
+.dashboard .module table td { white-space:nowrap; }
+.dashboard .module table td a { display:block; padding-right:.6em; }
+
+/*  RECENT ACTIONS MODULE  */
+.module ul.actionlist { margin-left:0; }
+ul.actionlist li { list-style-type:none; }
+
+td.ingestion_type {
+	font-size: 14pt;
+	text-align: center;
+	vertical-align: middle;
+	color: white;
+}
+
+td.ingestion_type select {
+	color: brown;
+	font-weight: bold;
+}
+
+td.vcenter {
+	vertical-align: middle;
+}
+
+td.submit {
+	vertical-align: middle;
+	text-align: right;
+}
+
+table.ingestion {
+	margin-top: 40px;
+}
+
+table.ingestion th {
+	border-bottom: 3px solid #002699;
+}
+
+table.ingestion td { 
+	border-bottom:1px solid #eee; 
+}
+
+#div_tree td {
+	border-bottom: none;
+}
+
+table.ingestion td.submit { 
+	border-bottom: none;
+}
+
+p.ingestion_no_image {
+	color: red;
+	padding: 5px;
+}
+
+p.ingestion_image {
+	color: #002699;
+	text-align: justify;
+}
+
+font.image_count {
+	color: #002699;
+}
+
+#input_email {
+	color: gray;
+	font-style: italic;
+}
+
+p.number_ingested {
+	margin-top: 20px;
+	margin-left: 30px;
+	font-weight: bold;
+}
+
+div.note, div.tip, div.important, div.caution, div.warning {
+	width: 95%;
+	border: 2px solid #B0C4DE;
+	background-color: #F0F8FF;
+	color: #000000;
+	/* padding inside table area */
+	padding: 0.5em;
+	margin-bottom: 0.5em;
+	margin-top: 0.5em;
+	text-align: justify;
+	-moz-border-radius: 5px;
+}
+
+div.tip {
+	background: #F0F8FF url('../img/34x34/tip.png') no-repeat top left;
+	padding-left: 40px;
+}
+
+div.warning {
+	background: #F0F8FF url('../img/34x34/warning.png') no-repeat top left;
+	padding-left: 40px;
+}
+
+div.lightTip {
+	padding: 2px;
+	color: brown;
+}
+
+table.history {
+	margin-top: 30px;
+}
+
+table.history td {
+	text-align: center;
+}
+
+tr.pair td {
+	background-color: #f0f8ff;
+}
+
+tr.impair td {
+	background-color: transparent;
+}
+
+table.results {
+	width: 100%;
+}
+
+table.results tr {
+	cursor: pointer;
+}
+
+table.results tr.success {
+	border-bottom: 1px gray dashed;
+}
+
+table.results tr.success td {
+	color: green;
+}
+
+table.results tr.mouseover_success {
+	border-bottom: 1px gray dashed;
+}
+
+table.results tr.mouseover_success td {
+	background-color: lightblue;
+}
+
+table.results tr.mouseover_success td.exit {
+	background: lightblue url('../img/admin/icon_success.gif') no-repeat center right;
+	width: 100%;
+}
+
+table.results tr.mouseover_failure {
+	border-bottom: 1px gray dashed;
+}
+
+table.results tr.mouseover_failure td {
+	background-color: lightblue;
+}
+
+table.results tr.mouseover_failure td.exit {
+	background: lightblue url('../img/admin/icon_error.gif') no-repeat center right;
+	width: 100%;
+}
+
+table.results tr.success td.exit {
+	background: white url('../img/admin/icon_success.gif') no-repeat center right;
+	width: 100%;
+}
+
+table.results tr.failure td.exit {
+	background: white url('../img/admin/icon_error.gif') no-repeat center right;
+	width: 100%;
+}
+
+
+table.results tr.failure {
+	border-bottom: 1px gray dashed;
+}
+
+table.results tr.failure td{
+	color: red;
+}
+
+table.results div.user {
+	background: transparent url('../img/16x16/user16x16.png') no-repeat center left;
+	height: 20px; 
+	padding-left: 20px;
+}
+
+table.results div.node {
+	background: transparent url('../img/16x16/nodes.png') no-repeat center left;
+	height: 20px; 
+	padding-left: 20px;
+}
+
+table.results div.clock {
+	background: transparent url('../img/admin/icon_clock.gif') no-repeat bottom left;
+	height: 20px; 
+	padding-left: 20px;
+}
+
+table.results-filter {
+	width: 100%;
+}
+
+table.results-filter td {
+	padding: 0px;
+	margin: 0px;
+	vertical-align: middle;
+	white-space: nowrap;
+	font-size: 10px;
+}
+
+table.results-filter td.filter * {
+	font-size: 10px;
+}
+
+table.results-filter td.filter select, label {
+	margin-right: 3px;
+}
+
+tr.qfits-result-entry-tn td.qfits-result-entry-complete-off {
+	background: white url('../img/misc/qfitspreview-off.png') no-repeat top center;
+	background-color: #fff3bb; 
+	text-align: center;
+	font-size: 10px;
+	vertical-align: bottom; 
+	cursor: pointer; 
+}
+
+tr.qfits-result-entry-tn td.qfits-result-entry-complete-on {
+	background: white url('../img/misc/qfitspreview-on.png') no-repeat top center;
+	background-color: #fff3bb; 
+	text-align: center;
+	font-size: 10px;
+	vertical-align: bottom; 
+	cursor: pointer; 
+	text-decoration: underline;
+}
+
+tr.scamp-result-entry-tn td.scamp-result-entry-complete-off {
+	background: white url('../img/misc/scamp-preview-off.png') no-repeat top center;
+	background-color: #fff3bb; 
+	text-align: center;
+	font-size: 10px;
+	vertical-align: bottom; 
+	cursor: pointer; 
+	margin: 2px;
+}
+tr.scamp-result-entry-tn td.scamp-result-entry-complete-on {
+	background: white url('../img/misc/scamp-preview-on.png') no-repeat top center;
+	background-color: #fff3bb; 
+	text-align: center;
+	font-size: 10px;
+	vertical-align: bottom; 
+	cursor: pointer; 
+	text-decoration: underline;
+	margin: 2px;
+}
+
+tr.scamp-result-entry-tn td {
+	border-bottom: 2px #5b80b2 solid;
+	background-color: #fff3bb; 
+	font-weight: bold; 
+	vertical-align: middle; 
+	color: green; 
+	text-align: left;
+}
+
+img.scamp-result-entry-tn {
+	margin-right: 2px; 
+	margin-bottom: 2px; 
+	cursor: pointer;
+}
+
+table.scamp-result-entry-params {
+	width: 100%;
+}
+
+table.scamp-result-entry-params td {
+	border: none;
+	padding: 1px 0px 1px 2px;
+	font-size: 9px;
+}
+
+table.qfits-result-entry-params {
+	width: 100%;
+}
+
+table.qfits-result-entry-params td {
+	border: none;
+	padding: 1px 0px 1px 2px;
+	font-size: 9px;
+}
+
+tr.qfits-result-entry-tn td {
+	border-bottom: 2px #5b80b2 solid;
+	background-color: #fff3bb; 
+	font-weight: bold; 
+	vertical-align: middle; 
+	color: green; 
+	text-align: left;
+}
+
+img.qfits-result-entry-tn {
+	margin-right: 2px; 
+	margin-bottom: 2px; 
+	cursor: pointer;
+}
+
+table.qfits-result-entry-grades {
+	width: 25%;
+}
+
+table.qfits-result-entry-grades td {
+	text-align: center;
+	vertical-align: bottom;
+	padding: 0px;
+	border: none;
+	font-size: 9px;
+	color: black;
+}
+
+td.qfits-result-header-title {
+	color: white; 
+	background-color: #5b80b2; 
+	text-align: center; 
+	text-transform: uppercase; 
+	padding: 0px;
+}
+
+table.qfits-result-history {
+	width: 100%;
+}
+
+table.qfits-result-history td {
+	vertical-align: middle;
+	text-align: center;
+	font-size: 9px;
+	color: black;
+}
+
+table.qfits-result-history td.reprocess img {
+	cursor: pointer;
+}
+
+table.qfits-result-history tr.history-current td {
+	font-weight: bold;
+}
+
+div.reprocess {
+	background-color: lightgray; 
+	border-bottom: 1px solid gray; 
+	padding: 5px;
+}
+
+div.reprocess img {
+	cursor: pointer;
+}
+
+body {
+	background-color: white; 
+	padding: 0px; 
+	margin: 0px; 
+	font-size: 11px;
+}
+div.result_panel_main {
+	width: 100%; 
+	height: 97px; 
+	border-bottom: 2px solid #ff982a;
+}
+div.result_panel_grade_label {
+	font-weight: bold;
+	text-align:center;
+	font-size: 14px;
+}
+table.result_panel td {
+	font-size: 11px;
+	vertical-align: top;
+	border: none;
+}
+img.result_panel_star {
+	cursor: pointer;
+}
+div.result_panel_commit {
+	text-align: center; 
+	padding-top: 5px; 
+	display: none;
+	font-style: italic;
+	font-size: 10px;
+	color: green;
+}
+div.result_panel_commit img {
+	cursor: pointer;
+}
+table.result_panel_history td {
+	font-size: 10px;
+	vertical-align: middle;
+	text-align: center;
+	padding: 0px;
+	padding-right: 3px;
+	margin: 0px;
+}
+
+table.result_panel_history td.char {
+	padding-left: 3px;
+	padding-right: 3px;
+	border: 1px solid red;
+	color: white;
+	background-color: red;
+	font-weight: bold;
+}
+table.result_panel_history td.date {
+	color: brown;
+}
+
+table.result_panel_history td.user {
+	color: green;
+	text-align: left;
+}
+
+table.versions_check td {
+	border: none;
+	height: 25px;
+	border-bottom: 1px solid #ff982a;
+}
+
+table.versions_check td.version {
+	text-align: center;
+}
+
+table.versions_check td.software {
+	color: brown;
+	font-weight: bold;
+}
+
+table.versions_check td.loading {
+	border: none;
+}
+
+table.versions_check td.node {
+	color: brown;
+	background: white url('/media/js/3rdParty/tafelTree/imgs/base.gif') no-repeat center left;
+	padding-left: 16px;
+	
+}
+
+table.output_dir_stats {
+	border: 1px solid #5b80b2;
+}
+
+table.output_dir_stats td {
+	border: 1px solid #5b80b2;
+	text-align: center;
+}
+
+table.output_dir_stats th {
+	border: 1px solid #5b80b2;
+	text-align: center;
+}
+
+table.output_dir_stats td.task_total {
+	color: #996600;
+}
+
+table.output_dir_stats th.task_total {
+	background-color: #996600;
+}
+
+table.output_dir_stats td.task_failure {
+	color: #ff6600;
+}
+
+table.output_dir_stats th.task_failure {
+	background-color: #ff6600;
+}
+
+table.output_dir_stats td.task_success {
+	color: #669900;
+}
+
+table.output_dir_stats th.task_success {
+	background-color: #669900;
+}
+
+table.output_dir_stats td.image_total {
+	color: #996600;
+}
+
+table.output_dir_stats th.image_total {
+	background-color: #996600;
+}
+
+table.output_dir_stats td.image_success {
+	color: #669900;
+}
+
+table.output_dir_stats th.image_success {
+	background-color: #669900;
+}
+
+table.output_dir_stats td.image_failure {
+	color: #ff6600;
+}
+
+table.output_dir_stats th.image_failure {
+	background-color: #ff6600;
+}
+
+div.stats_error_log_title {
+	font-size: 14px;
+	color: red;
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+div.apidoc {
+	text-align: center;
+	background-color: #51a240;
+	border-bottom: 3px solid white;
+	color: red:
+}
+
+table#cluster_log_table td.IngestionId {
+	font-style: italic;
+	text-align: center;
+}
+
+table#cluster_log_table td.JobId {
+	color: green;
+	text-align: center;
+}
+
+table#cluster_log_table td.Host {
+	color: brown;
+	text-align: center;
+}
+
+table#cluster_log_table td.Path {
+	font-size: 9px;
+	font-family: sans-serif;
+}
+
+div.processing_menu_entry {
+	width: 150px;
+	cursor: pointer;
+	border: 1px solid white;
+	padding: 10px;
+	-moz-border-radius: 5px;
+}
+
+div.processing_menu_entry:hover {
+	background-color: lightyellow;
+	border: 1px solid lightgray;
+}
+
+div.processing_menu_entry span.desc {
+	font-weight: bold;
+}
+
+div.processing_menu_entry span.label {
+	font-style: italic;
+}
+
+table.plugin_menu {
+		/*
+	background: transparent url('../img/misc/terapix_art.png') no-repeat center center;
+	*/
+}
+
+table.plugin_menu td {
+	padding: 20px;
+	border: none;
+}
+
+div.ims_batch_log_div {
+	margin-top: 20px;
+	color: brown; 
+	overflow: auto; 
+	height: 200px;
+	width: 700px;
+	display: none;
+	border: 1px solid green;
+	-moz-border-radius: 5px;
+}
+
+div.ims_batch_log_div pre {
+	color: brown;
+}
