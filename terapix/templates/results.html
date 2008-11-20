@@ -9,7 +9,7 @@
 <script type="text/javascript" src="/media/js/processinghistorywidget.js"></script>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -54,7 +54,7 @@ function get_stats() {
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 
@@ -79,8 +79,8 @@ function get_stats() {
 						<div style="width: 100%;" id="infopanel">
 							<div class="tip" style="width: 75%; margin-top: 20px;">
 								<p>Just click an entry from the processing history panel on the left to get detailled information about a processing.</p>
-								<p>Please note that successful processings are tagged with a <img src="/media/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif"/> flag. Processings that 
-								terminate with errors are tagged with a <img src="/media/{{ user.get_profile.guistyle }}/img/admin/icon_error.gif"/> flag. In both cases, associated detailled information offers:
+								<p>Please note that successful processings are tagged with a <img src="/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif"/> flag. Processings that 
+								terminate with errors are tagged with a <img src="/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_error.gif"/> flag. In both cases, associated detailled information offers:
 									<ul>
 										<li>A complete list of all parameters used for that processing</li>
 										<li>A view of the QualityFITS configuration file</li>
@@ -114,7 +114,7 @@ function get_stats() {
 							<option value="{{ dir }}">{{ dir }}</option>
 						{% endfor %}
 						</select>
-						<img src="/media/{{ user.get_profile.guistyle }}/img/misc/reload.gif" onclick="get_stats();" style="cursor: pointer;" title="Click to reload data..."/>
+						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/reload.gif" onclick="get_stats();" style="cursor: pointer;" title="Click to reload data..."/>
 					</div>
 					<div style="margin-top: 20px;" id="dir_stats_div"></div>
 				</div>

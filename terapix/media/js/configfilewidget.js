@@ -312,7 +312,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 				var txt = selNode.options[selNode.selectedIndex].text;
 				var img = document.createElement('img');
 				img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
-				img.setAttribute('src', '/media/' + guistyle + '/img/16x16/cancel.png');
+				img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
 				img.setAttribute('onclick', instance_name + ".deleteConfigFile();");
 				cdiv.appendChild(img);
 				

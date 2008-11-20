@@ -1,7 +1,7 @@
 {% extends "base_site.html" %}
 {% load i18n %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
@@ -11,12 +11,12 @@
 <script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/scriptaculous.js"></script>
 <script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
 
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 
 <script type="text/javascript" src="/media/js/sqlform.js"></script>
@@ -41,7 +41,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 function show_plugin_info() {
 	var ul = document.getElementById('menu');
 	ul.setAttribute('style', 	'background-repeat: no-repeat; background-position: center right;' + 
-								'background-image: url(/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png);');
+								'background-image: url(/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png);');
 
 	var li = document.createElement('li');
 	li.setAttribute('class', 'disabled');
@@ -59,7 +59,7 @@ function show_plugin_info() {
 
 	var c = document.createElement('div');
 	c.setAttribute('style', 'margin: 30px; text-align: left; height: 60px; vertical-align: bottom; padding-left: 50px;');
-	c.innerHTML = 	"<img src=\"/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png\"/><br/>" + 
+	c.innerHTML = 	"<img src=\"/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png\"/><br/>" + 
 					'<b>Plugin name</b>: {{ plugin.optionLabel }}<br/><b>Plugin description</b>: ' + 
 					'{{ plugin.description }}<br/><b>Version</b>: {{ plugin.version }}</div>';
 	d.appendChild(c);
@@ -81,7 +81,7 @@ function show_plugin_info() {
 	</script>
 	<!-- TODO: include 'About' submenu 
 <div>
-	<img src="/media/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="float: left; margin-right: 10px;"/>
+	<img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="float: left; margin-right: 10px;"/>
 	<div style="font-style: italic; padding-top: 16px;">{{ plugin.description }}, version {{ plugin.version }}</div>
 </div>
 	-->

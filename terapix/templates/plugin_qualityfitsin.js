@@ -207,7 +207,7 @@ function {{ plugin.id }}_showSavedItems() {
 				table.setAttribute('class', 'savedItems');
 				var tr, th;
 				var icon = document.createElement('img');
-				icon.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
+				icon.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
 				icon.setAttribute('style', 'vertical-align: middle; margin-right: 10px;');
 
 				tr = document.createElement('tr');
@@ -325,11 +325,11 @@ function {{ plugin.id }}_showSavedItems() {
 					td = document.createElement('td');
 					delImg = document.createElement('img');
 					delImg.setAttribute('style', 'margin-right: 5px');
-					delImg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
+					delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
 					delImg.setAttribute('onclick', "{{ plugin.id }}_delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
 					td.appendChild(delImg);
 					delImg = document.createElement('img');
-					delImg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
+					delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
 					delImg.setAttribute('onclick', "{{ plugin.id }}_addToCart('" + 
 							resp['result'][k]['idList'] + "','" + 
 							resp['result'][k]['config'] + "','" + 
@@ -502,7 +502,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 	var src;
 	resp['Success'] ? src = 'success' : src = 'error';
 	var img = document.createElement('img');
-	img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+	img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 	img.setAttribute('style', 'padding-right: 5px;');
 	tdiv.appendChild(img);
 	tdiv.appendChild(document.createTextNode(resp['Duration'] + ' on'));
@@ -617,7 +617,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		td = document.createElement('td');
 		var src = hist[k]['Success'] ? 'success' : 'error';
 		var img = document.createElement('img');
-		img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 		td.appendChild(img);
 		tr.appendChild(td);
 
@@ -652,7 +652,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		td.setAttribute('class', 'reprocess');
 		img = document.createElement('img');
 		img.setAttribute('onclick', "{{ plugin.id }}_reprocess_image('" + hist[k]['FitsinId'] + "');");
-		img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 		td.appendChild(img);
 		tr.appendChild(td);
 
@@ -1128,7 +1128,7 @@ function monitorJobs() {
 				img = document.createElement('img');
 				td.appendChild(img);
 				img.setAttribute('style', 'cursor: pointer');
-				img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/16x16/cancel.png');
+				img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/16x16/cancel.png');
 				img.setAttribute('onclick', "{{ plugin.id }}_cancelJob('" + tdid + "'," + r[j]['ClusterId'] + "," + r[j]['ProcId'] + ");");
 				tr.appendChild(td);
 
@@ -1306,7 +1306,7 @@ function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
 				s_cart.addProcessing(	p_data,
 										// Custom handler
 										function() {
-											container.innerHTML = "<img src=\"/media/{{ user.get_profile.guistyle }}/img/admin/icon-yes.gif\"/> Done. A cart item for reprocessing all " + 
+											container.innerHTML = "<img src=\"/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon-yes.gif\"/> Done. A cart item for reprocessing all " + 
 												tasksList.split(',').length + " images at once has been<br/>added to your <a href=\"/youpi/cart/\">shopping cart</a>.";
 										}
 				);
@@ -1344,7 +1344,7 @@ function {{ plugin.id }}_renderOutputDirStats(container_id) {
 			th.appendChild(document.createElement('br'));
 			var rimg = document.createElement('img');
 			rimg.setAttribute('onclick', resp['PluginId'] + "_reprocessAllFailedProcessings('" + stats['ReprocessTaskList'] + "');");
-			rimg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+			rimg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 			rimg.setAttribute('style', 'cursor: pointer;');
 			th.appendChild(rimg);
 		}

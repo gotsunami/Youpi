@@ -4,7 +4,7 @@
 
 
 {% block extrahead %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script language="javascript" type="text/javascript" src="/media/js/javascript.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/common.js"></script>
@@ -21,7 +21,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 
@@ -141,7 +141,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 							</th>
                 	    </tr>
       		            <tr>
-							<td><center><img src="/media/{{ user.get_profile.guistyle }}/img/34x34/warning.png"></img>images from multiple ingestion are not counted</center></td>
+							<td><center><img src="/media/themes/{{ user.get_profile.guistyle }}/img/34x34/warning.png"></img>images from multiple ingestion are not counted</center></td>
 						</tr>
 						<tr id="display_image" style="display:none">
                     	    <td>

@@ -121,7 +121,7 @@ function getMessageNode(msg, cssClass, width, mtop) {
 
 function getLoadingHTML(msg)
 {
-	return '<span><img src="/media/' + guistyle + '/img/misc/running_bar.gif"/> ' + msg + '...</span>';
+	return '<span><img src="/media/themes/' + guistyle + '/img/misc/running_bar.gif"/> ' + msg + '...</span>';
 }
 
 /*
@@ -164,12 +164,12 @@ function getDOMTableFromResults(json_results, style)
 				case 'check':
 					var n = document.createElement('img');
 					var state = data[0] == 0 ? 'off' : 'on';
-					n.setAttribute('src', '/media/' + guistyle + '/img/misc/checkbox_' + state + '.gif');
+					n.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/checkbox_' + state + '.gif');
 					break;
 				case 'exit':
 					var n = document.createElement('img');
 					var state = data[0] == 0 ? 'success' : 'error';
-					n.setAttribute('src', '/media/' + guistyle + '/img/admin/icon_' + state + '.gif');
+					n.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_' + state + '.gif');
 					break;
 				case 'link':
 					var n = document.createElement('a');

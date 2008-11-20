@@ -132,7 +132,7 @@ function PathSelectorWidget(container_id, varName, pluginId)
 						div.appendChild(sel);
 						img = document.createElement('img');
 						img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
-						img.setAttribute('src', '/media/' + guistyle + '/img/16x16/cancel.png');
+						img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
 						img.setAttribute('onclick', instance_name + ".deletePath('" + prefix + "')");
 						div.appendChild(img);
 		

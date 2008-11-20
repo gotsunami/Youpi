@@ -68,7 +68,7 @@ function GradingWidget(container_id, varName, starsCount)
 		for (var k=0; k < starsCount; k++) {
 			grades[k] = String.fromCharCode(65 + k);
 			imgs[k] = document.createElement('img');
-			imgs[k].setAttribute('src', '/media/' + guistyle + '/img/16x16/grading-star-off.gif');
+			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
 			if (active) {
 				imgs[k].setAttribute('class', 'result_panel_star');
 				imgs[k].setAttribute('onmouseover', instance_name + ".enlight(" + k + ");");
@@ -128,7 +128,7 @@ function GradingWidget(container_id, varName, starsCount)
 		}
 
 		for (var k=0; k < imgs.length; k++) {
-			imgs[k].setAttribute('src', '/media/' + guistyle + '/img/16x16/grading-star-off.gif');
+			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
 		}
 
 		gdiv.innerHTML = '';
@@ -137,10 +137,10 @@ function GradingWidget(container_id, varName, starsCount)
 
 	this.enlight = function(idx) {
 		for (var k=0; k <= idx; k++) {
-			imgs[k].setAttribute('src', '/media/' + guistyle + '/img/16x16/grading-star-on.gif');
+			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-on.gif');
 		}
 		for (var k=idx+1; k < imgs.length; k++) {
-			imgs[k].setAttribute('src', '/media/' + guistyle + '/img/16x16/grading-star-off.gif');
+			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
 		}
 
 		gdiv.innerHTML = '';
@@ -179,7 +179,7 @@ function GradingWidget(container_id, varName, starsCount)
 		cdiv.style.display = 'block';
 		cdiv.innerHTML = '';
 		var cimg = document.createElement('img');
-		cimg.setAttribute('src', '/media/' + guistyle + '/img/misc/commit.gif');
+		cimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/commit.gif');
 		cimg.setAttribute('onclick', instance_name + '.commit()');
 		cdiv.appendChild(cimg);
 	}

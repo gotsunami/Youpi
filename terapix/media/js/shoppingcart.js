@@ -42,7 +42,7 @@ function ShoppingCart(container_id, varName)
 				div.setAttribute('onclick', 'location.href="/youpi/cart/";');
 
 				var img = document.createElement('img');
-				img.setAttribute('src', '/media/' + guistyle + '/img/misc/minicart.gif');
+				img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/minicart.gif');
 				div.appendChild(img);
 				div.appendChild(document.createTextNode(getArticlesCountMsg()));
 				removeAllChildrenNodes(container);

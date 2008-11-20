@@ -1,7 +1,7 @@
 {% extends "base_site.html" %}
 {% load i18n %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
@@ -11,12 +11,13 @@
 <script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/scriptaculous.js"></script>
 <script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
 
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
+<script type="text/javascript" src="/media/js/menu.js"></script>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 
@@ -47,7 +48,7 @@ function build_menu(colCount) {
 		pdiv.setAttribute('class', "processing_menu_entry");
 
 		var img = document.createElement('img');
-		img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/48x48/' + plugin_data[k][0] + '.png');
+		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/48x48/' + plugin_data[k][0] + '.png');
 		img.setAttribute('style', 'margin-right: 10px;');
 
 		tdiv = document.createElement('div');

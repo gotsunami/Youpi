@@ -1,14 +1,14 @@
 {% extends "base_site.html" %}
 {% load i18n %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/history.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/history.css"></script>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 
 <!-- Auto-completion code -->
@@ -23,7 +23,7 @@
 
 <!-- Tooltip code -->
 <script type="text/javascript" src="/media/js/tooltip.js"></script>
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/tooltip.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"></script>
 
 <!-- Ingestion-related Javascript code -->
 <script type="text/javascript" src="/media/js/spica2Ingestion.js"></script>

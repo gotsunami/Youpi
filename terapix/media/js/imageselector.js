@@ -2625,7 +2625,7 @@ function ImageSelector(container_id, varName)
 
 		for (var k=0; k<msg.length; k++) {
 			var img = document.createElement('img');
-			img.setAttribute('src', '/media/' + guistyle + '/img/admin/' + img_name);
+			img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/' + img_name);
 			log.appendChild(img);
 			log.appendChild(document.createTextNode(msg[k]));
 			log.appendChild(document.createElement('br'));
@@ -2663,7 +2663,7 @@ function ImageSelector(container_id, varName)
 				rdiv.innerHTML = '';
 				rdiv.style.color = 'green';
 				var img = document.createElement('img');
-				img.setAttribute('src', '/media/' + guistyle + '/img/admin/' + img_name);
+				img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/' + img_name);
 				rdiv.appendChild(img);
 				rdiv.appendChild(document.createTextNode('Found ' + res['nbSelections'] + ' selections'));
 

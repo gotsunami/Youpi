@@ -7,7 +7,7 @@
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript">
 
@@ -164,7 +164,7 @@ function monitorJobs() {
 					img = document.createElement('img');
 					td.appendChild(img);
 					img.setAttribute('style', 'cursor: pointer');
-					img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/16x16/cancel.png');
+					img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/16x16/cancel.png');
 					img.setAttribute('onclick', "cancelJob('" + tdid + "'," + r[j]['ClusterId'] + "," + r[j]['ProcId'] + ");");
 				}
 				else {
@@ -231,7 +231,7 @@ function cancelAllJobs(what) {
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 

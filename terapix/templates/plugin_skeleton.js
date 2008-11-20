@@ -197,7 +197,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 	var src;
 	resp['Success'] ? src = 'success' : src = 'error';
 	var img = document.createElement('img');
-	img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+	img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 	img.setAttribute('style', 'padding-right: 5px;');
 	tdiv.appendChild(img);
 	tdiv.appendChild(document.createTextNode(resp['Duration']));
@@ -289,7 +289,7 @@ function {{ plugin.id }}_showSavedItems() {
 				table.setAttribute('class', 'savedItems');
 				var tr, th;
 				var icon = document.createElement('img');
-				icon.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
+				icon.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
 				icon.setAttribute('style', 'vertical-align:middle; margin-right: 10px;');
 
 				tr = document.createElement('tr');
@@ -342,11 +342,11 @@ function {{ plugin.id }}_showSavedItems() {
 					td = document.createElement('td');
 					delImg = document.createElement('img');
 					delImg.setAttribute('style', 'margin-right: 5px');
-					delImg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/16x16/delete.gif');
+					delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/16x16/delete.gif');
 					delImg.setAttribute('onclick', "{{ plugin.id }}_delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
 					td.appendChild(delImg);
 					delImg = document.createElement('img');
-					delImg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
+					delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
 					delImg.setAttribute('onclick', "{{ plugin.id }}_addToCart('" + resp['result'][k]['resultsOutputDir'] + "')");
 					td.appendChild(delImg);
 					tr.appendChild(td);

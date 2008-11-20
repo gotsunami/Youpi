@@ -1,12 +1,12 @@
 {% extends "base_site.html" %}
 {% load i18n %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/history.css"></script>
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/history.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
@@ -23,7 +23,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	<ul class="smart_tabnav_sub" id="menu">
 		<li class="enabled">
 			<a 	href="#" id="entry_0" 
-				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Look 'n' Feel</a>
+				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Theme</a>
 		</li>
 	</ul>
 	<div align="center" style="width: 100%" id="menuitem_sub_0">

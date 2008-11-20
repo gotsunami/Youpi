@@ -282,7 +282,7 @@ function submitIngestion(ingestionId) {
 					else
 						icon = 'success';
 
-					img.setAttribute('src', '/media/' + guistyle + '/img/admin/icon_' + icon + '.gif');
+					img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_' + icon + '.gif');
 				}
 				else {
 					td.appendChild(document.createTextNode(resp[fields[k]]));

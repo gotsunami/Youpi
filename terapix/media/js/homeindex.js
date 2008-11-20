@@ -277,7 +277,7 @@ function display2(info)
 							tr.appendChild(tdd);
 							tdi.innerHTML = '<center><font color=#FF0000>Should continue ingestion</font></center>';
 							tr.appendChild(tdi);
-							tds.innerHTML = '<center><img src=/media/' + guistyle + '/img/admin/icon-no.gif></img></center>';
+							tds.innerHTML = '<center><img src=/media/themes/' + guistyle + '/img/admin/icon-no.gif></img></center>';
 							tr.appendChild(tds);
 						}
 
@@ -289,14 +289,14 @@ function display2(info)
 							{
 								tdi.innerHTML = '<center><font color=#FF9900>Maybe some images are corrupted</font></center><font color=#339900>(try to run ingestion by unchecking options)';
                     			tr.appendChild(tdi);
-								tds.innerHTML = '<center><img src=/media/' + guistyle + '/img/34x34/warning.png width=20px></img></center>';
+								tds.innerHTML = '<center><img src=/media/themes/' + guistyle + '/img/34x34/warning.png width=20px></img></center>';
 								tr.appendChild(tds);
 							}
 							else
 							{
                                 tdi.innerHTML = '<center><font color=#FF9900>Should continue ingestion</font></center><font color=#FF9900>(try to run ingestion by unchecking options)';
                                 tr.appendChild(tdi);
-								tds.innerHTML = '<center><img src=/media/' + guistyle + '/img/34x34/warning.png width=20px></img></center>';
+								tds.innerHTML = '<center><img src=/media/themes/' + guistyle + '/img/34x34/warning.png width=20px></img></center>';
 				                tr.appendChild(tds);
                             }
 						}
@@ -309,7 +309,7 @@ function display2(info)
 							{
 								tdi.innerHTML = '<center><font color=#339900>All images are ingested</font></center>';
 			                    tr.appendChild(tdi);
-								tds.innerHTML = '<center><img src=/media/' + guistyle + '/img/admin/icon-yes.gif></img></center>';
+								tds.innerHTML = '<center><img src=/media/themes/' + guistyle + '/img/admin/icon-yes.gif></img></center>';
 								tr.appendChild(tds);
 							}
 
@@ -325,7 +325,7 @@ function display2(info)
                     tr.appendChild(tdd);
 					tdi.innerHTML = '<center><b><font color=#0000FF>Have to be ingested</font></b></center>';
                     tr.appendChild(tdi);
-					tds.innerHTML = '<center><img src=/media/' + guistyle + '/img/admin/ingest.gif></img></center>';
+					tds.innerHTML = '<center><img src=/media/themes/' + guistyle + '/img/admin/ingest.gif></img></center>';
                     tr.appendChild(tds);
 				}
 

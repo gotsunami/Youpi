@@ -438,7 +438,7 @@ function FileBrowser(container_id, varName) {
 		if (_tree) delete _tree;
 		_tree = new TafelTree(container_id + '_tree', _root, {
 			'generate'			: true,
-			'imgBase'			: '/media/js/3rdParty/tafelTree/imgs/',
+			'imgBase'			: '/media/themes/js/3rdParty/tafelTree/imgs/',
 			'height'			: _treeviewHeight,
 			'defaultImg'		: 'page.gif',
 			'defaultImgOpen'	: 'folderopen.gif',
@@ -630,7 +630,7 @@ function FileBrowser(container_id, varName) {
 		td = document.createElement('td');
 		var img = document.createElement('img');
 		img.setAttribute('style', 'cursor: pointer; vertical-align: middle;');
-		img.setAttribute('src', '/media/' + guistyle + '/img/16x16/cancel.png');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
 		img.setAttribute('onclick', _instance_name + ".removeDataPath(" + (_selectedDataPaths.length-1) + ");");
 		td.appendChild(img);
 		tr.appendChild(td);

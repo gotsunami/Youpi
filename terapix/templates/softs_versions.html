@@ -7,7 +7,7 @@
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript">
 
@@ -26,7 +26,7 @@ function get_cluster_nodes() {
 		function(resp) {
 			container.innerHTML = '';
 			var img = document.createElement('img');
-			img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif');
+			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif');
 			container.appendChild(img);
 			container.appendChild(document.createTextNode('Found ' + resp['Hosts'].length + ' nodes attached to the cluster.'));
 
@@ -178,7 +178,7 @@ function get_cluster_softs(nodes) {
 			container.innerHTML = '';
 			container.appendChild(document.createElement('br'));
 			var img = document.createElement('img');
-			img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif');
+			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_success.gif');
 			container.appendChild(img);
 			container.appendChild(document.createTextNode('Found ' + resp['Softs'].length + ' softs.'));
 
@@ -254,7 +254,7 @@ function run_checks() {
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 

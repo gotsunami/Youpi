@@ -1,14 +1,14 @@
 {% extends "base_site.html" %}
 {% load i18n %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/history.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/history.css"/>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 
 <script type="text/javascript" src="/media/js/common.js"></script>
@@ -139,7 +139,7 @@ function proceed_cart() {
 				{% if plugin.hasItemsInCart %}
 				<tr>
 					<th>
-						<img src="/media/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}_runAll()"/>
+						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}_runAll()"/>
 					</th>
 					<th colspan="2">{{ plugin.optionLabel }} ({{ plugin.description }}) related items</th>
 				</tr>
@@ -148,7 +148,7 @@ function proceed_cart() {
 				<tr id="{{ plugin.id }}_{{ forloop.counter }}">
 					<td style="text-align: right">
 						<p style="text-align: right; font-size: 80%">Item <b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> added on {{ data.date }}</p>
-						<img src="/media/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
+						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
 					</td>
 					<td width="100%" colspan="2">
 						<div>
@@ -164,7 +164,7 @@ function proceed_cart() {
 				<!--
 				<tr>
 					<td colspan="3" style="text-align: right; border: none">
-						<img src="/media/{{ user.get_profile.guistyle }}/img/misc/proceed.gif"/>
+						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/proceed.gif"/>
 					</td>
 				</tr>
 				-->
@@ -192,7 +192,7 @@ function proceed_cart() {
 				{% endif %}
 						<a 	href="#" id="plugin_entry_{{ forloop.counter0 }}" 
 							onclick="swap_display(this.id, 'plugin_menuitem_sub_{{ plugin.id }}', 'saved_menu', 'plugin_menuitem_sub_');">
-							<div style="background: transparent url(/media/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}.png) center left no-repeat; padding-left: 30px;">
+							<div style="background: transparent url(/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}.png) center left no-repeat; padding-left: 30px;">
 								{{ plugin.description }}
 								<div id="plugin_{{ plugin.id }}_saved_count" class="count"></div>
 							</div>

@@ -9,5 +9,5 @@ function switchVisibility(id)
 	else {
 		document.getElementById(id).style.display = 'block';
 	}
-	document.getElementById("image" + id).src = "/media/" + guistyle + "/img/16x16/visible.gif";
+	document.getElementById("image" + id).src = "/media/themes/" + guistyle + "/img/16x16/visible.gif";
 }

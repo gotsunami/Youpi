@@ -117,7 +117,7 @@ function ProcessingHistoryWidget(container, varName) {
 		rtd = document.createElement('td');
 
 		var img = document.createElement('img');
-		img.setAttribute('src', '/media/' + guistyle + '/img/admin/selector-search.gif');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/selector-search.gif');
 		rtd.appendChild(img);
 
 		var input = document.createElement('input');
@@ -129,7 +129,7 @@ function ProcessingHistoryWidget(container, varName) {
 		rtd.appendChild(input);
 
 		img = document.createElement('img');
-		img.setAttribute('src', '/media/' + guistyle + '/img/misc/reset.png');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
 		img.setAttribute('title', 'Reset field');
 		img.setAttribute('style', 'cursor: pointer;');
 		img.setAttribute('onclick', _instance_name + '.resetFilterText();');
@@ -138,13 +138,13 @@ function ProcessingHistoryWidget(container, varName) {
 
 		rtd = document.createElement('td');
 		img = document.createElement('img');
-		img.setAttribute('src', '/media/' + guistyle + '/img/admin/icon_success.gif');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_success.gif');
 		var span = document.createElement('span');
 		span.setAttribute('id', _instance_name + '_success_span');
 		rtd.appendChild(img);
 		rtd.appendChild(span);
 		img = document.createElement('img');
-		img.setAttribute('src', '/media/' + guistyle + '/img/admin/icon_error.gif');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_error.gif');
 		span = document.createElement('span');
 		span.setAttribute('id', _instance_name + '_failed_span');
 		rtd.appendChild(img);
@@ -177,7 +177,7 @@ function ProcessingHistoryWidget(container, varName) {
 		rtd.appendChild(form);
 
 		img = document.createElement('img');
-		img.setAttribute('src', '/media/' + guistyle + '/img/16x16/filter.png');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/filter.png');
 		var label = document.createElement('label');
 		label.appendChild(document.createTextNode('Show'));
 		form.appendChild(img);
@@ -206,7 +206,7 @@ function ProcessingHistoryWidget(container, varName) {
 		form.appendChild(sel);
 
 		img = document.createElement('img');
-		img.setAttribute('src', '/media/' + guistyle + '/img/misc/reset.png');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
 		img.setAttribute('title', 'Reset filter');
 		img.setAttribute('style', 'cursor: pointer;');
 		img.setAttribute('onclick', 'this.parentNode.reset(); ' + _instance_name + ".applyFilter(); document.getElementById('" 
@@ -421,7 +421,7 @@ function ProcessingHistoryWidget(container, varName) {
 					rdiv.setAttribute('class', 'reprocess');
 					var rimg = document.createElement('img');
 					rimg.setAttribute('onclick', kind + "_reprocess_all_failed_processings('" + resp['Stats']['TasksIds'] + "');");
-					rimg.setAttribute('src', '/media/' + guistyle + '/img/misc/reprocess.gif');
+					rimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reprocess.gif');
 					rdiv.appendChild(rimg);
 					rdiv.appendChild(document.createTextNode(' that current selection of processings that never succeeded'));
 					container.appendChild(rdiv);

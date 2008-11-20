@@ -279,7 +279,7 @@ function {{ plugin.id }}_manualLDACSelection(container) {
 	// Add to cart button
 	var addc = document.createElement('img');
 	addc.setAttribute('style', 'cursor: pointer; float: right;');
-	addc.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif');
+	addc.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif');
 	addc.setAttribute('onclick', "{{ plugin.id }}_do_addSelectionToCart();");
 	ldac_opt_div.appendChild(addc);
 		
@@ -524,7 +524,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 	var src;
 	resp['Success'] ? src = 'success' : src = 'error';
 	var img = document.createElement('img');
-	img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+	img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 	img.setAttribute('style', 'padding-right: 5px;');
 	tdiv.appendChild(img);
 	tdiv.appendChild(document.createTextNode(resp['Duration'] + ' on'));
@@ -624,7 +624,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		td = document.createElement('td');
 		var src = hist[k]['Success'] ? 'success' : 'error';
 		var img = document.createElement('img');
-		img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 		td.appendChild(img);
 		tr.appendChild(td);
 
@@ -651,7 +651,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 		td.setAttribute('class', 'reprocess');
 		img = document.createElement('img');
 		img.setAttribute('onclick', "{{ plugin.id }}_reprocess_image('" + hist[k]['FitsinId'] + "');");
-		img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 		td.appendChild(img);
 		tr.appendChild(td);
 
@@ -795,7 +795,7 @@ function {{ plugin.id }}_showSavedItems() {
 				table.setAttribute('class', 'savedItems');
 				var tr, th;
 				var icon = document.createElement('img');
-				icon.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
+				icon.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
 				icon.setAttribute('style', 'vertical-align:middle; margin-right: 10px;');
 
 				tr = document.createElement('tr');
@@ -867,11 +867,11 @@ function {{ plugin.id }}_showSavedItems() {
 					td = document.createElement('td');
 					delImg = document.createElement('img');
 					delImg.setAttribute('style', 'margin-right: 5px');
-					delImg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
+					delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
 					delImg.setAttribute('onclick', "{{ plugin.id }}_delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
 					td.appendChild(delImg);
 					delImg = document.createElement('img');
-					delImg.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
+					delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
 					delImg.setAttribute('onclick', "{{ plugin.id }}_addToCart('" + 
 							resp['result'][k]['idList'] + "','" + 
 							resp['result'][k]['config'] + "','" + 
@@ -1183,7 +1183,7 @@ function ScampXMLParser(taskId, container, varName) {
 				var img = document.createElement('img');
 				img.setAttribute('style', 'cursor: pointer;');
 				img.setAttribute('onclick', "{{ plugin.id }}_reprocess_ldac_selection('" + ldac_files + "'," + d['TaskId'] + ");");
-				img.setAttribute('src', '/media/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+				img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 				bdiv.appendChild(img);
 				container.appendChild(bdiv);
 			}

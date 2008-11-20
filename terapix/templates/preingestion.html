@@ -8,14 +8,14 @@
 <script type="text/javascript" src="/media/js/3rdParty/tafelTree/js/scriptaculous.js"></script>
 <script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
 
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/tooltip.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"></script>
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/preIngestionTreeview.js"></script>
 <script type="text/javascript" src="/media/js/preIngestionAsyncCalls.js"></script>
 
 <!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 
 <!-- Progress bar -->
@@ -39,7 +39,7 @@ function preingestion_history()
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 
