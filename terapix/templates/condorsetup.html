@@ -8,6 +8,8 @@
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
+<script type="text/javascript" src="/media/js/advancedtable.js"></script>
+<script type="text/javascript" src="/media/js/condorpanel.js"></script>
 
 <!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
@@ -32,8 +34,19 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	</ul>
 	<div align="center" style="width: 100%" id="menuitem_sub_0">
 		<div style="margin-top: 40px;" align="center">
-			TODO...
+			<table style="width: 90%;">
+				<tr>
+					<td style="border: none;">
+						<h1 style="border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">Available Cluster Nodes</h1>
+						<div id="condor_panel_div"></div>	
+					<td>
+				</tr>
+			</table>
 		</div>
 	</div>
 </div>
+<script type="text/javascript">
+	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
+	condorPanel.render();
+</script>
 {% endblock %}

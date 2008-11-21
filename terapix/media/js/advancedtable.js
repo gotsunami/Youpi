@@ -59,6 +59,15 @@ function AdvancedTable(varName) {
 	 *
 	 */
 	var _userRowIdPrefix = _instance_name + '.';
+	/*
+	 * Var: _styles
+	 * Array of CSS class names
+	 *
+	 * See Also:
+	 *  <setColStyles>
+	 *
+	 */ 
+	var _styles;
 
 
 	// Group: Variables
@@ -113,6 +122,17 @@ function AdvancedTable(varName) {
 	 *
 	 */
 	var _rows = new Array();
+	/*
+	 * Var: _rowStyles
+	 * Array of row custom styles
+	 *
+	 * Ex: [null, 'style_for_row_1', null, null, 'style_row_4', ...]
+	 *
+	 * See Also:
+	 *  <appendRow>
+	 *
+	 */
+	var _rowStyles = new Array();
 
 
 	// Group: Functions
@@ -140,6 +160,27 @@ function AdvancedTable(varName) {
 	 */ 
 	this.rowCount = function() {
 		return _rows.length;
+	}
+	
+	/*
+	 * Function: setColStyles
+	 * Uses specified column class names instead of default ones
+	 *
+	 * Array lenght can be of any size; no checks are made. At rendering time,
+	 * if _styles[col_idx] is defined, subsequent style is applied. Exceptions 
+	 * are ignored.
+	 *
+	 * Parameters:
+	 *  styles - array of CSS class names, one per column
+	 *
+	 */ 
+	this.setColStyles = function(styles) {
+		if (typeof styles != 'object') {
+			_error('setColStyles: styles variable must be an array!');
+			return;
+		}
+
+		_styles = styles;
 	}
 
 	/*
@@ -279,28 +320,24 @@ function AdvancedTable(varName) {
 	 *
 	 */ 
 	function _render() {
-		if (!_headers.length) {
-			_error('No table header defined!')
-			return;
-		}
 		_container = document.getElementById(_container_id);
 
 		_mainDiv = document.createElement('div');
 		_mainDiv.setAttribute('class', 'advancedTable');
 
-		_headerDiv = document.createElement('div');
-		_headerDiv.setAttribute('class', 'header');
-
 		_bodyDiv = document.createElement('div');
 		_bodyDiv.setAttribute('class', 'body');
-
-		_headerTab = document.createElement('table');
 		_bodyTab = document.createElement('table');
 
-		_mainDiv.appendChild(_headerDiv);
-		_mainDiv.appendChild(_bodyDiv);
+		if (_headers.length) {
+			_headerDiv = document.createElement('div');
+			_headerDiv.setAttribute('class', 'header');
+			_headerTab = document.createElement('table');
+			_mainDiv.appendChild(_headerDiv);
+			_headerDiv.appendChild(_headerTab);
+		}
 
-		_headerDiv.appendChild(_headerTab);
+		_mainDiv.appendChild(_bodyDiv);
 		_bodyDiv.appendChild(_bodyTab);
 		_container.appendChild(_mainDiv);
 
@@ -308,18 +345,24 @@ function AdvancedTable(varName) {
 		tr = document.createElement('tr');
 		var cellw = 100.0/_headers.length;
 
-		for (var k=0; k < _headers.length; k++) {
-			th = document.createElement('th');
-//			th.setAttribute('width', cellw + '%;');
-			th.appendChild(document.createTextNode(_headers[k]));
-			tr.appendChild(th);
+		if (_headers.length) {
+			for (var k=0; k < _headers.length; k++) {
+				th = document.createElement('th');
+	//			th.setAttribute('width', cellw + '%;');
+				th.appendChild(document.createTextNode(_headers[k]));
+				tr.appendChild(th);
+			}
+			_headerTab.appendChild(tr);
 		}
-		_headerTab.appendChild(tr);
 
 		var handler;
 		for (var k=0; k < _rows.length; k++) {
 			tr = document.createElement('tr');
 			tr.setAttribute('onclick', _instance_name + '.toggleRowSelection(' + k + ');');
+
+			// Use custom CSS class style for this row?
+			if(_rowStyles[k])
+				tr.setAttribute('class', _rowStyles[k]);
 
 			if (_colIdxForRowIds == -1) {
 				// Auto row id
@@ -334,6 +377,11 @@ function AdvancedTable(varName) {
 					continue;
 				}
 				td = document.createElement('td');
+				try {
+					if (_styles[j])
+						td.setAttribute('class', _styles[j]);
+				} catch(e) {}
+
 				td.appendChild(document.createTextNode(row[j]));
 				tr.appendChild(td);
 			}
@@ -347,10 +395,16 @@ function AdvancedTable(varName) {
 	 *
 	 * Parameters:
 	 *  data - Array of string
+	 *  rowStyle - string: CSS row style name
 	 *
 	 */ 
-	this.appendRow = function(data) {
-		_rows[_rows.length] = data;
+	this.appendRow = function(data, rowStyle) {
+		var j = _rows.length;
+		_rows[j] = data;
+		if (typeof rowStyle == 'string' && rowStyle.length)
+			_rowStyles[j] = rowStyle;
+		else
+			_rowStyles[j] = null;
 	}
 
 	/*
@@ -373,7 +427,10 @@ function AdvancedTable(varName) {
 		var rowId = _bodyTab.childNodes[row].id;
 		var r = document.getElementById(rowId);
 		var cls;
-		r.getAttribute('class') == 'rowSelected' ? cls = '' : cls = 'rowSelected';
+		if (r.getAttribute('class') == 'rowSelected')
+			_rowStyles[row] ? cls =  _rowStyles[row] : cls = '';
+		else
+			cls = 'rowSelected';
 		r.setAttribute('class', cls);
 
 	 	// Executes custom handler, if any
@@ -421,7 +478,12 @@ function AdvancedTable(varName) {
 		for (var k=0; k < _rows.length; k++) { 
 			rowId = _bodyTab.childNodes[k].id;
 			r = document.getElementById(rowId);
-			selected ? cls = 'rowSelected' : cls = '';
+			if (selected) 
+				cls = 'rowSelected';
+			else {
+				// Use custom CSS class style for this row?
+				_rowStyles[k] ? cls =  _rowStyles[k] : cls = '';
+			}
 			r.setAttribute('class', cls);
 		}	
 	}

@@ -372,6 +372,9 @@ def process(userData, kind_id, argv):
 
 	task_end_log(userData, g, storeLog, task_id, success, kind)
 
+	print "WRAPPER PROCESSING: Exiting"
+	sys.exit(0)
+
 
 def init_job(userData):
 	global username

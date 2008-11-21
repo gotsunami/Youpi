@@ -366,11 +366,6 @@ function {{ plugin.id }}_run(trid, idList, itemId, config, resultsOutputDir, sca
 		return;
 	}
 
-	if (prefix.length == 0)
-		txt = ' Also please note that no custom prefix name has been defined.';
-	else 
-		txt = " Please note that you have defined a custom '" + prefix + "' prefix that will be used when items get submitted.";
-
 	if (!silent) {
 		var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
 		if (!r) return;

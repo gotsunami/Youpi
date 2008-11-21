@@ -464,25 +464,32 @@ div.shoppingCartPanel {
 	margin-left: 20px;
 }
 
-div.shoppingCartPanel table.box {
-	border: 2px solid #5b80b2;
-	width: 270px;
+table.condorPanelBox {
+	background-color: #e9f3ff;
+	width: 300px;
 	margin-bottom: 10px;
+	-moz-border-radius: 5px;
 }
 
-div.shoppingCartPanel table.box th {
+table.condorPanelBox th {
 	border: none;
 	background-color: lightblue;
 	border-bottom: 2px solid #5b80b2;
 }
 
-div.shoppingCartPanel table.box td {
+table.condorPanelBox td {
 	border: none;
 }
 
-div.shoppingCartPanel table.box div.stats {
+table.condorPanelBox div.stats, table.condorPanelBox div.list {
 	font-size: 9px;
 	margin-bottom: 3px;
+}
+
+table.condorPanelBox div.list {
+	width: 100%; 
+	overflow: auto; 
+	margin-bottom: 5px;
 }
 
 table.shoppingCart * {
@@ -682,21 +689,11 @@ table.condorPanel {
 table.condorPanel td.host {
 	text-align: left;
 	font-family: typewriter;
+	padding-left: 30px;
 }
 
 table.condorPanel td.status {
 	text-align: center;
-}
-
-table.condorPanel tr.idle td {
-	background-color: #d4ffd1;
-	border-bottom: 1px solid #3e7c39;
-}
-
-table.condorPanel tr.busy td {
-	background-color: #ff8484;
-	border-bottom: 1px solid #de0000;
-	font-weight: bold;
 }
 
 .cart_option_closed {
@@ -852,13 +849,28 @@ div.advancedTable div.body table {
   	width: 100%;
 }
 
-div.advancedTable div.body table td {
+div.advancedTable div.body table td, div.advancedTable div.body table td.slot {
 	border-bottom: 1px dashed lightblue; 
 	color: black;
   	width: 100%;
 	margin: 0px;
 	white-space: nowrap;
 	text-align: center;
+}
+
+div.advancedTable div.body table td.slot {
+	text-align: left;
+	padding-left: 30px;
+	font-family: monospace;
+}
+
+div.advancedTable div.body table tr.idle td.slot, div.advancedTable div.body table tr.idle td.state {
+	color: green;
+}
+
+div.advancedTable div.body table tr.busy td.slot, div.advancedTable div.body table tr.busy td.state {
+	color: red;
+	font-weight: bold;
 }
 
 div.advancedTable div.body table tr:hover {
@@ -877,7 +889,7 @@ div.advancedTable div.body table tr.rowSelected td {
 	color: blue;
 }
 
-div.advancedTable div.body table tr.rowSelected td:first-child {
+div.advancedTable div.body table tr.rowSelected td:first-child  {
 	background-image: url(../img/misc/checkbox_on.gif);
 	background-position: 10px center;
 	background-repeat: no-repeat; 

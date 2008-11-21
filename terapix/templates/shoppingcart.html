@@ -13,7 +13,6 @@
 
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
-<script type="text/javascript" src="/media/js/condorpanel.js"></script>
 <script type="text/javascript">
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -114,25 +113,6 @@ function proceed_cart() {
 		<div align="center" style="width: 100%" id="menuitem_sub_0">
 			{# Cart items #}
 			{% if cartHasData %}
-			<div class="shoppingCartPanel">
-				<table class="box">
-					<tr>
-						<th>Item prefix name</th>
-					<tr>
-					<tr>
-						<td>You can define a short name that <i>will prefix all items' IDs</i> at processing time. It is useful 
-						if you want to monitor only jobs with a specific prefix ID.
-						</td>
-					</tr>
-					<tr>
-						<td><input type="text" id="prefix"/>
-						</td>
-					</tr>
-				</table>
-	
-				<div id="condor_panel_div"></div>
-			</div>
-	
 			<div style="padding-top: 20px;">
 			<table width="50%" class="shoppingCart">
 			{% for plugin in plugins %}
@@ -154,6 +134,10 @@ function proceed_cart() {
 						<div>
 							<input id="reprocess_successful_checkbox" type="checkbox" checked="checked"/>
 							<label>Do not reprocess already successful processings</label>
+						</div>
+						<div>
+							<label>Item prefix name</label>
+							<input type="text" id="prefix"/>
 						</div>
 						{% include plugin.itemCartTemplate %}
 					</td>
@@ -213,12 +197,4 @@ function proceed_cart() {
 	</div>
 </div>
 </div>
-
-<script type="text/javascript">
-	if (document.getElementById('condor_panel_div')) {
-		var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
-		condorPanel.render();
-	}
-</script>
-
 {% endblock %}

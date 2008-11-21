@@ -8,6 +8,14 @@
  * Please note that this page documents Javascript code. <CondorPanel> is a pseudo-class, 
  * it provides encapsulation and basic public/private features.
  *
+ * File:
+ *
+ *  condorpanel.js
+ *
+ * Dependencies:
+ *
+ *  Table rendering - <AdvancedTable> widget
+ *
  * Constructor Parameters:
  *
  * container_id - string: name of parent DOM block container
@@ -20,23 +28,34 @@ function CondorPanel(container_id, varName) {
 
 
 	/*
-	 * Var: instance_name
+	 * Var: _instance_name
 	 * Name of instance in global namespace
 	 *
 	 */
-	var instance_name = varName;
+	var _instance_name = varName;
 	/*
-	 * Var: headerTitle
+	 * Var: _headerTitle
 	 * Header box's title
 	 *
 	 */
-	var headerTitle = 'Select Condor Nodes';
+	var _headerTitle = 'Select Condor Nodes';
 	/*
 	 * Var: container
 	 * Parent DOM container
 	 *
 	 */ 
 	var container = document.getElementById(container_id);
+
+
+	// Group: Variables
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+	/*
+	 * Var: _advT
+	 * <AdvancedTable> instance
+	 *
+	 */ 
+	var _advT;
 
 
 	// Group: Functions
@@ -54,13 +73,7 @@ function CondorPanel(container_id, varName) {
 	this.render = function() {
 		var tr, th, td;
 		var tab = document.createElement('table');
-		tab.setAttribute('class', 'box');
-
-		tr = document.createElement('tr');
-		th = document.createElement('th');
-		th.appendChild(document.createTextNode(headerTitle));
-		tr.appendChild(th);
-		tab.appendChild(tr);
+		tab.setAttribute('class', 'condorPanelBox');
 
 		tr = document.createElement('tr');
 		td = document.createElement('td');
@@ -71,6 +84,15 @@ function CondorPanel(container_id, varName) {
 		container.appendChild(tab);
 
 		this.update();
+	}
+
+	/*
+	 * Function: getTable
+	 * Returns current <AdvancedTable> instance
+	 *
+	 */ 
+	this.getTable = function() {
+		return _advT;
 	}
 
 	/*
@@ -99,13 +121,16 @@ function CondorPanel(container_id, varName) {
 				td.appendChild(sdiv);
 
 				var ldiv = document.createElement('div');
-				ldiv.setAttribute('style', 'width: 100%; height: 150px; overflow: auto; border: 1px solid #5b80b2; margin-bottom: 5px;');
+				ldiv.setAttribute('id', _instance_name + '_content_div');
+				ldiv.setAttribute('class', 'list');
 				td.appendChild(ldiv);
-
-				tab = document.createElement('table');
-				tab.setAttribute('class', 'condorPanel');
-				var check, statusClass;
 				var nbidle=0, nbbusy=0, total = resp['results'].length;
+
+				_advT = new AdvancedTable(_instance_name + '.getTable()');
+				_advT.setContainer(ldiv.id);
+				_advT.setColStyles(['slot', 'state']);
+
+				var check, statusClass;
 				for (var k=0; k < total; k++) {
 					if(resp['results'][k][1] == 'Idle') {
 						statusClass = 'idle';
@@ -116,40 +141,22 @@ function CondorPanel(container_id, varName) {
 						nbbusy++;
 					}
 
-					tr = document.createElement('tr');
-					tr.setAttribute('class', statusClass);
-
-					td = document.createElement('td');
-					td.setAttribute('id', instance_name + '_host_td' + k);
-					td.setAttribute('class', 'host');
-					check = document.createElement('input');
-					check.setAttribute('id', instance_name + '_host_check' + k);
-					check.setAttribute('type', 'checkbox');
-					check.setAttribute('style', 'margin-right: 5px;');
-					td.appendChild(check);
-					td.appendChild(document.createTextNode(resp['results'][k][0]));
-					tr.appendChild(td);
-
-					td = document.createElement('td');
-					td.setAttribute('class', 'status');
-					td.appendChild(document.createTextNode(resp['results'][k][1]));
-					tr.appendChild(td);
-					tab.appendChild(tr);
+					_advT.appendRow([resp['results'][k][0], resp['results'][k][1]], statusClass);
 				}
+				_advT.render();
+
 				sdiv.appendChild(document.createTextNode('Idle: ' + nbidle + ' (' + (nbidle/total*100).toFixed(2) + '%), Busy: ' 
 					+ nbbusy + ' (' + (nbbusy/total*100).toFixed(2) + '%) ['));
 				var ref = document.createElement('a');
 				ref.setAttribute('href', '#');
-				ref.setAttribute('onclick', instance_name + '.update();');
+				ref.setAttribute('onclick', _instance_name + '.update();');
 				ref.appendChild(document.createTextNode('Refresh'));
 				sdiv.appendChild(ref);
 				sdiv.appendChild(document.createTextNode(']'));
 
-				ldiv.appendChild(tab);
-
 				var htd = document.getElementById(container_id + '_host_list_td');
 				var s_chk = document.createElement('input');
-				s_chk.setAttribute('id', instance_name + '_save_sel_check');
+				s_chk.setAttribute('id', _instance_name + '_save_sel_check');
 				s_chk.setAttribute('type', 'checkbox');
 				s_chk.setAttribute('checked', 'checked');
 				s_chk.setAttribute('style', 'margin-right: 5px;');
@@ -163,13 +170,13 @@ function CondorPanel(container_id, varName) {
 				but.setAttribute('type', 'button');
 				but.setAttribute('value', 'Select all');
 				but.setAttribute('style', 'margin-right: 10px;');
-				but.setAttribute('onclick', instance_name + '.selectAll();');
+				but.setAttribute('onclick', _instance_name + '.selectAll();');
 				bdiv.appendChild(but);
 
 				but = document.createElement('input');
 				but.setAttribute('type', 'button');
 				but.setAttribute('value', 'Unselect all');
-				but.setAttribute('onclick', instance_name + '.unselectAll();');
+				but.setAttribute('onclick', _instance_name + '.unselectAll();');
 				bdiv.appendChild(but);
 
 				htd.appendChild(bdiv);
@@ -187,7 +194,7 @@ function CondorPanel(container_id, varName) {
 						}	
 
 						for (var n=0; n < total; n++) {
-							var e = document.getElementById(instance_name + '_host_check' + n);
+							var e = document.getElementById(_instance_name + '_host_check' + n);
 							e.checked = false;
 							for (var t=0; t < savedNodeSelection.length; t++) {
 								if (savedNodeSelection[t] == resp['results'][n][0]) {
@@ -198,11 +205,12 @@ function CondorPanel(container_id, varName) {
 						}	
 					}
 				);
-				ry.send('/youpi/profile/loadCondorNodeSelection/');
+				// FIXME ry.send('/youpi/profile/loadCondorNodeSelection/');
 			}
 		);
 
 		// Send POST HTTP query
+		xhr.setBusyMsg('Getting Condor nodes information, please wait');
 		xhr.send('/youpi/cluster/status/');
 	}
 
@@ -216,7 +224,7 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	function _mustSaveCurrentSelection() {
-		return document.getElementById(instance_name + '_save_sel_check').checked;
+		return document.getElementById(_instance_name + '_save_sel_check').checked;
 	}
 
 	/*
@@ -225,7 +233,7 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	this.selectAll = function() {
-		toggleSelection(true);
+		_advT.selectAll(true);
 	}
 
 	/*
@@ -234,25 +242,7 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	this.unselectAll = function() {
-		toggleSelection(false);
-	}
-
-	/*
-	 * Function: toggleSelection
-	 * Un/Checks a node's checkbox
-	 *
-	 * Parameters:
-	 *
-	 * checked - boolean: true or false
-	 *
-	 */ 
-	function toggleSelection(checked) {
-		var checked = checked == true ? true : false;
-		var nodes = getHostsInputNodes();
-
-		for (var k=0; k < nodes.length; k++) {
-			nodes[k].checked = checked;
-		}
+		_advT.selectAll(false);
 	}
 
 	/*
@@ -274,7 +264,7 @@ function CondorPanel(container_id, varName) {
 
 		for (var k=0; k < nodes.length; k++) {
 			if (nodes[k].checked) {
-				hosts[j++] = document.getElementById(instance_name + '_host_td' + k).firstChild.nextSibling.nodeValue;
+				hosts[j++] = document.getElementById(_instance_name + '_host_td' + k).firstChild.nextSibling.nodeValue;
 			}
 		}
 
@@ -310,7 +300,7 @@ function CondorPanel(container_id, varName) {
 		var checks = new Array();
 		var i=0;
 		for (var k=0; k < nodes.length; k++) {
-			if (nodes[k].id.search(instance_name + '_host_check') == 0) {
+			if (nodes[k].id.search(_instance_name + '_host_check') == 0) {
 				checks[i++] = nodes[k];
 			}
 		}
