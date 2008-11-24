@@ -30,6 +30,8 @@ graph mcd {
 	pluginother [label="{ Other plugin | [ Id ]\n... }",style=dotted];
 	firstqcomment [label="{ First Quality Comment | [ Comment ]}"];
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
+	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style}"];
+	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection}"];
 
 	/* Relations */
 	node [shape=ellipse];
@@ -54,6 +56,8 @@ graph mcd {
 	node25 [label="{ final quality evaluation | Creation Date\nGrade\nCustom Comment }", style=dashed, shape=Mrecord];
 	node26 [label="predefined comments"];
 	node27 [label="predefined comments"];
+	node28 [label="has profile", style=dashed, shape=Mrecord];
+	node29 [label="defines", style=dashed, shape=Mrecord];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
@@ -88,6 +92,12 @@ graph mcd {
 	node23 -- pluginfitsout [label="  1,1"];
 	node23 -- pluginscamp [label="  1,1"];
 	node23 -- pluginother [label="  1,1", style=dotted];
+
+	siteprofile -- node28 [label="  1, 1"];
+	authuser -- node28 [label="  0,1", style=dashed];
+
+	condornodesel -- node29 [label="  1,1"];
+	authuser -- node29 [label="  0,n", style=dashed];
 
 	image -- node14 [label="  1,1"];
 	node14 -- instrument [label="  0,n"];

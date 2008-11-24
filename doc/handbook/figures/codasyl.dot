@@ -31,6 +31,8 @@ digraph codasyl {
 	outgrading [label="Final Quality Evaluation"];
 	incomment [label="First Quality Comment"];
 	outcomment [label="Final Quality Comment"];
+	siteprofile [label="Site Profile"];
+	condornodesel [label="Condor Node Selections"];
 
 	/* Sets */
 	calib -> Image;
@@ -57,6 +59,8 @@ digraph codasyl {
 	user -> configfile[style=dashed];
 	user -> ingrading[style=dashed];
 	user -> outgrading[style=dashed];
+	user -> siteprofile[style=dashed];
+	user -> condornodesel[style=dashed];
 	plugfitsin -> ingrading[style=dashed];
 	plugfitsout -> outgrading[style=dashed];
 	
