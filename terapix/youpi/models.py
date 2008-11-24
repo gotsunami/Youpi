@@ -557,4 +557,10 @@ class SiteProfile(models.Model):
 	# Serialized data (base64 encoding over marshal serialization)
 	condornodesel = models.TextField()
 
+class CondorNodeSel(models.Model):
+	# Mandatory
+	user = models.ForeignKey(User)
 
+	label = models.CharField(max_length = 255)
+	# Serialized data (base64 encoding over marshal serialization)
+	nodeselection = models.TextField()
