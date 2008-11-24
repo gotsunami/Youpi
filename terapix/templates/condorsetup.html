@@ -36,9 +36,21 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		<div style="margin-top: 40px;" align="center">
 			<table style="width: 90%;">
 				<tr>
-					<td style="border: none;">
+					<td style="border: none; width: 50%;">
 						<h1 style="border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">Available Cluster Nodes</h1>
 						<div id="condor_panel_div"></div>	
+					<td>
+					<td style="border: none;">
+						<h1 style="border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">Custom policies</h1>
+						<div class="tip" style="width: 80%;">Custom policies are <b>dynamic rules</b> you can define in the form below. The thing is that 
+						no cluster node selection is done at this time. Those policies will be applied just before job execution on the cluster. This way, the 
+						resulting node selection will depend on the cluster's real-time status.</div> 
+						<div id="saved_sel_div"></div>	
+						<h1 style="margin-top: 20px; border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">
+						Custom selections</h1>
+						<div class="tip" style="width: 80%;">Custom selections are made of <b>static nodes</b> selected among the available nodes showed in the 
+						list on the left.</div>
+						<div id="custom_sel_div"></div>	
 					<td>
 				</tr>
 			</table>
@@ -47,6 +59,8 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 </div>
 <script type="text/javascript">
 	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
+	condorPanel.renderCustomPolicies('custom_sel_div');
+	condorPanel.renderSavedSelections('saved_sel_div');
 	condorPanel.render();
 </script>
 {% endblock %}

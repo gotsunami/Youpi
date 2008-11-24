@@ -50,17 +50,103 @@ function CondorPanel(container_id, varName) {
 	// Group: Variables
 	// -----------------------------------------------------------------------------------------------------------------------------
 
+
 	/*
 	 * Var: _advT
 	 * <AdvancedTable> instance
 	 *
 	 */ 
 	var _advT;
+	/*
+	 * Var: _custom_container
+	 * DOM container for rendering custom selections
+	 *
+	 */ 
+	var _custom_container;
+	/*
+	 * Var: _saved_container
+	 * DOM container for rendering saved selections
+	 *
+	 */ 
+	var _saved_container;
 
 
 	// Group: Functions
 	// -----------------------------------------------------------------------------------------------------------------------------
 
+
+	/*
+	 * Function: _error
+	 * Displays custom error message
+	 *
+	 * Parameters:
+	 *  msg - string: error message
+	 *
+	 */ 
+	function _error(msg) {
+		alert('CondorPanel: ' + msg);
+	}
+
+	/*
+	 * Function: _validateContainer
+	 * Checks whether a container is valid.
+	 *
+	 * Parameters:
+	 *  container - string of DOM element for rendering content
+	 *
+	 * Returns:
+	 *  DOM element or null
+	 *
+	 */ 
+	function _validate_container(container) {
+		var d;
+		if (typeof container == 'string' && container.length) {
+			d = document.getElementById(container);
+			if (!d) {
+				_error("bad container '" + container + "' used!");
+				return null;
+			}
+		}
+		else if (typeof container == 'object') {
+			d = container;
+		}
+		else {
+			_error('container must be string or a DOM object!');
+			return null;
+		}
+
+		return d;
+	}
+
+	/*
+	 * Function: renderCustomPolicies
+	 * Renders custom policies widget
+	 *
+	 * Parameters:
+	 *  container - string of DOM element for rendering content
+	 *
+	 */ 
+	this.renderCustomPolicies = function(container) {
+		_custom_container = _validate_container(container);
+		if (!_custom_container) return;
+
+		_custom_container.innerHTML = 'No saved policy at this time.';
+	}
+
+	/*
+	 * Function: renderSavedSelections
+	 * Renders saved selections widget
+	 *
+	 * Parameters:
+	 *  container - string of DOM element for rendering content
+	 *
+	 */ 
+	this.renderSavedSelections = function(container) {
+		_saved_container = _validate_container(container);
+		if (!_saved_container) return;
+
+		_saved_container.innerHTML = 'No saved selection at this time.';
+	}
 
 	/*
 	 * Function: render

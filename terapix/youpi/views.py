@@ -158,6 +158,8 @@ def cart_view(request):
 					'cartHasData' 		: cartHasData, 
 					'Debug' 			: DEBUG, 
 					'menu'				: app_menu,
+					# Cluster node available policies + selections
+					'nodePolicies'		: ['a', 'b', 'c'],
 					'selected_entry_id'	: 'shoppingcart', 
 					'misc' 				: manager
 				},

@@ -139,6 +139,14 @@ function proceed_cart() {
 							<label>Item prefix name</label>
 							<input type="text" id="prefix"/>
 						</div>
+						<div>
+							<label>Cluster node policy</label>
+							<select>
+							{% for sel in nodePolicies %}
+								<option>{{ sel }}</option>
+							{% endfor %}
+							</select>
+						</div>
 						{% include plugin.itemCartTemplate %}
 					</td>
 				</tr>
