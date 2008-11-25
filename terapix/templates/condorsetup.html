@@ -45,12 +45,25 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 						<div class="tip" style="width: 80%;">Custom policies are <b>dynamic rules</b> you can define in the form below. The thing is that 
 						no cluster node selection is done at this time. Those policies will be applied just before job execution on the cluster. This way, the 
 						resulting node selection will depend on the cluster's real-time status.</div> 
-						<div id="saved_sel_div"></div>	
+						<div id="saved_sel_div" style="margin-bottom: 10px;"></div>	
+						<div id="policy_div">	
+							<div>
+								<label>Add a policy</label>
+							</div>						
+							<div>toto</div>
+						</div>						
+						
 						<h1 style="margin-top: 20px; border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">
 						Custom selections</h1>
 						<div class="tip" style="width: 80%;">Custom selections are made of <b>static nodes</b> selected among the available nodes showed in the 
 						list on the left.</div>
-						<div id="custom_sel_div"></div>	
+						<div id="custom_sel_div" style="margin-bottom: 10px;"></div>	
+						<div id="save_sel_div">	
+							<div>
+								<label>Save current selection</label>
+							</div>						
+							<div>caca</div>
+						</div>						
 					<td>
 				</tr>
 			</table>
@@ -59,8 +72,15 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 </div>
 <script type="text/javascript">
 	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
-	condorPanel.renderCustomPolicies('custom_sel_div');
-	condorPanel.renderSavedSelections('saved_sel_div');
 	condorPanel.render();
+	var pol = condorPanel.getCustomPolicies();
+	if (!pol)
+		document.getElementById('custom_sel_div').innerHTML = 'No saved policy at this time';
+
+	var sel = condorPanel.getSavedSelections();
+	if (!sel)
+		document.getElementById('saved_sel_div').innerHTML = 'No saved selection at this time';
+
+	make_dropdown_box('policy_div', 'save_sel_div');
 </script>
 {% endblock %}

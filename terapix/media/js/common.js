@@ -488,3 +488,53 @@ function Logger(container)
 
 	_init();
 }
+
+/*
+ * Function: make_dropdown_box
+ * Build a clickable dropdown box
+ *
+ * Parameters:
+ *  Variable arguments list - ids or DOM elements
+ *
+ */ 
+function make_dropdown_box() {
+	for (var k=0; k < make_dropdown_box.arguments.length; k++) {
+		var c = validate_container(make_dropdown_box.arguments[k]);
+		if (!c) continue;
+		c.setAttribute('class', 'ebox');
+		var content = c.getElementsByTagName('div');
+		content[0].setAttribute('class', 'banner_closed');
+		content[0].setAttribute('onclick', "this.getAttribute('class')=='banner_opened'?this.setAttribute('class','banner_closed'):this.setAttribute('class','banner_opened');");
+	}	
+}
+
+/*
+ * Function: validate_container
+ * Checks whether a container is valid.
+ *
+ * Parameters:
+ *  container - string of DOM element for rendering content
+ *
+ * Returns:
+ *  DOM element or null
+ *
+ */ 
+function validate_container(container) {
+	var d;
+	if (typeof container == 'string' && container.length) {
+		d = document.getElementById(container);
+		if (!d) {
+			_error("bad container '" + container + "' used!");
+		return null;
+		}
+	}
+	else if (typeof container == 'object') {
+		d = container;
+	}
+else {
+		_error('container must be string or a DOM object!');
+		return null;
+	}
+
+	return d;
+}

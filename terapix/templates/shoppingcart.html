@@ -131,22 +131,30 @@ function proceed_cart() {
 						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
 					</td>
 					<td width="100%" colspan="2">
-						<div>
-							<input id="reprocess_successful_checkbox" type="checkbox" checked="checked"/>
-							<label>Do not reprocess already successful processings</label>
+						<div id="{{ plugin.id }}_options_div_{{ forloop.counter }}">
+							<div>
+								<label>Runtime Options</label>
+							</div>
+							<div>
+								<input id="reprocess_successful_checkbox" type="checkbox" checked="checked"/>
+								<label>Do not reprocess already successful processings</label>
+							</div>
+							<div>
+								<label>Item prefix name</label>
+								<input type="text" id="prefix"/>
+							</div>
+							<div>
+								<label>Cluster node policy</label>
+								<select>
+								{% for sel in nodePolicies %}
+									<option>{{ sel }}</option>
+								{% endfor %}
+								</select>
+							</div>
 						</div>
-						<div>
-							<label>Item prefix name</label>
-							<input type="text" id="prefix"/>
-						</div>
-						<div>
-							<label>Cluster node policy</label>
-							<select>
-							{% for sel in nodePolicies %}
-								<option>{{ sel }}</option>
-							{% endfor %}
-							</select>
-						</div>
+						<script type="text/javascript">
+							make_dropdown_box('{{ plugin.id }}_options_div_{{ forloop.counter }}');
+						</script>
 						{% include plugin.itemCartTemplate %}
 					</td>
 				</tr>

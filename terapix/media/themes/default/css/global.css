@@ -1095,3 +1095,56 @@ div.toplevelmenu div.user {
 	color: gray; 
 	background-color: inherit;
 }
+
+/********************* dropdown box ************************************/
+
+.ebox .banner_opened, .ebox .banner_closed {
+	width: 50%;	
+	background-position: 3px center;
+	background-repeat: no-repeat;
+	background-color: #D5FFE0;
+	padding: 3px;
+	padding-left: 16px;
+	border: 1px solid #ebebeb;
+	border-right-color: #ccc;
+	border-bottom-color: #ccc;
+	-moz-border-radius: 5px;
+	display: block;
+	cursor: pointer;
+}
+
+.ebox .banner_opened *, .ebox .banner_closed * {
+	cursor: pointer;
+}
+
+.ebox .banner_opened {
+	background-image: url(../img/admin/arrow-down.gif);
+}
+
+.ebox .banner_opened ~ * {
+	display: block;
+	border: 1px solid #ebebeb;
+	border-right-color: #ccc;
+	border-bottom-color: #ccc;
+	-moz-border-radius: 5px;
+	margin-top: 3px;
+	margin-left: 15px;
+	padding: 5px;
+	cursor: default;
+	font-weight: normal;
+	font-size: 9px;
+}
+
+.ebox .banner_closed ~ * {
+	display: none;
+}
+
+.ebox .banner_closed {
+	background-image: url(../img/admin/arrow-right.gif);
+}
+
+.ebox .banner_opened label, .ebox .banner_closed label {
+	color: #686868;
+	font-weight: bold;
+}
+

@@ -88,7 +88,7 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
-	 * Function: _validateContainer
+	 * Function: _validate_container
 	 * Checks whether a container is valid.
 	 *
 	 * Parameters:
@@ -119,33 +119,27 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
-	 * Function: renderCustomPolicies
-	 * Renders custom policies widget
+	 * Function: getCustomPolicies
+	 * Returns custom policies data
 	 *
-	 * Parameters:
-	 *  container - string of DOM element for rendering content
+	 * Returns:
+	 *  data
 	 *
 	 */ 
-	this.renderCustomPolicies = function(container) {
-		_custom_container = _validate_container(container);
-		if (!_custom_container) return;
-
-		_custom_container.innerHTML = 'No saved policy at this time.';
+	this.getCustomPolicies = function() {
+		return null;
 	}
 
 	/*
-	 * Function: renderSavedSelections
-	 * Renders saved selections widget
+	 * Function: getSavedSelections
+	 * Returns saved selections data
 	 *
-	 * Parameters:
-	 *  container - string of DOM element for rendering content
+	 * Returns:
+	 *  data
 	 *
 	 */ 
-	this.renderSavedSelections = function(container) {
-		_saved_container = _validate_container(container);
-		if (!_saved_container) return;
-
-		_saved_container.innerHTML = 'No saved selection at this time.';
+	this.getSavedSelections = function() {
+		return null;
 	}
 
 	/*
