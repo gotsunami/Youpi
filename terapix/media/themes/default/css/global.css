@@ -1098,6 +1098,14 @@ div.toplevelmenu div.user {
 
 /********************* dropdown box ************************************/
 
+.ebox * {
+	font-size: 9px;
+	/*
+	margin: 0px;
+	padding: 0px;
+	*/	
+}
+
 .ebox .banner_opened, .ebox .banner_closed {
 	width: 50%;	
 	background-position: 3px center;
@@ -1132,7 +1140,6 @@ div.toplevelmenu div.user {
 	padding: 5px;
 	cursor: default;
 	font-weight: normal;
-	font-size: 9px;
 }
 
 .ebox .banner_closed ~ * {
@@ -1146,5 +1153,6 @@ div.toplevelmenu div.user {
 .ebox .banner_opened label, .ebox .banner_closed label {
 	color: #686868;
 	font-weight: bold;
+	font-size: 12px;
 }
 
