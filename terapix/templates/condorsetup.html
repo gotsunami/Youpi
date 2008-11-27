@@ -82,7 +82,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	if (!pol)
 		document.getElementById('saved_pol_div').innerHTML = 'No saved policy at this time';
 
-	var sel = condorPanel.showSavedSelections('saved_sel_div', function() { condorPanel.render(); });
+	var sel = condorPanel.showSavedSelections('saved_sel_div', true, function() { condorPanel.render(); });
 
 	{# Auto-completion stuff #}
 	try {

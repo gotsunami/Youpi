@@ -13,9 +13,11 @@
 
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
+<script type="text/javascript" src="/media/js/condorpanel.js"></script>
 <script type="text/javascript">
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
+var condorPanel = new CondorPanel();
 
 // trNode: parent TR node
 function removeItemFromCart(rid, force) {
@@ -145,15 +147,12 @@ function proceed_cart() {
 							</div>
 							<div>
 								<label>Cluster node policy</label>
-								<select>
-								{% for sel in nodePolicies %}
-									<option>{{ sel }}</option>
-								{% endfor %}
-								</select>
+								<div id="{{ plugin.id }}_saved_sel_div"></div>
 							</div>
 						</div>
 						<script type="text/javascript">
 							make_dropdown_box('{{ plugin.id }}_options_div_{{ forloop.counter }}');
+							condorPanel.showSavedSelections('{{ plugin.id }}_saved_sel_div');
 						</script>
 						{% include plugin.itemCartTemplate %}
 					</td>

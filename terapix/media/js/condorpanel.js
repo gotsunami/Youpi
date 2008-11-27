@@ -186,6 +186,7 @@ function CondorPanel(container_id, varName) {
 
 	function _showSavedSelections(container_id, can_delete, handler) {
 		var callback = typeof(handler) == 'function' ? true : false;
+		var show_delete = can_delete ? true : false;
 		var container = document.getElementById(container_id);
 		_savedSelectionDivId = container_id;
 		var log = new Logger(container);
@@ -206,11 +207,13 @@ function CondorPanel(container_id, varName) {
 					container.appendChild(document.createTextNode('Saved selections: '));
 					container.appendChild(select);
 	
-					var img = document.createElement('img');
-					img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
-					img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
-					img.setAttribute('onclick', _instance_name + ".removeCurrentSelection();");
-					container.appendChild(img);
+					if (show_delete) {
+						var img = document.createElement('img');
+						img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
+						img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
+						img.setAttribute('onclick', _instance_name + ".removeCurrentSelection();");
+						container.appendChild(img);
+					}
 				}
 				
 				if (callback) handler();
