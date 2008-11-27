@@ -489,21 +489,26 @@ function AdvancedTable(varName) {
 	}
 
 	/*
-	 * Function: getSelectedRows
-	 * Returns a string of comma-separated rows ids
+	 * Function: getSelectedColsValues
+	 * Returns a string of comma-separated columns' values
+	 *
+	 * Looks for selected rows and builds a selection string with the content 
+	 * of the column used to define unique rows ids.
 	 *
 	 * Returns:
-	 *  string of comma-separated rows ids (without <_instance_name> prefix)
+	 *  String of comma-separated selected rows' column's value
 	 *
 	 */ 
-	this.getSelectedRows = function() {
-		var rowId, r, cls;
+	this.getSelectedColsValues = function() {
+		var rowId, r, cls, colIdx;
 		var selection = '';
 		for (var k=0; k < _rows.length; k++) { 
 			rowId = _bodyTab.childNodes[k].id;
 			r = document.getElementById(rowId);
-			if (r.getAttribute('class') == 'rowSelected')
-				selection += _rows[k][_colIdxForRowIds] + ',';
+			if (r.getAttribute('class') == 'rowSelected') {
+				colIdx = _colIdxForRowIds == -1 ? 0 : _colIdxForRowIds;
+				selection += _rows[k][colIdx] + ',';
+			}
 		}	
 
 		return selection.substr(0, selection.length-1);
@@ -522,14 +527,14 @@ function AdvancedTable(varName) {
 	}
 
 	/*
-	 * Function: getSelectedRows
-	 * Returns a string of comma-separated rows ids
+	 * Function: setSelectedRows
+	 * Defines row selection
 	 *
 	 * Parameters:
-	 *  rowIds - string of comma-separated rows ids (as returned by <getSelectedRows>)
+	 *  rowIds - string of comma-separated rows ids (as returned by <getSelectedColsValues>)
 	 *
 	 * See Also:
-	 *  <getSelectedRows>
+	 *  <getSelectedColsValues>
 	 *
 	 */ 
 	this.setSelectedRows = function(rowIds) {

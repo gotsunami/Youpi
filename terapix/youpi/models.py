@@ -564,3 +564,4 @@ class CondorNodeSel(models.Model):
 	label = models.CharField(max_length = 255)
 	# Serialized data (base64 encoding over marshal serialization)
 	nodeselection = models.TextField()
+	date = models.DateTimeField(auto_now_add = True)

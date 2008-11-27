@@ -1129,20 +1129,25 @@ def upload_file(request):
 
 	return HttpResponse(str({'filename' : str(filename), 'length' : len(content), 'exit_code' : exitCode, 'error_msg' : errMsg }), mimetype = 'text/html')
 
-def profile_save_condor_nodes_selection(request):
+def save_condor_nodes_selection(request):
 	"""
 	Save Condor nodes selection
 	"""
 	try:
 		selHosts = request.POST['SelectedHosts'].split(',')
+		label = request.POST['Label']
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
 
-	pr = request.user.get_profile()
-	pr.condornodesel = base64.encodestring(marshal.dumps(selHosts)).replace('\n', '')
-	pr.save()
+	sels = CondorNodeSel.objects.filter(label = label)
+	if sels:
+		return HttpResponse(str({'Error' : str("'%s' label is already used, please use another name." % label)}), mimetype = 'text/plain')
 
-	return HttpResponse(str({'SavedCount' : len(selHosts)}), mimetype = 'text/plain')
+	nodesel = base64.encodestring(marshal.dumps(selHosts)).replace('\n', '')
+	sel = CondorNodeSel(user = request.user, label = label, nodeselection = nodesel)
+	sel.save()
+
+	return HttpResponse(str({'Label' : str(label), 'SavedCount' : len(selHosts)}), mimetype = 'text/plain')
 
 def profile_load_condor_nodes_selection(request):
 	"""

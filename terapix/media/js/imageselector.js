@@ -1561,7 +1561,7 @@ function ImageSelector(container_id, varName)
 	function _getListsOfSelections() {
 		switch(_selectionMode) {
 			case _singleMode:
-				var sel = _tableWidget.getSelectedRows();
+				var sel = _tableWidget.getSelectedColsValues();
 				var nb = 0;
 
 				if (sel.length > 0)
@@ -2003,7 +2003,7 @@ function ImageSelector(container_id, varName)
 					}
 				}
 
-				gIdList = _tableWidget.getSelectedRows().split(',');
+				gIdList = _tableWidget.getSelectedColsValues().split(',');
 
 				// Rebuild grid
 				resultHandler(gIdList.concat(selIdList), document.getElementById('_result_grid_div'));

@@ -100,7 +100,7 @@ urlpatterns = patterns(
 
 	# User profile
 	(r'^youpi/profile/loadCondorNodeSelection/$', 'profile_load_condor_nodes_selection'),
-	(r'^youpi/profile/saveCondorNodeSelection/$', 'profile_save_condor_nodes_selection'),
+	(r'^youpi/profile/saveCondorNodeSelection/$', 'save_condor_nodes_selection'),
 
 	# Plots
 	(r'^youpi/plot/sky/selections/$', 'plot_sky_selections'),

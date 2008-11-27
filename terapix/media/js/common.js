@@ -441,6 +441,15 @@ function Logger(container)
 	}
 
 	/*
+	 * Function: clear
+	 * Clear log
+	 *
+	 */ 
+	this.clear = function() {
+		_log.innerHTML = '';
+	}
+
+	/*
 	 * Function: msg_ok
 	 * Display an 'OK' message
 	 *
@@ -476,14 +485,17 @@ function Logger(container)
 	 *
 	 * Parameters:
 	 *  msg - string: message
+	 *  alertBox - boolean: whether to display an alert box on the screen
 	 *
 	 */ 
-	this.msg_error = function(msg) {
+	this.msg_error = function(msg, alertBox) {
+		var do_ab = alertBox ? true : false;
 		var line = document.createElement('div');
 		line.setAttribute('class', 'logger_error');
 		line.appendChild(document.createTextNode(msg));
 		_log.appendChild(line);
-		alert('Error: ' + msg);
+		if (do_ab)
+			alert('Error: ' + msg);
 	}
 
 	_init();

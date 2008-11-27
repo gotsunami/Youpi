@@ -54,7 +54,7 @@ function {{ plugin.id }}_addSelectionToCart() {
 
 	sels = ims.getListsOfSelections();
 	if (!sels) {
-		log.msg_error('No images selected. Nothing to add to cart !');
+		log.msg_error('No images selected. Nothing to add to cart !', true);
 		return;
 	}
 
@@ -134,7 +134,7 @@ function {{ plugin.id }}_checkForSelectionLDACData(container) {
 				}
 				else {
 					if ({{ plugin.id }}_LDAC_error) {
-						log.msg_error('Missing LDAC information. Selection(s) not added to cart!');
+						log.msg_error('Missing LDAC information. Selection(s) not added to cart!', true);
 						return;
 					}
 

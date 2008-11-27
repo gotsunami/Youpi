@@ -235,6 +235,7 @@ function CondorPanel(container_id, varName) {
 				sdiv.appendChild(document.createTextNode(']'));
 
 				var htd = document.getElementById(container_id + '_host_list_td');
+				/* FIXME: delete
 				var s_chk = document.createElement('input');
 				s_chk.setAttribute('id', _instance_name + '_save_sel_check');
 				s_chk.setAttribute('type', 'checkbox');
@@ -242,6 +243,7 @@ function CondorPanel(container_id, varName) {
 				s_chk.setAttribute('style', 'margin-right: 5px;');
 				htd.appendChild(s_chk);
 				htd.appendChild(document.createTextNode('Save current selection for later use'));
+				*/
 
 				// Buttons div
 				var bdiv = document.createElement('div');
@@ -295,19 +297,6 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
-	 * Function: _mustSaveCurrentSelection
-	 * Returns Checkbox's state to know if current Condor selection should be saved.
-	 *
-	 * Returns:
-	 *
-	 * true if checkbox is checked; false if not
-	 *
-	 */ 
-	function _mustSaveCurrentSelection() {
-		return document.getElementById(_instance_name + '_save_sel_check').checked;
-	}
-
-	/*
 	 * Function: selectAll
 	 * Checks all checkboxes list
 	 *
@@ -330,60 +319,51 @@ function CondorPanel(container_id, varName) {
 	 * Returns array of names of selected Condor nodes 
 	 *
 	 * Returns:
-	 *
-	 * Array of strings (Condor nodes)
-	 *
-	 * See Also:
-	 * <getHostsInputNodes>
+	 *  Array of strings (Condor node names) or null if none selected
 	 *
 	 */ 
 	this.getSelectedHosts = function() {
-		var nodes = getHostsInputNodes();
-		var hosts = new Array();
-		var j=0;
-
-		for (var k=0; k < nodes.length; k++) {
-			if (nodes[k].checked) {
-				hosts[j++] = document.getElementById(_instance_name + '_host_td' + k).firstChild.nextSibling.nodeValue;
-			}
-		}
-
-		if (_mustSaveCurrentSelection()) {
-			var r = new HttpRequest(
-				'{{ plugin.id }}_result',
-				null,	
-				function(resp) {
-					// NOP
-				}
-			);
-			var post = 'SelectedHosts=' + hosts;
-			r.send('/youpi/profile/saveCondorNodeSelection/', post);
-		}
-
-		return hosts;
+		var vals = _advT.getSelectedColsValues();
+		return vals.length > 0 ? vals.split(',') : null;
 	}
 
 	/*
-	 * Function: getHostsInputNodes
-	 * Returns array of DOM checkbox nodes (hosts nodes)
+	 * Function: saveCurrentNodeSelection
+	 * Save current Condor node selection
 	 *
-	 * Returns:
-	 *
-	 * Array of strings (Condor nodes)
-	 *
-	 * See Also:
-	 * <getSelectedHosts>
+	 * Parameters:
+	 *  name - string: selection name (must be unique)
 	 *
 	 */ 
-	function getHostsInputNodes() {
-		var nodes = document.getElementsByTagName('input');
-		var checks = new Array();
-		var i=0;
-		for (var k=0; k < nodes.length; k++) {
-			if (nodes[k].id.search(_instance_name + '_host_check') == 0) {
-				checks[i++] = nodes[k];
-			}
+	this.saveCurrentNodeSelection = function(name) {
+		var hosts;
+		try {
+			hosts = this.getSelectedHosts();
+		} catch(e) { hosts = null; }
+
+		var log = new Logger('custom_sel_save_log_div');
+		log.clear();
+
+		if (!hosts) {
+			log.msg_warning('No selection to save! Please select some Condor nodes first.');
+			return;
 		}
-		return checks;
+
+		var r = new HttpRequest(
+			'custom_sel_save_log_div',
+			null,	
+			function(resp) {
+				log.clear();
+				if (resp['Error']) {
+					log.msg_error(resp['Error']);
+					return;
+				}
+				log.msg_ok("Selection '" + resp['Label'] + "' has been saved (" + resp['SavedCount'] + ' host' + 
+					(resp['SavedCount'] > 1 ? 's' : '') + ')');
+			}
+		);
+		var post = 'Label=' + name + '&SelectedHosts=' + hosts;
+		r.setBusyMsg('Saving selection');
+		r.send('/youpi/profile/saveCondorNodeSelection/', post);
 	}
 }
