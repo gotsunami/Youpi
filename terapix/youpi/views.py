@@ -1129,7 +1129,7 @@ def upload_file(request):
 
 	return HttpResponse(str({'filename' : str(filename), 'length' : len(content), 'exit_code' : exitCode, 'error_msg' : errMsg }), mimetype = 'text/html')
 
-def save_condor_nodes_selection(request):
+def save_condor_node_selection(request):
 	"""
 	Save Condor nodes selection
 	"""
@@ -1149,15 +1149,29 @@ def save_condor_nodes_selection(request):
 
 	return HttpResponse(str({'Label' : str(label), 'SavedCount' : len(selHosts)}), mimetype = 'text/plain')
 
-def profile_load_condor_nodes_selection(request):
+def del_condor_node_selection(request):
 	"""
-	Load Condor nodes selection, if any.
+	Delete Condor node selection.
 	"""
 
-	pr = request.user.get_profile()
-	hosts = marshal.loads(base64.decodestring(str(pr.condornodesel)))
+	try:
+		label = request.POST['Label']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
 
-	return HttpResponse(str({'SavedHosts' : [str(h) for h in hosts]}), mimetype = 'text/plain')
+	sel = CondorNodeSel.objects.filter(label = label)[0]
+	sel.delete()
+
+	return HttpResponse(str({'Deleted' : str(label)}), mimetype = 'text/plain')
+
+def get_condor_node_selections(request):
+	"""
+	Returns Condor nodes selections.
+	"""
+
+	sels = CondorNodeSel.objects.all().order_by('label')
+
+	return HttpResponse(str({'Selections' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
 
 @login_required
 @profile

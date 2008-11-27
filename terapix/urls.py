@@ -98,9 +98,9 @@ urlpatterns = patterns(
 	(r'^youpi/uploadFile/batch/viewContent/(.*)/$', 'batch_view_content'),
 	(r'^youpi/uploadFile/batch/viewSelection/$', 'batch_view_selection'),
 
-	# User profile
-	(r'^youpi/profile/loadCondorNodeSelection/$', 'profile_load_condor_nodes_selection'),
-	(r'^youpi/profile/saveCondorNodeSelection/$', 'save_condor_nodes_selection'),
+	(r'^youpi/profile/delCondorNodeSelection/$', 'del_condor_node_selection'),
+	(r'^youpi/profile/getCondorNodeSelections/$', 'get_condor_node_selections'),
+	(r'^youpi/profile/saveCondorNodeSelection/$', 'save_condor_node_selection'),
 
 	# Plots
 	(r'^youpi/plot/sky/selections/$', 'plot_sky_selections'),

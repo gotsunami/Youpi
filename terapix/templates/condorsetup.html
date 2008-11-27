@@ -64,7 +64,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 							</div>						
 							<div>Save as 
 								<input id="selection_save_input" style="margin-right: 10px;" type="text"/>
-								<input type="button" value="Save!" onclick="condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value);"/>
+								<input type="button" value="Save!" onclick="condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value, function() { condorPanel.showSavedSelections('saved_sel_div'); });"/>
 								<div id="custom_sel_save_log_div"></div>
 							</div>
 						</div>						
@@ -78,14 +78,11 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	make_dropdown_box('policy_div', 'save_sel_div');
 
 	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
-	condorPanel.render();
 	var pol = condorPanel.getCustomPolicies();
 	if (!pol)
 		document.getElementById('saved_pol_div').innerHTML = 'No saved policy at this time';
 
-	var sel = condorPanel.getSavedSelections();
-	if (!sel)
-		document.getElementById('saved_sel_div').innerHTML = 'No saved selection at this time';
+	var sel = condorPanel.showSavedSelections('saved_sel_div', function() { condorPanel.render(); });
 
 	{# Auto-completion stuff #}
 	try {

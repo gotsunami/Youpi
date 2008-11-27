@@ -15,6 +15,7 @@
  * Dependencies:
  *
  *  Table rendering - <AdvancedTable> widget
+ *  Selects rendering - <getSelect> function
  *
  * Constructor Parameters:
  *
@@ -57,6 +58,18 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	var _advT;
+	/*
+	 * Var: _savedSelectionSelectId
+	 * DOM select ID for saved selection names
+	 *
+	 */ 
+	var	_savedSelectionSelectId;
+	/*
+	 * Var: _savedSelectionDivId
+	 * DOM div ID for saved selections 
+	 *
+	 */ 
+	var _savedSelectionDivId;
 	/*
 	 * Var: _custom_container
 	 * DOM container for rendering custom selections
@@ -131,15 +144,79 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
-	 * Function: getSavedSelections
-	 * Returns saved selections data
-	 *
-	 * Returns:
-	 *  data
+	 * Function: removeCurrentSelection
+	 * Remove current custom selection
 	 *
 	 */ 
-	this.getSavedSelections = function() {
-		return null;
+	this.removeCurrentSelection = function() {
+		var sel = document.getElementById(_savedSelectionSelectId);
+		var opt = sel.options[sel.selectedIndex];
+		name = opt.text;
+
+		var c = confirm("Are you sure you want to delete the '" + name + "' selection?");
+		if (!c) return;
+
+		var r = new HttpRequest(
+			null,
+			null,	
+			function(resp) {
+				if (sel.options.length == 1)
+					_showSavedSelections(_savedSelectionDivId);
+				else
+					sel.removeChild(opt);
+			}
+		);
+		var post = 'Label=' + name;
+		r.send('/youpi/profile/delCondorNodeSelection/', post);
+	}
+
+	/*
+	 * Function: showSavedSelections
+	 * Shows saved selections name
+	 *
+	 * Parameters:
+	 *  container_id - string: DOM element id
+	 *  can_delete - boolean: optional callback function
+	 *  handler - optional callback function
+	 *
+	 */ 
+	this.showSavedSelections = function(container_id, can_delete, handler) {
+		_showSavedSelections(container_id, can_delete, handler);
+	}
+
+	function _showSavedSelections(container_id, can_delete, handler) {
+		var callback = typeof(handler) == 'function' ? true : false;
+		var container = document.getElementById(container_id);
+		_savedSelectionDivId = container_id;
+		var log = new Logger(container);
+
+		var r = new HttpRequest(
+			null,
+			null,	
+			function(resp) {
+				log.clear();
+
+				var sels = resp['Selections'];
+				if (!sels.length) {
+					log.msg_warning('No saved selections at the moment.');
+				}
+				else {
+					var select = getSelect(container_id + '_select', sels);
+					_savedSelectionSelectId = select.id;
+					container.appendChild(document.createTextNode('Saved selections: '));
+					container.appendChild(select);
+	
+					var img = document.createElement('img');
+					img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
+					img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
+					img.setAttribute('onclick', _instance_name + ".removeCurrentSelection();");
+					container.appendChild(img);
+				}
+				
+				if (callback) handler();
+			}
+		);
+		r.send('/youpi/profile/getCondorNodeSelections/');
 	}
 
 	/*
@@ -235,15 +312,6 @@ function CondorPanel(container_id, varName) {
 				sdiv.appendChild(document.createTextNode(']'));
 
 				var htd = document.getElementById(container_id + '_host_list_td');
-				/* FIXME: delete
-				var s_chk = document.createElement('input');
-				s_chk.setAttribute('id', _instance_name + '_save_sel_check');
-				s_chk.setAttribute('type', 'checkbox');
-				s_chk.setAttribute('checked', 'checked');
-				s_chk.setAttribute('style', 'margin-right: 5px;');
-				htd.appendChild(s_chk);
-				htd.appendChild(document.createTextNode('Save current selection for later use'));
-				*/
 
 				// Buttons div
 				var bdiv = document.createElement('div');
@@ -287,7 +355,6 @@ function CondorPanel(container_id, varName) {
 						}	
 					}
 				);
-				// FIXME ry.send('/youpi/profile/loadCondorNodeSelection/');
 			}
 		);
 
@@ -333,9 +400,11 @@ function CondorPanel(container_id, varName) {
 	 *
 	 * Parameters:
 	 *  name - string: selection name (must be unique)
+	 *  handler - optional callback function
 	 *
 	 */ 
-	this.saveCurrentNodeSelection = function(name) {
+	this.saveCurrentNodeSelection = function(name, handler) {
+		var callback = typeof(handler) == 'function' ? true : false;
 		var hosts;
 		try {
 			hosts = this.getSelectedHosts();
@@ -346,6 +415,11 @@ function CondorPanel(container_id, varName) {
 
 		if (!hosts) {
 			log.msg_warning('No selection to save! Please select some Condor nodes first.');
+			return;
+		}
+
+		if (!name.length) {
+			log.msg_warning('Cannot save a selection with an empty name!');
 			return;
 		}
 
@@ -360,6 +434,8 @@ function CondorPanel(container_id, varName) {
 				}
 				log.msg_ok("Selection '" + resp['Label'] + "' has been saved (" + resp['SavedCount'] + ' host' + 
 					(resp['SavedCount'] > 1 ? 's' : '') + ')');
+
+				if (callback) handler();
 			}
 		);
 		var post = 'Label=' + name + '&SelectedHosts=' + hosts;
