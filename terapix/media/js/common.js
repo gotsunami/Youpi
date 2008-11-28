@@ -541,6 +541,7 @@ function DropdownBox(varName, container, title)
 	 */
 	this.setTopLevelContainer = function(is_top) {
 		_isTopLevelContainer = (typeof is_top == 'boolean' && is_top) ? true : false;
+		_setStateOpen(_stateOpen);
 	}
 
 	/*

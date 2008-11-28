@@ -1100,14 +1100,11 @@ div.toplevelmenu div.user {
 
 .ebox * {
 	font-size: 9px;
-	/*
-	margin: 0px;
-	padding: 0px;
-	*/	
 }
 
-.ebox .banner_opened, .ebox .banner_closed {
-	width: 50%;	
+.ebox .banner_opened, .ebox .banner_closed, .ebox .banner_opened_child, .ebox .banner_closed_child {
+	width: -moz-fit-content;	
+	max-width: 50%;
 	background-position: 3px center;
 	background-repeat: no-repeat;
 	background-color: #D5FFE0;
@@ -1121,15 +1118,19 @@ div.toplevelmenu div.user {
 	cursor: pointer;
 }
 
-.ebox .banner_opened *, .ebox .banner_closed * {
+.ebox .banner_opened_child, .ebox .banner_closed_child {
+	background-color: #ffe1d0;
+}
+
+.ebox .banner_opened *, .ebox .banner_closed *, .ebox .banner_opened_child *, .ebox .banner_closed_child * {
 	cursor: pointer;
 }
 
-.ebox .banner_opened {
+.ebox .banner_opened, .ebox .banner_opened_child {
 	background-image: url(../img/admin/arrow-down.gif);
 }
 
-.ebox .banner_opened ~ * {
+.ebox .banner_opened ~ *, .ebox .banner_opened_child ~ * {
 	display: block;
 	border: 1px solid #ebebeb;
 	border-right-color: #ccc;
@@ -1142,17 +1143,22 @@ div.toplevelmenu div.user {
 	font-weight: normal;
 }
 
-.ebox .banner_closed ~ * {
+.ebox .banner_closed ~ *, .ebox .banner_closed_child ~ * {
 	display: none;
 }
 
-.ebox .banner_closed {
+.ebox .banner_closed, .ebox .banner_closed_child {
 	background-image: url(../img/admin/arrow-right.gif);
 }
 
-.ebox .banner_opened label, .ebox .banner_closed label {
+.ebox .banner_opened label, .ebox .banner_closed label, .ebox .banner_opened_child label, .ebox .banner_closed_child label {
 	color: #686868;
 	font-weight: bold;
-	font-size: 12px;
+	font-size: 11px;
+}
+
+.ebox .banner_opened_child label, .ebox .banner_closed_child label {
+	font-size: 9px;
+	font-weight: normal;
 }
 

@@ -14,8 +14,8 @@
  *
  * Dependencies:
  *
- *  Table rendering - <AdvancedTable> widget
- *  Selects rendering - <getSelect> function
+ *  advancedtable.js - Table rendering (<AdvancedTable> class)
+ *  common.js - Selects rendering with <getSelect> function; <DropdownBox> class
  *
  * Constructor Parameters:
  *
@@ -82,6 +82,18 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	var _saved_container;
+	/*
+	 * Var: _savedSelBox
+	 * <DropdownBox> instance for saved selections
+	 *
+	 */ 
+	var _savedSelBox;
+	/*
+	 * Var: _viewSelContentBox
+	 * <DropdownBox> instance for selection content
+	 *
+	 */ 
+	var _viewSelContentBox;
 
 
 	// Group: Functions
@@ -184,6 +196,30 @@ function CondorPanel(container_id, varName) {
 		_showSavedSelections(container_id, can_delete, handler);
 	}
 
+	/*
+	 * Function: getSavedSelBox
+	 * Returns saved selection box instance
+	 *
+	 * Returns:
+	 *  <DropdownBox> instance
+	 *
+	 */ 
+	this.getSavedSelBox = function() { 
+		return _savedSelBox; 
+	}
+
+	/*
+	 * Function: getViewContentBox
+	 * Returns selection content box instance
+	 *
+	 * Returns:
+	 *  <DropdownBox> instance
+	 *
+	 */ 
+	this.getViewContentBox = function() { 
+		return _viewSelContentBox; 
+	}
+
 	function _showSavedSelections(container_id, can_delete, handler) {
 		var callback = typeof(handler) == 'function' ? true : false;
 		var show_delete = can_delete ? true : false;
@@ -202,18 +238,27 @@ function CondorPanel(container_id, varName) {
 					log.msg_warning('No saved selections at the moment.');
 				}
 				else {
+					var d = document.createElement('div');
+					container.appendChild(d);
+					_savedSelBox = new DropdownBox(_instance_name + '.getSavedSelBox()', d, 'View saved selections');
+
+					var sp = document.createElement('span');
 					var select = getSelect(container_id + '_select', sels);
 					_savedSelectionSelectId = select.id;
-					container.appendChild(document.createTextNode('Saved selections: '));
-					container.appendChild(select);
+					sp.appendChild(document.createTextNode('Saved selections: '));
+					sp.appendChild(select);
 	
 					if (show_delete) {
 						var img = document.createElement('img');
 						img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
 						img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
 						img.setAttribute('onclick', _instance_name + ".removeCurrentSelection();");
-						container.appendChild(img);
+						sp.appendChild(img);
 					}
+					_savedSelBox.getContentNode().appendChild(sp);
+					_viewSelContentBox = new DropdownBox(_instance_name + '.getViewContentBox()', _savedSelBox.getContentNode(), 
+						'View selection content');
+					_viewSelContentBox.setTopLevelContainer(false);
 				}
 				
 				if (callback) handler();

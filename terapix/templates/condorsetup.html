@@ -46,12 +46,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 						no cluster node selection is done at this time. Those policies will be applied just before job execution on the cluster. This way, the 
 						resulting node selection will depend on the cluster's real-time status.</div> 
 						<div id="saved_pol_div" style="margin-bottom: 10px;"></div>	
-						<div id="policy_div">	
-							<div>
-								<label>Add a policy</label>
-							</div>						
-							<div>toto</div>
-						</div>						
+						<div id="policy_div"></div>						
 						
 						<h1 style="margin-top: 20px; border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">
 						Custom selections</h1>
@@ -59,14 +54,8 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 						list on the left.</div>
 						<div id="saved_sel_div" style="margin-bottom: 10px;"></div>	
 						<div id="save_sel_div">	
-							<div>
-								<label>Save current selection</label>
-							</div>						
-							<div>Save as 
-								<input id="selection_save_input" style="margin-right: 10px;" type="text"/>
-								<input type="button" value="Save!" onclick="condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value, function() { condorPanel.showSavedSelections('saved_sel_div'); });"/>
-								<div id="custom_sel_save_log_div"></div>
-							</div>
+						<!--
+							-->
 						</div>						
 					<td>
 				</tr>
@@ -75,7 +64,32 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	</div>
 </div>
 <script type="text/javascript">
-	make_dropdown_box('policy_div', 'save_sel_div');
+	var pb = new DropdownBox('pb', 'policy_div', 'Add a policy');
+	pb.getContentNode().appendChild(document.createTextNode('todo...'));
+
+	var sb = new DropdownBox('sb', 'save_sel_div', 'Save current selection');
+	var csb = sb.getContentNode();
+	var l = document.createElement('label');
+	l.appendChild(document.createTextNode('Save as '));
+	csb.appendChild(l);
+
+	var name = document.createElement('input');
+	name.setAttribute('id', 'selection_save_input');
+	name.setAttribute('style', 'margin-right: 10px;');
+	name.setAttribute('type', 'text');
+	csb.appendChild(name);
+
+	name = document.createElement('input');
+	name.setAttribute('id', 'selection_save_input');
+	name.setAttribute('style', 'margin-right: 10px;');
+	name.setAttribute('type', 'button');
+	name.setAttribute('value', 'Save!');
+	name.setAttribute('onclick', "condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value, function() { condorPanel.showSavedSelections('saved_sel_div'); });");
+	csb.appendChild(name);
+
+	var k = document.createElement('div');
+	k.setAttribute('id', 'custom_sel_save_log_div');
+	csb.appendChild(k);
 
 	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
 	var pol = condorPanel.getCustomPolicies();
