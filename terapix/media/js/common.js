@@ -374,6 +374,276 @@ function plugin_enableOutputDirectory(div_id, data_path) {
 	div.appendChild(p);
 }
 
+/*
+ * Class: DropdownBox
+ *
+ * Note:
+ *
+ * Constructor Parameters:
+ *  varName - string: global variable name of instance, used internally for public interface definition
+ *  container - object or string: name of parent DOM block container
+ *  title - Box's title
+ *
+ */
+function DropdownBox(varName, container, title) 
+{
+	// Group: Constants
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _container
+	 * Top-level DOM container
+	 *
+	 */
+	var _container;
+	/*
+	 * Var: _instance_name
+	 * Name of instance, used for public interface
+	 *
+	 */
+	var _instance_name;
+
+
+	// Group: Variables
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _title
+	 * Box's title
+	 *
+	 */
+	var _title;
+	/*
+	 * Var: _contentContainer
+	 * Content DOM DIV container
+	 *
+	 */
+	var _contentContainer;
+	/*
+	 * Var: _isTopLevelContainer
+	 * true is the box is defined as a top level container (default: true)
+	 *
+	 */
+	var _isTopLevelContainer = true;
+	/*
+	 * Var: _onClickHandler
+	 * custom function handler to execute in response to onclick events on label
+	 *
+	 */
+	var _onClickHanlder = null;
+	/*
+	 * Var: _stateOpen
+	 * true if the dropdown box is opened (default: false)
+	 *
+	 */
+	var _stateOpen = false;
+
+
+	// Group: Functions
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+  	 * Function: _main
+	 * Main entry point
+	 *
+	 */
+	function _main() {
+		_instance_name = varName;
+		_container = validate_container(container);
+		_title = title;
+		_container.setAttribute('class', 'ebox');
+
+		if (!_container.hasAttribute('id')) {
+			_container.setAttribute('id', 'dropdown_box_' + Math.random() + '_div');
+		}
+
+		var ldiv = document.createElement('div');
+		var lab = document.createElement('label');
+		lab.appendChild(document.createTextNode(_title));
+		var cdiv = document.createElement('div');
+		cdiv.setAttribute('id', _container.getAttribute('id') + '_content');
+		_contentContainer = cdiv;
+		ldiv.appendChild(lab);
+		_container.appendChild(ldiv);
+		_container.appendChild(cdiv);
+
+		_setStateOpen(false);
+
+	}
+
+	/*
+  	 * Function: getRootNode
+	 * Returns root (top-level) DOM node
+	 *
+	 * Returns:
+	 *  Top-level DOM container
+	 *
+	 */
+	this.getRootNode = function() {
+		return _container;
+	}
+
+	/*
+  	 * Function: getContentNode
+	 * Returns content DOM node
+	 *
+	 * Returns:
+	 *  Content DIV DOM container
+	 *
+	 */
+	this.getContentNode = function() {
+		return _contentContainer;
+	}
+
+	/*
+  	 * Function: setTopLevelContainer
+	 * Indicates whether the box is a top-level container
+	 *
+	 * CSS styles used depend on this parameter.
+	 *
+	 * Parameters:
+	 *  is_top - boolean: True if top-level container
+	 *
+	 */
+	this.setTopLevelContainer = function(is_top) {
+		_isTopLevelContainer = (typeof is_top == 'boolean' && is_top) ? true : false;
+	}
+
+	/*
+  	 * Function: isTopLevelContainer
+	 * Returns true if the box has been defined as a top level container 
+	 *
+	 * Returns:
+	 *  boolean
+	 *
+	 */
+	this.isTopLevelContainer = function() {
+		return _isTopLevelContainer;
+	}
+
+	/*
+  	 * Function: setOnClickHandler
+	 * Defines custom handler function for OnClick box's events
+	 *
+	 * Parameters:
+	 *  handler - function: custom handler function
+	 *
+	 */
+	this.setOnClickHandler = function(handler) {
+		_onClickHandler = typeof handler == 'function' ? handler : null;
+	}
+
+	/*
+  	 * Function: getOnClickHandler
+	 * Returns custom handler used
+	 *
+	 * Returns:
+	 *  function handler or null
+	 *
+	 */
+	this.getOnClickHandler = function() {
+		return _onClickHandler;
+	}
+
+	/*
+  	 * Function: getOpenState
+	 * Returns box's open state
+	 *
+	 * Returns:
+	 *  boolean - true if open; otherwise false
+	 *
+	 */
+	this.getOpenState = function() {
+		return _stateOpen;
+	}
+
+	/*
+  	 * Function: setStateOpen
+	 * Defines whether the box is open
+	 *
+	 * Parameters:
+	 *  open - boolean
+	 *
+	 */
+	this.setStateOpen = function(open) {
+		_setStateOpen(open);
+	}
+
+	/*
+  	 * Function: toggleState
+	 * Toggles box's state (opened or closed) 
+	 *
+	 */
+	this.toggleState = function() {
+		_stateOpen = !_stateOpen;
+		_setStateOpen(_stateOpen);
+	}
+
+	/*
+  	 * Function: _setStateOpen
+	 * Defines whether the box is open
+	 *
+	 * Parameters:
+	 *  open - boolean
+	 *
+	 */
+	function _setStateOpen(open) {
+		_stateOpen = (typeof open == 'boolean' && open) ? true : false;
+		var divs = _container.getElementsByTagName('div');
+		var div = divs[0];
+		var clsname = 'banner';
+		var o_clsname = clsname + '_opened' + (!_isTopLevelContainer ? '_child' : '');
+		var c_clsname = clsname + '_closed' + (!_isTopLevelContainer ? '_child' : '');
+		var onclick;
+		var cls = _stateOpen ? o_clsname : c_clsname;
+	
+		div.setAttribute('class', cls); 
+		div.setAttribute('onclick', _instance_name + ".toggleState();var h=" + _instance_name + 
+			".getOnClickHandler();if(h) h();");
+	}
+
+	/*
+  	 * Function: _main
+	 * Main entry point
+	 *
+	 */
+	_main();
+}
+
+/*
+ * Function: validate_container
+ * Checks whether a container is valid.
+ *
+ * Parameters:
+ *  container - string of DOM element for rendering content
+ *
+ * Returns:
+ *  DOM element or null
+ *
+ */ 
+function validate_container(container) {
+	var d;
+	if (typeof container == 'string' && container.length) {
+		d = document.getElementById(container);
+		if (!d) {
+			_error("bad container '" + container + "' used!");
+		return null;
+		}
+	}
+	else if (typeof container == 'object') {
+		d = container;
+	}
+else {
+		_error('container must be string or a DOM object!');
+		return null;
+	}
+
+	return d;
+}
+
 
 /*
  * Class: Logger
@@ -501,52 +771,3 @@ function Logger(container)
 	_init();
 }
 
-/*
- * Function: make_dropdown_box
- * Build a clickable dropdown box
- *
- * Parameters:
- *  Variable arguments list - ids or DOM elements
- *
- */ 
-function make_dropdown_box() {
-	for (var k=0; k < make_dropdown_box.arguments.length; k++) {
-		var c = validate_container(make_dropdown_box.arguments[k]);
-		if (!c) continue;
-		c.setAttribute('class', 'ebox');
-		var content = c.getElementsByTagName('div');
-		content[0].setAttribute('class', 'banner_closed');
-		content[0].setAttribute('onclick', "this.getAttribute('class')=='banner_opened'?this.setAttribute('class','banner_closed'):this.setAttribute('class','banner_opened');");
-	}	
-}
-
-/*
- * Function: validate_container
- * Checks whether a container is valid.
- *
- * Parameters:
- *  container - string of DOM element for rendering content
- *
- * Returns:
- *  DOM element or null
- *
- */ 
-function validate_container(container) {
-	var d;
-	if (typeof container == 'string' && container.length) {
-		d = document.getElementById(container);
-		if (!d) {
-			_error("bad container '" + container + "' used!");
-		return null;
-		}
-	}
-	else if (typeof container == 'object') {
-		d = container;
-	}
-else {
-		_error('container must be string or a DOM object!');
-		return null;
-	}
-
-	return d;
-}
