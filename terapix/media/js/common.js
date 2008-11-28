@@ -375,6 +375,37 @@ function plugin_enableOutputDirectory(div_id, data_path) {
 }
 
 /*
+ * Function: validate_container
+ * Checks whether a container is valid.
+ *
+ * Parameters:
+ *  container - string of DOM element for rendering content
+ *
+ * Returns:
+ *  DOM element or null
+ *
+ */ 
+function validate_container(container) {
+	var d;
+	if (typeof container == 'string' && container.length) {
+		d = document.getElementById(container);
+		if (!d) {
+			_error("bad container '" + container + "' used!");
+		return null;
+		}
+	}
+	else if (typeof container == 'object') {
+		d = container;
+	}
+else {
+		_error('container must be string or a DOM object!');
+		return null;
+	}
+
+	return d;
+}
+
+/*
  * Class: DropdownBox
  *
  * Note:
@@ -382,7 +413,7 @@ function plugin_enableOutputDirectory(div_id, data_path) {
  * Constructor Parameters:
  *  varName - string: global variable name of instance, used internally for public interface definition
  *  container - object or string: name of parent DOM block container
- *  title - Box's title
+ *  title - string: box's title
  *
  */
 function DropdownBox(varName, container, title) 
@@ -432,7 +463,7 @@ function DropdownBox(varName, container, title)
 	 * custom function handler to execute in response to onclick events on label
 	 *
 	 */
-	var _onClickHanlder = null;
+	var _onClickHandler = null;
 	/*
 	 * Var: _stateOpen
 	 * true if the dropdown box is opened (default: false)
@@ -611,37 +642,6 @@ function DropdownBox(varName, container, title)
 	 *
 	 */
 	_main();
-}
-
-/*
- * Function: validate_container
- * Checks whether a container is valid.
- *
- * Parameters:
- *  container - string of DOM element for rendering content
- *
- * Returns:
- *  DOM element or null
- *
- */ 
-function validate_container(container) {
-	var d;
-	if (typeof container == 'string' && container.length) {
-		d = document.getElementById(container);
-		if (!d) {
-			_error("bad container '" + container + "' used!");
-		return null;
-		}
-	}
-	else if (typeof container == 'object') {
-		d = container;
-	}
-else {
-		_error('container must be string or a DOM object!');
-		return null;
-	}
-
-	return d;
 }
 
 
