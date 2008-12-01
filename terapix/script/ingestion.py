@@ -290,6 +290,7 @@ def run_ingestion():
 					check_fitsverify  = vars[0][1],
 					check_qso_status = vars[1][1],
 					check_multiple_ingestion = vars[2][1],
+					path = path,
 					exit_code = 0 )
 		ingestionId = g.con.insert_id()
 		g.con.commit()
