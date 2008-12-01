@@ -19,6 +19,9 @@ digraph codasyl {
 	carti [label="Cart Item"];
 	relsi [label="Survey-Instrument Relation"];
 	relit [label="Image-Task Relation"];
+	relrinst [label="Release-Instrument Relation"];
+	relus [label="User-Survey Relation"];
+	relur [label="User-Release Relation"];
 	kind [label="Processing Kind"];
 	plugfitsin [label="FITSin Plugin"];
 	plugfitsout [label="FITSout Plugin"];
@@ -61,13 +64,19 @@ digraph codasyl {
 	user -> outgrading[style=dashed];
 	user -> siteprofile[style=dashed];
 	user -> condornodesel[style=dashed];
+	user -> relus[style=dashed];
+	user -> relur[style=dashed];
 	plugfitsin -> ingrading[style=dashed];
 	plugfitsout -> outgrading[style=dashed];
 	
 	Instrument -> Channel;
 	Instrument -> Run;
 	Survey -> relsi;
+	Survey -> relus;
 	Instrument -> relsi;
+	Instrument -> relrinst;
+	Release -> relur;
+	Release -> relrinst;
 
 	kind -> task;
 	kind -> configfile;

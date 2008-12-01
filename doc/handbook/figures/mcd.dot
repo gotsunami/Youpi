@@ -32,6 +32,7 @@ graph mcd {
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
 	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style}"];
 	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection}"];
+	release [label="{ Release | [ Release Id ]\nLabel\nCreation date\nRelease date}"];
 
 	/* Relations */
 	node [shape=ellipse];
@@ -58,10 +59,22 @@ graph mcd {
 	node27 [label="predefined comments"];
 	node28 [label="has profile", style=dashed, shape=Mrecord];
 	node29 [label="defines", style=dashed, shape=Mrecord];
+	node30 [label="processes data", style=dashed, shape=Mrecord];
+	node31 [label="has results"];
+	node32 [label="builds", style=dashed, shape=Mrecord];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
 	node4 -- image [label="  1,n"]; 
+
+	authuser -- node30 [label="  0,n", style=dashed]; 
+	node30 -- survey [label="  1,n", style=dashed]; 
+
+	release -- node31 [label="  1,n"];
+	node31 -- instrument [label="  0,n"];
+
+	authuser -- node32 [label="  1,n", style=dashed]; 
+	node32 -- release [label="  1,n", style=dashed];
 
 	instrument -- node5 [label="  0,n"]; 
 	node5 -- run [label="  1,1"]; 
@@ -93,10 +106,10 @@ graph mcd {
 	node23 -- pluginscamp [label="  1,1"];
 	node23 -- pluginother [label="  1,1", style=dotted];
 
-	siteprofile -- node28 [label="  1, 1"];
+	siteprofile -- node28 [label="  1, 1", style=dashed];
 	authuser -- node28 [label="  0,1", style=dashed];
 
-	condornodesel -- node29 [label="  1,1"];
+	condornodesel -- node29 [label="  1,1", style=dashed];
 	authuser -- node29 [label="  0,n", style=dashed];
 
 	image -- node14 [label="  1,1"];

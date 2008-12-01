@@ -166,6 +166,14 @@
 			<listitem><para>Processing Task (<emphasis>Processing Task Id</emphasis>, Django's User Id, Processing Kind Id, Start Date, End Date, Success, Error Log, Hostname, Results Output Directory, Title)</para></listitem>
 		</varlistentry>
 		<varlistentry>
+			<term><varname>Release</varname></term>
+			<listitem><para>Release (<emphasis>Release Id</emphasis>, Label, Creation Date, Release Date)</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term><varname>Release-Intrument Relation</varname></term>
+			<listitem><para>Release-Instrument Relation (<emphasis>R--I Id, Release Id, Instrument Id</emphasis>)</para></listitem>
+		</varlistentry>
+		<varlistentry>
 			<term><varname>Run</varname></term>
 			<listitem><para>Run (<emphasis>Run Id</emphasis>, Instrument Id, Name, PI, Url, Email, Process Request Date, Date Start, Date End, Date Download, Release Date)</para></listitem>
 		</varlistentry>
@@ -188,6 +196,14 @@
 		<varlistentry>
 			<term><varname>Survey-Instrument Relation</varname></term>
 			<listitem><para>Survey-Instrument Relation (<emphasis>S--I Id, Survey Id, Instrument Id</emphasis>)</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term><varname>User-Release Relation</varname></term>
+			<listitem><para>User-Release Relation (<emphasis>U--R Id, User Id, Release Id</emphasis>)</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term><varname>User-Survey Relation</varname></term>
+			<listitem><para>User-Survey Relation (<emphasis>U--S Id, User Id, Survey Id</emphasis>)</para></listitem>
 		</varlistentry>
 	</variablelist>
 	</para>
