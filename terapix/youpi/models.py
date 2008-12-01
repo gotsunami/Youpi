@@ -530,6 +530,48 @@ class Rel_it(models.Model):
 	class Meta:
 		unique_together = ('image', 'task')
 
+class Rel_us(models.Model):
+	"""
+	User-Survey relation
+	"""
+
+	user = models.ForeignKey(User)
+	survey = models.ForeignKey(Survey)
+
+	class Meta:
+		unique_together = ('user', 'survey')
+
+class Release(models.Model):
+	"""
+	Release
+	"""
+
+	label = models.CharField(max_length = 255, unique = True)
+	creationdate = models.DateTimeField(auto_now_add = True)
+	releasedate = models.DateTimeField()
+
+class Rel_rinst(models.Model):
+	"""
+	Release-Instrument relation
+	"""
+
+	release = models.ForeignKey(Release)
+	instrument = models.ForeignKey(Instrument)
+
+	class Meta:
+		unique_together = ('release', 'instrument')
+
+class Rel_ur(models.Model):
+	"""
+	User-Release relation
+	"""
+
+	user = models.ForeignKey(User)
+	release = models.ForeignKey(Release)
+
+	class Meta:
+		unique_together = ('user', 'release')
+
 class Rel_ai(models.Model):
 	"""
 	Astrophotocalibration-Image relation
