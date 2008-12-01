@@ -1162,3 +1162,10 @@ div.toplevelmenu div.user {
 	font-weight: normal;
 }
 
+/****************************************************************************/
+
+.custom_sel_members {
+	overflow: auto; 
+	max-height: 100px;
+	font-family: typewriter;
+}

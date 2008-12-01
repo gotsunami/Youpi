@@ -20,6 +20,34 @@
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
+var sb;
+
+function show_save_current_selection() {
+	sb = new DropdownBox('sb', 'save_sel_div', 'Save current selection');
+	var csb = sb.getContentNode();
+	var l = document.createElement('label');
+	l.appendChild(document.createTextNode('Save as '));
+	csb.appendChild(l);
+
+	var name = document.createElement('input');
+	name.setAttribute('id', 'selection_save_input');
+	name.setAttribute('style', 'margin-right: 10px;');
+	name.setAttribute('type', 'text');
+	csb.appendChild(name);
+
+	name = document.createElement('input');
+	name.setAttribute('id', 'selection_save_input');
+	name.setAttribute('style', 'margin-right: 10px;');
+	name.setAttribute('type', 'button');
+	name.setAttribute('value', 'Save!');
+	name.setAttribute('onclick', "condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value, function() { condorPanel.showSavedSelections('saved_sel_div'); });");
+	csb.appendChild(name);
+
+	var k = document.createElement('div');
+	k.setAttribute('id', 'custom_sel_save_log_div');
+	csb.appendChild(k);
+}
+
 </script>
 {% endblock %}
 
@@ -67,36 +95,14 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	var pb = new DropdownBox('pb', 'policy_div', 'Add a policy');
 	pb.getContentNode().appendChild(document.createTextNode('todo...'));
 
-	var sb = new DropdownBox('sb', 'save_sel_div', 'Save current selection');
-	var csb = sb.getContentNode();
-	var l = document.createElement('label');
-	l.appendChild(document.createTextNode('Save as '));
-	csb.appendChild(l);
-
-	var name = document.createElement('input');
-	name.setAttribute('id', 'selection_save_input');
-	name.setAttribute('style', 'margin-right: 10px;');
-	name.setAttribute('type', 'text');
-	csb.appendChild(name);
-
-	name = document.createElement('input');
-	name.setAttribute('id', 'selection_save_input');
-	name.setAttribute('style', 'margin-right: 10px;');
-	name.setAttribute('type', 'button');
-	name.setAttribute('value', 'Save!');
-	name.setAttribute('onclick', "condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value, function() { condorPanel.showSavedSelections('saved_sel_div'); });");
-	csb.appendChild(name);
-
-	var k = document.createElement('div');
-	k.setAttribute('id', 'custom_sel_save_log_div');
-	csb.appendChild(k);
+	show_save_current_selection();
 
 	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
 	var pol = condorPanel.getCustomPolicies();
 	if (!pol)
 		document.getElementById('saved_pol_div').innerHTML = 'No saved policy at this time';
 
-	var sel = condorPanel.showSavedSelections('saved_sel_div', true, function() { condorPanel.render(); });
+	var sel = condorPanel.showSavedSelections('saved_sel_div', true, function() { condorPanel.render(); }, true);
 
 	{# Auto-completion stuff #}
 	try {

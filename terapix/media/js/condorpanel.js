@@ -220,9 +220,23 @@ function CondorPanel(container_id, varName) {
 		return _viewSelContentBox; 
 	}
 
-	function _showSavedSelections(container_id, can_delete, handler) {
-		var callback = typeof(handler) == 'function' ? true : false;
+	/*
+	 * Function: savedSelectionChanged
+	 * Selected option is saved selection combo box has changed
+	 *
+	 */ 
+	this.savedSelectionChanged = function() { 
+		_viewSelContentBox.setTitle('Changed...');
+		var sel = document.getElementById(_savedSelectionSelectId);
+		_viewSelContentBox.setTitle("View '" + sel.options[sel.selectedIndex].text + "' selection content");
+		// Closes box
+		_viewSelContentBox.setOpen(false);
+	}
+
+	function _showSavedSelections(container_id, can_delete, handler, is_top_level) {
+		var callback = typeof handler == 'function' ? true : false;
 		var show_delete = can_delete ? true : false;
+		var top_level = is_top_level == false ? false : true;
 		var container = document.getElementById(container_id);
 		_savedSelectionDivId = container_id;
 		var log = new Logger(container);
@@ -241,9 +255,12 @@ function CondorPanel(container_id, varName) {
 					var d = document.createElement('div');
 					container.appendChild(d);
 					_savedSelBox = new DropdownBox(_instance_name + '.getSavedSelBox()', d, 'View saved selections');
+					if (!top_level) 
+						_savedSelBox.setTopLevelContainer(false);
 
 					var sp = document.createElement('span');
 					var select = getSelect(container_id + '_select', sels);
+					select.setAttribute('onchange', _instance_name + ".savedSelectionChanged();");
 					_savedSelectionSelectId = select.id;
 					sp.appendChild(document.createTextNode('Saved selections: '));
 					sp.appendChild(select);
@@ -257,8 +274,39 @@ function CondorPanel(container_id, varName) {
 					}
 					_savedSelBox.getContentNode().appendChild(sp);
 					_viewSelContentBox = new DropdownBox(_instance_name + '.getViewContentBox()', _savedSelBox.getContentNode(), 
-						'View selection content');
+						"View '" + select.options[select.selectedIndex].text + "' selection content");
 					_viewSelContentBox.setTopLevelContainer(false);
+
+					// Handler function to show member nodes
+					_viewSelContentBox.setOnClickHandler(function() {
+						if (!_viewSelContentBox.isOpen())
+							return;
+						var ndiv = _viewSelContentBox.getContentNode();
+						log = new Logger(ndiv);
+						var selText = select.options[select.selectedIndex].text;
+						var mr = new HttpRequest(
+							ndiv,
+							null,	
+							function(resp) {
+								ndiv.innerHTML = '';
+								if (resp['Error'].length) {
+									log.clear();
+									log.msg_error('Error: ' + resp['Error']);
+									return;
+								}
+								var d = document.createElement('div');
+								d.setAttribute('class', 'custom_sel_members');
+								for (var k=0; k < resp['Members'].length; k++) {
+									d.appendChild(document.createTextNode(resp['Members'][k]));
+									d.appendChild(document.createElement('br'));
+								}
+								ndiv.appendChild(d);
+							}
+						);
+						post = 'Name=' + selText;
+						mr.setBusyMsg('Loading members');
+						mr.send('/youpi/profile/getCondorSelectionMembers/', post);
+					} );
 				}
 				
 				if (callback) handler();

@@ -1173,6 +1173,28 @@ def get_condor_node_selections(request):
 
 	return HttpResponse(str({'Selections' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
 
+def get_condor_selection_members(request):
+	"""
+	Returns Condor selection members.
+	"""
+
+	try:
+		name = request.POST['Name']
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	data = CondorNodeSel.objects.filter(label = name)
+	error = ''
+
+	if data:
+		members = marshal.loads(base64.decodestring(str(data[0].nodeselection)))
+		members = [str(s) for s in members]
+	else:
+		members = '';
+		error = 'No selection of that name.'
+
+	return HttpResponse(str({'Members' : members, 'Error' : error}), mimetype = 'text/plain')
+
 @login_required
 @profile
 def set_current_theme(request):

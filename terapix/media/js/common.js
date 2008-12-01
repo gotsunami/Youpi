@@ -470,6 +470,12 @@ function DropdownBox(varName, container, title)
 	 *
 	 */
 	var _stateOpen = false;
+	/*
+	 * Var: _titleNode
+	 * DOM label node for box's title
+	 *
+	 */
+	var _titleNode;
 
 
 	// Group: Functions
@@ -492,16 +498,16 @@ function DropdownBox(varName, container, title)
 		}
 
 		var ldiv = document.createElement('div');
-		var lab = document.createElement('label');
-		lab.appendChild(document.createTextNode(_title));
+		_titleNode = document.createElement('label');
+		_titleNode.appendChild(document.createTextNode(_title));
 		var cdiv = document.createElement('div');
 		cdiv.setAttribute('id', _container.getAttribute('id') + '_content');
 		_contentContainer = cdiv;
-		ldiv.appendChild(lab);
+		ldiv.appendChild(_titleNode);
 		_container.appendChild(ldiv);
 		_container.appendChild(cdiv);
 
-		_setStateOpen(false);
+		_setOpen(false);
 
 	}
 
@@ -515,6 +521,21 @@ function DropdownBox(varName, container, title)
 	 */
 	this.getRootNode = function() {
 		return _container;
+	}
+
+	/*
+  	 * Function: setTitle
+	 * Sets box's main title
+	 *
+	 */
+	this.setTitle = function(title) {
+		if (typeof title == 'string') {
+			_title = title;
+			_titleNode.innerHTML = '';
+			_titleNode.appendChild(document.createTextNode(_title));
+		}
+		else
+			alert('dbox::setTitle error: bad title, must be a string!');
 	}
 
 	/*
@@ -541,7 +562,7 @@ function DropdownBox(varName, container, title)
 	 */
 	this.setTopLevelContainer = function(is_top) {
 		_isTopLevelContainer = (typeof is_top == 'boolean' && is_top) ? true : false;
-		_setStateOpen(_stateOpen);
+		_setOpen(_stateOpen);
 	}
 
 	/*
@@ -581,27 +602,27 @@ function DropdownBox(varName, container, title)
 	}
 
 	/*
-  	 * Function: getOpenState
+  	 * Function: isOpen
 	 * Returns box's open state
 	 *
 	 * Returns:
 	 *  boolean - true if open; otherwise false
 	 *
 	 */
-	this.getOpenState = function() {
+	this.isOpen = function() {
 		return _stateOpen;
 	}
 
 	/*
-  	 * Function: setStateOpen
+  	 * Function: setOpen
 	 * Defines whether the box is open
 	 *
 	 * Parameters:
 	 *  open - boolean
 	 *
 	 */
-	this.setStateOpen = function(open) {
-		_setStateOpen(open);
+	this.setOpen = function(open) {
+		_setOpen(open);
 	}
 
 	/*
@@ -611,18 +632,18 @@ function DropdownBox(varName, container, title)
 	 */
 	this.toggleState = function() {
 		_stateOpen = !_stateOpen;
-		_setStateOpen(_stateOpen);
+		_setOpen(_stateOpen);
 	}
 
 	/*
-  	 * Function: _setStateOpen
+  	 * Function: _setOpen
 	 * Defines whether the box is open
 	 *
 	 * Parameters:
 	 *  open - boolean
 	 *
 	 */
-	function _setStateOpen(open) {
+	function _setOpen(open) {
 		_stateOpen = (typeof open == 'boolean' && open) ? true : false;
 		var divs = _container.getElementsByTagName('div');
 		var div = divs[0];

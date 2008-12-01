@@ -17,7 +17,7 @@
 <script type="text/javascript">
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
-var condorPanel = new CondorPanel();
+var condorPanel = new CondorPanel(null, 'condorPanel');
 
 // trNode: parent TR node
 function removeItemFromCart(rid, force) {
@@ -83,6 +83,51 @@ function showSavedItems() {
 {% endfor %}
 }
 
+{% for plugin in plugins %}
+var {{ plugin.id }}_drop_box;
+
+function {{ plugin.id }}_show_runtime_options() {
+	{{ plugin.id }}_drop_box = new DropdownBox('{{ plugin.id }}_drop_box', 
+		'{{ plugin.id }}_options_div_{{ forloop.counter }}', 'Runtime Options');
+	var r = {{ plugin.id }}_drop_box.getContentNode();
+	
+	// Checkbox
+	var da = document.createElement('div');
+	ia = document.createElement('input');
+	ia.setAttribute('id', '{{ plugin.id }}_reprocess_successful_checkbox');
+	ia.setAttribute('type', 'checkbox');
+	ia.setAttribute('checked', 'checked');
+	var la = document.createElement('label');
+	la.appendChild(document.createTextNode('Do not reprocess already successful processings'));
+	da.appendChild(ia);
+	da.appendChild(la);
+	r.appendChild(da);
+	
+	// Item prefix name
+	da = document.createElement('div');
+	la = document.createElement('label');
+	la.appendChild(document.createTextNode('Item prefix name'));
+	ia = document.createElement('input');
+	ia.setAttribute('id', '{{ plugin.id }}_prefix_name_input');
+	ia.setAttribute('type', 'text');
+	da.appendChild(la);
+	da.appendChild(ia);
+	r.parentNode.appendChild(da);
+	
+	// Cluster policy
+	da = document.createElement('div');
+	la = document.createElement('label');
+	la.appendChild(document.createTextNode('Cluster node policy'));
+	db = document.createElement('div');
+	db.setAttribute('id', '{{ plugin.id }}_saved_sel_div');
+	da.appendChild(la);
+	da.appendChild(db);
+	r.parentNode.appendChild(da);
+	
+	condorPanel.showSavedSelections('{{ plugin.id }}_saved_sel_div');
+}
+{% endfor %}
+
 function proceed_cart() {
 	alert('TODO...');
 }
@@ -133,26 +178,9 @@ function proceed_cart() {
 						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
 					</td>
 					<td width="100%" colspan="2">
-						<div id="{{ plugin.id }}_options_div_{{ forloop.counter }}">
-							<div>
-								<label>Runtime Options</label>
-							</div>
-							<div>
-								<input id="reprocess_successful_checkbox" type="checkbox" checked="checked"/>
-								<label>Do not reprocess already successful processings</label>
-							</div>
-							<div>
-								<label>Item prefix name</label>
-								<input type="text" id="prefix"/>
-							</div>
-							<div>
-								<label>Cluster node policy</label>
-								<div id="{{ plugin.id }}_saved_sel_div"></div>
-							</div>
-						</div>
+						<div id="{{ plugin.id }}_options_div_{{ forloop.counter }}"></div>
 						<script type="text/javascript">
-							make_dropdown_box('{{ plugin.id }}_options_div_{{ forloop.counter }}');
-							condorPanel.showSavedSelections('{{ plugin.id }}_saved_sel_div');
+							{{ plugin.id }}_show_runtime_options();
 						</script>
 						{% include plugin.itemCartTemplate %}
 					</td>
