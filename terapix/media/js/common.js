@@ -476,6 +476,12 @@ function DropdownBox(varName, container, title)
 	 *
 	 */
 	var _titleNode;
+	/*
+	 * Var: _mainDiv
+	 * Main DIV (clickable) DOM node
+	 *
+	 */
+	var _mainDiv;
 
 
 	// Group: Functions
@@ -491,24 +497,25 @@ function DropdownBox(varName, container, title)
 		_instance_name = varName;
 		_container = validate_container(container);
 		_title = title;
-		_container.setAttribute('class', 'ebox');
 
 		if (!_container.hasAttribute('id')) {
 			_container.setAttribute('id', 'dropdown_box_' + Math.random() + '_div');
 		}
 
-		var ldiv = document.createElement('div');
+		var topDiv = document.createElement('div');
+		topDiv.setAttribute('class', 'ebox');
+		_mainDiv = document.createElement('div');
 		_titleNode = document.createElement('label');
 		_titleNode.appendChild(document.createTextNode(_title));
 		var cdiv = document.createElement('div');
-		cdiv.setAttribute('id', _container.getAttribute('id') + '_content');
+		cdiv.setAttribute('id', _container.getAttribute('id') + '_' + Math.random() + '_content');
 		_contentContainer = cdiv;
-		ldiv.appendChild(_titleNode);
-		_container.appendChild(ldiv);
-		_container.appendChild(cdiv);
+		_mainDiv.appendChild(_titleNode);
+		topDiv.appendChild(_mainDiv);
+		topDiv.appendChild(cdiv);
+		_container.appendChild(topDiv);
 
 		_setOpen(false);
-
 	}
 
 	/*
@@ -645,17 +652,17 @@ function DropdownBox(varName, container, title)
 	 */
 	function _setOpen(open) {
 		_stateOpen = (typeof open == 'boolean' && open) ? true : false;
-		var divs = _container.getElementsByTagName('div');
-		var div = divs[0];
 		var clsname = 'banner';
 		var o_clsname = clsname + '_opened' + (!_isTopLevelContainer ? '_child' : '');
 		var c_clsname = clsname + '_closed' + (!_isTopLevelContainer ? '_child' : '');
 		var onclick;
 		var cls = _stateOpen ? o_clsname : c_clsname;
 	
-		div.setAttribute('class', cls); 
-		div.setAttribute('onclick', _instance_name + ".toggleState();var h=" + _instance_name + 
-			".getOnClickHandler();if(h) h();");
+		_mainDiv.setAttribute('class', cls); 
+		if (!_mainDiv.hasAttribute('onclick')) {
+			_mainDiv.setAttribute('onclick', _instance_name + ".toggleState();var h=" + _instance_name + 
+				".getOnClickHandler();if(h) h();");
+		}
 	}
 
 	/*

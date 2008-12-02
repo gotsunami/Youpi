@@ -93,6 +93,12 @@ function ClusterPolicyWidget(container, varName) {
 	 *
 	 */
 	var _savePolicyBox;
+	/*
+	 * Var: _stringPolicyBox
+	 * <DropdownBox> for displaying computed Condor requirement string policy
+	 *
+	 */
+	var _stringPolicyBox;
 
 
 	// Group: Functions
@@ -127,6 +133,15 @@ function ClusterPolicyWidget(container, varName) {
 
 		_addRow();
 
+		// Condor string policy box
+		_stringPolicyBox = new DropdownBox(_instance_name + '.getStringPolicyBox()', _container, 'View computed Condor requirement string');
+		_stringPolicyBox.setTopLevelContainer(false);
+		_stringPolicyBox.setOnClickHandler(function() {
+			if (_stringPolicyBox.isOpen())
+				_computeCondorRequirementString(_stringPolicyBox.getContentNode());
+		} );
+
+		// Save policy box
 		_savePolicyBox = new DropdownBox(_instance_name + '.getSavePolicyBox()', _container, 'Save current policy');
 		_savePolicyBox.setTopLevelContainer(false);
 		_savePolicyBox.setOnClickHandler(function() {
@@ -159,6 +174,18 @@ function ClusterPolicyWidget(container, varName) {
 	 */ 
 	this.getSavePolicyBox = function() {
 		return _savePolicyBox;
+	}
+
+	/*
+	 * Function: getStringPolicyBox
+	 * Returns Condor requirement string policy <DropdownBox> instance
+	 *
+	 * Returns:
+	 *  Condor requirement string policy <DropdownBox> instance
+	 *
+	 */ 
+	this.getStringPolicyBox = function() {
+		return _stringPolicyBox;
 	}
 
 	/*
@@ -265,13 +292,45 @@ function ClusterPolicyWidget(container, varName) {
 
 	/*
 	 * Function: _computeCondorRequirementString
-	 * Returns string suitable for Condor requirement parameter
+	 * Computes string suitable for Condor requirement parameter
 	 *
-	 * Returns:
-	 *  string
+	 * Parameters:
+	 *  container - DOM element container
 	 *
 	 */ 
-	function _computeCondorRequirementString() {
+	function _computeCondorRequirementString(container) {
+		container.innerHTML = '';
+		var req_str = '(';
+		var trs = _policyTable.getElementsByTagName('tr');
+		for (var k=0; k < trs.length; k++) {
+			var sel = trs[k].getElementsByTagName('select')[0];
+			switch(parseInt(sel.options[sel.selectedIndex].value)) {
+				case 0:
+					// Memory
+					req_str += '&& (Memory) ';
+					break;
+	
+				case 1:
+					// Disk space
+					req_str += '&& (Disk) ';
+					break;
+	
+				case 2:
+					// Slots (vms)
+					req_str += '&& (Slots) ';
+					break;
+	
+				case 3:
+					// Host name
+					req_str += '&& (Hosts) ';
+					break;
+	
+				default:
+					break;
+			}
+		}
+		req_str += ')';
+		container.appendChild(document.createTextNode(req_str));
 	}
 
 	/*

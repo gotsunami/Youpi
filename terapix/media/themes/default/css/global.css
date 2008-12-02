@@ -1098,6 +1098,10 @@ div.toplevelmenu div.user {
 
 /********************* dropdown box ************************************/
 
+.ebox {
+	margin-bottom: 5px;
+}
+
 .ebox * {
 	font-size: 9px;
 }
