@@ -1169,3 +1169,26 @@ div.toplevelmenu div.user {
 	max-height: 100px;
 	font-family: typewriter;
 }
+
+table.cluster_policy {
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+table.cluster_policy td {
+	border: none;
+}
+
+table.cluster_policy td:first-child {
+	white-space: nowrap;
+}
+
+table.cluster_policy td:last-child {
+	width; 100%;
+}
+
+table.cluster_policy td:last-child * {
+	margin-right: 5px;
+}
+

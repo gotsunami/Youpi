@@ -10,6 +10,7 @@
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/advancedtable.js"></script>
 <script type="text/javascript" src="/media/js/condorpanel.js"></script>
+<script type="text/javascript" src="/media/js/clusterpolicywidget.js"></script>
 
 <!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
@@ -93,7 +94,7 @@ function show_save_current_selection() {
 </div>
 <script type="text/javascript">
 	var pb = new DropdownBox('pb', 'policy_div', 'Add a policy');
-	pb.getContentNode().appendChild(document.createTextNode('todo...'));
+	var pw = new ClusterPolicyWidget(pb.getContentNode(), 'pw');
 
 	show_save_current_selection();
 
