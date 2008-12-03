@@ -8,7 +8,7 @@
  *
  * Dependencies:
  *
- *  common.js - Selects rendering with <getSelect> function; <validate_container> function; <DropdownBox> class.
+ *  common.js - Selects rendering with <getSelect> function; <validate_container> function; <DropdownBox> class; <Logger> class.
  *
  * Constructor Parameters:
  *
@@ -74,7 +74,7 @@ function ClusterPolicyWidget(container, varName) {
 	 * Array of strings for disk units
 	 *
 	 */
-	var _diskUnits = ['MB', 'GB', 'T'];
+	var _diskUnits = ['MB', 'GB', 'TB'];
 	/*
 	 * Var: _slotsConditions
 	 * Array of strings for slots conditions
@@ -99,6 +99,29 @@ function ClusterPolicyWidget(container, varName) {
 	 *
 	 */
 	var _stringPolicyBox;
+	/*
+	 * Var: _serialMappings
+	 * Associative array for serialized mappings
+	 *
+	 */
+	var _serialMappings = {
+		'>='	: 'G',
+		'<='	: 'L',
+		'='		: 'E',
+		'MB'	: 'M',
+		'GB'	: 'G',
+		'TB'	: 'T',
+		'belong to selection' 	: 'B',
+		'are not in selection'	: 'NB',
+		'matches'				: 'M',
+		'does not match' 		: 'NM'
+	};
+	/*
+	 * Var: _noSelText
+	 * Caption used when no saved selections are available
+	 *
+	 */
+	var _noSelText = '-- no saved selections available --';
 
 
 	// Group: Functions
@@ -134,7 +157,7 @@ function ClusterPolicyWidget(container, varName) {
 		_addRow();
 
 		// Condor string policy box
-		_stringPolicyBox = new DropdownBox(_instance_name + '.getStringPolicyBox()', _container, 'View computed Condor requirement string');
+		_stringPolicyBox = new DropdownBox(_instance_name + '.getStringPolicyBox()', _container, 'Instant view of Condor requirement string');
 		_stringPolicyBox.setTopLevelContainer(false);
 		_stringPolicyBox.setOnClickHandler(function() {
 			if (_stringPolicyBox.isOpen())
@@ -250,7 +273,7 @@ function ClusterPolicyWidget(container, varName) {
 					function(resp) {
 						var sels = resp['Selections'];
 						if (!sels.length) {
-							savedSel = getSelect('', ['-- no saved selections available --']);
+							savedSel = getSelect('', [_noSelText]);
 						}
 						else {
 							savedSel = getSelect('', sels);
@@ -294,43 +317,104 @@ function ClusterPolicyWidget(container, varName) {
 	 * Function: _computeCondorRequirementString
 	 * Computes string suitable for Condor requirement parameter
 	 *
+	 * Purpose:
+	 * 	Serializes the form's data before sending POST data to the server. Server-side script de-serialize 
+	 *  the data and builds a Condor requirement string depending on the cluster's status.
+	 *
+	 * Serialized data format:
+	 *  The following elements can occur in any order (for every line):
+	 *
+	 * > MEM,[G|E|L],value,[M|G];
+	 * > DSK,[G|E|L],value,[M|G|T];
+	 * > SLT,[B|NB],selname;
+	 * > HST,[M,NM],regexp;
+	 *
 	 * Parameters:
 	 *  container - DOM element container
 	 *
 	 */ 
 	function _computeCondorRequirementString(container) {
 		container.innerHTML = '';
-		var req_str = '(';
+		var post = '';
 		var trs = _policyTable.getElementsByTagName('tr');
+		// Data validation
+		var errors = false;
+		var error_msg;
+		var log = new Logger(container);
+
 		for (var k=0; k < trs.length; k++) {
+			var kind = null;
 			var sel = trs[k].getElementsByTagName('select')[0];
-			switch(parseInt(sel.options[sel.selectedIndex].value)) {
-				case 0:
-					// Memory
-					req_str += '&& (Memory) ';
+			var tds = trs[k].getElementsByTagName('td');
+			// Last td
+			ltd = tds[tds.length-1];
+			var msels = ltd.getElementsByTagName('select');
+			var ov = parseInt(sel.options[sel.selectedIndex].value);
+			if (ov == 0) {
+				// Memory
+				kind = 'MEM';
+			} 
+			else if (ov == 1) {
+				// Disk space
+				kind = 'DSK';
+			}
+			else if (ov == 2) {
+				// Slots (vms)
+				var comp = msels[0];
+				var sel = msels[1];
+				if (sel.options.length == 1 && sel.options[sel.selectedIndex].text == _noSelText) {
+					errors = true;
+					error_msg = 'no saved selection available. Please first save custom selections below if you want to ' +
+						'use this search criterium.';
 					break;
-	
-				case 1:
-					// Disk space
-					req_str += '&& (Disk) ';
+				}
+				post += 'SLT,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + 
+					sel.options[sel.selectedIndex].text + ';';
+			}
+			else if (ov == 3) {
+				// Host name
+				var comp = msels[0];
+				var val = ltd.getElementsByTagName('input')[0].value;
+				if (!val.length) {
+					errors = true;
+					error_msg = 'host name search criteria cannot be empty!';
 					break;
-	
-				case 2:
-					// Slots (vms)
-					req_str += '&& (Slots) ';
+				}
+				post += 'HST,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + encodeURI(val) + ';';
+			}
+
+			if (kind) {
+				var comp = msels[0];
+				var unit = msels[1];
+				var val = ltd.getElementsByTagName('input')[0].value;
+				if (isNaN(parseInt(val))) {
+					errors = true;
+					error_msg = "memory or disk related size field must be an integer, not '" + val + "'!";
 					break;
-	
-				case 3:
-					// Host name
-					req_str += '&& (Hosts) ';
-					break;
-	
-				default:
-					break;
+				}
+				post += kind + ',' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + val + ',' + 
+					_serialMappings[unit.options[unit.selectedIndex].text] + ';';
 			}
 		}
-		req_str += ')';
-		container.appendChild(document.createTextNode(req_str));
+
+		if (errors) {
+			log.msg_error('Error at line ' + (k+1) + ': ' + error_msg);
+			return;
+		}
+
+		// Send request to get computed Condor requirement string
+		var r = new HttpRequest(
+			container,
+			null,	
+			function(resp) {
+				container.innerHTML = '';
+				container.appendChild(document.createTextNode(resp['ReqString']));
+			}
+		);
+
+		post = 'Params=' + post;
+		r.setBusyMsg('Computing requirement string');
+		r.send('/youpi/cluster/computeRequirementString/', post);
 	}
 
 	/*

@@ -654,3 +654,16 @@ queue
 								'JobId' 		: str(jobid),
 								'Error'			: str(error)
 							}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def compute_requirement_string(request):
+	"""
+	Compute Condor's requirement string
+	"""
+	try:
+		params = request.POST['Params'].split(';');
+	except KeyError, e:
+		raise HttpResponseServerError('Bad parameters')
+
+	return HttpResponse(str({'ReqString' : str(params[-1]) }), mimetype = 'text/plain')
