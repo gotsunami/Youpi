@@ -662,8 +662,88 @@ def compute_requirement_string(request):
 	Compute Condor's requirement string
 	"""
 	try:
-		params = request.POST['Params'].split(';');
+		params = request.POST['Params'].split('#')
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
-	return HttpResponse(str({'ReqString' : str(params[-1]) }), mimetype = 'text/plain')
+	# De-serialization mappings
+	cdeserial = {
+		'G' : '>=',
+		'L' : '<=',
+		'E' : '='
+	}
+	sdeserial = {
+		'M'	: 1,
+		'G'	: 1024,
+		'T'	: 1024 * 1024
+	}
+
+	vms = get_condor_status(request)
+	nodes = [vm[0] for vm in vms]
+
+	crit = {}
+	for p in params:
+		d = p.split(',')
+		if not crit.has_key(d[0]):
+			crit[d[0]] = []
+		crit[d[0]].append(d[1:])
+
+	req = 'Requirements = (('
+
+	# Memory
+	if crit.has_key('MEM'):
+		for mem in crit['MEM']:
+			comp, val, unit = mem
+			req += "Memory %s %d && " % (cdeserial[comp], int(val)*sdeserial[unit])
+		req = req[:-4] + ')'
+
+	# Disk
+	if crit.has_key('DSK'):
+		req += ' && ('
+		for dsk in crit['DSK']:
+			comp, val, unit = dsk
+			req += "Disk %s %d && " % (cdeserial[comp], int(val)*sdeserial[unit])
+		req = req[:-4] + ')'
+
+	# Host name
+	vm_sel = []
+	if crit.has_key('HST'):
+		for hst in crit['HST']:
+			comp, val = hst
+			for vm in nodes:
+				m = re.match(val, vm)
+				if m:
+					if comp == 'M':
+						vm_sel.append(vm)
+				else:
+					if comp == 'NM':
+						vm_sel.append(vm)
+
+	# Filter slots
+	if crit.has_key('SLT'):
+		for slt in crit['SLT']:
+			comp, selname = slt
+			sel = CondorNodeSel.objects.filter(label = selname)[0]
+			data = marshal.loads(base64.decodestring(sel.nodeselection))
+			for n in data:
+				# Belongs to
+				if comp == 'B':
+					vm_sel.append(n)
+				else:
+					if n in vm_sel:
+						try:
+							while 1:
+								vm_sel.remove(n)
+						except:
+							pass
+
+	# Finally build host selection
+	if vm_sel:
+		req += ' && ('
+		for vm in vm_sel:
+			req += "Name == '%s' || " % vm
+		req = req[:-4] + ')'
+	
+	req += ')'
+
+	return HttpResponse(str({'ReqString': str(req)}), mimetype = 'text/plain')

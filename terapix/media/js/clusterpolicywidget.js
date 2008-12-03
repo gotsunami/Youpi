@@ -340,6 +340,7 @@ function ClusterPolicyWidget(container, varName) {
 		// Data validation
 		var errors = false;
 		var error_msg;
+		var eop = '#';
 		var log = new Logger(container);
 
 		for (var k=0; k < trs.length; k++) {
@@ -369,7 +370,7 @@ function ClusterPolicyWidget(container, varName) {
 					break;
 				}
 				post += 'SLT,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + 
-					sel.options[sel.selectedIndex].text + ';';
+					sel.options[sel.selectedIndex].text + eop;
 			}
 			else if (ov == 3) {
 				// Host name
@@ -380,7 +381,7 @@ function ClusterPolicyWidget(container, varName) {
 					error_msg = 'host name search criteria cannot be empty!';
 					break;
 				}
-				post += 'HST,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + encodeURI(val) + ';';
+				post += 'HST,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + encodeURI(val) + eop;
 			}
 
 			if (kind) {
@@ -393,7 +394,7 @@ function ClusterPolicyWidget(container, varName) {
 					break;
 				}
 				post += kind + ',' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + val + ',' + 
-					_serialMappings[unit.options[unit.selectedIndex].text] + ';';
+					_serialMappings[unit.options[unit.selectedIndex].text] + eop;
 			}
 		}
 
@@ -408,7 +409,12 @@ function ClusterPolicyWidget(container, varName) {
 			null,	
 			function(resp) {
 				container.innerHTML = '';
-				container.appendChild(document.createTextNode(resp['ReqString']));
+				var area = document.createElement('textarea');
+				area.setAttribute('style', 'width: 90%;');
+				area.setAttribute('rows', '4');
+				area.setAttribute('readonly', 'readonly');
+				area.appendChild(document.createTextNode(resp['ReqString']));
+				container.appendChild(area);
 			}
 		);
 
