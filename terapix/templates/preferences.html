@@ -11,6 +11,7 @@
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript" src="/media/js/condorpanel.js"></script>
 
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -73,6 +74,10 @@ function show_available_themes() {
 			<a 	href="#" id="entry_0" 
 				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Themes</a>
 		</li>
+		<li class="disabled">
+			<a 	href="#" id="entry_1" 
+				onclick="swap_display(this.id, 'menuitem_sub_1', 'menu', 'menuitem_sub_');">Default Condor Setup</a>
+		</li>
 	</ul>
 	<div style="width: 100%" id="menuitem_sub_0">
 		<div id="current_theme_div" class="themes">
@@ -96,9 +101,35 @@ function show_available_themes() {
 			<div id="all_themes_div" class="allthemes"></div>
 		</div>
 	</div>
+	<div style="width: 100%" id="menuitem_sub_1">
+		<div class="prefs_condor">
+			<h1>Default Shopping Cart Item Behaviour</h1>
+			You can configure cart's items to use either your default <b>policy</b> or <b>selection</b> automatically, as 
+			a default choice.
+			<div style="margin-top: 10px;">
+				<label>Please, <b>select default behaviour</b>: use default</label>
+				<select>
+					<option>policy</option>
+					<option>selection</option>
+				</select>
+				<input type="button" value="Save!"/>
+			</div>
+		</div>
+		<div class="prefs_condor">
+			<h1>Default Policy</h1>
+			<div id="saved_pol_div"></div>
+		</div>
+		<div class="prefs_condor">
+			<h1>Default Selection</h1>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
 	show_available_themes();
+	/*
+	var condorPanel = new CondorPanel();
+	condorPanel.showSavedPolicies('saved_pol_div');
+	*/
 </script>
 {% endblock %}

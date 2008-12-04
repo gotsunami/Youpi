@@ -46,7 +46,7 @@ function show_save_current_selection() {
 	name.setAttribute('style', 'margin-right: 10px;');
 	name.setAttribute('type', 'button');
 	name.setAttribute('value', 'Save!');
-	name.setAttribute('onclick', "condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value, function() { condorPanel.showSavedSelections('saved_sel_div'); });");
+	name.setAttribute('onclick', "condorPanel.saveCurrentNodeSelection(document.getElementById('selection_save_input').value, function() { condorPanel.showSavedSelections('saved_sel_div', true); });");
 	csb.appendChild(name);
 
 	var k = document.createElement('div');
@@ -111,7 +111,7 @@ function show_save_current_selection() {
 	var pb = new DropdownBox('pb', 'policy_div', 'Add a policy');
 	var pw = new ClusterPolicyWidget(pb.getContentNode(), 'pw');
 	pw.setOnSavePolicyHandler(function() {
-		condorPanel.showSavedPolicies('saved_pol_div');
+		condorPanel.showSavedPolicies('saved_pol_div', true);
 	});
 
 	condorPanel.showSavedPolicies('saved_pol_div', true);

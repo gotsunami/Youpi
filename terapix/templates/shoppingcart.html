@@ -116,15 +116,20 @@ function {{ plugin.id }}_show_runtime_options() {
 	
 	// Cluster policy
 	da = document.createElement('div');
+	da.setAttribute('class', 'cart_item_policy');
 	la = document.createElement('label');
 	la.appendChild(document.createTextNode('Cluster node policy'));
 	db = document.createElement('div');
-	db.setAttribute('id', '{{ plugin.id }}_saved_sel_div');
+	db.setAttribute('id', '{{ plugin.id }}_saved_pol_div');
+	dc = document.createElement('div');
+	dc.setAttribute('id', '{{ plugin.id }}_saved_sel_div');
 	da.appendChild(la);
 	da.appendChild(db);
+	da.appendChild(dc);
 	r.parentNode.appendChild(da);
 	
-	condorPanel.showSavedSelections('{{ plugin.id }}_saved_sel_div');
+	condorPanel.showSavedSelections('{{ plugin.id }}_saved_sel_div', false, null, false);
+	condorPanel.showSavedPolicies('{{ plugin.id }}_saved_pol_div', false, null, false);
 }
 {% endfor %}
 

@@ -1014,7 +1014,7 @@ div.pagination a:hover {
 
 /***** themes prefs ******/
 
-div.themes {
+div.themes, div.prefs_condor {
 	margin-top: 40px;
 	margin-left: 20px;
 }
@@ -1029,7 +1029,7 @@ div.allthemes table td {
 	width: 200px;
 }
 
-div.themes h1 {
+div.themes h1, div.prefs_condor h1 {
 	border-bottom: 1px solid lightgray;
 	padding-bottom: 7px;
 	margin-bottom: 20px;
@@ -1096,10 +1096,18 @@ div.toplevelmenu div.user {
 	background-color: inherit;
 }
 
+/***** condor setup prefs ******/
+
+div.condor_setup {
+	margin-top: 40px;
+	margin-left: 20px;
+}
+
+
 /********************* dropdown box ************************************/
 
 .ebox {
-	margin-bottom: 5px;
+	margin-bottom: 3px;
 }
 
 .ebox * {
@@ -1108,7 +1116,7 @@ div.toplevelmenu div.user {
 
 .ebox .banner_opened, .ebox .banner_closed, .ebox .banner_opened_child, .ebox .banner_closed_child {
 	width: -moz-fit-content;	
-	max-width: 50%;
+	max-width: 70%;
 	background-position: 3px center;
 	background-repeat: no-repeat;
 	background-color: #D5FFE0;
@@ -1159,6 +1167,7 @@ div.toplevelmenu div.user {
 	color: #686868;
 	font-weight: bold;
 	font-size: 11px;
+	white-space: nowrap;
 }
 
 .ebox .banner_opened_child label, .ebox .banner_closed_child label {
@@ -1194,5 +1203,15 @@ table.cluster_policy td:last-child {
 
 table.cluster_policy td:last-child * {
 	margin-right: 5px;
+}
+
+div.cart_item_policy label {
+	font-weight: bold;
+}
+
+div.cart_item_policy div {
+	margin: 0px;
+	padding: 0px;
+	margin-bottom: 2px;
 }
 
