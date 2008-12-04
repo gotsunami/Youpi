@@ -298,7 +298,13 @@ def autocomplete(request, key, value):
 			res.append({'value' : str(d.name), 'info' : str("%s - %s" % (d.user.username, d.date))})
 
 	elif key == 'CondorSavedSelections':
-		data = CondorNodeSel.objects.filter(label__istartswith = value)
+		data = CondorNodeSel.objects.filter(label__istartswith = value, is_policy = False)
+
+		for d in data:
+			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.date))})
+
+	elif key == 'CondorSavedPolicies':
+		data = CondorNodeSel.objects.filter(label__istartswith = value, is_policy = True)
 
 		for d in data:
 			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.date))})
@@ -654,6 +660,29 @@ queue
 								'JobId' 		: str(jobid),
 								'Error'			: str(error)
 							}), mimetype = 'text/plain')
+@login_required
+@profile
+def get_condor_requirement_string(request):
+	"""
+	Get requirement string from saved policy
+	"""
+	try:
+		name = request.POST['Name']
+	except KeyError, e:
+		raise HttpResponseServerError('Bad parameters')
+
+	error = req = '' 
+	try:
+		policy = CondorNodeSel.objects.filter(label = name, is_policy = True)[0]
+		vms = get_condor_status(request)
+		req = _compute_requirement_string(policy.nodeselection, vms)
+	except Exception, e:
+		error = e
+
+	return HttpResponse(str({	'ReqStr': str(req), 
+								'Error'	: str(error)
+							}), mimetype = 'text/plain')
+
 
 @login_required
 @profile
@@ -662,9 +691,19 @@ def compute_requirement_string(request):
 	Compute Condor's requirement string
 	"""
 	try:
-		params = request.POST['Params'].split('#')
+		params = request.POST['Params']
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
+
+	vms = get_condor_status(request)
+	req = _compute_requirement_string(params, vms)
+
+	return HttpResponse(str({'ReqString': str(req)}), mimetype = 'text/plain')
+
+def _compute_requirement_string(params, vms):
+	"""
+	Compute Condor's requirement string (private)
+	"""
 
 	# De-serialization mappings
 	cdeserial = {
@@ -678,7 +717,7 @@ def compute_requirement_string(request):
 		'T'	: 1024 * 1024
 	}
 
-	vms = get_condor_status(request)
+	params = params.split('#')
 	nodes = [vm[0] for vm in vms]
 
 	crit = {}
@@ -728,6 +767,8 @@ def compute_requirement_string(request):
 			comp, selname = slt
 			sel = CondorNodeSel.objects.filter(label = selname)[0]
 			data = marshal.loads(base64.decodestring(sel.nodeselection))
+			if not crit.has_key('HST') and comp == 'NB':
+				vm_sel = nodes
 			for n in data:
 				# Belongs to
 				if comp == 'B':
@@ -751,4 +792,4 @@ def compute_requirement_string(request):
 	
 	req += ')'
 
-	return HttpResponse(str({'ReqString': str(req)}), mimetype = 'text/plain')
+	return req

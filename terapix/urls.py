@@ -24,12 +24,20 @@ urlpatterns = patterns(
 
 	# Cluster
 	(r'^youpi/cluster/computeRequirementString/$', 'compute_requirement_string'),
-	(r'^youpi/cluster/status/$', 'condor_status'),
+	(r'^youpi/cluster/delCondorNodeSelection/$', 'del_condor_node_selection'),
+	(r'^youpi/cluster/delCondorPolicy/$', 'del_condor_policy'),
+	(r'^youpi/cluster/getCondorNodeSelections/$', 'get_condor_node_selections'),
+	(r'^youpi/cluster/getCondorRequirementString/$', 'get_condor_requirement_string'),
+	(r'^youpi/cluster/getCondorSelectionMembers/$', 'get_condor_selection_members'),
+	(r'^youpi/cluster/getCondorPolicies/$', 'get_condor_policies'),
 	(r'^youpi/cluster/nodes/$', 'condor_hosts'),
+	(r'^youpi/cluster/saveNodeSelection/$', 'save_condor_node_selection'),
+	(r'^youpi/cluster/savePolicy/$', 'save_condor_policy'),
 	(r'^youpi/cluster/softwares/$', 'condor_softs'),
 	(r'^youpi/cluster/softwares/versions/$', 'softs_versions'),
 	(r'^youpi/cluster/softwares/versions/refresh/$', 'query_condor_node_for_versions'),
 	(r'^youpi/cluster/softwares/versions/delete/$', 'clear_softs_versions'),
+	(r'^youpi/cluster/status/$', 'condor_status'),
 
 	(r'^youpi/monitoring/$', 'monitoring'),
 	(r'^youpi/monitoring/live/$', 'live_monitoring'),
@@ -101,12 +109,6 @@ urlpatterns = patterns(
 	(r'^youpi/uploadFile/batch/parseContent/$', 'batch_parse_content'),
 	(r'^youpi/uploadFile/batch/viewContent/(.*)/$', 'batch_view_content'),
 	(r'^youpi/uploadFile/batch/viewSelection/$', 'batch_view_selection'),
-
-	# FIXME: remove /profile/ part in urls
-	(r'^youpi/profile/delCondorNodeSelection/$', 'del_condor_node_selection'),
-	(r'^youpi/profile/getCondorNodeSelections/$', 'get_condor_node_selections'),
-	(r'^youpi/profile/getCondorSelectionMembers/$', 'get_condor_selection_members'),
-	(r'^youpi/profile/saveCondorNodeSelection/$', 'save_condor_node_selection'),
 
 	# Plots
 	(r'^youpi/plot/sky/selections/$', 'plot_sky_selections'),

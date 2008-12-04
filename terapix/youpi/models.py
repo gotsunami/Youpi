@@ -600,10 +600,19 @@ class SiteProfile(models.Model):
 	condornodesel = models.TextField()
 
 class CondorNodeSel(models.Model):
+	"""
+	Used to store both custom selections and custom policies
+	Only custom selections content is base64 + marshal encoded.
+	Custom policies are clear text content.
+	"""
+
 	# Mandatory
 	user = models.ForeignKey(User)
 
 	label = models.CharField(max_length = 255)
-	# Serialized data (base64 encoding over marshal serialization)
 	nodeselection = models.TextField()
 	date = models.DateTimeField(auto_now_add = True)
+	is_policy = models.BooleanField('Selection is a custom policy', default = False)
+
+	class Meta:
+		unique_together = ('label', 'is_policy')

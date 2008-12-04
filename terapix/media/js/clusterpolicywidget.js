@@ -8,7 +8,8 @@
  *
  * Dependencies:
  *
- *  common.js - Selects rendering with <getSelect> function; <validate_container> function; <DropdownBox> class; <Logger> class.
+ *  common.js - <getSelect>, <validate_container>, <DropdownBox>, <Logger>
+ *  bsn.AutoSuggest_c_2.0.js - AutoSuggest feature (3rd party)
  *
  * Constructor Parameters:
  *
@@ -122,6 +123,11 @@ function ClusterPolicyWidget(container, varName) {
 	 *
 	 */
 	var _noSelText = '-- no saved selections available --';
+	/*
+	 * Var: _onSavePolicyHandler
+	 *  Custom handler function called when new policy has been saved
+	 */
+	var _onSavePolicyHandler = null;
 
 
 	// Group: Functions
@@ -160,19 +166,115 @@ function ClusterPolicyWidget(container, varName) {
 		_stringPolicyBox = new DropdownBox(_instance_name + '.getStringPolicyBox()', _container, 'Instant view of Condor requirement string');
 		_stringPolicyBox.setTopLevelContainer(false);
 		_stringPolicyBox.setOnClickHandler(function() {
-			if (_stringPolicyBox.isOpen())
-				_computeCondorRequirementString(_stringPolicyBox.getContentNode());
+			if (_stringPolicyBox.isOpen()) {
+				_getSerializedData(_stringPolicyBox.getContentNode(), function(post) {
+					if (!post.length)
+						return;
+
+					// Sends request to get computed Condor requirement string
+					var container = _stringPolicyBox.getContentNode();
+					var r = new HttpRequest(
+						container,
+						null,	
+						function(resp) {
+							container.innerHTML = '';
+							var area = document.createElement('textarea');
+							area.setAttribute('style', 'width: 90%;');
+							area.setAttribute('rows', '4');
+							area.setAttribute('readonly', 'readonly');
+							area.appendChild(document.createTextNode(resp['ReqString']));
+							container.appendChild(area);
+						}
+					);
+	
+					post = 'Params=' + post;
+					r.setBusyMsg('Computing requirement string');
+					r.send('/youpi/cluster/computeRequirementString/', post);
+				} );
+			}
 		} );
 
 		// Save policy box
 		_savePolicyBox = new DropdownBox(_instance_name + '.getSavePolicyBox()', _container, 'Save current policy');
 		_savePolicyBox.setTopLevelContainer(false);
 		_savePolicyBox.setOnClickHandler(function() {
-			if (_savePolicyBox.isOpen())
-				document.getElementById(_instance_name + '_save_policy_input').focus();
+			if (_savePolicyBox.isOpen()) {
+				_getSerializedData(_savePolicyBox.getContentNode(), function(post) {
+					if (!post.length) return;
+					_renderSaveCurrentPolicy(_savePolicyBox.getContentNode());
+				} );
+			}
 		} );
 
-		var saveDiv = _savePolicyBox.getContentNode();
+	}
+
+	/*
+	 * Function: setOnSavePolicyHandler
+	 * Sets custom function handler
+	 *
+	 * Parameters:
+	 *  handler - function: custom handler function called when new policy has been saved
+	 *
+	 */ 
+	this.setOnSavePolicyHandler = function(handler) {
+		_onSavePolicyHandler = typeof handler == 'function' ? handler : null;
+	}
+
+	/*
+	 * Function: getOnSavePolicyHandler
+	 * Returns custom function handler called when new policy saved
+	 *
+	 * Returns:
+	 *  function
+	 *
+	 */ 
+	this.getOnSavePolicyHandler = function(handler) {
+		return _onSavePolicyHandler;
+	}
+
+	/*
+	 * Function: savePolicy
+	 * Saves current policy
+	 *
+	 */ 
+	this.savePolicy = function() {
+		var name = document.getElementById(_instance_name + '_save_policy_input').value;
+		var log = new Logger(_instance_name + '_save_log_div');
+		log.clear();
+
+		if (!name.length) {
+			log.msg_warning('Cannot save a policy with an empty name!');
+			return;
+		}
+
+		var r = new HttpRequest(
+			log,
+			null,	
+			function(resp) {
+				log.clear();
+				if (resp['Error']) {
+					log.msg_error(resp['Error']);
+					return;
+				}
+				log.msg_ok("Policy '" + resp['Label'] + "' has been saved.");
+
+				if (_onSavePolicyHandler) _onSavePolicyHandler();
+			}
+		);
+		var post = 'Label=' + name + '&Serial=' + _getSerializedData();
+		r.setBusyMsg('Saving policy');
+		r.send('/youpi/cluster/savePolicy/', post);
+	}
+
+	/*
+	 * Function: _renderSaveCurrentPolicy
+	 * Renders save policy widget
+	 *
+	 * Parameters:
+	 *  container - DOM container
+	 *
+	 */ 
+	function _renderSaveCurrentPolicy(container) {
 		var label = document.createElement('label');
 		label.appendChild(document.createTextNode('Save as'));
 		var iname = document.createElement('input');
@@ -181,10 +283,28 @@ function ClusterPolicyWidget(container, varName) {
 		iname.setAttribute('style', 'margin-right: 10px;');
 		var ibut = document.createElement('input');
 		ibut.setAttribute('type', 'button');
-		ibut.setAttribute('value', 'save!');
-		saveDiv.appendChild(label);
-		saveDiv.appendChild(iname);
-		saveDiv.appendChild(ibut);
+		ibut.setAttribute('value', 'Save!');
+		ibut.setAttribute('onclick', _instance_name + '.savePolicy();');
+		var logdiv = document.createElement('div');
+		logdiv.setAttribute('id', _instance_name + '_save_log_div');
+
+		container.appendChild(label);
+		container.appendChild(iname);
+		container.appendChild(ibut);
+		container.appendChild(logdiv);
+		document.getElementById(_instance_name + '_save_policy_input').focus();
+					
+		// Live autocompletion:s
+		try {
+			var options = {
+				script: '/youpi/autocompletion/CondorSavedPolicies/',
+				varname: 'Value',
+				json: true,
+				maxresults: 10,
+				timeout: 2000
+			};
+			var as = new _bsn.AutoSuggest(_instance_name + '_save_policy_input', options);
+		} catch(e) {}
 	}
 
 	/*
@@ -282,7 +402,7 @@ function ClusterPolicyWidget(container, varName) {
 						td.appendChild(savedSel);
 					}
 				);
-				r.send('/youpi/profile/getCondorNodeSelections/');
+				r.send('/youpi/cluster/getCondorNodeSelections/');
 				break;
 
 			case 3:
@@ -314,12 +434,11 @@ function ClusterPolicyWidget(container, varName) {
 	}
 
 	/*
-	 * Function: _computeCondorRequirementString
-	 * Computes string suitable for Condor requirement parameter
+	 * Function: _getSerializedData
+	 * Serialize form parameters
 	 *
 	 * Purpose:
-	 * 	Serializes the form's data before sending POST data to the server. Server-side script de-serialize 
-	 *  the data and builds a Condor requirement string depending on the cluster's status.
+	 * 	Serializes the form's data which can be sent as POST data to the server.
 	 *
 	 * Serialized data format:
 	 *  The following elements can occur in any order (for every line):
@@ -330,10 +449,19 @@ function ClusterPolicyWidget(container, varName) {
 	 * > HST,[M,NM],regexp;
 	 *
 	 * Parameters:
-	 *  container - DOM element container
+	 *  container - (_optional_) DOM element container 
+	 *  onFinishHanlder - (_optional_) handler function called after computation
+	 *
+	 * Returns:
+	 *  post - string: POST parameters of serialized data. Is an empty string in case of failure (bad form validation).
 	 *
 	 */ 
-	function _computeCondorRequirementString(container) {
+	function _getSerializedData(container, onFinishHandler) {
+		var handler = typeof onFinishHandler == 'function' ? true : false;
+		// Fake container
+		var c = (typeof container == 'undefined' || !container) ? false : true;
+		if (!c)
+			var container = document.createElement('div');
 		container.innerHTML = '';
 		var post = '';
 		var trs = _policyTable.getElementsByTagName('tr');
@@ -400,27 +528,13 @@ function ClusterPolicyWidget(container, varName) {
 
 		if (errors) {
 			log.msg_error('Error at line ' + (k+1) + ': ' + error_msg);
-			return;
 		}
 
-		// Send request to get computed Condor requirement string
-		var r = new HttpRequest(
-			container,
-			null,	
-			function(resp) {
-				container.innerHTML = '';
-				var area = document.createElement('textarea');
-				area.setAttribute('style', 'width: 90%;');
-				area.setAttribute('rows', '4');
-				area.setAttribute('readonly', 'readonly');
-				area.appendChild(document.createTextNode(resp['ReqString']));
-				container.appendChild(area);
-			}
-		);
+		post = post.substr(0, post.length-1);
+		if (handler)
+			onFinishHandler(post);
 
-		post = 'Params=' + post;
-		r.setBusyMsg('Computing requirement string');
-		r.send('/youpi/cluster/computeRequirementString/', post);
+		return post;
 	}
 
 	/*

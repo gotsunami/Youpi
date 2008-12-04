@@ -25,6 +25,11 @@ var sb;
 
 function show_save_current_selection() {
 	sb = new DropdownBox('sb', 'save_sel_div', 'Save current selection');
+	sb.setOnClickHandler(function() {
+		if (sb.isOpen()) {
+			document.getElementById('selection_save_input').focus();
+		}
+	} );
 	var csb = sb.getContentNode();
 	var l = document.createElement('label');
 	l.appendChild(document.createTextNode('Save as '));
@@ -47,6 +52,17 @@ function show_save_current_selection() {
 	var k = document.createElement('div');
 	k.setAttribute('id', 'custom_sel_save_log_div');
 	csb.appendChild(k);
+
+	try {
+		var options = {
+			script: '/youpi/autocompletion/CondorSavedSelections/',
+			varname: 'Value',
+			json: true,
+			maxresults: 10,
+			timeout: 2000
+		};
+		var as = new _bsn.AutoSuggest('selection_save_input', options);
+	} catch(e) {}
 }
 
 </script>
@@ -71,7 +87,7 @@ function show_save_current_selection() {
 					<td>
 					<td style="border: none;">
 						<h1 style="border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">Custom policies</h1>
-						<div class="tip" style="width: 80%;">Custom policies are <b>dynamic rules</b> you can define in the form below. The thing is that 
+						<div class="tip" style="width: 80%;">Custom policies are <b>dynamic rules</b> you can define by clicking on the 'Add a policy' dropdown box below. The point is that 
 						no cluster node selection is done at this time. Those policies will be applied just before job execution on the cluster. This way, the 
 						resulting node selection will depend on the cluster's real-time status.</div> 
 						<div id="saved_pol_div" style="margin-bottom: 10px;"></div>	
@@ -83,8 +99,6 @@ function show_save_current_selection() {
 						list on the left.</div>
 						<div id="saved_sel_div" style="margin-bottom: 10px;"></div>	
 						<div id="save_sel_div">	
-						<!--
-							-->
 						</div>						
 					<td>
 				</tr>
@@ -93,28 +107,16 @@ function show_save_current_selection() {
 	</div>
 </div>
 <script type="text/javascript">
+	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
 	var pb = new DropdownBox('pb', 'policy_div', 'Add a policy');
 	var pw = new ClusterPolicyWidget(pb.getContentNode(), 'pw');
+	pw.setOnSavePolicyHandler(function() {
+		condorPanel.showSavedPolicies('saved_pol_div');
+	});
+
+	condorPanel.showSavedPolicies('saved_pol_div', true);
+	condorPanel.showSavedSelections('saved_sel_div', true, function() { condorPanel.render(); });
 
 	show_save_current_selection();
-
-	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
-	var pol = condorPanel.getCustomPolicies();
-	if (!pol)
-		document.getElementById('saved_pol_div').innerHTML = 'No saved policy at this time';
-
-	var sel = condorPanel.showSavedSelections('saved_sel_div', true, function() { condorPanel.render(); }, true);
-
-	{# Auto-completion stuff #}
-	try {
-		var options = {
-			script: '/youpi/autocompletion/CondorSavedSelections/',
-			varname: 'Value',
-			json: true,
-			maxresults: 10,
-			timeout: 2000
-		};
-		var as = new _bsn.AutoSuggest('selection_save_input', options);
-	} catch(e) {}
 </script>
 {% endblock %}

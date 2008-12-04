@@ -3,11 +3,6 @@
  * Condor panel widget, usefull to easily choose which Condor nodes are to be used
  * for processing.
  *
- * Note:
- *
- * Please note that this page documents Javascript code. <CondorPanel> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
- *
  * File:
  *
  *  condorpanel.js
@@ -46,6 +41,18 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	var container = document.getElementById(container_id);
+	/*
+	 * Var: SELECTION
+	 * Use by <_showSavedData>'s *kind* parameter
+	 *
+	 */ 
+	var SELECTION = 1;
+	/*
+	 * Var: POLICY
+	 * Use by <_showSavedData>'s *kind* parameter
+	 *
+	 */ 
+	var POLICY = 2;
 
 
 	// Group: Variables
@@ -71,8 +78,20 @@ function CondorPanel(container_id, varName) {
 	 */ 
 	var _savedSelectionDivId;
 	/*
+	 * Var: _savedPolicySelectId
+	 * DOM select ID for saved selection names
+	 *
+	 */ 
+	var	_savedPolicySelectId;
+	/*
+	 * Var: _savedPolicyDivId
+	 * DOM div ID for saved policies 
+	 *
+	 */ 
+	var _savedPolicyDivId;
+	/*
 	 * Var: _custom_container
-	 * DOM container for rendering custom selections
+	 * DOM container for rendering custom policies
 	 *
 	 */ 
 	var _custom_container;
@@ -89,11 +108,23 @@ function CondorPanel(container_id, varName) {
 	 */ 
 	var _savedSelBox;
 	/*
+	 * Var: _savedPolBox
+	 * <DropdownBox> instance for saved policies
+	 *
+	 */ 
+	var _savedPolBox;
+	/*
 	 * Var: _viewSelContentBox
-	 * <DropdownBox> instance for selection content
+	 * <DropdownBox> instance for saved selection members
 	 *
 	 */ 
 	var _viewSelContentBox;
+	/*
+	 * Var: _viewPolContentBox
+	 * <DropdownBox> instance for saved policy members
+	 *
+	 */ 
+	var _viewPolContentBox;
 
 
 	// Group: Functions
@@ -109,7 +140,7 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	function _error(msg) {
-		alert('CondorPanel: ' + msg);
+		alert('CondorPanel::' + msg);
 	}
 
 	/*
@@ -144,18 +175,6 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
-	 * Function: getCustomPolicies
-	 * Returns custom policies data
-	 *
-	 * Returns:
-	 *  data
-	 *
-	 */ 
-	this.getCustomPolicies = function() {
-		return null;
-	}
-
-	/*
 	 * Function: removeCurrentSelection
 	 * Remove current custom selection
 	 *
@@ -173,13 +192,40 @@ function CondorPanel(container_id, varName) {
 			null,	
 			function(resp) {
 				if (sel.options.length == 1)
-					_showSavedSelections(_savedSelectionDivId);
+					_showSavedData(SELECTION, _savedSelectionDivId);
 				else
 					sel.removeChild(opt);
 			}
 		);
 		var post = 'Label=' + name;
-		r.send('/youpi/profile/delCondorNodeSelection/', post);
+		r.send('/youpi/cluster/delCondorNodeSelection/', post);
+	}
+
+	/*
+	 * Function: removeCurrentPolicy
+	 * Remove current custom policy
+	 *
+	 */ 
+	this.removeCurrentPolicy = function() {
+		var sel = document.getElementById(_savedPolicySelectId);
+		var opt = sel.options[sel.selectedIndex];
+		name = opt.text;
+
+		var c = confirm("Are you sure you want to delete the '" + name + "' policy?");
+		if (!c) return;
+
+		var r = new HttpRequest(
+			null,
+			null,	
+			function(resp) {
+				if (sel.options.length == 1)
+					_showSavedData(POLICY, _savedPolicyDivId);
+				else
+					sel.removeChild(opt);
+			}
+		);
+		var post = 'Label=' + name;
+		r.send('/youpi/cluster/delCondorPolicy/', post);
 	}
 
 	/*
@@ -193,12 +239,26 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	this.showSavedSelections = function(container_id, can_delete, handler) {
-		_showSavedSelections(container_id, can_delete, handler);
+		_showSavedData(SELECTION, container_id, can_delete, handler);
+	}
+
+	/*
+	 * Function: showSavedPolicies
+	 * Shows saved policies
+	 *
+	 * Parameters:
+	 *  container_id - string: DOM element id
+	 *  can_delete - boolean: optional callback function
+	 *  handler - optional callback function
+	 *
+	 */ 
+	this.showSavedPolicies = function(container_id, can_delete, handler) {
+		_showSavedData(POLICY, container_id, can_delete, handler);
 	}
 
 	/*
 	 * Function: getSavedSelBox
-	 * Returns saved selection box instance
+	 * Returns saved selections box instance
 	 *
 	 * Returns:
 	 *  <DropdownBox> instance
@@ -209,37 +269,99 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
-	 * Function: getViewContentBox
+	 * Function: getSavedPolBox
+	 * Returns saved policies box instance
+	 *
+	 * Returns:
+	 *  <DropdownBox> instance
+	 *
+	 */ 
+	this.getSavedPolBox = function() { 
+		return _savedPolBox; 
+	}
+
+	/*
+	 * Function: getViewSelContentBox
 	 * Returns selection content box instance
 	 *
 	 * Returns:
 	 *  <DropdownBox> instance
 	 *
 	 */ 
-	this.getViewContentBox = function() { 
+	this.getViewSelContentBox = function() { 
 		return _viewSelContentBox; 
 	}
 
 	/*
+	 * Function: getViewPolContentBox
+	 * Returns policy content box instance
+	 *
+	 * Returns:
+	 *  <DropdownBox> instance
+	 *
+	 */ 
+	this.getViewPolContentBox = function() { 
+		return _viewPolContentBox; 
+	}
+
+	/*
 	 * Function: savedSelectionChanged
-	 * Selected option is saved selection combo box has changed
+	 * Refreshes box's label and closes it
 	 *
 	 */ 
 	this.savedSelectionChanged = function() { 
-		_viewSelContentBox.setTitle('Changed...');
 		var sel = document.getElementById(_savedSelectionSelectId);
 		_viewSelContentBox.setTitle("View '" + sel.options[sel.selectedIndex].text + "' selection content");
 		// Closes box
 		_viewSelContentBox.setOpen(false);
 	}
 
-	function _showSavedSelections(container_id, can_delete, handler, is_top_level) {
+	/*
+	 * Function: savedPolicyChanged
+	 * Refreshes box's label and closes it
+	 *
+	 */ 
+	this.savedPolicyChanged = function() { 
+		var sel = document.getElementById(_savedPolicySelectId);
+		_viewPolContentBox.setTitle("Instant view of '" + sel.options[sel.selectedIndex].text + "' policy requirements string");
+		// Closes box
+		_viewPolContentBox.setOpen(false);
+	}
+
+	/*
+	 * Function: _showSavedData
+	 * Show saved data (selections or policies)
+	 *
+	 * Parameters:
+	 *  kind - int: <SELECTION> or <POLICY>
+	 *  container_id - string: block container
+	 *  can_delete - boolean: displays a delete button if true
+	 *  handler - function: custom handler to execute
+	 *  is_top_level - boolean: use it to switch CSS classes
+	 *
+	 */ 
+	function _showSavedData(kind, container_id, can_delete, handler, is_top_level) {
+		if (kind != SELECTION && kind != POLICY) {
+			_error('showSavedData: bad kind value: ' + kind);
+			return;
+		}
 		var callback = typeof handler == 'function' ? true : false;
 		var show_delete = can_delete ? true : false;
 		var top_level = is_top_level == false ? false : true;
 		var container = document.getElementById(container_id);
-		_savedSelectionDivId = container_id;
 		var log = new Logger(container);
+		var url, m_url;
+
+		if (kind == SELECTION) {
+			_savedSelectionDivId = container_id;
+			url = '/youpi/cluster/getCondorNodeSelections/';
+			m_url = '/youpi/cluster/getCondorSelectionMembers/';
+		}
+		else {
+			_savedPolicyDivId = container_id;
+			url = '/youpi/cluster/getCondorPolicies/';
+			m_url = '/youpi/cluster/getCondorRequirementString/';
+		}
 
 		var r = new HttpRequest(
 			null,
@@ -247,41 +369,64 @@ function CondorPanel(container_id, varName) {
 			function(resp) {
 				log.clear();
 
-				var sels = resp['Selections'];
+				var sels = kind == SELECTION ? resp['Selections'] : resp['Policies'];
 				if (!sels.length) {
-					log.msg_warning('No saved selections at the moment.');
+					log.msg_warning('No saved ' + (kind == SELECTION ? 'selections' : 'policies') + ' at the moment.');
 				}
 				else {
 					var d = document.createElement('div');
 					container.appendChild(d);
-					_savedSelBox = new DropdownBox(_instance_name + '.getSavedSelBox()', d, 'View saved selections');
+					var top_box, child_box;
+
+					if (kind == SELECTION) {
+						_savedSelBox = new DropdownBox(_instance_name + '.getSavedSelBox()', d, 'View saved selections');
+						top_box = _savedSelBox;
+					}
+					else {
+						_savedPolBox = new DropdownBox(_instance_name + '.getSavedPolBox()', d, 'View saved policies');
+						top_box = _savedPolBox;
+					}
+
 					if (!top_level) 
-						_savedSelBox.setTopLevelContainer(false);
+						top_box.setTopLevelContainer(false);
 
 					var sp = document.createElement('span');
-					var select = getSelect(container_id + '_select', sels);
-					select.setAttribute('onchange', _instance_name + ".savedSelectionChanged();");
-					_savedSelectionSelectId = select.id;
-					sp.appendChild(document.createTextNode('Saved selections: '));
+					var select = getSelect(container_id + '_' + (kind == 'SELECTION' ? 'sel_' : 'pol_') + 'select', sels);
+					select.setAttribute('onchange', _instance_name + '.saved' + (kind == SELECTION ? 'Selection' : 'Policy') + 
+						'Changed();');
+					sp.appendChild(document.createTextNode('Saved ' + (kind == SELECTION ? 'selections' : 'policies') + ': '));
 					sp.appendChild(select);
 	
 					if (show_delete) {
 						var img = document.createElement('img');
 						img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
 						img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
-						img.setAttribute('onclick', _instance_name + ".removeCurrentSelection();");
+						img.setAttribute('onclick', _instance_name + '.removeCurrent' + (kind == SELECTION ? 'Selection' : 'Policy') + 
+							'();');
 						sp.appendChild(img);
 					}
-					_savedSelBox.getContentNode().appendChild(sp);
-					_viewSelContentBox = new DropdownBox(_instance_name + '.getViewContentBox()', _savedSelBox.getContentNode(), 
-						"View '" + select.options[select.selectedIndex].text + "' selection content");
-					_viewSelContentBox.setTopLevelContainer(false);
+
+					top_box.getContentNode().appendChild(sp);
+					if (kind == SELECTION) {
+						_savedSelectionSelectId = select.id;
+						_viewSelContentBox = new DropdownBox(_instance_name + '.getViewSelContentBox()', _savedSelBox.getContentNode(), 
+							"View '" + select.options[select.selectedIndex].text + "' selection content");
+						_viewSelContentBox.setTopLevelContainer(false);
+						child_box = _viewSelContentBox;
+					}
+					else {
+						_savedPolicySelectId = select.id;
+						_viewPolContentBox = new DropdownBox(_instance_name + '.getViewPolContentBox()', _savedPolBox.getContentNode(), 
+							"Instant view of '" + select.options[select.selectedIndex].text + "' requirement string");
+						_viewPolContentBox.setTopLevelContainer(false);
+						child_box = _viewPolContentBox;
+					}
 
 					// Handler function to show member nodes
-					_viewSelContentBox.setOnClickHandler(function() {
-						if (!_viewSelContentBox.isOpen())
+					child_box.setOnClickHandler(function() {
+						if (!child_box.isOpen())
 							return;
-						var ndiv = _viewSelContentBox.getContentNode();
+						var ndiv = child_box.getContentNode();
 						log = new Logger(ndiv);
 						var selText = select.options[select.selectedIndex].text;
 						var mr = new HttpRequest(
@@ -295,24 +440,34 @@ function CondorPanel(container_id, varName) {
 									return;
 								}
 								var d = document.createElement('div');
-								d.setAttribute('class', 'custom_sel_members');
-								for (var k=0; k < resp['Members'].length; k++) {
-									d.appendChild(document.createTextNode(resp['Members'][k]));
-									d.appendChild(document.createElement('br'));
+								if (kind == SELECTION) {
+									d.setAttribute('class', 'custom_sel_members');
+									for (var k=0; k < resp['Members'].length; k++) {
+										d.appendChild(document.createTextNode(resp['Members'][k]));
+										d.appendChild(document.createElement('br'));
+									}
+								}
+								else {
+									var area = document.createElement('textarea');
+									area.setAttribute('style', 'width: 90%;');
+									area.setAttribute('rows', '4');
+									area.setAttribute('readonly', 'readonly');
+									area.appendChild(document.createTextNode(resp['ReqStr']));
+									d.appendChild(area);
 								}
 								ndiv.appendChild(d);
 							}
 						);
 						post = 'Name=' + selText;
-						mr.setBusyMsg('Loading members');
-						mr.send('/youpi/profile/getCondorSelectionMembers/', post);
+						mr.setBusyMsg('Loading ' + (kind == 'SELECTION' ? 'members' : 'requirements string'));
+						mr.send(m_url, post);
 					} );
 				}
 				
 				if (callback) handler();
 			}
 		);
-		r.send('/youpi/profile/getCondorNodeSelections/');
+		r.send(url);
 	}
 
 	/*
@@ -495,7 +650,7 @@ function CondorPanel(container_id, varName) {
 	 * Save current Condor node selection
 	 *
 	 * Parameters:
-	 *  name - string: selection name (must be unique)
+	 *  name - string: selection name
 	 *  handler - optional callback function
 	 *
 	 */ 
@@ -536,6 +691,6 @@ function CondorPanel(container_id, varName) {
 		);
 		var post = 'Label=' + name + '&SelectedHosts=' + hosts;
 		r.setBusyMsg('Saving selection');
-		r.send('/youpi/profile/saveCondorNodeSelection/', post);
+		r.send('/youpi/cluster/saveNodeSelection/', post);
 	}
 }

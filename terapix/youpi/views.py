@@ -1139,15 +1139,36 @@ def save_condor_node_selection(request):
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
 
-	sels = CondorNodeSel.objects.filter(label = label)
+	sels = CondorNodeSel.objects.filter(label = label, is_policy = False)
 	if sels:
-		return HttpResponse(str({'Error' : str("'%s' label is already used, please use another name." % label)}), mimetype = 'text/plain')
+		return HttpResponse(str({'Error' : str("'%s' label is already used, please use another name." % label)}), 
+					mimetype = 'text/plain')
 
 	nodesel = base64.encodestring(marshal.dumps(selHosts)).replace('\n', '')
 	sel = CondorNodeSel(user = request.user, label = label, nodeselection = nodesel)
 	sel.save()
 
 	return HttpResponse(str({'Label' : str(label), 'SavedCount' : len(selHosts)}), mimetype = 'text/plain')
+
+def save_condor_policy(request):
+	"""
+	Save Condor custom policy
+	"""
+	try:
+		label = request.POST['Label']
+		serial = request.POST['Serial']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	sels = CondorNodeSel.objects.filter(label = label, is_policy = True)
+	if sels:
+		return HttpResponse(str({'Error' : str("'%s' label is already used, please use another name." % label)}), 
+					mimetype = 'text/plain')
+
+	sel = CondorNodeSel(user = request.user, label = label, nodeselection = serial, is_policy = True)
+	sel.save()
+
+	return HttpResponse(str({'Label' : str(label), 'Policy' : str(serial)}), mimetype = 'text/plain')
 
 def del_condor_node_selection(request):
 	"""
@@ -1159,7 +1180,22 @@ def del_condor_node_selection(request):
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
 
-	sel = CondorNodeSel.objects.filter(label = label)[0]
+	sel = CondorNodeSel.objects.filter(label = label, is_policy = False)[0]
+	sel.delete()
+
+	return HttpResponse(str({'Deleted' : str(label)}), mimetype = 'text/plain')
+
+def del_condor_policy(request):
+	"""
+	Delete Condor policy
+	"""
+
+	try:
+		label = request.POST['Label']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	sel = CondorNodeSel.objects.filter(label = label, is_policy = True)[0]
 	sel.delete()
 
 	return HttpResponse(str({'Deleted' : str(label)}), mimetype = 'text/plain')
@@ -1169,9 +1205,18 @@ def get_condor_node_selections(request):
 	Returns Condor nodes selections.
 	"""
 
-	sels = CondorNodeSel.objects.all().order_by('label')
+	sels = CondorNodeSel.objects.filter(is_policy = False)
 
 	return HttpResponse(str({'Selections' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
+
+def get_condor_policies(request):
+	"""
+	Returns Condor policies.
+	"""
+
+	sels = CondorNodeSel.objects.filter(is_policy = True)
+
+	return HttpResponse(str({'Policies' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
 
 def get_condor_selection_members(request):
 	"""
@@ -1183,7 +1228,7 @@ def get_condor_selection_members(request):
 	except Exception, e:
 		return HttpResponseBadRequest('Incorrect POST data')
 
-	data = CondorNodeSel.objects.filter(label = name)
+	data = CondorNodeSel.objects.filter(label = name, is_policy = False)
 	error = ''
 
 	if data:
