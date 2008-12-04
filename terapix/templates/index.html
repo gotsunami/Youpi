@@ -27,7 +27,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 
 {% block content %}
 	<div id="pre_submenu">
-				<ul class="smart_tabnav" id="tabnav2">
+				<ul class="smart_tabnav_sub" id="tabnav2">
 					<li class="enabled"><a href="#" id="link_global" onclick="swap_display(this.id, 'menuitem_global', 'tabnav2', 'menuitem_');">Global Informations</a></li>
 				</ul>
 	</div>
@@ -49,19 +49,20 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 
 	<script type="text/javascript">
 function show_global_user_info() {
-su = new DropdownBox('su','user_info', 'Display account');
-sus = new DropdownBox('sus','survey', 'Display survey');
-sui = new DropdownBox('sui','instrument', 'Display related instrument');
-var user_id = {{user.id}};
-su.setOnClickHandler( function (){get_db_info(user_id);});
-su.getContentNode().appendChild(document.createTextNode('todo...'))
-}
+	su = new DropdownBox('su','user_info', 'Display account');
+	sus = new DropdownBox('sus','survey', 'Display survey');
+	sui = new DropdownBox('sui','instrument', 'Display related instrument');
+	var user_id = {{user.id}};
+	su.setOnClickHandler( function (){get_db_info(user_id);});
+	}
 
 function get_db_info(user_id) {
     var xhr = new HttpRequest(
         null,
         null,
         function(resp) {
+			var n = resp['data']['user_info'];
+			su.getContentNode().appendChild(document.createTextNode(n))
 			
         }
     );
