@@ -1,6 +1,7 @@
 # vim: set ts=4
 
 from django.contrib import auth
+from django.contrib.auth.models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.db import models
 from django.shortcuts import render_to_response
@@ -332,101 +333,23 @@ def browse_api(request, type):
 	return HttpResponseRedirect('http://clix.iap.fr:8001/' + path)
 
 def index2(request):
-	#stats
-	l_survey = []
-	l_instru = []
-	ll = []
 	try:
-		globstat = request.POST.get('globstat', '')
-		instrument = request.POST.get('Kind', '')
-		run = request.POST.get('Kind2', '')
-		user = request.POST.get('Kind3', '')
-		if len(globstat) == 0 and len(instrument) == 0 and len(run) == 0 and len(user) == 0 :
+		user_id = request.POST['user_id']
+		if len(user_id) == 0 :
 			raise Exception, 'No data found'
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data: %s' % e)
 
 
-	if globstat:
-			survey = Survey.objects.all()
-			for s in survey:
-				rels = Rel_si.objects.filter(survey__name = s.name)
-				l_survey.append(str(s.name))  
-				l_survey.append(str(s.comment))  
-				l_survey.append(str(s.url))
-
-				for re in rels:
-
-					l_instru.append(str(re.instrument.name))
-					
-			resp = {'survey' : l_survey, 'instrument' : l_instru}
-
-	elif instrument:
-		# Instrument button clicked
-		runs = Run.objects.filter(instrument__name__exact = instrument)
-		instrument_field = Instrument.objects.filter(name__exact = instrument)
-		for i in instrument_field:
-			d = [ 
-				'Instrument :',str(i.name),
-				'Telescope :',str(i.telescope),
-				'URL :',str(i.url),
-				'TimeZone :',str(i.timezone),
-				'Altitude :',str(i.altitude),
-				'Number of Chips :',str(i.nchips),
-				'Astro key :',str(i.astrinstru_key),
-				'Photo key :',str(i.photinstru_key),
-				'Path :',str(i.path)
-				]
+	if user_id:
+		l_u = []
+		l_u.append(str(Group.objects.filter(user =3)[0]))
+		list = User.objects.filter(id = user_id)
+		for l in list:
+			l_u.append(str(l.email))
+			l_u.append(str(l.last_login))
 				
-			resp = {'run' : [str(r.name) for r in runs],'instrument_field' : d, 'length' : len(d)/2 }
-
-
-
-	elif run:
-		# Run button clicked
-		run_field = Run.objects.filter(name__exact = run)
-		for k in run_field:
-				kk = [
-					'Run :',str(k.name),
-					'Project Investigator :',str(k.pi),
-					'Email (P.I) :',str(k.email),
-					'Process request date :',str(k.processrequestdate),
-					'Start date :',str(k.datestart),
-					'End date :',str(k.datend),
-					'Download date :',str(k.datedownload),
-					'Release date :',str(k.releasedate),
-					]
-		
-		q = Image.objects.filter(run__name = run, name__endswith = "p")
-		res={}
-		for i in q:
-			if not res.has_key(i.channel.name):
-				res[i.channel.name] = 0
-			res[i.channel.name] += 1
-
-		f = Fitstables.objects.filter(run = run)
-		res1={}
-		for i in f:
-			if not res1.has_key(i.channel):
-				res1[i.channel] = 0
-			res1[i.channel] +=1
-
-		resp = {'image_count_channel' : [[str(i),str(res[i])] for i in res],'image_count_fits' : [[str(i),str(res1[i])] for i in res1],'run_field' : kk, 'length': len(kk)/2 }
-
-	elif user:
-		# User button clicked
-		users = User.objects.all()
-		us = [
-				[
-				str(i.email),
-				str(i.last_login),
-				]
-				for i in users
-			]
-
-		resp = {'current_user': us}
-
-
+	resp = {'user_info' : l_u,}
 
 	return HttpResponse(str({'data' : resp}), mimetype = 'text/plain')
 
