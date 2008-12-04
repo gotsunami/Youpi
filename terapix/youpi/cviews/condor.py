@@ -688,10 +688,11 @@ def compute_requirement_string(request):
 			crit[d[0]] = []
 		crit[d[0]].append(d[1:])
 
-	req = 'Requirements = (('
+	req = 'Requirements = ('
 
 	# Memory
 	if crit.has_key('MEM'):
+		req += '('
 		for mem in crit['MEM']:
 			comp, val, unit = mem
 			req += "Memory %s %d && " % (cdeserial[comp], int(val)*sdeserial[unit])
@@ -699,7 +700,9 @@ def compute_requirement_string(request):
 
 	# Disk
 	if crit.has_key('DSK'):
-		req += ' && ('
+		if req[-1] == ')':
+			req += ' && '
+		req += '('
 		for dsk in crit['DSK']:
 			comp, val, unit = dsk
 			req += "Disk %s %d && " % (cdeserial[comp], int(val)*sdeserial[unit])
@@ -711,7 +714,7 @@ def compute_requirement_string(request):
 		for hst in crit['HST']:
 			comp, val = hst
 			for vm in nodes:
-				m = re.match(val, vm)
+				m = re.search(val, vm)
 				if m:
 					if comp == 'M':
 						vm_sel.append(vm)
@@ -739,7 +742,9 @@ def compute_requirement_string(request):
 
 	# Finally build host selection
 	if vm_sel:
-		req += ' && ('
+		if req[-1] == ')':
+			req += ' && '
+		req += '('
 		for vm in vm_sel:
 			req += "Name == '%s' || " % vm
 		req = req[:-4] + ')'
