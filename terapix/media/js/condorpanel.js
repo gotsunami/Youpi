@@ -175,60 +175,6 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
-	 * Function: removeCurrentSelection
-	 * Remove current custom selection
-	 *
-	 */ 
-	this.removeCurrentSelection = function() {
-		var sel = document.getElementById(_savedSelectionSelectId);
-		var opt = sel.options[sel.selectedIndex];
-		name = opt.text;
-
-		var c = confirm("Are you sure you want to delete the '" + name + "' selection?");
-		if (!c) return;
-
-		var r = new HttpRequest(
-			null,
-			null,	
-			function(resp) {
-				if (sel.options.length == 1)
-					_showSavedData(SELECTION, _savedSelectionDivId);
-				else
-					sel.removeChild(opt);
-			}
-		);
-		var post = 'Label=' + name;
-		r.send('/youpi/cluster/delCondorNodeSelection/', post);
-	}
-
-	/*
-	 * Function: removeCurrentPolicy
-	 * Remove current custom policy
-	 *
-	 */ 
-	this.removeCurrentPolicy = function() {
-		var sel = document.getElementById(_savedPolicySelectId);
-		var opt = sel.options[sel.selectedIndex];
-		name = opt.text;
-
-		var c = confirm("Are you sure you want to delete the '" + name + "' policy?");
-		if (!c) return;
-
-		var r = new HttpRequest(
-			null,
-			null,	
-			function(resp) {
-				if (sel.options.length == 1)
-					_showSavedData(POLICY, _savedPolicyDivId);
-				else
-					sel.removeChild(opt);
-			}
-		);
-		var post = 'Label=' + name;
-		r.send('/youpi/cluster/delCondorPolicy/', post);
-	}
-
-	/*
 	 * Function: showSavedSelections
 	 * Shows saved selections name
 	 *
@@ -310,6 +256,15 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	this.savedSelectionChanged = function() { 
+		return _savedSelectionChanged();
+	}
+
+	/*
+	 * Function: _savedSelectionChanged
+	 * Refreshes box's label and closes it
+	 *
+	 */ 
+	function _savedSelectionChanged() { 
 		var sel = document.getElementById(_savedSelectionSelectId);
 		_viewSelContentBox.setTitle("View '" + sel.options[sel.selectedIndex].text + "' selection content");
 		// Closes box
@@ -322,11 +277,79 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	this.savedPolicyChanged = function() { 
+		_savedPolicyChanged();
+	}	
+
+	/*
+	 * Function: savedPolicyChanged
+	 * Refreshes box's label and closes it
+	 *
+	 */ 
+	function _savedPolicyChanged() { 
 		var sel = document.getElementById(_savedPolicySelectId);
 		_viewPolContentBox.setTitle("Instant view of '" + sel.options[sel.selectedIndex].text + "' policy requirements string");
 		// Closes box
 		_viewPolContentBox.setOpen(false);
 	}
+
+	/*
+	 * Function: removeCurrentSelection
+	 * Remove current custom selection
+	 *
+	 */ 
+	this.removeCurrentSelection = function() {
+		var sel = document.getElementById(_savedSelectionSelectId);
+		var opt = sel.options[sel.selectedIndex];
+		name = opt.text;
+
+		var c = confirm("Are you sure you want to delete the '" + name + "' selection?");
+		if (!c) return;
+
+		var r = new HttpRequest(
+			null,
+			null,	
+			function(resp) {
+				if (sel.options.length == 1)
+					_showSavedData(SELECTION, _savedSelectionDivId);
+				else {
+					sel.removeChild(opt);
+					_savedSelectionChanged();
+				}
+			}
+		);
+		var post = 'Label=' + name;
+		r.send('/youpi/cluster/delCondorNodeSelection/', post);
+	}
+
+	/*
+	 * Function: removeCurrentPolicy
+	 * Remove current custom policy
+	 *
+	 */ 
+	this.removeCurrentPolicy = function() {
+		var sel = document.getElementById(_savedPolicySelectId);
+		var opt = sel.options[sel.selectedIndex];
+		name = opt.text;
+
+		var c = confirm("Are you sure you want to delete the '" + name + "' policy?");
+		if (!c) return;
+
+		var r = new HttpRequest(
+			null,
+			null,	
+			function(resp) {
+				if (sel.options.length == 1)
+					_showSavedData(POLICY, _savedPolicyDivId);
+				else {
+					sel.removeChild(opt);
+					_savedPolicyChanged();
+				}
+			}
+		);
+		var post = 'Label=' + name;
+		r.send('/youpi/cluster/delCondorPolicy/', post);
+	}
+
 
 	/*
 	 * Function: _showSavedData
