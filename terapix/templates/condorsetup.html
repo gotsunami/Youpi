@@ -113,6 +113,7 @@ function show_save_current_selection() {
 	pw.setOnSavePolicyHandler(function() {
 		condorPanel.showSavedPolicies('saved_pol_div', true);
 	});
+	pw.render();
 
 	condorPanel.showSavedPolicies('saved_pol_div', true);
 	condorPanel.showSavedSelections('saved_sel_div', true, function() { condorPanel.render(); });

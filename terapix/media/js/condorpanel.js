@@ -11,6 +11,7 @@
  *
  *  advancedtable.js - Table rendering (<AdvancedTable> class)
  *  common.js - Selects rendering with <getSelect> function; <DropdownBox> class
+ *  clusterpolicywidget.js - <ClusterPolicyWidget> class
  *
  * Constructor Parameters:
  *
@@ -125,6 +126,18 @@ function CondorPanel(container_id, varName) {
 	 *
 	 */ 
 	var _viewPolContentBox;
+	/*
+	 * Var: _editPolContentBox
+	 * <DropdownBox> instance for policy edition
+	 *
+	 */ 
+	var _editPolContentBox;
+	/*
+	 * Var: _editPolicyWidget
+	 * <ClusterPolicyWidget> instance for policy edition
+	 *
+	 */ 
+	var _editPolicyWidget;
 
 
 	// Group: Functions
@@ -203,6 +216,18 @@ function CondorPanel(container_id, varName) {
 	}
 
 	/*
+	 * Function: getEditPolicyWidget
+	 * Returns edit policy widget instance
+	 *
+	 * Returns:
+	 *  <ClusterPolicyWidget> instance
+	 *
+	 */ 
+	this.getEditPolicyWidget = function() { 
+		return _editPolicyWidget; 
+	}
+
+	/*
 	 * Function: getSavedSelBox
 	 * Returns saved selections box instance
 	 *
@@ -236,6 +261,18 @@ function CondorPanel(container_id, varName) {
 	 */ 
 	this.getViewSelContentBox = function() { 
 		return _viewSelContentBox; 
+	}
+
+	/*
+	 * Function: getEditPolContentBox
+	 * Returns policy edit box instance
+	 *
+	 * Returns:
+	 *  <DropdownBox> instance
+	 *
+	 */ 
+	this.getEditPolContentBox = function() { 
+		return _editPolContentBox; 
 	}
 
 	/*
@@ -288,8 +325,9 @@ function CondorPanel(container_id, varName) {
 	function _savedPolicyChanged() { 
 		var sel = document.getElementById(_savedPolicySelectId);
 		_viewPolContentBox.setTitle("Instant view of '" + sel.options[sel.selectedIndex].text + "' policy requirements string");
-		// Closes box
 		_viewPolContentBox.setOpen(false);
+		_editPolContentBox.setTitle("Edit '" + sel.options[sel.selectedIndex].text + "' policy");
+		_editPolContentBox.setOpen(false);
 	}
 
 	/*
@@ -442,6 +480,37 @@ function CondorPanel(container_id, varName) {
 						_viewPolContentBox = new DropdownBox(_instance_name + '.getViewPolContentBox()', _savedPolBox.getContentNode(), 
 							"Instant view of '" + select.options[select.selectedIndex].text + "' requirement string");
 						_viewPolContentBox.setTopLevelContainer(false);
+
+						_editPolContentBox = new DropdownBox(_instance_name + '.getEditPolContentBox()', _savedPolBox.getContentNode(), 
+							"Edit '" + select.options[select.selectedIndex].text + "' policy");
+						_editPolContentBox.setTopLevelContainer(false);
+						// Gets serialized policy string
+						var ed = _editPolContentBox.getContentNode();
+						_editPolContentBox.setOnClickHandler(function() {
+							if (!_editPolContentBox.isOpen())
+								return;
+							var mr = new HttpRequest(
+								ed,
+								null,	
+								function(resp) {
+									var log = new Logger(ed);
+									log.clear();
+
+									if (resp['Error'].length) {
+										log.clear();
+										log.msg_error('Error: ' + resp['Error']);
+										return;
+									}
+
+									_editPolicyWidget = new ClusterPolicyWidget(ed, _instance_name + '.getEditPolicyWidget()');
+									_editPolicyWidget.setupFormFromSerializedData(resp['Serial']);
+								}
+							);
+							var post = 'Name=' + select.options[select.selectedIndex].text;
+							mr.setBusyMsg('Loading serialized policy');
+							mr.send('/youpi/cluster/getPolicyData/', post);
+						} );
+
 						child_box = _viewPolContentBox;
 					}
 
@@ -451,7 +520,6 @@ function CondorPanel(container_id, varName) {
 							return;
 						var ndiv = child_box.getContentNode();
 						log = new Logger(ndiv);
-						var selText = select.options[select.selectedIndex].text;
 						var mr = new HttpRequest(
 							ndiv,
 							null,	
@@ -481,7 +549,7 @@ function CondorPanel(container_id, varName) {
 								ndiv.appendChild(d);
 							}
 						);
-						post = 'Name=' + selText;
+						post = 'Name='  +select.options[select.selectedIndex].text;
 						mr.setBusyMsg('Loading ' + (kind == 'SELECTION' ? 'members' : 'requirements string'));
 						mr.send(m_url, post);
 					} );

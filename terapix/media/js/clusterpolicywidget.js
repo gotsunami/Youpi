@@ -40,24 +40,6 @@ function ClusterPolicyWidget(container, varName) {
 	 *
 	 */ 
 	var _container;
-
-
-	// Group: Variables
-	// -----------------------------------------------------------------------------------------------------------------------------
-
-
-	/*
-	 * Var: _rowIdx
-	 * Current row index in table
-	 *
-	 */
-	var _rowIdx = 0;
-	/*
-	 * Var: _policyTable
-	 * DOM table node
-	 *
-	 */
-	var _policyTable;
 	/*
 	 * Var: _searchCriteria
 	 * Array of strings enumerating search criterias
@@ -89,17 +71,11 @@ function ClusterPolicyWidget(container, varName) {
 	 */
 	var _hostConditions = ['matches', 'does not match'];
 	/*
-	 * Var: _savePolicyBox
-	 * <DropdownBox> for saving current policy
+	 * Var: _eop
+	 * Policy delimiter
 	 *
 	 */
-	var _savePolicyBox;
-	/*
-	 * Var: _stringPolicyBox
-	 * <DropdownBox> for displaying computed Condor requirement string policy
-	 *
-	 */
-	var _stringPolicyBox;
+	var _eop = '#';
 	/*
 	 * Var: _serialMappings
 	 * Associative array for serialized mappings
@@ -118,11 +94,47 @@ function ClusterPolicyWidget(container, varName) {
 		'does not match' 		: 'NM'
 	};
 	/*
+	 * Var: _criteriaMappings
+	 * Used to deserialize critera
+	 *
+	 */
+	var _criteriaMappings = {'MEM' : 0, 'DSK' : 1, 'SLT' : 2, 'HST' : 3};
+	/*
 	 * Var: _noSelText
 	 * Caption used when no saved selections are available
 	 *
 	 */
 	var _noSelText = '-- no saved selections available --';
+
+
+	// Group: Variables
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _rowIdx
+	 * Current row index in table
+	 *
+	 */
+	var _rowIdx = 0;
+	/*
+	 * Var: _policyTable
+	 * DOM table node
+	 *
+	 */
+	var _policyTable;
+	/*
+	 * Var: _savePolicyBox
+	 * <DropdownBox> for saving current policy
+	 *
+	 */
+	var _savePolicyBox;
+	/*
+	 * Var: _stringPolicyBox
+	 * <DropdownBox> for displaying computed Condor requirement string policy
+	 *
+	 */
+	var _stringPolicyBox;
 	/*
 	 * Var: _onSavePolicyHandler
 	 *  Custom handler function called when new policy has been saved
@@ -147,11 +159,27 @@ function ClusterPolicyWidget(container, varName) {
 	}
 
 	/*
-	 * Function: _render
+	 * Function: render
 	 * Renders widget
 	 *
 	 */ 
-	function _render() {
+	this.render = function() {
+		_render();
+	}
+
+	/*
+	 * Function: _render
+	 * Renders widget
+	 *
+	 * Parameters:
+	 *  policies - string: row policies (optional)
+	 *
+	 */ 
+	function _render(policies) {
+		var policies = typeof policies == 'string' ? policies : null;
+		if (policies)
+			policies = policies.split(_eop);
+
 		_container.innerHTML = '';
 		_container.appendChild(document.createTextNode(_headerTitle));
 
@@ -160,7 +188,12 @@ function ClusterPolicyWidget(container, varName) {
 		_policyTable.setAttribute('class', 'cluster_policy');
 		_container.appendChild(_policyTable);
 
-		_addRow();
+		if (!policies)
+			_addRow();
+		else {
+			for (var k=0; k < policies.length; k++)
+				_addRow(policies[k]);
+		}
 
 		// Condor string policy box
 		_stringPolicyBox = new DropdownBox(_instance_name + '.getStringPolicyBox()', _container, 'Instant view of Condor requirement string');
@@ -354,17 +387,23 @@ function ClusterPolicyWidget(container, varName) {
 	 *
 	 * Parameters:
 	 *  rowIdx - integer: table row index where the criteria changed
+	 *  rpol - string: row policy (optional)
 	 *
 	 * See Also:
 	 *  <criteriumChanged>
 	 *
 	 */ 
-	function _updateRowContent(rowIdx) {
+	function _updateRowContent(rowIdx, rpol) {
 		var tr = _getTableTRNode(rowIdx);
 		var sel = document.getElementById(_policyTable.id + '_select_' + rowIdx);
 		var td = document.getElementById(tr.id + '_condition_td');
 		var later = false;
 		var prefix;
+		var policy = typeof rpol == 'string' ? rpol : null;
+
+		if (policy) {
+			var pol = policy.split(',');
+		}
 
 		removeAllChildrenNodes(td);
 		td.innerHTML = '';
@@ -392,12 +431,26 @@ function ClusterPolicyWidget(container, varName) {
 					null,	
 					function(resp) {
 						var sels = resp['Selections'];
+						if (policy) {
+							for (var k=0; k < sels.length; k++) {
+								if (sels[k] == pol[2])
+									break;
+							}
+							if (k == sels.length) {
+								// FIXME: pb!! selection does not exist anymore!
+								_error('PB');
+							}
+						}
+
 						if (!sels.length) {
 							savedSel = getSelect('', [_noSelText]);
 						}
 						else {
 							savedSel = getSelect('', sels);
+							if (policy)
+								savedSel.selectedIndex = k;
 						}
+
 
 						td.appendChild(savedSel);
 					}
@@ -411,6 +464,9 @@ function ClusterPolicyWidget(container, varName) {
 				var i = document.createElement('input');
 				i.setAttribute('id', tr.id + prefix + '_value');
 				i.setAttribute('type', 'text');
+				if (policy) {
+					i.setAttribute('value', pol[2]);
+				}
 				td.appendChild(condSel);
 				td.appendChild(i);
 				break;
@@ -427,10 +483,25 @@ function ClusterPolicyWidget(container, varName) {
 			i.setAttribute('type', 'text');
 			i.setAttribute('maxlength', '4');
 			i.setAttribute('size', '4');
+			if (policy) {
+				i.setAttribute('value', pol[2]);
+			}
 			td.appendChild(condSel);
 			td.appendChild(i);
 			td.appendChild(uSel);
 		}
+	}
+
+	/*
+	 * Function: setupFormFromSerializedData
+	 * Restaure complete form from serialized data
+	 *
+	 * Parameters:
+	 *  serial - serialized data
+	 *
+	 */ 
+	this.setupFormFromSerializedData = function(serial) {
+		_render(serial);
 	}
 
 	/*
@@ -468,7 +539,6 @@ function ClusterPolicyWidget(container, varName) {
 		// Data validation
 		var errors = false;
 		var error_msg;
-		var eop = '#';
 		var log = new Logger(container);
 
 		for (var k=0; k < trs.length; k++) {
@@ -498,7 +568,7 @@ function ClusterPolicyWidget(container, varName) {
 					break;
 				}
 				post += 'SLT,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + 
-					sel.options[sel.selectedIndex].text + eop;
+					sel.options[sel.selectedIndex].text + _eop;
 			}
 			else if (ov == 3) {
 				// Host name
@@ -509,7 +579,7 @@ function ClusterPolicyWidget(container, varName) {
 					error_msg = 'host name search criteria cannot be empty!';
 					break;
 				}
-				post += 'HST,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + encodeURI(val) + eop;
+				post += 'HST,' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + encodeURI(val) + _eop;
 			}
 
 			if (kind) {
@@ -522,7 +592,7 @@ function ClusterPolicyWidget(container, varName) {
 					break;
 				}
 				post += kind + ',' + _serialMappings[comp.options[comp.selectedIndex].text] + ',' + val + ',' + 
-					_serialMappings[unit.options[unit.selectedIndex].text] + eop;
+					_serialMappings[unit.options[unit.selectedIndex].text] + _eop;
 			}
 		}
 
@@ -578,10 +648,17 @@ function ClusterPolicyWidget(container, varName) {
 	 * Function: _addRow
 	 * Adds a new row of data
 	 *
+	 * Example:
+	 *  rpol = 'MEM,G,1,G' will render a row with 'Memory >= 1 GB'
+	 *
+	 * Parameters:
+	 *  rpol - string: row policy (optional)
+	 *
 	 */ 
-	function _addRow() {
+	function _addRow(rpol) {
 		var tr, td;
 		var tab = _policyTable;
+		var policy = typeof rpol == 'string' ? rpol : null;
 
 		tr = document.createElement('tr');
 		tab.appendChild(tr);
@@ -611,6 +688,10 @@ function ClusterPolicyWidget(container, varName) {
 		td = document.createElement('td');
 		var sel = getSelect(tab.id + '_select_' + _rowIdx, _searchCriteria);
 		sel.setAttribute('onchange', _instance_name + ".criteriumChanged(" + _rowIdx + ");");
+		if (policy) {
+			var crit = policy.split(',');
+			sel.selectedIndex = _criteriaMappings[crit[0]];
+		}
 		td.appendChild(sel);
 		tr.appendChild(td);
 
@@ -619,7 +700,7 @@ function ClusterPolicyWidget(container, varName) {
 		td.setAttribute('id', tr.id + '_condition_td');
 		tr.appendChild(td);
 
-		_updateRowContent(_rowIdx);
+		_updateRowContent(_rowIdx, policy);
 		_rowIdx++;
 	}
 
@@ -634,8 +715,6 @@ function ClusterPolicyWidget(container, varName) {
 			_error('_main:: container is not valid!');
 			return;
 		}
-
-		_render();
 	}
 
 	_main();

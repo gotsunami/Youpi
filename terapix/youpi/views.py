@@ -1163,6 +1163,26 @@ def get_condor_selection_members(request):
 
 	return HttpResponse(str({'Members' : members, 'Error' : error}), mimetype = 'text/plain')
 
+def get_policy_data(request):
+	"""
+	Returns policy serialized data
+	"""
+
+	try:
+		name = request.POST['Name']
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	data = CondorNodeSel.objects.filter(label = name, is_policy = True)
+	error = serial = ''
+
+	if data:
+		serial = str(data[0].nodeselection)
+	else:
+		error = 'No policy of that name.'
+
+	return HttpResponse(str({'Serial' : serial, 'Error' : error}), mimetype = 'text/plain')
+
 @login_required
 @profile
 def set_current_theme(request):
