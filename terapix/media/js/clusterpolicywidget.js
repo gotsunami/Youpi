@@ -124,6 +124,12 @@ function ClusterPolicyWidget(container, varName) {
 	 */
 	var _compMappings = {'G' : 0, 'E' : 1, 'L' : 2};
 	/*
+	 * Var: _memMappings
+	 * Used to deserialize mem and disk units
+	 *
+	 */
+	var _unitsMappings = {'M' : 0, 'G' : 1, 'T' : 2};
+	/*
 	 * Var: _noSelText
 	 * Caption used when no saved selections are available
 	 *
@@ -506,20 +512,20 @@ function ClusterPolicyWidget(container, varName) {
 
 		if (later) {
 			var condSel = getSelect(tr.id + '_' + prefix + '_select', _comparators);
-			if (policy)
-				condSel.selectedIndex = _compMappings[pol[1]];
 			var uSel = getSelect(tr.id + '_unit_select', (sel.selectedIndex == 0 ? _memUnits : _diskUnits));
 			var i = document.createElement('input');
 			i.setAttribute('id', tr.id + prefix + '_value');
 			i.setAttribute('type', 'text');
 			i.setAttribute('maxlength', '4');
 			i.setAttribute('size', '4');
-			if (policy) {
-				i.setAttribute('value', pol[2]);
-			}
 			td.appendChild(condSel);
 			td.appendChild(i);
 			td.appendChild(uSel);
+			if (policy) {
+				i.setAttribute('value', pol[2]);
+				condSel.selectedIndex = _compMappings[pol[1]];
+				uSel.selectedIndex = _unitsMappings[pol[3]];
+			}
 		}
 	}
 
