@@ -340,24 +340,64 @@ def browse_api(request, type):
 
 def index2(request):
 	try:
-		user_id = request.POST['user_id']
-		if len(user_id) == 0 :
-			raise Exception, 'No data found'
+		param = request.POST['Param']
+		value = request.POST['Value']
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data: %s' % e)
+	
+	error = warning = ''
+
+	try:
+		if param == 'survey':
+			if not Survey.objects.filter(name__iexact = value):
+				if len(value) == 0 :
+					warning = 'Please, enter a non-empty string'
+				else:
+					sur = Survey(name = value)
+					sur.save()
+					m = Rel_us(user_id = request.user.id, survey_id = sur.id)
+					m.save()
+			else:
+				warning = 'Survey already existing'
+
+		if param == 'instrument':
+			survey = request.POST['Survey']
+
+			if not Instrument.objects.filter(name__iexact = value):
+				if len(value) == 0 :
+					warning = 'Please, enter a non-empty string'
+				else:
+					ins = Instrument(name = value)
+					ins.save()
+					g = Survey.objects.filter(name__iexact = survey)[0]
+					i = Rel_si(survey_id = g.id, instrument_id = ins.id)
+					i.save()
+			else:
+				warning = 'Instrument already existing'
+
+		if param == 'release':
+			instrument = request.POST['Instrument']
+
+			if not Release.objects.filter(label__iexact = value):
+				if len(value) == 0 :
+					warning = 'Please, enter a non-empty string'
+				else:
+					rel = Release(label = value,releasedate = getNowDateTime())
+					rel.save()
+					ins = Instrument.objects.filter(name__iexact = instrument)[0]
+					i = Rel_rinst(release_id =rel.id, instrument_id = ins.id)
+					i.save()
+			else:
+				warning = 'Instrument already existing'
 
 
-	if user_id:
-		l_u = []
-		l_u.append(str(Group.objects.filter(user =3)[0]))
-		list = User.objects.filter(id = user_id)
-		for l in list:
-			l_u.append(str(l.email))
-			l_u.append(str(l.last_login))
-				
-	resp = {'user_info' : l_u,}
+	except Exception, e:
+		error = e
 
-	return HttpResponse(str({'data' : resp}), mimetype = 'text/plain')
+		
+	resp = {'Survey' : str(value), 'Error' : str(error),'Warning' : warning}
+
+	return HttpResponse(str(resp), mimetype = 'text/plain')
 
 def local_ingestion(request):
 	"""
