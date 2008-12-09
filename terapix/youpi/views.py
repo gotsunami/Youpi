@@ -103,10 +103,16 @@ def preferences(request):
 		if themes[k]['short_name'] == request.user.get_profile().guistyle:
 			break
 
+	policies = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
+	selections = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
+
 	return render_to_response('preferences.html', 
 					{	'Debug' 			: DEBUG,
 						'themes'			: themes,
+						'plugins' 			: manager.plugins, 
 						'current_theme'		: themes[k],
+						'policies'			: policies,
+						'selections'		: selections,
 						'menu'				: app_menu,
 						'selected_entry_id'	: 'preferences' }, 
 					context_instance = RequestContext(request))
@@ -1145,7 +1151,7 @@ def get_condor_node_selections(request):
 	Returns Condor nodes selections.
 	"""
 
-	sels = CondorNodeSel.objects.filter(is_policy = False)
+	sels = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
 
 	return HttpResponse(str({'Selections' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
 
@@ -1154,7 +1160,7 @@ def get_condor_policies(request):
 	Returns Condor policies.
 	"""
 
-	sels = CondorNodeSel.objects.filter(is_policy = True)
+	sels = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
 
 	return HttpResponse(str({'Policies' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
 
@@ -1217,7 +1223,36 @@ def set_current_theme(request):
 
 	return HttpResponse(str({'Default': str(name)}), mimetype = 'text/plain')
 
+@login_required
+@profile
+def pref_save_condor_config(request):
+	"""
+	Save per-user default condor setup
+	"""
+	try:
+		db = request.POST['DB'].split(',')
+		dp = request.POST['DP'].split(',')
+		ds = request.POST['DS'].split(',')
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
 
+	condor_setup = {}
+	k = 0
+	for plugin in manager.plugins:
+		condor_setup[plugin.id] = {}
+		condor_setup[plugin.id]['DB'] = db[k]
+		condor_setup[plugin.id]['DP'] = dp[k]
+		condor_setup[plugin.id]['DS'] = ds[k]
+		k += 1
+
+	try:
+		p = request.user.get_profile()
+		p.dflt_condor_setup = base64.encodestring(marshal.dumps(condor_setup)).replace('\n', '')
+		p.save()
+	except Exception, e:
+		return HttpResponse(str({'Error': str(e)}), mimetype = 'text/plain')
+
+	return HttpResponse(str({'Setup': str(condor_setup)}), mimetype = 'text/plain')
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'

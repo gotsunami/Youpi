@@ -53,6 +53,7 @@ urlpatterns = patterns(
 	# Prefs and docs
 	(r'^youpi/preferences/$', 'preferences'),
 	(r'^youpi/preferences/theme/set/$', 'set_current_theme'),
+	(r'^youpi/preferences/condor/saveCurrentConfig/$', 'pref_save_condor_config'),
 	(r'^youpi/documentation/$', 'documentation'),
 
 	# Sandbox for testing django form processing

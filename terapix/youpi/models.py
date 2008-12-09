@@ -598,6 +598,8 @@ class SiteProfile(models.Model):
 	# Current user Condor's nodes selection (in shopping cart)
 	# Serialized data (base64 encoding over marshal serialization)
 	condornodesel = models.TextField()
+	# Serialized data (base64 encoding over marshal serialization)
+	dflt_condor_setup = models.TextField()
 
 class CondorNodeSel(models.Model):
 	"""
@@ -616,3 +618,4 @@ class CondorNodeSel(models.Model):
 
 	class Meta:
 		unique_together = ('label', 'is_policy')
+

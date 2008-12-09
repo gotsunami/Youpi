@@ -63,6 +63,63 @@ function show_available_themes() {
 	tab.appendChild(tr);
 	d.appendChild(tab);
 }
+
+function show_current_config_button(container_id) {
+	var c = document.getElementById(container_id);
+	var but = document.createElement('input');
+	but.setAttribute('type', 'button');
+	but.setAttribute('value', 'Save current configuration');
+	but.setAttribute('onclick', "save_config(this.nextSibling);");
+	c.appendChild(but);
+
+	var ldiv = document.createElement('div');
+	c.appendChild(ldiv);
+
+}
+
+function save_config(logNode) {
+	var log = new Logger(logNode);
+
+	// Build POST data
+	// Behaviour
+	var post = 'DB=';
+	{% for plugin in plugins %}
+		var sel = document.getElementById('{{ plugin.id }}_def_behaviour_select');
+		post += sel.options[sel.selectedIndex].value + ','
+	{% endfor %}
+	post = post.substr(0, post.length-1);
+
+	// Default policy
+	post += '&DP=';
+	{% for plugin in plugins %}
+		var sel = document.getElementById('{{ plugin.id }}_pol_select');
+		post += sel.options[sel.selectedIndex].value + ','
+	{% endfor %}
+	post = post.substr(0, post.length-1);
+
+	// Default selection
+	post += '&DS=';
+	{% for plugin in plugins %}
+		var sel = document.getElementById('{{ plugin.id }}_sel_select');
+		post += sel.options[sel.selectedIndex].value + ','
+	{% endfor %}
+	post = post.substr(0, post.length-1);
+
+	var r = new HttpRequest(
+		null,
+		null,	
+		function(resp) {
+			log.clear();
+			if (resp['Error']) {
+				log.msg_error(resp['Error']);
+				return;
+			}
+			log.msg_ok('Configuration successfully saved.');
+		}
+	);
+
+	r.send('/youpi/preferences/condor/saveCurrentConfig/', post);
+}
 </script>
 {% endblock %}
 
@@ -101,35 +158,72 @@ function show_available_themes() {
 			<div id="all_themes_div" class="allthemes"></div>
 		</div>
 	</div>
-	<div style="width: 100%" id="menuitem_sub_1">
+	<div style="width: 100%; display: none;" id="menuitem_sub_1">
+		<div id="top_save_div" class="prefs_condor"></div>
 		<div class="prefs_condor">
 			<h1>Default Shopping Cart Item Behaviour</h1>
-			You can configure cart's items to use either your default <b>policy</b> or <b>selection</b> automatically, as 
+			You can configure cart's items to use either your default <b>policy</b> or <b>selection</b> automatically as 
 			a default choice.
 			<div style="margin-top: 10px;">
-				<label>Please, <b>select default behaviour</b>: use default</label>
-				<select>
-					<option>policy</option>
-					<option>selection</option>
-				</select>
-				<input type="button" value="Save!"/>
+				<table class="defaultCondorSetup">
+				{% for plugin in plugins %}
+					<tr>
+						<td>
+							{{ plugin.optionLabel }}
+						</td>
+						<td>
+							<label>use default </label>
+							<select id="{{ plugin.id }}_def_behaviour_select">
+								<option>policy</option>	
+								<option>selection</option>	
+							</select>
+						</td>
+					</tr>
+				{% endfor %}
+				</table>
 			</div>
 		</div>
 		<div class="prefs_condor">
 			<h1>Default Policy</h1>
-			<div id="saved_pol_div"></div>
+			<table class="defaultCondorSetup">
+			{% for plugin in plugins %}
+				<tr>
+					<td>{{ plugin.optionLabel }}</td>
+					<td>
+						<select id="{{ plugin.id }}_pol_select">
+				{% for pol in policies %}
+							<option>{{ pol.label }}</option>	
+				{% endfor %}
+						</select>
+					</td>
+				</tr>
+			{% endfor %}
+			</table>
 		</div>
 		<div class="prefs_condor">
 			<h1>Default Selection</h1>
+			<table class="defaultCondorSetup">
+			{% for plugin in plugins %}
+				<tr>
+					<td>{{ plugin.optionLabel }}</td>
+					<td>
+						<select id="{{ plugin.id }}_sel_select">
+				{% for sel in selections %}
+							<option>{{ sel.label }}</option>	
+				{% endfor %}
+						</select>
+					</td>
+				</tr>
+			{% endfor %}
+			</table>
 		</div>
+		<div id="bottom_save_div" class="prefs_condor"></div>
 	</div>
 </div>
 
 <script type="text/javascript">
 	show_available_themes();
-	/*
-	var condorPanel = new CondorPanel();
-	condorPanel.showSavedPolicies('saved_pol_div');
-	*/
+	show_current_config_button('top_save_div');
+	show_current_config_button('bottom_save_div');
 </script>
 {% endblock %}

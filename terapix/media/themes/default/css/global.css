@@ -1209,3 +1209,12 @@ div.cart_item_policy div {
 	margin-bottom: 2px;
 }
 
+table.defaultCondorSetup td {
+	border: none;
+	vertical-align: middle;
+}
+	
+table.defaultCondorSetup td:first-child {
+	font-weight: bold;
+	color: brown;
+}
