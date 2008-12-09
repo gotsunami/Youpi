@@ -1083,19 +1083,29 @@ def save_condor_policy(request):
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
 
-	sels = CondorNodeSel.objects.filter(label = label, is_policy = True)
-	if sels:
-		return HttpResponse(str({'Error' : str("'%s' label is already used, please use another name." % label)}), 
-					mimetype = 'text/plain')
+	try:
+		sels = CondorNodeSel.objects.filter(label = label, is_policy = True)
+		if sels:
+			if sels[0].user != request.user:
+				# Only owner can update its policy
+				return HttpResponse(str({'Error' : 'Only selection owner can update its policies. Policy not overwritten.'}), mimetype = 'text/plain')
+			else:
+				sel = sels[0]
+				sel.nodeselection = serial
+		else:
+			sel = CondorNodeSel(user = request.user, label = label, nodeselection = serial, is_policy = True)
 
-	sel = CondorNodeSel(user = request.user, label = label, nodeselection = serial, is_policy = True)
-	sel.save()
+		sel.save()
+		
+	except Exception, e:
+		return HttpResponse(str({'Error' : "%s" % e}), mimetype = 'text/plain')
 
 	return HttpResponse(str({'Label' : str(label), 'Policy' : str(serial)}), mimetype = 'text/plain')
 
 def del_condor_node_selection(request):
 	"""
-	Delete Condor node selection.
+	Delete Condor node selection. 
+	No deletion is allowed if at least one policy is using that selection.
 	"""
 
 	try:
@@ -1104,6 +1114,13 @@ def del_condor_node_selection(request):
 		return HttpResponseServerError('Incorrect POST data.')
 
 	sel = CondorNodeSel.objects.filter(label = label, is_policy = False)[0]
+	pols = CondorNodeSel.objects.filter(is_policy = True)
+	if pols:
+		for pol in pols:
+			if pol.nodeselection.find(label) >= 0:
+				return HttpResponse(str({'Error' : str("Some policies depends on this selection. Unable to delete selection '%s'." % label)}), 
+					mimetype = 'text/plain')
+
 	sel.delete()
 
 	return HttpResponse(str({'Deleted' : str(label)}), mimetype = 'text/plain')

@@ -47,6 +47,12 @@ function ClusterPolicyWidget(container, varName) {
 	 */
 	var _searchCriteria = ['Available memory (RAM)','Available disk space', 'Slots (vms)', 'Host name'];
 	/*
+	 * Var: _comparators
+	 * Array of strings for integer comparison
+	 *
+	 */
+	var _comparators = ['>=', '=', '<='];
+	/*
 	 * Var: _memUnits
 	 * Array of strings for memory units
 	 *
@@ -99,6 +105,24 @@ function ClusterPolicyWidget(container, varName) {
 	 *
 	 */
 	var _criteriaMappings = {'MEM' : 0, 'DSK' : 1, 'SLT' : 2, 'HST' : 3};
+	/*
+	 * Var: _slotsMappings
+	 * Used to deserialize slotsConditions
+	 *
+	 */
+	var _slotsMappings = {'B' : 0, 'NB' : 1};
+	/*
+	 * Var: _hostsMappings
+	 * Used to deserialize hostsMappings
+	 *
+	 */
+	var _hostsMappings = {'M' : 0, 'NM' : 1};
+	/*
+	 * Var: _compMappings
+	 * Used to deserialize comparators
+	 *
+	 */
+	var _compMappings = {'G' : 0, 'E' : 1, 'L' : 2};
 	/*
 	 * Var: _noSelText
 	 * Caption used when no saved selections are available
@@ -424,6 +448,9 @@ function ClusterPolicyWidget(container, varName) {
 			case 2:
 				// Slots (vms)
 				var condSel = getSelect(tr.id + '_' + prefix + '_select', _slotsConditions);
+				if (policy)
+					condSel.selectedIndex = _slotsMappings[pol[1]];
+
 				td.appendChild(condSel);
 				var savedSel;
 				var r = new HttpRequest(
@@ -461,6 +488,8 @@ function ClusterPolicyWidget(container, varName) {
 			case 3:
 				// Host name
 				var condSel = getSelect(tr.id + '_' + prefix + '_select', _hostConditions);
+				if (policy)
+					condSel.selectedIndex = _hostsMappings[pol[1]];
 				var i = document.createElement('input');
 				i.setAttribute('id', tr.id + prefix + '_value');
 				i.setAttribute('type', 'text');
@@ -476,7 +505,9 @@ function ClusterPolicyWidget(container, varName) {
 		}
 
 		if (later) {
-			var condSel = getSelect(tr.id + '_' + prefix + '_select', ['>=', '=', '<=']);
+			var condSel = getSelect(tr.id + '_' + prefix + '_select', _comparators);
+			if (policy)
+				condSel.selectedIndex = _compMappings[pol[1]];
 			var uSel = getSelect(tr.id + '_unit_select', (sel.selectedIndex == 0 ? _memUnits : _diskUnits));
 			var i = document.createElement('input');
 			i.setAttribute('id', tr.id + prefix + '_value');

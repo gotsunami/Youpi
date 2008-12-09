@@ -306,6 +306,7 @@ function CondorPanel(container_id, varName) {
 		_viewSelContentBox.setTitle("View '" + sel.options[sel.selectedIndex].text + "' selection content");
 		// Closes box
 		_viewSelContentBox.setOpen(false);
+		document.getElementById(_instance_name + '_selection_log_div').innerHTML = '';
 	}
 
 	/*
@@ -347,6 +348,12 @@ function CondorPanel(container_id, varName) {
 			null,
 			null,	
 			function(resp) {
+				if (resp['Error']) {
+					var log = new Logger(document.getElementById(_instance_name + '_selection_log_div'));
+					log.msg_error(resp['Error']);
+					return;
+				}
+
 				if (sel.options.length == 1)
 					_showSavedData(SELECTION, _savedSelectionDivId);
 				else {
@@ -467,7 +474,13 @@ function CondorPanel(container_id, varName) {
 						sp.appendChild(img);
 					}
 
+					// Log box
+					var lb = document.createElement('div');
+					lb.setAttribute('id', _instance_name + '_' + (kind == SELECTION ? 'selection' : 'policy') + '_log_div');
+
 					top_box.getContentNode().appendChild(sp);
+					top_box.getContentNode().appendChild(lb);
+
 					if (kind == SELECTION) {
 						_savedSelectionSelectId = select.id;
 						_viewSelContentBox = new DropdownBox(_instance_name + '.getViewSelContentBox()', _savedSelBox.getContentNode(), 

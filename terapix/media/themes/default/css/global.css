@@ -905,40 +905,34 @@ div.advancedTable div.body table tr:hover td {
 
 /********* LOGGER **********************************************************/
 
-div.logger_status {
-	color: brown; 
+div.logger_status, div.logger_error, div.logger_ok, div.logger_warning {
 	text-align: left;
-	background-image: url(../img/admin/selector-addall.gif);
 	background-position: 1px center;
 	background-repeat: no-repeat; 
 	padding-left: 20px;
+	height: 20px;
+	margin-top: 2px;
+	padding-top: 5px;
+}
+
+div.logger_status {
+	color: brown; 
+	background-image: url(../img/admin/selector-addall.gif);
 }
 
 div.logger_ok {
 	color: green; 
-	text-align: left;
 	background-image: url(../img/admin/icon_success.gif);
-	background-position: 1px center;
-	background-repeat: no-repeat; 
-	padding-left: 20px;
 }
 
 div.logger_warning {
 	color: orange; 
-	text-align: left;
 	background-image: url(../img/admin/icon_alert.gif);
-	background-position: 1px center;
-	background-repeat: no-repeat; 
-	padding-left: 20px;
 }
 
 div.logger_error {
 	color: red; 
-	text-align: left;
 	background-image: url(../img/admin/icon_error.gif);
-	background-position: 1px center;
-	background-repeat: no-repeat; 
-	padding-left: 20px;
 }
 
 /********* END OF LOGGER **********************************************************/
