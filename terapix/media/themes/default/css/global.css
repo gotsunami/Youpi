@@ -910,7 +910,7 @@ div.logger_status, div.logger_error, div.logger_ok, div.logger_warning {
 	background-position: 1px center;
 	background-repeat: no-repeat; 
 	padding-left: 20px;
-	height: 20px;
+	min-height: 20px;
 	margin-top: 2px;
 	padding-top: 5px;
 }

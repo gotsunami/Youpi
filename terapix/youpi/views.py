@@ -1158,6 +1158,7 @@ def del_condor_node_selection(request):
 	"""
 	Delete Condor node selection. 
 	No deletion is allowed if at least one policy is using that selection.
+	No deletion is allowed if at least Condor Default Setup rules is using that selection.
 	"""
 
 	try:
@@ -1165,7 +1166,20 @@ def del_condor_node_selection(request):
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
 
-	sel = CondorNodeSel.objects.filter(label = label, is_policy = False)[0]
+	profiles = SiteProfile.objects.all()
+	for p in profiles:
+		try:
+			data = marshal.loads(base64.decodestring(str(p.dflt_condor_setup)))
+		except EOFError:
+			# No data found, unable to decodestring
+			data = None
+
+		if data:
+			for plugin in data.keys():
+				if data[plugin]['DS'].find(label) >= 0:
+					return HttpResponse(str({'Error' : str("Cannot delete selection '%s'. User '%s' references it in his/her default selection preferences menu." 
+								% (label, p.user.username))}), mimetype = 'text/plain')
+
 	pols = CondorNodeSel.objects.filter(is_policy = True)
 	if pols:
 		for pol in pols:
@@ -1173,6 +1187,7 @@ def del_condor_node_selection(request):
 				return HttpResponse(str({'Error' : str("Some policies depends on this selection. Unable to delete selection '%s'." % label)}), 
 					mimetype = 'text/plain')
 
+	sel = CondorNodeSel.objects.filter(label = label, is_policy = False)[0]
 	sel.delete()
 
 	return HttpResponse(str({'Deleted' : str(label)}), mimetype = 'text/plain')
@@ -1186,6 +1201,20 @@ def del_condor_policy(request):
 		label = request.POST['Label']
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
+
+	profiles = SiteProfile.objects.all()
+	for p in profiles:
+		try:
+			data = marshal.loads(base64.decodestring(str(p.dflt_condor_setup)))
+		except EOFError:
+			# No data found, unable to decodestring
+			data = None
+
+		if data:
+			for plugin in data.keys():
+				if data[plugin]['DP'].find(label) >= 0:
+					return HttpResponse(str({'Error' : str("Cannot delete policy '%s'. User '%s' references it in his/her default selection preferences menu." 
+								% (label, p.user.username))}), mimetype = 'text/plain')
 
 	sel = CondorNodeSel.objects.filter(label = label, is_policy = True)[0]
 	sel.delete()

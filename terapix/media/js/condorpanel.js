@@ -353,7 +353,6 @@ function CondorPanel(container_id, varName) {
 					log.msg_error(resp['Error']);
 					return;
 				}
-
 				if (sel.options.length == 1)
 					_showSavedData(SELECTION, _savedSelectionDivId);
 				else {
@@ -383,6 +382,11 @@ function CondorPanel(container_id, varName) {
 			null,
 			null,	
 			function(resp) {
+				if (resp['Error']) {
+					var log = new Logger(document.getElementById(_instance_name + '_policy_log_div'));
+					log.msg_error(resp['Error']);
+					return;
+				}
 				if (sel.options.length == 1)
 					_showSavedData(POLICY, _savedPolicyDivId);
 				else {
