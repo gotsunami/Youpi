@@ -81,29 +81,20 @@ function save_config(logNode) {
 	var log = new Logger(logNode);
 
 	// Build POST data
-	// Behaviour
-	var post = 'DB=';
-	{% for plugin in plugins %}
-		var sel = document.getElementById('{{ plugin.id }}_def_behaviour_select');
-		post += sel.options[sel.selectedIndex].value + ','
-	{% endfor %}
-	post = post.substr(0, post.length-1);
+	// Default Behaviour
+	var selsuff = ['_def_behaviour_select', '_pol_select', '_sel_select'];
+	var kind = ['DB', 'DP', 'DS'];
+	var post = '';
+	var sel;
 
-	// Default policy
-	post += '&DP=';
-	{% for plugin in plugins %}
-		var sel = document.getElementById('{{ plugin.id }}_pol_select');
+	for (var k=0; k < selsuff.length; k++) {
+		post += (k > 0 ? '&' : '') + kind[k] + '=';
+{% for plugin in plugins %}
+		sel = document.getElementById('{{ plugin.id }}' + selsuff[k]);
 		post += sel.options[sel.selectedIndex].value + ','
-	{% endfor %}
-	post = post.substr(0, post.length-1);
-
-	// Default selection
-	post += '&DS=';
-	{% for plugin in plugins %}
-		var sel = document.getElementById('{{ plugin.id }}_sel_select');
-		post += sel.options[sel.selectedIndex].value + ','
-	{% endfor %}
-	post = post.substr(0, post.length-1);
+{% endfor %}
+		post = post.substr(0, post.length-1);
+	}
 
 	var r = new HttpRequest(
 		null,
@@ -119,6 +110,30 @@ function save_config(logNode) {
 	);
 
 	r.send('/youpi/preferences/condor/saveCurrentConfig/', post);
+}
+
+function load_config() {
+	var config = "{{ config }}".replace(/&#39;/g, "'");
+	if (config == 'None') return;
+
+	config = eval('(' + config + ')');
+	var selsuff = ['_def_behaviour_select', '_pol_select', '_sel_select'];
+	var kind = ['DB', 'DP', 'DS'];
+	var sel;
+	var pid;
+
+	for (var k=0; k < selsuff.length; k++) {
+{% for plugin in plugins %}
+		pid = '{{ plugin.id }}';
+		sel = document.getElementById(pid + selsuff[k]);
+		for (var j=0; j < sel.options.length; j++) {
+			if (sel.options[j].value == config[pid][kind[k]]) {
+				sel.options[j].setAttribute('selected', 'selected');
+				break;
+			}
+		}
+{% endfor %}
+	}
 }
 </script>
 {% endblock %}
@@ -225,5 +240,6 @@ function save_config(logNode) {
 	show_available_themes();
 	show_current_config_button('top_save_div');
 	show_current_config_button('bottom_save_div');
+	load_config();
 </script>
 {% endblock %}

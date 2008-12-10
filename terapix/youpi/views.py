@@ -105,6 +105,11 @@ def preferences(request):
 
 	policies = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
 	selections = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
+	try:
+		p = request.user.get_profile()
+		config = marshal.loads(base64.decodestring(str(p.dflt_condor_setup)))
+	except EOFError:
+		config = None
 
 	return render_to_response('preferences.html', 
 					{	'Debug' 			: DEBUG,
@@ -113,6 +118,7 @@ def preferences(request):
 						'current_theme'		: themes[k],
 						'policies'			: policies,
 						'selections'		: selections,
+						'config'			: config,
 						'menu'				: app_menu,
 						'selected_entry_id'	: 'preferences' }, 
 					context_instance = RequestContext(request))
@@ -1280,9 +1286,9 @@ def pref_save_condor_config(request):
 	k = 0
 	for plugin in manager.plugins:
 		condor_setup[plugin.id] = {}
-		condor_setup[plugin.id]['DB'] = db[k]
-		condor_setup[plugin.id]['DP'] = dp[k]
-		condor_setup[plugin.id]['DS'] = ds[k]
+		condor_setup[plugin.id]['DB'] = str(db[k])
+		condor_setup[plugin.id]['DP'] = str(dp[k])
+		condor_setup[plugin.id]['DS'] = str(ds[k])
 		k += 1
 
 	try:
@@ -1293,6 +1299,23 @@ def pref_save_condor_config(request):
 		return HttpResponse(str({'Error': str(e)}), mimetype = 'text/plain')
 
 	return HttpResponse(str({'Setup': str(condor_setup)}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def pref_load_condor_config(request):
+	"""
+	Load per-user default condor setup. Can be empty if user never saved its Condor default 
+	config.
+	"""
+
+	try:
+		p = request.user.get_profile()
+		data = marshal.loads(base64.decodestring(str(p.dflt_condor_setup)))
+	except EOFError:
+		# No data found, unable to decodestring
+		config = None
+
+	return HttpResponse(str({'config': str(data)}), mimetype = 'text/plain')
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'
