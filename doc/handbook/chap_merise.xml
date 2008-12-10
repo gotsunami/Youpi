@@ -99,7 +99,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Condor Node Selection</varname></term>
-			<listitem><para>Condor Node Selection (<emphasis>Selection Id</emphasis>, Label, Node selection)</para></listitem>
+			<listitem><para>Condor Node Selection (<emphasis>Selection Id</emphasis>, Label, Node selection, Date, Is Policy)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Config File</varname></term>
@@ -183,7 +183,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Site Profile</varname></term>
-			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, GUI Style)</para></listitem>
+			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, GUI Style, Default Condor Setup)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>SCAMP Plugin</varname></term>

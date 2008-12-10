@@ -30,8 +30,8 @@ graph mcd {
 	pluginother [label="{ Other plugin | [ Id ]\n... }",style=dotted];
 	firstqcomment [label="{ First Quality Comment | [ Comment ]}"];
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
-	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style}"];
-	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection}"];
+	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style\nDefault Condor Setup}"];
+	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection\nDate\nIs policy}"];
 	release [label="{ Release | [ Release Id ]\nLabel\nCreation date\nRelease date}"];
 
 	/* Relations */
