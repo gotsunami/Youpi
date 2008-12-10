@@ -548,7 +548,7 @@ class Release(models.Model):
 
 	label = models.CharField(max_length = 255, unique = True)
 	creationdate = models.DateTimeField(auto_now_add = True)
-	releasedate = models.DateTimeField()
+	releasedate = models.DateTimeField(null = True)
 
 class Rel_rinst(models.Model):
 	"""
@@ -595,9 +595,6 @@ class SiteProfile(models.Model):
 
 	# Current user GUI style
 	guistyle = models.CharField(max_length = 255, default = 'default')
-	# Current user Condor's nodes selection (in shopping cart)
-	# Serialized data (base64 encoding over marshal serialization)
-	condornodesel = models.TextField()
 	# Serialized data (base64 encoding over marshal serialization)
 	dflt_condor_setup = models.TextField()
 
