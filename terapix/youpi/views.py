@@ -354,7 +354,7 @@ def index2(request):
 	error = warning = ''
 
 	try:
-		if param == 'survey':
+		if param == 'create_survey':
 			if not Survey.objects.filter(name__iexact = value):
 				if len(value) == 0 :
 					warning = 'Please, enter a non-empty string'
@@ -366,7 +366,7 @@ def index2(request):
 			else:
 				warning = 'Survey already existing'
 
-		if param == 'instrument':
+		if param == 'create_instrument':
 			survey = request.POST['Survey']
 
 			if not Instrument.objects.filter(name__iexact = value):
@@ -381,14 +381,14 @@ def index2(request):
 			else:
 				warning = 'Instrument already existing'
 
-		if param == 'release':
+		if param == 'create_release':
 			instrument = request.POST['Instrument']
 
 			if not Release.objects.filter(label__iexact = value):
 				if len(value) == 0 :
 					warning = 'Please, enter a non-empty string'
 				else:
-					rel = Release(label = value,releasedate = getNowDateTime())
+					rel = Release(label = value,creationdate = getNowDateTime())
 					rel.save()
 					ins = Instrument.objects.filter(name__iexact = instrument)[0]
 					i = Rel_rinst(release_id =rel.id, instrument_id = ins.id)

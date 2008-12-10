@@ -33,24 +33,31 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	</div>
 	<div id="menuitem_sub_0" style="margin-top: 40px;" align="center">
 		<div align="center" class="homepage">
-			<div id="survey">
+			<div id="create_survey">
 				Please, add a survey :
-				<input type="text" size="20" id="survey_input"></input>
+				<input type="text" size="20" id="create_survey_input"></input>
 				<input type="button" value="add !" id="add_survey_button" onclick="setup(this.parentNode.id);"></input>
-				<div id="survey_log"></div>
+				<div id="create_survey_log"></div>
 			</div>
-			<div id="instrument" style="display:none">
+			<div>or</div>
+			<div id="select_survey">
+			</div>
+			<div id="create_instrument" style="display:none">
 				Please, add an instrument :
-				<input type="text" size="20" id="instrument_input"></input>
+				<input type="text" size="20" id="create_instrument_input"></input>
 				<input type="button" value="add !" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
-				<div id="instrument_log"></div>
+				<div id="create_instrument_log"></div>
 			</div>
-			<div id="release" style="display:none">
+			<div>or</div>
+			<div id="select_instrument"></div>
+			<div id="create_release" style="display:none">
 				Please, add a release :
-				<input type="text" size="20" id="release_input"></input>
+				<input type="text" size="20" id="create_release_input"></input>
 				<input type="button" value="add !" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
-				<div id="release_log"></div>
+				<div id="create_release_log"></div>
 			</div>
+			<div>or</div>
+			<div id="select_release"></div>
 		</div>
 	</div>
 	
@@ -60,10 +67,10 @@ function  setup(param) {
 
 	var name = document.getElementById(param + '_input').value;
 	var post = '';
-	if (param == 'instrument') { 
+	if (param == 'create_instrument') { 
 		post += '&Survey=' + document.getElementById('survey_input').value;
 	}
-	else if(param == 'release') {
+	else if(param == 'create_release') {
 		post += '&Survey=' + document.getElementById('survey_input').value + '&Instrument=' + document.getElementById('instrument_input').value;
 	}
 
@@ -86,11 +93,11 @@ function  setup(param) {
 				}
 				else {
 					log.msg_ok('OK : '+ param + ' saved...');
-					if (param == 'survey') {
-						document.getElementById('instrument').setAttribute('style','display:block');
+					if (param == 'create_survey') {
+						document.getElementById('create_instrument').setAttribute('style','display:block');
 						}
-					else if (param == 'instrument') {
-						document.getElementById('release').setAttribute('style','display:block');
+					else if (param == 'create_instrument') {
+						document.getElementById('create_release').setAttribute('style','display:block');
 					}
 				}
 			}
