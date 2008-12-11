@@ -85,16 +85,19 @@ function showSavedItems() {
 
 {% for plugin in plugins %}
 var {{ plugin.id }}_drop_box;
+var {{ plugin.id }}_item_count = 0;
 
 function {{ plugin.id }}_show_runtime_options() {
 	{{ plugin.id }}_drop_box = new DropdownBox('{{ plugin.id }}_drop_box', 
 		'{{ plugin.id }}_options_div_{{ forloop.counter }}', 'Runtime Options');
 	var r = {{ plugin.id }}_drop_box.getContentNode();
+	// Base id
+	var id = '{{ plugin.id }}_' + {{ plugin.id }}_item_count;
 	
 	// Checkbox
 	var da = document.createElement('div');
 	ia = document.createElement('input');
-	ia.setAttribute('id', '{{ plugin.id }}_reprocess_successful_checkbox');
+	ia.setAttribute('id', id + '_reprocess_successful_checkbox');
 	ia.setAttribute('type', 'checkbox');
 	ia.setAttribute('checked', 'checked');
 	var la = document.createElement('label');
@@ -108,7 +111,7 @@ function {{ plugin.id }}_show_runtime_options() {
 	la = document.createElement('label');
 	la.appendChild(document.createTextNode('Item prefix name'));
 	ia = document.createElement('input');
-	ia.setAttribute('id', '{{ plugin.id }}_prefix_name_input');
+	ia.setAttribute('id', id + '_prefix_name_input');
 	ia.setAttribute('type', 'text');
 	da.appendChild(la);
 	da.appendChild(ia);
@@ -117,21 +120,93 @@ function {{ plugin.id }}_show_runtime_options() {
 	// Cluster policy
 	da = document.createElement('div');
 	da.setAttribute('class', 'cart_item_policy');
-	la = document.createElement('label');
+	la = document.createElement('div');
 	la.appendChild(document.createTextNode('Cluster node policy'));
-	db = document.createElement('div');
-	db.setAttribute('id', '{{ plugin.id }}_saved_pol_div');
-	dc = document.createElement('div');
-	dc.setAttribute('id', '{{ plugin.id }}_saved_sel_div');
+
+	// Default option (radio)
+	var dd = document.createElement('div');
+	var odflt = document.createElement('input');
+	odflt.setAttribute('id', id + '_default_radio');
+	odflt.setAttribute('onclick', "toggle_node_policy_radio(this.id,'" + id + '_custom_radio' + 
+		"','" + id + '_custom_div' + "');");
+	odflt.setAttribute('type', 'radio');
+	odflt.setAttribute('checked', 'checked');
+	odflt.setAttribute('name', id + '_node_policy');
+	var dl = document.createElement('label');
+	dl.appendChild(document.createTextNode('Use your default Condor setup configuration'));
+	dd.appendChild(odflt);
+	dd.appendChild(dl);
+
+	// Custom option (radio)
+	var cd = document.createElement('div');
+	var ocus = document.createElement('input');
+	ocus.setAttribute('id', id + '_custom_radio');
+	ocus.setAttribute('onclick', "toggle_node_policy_radio('" + id + '_default_radio' + "',this.id,'" +
+		id + '_custom_div' + "');");
+	ocus.setAttribute('type', 'radio');
+	ocus.setAttribute('name', id + '_node_policy');
+	var cl = document.createElement('label');
+	cl.appendChild(document.createTextNode('Select a custom configuration for this processing'));
+	cd.appendChild(ocus);
+	cd.appendChild(cl);
+
+	var cc = document.createElement('div');
+	cc.setAttribute('id', id + '_custom_div');
+	cc.setAttribute('style', 'display: none;');
+	cl = document.createElement('label');
+	cl.appendChild(document.createTextNode('Select a policy or selection: '));
+	var csel = document.createElement('select');
+	var copt;
+	copt = document.createElement('option');
+	copt.appendChild(document.createTextNode('Policies'));
+	copt.setAttribute('disabled', 'disabled');
+	copt.setAttribute('class', 'header');
+	csel.appendChild(copt);
+
+	// Add policies
+	{% for pol in policies %}
+	copt = document.createElement('option');
+	copt.appendChild(document.createTextNode("{{ pol.label }}"));
+	copt.setAttribute('class', 'policy');
+	{% if forloop.first %}
+	copt.setAttribute('selected', 'selected');
+	{% endif %}
+	csel.appendChild(copt);
+	{% endfor %}
+
+	// Add selections
+	copt = document.createElement('option');
+	copt.appendChild(document.createTextNode('Selections'));
+	copt.setAttribute('disabled', 'disabled');
+	copt.setAttribute('class', 'header');
+	csel.appendChild(copt);
+	{% for sel in selections %}
+	copt = document.createElement('option');
+	copt.appendChild(document.createTextNode("{{ sel.label }}"));
+	copt.setAttribute('class', 'selection');
+	csel.appendChild(copt);
+	{% endfor %}
+
+	cc.appendChild(cl);
+	cc.appendChild(csel);
+
 	da.appendChild(la);
-	da.appendChild(db);
-	da.appendChild(dc);
+	da.appendChild(dd);
+	da.appendChild(cd);
+	da.appendChild(cc);
 	r.parentNode.appendChild(da);
 	
-	condorPanel.showSavedSelections('{{ plugin.id }}_saved_sel_div', false, null, false);
-	condorPanel.showSavedPolicies('{{ plugin.id }}_saved_pol_div', false, null, false);
+	{{ plugin.id }}_item_count++;
 }
 {% endfor %}
+
+function toggle_node_policy_radio(def_id, cus_id, cus_div_id) {
+	var def = document.getElementById(def_id);
+	var cus = document.getElementById(cus_id);
+	var cusdiv = document.getElementById(cus_div_id);
+
+	cus.checked ? cusdiv.setAttribute('style', 'display: block; padding-left: 20px;') : cusdiv.style.display = 'none';
+}
 
 function proceed_cart() {
 	alert('TODO...');

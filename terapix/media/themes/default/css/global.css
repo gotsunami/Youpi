@@ -1199,14 +1199,47 @@ table.cluster_policy td:last-child * {
 	margin-right: 5px;
 }
 
-div.cart_item_policy label {
+div.cart_item_policy div:first-child {
 	font-weight: bold;
+	margin-bottom: 5px;
 }
 
 div.cart_item_policy div {
 	margin: 0px;
 	padding: 0px;
 	margin-bottom: 2px;
+}
+
+div.cart_item_policy select * {
+	font-size: 9px;
+}
+
+div.cart_item_policy select  {
+	padding: 0px;
+	font-size: 9px;
+}
+
+div.cart_item_policy select option.header {
+	color: black;
+	font-weight: bold;
+	background-color: lightblue;
+}
+
+div.cart_item_policy select option.policy, div.cart_item_policy select option.selection {
+	padding-left: 5px;
+	cursor: pointer;
+}
+
+div.cart_item_policy select option.policy {
+	color: brown;
+}
+
+div.cart_item_policy select option.selection {
+	color: green;
+}
+
+div.cart_item_policy input[type="radio"] {
+	margin-right: 5px;
 }
 
 table.defaultCondorSetup td {

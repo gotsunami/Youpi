@@ -166,13 +166,17 @@ def cart_view(request):
 		else:
 			plugObj.removeData()
 
+	policies = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
+	selections = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
+
 	return render_to_response('shoppingcart.html', 
 				{	'plugins' 			: manager.plugins, 
 					'cartHasData' 		: cartHasData, 
 					'Debug' 			: DEBUG, 
 					'menu'				: app_menu,
 					# Cluster node available policies + selections
-					'nodePolicies'		: ['a', 'b', 'c'],
+					'policies'			: policies,
+					'selections'		: selections,
 					'selected_entry_id'	: 'shoppingcart', 
 					'misc' 				: manager
 				},
