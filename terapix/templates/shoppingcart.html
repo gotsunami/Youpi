@@ -83,16 +83,66 @@ function showSavedItems() {
 {% endfor %}
 }
 
+/*
+ * Function: get_runtime_options
+ * Returns per-item runtime options
+ *
+ * Called by used by {plugin}_run() functions
+ *
+ * Parameters:
+ *  prefix_id - string: TR id that identifies a SC item uniquely
+ *
+ * Data Format:
+ *  {reprocessValid: bool, itemPrefix: string, clusterPolicy: POST string}
+ *
+ * Returns:
+ *  JSON object as described in Data Format
+ *
+ */ 
+function get_runtime_options(prefix_id) {
+	var options = {
+		reprocessValid: false,
+		itemPrefix: '',
+		clusterPolicy: ''
+	};
+
+	options.reprocessValid = !document.getElementById(prefix_id + '_reprocess_successful_checkbox').checked;
+	options.itemPrefix = document.getElementById(prefix_id + '_prefix_name_input').value.replace(/ /g, '');
+
+	var post = "CondorSetup=";
+	use_custom_config = document.getElementById(prefix_id + '_custom_radio').checked;
+	// Add POST parameters depending on selected runtime options
+	if (!use_custom_config) {
+		// Use default Condor setup configuration
+		post += "default";
+	}
+	else {
+		// Use specified policy or selection
+		var sel = document.getElementById(prefix_id + '_node_select');
+		post += "custom";
+		var opt = sel.options[sel.selectedIndex];
+		if (opt.id.search(/pol_opt/) != -1)
+			post += "&Policy=";
+		else
+			post += "&Selection=";
+		post += opt.value;
+	}
+
+	options.clusterPolicy = post;
+	return options;
+}
+
 {% for plugin in plugins %}
 var {{ plugin.id }}_drop_box;
-var {{ plugin.id }}_item_count = 0;
+// Same as forloop.counter
+var {{ plugin.id }}_item_counter = 1;
 
 function {{ plugin.id }}_show_runtime_options() {
 	{{ plugin.id }}_drop_box = new DropdownBox('{{ plugin.id }}_drop_box', 
 		'{{ plugin.id }}_options_div_{{ forloop.counter }}', 'Runtime Options');
 	var r = {{ plugin.id }}_drop_box.getContentNode();
 	// Base id
-	var id = '{{ plugin.id }}_' + {{ plugin.id }}_item_count;
+	var id = '{{ plugin.id }}_' + {{ plugin.id }}_item_counter;
 	
 	// Checkbox
 	var da = document.createElement('div');
@@ -156,6 +206,7 @@ function {{ plugin.id }}_show_runtime_options() {
 	cl = document.createElement('label');
 	cl.appendChild(document.createTextNode('Select a policy or selection: '));
 	var csel = document.createElement('select');
+	csel.setAttribute('id', id + '_node_select');
 	var copt;
 	copt = document.createElement('option');
 	copt.appendChild(document.createTextNode('Policies'));
@@ -167,6 +218,7 @@ function {{ plugin.id }}_show_runtime_options() {
 	{% for pol in policies %}
 	copt = document.createElement('option');
 	copt.appendChild(document.createTextNode("{{ pol.label }}"));
+	copt.setAttribute('id', id + '_pol_opt_{{ forloop.counter0 }}');
 	copt.setAttribute('class', 'policy');
 	{% if forloop.first %}
 	copt.setAttribute('selected', 'selected');
@@ -183,6 +235,7 @@ function {{ plugin.id }}_show_runtime_options() {
 	{% for sel in selections %}
 	copt = document.createElement('option');
 	copt.appendChild(document.createTextNode("{{ sel.label }}"));
+	copt.setAttribute('id', id + '_sel_opt_{{ forloop.counter0 }}');
 	copt.setAttribute('class', 'selection');
 	csel.appendChild(copt);
 	{% endfor %}
@@ -196,7 +249,7 @@ function {{ plugin.id }}_show_runtime_options() {
 	da.appendChild(cc);
 	r.parentNode.appendChild(da);
 	
-	{{ plugin.id }}_item_count++;
+	{{ plugin.id }}_item_counter++;
 }
 {% endfor %}
 
@@ -241,6 +294,7 @@ function proceed_cart() {
 			{# Cart items #}
 			{% if cartHasData %}
 			<div style="padding-top: 20px;">
+			<div id="master_condor_log_div"></div>
 			<table width="50%" class="shoppingCart">
 			{% for plugin in plugins %}
 				{% if plugin.hasItemsInCart %}

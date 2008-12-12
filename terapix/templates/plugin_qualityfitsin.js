@@ -40,52 +40,85 @@ function {{ plugin.id }}_viewImageList(container_id, idList) {
 /*
  * fitsinId allows to retreive config file by content (not by name) when reprocessing data
  *
+ * Note: 
+ *  trid is also used as an element prefix id
+ *
  */
 function {{ plugin.id }}_run(trid, idList, itemId, flat, mask, reg, config, resultsOutputDir, fitsinId, silent) {
 	var silent = silent == true ? true : false;
 	var fitsinId = fitsinId ? fitsinId : '';
-	var condorHosts = condorPanel.getSelectedHosts();
-	var prefix = document.getElementById('prefix').value.replace(/ /g, '');
 	var txt = '';
-	var reprocess_valid = !document.getElementById('reprocess_successful_checkbox').checked;
-
-	if (condorHosts.length == 0) {
-		alert('Please select at least a node on the cluster in the Condor panel on the left.');
-		return;
-	}
+	var runopts = get_runtime_options(trid);
 
 	if (!silent) {
 		var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
 		if (!r) return;
 	}
 
+	var logdiv = document.getElementById('master_condor_log_div');
+	var log = new Logger(logdiv);
+
 	var r = new HttpRequest(
-			'{{ plugin.id}}_result',
+			logdiv,
 			null,	
 			// Custom handler for results
 			function(resp) {
-				if (resp['result']['count'] == -1) {
-					alert('An error occured. Unable to submit jobs to Condor.');
+				r = resp['result'];
+				log.clear();
+
+				if (r['Error']) {
+					log.msg_error(r['Error']);
 					return;
 				}
-				if (!silent)
-					alert('Done. Sent to cluster: ' + resp['result']['clusterId']);
+
+				if (r['CondorError']) {
+					var d = document.createElement('div');
+					d.setAttribute('style', 'width: 50%;');
+					d.setAttribute('class', 'warning');
+					d.appendChild(document.createTextNode('Condor has returned a runtime error:'));
+					var d2 = document.createElement('div');
+					var pre = document.createElement('pre');
+					pre.setAttribute('style', 'color: red; overflow: auto; text-align: left;');
+					pre.appendChild(document.createTextNode(r['CondorError']));
+					var tipd = document.createElement('div');
+					tipd.innerHTML = 'If this is a parsing error in your Condor submission file, maybe ' +
+						'the requirements you are using cause the error. In this case, you should have a look at the ' + 
+						"<a href=\"/youpi/condor/setup/\">Condor Setup</a> page, check the <b>policies</b> and <b>selection" +
+						'</b> your are using for this item submission.';
+
+					d2.appendChild(pre);
+					d.appendChild(d2);
+					d.appendChild(tipd);
+					logdiv.appendChild(d);
+					return;
+				}
+
+				if (!silent) {
+					log.msg_ok('Done. Jobs successfully sent to the cluster.');
+					var i = eval(r['ClusterIds']);
+					for (var k=0; k < i.length; k++) {
+						log.msg_ok(i[k]['count'] + ' job(s) submitted to cluster ' + i[k]['clusterId']);
+					}
+				}
 
 				// Silently remove item from the cart
 //				removeItemFromCart(trid, true);
 			}
 	);
 
-	var post = 	'Plugin={{ plugin.id }}&Method=process&IdList=' + idList + 
-				'&ItemId=' + prefix + itemId + 
+	var post = 	'Plugin={{ plugin.id }}' + 
+				'&Method=process' + 
+				'&IdList=' + idList + 
+				'&' + runopts.clusterPolicy +	
+				'&ItemId=' + runopts.itemPrefix + itemId + 
 				'&FlatPath=' + flat +
 				'&MaskPath=' + mask + 
 				'&RegPath=' + reg + 
-				'&CondorHosts=' + condorHosts + 
 				'&FitsinId=' + fitsinId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
-				'&ReprocessValid=' + (reprocess_valid ?  1 : 0) + 
+				'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0) + 
 				'&Config=' + config;
+	r.setBusyMsg('Sending jobs to the cluster, please wait');
 	r.send('/youpi/process/plugin/', post);
 }
 

@@ -13,54 +13,23 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
 from django.db.models import get_models
-from django.db.models import Q
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 from django.contrib.auth.models import User
 #
+from terapix.youpi.cviews import *
+from terapix.youpi.cviews.condreqstr import *
 from terapix.youpi.forms import *
 from terapix.youpi.models import *
+from terapix.youpi.pluginmanager import PluginManagerError
+#
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
-from terapix.youpi.cviews import *
-from terapix.youpi.pluginmanager import PluginManagerError
 #
 from terapix.settings import *
 
-def get_condor_status(request):
-	"""
-	This function is usefull to get a list of hosts attached to condor (part of the cluster) in real time.
-	A list of lists is returned : [[ vm_full_name1, state1], [vm_full_name2, state2]...]
-
-	short_host_name may be one of 'mix3', 'mix4' etc.
-	state is one of 'Idle' or 'Running'.
-	"""
-
-	pipe = os.popen("/opt/condor/bin/condor_status -xml")
-	data = pipe.readlines()
-	pipe.close()
-
-	doc = dom.parseString(string.join(data))
-	nodes = doc.getElementsByTagName('c')
-
-	vms = []
-	cur = 0
-	for n in nodes:
-		data = n.getElementsByTagName('a')
-
-		for a in data:
-			if a.getAttribute('n') == 'Name':
-				name = a.firstChild.firstChild.nodeValue
-				vms.append([str(name), 0])
-			elif a.getAttribute('n') == 'Activity':
-				status = a.firstChild.firstChild.nodeValue
-				vms[cur][1] = str(status)
-				cur += 1
-
-	return vms
-
 def condor_status(request):
-	return HttpResponse(str({'results' : get_condor_status(request)}), mimetype = 'text/plain')
+	return HttpResponse(str({'results' : get_condor_status()}), mimetype = 'text/plain')
 
 @login_required
 @profile
@@ -416,7 +385,7 @@ def live_monitoring(request):
 	return HttpResponse(str({'results' : res, 'JobCount' : jobCount, 'PageCount' : pageCount, 'nextPage' : nextPage}), mimetype = 'text/plain')
 
 def condor_hosts(request):
-	vms = get_condor_status(request)
+	vms = get_condor_status()
 	hosts = []
 	for vm in vms:
 		host = vm[0][vm[0].find('@')+1:]
@@ -674,8 +643,8 @@ def get_condor_requirement_string(request):
 	error = req = '' 
 	try:
 		policy = CondorNodeSel.objects.filter(label = name, is_policy = True)[0]
-		vms = get_condor_status(request)
-		req = _compute_requirement_string(policy.nodeselection, vms)
+		vms = get_condor_status()
+		req = get_requirement_string(policy.nodeselection, vms)
 	except Exception, e:
 		error = e
 
@@ -695,101 +664,8 @@ def compute_requirement_string(request):
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
-	vms = get_condor_status(request)
-	req = _compute_requirement_string(params, vms)
+	vms = get_condor_status()
+	req = get_requirement_string(params, vms)
 
 	return HttpResponse(str({'ReqString': str(req)}), mimetype = 'text/plain')
 
-def _compute_requirement_string(params, vms):
-	"""
-	Compute Condor's requirement string (private)
-	"""
-
-	# De-serialization mappings
-	cdeserial = {
-		'G' : '>=',
-		'L' : '<=',
-		'E' : '='
-	}
-	sdeserial = {
-		'M'	: 1,
-		'G'	: 1024,
-		'T'	: 1024 * 1024
-	}
-
-	params = params.split('#')
-	nodes = [vm[0] for vm in vms]
-
-	crit = {}
-	for p in params:
-		d = p.split(',')
-		if not crit.has_key(d[0]):
-			crit[d[0]] = []
-		crit[d[0]].append(d[1:])
-
-	req = 'Requirements = ('
-
-	# Memory
-	if crit.has_key('MEM'):
-		req += '('
-		for mem in crit['MEM']:
-			comp, val, unit = mem
-			req += "Memory %s %d && " % (cdeserial[comp], int(val)*sdeserial[unit])
-		req = req[:-4] + ')'
-
-	# Disk
-	if crit.has_key('DSK'):
-		if req[-1] == ')':
-			req += ' && '
-		req += '('
-		for dsk in crit['DSK']:
-			comp, val, unit = dsk
-			req += "Disk %s %d && " % (cdeserial[comp], int(val)*sdeserial[unit])
-		req = req[:-4] + ')'
-
-	# Host name
-	vm_sel = []
-	if crit.has_key('HST'):
-		for hst in crit['HST']:
-			comp, val = hst
-			for vm in nodes:
-				m = re.search(val, vm)
-				if m:
-					if comp == 'M':
-						vm_sel.append(vm)
-				else:
-					if comp == 'NM':
-						vm_sel.append(vm)
-
-	# Filter slots
-	if crit.has_key('SLT'):
-		for slt in crit['SLT']:
-			comp, selname = slt
-			sel = CondorNodeSel.objects.filter(label = selname)[0]
-			data = marshal.loads(base64.decodestring(sel.nodeselection))
-			if not crit.has_key('HST') and comp == 'NB':
-				vm_sel = nodes
-			for n in data:
-				# Belongs to
-				if comp == 'B':
-					vm_sel.append(n)
-				else:
-					if n in vm_sel:
-						try:
-							while 1:
-								vm_sel.remove(n)
-						except:
-							pass
-
-	# Finally build host selection
-	if vm_sel:
-		if req[-1] == ')':
-			req += ' && '
-		req += '('
-		for vm in vm_sel:
-			req += "Name == '%s' || " % vm
-		req = req[:-4] + ')'
-	
-	req += ')'
-
-	return req

@@ -1,16 +1,20 @@
 # vim: set ts=4
 
 from django.contrib.sessions.models import Session
-from terapix.youpi.models import *
-import glob, sys, types, re, os
+import glob, sys, types, re, os, string
 import marshal, base64
 from types import *
 from settings import *
+#
+from terapix.youpi.models import *
+#from terapix.youpi.cviews.condreqstr import *
 
 PLUGIN_DIRS = os.path.join(HOME, 'youpi', 'terapix', 'youpi', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 
+class CondorSetupError(Exception): pass
+class CondorSubmitError(Exception): pass
 class PluginError(Exception): pass
 class PluginManagerError(Exception): pass
 
@@ -71,33 +75,58 @@ class ProcessingPlugin:
 		except IndexError:
 			count = -1
 			cid = -1
+		except AttributeError:
+			# RE issue, could be a Condor error
+			if submit_content[1].find('ERROR') == 0:
+				raise CondorSubmitError, "Condor error:\n%s" % string.join(submit_content[1:], '')
 
 		return { 'count' : count, 'clusterId' : cid, 'data' : [str(s) for s in submit_content] }
 
-	def getCondorRequirementString(self, condorHosts):
-		#
-		# Handle requirements from condorHosts
-		# Hosts and vms must be separated from this vm@host list
-		# Will build packets of (Machine == "host" && (VirtualMachineID == 1 [|| ...])) [|| ...]
-		#
-		reqHosts = {}
-		for host in condorHosts:
-			m = re.match(r'^.*?(?P<vmid>\d+)@(?P<name>.*?)$', host)
-			name = m.group('name')
-			vmid = m.group('vmid')
-			try:
-				reqHosts[name].append(vmid)
-			except KeyError:
-				reqHosts[name] = []
-				reqHosts[name].append(vmid)
+	def getCondorRequirementString(self, request):
+		"""
+		Realtime and powerful Condor requirement string generation
+		"""
 
-		req = '('
-		for host, vms in reqHosts.iteritems():
-			req += """(Machine == "%s" && (""" % host
-			for vmid in vms:
-				req += """VirtualMachineID == %d || """ % int(vmid)
-			req = req[:-4] + ')) || '
-		req = req[:-4] + ')'
+		from terapix.youpi.cviews.condreqstr import *
+
+		post = request.POST
+		try:
+			condorSetup = post['CondorSetup']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
+		vms = get_condor_status()
+
+		if condorSetup == 'default':
+			dflt_setup = marshal.loads(base64.decodestring(request.user.get_profile().dflt_condor_setup))
+			# Check Behaviour: policy or selection
+			if not dflt_setup.has_key(self.id):
+				raise PluginError, "No default Condor setup found for '%s' plugin." % self.optionLabel
+
+			db = dflt_setup[self.id]['DB']
+			if db == 'policy':
+				pol = CondorNodeSel.objects.filter(label = dflt_setup[self.id]['DP'], is_policy = True)[0]
+				req = get_requirement_string(pol.nodeselection, vms)
+			else:
+				# Default behaviour is 'selection'
+				req = get_requirement_string_from_selection(dflt_setup[self.id]['DS'])
+
+		elif condorSetup == 'custom':
+			try:
+				c_policy = str(post['Policy'])
+				c_selection = None
+			except Exception, e:
+				try:
+					c_selection = str(post['Selection'])
+					c_policy = None
+				except Exception, e:
+					raise PluginError, 'condorSetup POST argument error. Unable to process data'
+
+			if c_policy:
+				pol = CondorNodeSel.objects.filter(label = c_policy, is_policy = True)[0]
+				req = get_requirement_string(pol.nodeselection, vms)
+			else:
+				req = get_requirement_string_from_selection(c_selection)
 
 		return req
 

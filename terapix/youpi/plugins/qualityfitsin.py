@@ -3,7 +3,7 @@
 import sys, os.path, re, time, string
 import xml.dom.minidom as dom
 import marshal, base64, zlib
-from pluginmanager import ProcessingPlugin, PluginError
+from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
 from terapix.youpi.models import *
 from types import *
 from sets import Set
@@ -303,13 +303,15 @@ class QualityFitsIn(ProcessingPlugin):
 			flatPath = post['FlatPath']
 			maskPath = post['MaskPath']
 			regPath = post['RegPath']
-			condorHosts = post['CondorHosts'].split(',')
 			config = post['Config']
 			fitsinId = post['FitsinId']
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = post['ReprocessValid']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
+
+		# Builds realtime Condor requirements string
+		req = self.getCondorRequirementString(request)
 
 		#
 		# Config file selection and storage.
@@ -329,9 +331,6 @@ class QualityFitsIn(ProcessingPlugin):
 				content = config.content
 		except Exception, e:
 			raise PluginError, "Unable to use a suitable config file: %s" % e
-
-		if not len(condorHosts):
-			raise PluginError, "No cluster host supplied. Unable to generate a condor submission file."
 
 		now = time.time()
 		customrc = os.path.join('/tmp/', "qf-%s.rc" % now)
@@ -362,9 +361,6 @@ class QualityFitsIn(ProcessingPlugin):
 
 		csf = open(csfPath, 'w')
 
-		# Builds Condor requirements string
-		req = self.getCondorRequirementString(condorHosts)
-
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
 	 	# Generates CSF
@@ -387,8 +383,8 @@ error                   = /tmp/QF.err.$(Cluster).$(Process)
 output                  = /tmp/QF.out.$(Cluster).$(Process)
 notification            = Error
 notify_user             = monnerville@iap.fr
-requirements            = %s
-""" % (	os.path.join(submit_file_path, 'script'),
+# Computed Req string
+%s""" % (	os.path.join(submit_file_path, 'script'),
 			submit_file_path, 
 			os.path.join(submit_file_path, 'script'),
 			customrc,
@@ -531,17 +527,26 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
-		post = request.POST
-		for imgList in idList:
-			if not len(imgList):
-				continue
-			csfPath = self.__getCondorSubmissionFile(request, imgList)
-			pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
-			data = pipe.readlines()
-			pipe.close()
+		cluster_ids = []
+		k = 1
+		error = condorError = '' 
 
-		# FIXME: returns only latest data
-		return self.getClusterId(data)
+		try:
+			for imgList in idList:
+				if not len(imgList):
+					continue
+				csfPath = self.__getCondorSubmissionFile(request, imgList)
+				pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
+				data = pipe.readlines()
+				pipe.close()
+				cluster_ids.append(self.getClusterId(data))
+				k += 1
+		except CondorSubmitError, e:
+				condorError = str(e)
+		except Exception, e:
+				error = "Error while processing list #%d: %s" % (k, e)
+
+		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
 	def getRuns(self, request):
 		# Return a list of lists [run name, image count]
