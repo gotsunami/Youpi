@@ -398,18 +398,19 @@ notify_user             = monnerville@iap.fr
 			raise ValueError, userData
 
 		scamp_params = "-XSL_URL %s/scamp.xsl" % os.path.join(	WWW_SCAMP_PREFIX, 
-																		request.user.username, 
-																		userData['Kind'], 
-																		userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+																request.user.username, 
+																userData['Kind'], 
+																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
 		condor_submit_entry = """
 arguments               = %s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %s %s -c %s 2>/dev/null
 # YOUPI_USER_DATA = %s
-environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
+environment             = USERNAME=%s; TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
 queue""" %  (	encUserData, 
 				scamp_params,
 				string.join(ldac_files), 
 				os.path.basename(customrc),
 				userData, 
+				request.user.username,
 				FTP_URL + resultsOutputDir,
 				base64.encodestring(marshal.dumps(userData)).replace('\n', '') )
 

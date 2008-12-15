@@ -366,6 +366,10 @@ def process(userData, kind_id, argv):
 	elif kind == 'sex':
 		if exit_code == 0:
 			success = 1
+
+	elif kind == 'swarp':
+		if exit_code == 0:
+			success = 1
 	else:
 		# Put other processing stuff here
 		pass
@@ -400,6 +404,9 @@ def init_job(userData):
 
 	if not len(res):
 		raise WrapperError, "Processing kind not supported: '%s'" % userData['Kind']
+
+	# Exports current hostname to ENV
+	os.environ['HOSTNAME'] = socket.getfqdn()
 
 	# Build per-user output path
 	user_path = os.path.join(PROCESSING_OUTPUT, username)
