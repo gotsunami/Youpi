@@ -357,43 +357,41 @@ function {{ plugin.id }}_renderLDACSelection(idx) {
 function {{ plugin.id }}_run(trid, idList, itemId, config, resultsOutputDir, scampId, silent) {
 	var silent = silent == true ? true : false;
 	var scampId = scampId ? scampId : '';
-	var condorHosts = condorPanel.getSelectedHosts();
-	var prefix = document.getElementById('prefix').value.replace(/ /g, '');
 	var txt = '';
-
-	if (condorHosts.length == 0) {
-		alert('Please select at least a node on the cluster in the Condor panel on the left.');
-		return;
-	}
+	var runopts = get_runtime_options(trid);
 
 	if (!silent) {
 		var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
 		if (!r) return;
 	}
 
+	var logdiv = document.getElementById('master_condor_log_div');
+
 	var r = new HttpRequest(
-			'{{ plugin.id }}_result',
+			logdiv,
 			null,	
 			// Custom handler for results
 			function(resp) {
-				if (resp['result']['count'] == -1) {
-					alert('An error occured. Unable to submit jobs to Condor.');
-					return;
-				}
-				if (!silent)
-					alert('Done. Sent to cluster: ' + resp['result']['clusterId']);
+				r = resp['result'];
+				var success = update_condor_submission_log(resp, silent);
+				if (!success) return;
 
 				// Silently remove item from the cart
 				removeItemFromCart(trid, true);
 			}
 	);
 
-	var post = 	'Plugin={{ plugin.id }}&Method=process&IdList=' + idList + 
-				'&ItemId=' + prefix + itemId + 
-				'&CondorHosts=' + condorHosts + 
+	var post = 	'Plugin={{ plugin.id }}' + 
+				'&Method=process' + 
+				'&IdList=' + idList + 
 				'&ScampId=' + scampId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
-				'&Config=' + config;
+				'&Config=' + config +
+				// runtime options related
+				'&' + runopts.clusterPolicy +	
+				'&ItemId=' + runopts.itemPrefix + itemId + 
+				'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0);
+
 	r.send('/youpi/process/plugin/', post);
 }
 
@@ -461,7 +459,7 @@ function {{ plugin.id }}_renderOutputDirStats(container_id) {
 }
 
 function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, resultsOutputDir, config) {
-	var prefix = document.getElementById('prefix').value.replace(/ /g, '');
+	var runopts = get_runtime_options(trid);
 	var r = new HttpRequest(
 			'result',
 			null,	
@@ -477,7 +475,7 @@ function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, resultsOutputDir
 	var post = 	'Plugin={{ plugin.id }}' + 
 				'&Method=saveCartItem' +
 				'&IdList=' + idList + 
-				'&ItemID=' + prefix + itemId + 
+				'&ItemID=' + runopts.itemPrefix + itemId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
 				'&Config=' + config;
 	r.send('/youpi/process/plugin/', post);

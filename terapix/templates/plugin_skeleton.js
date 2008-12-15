@@ -54,31 +54,32 @@ function {{ plugin.id }}_addSelectionToCart() {
  *  row - integer: for row number
  *
  */ 
-function {{ plugin.id }}_run(trid, resultsOutputDir, silent) {
+function {{ plugin.id }}_run(trid, itemId, resultsOutputDir, silent) {
 	var silent = silent == true ? true : false;
-	// REQUIRED
-	var condorHosts = condorPanel.getSelectedHosts();
+	var runopts = get_runtime_options(trid);
+	var logdiv = document.getElementById('master_condor_log_div');
 
 	var r = new HttpRequest(
-			null,
+			logdiv,
 			null,	
 			// Custom handler for results
 			function(resp) {
-				if (resp['result']['count'] == -1) {
-					alert('An error occured. Unable to submit jobs to Condor.');
-					return;
-				}
-				if (!silent)
-					alert('Done. Sent to cluster: ' + resp['result']['clusterId']);
+				r = resp['result'];
+				var success = update_condor_submission_log(resp, silent);
+				if (!success) return;
 
 				// Silently remove item from the cart
 				removeItemFromCart(trid, true);
 			}
 	);
 
-	var post = 	'Plugin={{ plugin.id }}&Method=process' +
-				'&CondorHosts=' + condorHosts +
-				'&ResultsOutputDir=' + resultsOutputDir;
+	var post = 	'Plugin={{ plugin.id }}' + 
+				'&Method=process' +
+				'&ResultsOutputDir=' + resultsOutputDir +
+				// runtime options related
+				'&' + runopts.clusterPolicy +	
+				'&ItemId=' + runopts.itemPrefix + itemId + 
+				'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0);
 	r.send('/youpi/process/plugin/', post);
 }
 
@@ -146,7 +147,7 @@ function {{ plugin.id }}_renderOutputDirStats(container_id) {
 }
 
 function {{ plugin.id }}_saveItemForLater(trid, itemId, resultsOutputDir) {
-	var prefix = document.getElementById('prefix').value.replace(/ /g, '');
+	var runopts = get_runtime_options(trid);
 	var r = new HttpRequest(
 			'{{ plugin.id}}_result',
 			null,	
@@ -160,7 +161,7 @@ function {{ plugin.id }}_saveItemForLater(trid, itemId, resultsOutputDir) {
 	);
 
 	var post = 	'Plugin={{ plugin.id }}&Method=saveCartItem' + 
-				'&ItemID=' + prefix + itemId +
+				'&ItemID=' + runopts.itemPrefix + itemId +
 				'&ResultsOutputDir=' + resultsOutputDir;
 	r.send('/youpi/process/plugin/', post);
 }

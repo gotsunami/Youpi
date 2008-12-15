@@ -56,7 +56,6 @@ function {{ plugin.id }}_run(trid, idList, itemId, flat, mask, reg, config, resu
 	}
 
 	var logdiv = document.getElementById('master_condor_log_div');
-	var log = new Logger(logdiv);
 
 	var r = new HttpRequest(
 			logdiv,
@@ -64,60 +63,28 @@ function {{ plugin.id }}_run(trid, idList, itemId, flat, mask, reg, config, resu
 			// Custom handler for results
 			function(resp) {
 				r = resp['result'];
-				log.clear();
-
-				if (r['Error']) {
-					log.msg_error(r['Error']);
-					return;
-				}
-
-				if (r['CondorError']) {
-					var d = document.createElement('div');
-					d.setAttribute('style', 'width: 50%;');
-					d.setAttribute('class', 'warning');
-					d.appendChild(document.createTextNode('Condor has returned a runtime error:'));
-					var d2 = document.createElement('div');
-					var pre = document.createElement('pre');
-					pre.setAttribute('style', 'color: red; overflow: auto; text-align: left;');
-					pre.appendChild(document.createTextNode(r['CondorError']));
-					var tipd = document.createElement('div');
-					tipd.innerHTML = 'If this is a parsing error in your Condor submission file, maybe ' +
-						'the requirements you are using cause the error. In this case, you should have a look at the ' + 
-						"<a href=\"/youpi/condor/setup/\">Condor Setup</a> page, check the <b>policies</b> and <b>selection" +
-						'</b> your are using for this item submission.';
-
-					d2.appendChild(pre);
-					d.appendChild(d2);
-					d.appendChild(tipd);
-					logdiv.appendChild(d);
-					return;
-				}
-
-				if (!silent) {
-					log.msg_ok('Done. Jobs successfully sent to the cluster.');
-					var i = eval(r['ClusterIds']);
-					for (var k=0; k < i.length; k++) {
-						log.msg_ok(i[k]['count'] + ' job(s) submitted to cluster ' + i[k]['clusterId']);
-					}
-				}
+				var success = update_condor_submission_log(resp, silent);
+				if (!success) return;
 
 				// Silently remove item from the cart
-//				removeItemFromCart(trid, true);
+				removeItemFromCart(trid, true);
 			}
 	);
 
 	var post = 	'Plugin={{ plugin.id }}' + 
 				'&Method=process' + 
 				'&IdList=' + idList + 
-				'&' + runopts.clusterPolicy +	
-				'&ItemId=' + runopts.itemPrefix + itemId + 
 				'&FlatPath=' + flat +
 				'&MaskPath=' + mask + 
 				'&RegPath=' + reg + 
 				'&FitsinId=' + fitsinId + 
 				'&ResultsOutputDir=' + resultsOutputDir + 
-				'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0) + 
-				'&Config=' + config;
+				'&Config=' + config +
+				// runtime options related
+				'&' + runopts.clusterPolicy +	
+				'&ItemId=' + runopts.itemPrefix + itemId + 
+				'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0);
+
 	r.setBusyMsg('Sending jobs to the cluster, please wait');
 	r.send('/youpi/process/plugin/', post);
 }
@@ -174,7 +141,7 @@ function {{ plugin.id }}_runAll() {
 
 // Mandatory function
 function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, flat, mask, reg, resultsOutputDir, config, silent) {
-	var prefix = document.getElementById('prefix').value.replace(/ /g, '');
+	var runopts = get_runtime_options(trid);
 	var r = new HttpRequest(
 			'{{ plugin.id}}_result',
 			null,	
@@ -190,7 +157,7 @@ function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, flat, mask, reg,
 	var post = 	'Plugin={{ plugin.id }}' + 
 				'&Method=saveCartItem' + 
 				'&IdList=' + idList + 
-				'&ItemID=' + prefix + itemId + 
+				'&ItemID=' + runopts.itemPrefix + itemId + 
 				'&FlatPath=' + flat +
 				'&MaskPath=' + mask + 
 				'&RegPath=' + reg + 

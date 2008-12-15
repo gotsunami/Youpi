@@ -15,7 +15,7 @@
 
 import sys, os.path, re, time, string
 import marshal, base64, zlib
-from pluginmanager import ProcessingPlugin, PluginError
+from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
 from terapix.youpi.models import *
 #
 from terapix.settings import *
@@ -60,17 +60,21 @@ class Skeleton(ProcessingPlugin):
 		"""
 		post = request.POST
 
-		csfContent, csfPath = self.__getCondorSubmissionFile(request)
+		cluster_ids = []
+		error = condorError = '' 
 
-		f = open(csfPath, 'w')
-		f.write(csfContent)
-		f.close()
+		try:
+			csfPath = self.__getCondorSubmissionFile(request)
+			pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
+			data = pipe.readlines()
+			pipe.close()
+			cluster_ids.append(self.getClusterId(data))
+		except CondorSubmitError, e:
+				condorError = str(e)
+		except Exception, e:
+				error = "Error while processing item: %s" % e
 
-		pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
-		data = pipe.readlines()
-		pipe.close()
-
-		return self.getClusterId(data)
+		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
 	def getOutputDirStats(self, outputDir):
 		"""
@@ -103,22 +107,27 @@ class Skeleton(ProcessingPlugin):
 			#
 			# Retreive your POST data here
 			#
-			condorHosts = post['CondorHosts'].split(',')
 			resultsOutputDir = post['ResultsOutputDir']
+			itemId = str(post['ItemId'])
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+				raise PluginError, "POST argument error. Unable to process data: %s" % e
 
 		now = time.time()
 		# Condor submission file
 		csfPath = "/tmp/skel-%s.txt" % now
+		csf = open(csfPath, 'w')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		# At least those 3 keys
 		userData = {'Descr' 			: str("%s trying %s" % (self.optionLabel, self.command)),		# Mandatory for Active Monitoring Interface (AMI)
-					'Kind'	 			: self.id,													# Mandatory for AMI, Wrapper Processing (WP)
-					'UserID' 			: str(request.user.id),										# Mandatory for AMI, WP
-					'ResultsOutputDir'	: str(resultsOutputDir)									# Mandatory for WP
+					'Kind'	 			: self.id,														# Mandatory for AMI, Wrapper Processing (WP)
+					'UserID' 			: str(request.user.id),											# Mandatory for AMI, WP
+					'ItemID' 			: itemId, 
+					'ResultsOutputDir'	: str(resultsOutputDir)											# Mandatory for WP
 				} 
+
+		# Builds realtime Condor requirements string
+		req = self.getCondorRequirementString(request)
 
 		# Base64 encoding + marshal serialization
 		# Will be passed as argument 1 to the wrapper script
@@ -131,9 +140,6 @@ class Skeleton(ProcessingPlugin):
 		args = ''
 		for x in range(self.jobCount):
 			args += "arguments = %s %s\nqueue\n" % (encUserData, self.command)
-
-		# Builds Condor requirements string
-		req = self.getCondorRequirementString(condorHosts)
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
@@ -162,7 +168,8 @@ error                   = /tmp/SKEL.err.$(Cluster).$(Process)
 output                  = /tmp/SKEL.out.$(Cluster).$(Process)
 notification            = Error
 notify_user             = monnerville@iap.fr
-requirements            = %s
+# Computed Req string
+%s
 %s""" % (	self.description,
 			os.path.join(submit_file_path, 'script'),
 			submit_file_path, 
@@ -174,7 +181,10 @@ requirements            = %s
 			req, 
 			args )
 
-		return (condor_submit_file, csfPath)
+		csf.write(condor_submit_file)
+		csf.close()
+
+		return csfPath
 
 
 	def getTaskInfo(self, request):
