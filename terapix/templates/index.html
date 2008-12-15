@@ -33,31 +33,59 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	</div>
 	<div id="menuitem_sub_0" style="margin-top: 40px;" align="center">
 		<div align="center" class="homepage">
+
 			<div id="create_survey">
 				Please, add a survey :
 				<input type="text" size="20" id="create_survey_input"></input>
-				<input type="button" value="add !" id="add_survey_button" onclick="setup(this.parentNode.id);"></input>
+				<input type="button" value="add!" id="add_survey_button" onclick="setup(this.parentNode.id);"></input>
 				<div id="create_survey_log"></div>
 			</div>
-			<div>or</div>
+
+			<div id="or1">or</div>
+
 			<div id="select_survey">
+			choose one from survey list :	
+				<select  id="select_survey_list"  onchange="kselect(this.parentNode.id);">
+				{% for i in list_survey %}
+					<option> {{ i }} </option>
+				{% endfor %}
+				</select>
+				<div id="select_survey_log"></div>
 			</div>
+
+
 			<div id="create_instrument" style="display:none">
 				Please, add an instrument :
 				<input type="text" size="20" id="create_instrument_input"></input>
-				<input type="button" value="add !" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
+				<input type="button" value="add!" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
 				<div id="create_instrument_log"></div>
 			</div>
-			<div>or</div>
-			<div id="select_instrument"></div>
+
+			<div id = "or2" style="display:none">or</div>
+
+			<div id="select_instrument" style="display:none">
+			choose one from instrument list :
+				<select  id="select_instrument_list" onchange="kselect(this.parentNode.id);"></select>
+				<div id="select_instrument_log"></div>
+			</div>
+
+
 			<div id="create_release" style="display:none">
 				Please, add a release :
 				<input type="text" size="20" id="create_release_input"></input>
-				<input type="button" value="add !" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
+				<input type="button" value="add!" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
 				<div id="create_release_log"></div>
 			</div>
-			<div>or</div>
-			<div id="select_release"></div>
+
+			<div id = "or3" style="display:none">or</div>
+
+			<div id="select_release" style="display:none">
+			choose one from release list :
+				<select  id="select_release_list" onchange="kselect(this.parentNode.id);"></select>
+				<div id="select_release_log"></div>
+			</div>
+
+
 		</div>
 	</div>
 	
@@ -68,10 +96,10 @@ function  setup(param) {
 	var name = document.getElementById(param + '_input').value;
 	var post = '';
 	if (param == 'create_instrument') { 
-		post += '&Survey=' + document.getElementById('survey_input').value;
+		post += '&Survey=' + document.getElementById('create_survey_input').value;
 	}
 	else if(param == 'create_release') {
-		post += '&Survey=' + document.getElementById('survey_input').value + '&Instrument=' + document.getElementById('instrument_input').value;
+		post += '&Survey=' + document.getElementById('create_survey_input').value + '&Instrument=' + document.getElementById('create_instrument_input').value;
 	}
 
 
@@ -106,6 +134,56 @@ function  setup(param) {
     post += '&Param=' + param + '&Value=' + name;
     xhr.send('/youpi/newindex/', post);
 }
+
+
+function kselect(param) {
+	
+	var post = '';
+	s = document.getElementById('select_survey_list').selectedIndex;
+	name = document.getElementById('select_survey_list').options[s].text;
+    post += '&Survey=' + param + '&Value=' + name;
+
+    var xhr = new HttpRequest(
+            null,
+            null,   
+            // Custom handler for results
+            function(resp) {
+
+				var log = new Logger(param + '_log');
+				log.clear();
+				if (resp['Error'].length) {
+					log.msg_error(resp['Error']);
+					return;
+				}
+				if (resp['Warning'].length) {
+					log.msg_warning(resp['Warning']);
+					return;
+				}
+				else {
+					if (param == 'select_survey') {
+						document.getElementById('select_instrument').setAttribute('style','display:block');
+						document.getElementById('create_instrument').setAttribute('style','display:block');
+						document.getElementById('or2').setAttribute('style','display:block');
+						select = document.getElementById('select_instrument_list');
+						list_instrument = resp['list_instrument'];
+						select.innerHTML = '';
+						for (var i = 0 ; i < list_instrument.length ; i++) {
+							option = document.createElement('option');
+							option.innerHTML = list_instrument[i];
+							select.appendChild(option);
+						}
+					}
+				}
+			}
+    );
+
+
+    post += '&Param=' + param + '&Value=' + name;
+    xhr.send('/youpi/newindex/', post);
+
+
+}
+
 </script>
 
 {% endblock %}

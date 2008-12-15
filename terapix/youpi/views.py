@@ -61,10 +61,16 @@ def index(request):
 	This is the main entry point (root) of the web application.
 	This is a callback function (as defined in django's urls.py file).
 	"""
+	k = []
+	s = Survey.objects.filter(rel_us__user = request.user.id)
+	for i in s:
+		k.append(str(i))
+
 	return render_to_response('index.html', 
 					{	'Debug' 			: DEBUG,
 						'menu'				: app_menu,
-						'selected_entry_id'	: 'home' }, 
+						'selected_entry_id'	: 'home' ,
+						'list_survey' : k},
 					context_instance = RequestContext(request))
 
 @login_required
@@ -359,6 +365,7 @@ def index2(request):
 
 	try:
 		if param == 'create_survey':
+			k = []
 			if not Survey.objects.filter(name__iexact = value):
 				if len(value) == 0 :
 					warning = 'Please, enter a non-empty string'
@@ -370,7 +377,8 @@ def index2(request):
 			else:
 				warning = 'Survey already existing'
 
-		if param == 'create_instrument':
+		elif param == 'create_instrument':
+			k = []
 			survey = request.POST['Survey']
 
 			if not Instrument.objects.filter(name__iexact = value):
@@ -385,7 +393,8 @@ def index2(request):
 			else:
 				warning = 'Instrument already existing'
 
-		if param == 'create_release':
+		elif param == 'create_release':
+			k = []
 			instrument = request.POST['Instrument']
 
 			if not Release.objects.filter(label__iexact = value):
@@ -400,14 +409,30 @@ def index2(request):
 			else:
 				warning = 'Instrument already existing'
 
+		elif param == 'select_survey':
+			k = []
+			survey = request.POST['Value']
+			l = Instrument.objects.filter(rel_si__survey__name = survey)
+			for li in l :
+				k.append(str(li))
+
+		elif param == 'select_instrument':
+			k = []
+			instrument = request.POST['Value']
+			l = Release.objects.filter(rel_rinst__instrument__name = instrument)
+			for li in l :
+				k.append(str(li))
+
+
+
 
 	except Exception, e:
 		error = e
 
-		
-	resp = {'Survey' : str(value), 'Error' : str(error),'Warning' : warning}
-
+	resp = {'Survey' : str(value),'Instrument' : str(value),'list_instrument' : k, 'Release' : str(value),'list_release' : k, 'Error' : str(error),'Warning' : warning}
+	
 	return HttpResponse(str(resp), mimetype = 'text/plain')
+	
 
 def local_ingestion(request):
 	"""
