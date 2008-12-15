@@ -76,27 +76,6 @@ class Skeleton(ProcessingPlugin):
 
 		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
-	def getOutputDirStats(self, outputDir):
-		"""
-		Return some skeleton-related statistics about processings from outputDir.
-		"""
-
-		headers = ['Task success', 'Task failures', 'Total processings']
-		cols = []
-		tasks = Processing_task.objects.filter(results_output_dir = outputDir)
-		tasks_success = tasks_failure = 0
-		for t in tasks:
-			if t.success == 1:
-				tasks_success += 1
-			else:
-				tasks_failure += 1
-
-		stats = {	'TaskSuccessCount' 	: [tasks_success, "%.2f" % (float(tasks_success)/len(tasks)*100)],
-					'TaskFailureCount' 	: [tasks_failure, "%.2f" % (float(tasks_failure)/len(tasks)*100)],
-					'Total' 			: len(tasks) }
-
-		return stats
-
 	def __getCondorSubmissionFile(self, request):
 		"""
 		Generates a suitable Condor submission for processing self.command jobs on the cluster.

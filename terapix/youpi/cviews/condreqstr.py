@@ -1,6 +1,6 @@
 # vim: set ts=4
 
-import os, string
+import os, string, re
 import xml.dom.minidom as dom
 import base64, marshal
 #

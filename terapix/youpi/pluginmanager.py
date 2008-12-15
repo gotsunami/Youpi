@@ -35,6 +35,27 @@ class ProcessingPlugin:
 		# Used to generate rather unique item ID in shopping cart
 		self.itemCounter = 0
 
+	def getOutputDirStats(self, outputDir):
+		"""
+		Return some skeleton-related statistics about processings from outputDir.
+		"""
+
+		headers = ['Task success', 'Task failures', 'Total processings']
+		cols = []
+		tasks = Processing_task.objects.filter(results_output_dir = outputDir)
+		tasks_success = tasks_failure = 0
+		for t in tasks:
+			if t.success == 1:
+				tasks_success += 1
+			else:
+				tasks_failure += 1
+
+		stats = {	'TaskSuccessCount' 	: [tasks_success, "%.2f" % (float(tasks_success)/len(tasks)*100)],
+					'TaskFailureCount' 	: [tasks_failure, "%.2f" % (float(tasks_failure)/len(tasks)*100)],
+					'Total' 			: len(tasks) }
+
+		return stats
+
 	def hasItemsInCart(self):
 		"""
 		Returns True if this plugin has items in shopping cart.
