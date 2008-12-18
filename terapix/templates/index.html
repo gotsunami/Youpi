@@ -18,89 +18,28 @@
 <script type="text/javascript" src="/media/js/sqlform.js"></script>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
-</script>
-{% endblock %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
-{% block coltype %}colMS{% endblock %}
-{% block bodyclass %}dashboard{% endblock %}
-
-{% block content %}
-	<div id="pre_submenu">
-		<ul class="smart_tabnav_sub" id="tabnav2">
-			<li class="enabled"><a href="#" id="link_global" onclick="swap_display(this.id, 'menuitem_sub_0', 'tabnav2', 'menuitem_');">Global Informations</a></li>
-		</ul>
-	</div>
-	<div id="menuitem_sub_0" style="margin-top: 40px;" align="center">
-		<div align="center" class="homepage">
-
-			<div id="create_survey">
-				Please, add a survey :
-				<input type="text" size="20" id="create_survey_input"></input>
-				<input type="button" value="add!" id="add_survey_button" onclick="setup(this.parentNode.id);"></input>
-				<div id="create_survey_log"></div>
-			</div>
-
-			<div id="or1">or</div>
-
-			<div id="select_survey">
-			choose one from survey list :	
-				<select  id="select_survey_list"  onchange="kselect(this.parentNode.id);">
-				{% for i in list_survey %}
-					<option> {{ i }} </option>
-				{% endfor %}
-				</select>
-				<div id="select_survey_log"></div>
-			</div>
-
-
-			<div id="create_instrument" style="display:none">
-				Please, add an instrument :
-				<input type="text" size="20" id="create_instrument_input"></input>
-				<input type="button" value="add!" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
-				<div id="create_instrument_log"></div>
-			</div>
-
-			<div id = "or2" style="display:none">or</div>
-
-			<div id="select_instrument" style="display:none">
-			choose one from instrument list :
-				<select  id="select_instrument_list" onchange="kselect(this.parentNode.id);"></select>
-				<div id="select_instrument_log"></div>
-			</div>
-
-
-			<div id="create_release" style="display:none">
-				Please, add a release :
-				<input type="text" size="20" id="create_release_input"></input>
-				<input type="button" value="add!" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
-				<div id="create_release_log"></div>
-			</div>
-
-			<div id = "or3" style="display:none">or</div>
-
-			<div id="select_release" style="display:none">
-			choose one from release list :
-				<select  id="select_release_list" onchange="kselect(this.parentNode.id);"></select>
-				<div id="select_release_log"></div>
-			</div>
-
-
-		</div>
-	</div>
-	
-
-<script type="text/javascript">
 function  setup(param) {
 
-	var name = document.getElementById(param + '_input').value;
 	var post = '';
-	if (param == 'create_instrument') { 
-		post += '&Survey=' + document.getElementById('create_survey_input').value;
-	}
+
+	var value = document.getElementById(param + '_input').value;
+
+	if (param == 'create_survey') {
+		post += '&Survey=' + value;
+		}
+
+	else if (param == 'create_instrument') { 
+		select = document.getElementById('select_survey_list').selectedIndex;
+		survey = document.getElementById('select_survey_list').options[select].text;
+		post += '&Survey=' + survey + '&Instrument=' + value;
+		}
+	
 	else if(param == 'create_release') {
-		post += '&Survey=' + document.getElementById('create_survey_input').value + '&Instrument=' + document.getElementById('create_instrument_input').value;
-	}
+		select = document.getElementById('select_instrument_list').selectedIndex;
+		instrument = document.getElementById('select_instrument_list').options[select].text;
+		post +=  '&Survey=' + survey + '&Instrument=' + instrument + '&Release=' + value;
+		}
 
 
     var xhr = new HttpRequest(
@@ -123,15 +62,25 @@ function  setup(param) {
 					log.msg_ok('OK : '+ param + ' saved...');
 					if (param == 'create_survey') {
 						document.getElementById('create_instrument').setAttribute('style','display:block');
+						//Add option node based on the related created_element input
+						select = document.getElementById('select_survey_list');
+						option = document.createElement('option');
+						option.innerHTML = value;
+						select.appendChild(option);
+
 						}
 					else if (param == 'create_instrument') {
 						document.getElementById('create_release').setAttribute('style','display:block');
+						select = document.getElementById('select_instrument_list');
+						option = document.createElement('option');
+						option.innerHTML = value;
+						select.appendChild(option);
 					}
 				}
 			}
     );
 
-    post += '&Param=' + param + '&Value=' + name;
+    post += '&Param=' + param + '&Value=' + value;
     xhr.send('/youpi/newindex/', post);
 }
 
@@ -141,8 +90,6 @@ function kselect(param) {
 	var post = '';
 	s = document.getElementById('select_survey_list').selectedIndex;
 	name = document.getElementById('select_survey_list').options[s].text;
-    post += '&Survey=' + param + '&Value=' + name;
-
     var xhr = new HttpRequest(
             null,
             null,   
@@ -160,32 +107,102 @@ function kselect(param) {
 					return;
 				}
 				else {
-					if (param == 'select_survey') {
-						document.getElementById('select_instrument').setAttribute('style','display:block');
-						document.getElementById('create_instrument').setAttribute('style','display:block');
-						document.getElementById('or2').setAttribute('style','display:block');
-						select = document.getElementById('select_instrument_list');
+					if (param == 'select_survey_list') {
 						list_instrument = resp['list_instrument'];
-						select.innerHTML = '';
+						select = document.getElementById('select_instrument_list');
+						document.getElementById('or2').setAttribute('style' , 'display:block');
+						document.getElementById('select_instrument').setAttribute('style' , 'display:block');
 						for (var i = 0 ; i < list_instrument.length ; i++) {
-							option = document.createElement('option');
+							var option = document.createElement('option');
 							option.innerHTML = list_instrument[i];
 							select.appendChild(option);
-						}
+							}
 					}
 				}
 			}
     );
-
-
     post += '&Param=' + param + '&Value=' + name;
     xhr.send('/youpi/newindex/', post);
-
-
 }
 
-</script>
 
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block content %}
+	<div id="pre_submenu">
+		<ul class="smart_tabnav_sub" id="tabnav2">
+			<li class="enabled"><a href="#" id="link_global" onclick="swap_display(this.id, 'menuitem_sub_0', 'tabnav2', 'menuitem_');">Global Informations</a></li>
+		</ul>
+	</div>
+	<div id="menuitem_sub_0" style="margin-top: 40px;" align="center">
+		<div align="center" class="homepage">
+			<div>
+				<div id="create_survey">
+					Add survey :
+					<input type="text" size="20" id="create_survey_input"></input>
+					<input type="button" value="add!" id="add_survey_button" onclick="setup(this.parentNode.id);"></input>
+					<div id="create_survey_log"></div>
+				</div>
+				<div id="or1">or</div>
+
+				<div id="select_survey">
+				choose survey from list :	
+					<select  id="select_survey_list">
+					{% for i in list_survey %}
+						<option> {{ i }} </option>
+					{% endfor %}
+					</select>
+					<input type="button" value="Use it!" id="choose_survey" onclick="kselect('select_survey_list');"></input>
+					<div id="select_survey_list_log"></div>
+				</div>
+			</div>
+			<HR></HR>
+			<div>
+				<div id="create_instrument" style="display:none">
+					Add instrument for survey:
+					<input type="text" size="20" id="create_instrument_input"></input>
+					<input type="button" value="add!" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
+					<div id="create_instrument_log"></div>
+				</div>
+
+				<div id = "or2" style="display:none">or</div>
+
+				<div id="select_instrument" style="display:none">
+				choose instrument from list :
+					<select  id="select_instrument_list">
+					</select>
+					<input type="button" value="Use it!" id="choose_instrument" onclick="kselect('select_instrument_list');"></input>
+					<div id="select_instrument_log"></div>
+				</div>
+			</div>
+			<HR></HR>
+			<div>
+				<div id="create_release" style="display:none">
+					Add release :
+					<input type="text" size="20" id="create_release_input"></input>
+					<input type="button" value="add!" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
+					<div id="create_release_log"></div>
+				</div>
+
+				<div id = "or3" style="display:none">or</div>
+
+				<div id="select_release" style="display:none">
+				choose release from list :
+					<select  id="select_release_list">
+					</select>
+					<input type="button" value="Use it!" id="choose_release"></input>
+					<div id="select_release_log"></div>
+				</div>
+			</div>
+			<HR></HR>
+		</div>
+	</div>
+	
 {% endblock %}
 	
 </body>

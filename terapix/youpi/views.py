@@ -362,10 +362,9 @@ def index2(request):
 		return HttpResponseServerError('Incorrect POST data: %s' % e)
 	
 	error = warning = ''
-
+	k = []
 	try:
 		if param == 'create_survey':
-			k = []
 			if not Survey.objects.filter(name__iexact = value):
 				if len(value) == 0 :
 					warning = 'Please, enter a non-empty string'
@@ -378,7 +377,6 @@ def index2(request):
 				warning = 'Survey already existing'
 
 		elif param == 'create_instrument':
-			k = []
 			survey = request.POST['Survey']
 
 			if not Instrument.objects.filter(name__iexact = value):
@@ -394,7 +392,6 @@ def index2(request):
 				warning = 'Instrument already existing'
 
 		elif param == 'create_release':
-			k = []
 			instrument = request.POST['Instrument']
 
 			if not Release.objects.filter(label__iexact = value):
@@ -409,15 +406,13 @@ def index2(request):
 			else:
 				warning = 'Instrument already existing'
 
-		elif param == 'select_survey':
-			k = []
+		elif param == 'select_survey_list':
 			survey = request.POST['Value']
 			l = Instrument.objects.filter(rel_si__survey__name = survey)
 			for li in l :
 				k.append(str(li))
 
-		elif param == 'select_instrument':
-			k = []
+		elif param == 'select_instrument_list':
 			instrument = request.POST['Value']
 			l = Release.objects.filter(rel_rinst__instrument__name = instrument)
 			for li in l :
@@ -429,7 +424,7 @@ def index2(request):
 	except Exception, e:
 		error = e
 
-	resp = {'Survey' : str(value),'Instrument' : str(value),'list_instrument' : k, 'Release' : str(value),'list_release' : k, 'Error' : str(error),'Warning' : warning}
+	resp = {'Survey' : str(value),'Instrument' : str(value),'list_instrument' : k, 'Release' : str(value), 'Error' : str(error),'Warning' : warning}
 	
 	return HttpResponse(str(resp), mimetype = 'text/plain')
 	
