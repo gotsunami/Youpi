@@ -568,19 +568,24 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 
 		td = document.createElement('td');
 		var tns = resp['Previews'];
-		var tn, imgpath;
+		var tn, imgpath, a;
 		for (var k=0; k < tns.length; k++) {
 			imgpath = resp['WWW'] + tns[k];
-			tn = document.createElement('img');
-			tn.setAttribute('src', imgpath);
-			if (!resp['HasThumbnails']) {
+			a = Builder.node('a', {
+				href: imgpath.replace(/tn_/, ''),
+				rel: 'lightbox[scamp]'
+			});
+
+			tn = Builder.node('img', {
+				src: resp['HasThumbnails'] ? imgpath : imgpath.replace(/tn_/, ''),
+				'class' : 'scamp-result-entry-tn'
+			});
+
+			if (!resp['HasThumbnails'])
 				tn.setAttribute('width', '60px');
-				tn.setAttribute('onclick', "window.open('" + imgpath + "');");
-			}
-			else
-				tn.setAttribute('onclick', "window.open('" + imgpath.replace(/tn_/, '') + "');");
-			tn.setAttribute('class', 'scamp-result-entry-tn');
-			td.appendChild(tn);
+
+			a.appendChild(tn);
+			td.appendChild(a);
 		}
 		tr.appendChild(td);
 		tab2.appendChild(tr);

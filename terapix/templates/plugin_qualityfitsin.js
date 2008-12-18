@@ -565,13 +565,20 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 
 		td = document.createElement('td');
 		var tns = ['bkg_histo', 'bkg_m', 'ell', 'fwhm_histo', 'gal_histo', 'm', 'psf_m', 'rhmag_gal', 'rhmag_star', 'rhmag', 'star_histo', 'wmm'];
-		var tn;
+		var tn, a;
 		for (var k=0; k < tns.length; k++) {
-			tn = document.createElement('img');
-			tn.setAttribute('src', resp['WWW'] + 'tn/' + resp['ImgName'] + '_' + tns[k] + '_tn.png');
-			tn.setAttribute('onclick', "window.open('" + resp['WWW'] + resp['ImgName'] + '_' + tns[k] + ".png');");
-			tn.setAttribute('class', 'qfits-result-entry-tn');
-			td.appendChild(tn);
+			a = Builder.node('a', {
+				href: resp['WWW'] + resp['ImgName'] + '_' + tns[k] + '.png',
+				rel: 'lightbox[qfitsin]'
+			});
+
+			tn = Builder.node('img', {
+				src: resp['WWW'] + 'tn/' + resp['ImgName'] + '_' + tns[k] + '_tn.png',
+				'class': 'qfits-result-entry-tn'
+			});
+
+			a.appendChild(tn);
+			td.appendChild(a);
 		}
 		tr.appendChild(td);
 		tab2.appendChild(tr);
