@@ -192,7 +192,7 @@ function show_runtime_options(pid, container_id) {
 	var id = pid + '_' + eval(pid + '_item_counter');
 	
 	// Checkbox
-	var da = Builder.node('div', { className: 'rndBox' }, [
+	var da = Builder.node('div', { className: 'rndBox', style: 'margin-left: 0px;' }, [
 		Builder.node('input', { id: id + '_reprocess_successful_checkbox',
 								type: 'checkbox',
 								checked: true }),
@@ -201,7 +201,7 @@ function show_runtime_options(pid, container_id) {
 	r.appendChild(da);
 
 	// Item prefix name
-	da = Builder.node('div', { className: 'rndBox' }, [
+	da = Builder.node('div', { className: 'rndBox', style: 'margin-left: 0px;' }, [
 		Builder.node('label', 'Item prefix name'),
 		Builder.node('input', { id: id + '_prefix_name_input',
 								type: 'text' })
@@ -209,7 +209,7 @@ function show_runtime_options(pid, container_id) {
 	r.appendChild(da);
 
 	// Cluster policy
-	da = Builder.node('div', { className: 'cart_item_policy rndBox' }, [
+	da = Builder.node('div', { className: 'cart_item_policy rndBox', style: 'margin-left: 0px;' }, [
 		Builder.node('div', 'Cluster node policy'),
 		Builder.node('div', [
 			Builder.node('input', { id: id + '_default_radio',

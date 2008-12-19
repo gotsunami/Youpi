@@ -662,7 +662,9 @@ function DropdownBox(varName, container, title)
 		_stateOpen ? gfx = Effect.BlindDown : gfx = Effect.BlindUp;
 		_mainDiv.setAttribute('class', 'banner_' + (_stateOpen ? 'opened' : 'closed') + (!_isTopLevelContainer ? '_child' : ''));
 
-		gfx(_contentContainer, { duration: 0.4 });
+		gfx(_contentContainer, { duration: 0.2 });
+		// Bug fix
+		if (_contentContainer.style.height == '0px') _contentContainer.setAttribute('style', 'height: -moz-fit-content;');	
 	}
 
 	/*
