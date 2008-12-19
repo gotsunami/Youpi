@@ -87,8 +87,11 @@ MANAGERS = ADMINS
 DATABASE_ENGINE = 'mysql'          # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_OPTIONS = {"init_command": "SET storage_engine=INNODB"}
 DATABASE_NAME = 'youpi_dev_greg'             # Or path to database file if using sqlite3.
+#DATABASE_NAME = 'spica2dev'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'greg'             # Not used with sqlite3.
+#DATABASE_USER = 'dev'             # Not used with sqlite3.
 DATABASE_PASSWORD = 'dev_greg'         # Not used with sqlite3.
+#DATABASE_PASSWORD = 'dev'         # Not used with sqlite3.
 DATABASE_HOST = 'dbterapix.iap.fr'             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
