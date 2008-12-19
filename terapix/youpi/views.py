@@ -362,7 +362,9 @@ def index2(request):
 		return HttpResponseServerError('Incorrect POST data: %s' % e)
 	
 	error = warning = ''
-	k = []
+	l_i = []
+	l_r = []
+
 	try:
 		if param == 'create_survey':
 			if not Survey.objects.filter(name__iexact = value):
@@ -410,13 +412,13 @@ def index2(request):
 			survey = request.POST['Value']
 			l = Instrument.objects.filter(rel_si__survey__name = survey)
 			for li in l :
-				k.append(str(li))
+				l_i.append(str(li))
 
 		elif param == 'select_instrument_list':
 			instrument = request.POST['Value']
 			l = Release.objects.filter(rel_rinst__instrument__name = instrument)
-			for li in l :
-				k.append(str(li))
+			for lr in l :
+				l_r.append(str(lr))
 
 
 
@@ -424,7 +426,7 @@ def index2(request):
 	except Exception, e:
 		error = e
 
-	resp = {'Survey' : str(value),'Instrument' : str(value),'list_instrument' : k, 'Release' : str(value), 'Error' : str(error),'Warning' : warning}
+	resp = {'Survey' : str(value),'Instrument' : str(value),'list_instrument' : l_i,'list_release' : l_r, 'Release' : str(value), 'Error' : str(error),'Warning' : warning}
 	
 	return HttpResponse(str(resp), mimetype = 'text/plain')
 	

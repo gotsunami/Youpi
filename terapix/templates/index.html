@@ -36,8 +36,11 @@ function  setup(param) {
 		}
 	
 	else if(param == 'create_release') {
-		select = document.getElementById('select_instrument_list').selectedIndex;
-		instrument = document.getElementById('select_instrument_list').options[select].text;
+		select1 = document.getElementById('select_survey_list').selectedIndex;
+		survey = document.getElementById('select_survey_list').options[select1].text;
+
+		select2 = document.getElementById('select_instrument_list').selectedIndex;
+		instrument = document.getElementById('select_instrument_list').options[select2].text;
 		post +=  '&Survey=' + survey + '&Instrument=' + instrument + '&Release=' + value;
 		}
 
@@ -76,6 +79,12 @@ function  setup(param) {
 						option.innerHTML = value;
 						select.appendChild(option);
 					}
+					else if (param == 'create_release') {
+						select = document.getElementById('select_release_list');
+						option = document.createElement('option');
+						option.innerHTML = value;
+						select.appendChild(option);
+					}
 				}
 			}
     );
@@ -88,8 +97,15 @@ function  setup(param) {
 function kselect(param) {
 	
 	var post = '';
-	s = document.getElementById('select_survey_list').selectedIndex;
-	name = document.getElementById('select_survey_list').options[s].text;
+	if (param == 'select_survey_list') {
+		s = document.getElementById('select_survey_list').selectedIndex;
+		name = document.getElementById('select_survey_list').options[s].text;
+		}
+	else if (param == 'select_instrument_list') {
+	        s = document.getElementById('select_instrument_list').selectedIndex;
+			name = document.getElementById('select_instrument_list').options[s].text;
+			}
+
     var xhr = new HttpRequest(
             null,
             null,   
@@ -112,12 +128,28 @@ function kselect(param) {
 						select = document.getElementById('select_instrument_list');
 						document.getElementById('or2').setAttribute('style' , 'display:block');
 						document.getElementById('select_instrument').setAttribute('style' , 'display:block');
+						document.getElementById('create_instrument').setAttribute('style' , 'display:block');
+						document.getElementById('instrument_text').innerHTML = 'Add instrument for survey : <B> ' + name + '</B>';
 						for (var i = 0 ; i < list_instrument.length ; i++) {
 							var option = document.createElement('option');
 							option.innerHTML = list_instrument[i];
 							select.appendChild(option);
 							}
 					}
+					if (param == 'select_instrument_list') {
+						list_release = resp['list_release'];
+						select = document.getElementById('select_release_list');
+						document.getElementById('or3').setAttribute('style' , 'display:block');
+						document.getElementById('select_release').setAttribute('style' , 'display:block');
+						document.getElementById('create_release').setAttribute('style' , 'display:block');
+						document.getElementById('release_text').innerHTML = 'Add release for instrument : <B> ' + name + '</B>';
+						for (var i = 0 ; i < list_release.length ; i++) {
+							var option = document.createElement('option');
+							option.innerHTML = list_release[i];
+							select.appendChild(option);
+							}
+					}
+
 				}
 			}
     );
@@ -161,10 +193,10 @@ function kselect(param) {
 					<div id="select_survey_list_log"></div>
 				</div>
 			</div>
-			<HR></HR>
+			<HR width="30%" size="2" align="center">
 			<div>
 				<div id="create_instrument" style="display:none">
-					Add instrument for survey:
+					<div id="instrument_text"></div>
 					<input type="text" size="20" id="create_instrument_input"></input>
 					<input type="button" value="add!" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
 					<div id="create_instrument_log"></div>
@@ -177,13 +209,13 @@ function kselect(param) {
 					<select  id="select_instrument_list">
 					</select>
 					<input type="button" value="Use it!" id="choose_instrument" onclick="kselect('select_instrument_list');"></input>
-					<div id="select_instrument_log"></div>
+					<div id="select_instrument_list_log"></div>
 				</div>
 			</div>
-			<HR></HR>
+			<HR width="30%" size="2" align="center">
 			<div>
 				<div id="create_release" style="display:none">
-					Add release :
+					<div id="release_text"></div>
 					<input type="text" size="20" id="create_release_input"></input>
 					<input type="button" value="add!" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
 					<div id="create_release_log"></div>
@@ -195,11 +227,11 @@ function kselect(param) {
 				choose release from list :
 					<select  id="select_release_list">
 					</select>
-					<input type="button" value="Use it!" id="choose_release"></input>
-					<div id="select_release_log"></div>
+					<input type="button" value="Use it!" id="choose_release" onclick="kselect('select_release_list');"></input>
+					<div id="select_release_list_log"></div>
 				</div>
 			</div>
-			<HR></HR>
+			<HR width="30%" size="2" align="center">
 		</div>
 	</div>
 	
