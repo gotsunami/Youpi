@@ -408,7 +408,8 @@ else {
 /*
  * Class: DropdownBox
  *
- * Note:
+ * Dependencies:
+ *  scriptaculous.js - 3rdParty Javascript library
  *
  * Constructor Parameters:
  *  varName - string: global variable name of instance, used internally for public interface definition
@@ -505,9 +506,14 @@ function DropdownBox(varName, container, title)
 		var topDiv = document.createElement('div');
 		topDiv.setAttribute('class', 'ebox');
 		_mainDiv = document.createElement('div');
+
+		_mainDiv.setAttribute('onclick', _instance_name + ".toggleState();var h=" + _instance_name + 
+			".getOnClickHandler();if(h) h();");
+
 		_titleNode = document.createElement('label');
 		_titleNode.appendChild(document.createTextNode(_title));
 		var cdiv = document.createElement('div');
+		cdiv.setAttribute('style', 'display: none;');
 		cdiv.setAttribute('id', _container.getAttribute('id') + '_' + Math.random() + '_content');
 		_contentContainer = cdiv;
 		_mainDiv.appendChild(_titleNode);
@@ -651,18 +657,12 @@ function DropdownBox(varName, container, title)
 	 *
 	 */
 	function _setOpen(open) {
+		var gfx;
 		_stateOpen = (typeof open == 'boolean' && open) ? true : false;
-		var clsname = 'banner';
-		var o_clsname = clsname + '_opened' + (!_isTopLevelContainer ? '_child' : '');
-		var c_clsname = clsname + '_closed' + (!_isTopLevelContainer ? '_child' : '');
-		var onclick;
-		var cls = _stateOpen ? o_clsname : c_clsname;
-	
-		_mainDiv.setAttribute('class', cls); 
-		if (!_mainDiv.hasAttribute('onclick')) {
-			_mainDiv.setAttribute('onclick', _instance_name + ".toggleState();var h=" + _instance_name + 
-				".getOnClickHandler();if(h) h();");
-		}
+		_stateOpen ? gfx = Effect.BlindDown : gfx = Effect.BlindUp;
+		_mainDiv.setAttribute('class', 'banner_' + (_stateOpen ? 'opened' : 'closed') + (!_isTopLevelContainer ? '_child' : ''));
+
+		gfx(_contentContainer, { duration: 0.4 });
 	}
 
 	/*

@@ -1120,7 +1120,6 @@ div.condor_setup {
 	border-right-color: #ccc;
 	border-bottom-color: #ccc;
 	-moz-border-radius: 5px;
-	display: block;
 	cursor: pointer;
 }
 
@@ -1136,8 +1135,7 @@ div.condor_setup {
 	background-image: url(../img/admin/arrow-down.gif);
 }
 
-.ebox .banner_opened ~ *, .ebox .banner_opened_child ~ * {
-	display: block;
+.ebox .banner_opened ~ *, .ebox .banner_opened_child ~ *, .ebox .banner_closed ~ *, .ebox .banner_closed_child ~ *, .rndBox {
 	border: 1px solid #ebebeb;
 	border-right-color: #ccc;
 	border-bottom-color: #ccc;
@@ -1147,10 +1145,7 @@ div.condor_setup {
 	padding: 5px;
 	cursor: default;
 	font-weight: normal;
-}
-
-.ebox .banner_closed ~ *, .ebox .banner_closed_child ~ * {
-	display: none;
+	height: -moz-fit-content;	
 }
 
 .ebox .banner_closed, .ebox .banner_closed_child {

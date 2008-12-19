@@ -14,6 +14,8 @@
 <script type="text/javascript" src="/media/js/common.js"></script>
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/condorpanel.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/scriptaculous/prototype.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/scriptaculous/scriptaculous.js"></script>
 <script type="text/javascript">
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -190,110 +192,61 @@ function show_runtime_options(pid, container_id) {
 	var id = pid + '_' + eval(pid + '_item_counter');
 	
 	// Checkbox
-	var da = document.createElement('div');
-	ia = document.createElement('input');
-	ia.setAttribute('id', id + '_reprocess_successful_checkbox');
-	ia.setAttribute('type', 'checkbox');
-	ia.setAttribute('checked', 'checked');
-	var la = document.createElement('label');
-	la.appendChild(document.createTextNode('Do not reprocess already successful processings'));
-	da.appendChild(ia);
-	da.appendChild(la);
+	var da = Builder.node('div', { className: 'rndBox' }, [
+		Builder.node('input', { id: id + '_reprocess_successful_checkbox',
+								type: 'checkbox',
+								checked: true }),
+		Builder.node('label', 'Do not reprocess already successful processings')
+	]);
 	r.appendChild(da);
-	
+
 	// Item prefix name
-	da = document.createElement('div');
-	la = document.createElement('label');
-	la.appendChild(document.createTextNode('Item prefix name'));
-	ia = document.createElement('input');
-	ia.setAttribute('id', id + '_prefix_name_input');
-	ia.setAttribute('type', 'text');
-	da.appendChild(la);
-	da.appendChild(ia);
-	r.parentNode.appendChild(da);
-	
+	da = Builder.node('div', { className: 'rndBox' }, [
+		Builder.node('label', 'Item prefix name'),
+		Builder.node('input', { id: id + '_prefix_name_input',
+								type: 'text' })
+	]);
+	r.appendChild(da);
+
 	// Cluster policy
-	da = document.createElement('div');
-	da.setAttribute('class', 'cart_item_policy');
-	la = document.createElement('div');
-	la.appendChild(document.createTextNode('Cluster node policy'));
-
-	// Default option (radio)
-	var dd = document.createElement('div');
-	var odflt = document.createElement('input');
-	odflt.setAttribute('id', id + '_default_radio');
-	odflt.setAttribute('onclick', "toggle_node_policy_radio(this.id,'" + id + '_custom_radio' + 
-		"','" + id + '_custom_div' + "');");
-	odflt.setAttribute('type', 'radio');
-	odflt.setAttribute('checked', 'checked');
-	odflt.setAttribute('name', id + '_node_policy');
-	var dl = document.createElement('label');
-	dl.appendChild(document.createTextNode('Use your default Condor setup configuration'));
-	dd.appendChild(odflt);
-	dd.appendChild(dl);
-
-	// Custom option (radio)
-	var cd = document.createElement('div');
-	var ocus = document.createElement('input');
-	ocus.setAttribute('id', id + '_custom_radio');
-	ocus.setAttribute('onclick', "toggle_node_policy_radio('" + id + '_default_radio' + "',this.id,'" +
-		id + '_custom_div' + "');");
-	ocus.setAttribute('type', 'radio');
-	ocus.setAttribute('name', id + '_node_policy');
-	var cl = document.createElement('label');
-	cl.appendChild(document.createTextNode('Select a custom configuration for this processing'));
-	cd.appendChild(ocus);
-	cd.appendChild(cl);
-
-	var cc = document.createElement('div');
-	cc.setAttribute('id', id + '_custom_div');
-	cc.setAttribute('style', 'display: none;');
-	cl = document.createElement('label');
-	cl.appendChild(document.createTextNode('Select a policy or selection: '));
-	var csel = document.createElement('select');
-	csel.setAttribute('id', id + '_node_select');
-	var copt;
-	copt = document.createElement('option');
-	copt.appendChild(document.createTextNode('Policies'));
-	copt.setAttribute('disabled', 'disabled');
-	copt.setAttribute('class', 'header');
-	csel.appendChild(copt);
-
-	// Add policies
+	da = Builder.node('div', { className: 'cart_item_policy rndBox' }, [
+		Builder.node('div', 'Cluster node policy'),
+		Builder.node('div', [
+			Builder.node('input', { id: id + '_default_radio',
+									onclick: "toggle_node_policy_radio(this.id,'" + id + '_custom_radio' + 
+												"','" + id + '_custom_div' + "');",
+									type: 'radio',
+									checked: true,
+									name: id + '_node_policy' }),
+			Builder.node('label', 'Use your default Condor setup configuration')
+		]),
+		Builder.node('div', [
+			Builder.node('input', { id: id + '_custom_radio',
+									onclick: "toggle_node_policy_radio('" + id + '_default_radio' + "',this.id,'" + 
+												id + '_custom_div' + "');",
+									type: 'radio',
+									name: id + '_node_policy' }),
+			Builder.node('label', 'Select a custom configuration for this processing')
+		]),
+		Builder.node('div', { id: id + '_custom_div', style: 'display: none;' }, [
+			Builder.node('label', 'Select a policy or selection: '),
+			Builder.node('select', { id: id + '_node_select' }, [
+				Builder.node('option', { className: 'header', disabled: true }, 'Policies'),
 	{% for pol in policies %}
-	copt = document.createElement('option');
-	copt.appendChild(document.createTextNode("{{ pol.label }}"));
-	copt.setAttribute('id', id + '_pol_opt_{{ forloop.counter0 }}');
-	copt.setAttribute('class', 'policy');
-	{% if forloop.first %}
-	copt.setAttribute('selected', 'selected');
-	{% endif %}
-	csel.appendChild(copt);
+				Builder.node('option', {className: 'policy', 
+										id: id + '_pol_opt_{{ forloop.counter0 }}',
+										{% if forloop.first %}selected: true{% endif %}}, 
+										'{{ pol.label }}'),
 	{% endfor %}
-
-	// Add selections
-	copt = document.createElement('option');
-	copt.appendChild(document.createTextNode('Selections'));
-	copt.setAttribute('disabled', 'disabled');
-	copt.setAttribute('class', 'header');
-	csel.appendChild(copt);
+				Builder.node('option', { className: 'header', disabled: true }, 'Selections'),
 	{% for sel in selections %}
-	copt = document.createElement('option');
-	copt.appendChild(document.createTextNode("{{ sel.label }}"));
-	copt.setAttribute('id', id + '_sel_opt_{{ forloop.counter0 }}');
-	copt.setAttribute('class', 'selection');
-	csel.appendChild(copt);
+				Builder.node('option', { className: 'selection', id: id + '_sel_opt_{{ forloop.counter0 }}' }, '{{ sel.label }}'),
 	{% endfor %}
+			])
+		])
+	]);
 
-	cc.appendChild(cl);
-	cc.appendChild(csel);
-
-	da.appendChild(la);
-	da.appendChild(dd);
-	da.appendChild(cd);
-	da.appendChild(cc);
-	r.parentNode.appendChild(da);
-	
+	r.appendChild(da);
 	eval(pid + '_item_counter++');
 }
 
