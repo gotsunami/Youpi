@@ -659,12 +659,8 @@ function DropdownBox(varName, container, title)
 	function _setOpen(open) {
 		var gfx;
 		_stateOpen = (typeof open == 'boolean' && open) ? true : false;
-		_stateOpen ? gfx = Effect.BlindDown : gfx = Effect.BlindUp;
 		_mainDiv.setAttribute('class', 'banner_' + (_stateOpen ? 'opened' : 'closed') + (!_isTopLevelContainer ? '_child' : ''));
-
-		gfx(_contentContainer, { duration: 0.2 });
-		// Bug fix
-		if (_contentContainer.style.height == '0px') _contentContainer.setAttribute('style', 'height: -moz-fit-content;');	
+		_stateOpen ? $(_contentContainer).show() : $(_contentContainer).hide();
 	}
 
 	/*
