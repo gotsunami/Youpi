@@ -12,6 +12,8 @@
 <script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript" src="/media/js/3rdParty/progressbar/js/prototype/prototype.js"></script>
 <script type="text/javascript" src="/media/js/3rdParty/progressbar/js/bramus/jsProgressBarHandler.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/scriptaculous/prototype.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/scriptaculous/scriptaculous.js"></script>
 <script type="text/javascript" src="/media/js/homeindex.js"></script>
 
 
@@ -23,24 +25,21 @@ function  setup(param) {
 
 	var post = '';
 
-	var value = document.getElementById(param + '_input').value;
+	var value = $F(param + '_input');
 
 	if (param == 'create_survey') {
 		post += '&Survey=' + value;
 		}
 
 	else if (param == 'create_instrument') { 
-		select = document.getElementById('select_survey_list').selectedIndex;
-		survey = document.getElementById('select_survey_list').options[select].text;
+		
+		var survey = $F('select_survey_list');
 		post += '&Survey=' + survey + '&Instrument=' + value;
 		}
 	
 	else if(param == 'create_release') {
-		select1 = document.getElementById('select_survey_list').selectedIndex;
-		survey = document.getElementById('select_survey_list').options[select1].text;
-
-		select2 = document.getElementById('select_instrument_list').selectedIndex;
-		instrument = document.getElementById('select_instrument_list').options[select2].text;
+		var survey = $F('select_survey_list');
+		var instrument = $F('select_instrument_list');
 		post +=  '&Survey=' + survey + '&Instrument=' + instrument + '&Release=' + value;
 		}
 
@@ -64,25 +63,23 @@ function  setup(param) {
 				else {
 					log.msg_ok('OK : '+ param + ' saved...');
 					if (param == 'create_survey') {
-						document.getElementById('create_instrument').setAttribute('style','display:block');
-						//Add option node based on the related created_element input
-						select = document.getElementById('select_survey_list');
-						option = document.createElement('option');
-						option.innerHTML = value;
+						$('create_instrument').show()
+						var select = $('select_survey_list');
+						var option = document.createElement('option');
+						option.update(value);
 						select.appendChild(option);
-
 						}
 					else if (param == 'create_instrument') {
-						document.getElementById('create_release').setAttribute('style','display:block');
-						select = document.getElementById('select_instrument_list');
+						$('create_release').show();
+						var select = $('select_instrument_list');
 						option = document.createElement('option');
-						option.innerHTML = value;
+						option.update(value);
 						select.appendChild(option);
 					}
 					else if (param == 'create_release') {
-						select = document.getElementById('select_release_list');
+						var select = $('select_release_list');
 						option = document.createElement('option');
-						option.innerHTML = value;
+						option.update(value);
 						select.appendChild(option);
 					}
 				}
@@ -98,12 +95,13 @@ function kselect(param) {
 	
 	var post = '';
 	if (param == 'select_survey_list') {
-		s = document.getElementById('select_survey_list').selectedIndex;
-		name = document.getElementById('select_survey_list').options[s].text;
+		var name = $F('select_survey_list');
 		}
 	else if (param == 'select_instrument_list') {
-	        s = document.getElementById('select_instrument_list').selectedIndex;
-			name = document.getElementById('select_instrument_list').options[s].text;
+			var name = $F('select_instrument_list');
+			}
+	else if (param == 'select_release_list') {
+			var name = $F('select_release_list');
 			}
 
     var xhr = new HttpRequest(
@@ -125,29 +123,33 @@ function kselect(param) {
 				else {
 					if (param == 'select_survey_list') {
 						list_instrument = resp['list_instrument'];
-						select = document.getElementById('select_instrument_list');
-						document.getElementById('or2').setAttribute('style' , 'display:block');
-						document.getElementById('select_instrument').setAttribute('style' , 'display:block');
-						document.getElementById('create_instrument').setAttribute('style' , 'display:block');
-						document.getElementById('instrument_text').innerHTML = 'Add instrument for survey : <B> ' + name + '</B>';
+						var select = $('select_instrument_list');
+						$('or2').show();
+						$('select_instrument').show();
+						$('create_instrument').show();
+						$('instrument_text').update('Add instrument for survey : <B> ' + name + '</B>');
 						for (var i = 0 ; i < list_instrument.length ; i++) {
 							var option = document.createElement('option');
-							option.innerHTML = list_instrument[i];
+							option.update(list_instrument[i]);
 							select.appendChild(option);
 							}
 					}
 					if (param == 'select_instrument_list') {
 						list_release = resp['list_release'];
-						select = document.getElementById('select_release_list');
-						document.getElementById('or3').setAttribute('style' , 'display:block');
-						document.getElementById('select_release').setAttribute('style' , 'display:block');
-						document.getElementById('create_release').setAttribute('style' , 'display:block');
-						document.getElementById('release_text').innerHTML = 'Add release for instrument : <B> ' + name + '</B>';
+						var select = $('select_release_list');
+						$('or3').show();
+						$('select_release').show();
+						$('create_release').show();
+						$('release_text').update('Add release for instrument : <B> ' + name + '</B>');
 						for (var i = 0 ; i < list_release.length ; i++) {
 							var option = document.createElement('option');
-							option.innerHTML = list_release[i];
+							option.	update(list_release[i]);
 							select.appendChild(option);
 							}
+
+					}
+					if (param == 'select_release_list') {
+					alert(param);
 					}
 
 				}
@@ -156,7 +158,6 @@ function kselect(param) {
     post += '&Param=' + param + '&Value=' + name;
     xhr.send('/youpi/newindex/', post);
 }
-
 
 </script>
 {% endblock %}
@@ -171,7 +172,6 @@ function kselect(param) {
 			<li class="enabled"><a href="#" id="link_global" onclick="swap_display(this.id, 'menuitem_sub_0', 'tabnav2', 'menuitem_');">Global Informations</a></li>
 		</ul>
 	</div>
-	<div align="center"><img src="/media/themes/default/img/misc/youpi_logo_small.png"></img></div>
 	<div id="menuitem_sub_0" style="margin-top: 10px;" align="center">
 		<div align="center" class="homepage">
 			<div>
@@ -196,16 +196,16 @@ function kselect(param) {
 			</div>
 			<HR width="30%" size="2" align="center">
 			<div>
-				<div id="create_instrument" style="display:none">
+				<div id="create_instrument">
 					<div id="instrument_text"></div>
 					<input type="text" size="20" id="create_instrument_input"></input>
 					<input type="button" value="add!" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
 					<div id="create_instrument_log"></div>
 				</div>
 
-				<div id = "or2" style="display:none">or</div>
+				<div id = "or2">or</div>
 
-				<div id="select_instrument" style="display:none">
+				<div id="select_instrument">
 				choose instrument from list :
 					<select  id="select_instrument_list">
 					</select>
@@ -215,16 +215,16 @@ function kselect(param) {
 			</div>
 			<HR width="30%" size="2" align="center">
 			<div>
-				<div id="create_release" style="display:none">
+				<div id="create_release">
 					<div id="release_text"></div>
 					<input type="text" size="20" id="create_release_input"></input>
 					<input type="button" value="add!" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
 					<div id="create_release_log"></div>
 				</div>
 
-				<div id = "or3" style="display:none">or</div>
+				<div id = "or3">or</div>
 
-				<div id="select_release" style="display:none">
+				<div id="select_release">
 				choose release from list :
 					<select  id="select_release_list">
 					</select>
@@ -239,3 +239,12 @@ function kselect(param) {
 {% endblock %}
 	
 </body>
+<script>
+//Hiding field by id
+$('create_instrument').hide();
+$('or2').hide();
+$('select_instrument').hide();
+$('create_release').hide();
+$('or3').hide();
+$('select_release').hide();
+</script>
