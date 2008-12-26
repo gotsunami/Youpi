@@ -124,6 +124,8 @@ function kselect(param) {
 					if (param == 'select_survey_list') {
 						list_instrument = resp['list_instrument'];
 						var select = $('select_instrument_list');
+						var chil = select.childElements();
+						chil.each(function(node){node.remove();});
 						$('or2').show();
 						$('select_instrument').show();
 						$('create_instrument').show();
@@ -137,13 +139,15 @@ function kselect(param) {
 					if (param == 'select_instrument_list') {
 						list_release = resp['list_release'];
 						var select = $('select_release_list');
+						var chil = select.childElements();
+						chil.each(function(node){node.remove();});
 						$('or3').show();
 						$('select_release').show();
 						$('create_release').show();
 						$('release_text').update('Add release for instrument : <B> ' + name + '</B>');
 						for (var i = 0 ; i < list_release.length ; i++) {
 							var option = document.createElement('option');
-							option.	update(list_release[i]);
+							option.update(list_release[i]);
 							select.appendChild(option);
 							}
 
@@ -186,6 +190,7 @@ function kselect(param) {
 				<div id="select_survey">
 				choose survey from list :	
 					<select  id="select_survey_list">
+						<option> -- </option>
 					{% for i in list_survey %}
 						<option> {{ i }} </option>
 					{% endfor %}
@@ -208,6 +213,7 @@ function kselect(param) {
 				<div id="select_instrument">
 				choose instrument from list :
 					<select  id="select_instrument_list">
+						<option> -- </option>
 					</select>
 					<input type="button" value="Use it!" id="choose_instrument" onclick="kselect('select_instrument_list');"></input>
 					<div id="select_instrument_list_log"></div>
@@ -227,6 +233,7 @@ function kselect(param) {
 				<div id="select_release">
 				choose release from list :
 					<select  id="select_release_list">
+						<option> -- </option>
 					</select>
 					<input type="button" value="Use it!" id="choose_release" onclick="kselect('select_release_list');"></input>
 					<div id="select_release_list_log"></div>
