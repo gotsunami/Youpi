@@ -418,7 +418,7 @@ def index2(request):
 			instrument = request.POST['Value']
 			l = Release.objects.filter(rel_rinst__instrument__name = instrument)
 			for lr in l :
-				l_r.append(str(lr))
+				l_r.append(str(lr.label))
 
 
 

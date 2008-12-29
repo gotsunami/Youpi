@@ -103,6 +103,9 @@ class CalibrationKit(models.Model):
 	badpixelmask = models.CharField(max_length = 512,blank=True,null=True,help_text="")
 	flatfield = models.CharField(max_length = 512,blank=True,null=True,help_text="")
 
+	class Admin:
+		pass
+
 	class Meta:
 		verbose_name = "Calibration kit"
 		verbose_name_plural = "Calibration kits"
