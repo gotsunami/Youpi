@@ -99,15 +99,15 @@ function ShoppingCart(container_id, varName)
 	 * Function: addProcessing
 	 * Adds an item to the shopping cart
 	 *
+	 * Parameters:
+	 *  obj - object: arbitrary object
+	 *  handler - function: custom function to execute after an item has been added
+	 *
 	 * Note:
 	 * The *obj* object must have the following properties.
 	 *
 	 *  plugin_name - string: internal plugin name
 	 *  userData - object: custom user data 
-	 *
-	 * Paremeters:
-	 *  obj - object: arbitrary object
-	 *  handler - function: custom function to execute after an item has been added
 	 *
 	 */ 
 	this.addProcessing = function(obj, handler) {
@@ -142,16 +142,16 @@ function ShoppingCart(container_id, varName)
 	 * Function: deletePluginItem
 	 * Deletes an item from the shopping cart
 	 *
+	 * Parameters:
+	 *  obj - object: arbitrary object
+	 *  deleteAll - boolean: true to delete all plugin's items at once
+	 *  handler - function: custom function to execute after an item has been deleted
+	 *
 	 * Note:
 	 * The *obj* object must have the following properties.
 	 *
 	 *  plugin_name - string: internal plugin name
 	 *  idx - int: row index (in plugin context)
-	 *
-	 * Paremeters:
-	 *  obj - object: arbitrary object
-	 *  deleteAll - boolean: true to delete all plugin's items at once
-	 *  handler - function: custom function to execute after an item has been deleted
 	 *
 	 */ 
 	this.deletePluginItem = function(obj, deleteAll, handler) {
@@ -180,15 +180,15 @@ function ShoppingCart(container_id, varName)
 	 * Function: deleteAllPluginItem
 	 * Deletes an item from the shopping cart
 	 *
+	 * Parameters:
+	 *  obj - object: arbitrary object
+	 *  handler - function: custom function to execute after an item has been deleted
+	 *
 	 * Note:
 	 * The *obj* object must have the following properties.
 	 *
 	 *  plugin_name - string: internal plugin name
 	 *  idx - int: row index (in plugin context)
-	 *
-	 * Paremeters:
-	 *  obj - object: arbitrary object
-	 *  handler - function: custom function to execute after an item has been deleted
 	 *
 	 */ 
 	this.deleteAllPluginItems = function(plugin_name, handler) {
