@@ -41,7 +41,7 @@ function get_stats() {
 		function(resp) {
 			// custom plugin rendering
 			output_dir_stats_data = resp;
-			eval(resp['PluginId'] + "_renderOutputDirStats('" + container.id + "');");
+			eval(resp['PluginId'] + ".renderOutputDirStats('" + container.id + "');");
 		}
 	);
 

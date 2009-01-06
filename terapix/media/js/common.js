@@ -326,7 +326,7 @@ function results_showDetails(pname, id, fullpage) {
 			}
 			// Global variable
 			currentReturnedData = resp['result'];
-			eval(pname + "_resultsShowEntryDetails('" + div.id + "')");
+			eval(pname + ".resultsShowEntryDetails('" + div.id + "')");
 		}
 	);
 
