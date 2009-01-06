@@ -412,12 +412,11 @@ else {
  *  scriptaculous.js - 3rdParty Javascript library
  *
  * Constructor Parameters:
- *  varName - string: global variable name of instance, used internally for public interface definition
- *  container - object or string: name of parent DOM block container
+ *  container - DOM object or string: name of parent DOM block container
  *  title - string: box's title
  *
  */
-function DropdownBox(varName, container, title) 
+function DropdownBox(container, title) 
 {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -428,13 +427,7 @@ function DropdownBox(varName, container, title)
 	 * Top-level DOM container
 	 *
 	 */
-	var _container;
-	/*
-	 * Var: _instance_name
-	 * Name of instance, used for public interface
-	 *
-	 */
-	var _instance_name;
+	var _container = $(container);
 
 
 	// Group: Variables
@@ -495,8 +488,6 @@ function DropdownBox(varName, container, title)
 	 *
 	 */
 	function _main() {
-		_instance_name = varName;
-		_container = validate_container(container);
 		_title = title;
 
 		if (!_container.hasAttribute('id')) {
@@ -507,8 +498,11 @@ function DropdownBox(varName, container, title)
 		topDiv.setAttribute('class', 'ebox');
 		_mainDiv = document.createElement('div');
 
-		_mainDiv.setAttribute('onclick', _instance_name + ".toggleState();var h=" + _instance_name + 
-			".getOnClickHandler();if(h) h();");
+		_mainDiv.observe('click', function() { 
+			_toggleState();
+			if (_onClickHandler)
+				_onClickHandler();
+		});
 
 		_titleNode = document.createElement('label');
 		_titleNode.appendChild(document.createTextNode(_title));
@@ -639,11 +633,11 @@ function DropdownBox(varName, container, title)
 	}
 
 	/*
-  	 * Function: toggleState
+  	 * Function: _toggleState
 	 * Toggles box's state (opened or closed) 
 	 *
 	 */
-	this.toggleState = function() {
+	function _toggleState() {
 		_stateOpen = !_stateOpen;
 		_setOpen(_stateOpen);
 	}

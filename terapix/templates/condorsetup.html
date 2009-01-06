@@ -22,7 +22,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 var sb;
 
 function show_save_current_selection() {
-	sb = new DropdownBox('sb', 'save_sel_div', 'Save current selection');
+	sb = new DropdownBox('save_sel_div', 'Save current selection');
 	sb.setOnClickHandler(function() {
 		if (sb.isOpen()) {
 			document.getElementById('selection_save_input').focus();
@@ -106,7 +106,7 @@ function show_save_current_selection() {
 </div>
 <script type="text/javascript">
 	var condorPanel = new CondorPanel('condor_panel_div', 'condorPanel');
-	var pb = new DropdownBox('pb', 'policy_div', 'Add a policy');
+	var pb = new DropdownBox('policy_div', 'Add a policy');
 	var pw = new ClusterPolicyWidget(pb.getContentNode(), 'pw');
 	pw.setOnSavePolicyHandler(function() {
 		condorPanel.showSavedPolicies('saved_pol_div', true);

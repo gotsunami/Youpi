@@ -226,7 +226,7 @@ function ClusterPolicyWidget(container, varName) {
 		}
 
 		// Condor string policy box
-		_stringPolicyBox = new DropdownBox(_instance_name + '.getStringPolicyBox()', _container, 'Instant view of Condor requirement string');
+		_stringPolicyBox = new DropdownBox(_container, 'Instant view of Condor requirement string');
 		_stringPolicyBox.setTopLevelContainer(false);
 		_stringPolicyBox.setOnClickHandler(function() {
 			if (_stringPolicyBox.isOpen()) {
@@ -258,7 +258,7 @@ function ClusterPolicyWidget(container, varName) {
 		} );
 
 		// Save policy box
-		_savePolicyBox = new DropdownBox(_instance_name + '.getSavePolicyBox()', _container, 'Save current policy');
+		_savePolicyBox = new DropdownBox(_container, 'Save current policy');
 		_savePolicyBox.setTopLevelContainer(false);
 		_savePolicyBox.setOnClickHandler(function() {
 			if (_savePolicyBox.isOpen()) {

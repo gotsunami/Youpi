@@ -451,11 +451,11 @@ function CondorPanel(container_id, varName) {
 					var top_box, child_box;
 
 					if (kind == SELECTION) {
-						_savedSelBox = new DropdownBox(_instance_name + '.getSavedSelBox()', d, 'View saved selections');
+						_savedSelBox = new DropdownBox(d, 'View saved selections');
 						top_box = _savedSelBox;
 					}
 					else {
-						_savedPolBox = new DropdownBox(_instance_name + '.getSavedPolBox()', d, 'View saved policies');
+						_savedPolBox = new DropdownBox(d, 'View saved policies');
 						top_box = _savedPolBox;
 					}
 
@@ -487,18 +487,18 @@ function CondorPanel(container_id, varName) {
 
 					if (kind == SELECTION) {
 						_savedSelectionSelectId = select.id;
-						_viewSelContentBox = new DropdownBox(_instance_name + '.getViewSelContentBox()', _savedSelBox.getContentNode(), 
+						_viewSelContentBox = new DropdownBox(_savedSelBox.getContentNode(), 
 							"View '" + select.options[select.selectedIndex].text + "' selection content");
 						_viewSelContentBox.setTopLevelContainer(false);
 						child_box = _viewSelContentBox;
 					}
 					else {
 						_savedPolicySelectId = select.id;
-						_viewPolContentBox = new DropdownBox(_instance_name + '.getViewPolContentBox()', _savedPolBox.getContentNode(), 
+						_viewPolContentBox = new DropdownBox(_savedPolBox.getContentNode(), 
 							"Instant view of '" + select.options[select.selectedIndex].text + "' requirement string");
 						_viewPolContentBox.setTopLevelContainer(false);
 
-						_editPolContentBox = new DropdownBox(_instance_name + '.getEditPolContentBox()', _savedPolBox.getContentNode(), 
+						_editPolContentBox = new DropdownBox(_savedPolBox.getContentNode(), 
 							"Edit '" + select.options[select.selectedIndex].text + "' policy");
 						_editPolContentBox.setTopLevelContainer(false);
 						// Gets serialized policy string

@@ -181,7 +181,7 @@ var {{ plugin.id }}_item_counter = 1;
 {% endfor %}
 
 function show_runtime_options(pid, container_id) {
-	eval(pid + "_drop_box = new DropdownBox(pid + '_drop_box', container_id, 'Runtime Options');");
+	eval(pid + "_drop_box = new DropdownBox(container_id, 'Runtime Options');");
 	var r = eval(pid + '_drop_box.getContentNode();');
 	// Base id
 	var id = pid + '_' + eval(pid + '_item_counter');
