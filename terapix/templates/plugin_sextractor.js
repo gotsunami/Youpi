@@ -118,19 +118,21 @@ function {{ plugin.id }}_addSelectionToCart() {
 	}
 
 	// Finally, add to the shopping cart
-	p_data = {	'plugin_name' : '{{ plugin.id }}', 
-				'userData' : "{'config' : '" + config + 
-				"', 'imgList' : '" + sel + 
-				"', 'flagPath' : '" + flagPath + 
-				"', 'weightPath' : '" + weightPath + 
-				"', 'psfPath' : '" + psfPath +
-				"', 'resultsOutputDir' : '" + output_data_path +
-				"'}" };
+	var p_data = {	plugin_name : '{{ plugin.id }}', 
+					userData : {'config' : config, 
+								'imgList' : sel, 
+								'flagPath' : flagPath, 
+								'weightPath' : weightPath,
+								'psfPath' : psfPath,
+								'resultsOutputDir' : output_data_path
+					}
+	};
 
 	s_cart.addProcessing(	p_data,
 							// Custom handler
 							function() {
-								alert('The current image selection (' + nb + ' ' + (nb > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
+								alert('The current image selection (' + nb + ' ' + (nb > 1 ? 'images' : 'image') + 
+									') has been\nadded to the cart.');
 							}
 	);
 
@@ -466,13 +468,17 @@ function {{ plugin.id }}_showSavedItems() {
 }
 
 function {{ plugin.id }}_addToCart(idList, config, flagPath, weightPath, psfPath, resultsOutputDir) {
-	s_cart.addProcessing({	'plugin_name' : '{{ plugin.id }}', 
-							'userData' :"{'config' : '" + config + 
-										"', 'imgList' : '" + idList + 
-										"', 'flagPath' : '" + flagPath + 
-										"', 'weightPath' : '" + weightPath + 
-										"', 'psfPath' : '" + psfPath +
-										"', 'resultsOutputDir' : '" + resultsOutputDir + "'}"},
+	var p_data = {	plugin_name : '{{ plugin.id }}', 
+					userData :{	'config' : config,
+								'imgList' : idList,
+								'flagPath' : flagPath,
+								'weightPath' : weightPath,
+								'psfPath' : psfPath,
+								'resultsOutputDir' : resultsOutputDir
+					}
+	};
+
+	s_cart.addProcessing(p_data,
 			// Custom hanlder
 			function() {
 				window.location.reload();

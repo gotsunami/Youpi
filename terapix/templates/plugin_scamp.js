@@ -195,18 +195,20 @@ function {{ plugin.id }}_do_addSelectionToCart(selIds) {
 		totalImgs += tmp[k].length;
 
 	// Finally, add to the shopping cart
-	p_data = {	'plugin_name' 	: 	'{{ plugin.id }}', 
-				'userData' 		: 	"{'config' : '" + config + 
-									"', 'imgList' : '" + selIds + 
-									"', 'resultsOutputDir' : '" + output_data_path +
-									"'}" };
+	p_data = {	plugin_name	: 	'{{ plugin.id }}', 
+				userData 	: 	{	'config' : config,
+									'imgList' : selIds,
+									'resultsOutputDir' : output_data_path
+				}
+	};
 
 	// Add entry into the shopping cart
 	s_cart.addProcessing(	p_data,
 							// Custom handler
 							function() {
 								msg = totalSels + ' selection' + (totalSels > 1 ? 's' : '') + ' (' + totalImgs + 
-									' image' + (totalImgs > 1 ? 's' : '') + ') ha' + (totalSels > 1 ? 've' : 's') + ' been\nadded to the cart.';
+									' image' + (totalImgs > 1 ? 's' : '') + ') ha' + (totalSels > 1 ? 've' : 's') + 
+									' been\nadded to the cart.';
 								alert(msg);
 							}
 	);
@@ -922,10 +924,14 @@ function {{ plugin.id }}_delSavedItem(trid, name) {
 }
 
 function {{ plugin.id }}_addToCart(idList, config, resultsOutputDir) {
-	s_cart.addProcessing({	'plugin_name' : '{{ plugin.id }}', 
-							'userData' :"{'config' : '" + config + 
-										"', 'imgList' : '" + idList + 
-										"', 'resultsOutputDir' : '" + resultsOutputDir + "'}"},
+	var p_data = {	plugin_name : '{{ plugin.id }}', 
+					userData : {'config' : config, 
+								'imgList' : idList,
+								'resultsOutputDir' : resultsOutputDir
+					}
+	};
+
+	s_cart.addProcessing(p_data,
 			// Custom hanlder
 			function() {
 				window.location.reload();
@@ -1353,12 +1359,13 @@ function {{ plugin.id }}_reprocess_ldac_selection(ldac_files, taskId) {
 			idList = idList.substr(0, idList.length-1) + ']]';
 
 			// Add to cart
-			p_data = {	'plugin_name' 	: 	'{{ plugin.id }}', 
-						'userData' 		: 	"{'config' : '" + 'The one used for the same processing' + 
-											"', 'imgList' : '" + idList + 
-											"', 'scampId' : '" + d['ScampId'] + 
-											"', 'resultsOutputDir' : '" + d['ResultsOutputDir'] +
-											"'}" };
+			p_data = {	plugin_name	: 	'{{ plugin.id }}', 
+						userData 	: 	{	config : 'The one used for the same processing',
+											imgList : idList,
+											scampId : d['ScampId'],
+											resultsOutputDir : d['ResultsOutputDir'],
+						}
+			};
 
 			// Add entry into the shopping cart
 			s_cart.addProcessing(	p_data,

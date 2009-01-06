@@ -7,7 +7,6 @@ from types import *
 from settings import *
 #
 from terapix.youpi.models import *
-#from terapix.youpi.cviews.condreqstr import *
 
 PLUGIN_DIRS = os.path.join(HOME, 'youpi', 'terapix', 'youpi', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)

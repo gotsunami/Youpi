@@ -349,15 +349,17 @@ function {{ plugin.id }}_showSavedItems() {
 }
 
 function {{ plugin.id }}_addToCart(idList, config, flatPath, maskPath, regPath, resultsOutputDir) {
-	s_cart.addProcessing({	plugin_name : '{{ plugin.id }}', 
-							userData :	{ 	'config' : config,
-											'imgList' : idList,
-											'flatPath' : flatPath,
-											'maskPath' : maskPath,
-											'regPath' : regPath,
-											'resultsOutputDir' : resultsOutputDir
-										}
-						},
+	var p_data = {	plugin_name : '{{ plugin.id }}', 
+					userData :	{ 	'config' : config,
+									'imgList' : idList,
+									'flatPath' : flatPath,
+									'maskPath' : maskPath,
+									'regPath' : regPath,
+									'resultsOutputDir' : resultsOutputDir
+					}
+	};
+
+	s_cart.addProcessing(p_data,
 						// Custom hanlder
 						function() {
 							window.location.reload();
@@ -447,7 +449,7 @@ function {{ plugin.id }}_reprocess_image(fitsinId) {
 											'regPath' : data.Reg,
 											'resultsOutputDir' : data.ResultsOutputDir
 							}
-				}
+				};
 
 				s_cart.addProcessing(
 						p_data,
@@ -1174,7 +1176,7 @@ function {{ plugin.id }}_addSelectionToCart() {
 	var mandvars = selector.getMandatoryPrefixes();
 	var mandpaths = new Array();
 	for (var k=0; k < mandvars.length; k++) {
-		var selNode = document.getElementById('{{ plugin.id }}_' + mandvars[k] + '_select');
+		var selNode = $('{{ plugin.id }}_' + mandvars[k] + '_select');
 		var success = true;
 		var path;
 		if (!selNode)
@@ -1194,7 +1196,7 @@ function {{ plugin.id }}_addSelectionToCart() {
 	}
 
 	// OPTIONAL
-	var rSel = document.getElementById('{{plugin.id}}_regs_select');
+	var rSel = $('{{plugin.id}}_regs_select');
 	var regPath = '';
 	if (rSel) {
 		var path = rSel.options[rSel.selectedIndex].text;
@@ -1203,11 +1205,11 @@ function {{ plugin.id }}_addSelectionToCart() {
 	}
 
 	// CHECK 3: get config file
-	var cSel = document.getElementById('{{ plugin.id }}_config_name_select');
+	var cSel = $('{{ plugin.id }}_config_name_select');
 	var config = cSel.options[cSel.selectedIndex].text;
 
 	// CHECK 4: custom output directory
-	var custom_dir = document.getElementById('output_path_input').value;
+	var custom_dir = $('output_path_input').value;
 	var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
 
 	if (custom_dir && custom_dir.replace(/\ /g, '').length) {
@@ -1218,23 +1220,25 @@ function {{ plugin.id }}_addSelectionToCart() {
 	}
 
 	// Finally, add to the shopping cart
-	p_data = {	'plugin_name' 	: '{{ plugin.id }}', 
-				'userData' 		:	"{'config' : '" + config + 
-									"', 'imgList' : '" + sels + 
-									"', 'flatPath' : '" + mandpaths[0] + 
-									"', 'maskPath' : '" + mandpaths[1] + 
-									"', 'regPath' : '" + regPath +
-									"', 'resultsOutputDir' : '" + output_data_path +
-									"'}" };
-
 	var total = {{ plugin.id }}_ims.getImagesCount();
+
+	p_data = {	plugin_name	: '{{ plugin.id }}', 
+				userData 	: {	'config' : config,
+								'imgList' : sels, 
+								'flatPath' : mandpaths[0], 
+								'maskPath' : mandpaths[1], 
+								'regPath' : regPath,
+								'resultsOutputDir' : output_data_path
+				}
+	};
+
 	s_cart.addProcessing(	p_data,
 							// Custom handler
 							function() {
-								alert('The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
+								alert('The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+									') has been\nadded to the cart.');
 							}
 	);
-
 }
 
 /*
@@ -1284,7 +1288,7 @@ function {{ plugin.id }}_displayImageCount(imgList, container_id) {
  *
  */
 function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
-	var container = document.getElementById('{{ plugin.id }}_stats_info_div');
+	var container = $('{{ plugin.id }}_stats_info_div');
 	var r = new HttpRequest(
 		container.id,
 		null,
@@ -1294,15 +1298,16 @@ function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
 			var proc = r['Processings'];
 
 			for (var k=0; k < proc.length; k++) {
-				p_data = {	'plugin_name' : '{{ plugin.id }}', 
-							'userData' : "{'config' : 'The one used for the last processing" +
-							"', 'fitsinId' : '" + proc[k]['FitsinId'] + 
-							"', 'imgList' : '" + proc[k]['ImgList'] + 
-							"', 'flatPath' : '" + proc[k]['Flat'] + 
-							"', 'maskPath' : '" + proc[k]['Mask'] + 
-							"', 'regPath' : '" + proc[k]['Reg'] +
-							"', 'resultsOutputDir' : '" + proc[k]['ResultsOutputDir'] +
-							"'}" };
+				p_data = {	plugin_name : '{{ plugin.id }}', 
+							userData : {config 			: 'The one used for the last processing',
+										fitsinId		: proc[k]['FitsinId'],
+										imgList 		: proc[k]['ImgList'],
+										flatPath		: proc[k]['Flat'],
+										maskPath		: proc[k]['Mask'],
+										regPath 		: proc[k]['Reg'],
+										resultsOutputDir: proc[k]['ResultsOutputDir']
+							}
+				};
 	
 				s_cart.addProcessing(	p_data,
 										// Custom handler

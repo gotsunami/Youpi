@@ -32,8 +32,9 @@ function {{ plugin.id }}_addSelectionToCart() {
 	var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
 
 	// Set mandatory structures
-	p_data = {	'plugin_name' : '{{ plugin.id }}', 
-				'userData' : "{'resultsOutputDir' : '" + output_data_path + "'}" };
+	p_data = {	plugin_name : '{{ plugin.id }}', 
+				userData : {resultsOutputDir: output_data_path}
+	};
 
 	// Add entry into the shopping cart
 	s_cart.addProcessing(	p_data,
@@ -397,8 +398,11 @@ function {{ plugin.id }}_delSavedItem(trid, name) {
 }
 
 function {{ plugin.id }}_addToCart(resultsOutputDir) {
-	s_cart.addProcessing({	'plugin_name' : '{{ plugin.id }}', 
-							'userData' :"{'resultsOutputDir' : '" + resultsOutputDir + "'}"},
+	var p_data = {	plugin_name : '{{ plugin.id }}', 
+					userData : {'resultsOutputDir' : resultsOutputDir}
+	};
+
+	s_cart.addProcessing(p_data,
 			// Custom hanlder
 			function() {
 				window.location.reload();

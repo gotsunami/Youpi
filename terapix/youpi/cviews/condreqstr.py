@@ -125,7 +125,7 @@ def get_requirement_string(params, vms):
 			req += ' && '
 		req += '('
 		for vm in vm_sel:
-			req += "Name == '%s' || " % vm
+			req += "Name == \"%s\" || " % vm
 		req = req[:-4] + ')'
 	
 	req += ')'
