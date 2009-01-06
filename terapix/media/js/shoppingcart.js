@@ -137,8 +137,8 @@ function ShoppingCart(container)
 	 *
 	 * Parameters:
 	 *  obj - object: arbitrary object
-	 *  deleteAll - boolean: true to delete all plugin's items at once
 	 *  handler - function: custom function to execute after an item has been deleted
+	 *  deleteAll - boolean: true to delete all plugin's items at once
 	 *
 	 * Note:
 	 * The *obj* object must have the following properties.
@@ -147,7 +147,7 @@ function ShoppingCart(container)
 	 *  idx - int: row index (in plugin context)
 	 *
 	 */ 
-	this.deletePluginItem = function(obj, deleteAll, handler) {
+	this.deletePluginItem = function(obj, handler, deleteAll) {
 		var handler = typeof handler == 'function' ? handler : null;
 		var deleteAll = typeof deleteAll == 'boolean' ? deleteAll : false;
 

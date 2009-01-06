@@ -70,10 +70,10 @@ function removeItemFromCart(rid, force) {
 		if (!r) return;
 	}
 
-	var trNode = document.getElementById(rid);
+	var trNode = $(rid);
 	var pluginName = rid.substr(0, rid.search(/_\d+$/));
 
-	var trs = document.getElementsByTagName('tr');
+	var trs = $$('tr');
 	var trid, idx, j=0;
 	var cartItemsCount = 0;
 
@@ -101,7 +101,7 @@ function removeItemFromCart(rid, force) {
 			}
 			else {
 				// Removes from DOM on successful deletion
-				trNode.parentNode.removeChild(trNode);
+				trNode.remove();
 			}
 		}
 	);
@@ -304,9 +304,9 @@ function proceed_cart() {
 						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
 					</td>
 					<td width="100%" colspan="2">
-						<div id="{{ plugin.id }}_options_div_{{ forloop.parentloop.counter }}"></div>
+						<div id="{{ plugin.id }}_options_div_{{ forloop.counter }}"></div>
 						<script type="text/javascript">
-							show_runtime_options('{{ plugin.id }}', '{{ plugin.id }}_options_div_{{ forloop.parentloop.counter }}');
+							show_runtime_options('{{ plugin.id }}', '{{ plugin.id }}_options_div_{{ forloop.counter }}');
 						</script>
 						{% include plugin.itemCartTemplate %}
 					</td>

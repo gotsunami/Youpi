@@ -437,22 +437,24 @@ function {{ plugin.id }}_reprocess_image(fitsinId) {
 			null,	
 			// Custom handler for results
 			function(resp) {
-				data = resp['result'];
-				p_data = {	'plugin_name' : '{{ plugin.id }}', 
-							'userData' : "{'config' : 'The one used for the last processing" +
-							"', 'fitsinId' : '" + fitsinId + 
-							"', 'imgList' : '" + data['ImageId'] + 
-							"', 'flatPath' : '" + data['Flat'] + 
-							"', 'maskPath' : '" + data['Mask'] + 
-							"', 'regPath' : '" + data['Reg'] +
-							"', 'resultsOutputDir' : '" + data['ResultsOutputDir'] +
-							"'}" };
+				data = resp.result;
+				p_data = {	plugin_name : '{{ plugin.id }}', 
+							userData : { 	'config' : 'The one used for the last processing',
+											'fitsinId' : fitsinId,
+											'imgList' : '[[' + data.ImageId + ']]',
+											'flatPath' : data.Flat, 
+											'maskPath' : data.Mask, 
+											'regPath' : data.Reg,
+											'resultsOutputDir' : data.ResultsOutputDir
+							}
+				}
 
 				s_cart.addProcessing(
 						p_data,
 						// Custom handler
 						function() {
-							alert('The current image has been scheduled for reprocessing. \nAn item has been added to the shopping cart.');
+							alert('The current image has been scheduled for reprocessing. \n' +
+								'An item has been added to the shopping cart.');
 						}
 				);
 			}
@@ -1245,28 +1247,27 @@ function {{ plugin.id }}_addSelectionToCart() {
  *
  */
 function {{ plugin.id }}_displayImageCount(imgList, container_id) {
-	var container = document.getElementById(container_id);
+	var container = $(container_id);
 	var imgList = eval(imgList);
 	var c = 0;
 	var txt;
 	imgList.length > 1 ? txt = 'Batch' : txt = 'Single';
-	var selDiv = document.createElement('div');
-	selDiv.setAttribute('class', 'selectionModeTitle');
-	selDiv.appendChild(document.createTextNode(txt + ' selection mode:'));
-	container.appendChild(selDiv);
+	var selDiv = new Element('div', {'class': 'selectionModeTitle'}).update(txt + ' selection mode:');
+	container.insert(selDiv);
 
-	selDiv = document.createElement('div');
-	selDiv.setAttribute('class', 'listsOfSelections');
+	selDiv = new Element('div', {'class': 'listsOfSelections'});
 
 	for (var k=0; k < imgList.length; k++) {
 		c = imgList[k].toString().split(',').length;
 		if (imgList.length > 1)
-			selDiv.appendChild(document.createTextNode('Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '')));
+			txt = 'Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '');
 		else
-			selDiv.appendChild(document.createTextNode(c + ' image' + (c > 1 ? 's' : '')));
-		selDiv.appendChild(document.createElement('br'));
+			txt = c + ' image' + (c > 1 ? 's' : '');
+
+		selDiv.update(txt);
+		selDiv.insert(new Element('br'));
 	}
-	container.appendChild(selDiv);
+	container.insert(selDiv);
 }
 
 /*
