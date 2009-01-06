@@ -12,28 +12,21 @@
  *
  * Constructor Parameters:
  *
- * container_id - string: name of parent DOM block container
- * varName - string: global variable name of instance, used internally for public interface definition
+ * container - string or DOM: name of parent DOM block container
  *
  */
-function ShoppingCart(container_id, varName)
+function ShoppingCart(container)
 {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 
 	/*
-	 * Var: _instance_name
-	 * Name of instance in global namespace
-	 *
-	 */
-	var _instance_name = varName;
-	/*
 	 * Var: _container
 	 * Parent DOM container
 	 *
 	 */ 
-	var _container = document.getElementById(container_id);
+	var _container = $(container);
 	/*
 	 * Var: _itemsCount
 	 * Number of items in cart
@@ -70,11 +63,11 @@ function ShoppingCart(container_id, varName)
 			function(resp) {
 				itemsCount = resp.count;
 				var div = Builder.node('div', { id: 'shoppingCart',
-												className: 'nonempty',
-												onclick: "location.href='/youpi/cart/'" }, [
+												className: 'nonempty' }, [
 								Builder.node('img', { src: '/media/themes/' + guistyle + '/img/misc/minicart.gif' }),
 								_getArticlesCountMsg()
 						  ]);
+				div.observe('click', function(event) { location.href = '/youpi/cart/'; });
 
 				// Clear contents
 				_container.update();

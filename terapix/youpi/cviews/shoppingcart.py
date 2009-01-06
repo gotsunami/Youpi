@@ -34,11 +34,13 @@ def cart_add_item(request):
 
 	# Eval misc data wich has to be a dictionnary of custom data
 	try:
+		if userData[0] == '"' and userData[len(userData)-1] == '"':
+			userData = userData[1:-1]
 		userData = eval(userData)
 		if not type(userData) is DictType:
-			raise TypeError, "Should be a dictionnary."
-	except:
-		return HttpResponseServerError('Incorrect POST data: ' + userData)
+			raise TypeError, "Should be a dictionnary, not %s" % type(userData)
+	except Exception, e:
+		return HttpResponseServerError("Incorrect POST data: %s" % e)
 
 	if 'cart' not in request.session:
 		# Maybe url has been called directly, which is NOT good

@@ -349,17 +349,19 @@ function {{ plugin.id }}_showSavedItems() {
 }
 
 function {{ plugin.id }}_addToCart(idList, config, flatPath, maskPath, regPath, resultsOutputDir) {
-	s_cart.addProcessing({	'plugin_name' : '{{ plugin.id }}', 
-							'userData' :"{'config' : '" + config + 
-										"', 'imgList' : '" + idList + 
-										"', 'flatPath' : '" + flatPath + 
-										"', 'maskPath' : '" + maskPath + 
-										"', 'regPath' : '" + regPath +
-										"', 'resultsOutputDir' : '" + resultsOutputDir + "'}"},
-			// Custom hanlder
-			function() {
-				window.location.reload();
-			}
+	s_cart.addProcessing({	plugin_name : '{{ plugin.id }}', 
+							userData :	{ 	'config' : config,
+											'imgList' : idList,
+											'flatPath' : flatPath,
+											'maskPath' : maskPath,
+											'regPath' : regPath,
+											'resultsOutputDir' : resultsOutputDir
+										}
+						},
+						// Custom hanlder
+						function() {
+							window.location.reload();
+						}
 	);
 }
 
