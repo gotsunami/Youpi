@@ -3,9 +3,9 @@
 <table class="cleantd">
 	<tr>
 		<td style="width: 100%; padding: 3px">
-			<span class="imgCountLink" onclick="{{ plugin.id }}_viewImageList('{{ plugin.id }}_images_div_{{ forloop.counter }}', '{{ data.userData.imgList }}');">
+			<span class="imgCountLink" onclick="{{ plugin.id }}.viewImageList('{{ plugin.id }}_images_div_{{ forloop.counter }}', '{{ data.userData.imgList }}');">
 			<script type="text/javascript">
-					{{ plugin.id }}_displayImageCount('{{ data.userData.imgList }}');
+					{{ plugin.id }}.displayImageCount('{{ data.userData.imgList }}');
 				</script>
 			</span>
 			<table class="plugin_small">
@@ -38,7 +38,7 @@
 			<div class="submitItem">
 				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
 				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster"
-						onclick="{{ plugin.id }}_run(	'{{ plugin.id }}_{{ forloop.counter }}', 
+						onclick="{{ plugin.id }}.run(	'{{ plugin.id }}_{{ forloop.counter }}', 
 														'{{ data.userData.imgList }}', 
 														'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
 														'{{ data.userData.flagPath }}', 
@@ -51,7 +51,7 @@
 			</div>
 			<div>or</div>
 			<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" 
-				onclick="{{ plugin.id }}_saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}',
+				onclick="{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}',
 						'{{ data.userData.imgList }}', 
 						'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
 						'{{ data.userData.flagPath }}', 
