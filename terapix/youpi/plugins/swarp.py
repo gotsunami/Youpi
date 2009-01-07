@@ -30,7 +30,7 @@ class Swarp(ProcessingPlugin):
 		self.jsSource = 'plugin_swarp.js'
 
 		# Decomment to disable the plugin
-		self.enable = False
+		#self.enable = False
 
 	def process(self, request):
 		"""
