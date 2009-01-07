@@ -563,7 +563,9 @@ var {{ plugin.id }} = {
 				tn = Builder.node('img', {
 					src: resp['HasThumbnails'] ? imgpath : imgpath.replace(/tn_/, ''),
 					'class' : 'scamp-result-entry-tn'
-				});
+				}).hide();
+				// Adds a cool fade-in effect
+				$(tn).appear({duration: k/3});
 	
 				if (!resp['HasThumbnails'])
 					tn.setAttribute('width', '60px');

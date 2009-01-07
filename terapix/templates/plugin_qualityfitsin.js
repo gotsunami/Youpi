@@ -582,7 +582,9 @@ var {{ plugin.id }} = {
 				tn = Builder.node('img', {
 					src: resp['WWW'] + 'tn/' + resp['ImgName'] + '_' + tns[k] + '_tn.png',
 					'class': 'qfits-result-entry-tn'
-				});
+				}).hide();
+				// Adds a cool fade-in effect
+				$(tn).appear({duration: k/3});
 	
 				a.appendChild(tn);
 				td.appendChild(a);
