@@ -111,7 +111,7 @@ function showSavedItems() {
 {% for plugin in plugins %}
 	var z = null;
 	try {
-		z = {{ plugin.id }}_showSavedItems; 
+		z = {{ plugin.id }}.showSavedItems; 
 	} catch(e) {
 		// Not implemented in plugin
 		var countNode = document.getElementById('plugin_{{ plugin.id }}_saved_count');
@@ -292,7 +292,7 @@ function proceed_cart() {
 				{% if plugin.hasItemsInCart %}
 				<tr>
 					<th>
-						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}_runAll()"/>
+						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}.runAll()"/>
 					</th>
 					<th colspan="2">{{ plugin.optionLabel }} ({{ plugin.description }}) related items</th>
 				</tr>

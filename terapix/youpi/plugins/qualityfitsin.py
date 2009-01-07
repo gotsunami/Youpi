@@ -47,7 +47,7 @@ class QualityFitsIn(ProcessingPlugin):
 		self.jsSource = 'plugin_qualityfitsin.js'
 
 		# Decomment to disable the plugin
-		#self.enable = False
+		self.enable = False
 
 	def saveCartItem(self, request):
 		"""

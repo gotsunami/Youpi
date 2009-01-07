@@ -39,7 +39,7 @@ class Scamp(ProcessingPlugin):
 		self.XMLFile = 'scamp.xml'
 
 		# Decomment to disable the plugin
-		#self.enable = False
+		self.enable = False
 
 	def getConfigFileNames(self, request):
 		# Updates entry

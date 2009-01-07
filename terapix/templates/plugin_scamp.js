@@ -1,25 +1,3 @@
-/*
- * Group: Skeleton Plugin
- *
- * JS code for Skeleton plugin.
- *
- * Functions in this file are required for every processing plugin to work. Feel free
- * to add any content in their bodies, but keep the declarations!
- *
- * Mandatory function prototypes:
- *
- * function - {{ plugin.id }}_addSelectionToCart()
- * function - {{ plugin.id }}_addToCart(resultsOutputDir)
- * function - {{ plugin.id }}_delSavedItem(trid, name)
- * function - {{ plugin.id }}_renderOutputDirStats(container_id)
- * function - {{ plugin.id }}_reprocessAllFailedProcessings(tasksList)
- * function - {{ plugin.id }}_resultsShowEntryDetails(container_id)
- * function - {{ plugin.id }}_run(trid, resultsOutputDir, silent)
- * function - {{ plugin.id }}_saveItemForLater(trid, itemId, resultsOutputDir)
- * function - {{ plugin.id }}_showSavedItems()
- *
- */
-
 // Global vars
 var ims;
 var advTable;
@@ -32,50 +10,50 @@ var xmlParser;
 var {{ plugin.id }}_curSelectionIdx = 0;
 var {{ plugin.id }}_LDAC_error = 0;
 
+var {{ plugin.id }} = {
+	/*
+	 * Function: addSelectionToCart
+	 *
+	 */
+	addSelectionToCart: function() {
+		// Global var
+		{{ plugin.id }}_curSelectionIdx = 0;
+		{{ plugin.id }}_LDAC_error = 0;
+	
+		var container = emptyContainer('menuitem_sub_5');
+		var pre = document.createElement('pre');
+		container.appendChild(pre);
+	
+		var log = new Logger(pre);
+	
+		// CHECK 1: list of selections check
+		log.msg_status('Please note that these tests DO NOT CHECK that LDAC files are available on disks!');
+		log.msg_status('Checking list of selections...');
+	
+		sels = ims.getListsOfSelections();
+		if (!sels) {
+			log.msg_error('No images selected. Nothing to add to cart !', true);
+			return;
+		}
+	
+		var total = ims.getImagesCount();
+		log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection.');
+	
+		// CHECK 2: get config file
+		var cSel = document.getElementById('{{ plugin.id }}_config_name_select');
+		var config = cSel.options[cSel.selectedIndex].text;
+		log.msg_status("Using '" + config + "' as configuration file");
+	
+		// CHECK 3: custom output directory
+		var output_data_path = {{ plugin.id }}_getOutputDataPath();
+		log.msg_status("Using output data path '" + output_data_path + "'");
+	
+		// CHECK 4: do images in selection(s) have LDAC data?
+		log.msg_status("Deeper selection(s) checks for LDAC data...");
+		{{ plugin.id }}_checkForSelectionLDACData(pre);
+	},
 
-/*
- * Function: addSelectionToCart
- *
- */
-function {{ plugin.id }}_addSelectionToCart() {
-	// Global var
-	{{ plugin.id }}_curSelectionIdx = 0;
-	{{ plugin.id }}_LDAC_error = 0;
-
-	var container = emptyContainer('menuitem_sub_5');
-	var pre = document.createElement('pre');
-	container.appendChild(pre);
-
-	var log = new Logger(pre);
-
-	// CHECK 1: list of selections check
-	log.msg_status('Please note that these tests DO NOT CHECK that LDAC files are available on disks!');
-	log.msg_status('Checking list of selections...');
-
-	sels = ims.getListsOfSelections();
-	if (!sels) {
-		log.msg_error('No images selected. Nothing to add to cart !', true);
-		return;
-	}
-
-	var total = ims.getImagesCount();
-	log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection.');
-
-	// CHECK 2: get config file
-	var cSel = document.getElementById('{{ plugin.id }}_config_name_select');
-	var config = cSel.options[cSel.selectedIndex].text;
-	log.msg_status("Using '" + config + "' as configuration file");
-
-	// CHECK 3: custom output directory
-	var output_data_path = {{ plugin.id }}_getOutputDataPath();
-	log.msg_status("Using output data path '" + output_data_path + "'");
-
-	// CHECK 4: do images in selection(s) have LDAC data?
-	log.msg_status("Deeper selection(s) checks for LDAC data...");
-	{{ plugin.id }}_checkForSelectionLDACData(pre);
-}
-
-function {{ plugin.id }}_getOutputDataPath() {
+function getOutputDataPath() {
 	var custom_dir = document.getElementById('output_path_input').value;
 	var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
 
@@ -98,7 +76,7 @@ function {{ plugin.id }}_getOutputDataPath() {
  * container - DOM element: DOM block container
  *
  */ 
-function {{ plugin.id }}_checkForSelectionLDACData(container) {
+function checkForSelectionLDACData(container) {
 	var div = document.createElement('div');
 	var log = new Logger(div);
 	var sels = ims.getListsOfSelections();
@@ -161,7 +139,7 @@ function {{ plugin.id }}_checkForSelectionLDACData(container) {
 	r.send('/youpi/process/plugin/', post);
 }
 
-function {{ plugin.id }}_do_addSelectionToCart(selIds) {
+function do_addSelectionToCart(selIds) {
 	var cSel = document.getElementById('{{ plugin.id }}_config_name_select');
 	var config = cSel.options[cSel.selectedIndex].text;
 	var output_data_path = {{ plugin.id }}_getOutputDataPath();
@@ -214,7 +192,7 @@ function {{ plugin.id }}_do_addSelectionToCart(selIds) {
 	);
 }
 
-function {{ plugin.id }}_manualLDACSelection(container) {
+function manualLDACSelection(container) {
 	var sels = ims.getListsOfSelections();
 	var selArr = eval(sels);
 	ldac_selection_last_idx = 0;
@@ -294,7 +272,7 @@ function {{ plugin.id }}_manualLDACSelection(container) {
 	{{ plugin.id }}_renderLDACSelection(0);
 }
 
-function {{ plugin.id }}_LDACSaveCurrentSelection() {
+function LDACSaveCurrentSelection() {
 	var idSel = ldac_table.getSelectedRows();
 	if (idSel) {
 		idSel = idSel.split(',');
@@ -307,7 +285,7 @@ function {{ plugin.id }}_LDACSaveCurrentSelection() {
 		ldac_table_active_selections[ldac_selection_last_idx] = '';
 }
 
-function {{ plugin.id }}_renderLDACSelection(idx) {
+function renderLDACSelection(idx) {
 	var sels = ims.getListsOfSelections();
 	var selArr = eval(sels);
 
@@ -356,7 +334,7 @@ function {{ plugin.id }}_renderLDACSelection(idx) {
  * scampId allows to retreive config file by content (not by name) when reprocessing data
  *
  */
-function {{ plugin.id }}_run(trid, idList, itemId, config, resultsOutputDir, scampId, silent) {
+function run(trid, idList, itemId, config, resultsOutputDir, scampId, silent) {
 	var silent = silent == true ? true : false;
 	var scampId = scampId ? scampId : '';
 	var txt = '';
@@ -397,11 +375,11 @@ function {{ plugin.id }}_run(trid, idList, itemId, config, resultsOutputDir, sca
 	r.send('/youpi/process/plugin/', post);
 }
 
-function {{ plugin.id }}_reprocessAllFailedProcessings(tasksList) {
+function reprocessAllFailedProcessings(tasksList) {
 	alert('TODO...');
 }
 
-function {{ plugin.id }}_renderOutputDirStats(container_id) {
+function renderOutputDirStats(container_id) {
 	var container = document.getElementById(container_id);
 	container.innerHTML = '';
 
@@ -460,7 +438,7 @@ function {{ plugin.id }}_renderOutputDirStats(container_id) {
 	container.appendChild(tab);
 }
 
-function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, resultsOutputDir, config) {
+function saveItemForLater(trid, idList, itemId, resultsOutputDir, config) {
 	var runopts = get_runtime_options(trid);
 	var r = new HttpRequest(
 			'result',
@@ -488,7 +466,7 @@ function {{ plugin.id }}_saveItemForLater(trid, idList, itemId, resultsOutputDir
  * server-side info to display
  *
  */
-function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
+function resultsShowEntryDetails(container_id) {
 	var tr, th, td;
 	// See templates/results.html, function showDetails(...)
 	// Global variable
@@ -764,7 +742,7 @@ function {{ plugin.id }}_resultsShowEntryDetails(container_id) {
 	xmlParser = new ScampXMLParser(resp['TaskId'], d, 'xmlParser');
 }
 
-function {{ plugin.id }}_showSavedItems() {
+function showSavedItems() {
 	var cdiv = document.getElementById('plugin_menuitem_sub_{{ plugin.id }}');
 	cdiv.innerHTML = '';
 	var div = document.createElement('div');
@@ -896,7 +874,7 @@ function {{ plugin.id }}_showSavedItems() {
 	r.send('/youpi/process/plugin/', post);
 }
 
-function {{ plugin.id }}_delSavedItem(trid, name) {
+function delSavedItem(trid, name) {
 	var r = confirm("Are you sure you want to delete saved item '" + name + "'?");
 	if (!r) return;
 
@@ -923,7 +901,7 @@ function {{ plugin.id }}_delSavedItem(trid, name) {
 	r.send('/youpi/process/plugin/', post);
 }
 
-function {{ plugin.id }}_addToCart(idList, config, resultsOutputDir) {
+function addToCart(idList, config, resultsOutputDir) {
 	var p_data = {	plugin_name : '{{ plugin.id }}', 
 					userData : {'config' : config, 
 								'imgList' : idList,
@@ -964,7 +942,7 @@ function selectImages() {
  * imgList - array of arrays of idLists
  *
  */
-function {{ plugin.id }}_displayImageCount(imgList, container_id) {
+function displayImageCount(imgList, container_id) {
 	var container = document.getElementById(container_id);
 	var imgList = eval(imgList);
 	var c = 0;
@@ -1339,7 +1317,7 @@ function ScampXMLParser(taskId, container, varName) {
 	_main();
 }
 
-function {{ plugin.id }}_reprocess_ldac_selection(ldac_files, taskId) {
+function reprocess_ldac_selection(ldac_files, taskId) {
 	var container = document.getElementById('{{ plugin.id }}_xml_fields_result_div');
 
 	var xhr = new HttpRequest(

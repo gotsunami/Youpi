@@ -35,6 +35,7 @@ class Sextractor(ProcessingPlugin):
 		self.itemCartTemplate = 'plugin_sextractor_item_cart.html'
 		# Custom javascript
 		self.jsSource = 'plugin_sextractor.js'
+		self.enable = False
 
 		self.jobCount = 10
 
