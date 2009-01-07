@@ -3,7 +3,7 @@
 import sys, os.path, re, time, string
 import xml.dom.minidom as dom
 import marshal, base64, zlib
-from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
+from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError, PluginAllDataAlreadyProcessed
 from terapix.youpi.models import *
 from types import *
 from sets import Set
@@ -22,10 +22,6 @@ class QualityFitsIn(ProcessingPlugin):
 	- Produce FITS Weightmap image
 	"""
 
-	#
-	# Constructor: __init__
-	# Constructor	
-	#
 	def __init__(self):
 		ProcessingPlugin.__init__(self)
 
@@ -47,7 +43,7 @@ class QualityFitsIn(ProcessingPlugin):
 		self.jsSource = 'plugin_qualityfitsin.js'
 
 		# Decomment to disable the plugin
-		self.enable = False
+		#self.enable = False
 
 	def saveCartItem(self, request):
 		"""
@@ -306,7 +302,7 @@ class QualityFitsIn(ProcessingPlugin):
 			config = post['Config']
 			fitsinId = post['FitsinId']
 			resultsOutputDir = post['ResultsOutputDir']
-			reprocessValid = post['ReprocessValid']
+			reprocessValid = int(post['ReprocessValid'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -401,7 +397,7 @@ notify_user             = monnerville@iap.fr
 			if rels:
 				reprocess_image = True
 				for r in rels:
-					if r.task.success:
+					if r.task.success and r.task.kind.name == self.id:
 						# Check if same run parameters
 						fitsin = Plugin_fitsin.objects.filter(task = r.task)[0]
 						conf = str(zlib.decompress(base64.decodestring(fitsin.qfconfig)))
@@ -409,10 +405,13 @@ notify_user             = monnerville@iap.fr
 							regPath == fitsin.reg or resultsOutputDir == r.task.results_output_dir:
 							reprocess_image = False
 
-				if reprocess_image:
+				if reprocess_image or reprocessValid:
 					process_images.append(img)
 			else:
 				process_images.append(img)
+
+		if not process_images:
+			raise PluginAllDataAlreadyProcessed
 
 		# One image per job
 		for img in process_images:
@@ -529,7 +528,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 
 		cluster_ids = []
 		k = 1
-		error = condorError = '' 
+		error = condorError = info = '' 
 
 		try:
 			for imgList in idList:
@@ -543,10 +542,12 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				k += 1
 		except CondorSubmitError, e:
 				condorError = str(e)
+		except PluginAllDataAlreadyProcessed:
+				info = 'This item has already been fully processed. Nothing to do.'
 		except Exception, e:
 				error = "Error while processing list #%d: %s" % (k, e)
 
-		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
+		return {'ClusterIds': cluster_ids, 'NoData': info, 'Error': error, 'CondorError': condorError}
 
 	def getRuns(self, request):
 		# Return a list of lists [run name, image count]

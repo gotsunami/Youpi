@@ -27,6 +27,10 @@ function update_condor_submission_log(resp, silent) {
 		log.msg_error(r['Error']);
 		return false;
 	}
+	else if (r.NoData) {
+		log.msg_ok(r.NoData);
+		return false;
+	}
 
 	if (r['CondorError']) {
 		var d = document.createElement('div');

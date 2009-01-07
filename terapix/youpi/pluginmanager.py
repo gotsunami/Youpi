@@ -16,6 +16,7 @@ class CondorSetupError(Exception): pass
 class CondorSubmitError(Exception): pass
 class PluginError(Exception): pass
 class PluginManagerError(Exception): pass
+class PluginAllDataAlreadyProcessed(Exception): pass
 
 class ProcessingPlugin: 
 	type = 'YOUPIPLUGIN'
