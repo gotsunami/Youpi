@@ -5,7 +5,7 @@
 		<td style="width: 100%; padding: 3px">
 			<div id="{{ plugin.id }}_{{ forloop.counter }}_selections_div"></div>
 			<script type="text/javascript">
-				{{ plugin.id }}_displayImageCount('{{ data.userData.imgList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
+				{{ plugin.id }}.displayImageCount('{{ data.userData.imgList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
 			</script>
 			<table class="plugin_small">
 				<tr>
@@ -23,7 +23,7 @@
 			<div class="submitItem">
 				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
 				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster" 
-						onclick="{{ plugin.id }}_run(	'{{ plugin.id }}_{{ forloop.counter }}', 
+						onclick="{{ plugin.id }}.run(	'{{ plugin.id }}_{{ forloop.counter }}', 
 														'{{ data.userData.imgList }}', 
 														'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
 														'{{ data.userData.config }}',
@@ -33,7 +33,7 @@
 			</div>
 			<div>or</div>
 			<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" 
-				onclick="{{ plugin.id }}_saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', 
+				onclick="{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', 
 				'{{ data.userData.imgList }}', 
 				'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
 				'{{ data.userData.resultsOutputDir }}',
