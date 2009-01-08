@@ -102,7 +102,7 @@ function ImageSelector(container_id, varName)
 	 * Parent DOM container
 	 *
 	 */ 
-	var container = document.getElementById(container_id);
+	var container = $(container_id);
 	container.setAttribute('class', 'imageSelector');
 	/*
 	 * Var: id
@@ -199,11 +199,11 @@ function ImageSelector(container_id, varName)
 	var AIM = {
 		frame: function(c) {
 			var n = 'f' + Math.floor(Math.random() * 99999);
-			var d = document.createElement('DIV');
+			var d = new Element('DIV');
 			d.innerHTML = '<iframe style="display:none" src="about:blank" id="'+n+'" name="'+n+'" onload="' + _instance_name + '.getAIM().loaded(\''+n+'\')"></iframe>';
-			document.body.appendChild(d);
+			document.body.insert(d);
 	
-			var i = document.getElementById(n);
+			var i = $(n);
 			if (c && typeof(c.onComplete) == 'function') {
 				i.onComplete = c.onComplete;
 			}
@@ -224,7 +224,7 @@ function ImageSelector(container_id, varName)
 		},
 
 		loaded: function(id) {
-			var i = document.getElementById(id);
+			var i = $(id);
 			if (i.contentDocument) {
 				var d = i.contentDocument;
 			} else if (i.contentWindow) {
@@ -257,14 +257,14 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _executeHandler(tr_idx) {
-		var curSelId = document.getElementById(id + '_mainCriteria_select_' + tr_idx);
+		var curSelId = $(id + '_mainCriteria_select_' + tr_idx);
 		var selOption = curSelId.options[curSelId.selectedIndex];
 
 		// Loads matching conditional combo box
-		var condDiv = document.getElementById(id + '_cond_div_' + tr_idx);
+		var condDiv = $(id + '_cond_div_' + tr_idx);
 		var selNode = eval('get' + fields[selOption.value] + 'CondSelect')(tr_idx);
 		removeAllChildrenNodes(condDiv);
-		condDiv.appendChild(selNode);
+		condDiv.insert(selNode);
 
 		// Now call matching handler
 		eval('build' + fields[selOption.value] + 'DataWidget')(tr_idx);
@@ -353,9 +353,9 @@ function ImageSelector(container_id, varName)
 	 */ 
 	function render() {
 		// Container for new image selection
-		var	topDiv = document.createElement('div');
+		var	topDiv = new Element('div');
 		topDiv.setAttribute('id', id + '_new_image_selection_div');
-		container.appendChild(topDiv);
+		container.insert(topDiv);
 		renderCreateNewImageSelection(topDiv);
 	}
 
@@ -441,56 +441,56 @@ function ImageSelector(container_id, varName)
 	 */ 
 	function renderSingleSelection(cNode, nbRes) {
 		// div for single selection
-		var single_div = document.createElement('div');
+		var single_div = new Element('div');
 		single_div.setAttribute('id', id + '_single_sel_div');
 
-		var div = document.createElement('div');
+		var div = new Element('div');
 		div.setAttribute('class', 'headerText');
-		div.appendChild(document.createTextNode(caption));
-		var snb = document.createElement('span');
+		div.insert(caption);
+		var snb = new Element('span');
 		snb.setAttribute('style', 'font-weight: bold;');
-		snb.appendChild(document.createTextNode(nbRes));
-		div.appendChild(snb);
-		div.appendChild(document.createTextNode(' images those for which:'));
-		single_div.appendChild(div);
+		snb.insert(nbRes);
+		div.insert(snb);
+		div.insert(' images those for which:');
+		single_div.insert(div);
 
 		// Table
-		topNode = document.createElement('table');
+		topNode = new Element('table');
 		var tab = topNode;
-		var tr = document.createElement('tr');
-		tab.appendChild(tr);
-		single_div.appendChild(tab);
-		cNode.appendChild(single_div);
+		var tr = new Element('tr');
+		tab.insert(tr);
+		single_div.insert(tab);
+		cNode.insert(single_div);
 
 		// Second row
 		addTRLine(tr);
 
 		// Execute query
-		div = document.createElement('div');
+		div = new Element('div');
 		div.setAttribute('style', 'text-align: left');
-		var sub = document.createElement('input');
+		var sub = new Element('input');
 		sub.setAttribute('type', 'button');
 		sub.setAttribute('value', 'Find images!');
 		sub.setAttribute('onclick', _instance_name + '.executeQuery();');
-		div.appendChild(sub);
-		single_div.appendChild(div);
+		div.insert(sub);
+		single_div.insert(div);
 
 		// Div that display results count
-		div = document.createElement('div');
+		div = new Element('div');
 		div.setAttribute('id', id + '_result_count_div');
-		single_div.appendChild(div);
+		single_div.insert(div);
 
 		// Result grid
-		div = document.createElement('div');
+		div = new Element('div');
 		div.setAttribute('id', '_result_grid_div');
 		div.setAttribute('style', 'width: ' + div.width + 'px; height: 90%;');
-		single_div.appendChild(div);
+		single_div.insert(div);
 
 		// Result div
-		div = document.createElement('div');
+		div = new Element('div');
 		div.setAttribute('id', id + '_result_div');
 		div.setAttribute('style', 'height: 100%; width: 100%; overflow: hidden;');
-		single_div.appendChild(div);
+		single_div.insert(div);
 	}
 
 	/*
@@ -505,49 +505,49 @@ function ImageSelector(container_id, varName)
 	 */ 
 	function renderBatchSelection(cNode, nbRes) {
 		// div for batch selection
-		var batch_div = document.createElement('div');
+		var batch_div = new Element('div');
 		batch_div.setAttribute('id', id + '_batch_sel_div');
 
-		var form = document.createElement('form');
+		var form = new Element('form');
 		form.setAttribute('action', '/youpi/uploadFile/');
 		form.setAttribute('enctype', 'multipart/form-data');
 		form.setAttribute('method', 'post');
 		form.setAttribute('onsubmit', "return " + _instance_name + ".getAIM().submit(this, {'onStart' : " + _instance_name + ".getFileUploadStartHandler(), 'onComplete' : " + _instance_name + ".getFileUploadCompleteHandler()});");
 
-		var xl = document.createElement('label');
-		xl.appendChild(document.createTextNode('Select an XML file to upload: '));
+		var xl = new Element('label');
+		xl.insert('Select an XML file to upload: ');
 
-		var filei = document.createElement('input');
+		var filei = new Element('input');
 		filei.setAttribute('type', 'file');
 		filei.setAttribute('name', 'xmlfile');
-		xl.appendChild(filei);
+		xl.insert(filei);
 
-		var subi = document.createElement('input');
+		var subi = new Element('input');
 		subi.setAttribute('style', 'margin-left: 10px;');
 		subi.setAttribute('type', 'submit');
 		subi.setAttribute('value', 'Upload and check file');
 
-		form.appendChild(xl);
-		form.appendChild(subi);
+		form.insert(xl);
+		form.insert(subi);
 
-		batch_div.appendChild(form);
+		batch_div.insert(form);
 
 		// for saved selections
-		var sdiv = document.createElement('div');
+		var sdiv = new Element('div');
 		sdiv.setAttribute('id', id + '_batch_load_saved_sel_div');
-		batch_div.appendChild(sdiv);
+		batch_div.insert(sdiv);
 
-		var r = document.createElement('div');
+		var r = new Element('div');
 		r.setAttribute('style', 'color: green; background-color: white; float: left; margin-right: 30px;');
 		r.setAttribute('id', id + '_upload_log_div');
-		batch_div.appendChild(r);
+		batch_div.insert(r);
 
-		r = document.createElement('div');
+		r = new Element('div');
 		r.setAttribute('id', id + '_sky_selections_div');
 		r.setAttribute('title', 'Click on image to see larger version');
-		batch_div.appendChild(r);
+		batch_div.insert(r);
 
-		cNode.appendChild(batch_div);
+		cNode.insert(batch_div);
 	}
 
 	/*
@@ -559,41 +559,41 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _getOptionsToolbar() {
-		var div = document.createElement('div');
+		var div = new Element('div');
 		div.setAttribute('class', 'modeOptions');
 
 		switch(_selectionMode) {
 			case _singleMode:
 				// Merge saved selections
-				var d = document.createElement('div');
+				var d = new Element('div');
 				d.setAttribute('id', id + '_merge_selections_div');
 				d.setAttribute('style', 'padding: 5px;');
-				var sub = document.createElement('input');
+				var sub = new Element('input');
 				sub.setAttribute('type', 'button');
 				sub.setAttribute('value', 'Merge with existing selections...');
 				sub.setAttribute('onclick', _instance_name + '.showMergeSelectionsBox();');
-				d.appendChild(sub);
-				div.appendChild(d);
+				d.insert(sub);
+				div.insert(d);
 
 				// Select all
-				sub = document.createElement('input');
+				sub = new Element('input');
 				sub.setAttribute('style', 'margin-right: 10px;');
 				sub.setAttribute('type', 'button');
 				sub.setAttribute('value', 'Select all');
 				sub.setAttribute('onclick', _instance_name + '.selectAll();');
-				div.appendChild(sub);
+				div.insert(sub);
 
 				// Unselect all
-				sub = document.createElement('input');
+				sub = new Element('input');
 				sub.setAttribute('type', 'button');
 				sub.setAttribute('value', 'Unselect all');
 				sub.setAttribute('onclick', _instance_name + '.unselectAll();');
-				div.appendChild(sub);
+				div.insert(sub);
 				break;
 
 			case _batchMode:
-				div.appendChild(_createCheckBox(_instance_name + '_batch_display_sky_check', true, 'Display sky visualization'));
-				div.appendChild(_createCheckBox(_instance_name + '_batch_sky_compute_all_check', false, 'Plot all images points, not only selections (slower)'));
+				div.insert(_createCheckBox(_instance_name + '_batch_display_sky_check', true, 'Display sky visualization'));
+				div.insert(_createCheckBox(_instance_name + '_batch_sky_compute_all_check', false, 'Plot all images points, not only selections (slower)'));
 				div.setAttribute('style', 'text-align: left;');
 				break;
 
@@ -618,19 +618,19 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _createCheckBox(id, checked, label) {
-		var s = document.createElement('div');
+		var s = new Element('div');
 		s.setAttribute('style', 'color: white; margin-left: 10px; margin-right: 5px;');
-		var input = document.createElement('input');
+		var input = new Element('input');
 		input.setAttribute('id', id);
 		input.setAttribute('type', 'checkbox');
 		if (checked)
 			input.setAttribute('checked', 'checked');
 
-		var lab = document.createElement('label');
-		lab.appendChild(document.createTextNode('   ' + label));
+		var lab = new Element('label');
+		lab.insert('   ' + label);
 
-		s.appendChild(input);
-		s.appendChild(lab);
+		s.insert(input);
+		s.insert(lab);
 
 		return s;
 	}
@@ -644,7 +644,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _getContextTip() {
-		var div = document.createElement('div');
+		var div = new Element('div');
 		div.setAttribute('class', 'tip');
 		div.setAttribute('style', 'width: 73%;');
 		var msg;
@@ -677,29 +677,29 @@ function ImageSelector(container_id, varName)
 	 */ 
 	function _getEditSelectionBox() {
 		// Selection related
-		var bdiv = document.createElement('div');
+		var bdiv = new Element('div');
 		bdiv.setAttribute('id', id + '_selection_box_div');
 		bdiv.setAttribute('class', 'controlPanel');
 
 		// Save selection
-		div = document.createElement('div');
+		div = new Element('div');
 		div.setAttribute('id', id + '_save_selection_div');
-		sub = document.createElement('input');
+		sub = new Element('input');
 		sub.setAttribute('type', 'button');
 		sub.setAttribute('value', 'Save selection as...');
 		sub.setAttribute('onclick', _instance_name + '.showSaveSelectionBox();');
-		div.appendChild(sub);
-		bdiv.appendChild(div);
+		div.insert(sub);
+		bdiv.insert(div);
 
 		// Delete existing selection
-		div = document.createElement('div');
+		div = new Element('div');
 		div.setAttribute('id', id + '_delete_selection_div');
-		sub = document.createElement('input');
+		sub = new Element('input');
 		sub.setAttribute('type', 'button');
 		sub.setAttribute('value', 'Delete existing selection...');
 		sub.setAttribute('onclick', _instance_name + '.showDeleteSelectionBox();');
-		div.appendChild(sub);
-		bdiv.appendChild(div);
+		div.insert(sub);
+		bdiv.insert(div);
 
 		return bdiv;
 	}
@@ -742,14 +742,14 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.showDeleteSelectionBox = function() {
-		var div = document.getElementById(id + '_delete_selection_div');
-		var sub = document.getElementById(id + '_delete_selection_subdiv');
+		var div = $(id + '_delete_selection_div');
+		var sub = $(id + '_delete_selection_subdiv');
 
 		if (!sub) {
-			sub = document.createElement('div');
+			sub = new Element('div');
 			sub.setAttribute('id', id + '_delete_selection_subdiv');
 			sub.setAttribute('class', 'show');
-			div.appendChild(sub);
+			div.insert(sub);
 		}
 		else {
 			if (sub.getAttribute('class') == 'show') {
@@ -767,12 +767,12 @@ function ImageSelector(container_id, varName)
 			removeAllChildrenNodes(sub);
 
 			if (resp['data'].length == 0) {
-				var p = document.createElement('p');
+				var p = new Element('p');
 				p.setAttribute('class', 'error');
-				p.appendChild(document.createTextNode('No saved selections found.'));
-				p.appendChild(document.createElement('br'));
-				p.appendChild(document.createTextNode('Nothing to delete.'));
-				sub.appendChild(p);
+				p.insert('No saved selections found.');
+				p.insert(new Element('br'));
+				p.insert('Nothing to delete.');
+				sub.insert(p);
 				return;
 			}
 
@@ -781,13 +781,13 @@ function ImageSelector(container_id, varName)
 				options[k] = resp['data'][k][0];
 			}
 			var sel = getSelect(id + '_del_selection_combo', options);
-			sub.appendChild(sel);
+			sub.insert(sel);
 
-			var del = document.createElement('input');
+			var del = new Element('input');
 			del.setAttribute('type', 'button');
 			del.setAttribute('onclick', _instance_name + '.deleteSavedSelection();');
 			del.setAttribute('value', 'Delete!');
-			sub.appendChild(del);
+			sub.insert(del);
 		});
 	}
 
@@ -801,14 +801,14 @@ function ImageSelector(container_id, varName)
 			alert(imgSelRequiredMsg);
 			return;
 		}
-		var div = document.getElementById(id + '_merge_selections_div');
-		var sub = document.getElementById(id + '_merge_selections_subdiv');
+		var div = $(id + '_merge_selections_div');
+		var sub = $(id + '_merge_selections_subdiv');
 		
 		if (!sub) {
-			sub = document.createElement('div');
+			sub = new Element('div');
 			sub.setAttribute('id', id + '_merge_selections_subdiv');
 			sub.setAttribute('class', 'show');
-			div.appendChild(sub);
+			div.insert(sub);
 		}
 		else {
 			if (sub.getAttribute('class') == 'show') {
@@ -827,19 +827,19 @@ function ImageSelector(container_id, varName)
 			var len = resp['data'].length;
 
 			if (len == 0) {
-				var p = document.createElement('p');
+				var p = new Element('p');
 				p.setAttribute('class', 'error');
-				p.appendChild(document.createTextNode('No saved selections found.'));
-				p.appendChild(document.createElement('br'));
-				p.appendChild(document.createTextNode('Nothing to merge.'));
-				sub.appendChild(p);
+				p.insert('No saved selections found.');
+				p.insert(new Element('br'));
+				p.insert('Nothing to merge.');
+				sub.insert(p);
 				return;
 			}
 
-			var p = document.createElement('p');
+			var p = new Element('p');
 			p.setAttribute('style', 'font-style: italic');
-			p.appendChild(document.createTextNode(len + ' ' + (len > 1 ? 'selections' : 'selection') + ' available'));
-			sub.appendChild(p);
+			p.insert(len + ' ' + (len > 1 ? 'selections' : 'selection') + ' available');
+			sub.insert(p);
 
 			var options = []
 			for (var k=0; k < len; k++) {
@@ -847,13 +847,13 @@ function ImageSelector(container_id, varName)
 			}
 			var combosize = options.length > 5 ? 8 : options.length
 			var sel = getSelect(id + '_merge_selections_combo', options, combosize);
-			sub.appendChild(sel);
+			sub.insert(sel);
 
-			var del = document.createElement('input');
+			var del = new Element('input');
 			del.setAttribute('type', 'button');
 			del.setAttribute('onclick', _instance_name + '.mergeSavedSelections();');
 			del.setAttribute('value', 'Merge!');
-			sub.appendChild(del);
+			sub.insert(del);
 		});
 	}
 
@@ -868,32 +868,32 @@ function ImageSelector(container_id, varName)
 			return;
 		}
 
-		var div = document.getElementById(id + '_save_selection_div');
-		var sub = document.getElementById(id + '_save_selection_subdiv');
+		var div = $(id + '_save_selection_div');
+		var sub = $(id + '_save_selection_subdiv');
 
 		if (!sub) {
-			sub = document.createElement('div');
+			sub = new Element('div');
 			sub.setAttribute('id', id + '_save_selection_subdiv');
 			sub.setAttribute('class', 'show');
 
-			var txt = document.createElement('input');
+			var txt = new Element('input');
 			txt.setAttribute('style', 'float: left; margin-right: 5px;');
 			txt.setAttribute('id', id + '_save_selection_text');
 			txt.setAttribute('type', 'text');
-			sub.appendChild(txt);
+			sub.insert(txt);
 
-			var save = document.createElement('input');
+			var save = new Element('input');
 			save.setAttribute('type', 'button');
 			save.setAttribute('onclick', _instance_name + '.saveSelection();');
 			save.setAttribute('value', 'Save!');
-			sub.appendChild(save);
+			sub.insert(save);
 
-			var res = document.createElement('div');
+			var res = new Element('div');
 			res.setAttribute('id', id + '_save_selection_res_div');
 			res.setAttribute('style', 'vertical-align: middle');
-			sub.appendChild(res);
+			sub.insert(res);
 
-			div.appendChild(sub);
+			div.insert(sub);
 
 			// Add auto-completion capabilities
 			if (_bsn) {
@@ -915,7 +915,7 @@ function ImageSelector(container_id, varName)
 			}
 			else {
 				sub.setAttribute('class', 'show');
-				var nText = document.getElementById(id + '_save_selection_text');
+				var nText = $(id + '_save_selection_text');
 				nText.select();
 				nText.focus();
 			}
@@ -941,7 +941,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildObjectDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
+		var output = $(id + '_custom_div_' + tr_idx);
 
 		var xhr = new HttpRequest(
 			output.id,
@@ -952,7 +952,7 @@ function ImageSelector(container_id, varName)
 				// Rendering
 				removeAllChildrenNodes(output);
 				var selNode = getSelect(id + '_object_select_' + tr_idx, resp['data'], 6);
-				output.appendChild(selNode);
+				output.insert(selNode);
 			}
 		);
 
@@ -1012,7 +1012,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildIngestionIdDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
+		var output = $(id + '_custom_div_' + tr_idx);
 
 		var xhr = new HttpRequest(
 			output.id,
@@ -1023,7 +1023,7 @@ function ImageSelector(container_id, varName)
 				// Rendering
 				removeAllChildrenNodes(output);
 				var selNode = getSelect(id + '_ingestionId_select_' + tr_idx, resp['data']);
-				output.appendChild(selNode);
+				output.insert(selNode);
 			}
 		);
 
@@ -1085,7 +1085,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildChannelDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
+		var output = $(id + '_custom_div_' + tr_idx);
 
 		var xhr = new HttpRequest(
 			output.id,
@@ -1096,7 +1096,7 @@ function ImageSelector(container_id, varName)
 				// Rendering
 				removeAllChildrenNodes(output);
 				var selNode = getSelect(id + '_channel_select_' + tr_idx, resp['data'], 6);
-				output.appendChild(selNode);
+				output.insert(selNode);
 			}
 		);
 
@@ -1157,7 +1157,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildInstrumentDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
+		var output = $(id + '_custom_div_' + tr_idx);
 
 		var xhr = new HttpRequest(
 			output.id,
@@ -1168,7 +1168,7 @@ function ImageSelector(container_id, varName)
 				// Rendering
 				removeAllChildrenNodes(output);
 				var selNode = getSelect(id + '_instrument_select_' + tr_idx, resp['data']);
-				output.appendChild(selNode);
+				output.insert(selNode);
 			}
 		);
 
@@ -1230,7 +1230,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildRunDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
+		var output = $(id + '_custom_div_' + tr_idx);
 
 		var xhr = new HttpRequest(
 			output.id,
@@ -1241,7 +1241,7 @@ function ImageSelector(container_id, varName)
 				// Rendering
 				removeAllChildrenNodes(output);
 				var selNode = getSelect(id + '_run_select_' + tr_idx, resp['data'], 6);
-				output.appendChild(selNode);
+				output.insert(selNode);
 			}
 		);
 
@@ -1303,7 +1303,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildSavedDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
+		var output = $(id + '_custom_div_' + tr_idx);
 
 		var xhr = new HttpRequest(
 			output.id,
@@ -1322,14 +1322,14 @@ function ImageSelector(container_id, varName)
 					var selNode = getSelect(selid, sels);
 				}
 				else {
-					var selNode = document.createElement('select');
+					var selNode = new Element('select');
 					selNode.setAttribute('id', selid);
-					option = document.createElement('option');
+					option = new Element('option');
 					option.setAttribute('value', 0);
-					option.appendChild(document.createTextNode('-- No saved selection in database --'));
-					selNode.appendChild(option);
+					option.insert('-- No saved selection in database --');
+					selNode.insert(option);
 				}
-				output.appendChild(selNode);
+				output.insert(selNode);
 			}
 		);
 
@@ -1389,12 +1389,12 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildNameDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
-		var txtNode = document.createElement('input');
+		var output = $(id + '_custom_div_' + tr_idx);
+		var txtNode = new Element('input');
 		txtNode.setAttribute('type', 'text');
 
 		removeAllChildrenNodes(output);
-		output.appendChild(txtNode);
+		output.insert(txtNode);
 	}
 
 	/*
@@ -1446,12 +1446,12 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildRaDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
-		var txtNode = document.createElement('input');
+		var output = $(id + '_custom_div_' + tr_idx);
+		var txtNode = new Element('input');
 		txtNode.setAttribute('type', 'text');
 
 		removeAllChildrenNodes(output);
-		output.appendChild(txtNode);
+		output.insert(txtNode);
 	}
 
 	/*
@@ -1503,12 +1503,12 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function buildDecDataWidget(tr_idx) {
-		var output = document.getElementById(id + '_custom_div_' + tr_idx);
-		var txtNode = document.createElement('input');
+		var output = $(id + '_custom_div_' + tr_idx);
+		var txtNode = new Element('input');
 		txtNode.setAttribute('type', 'text');
 
 		removeAllChildrenNodes(output);
-		output.appendChild(txtNode);
+		output.insert(txtNode);
 	}
 
 	/*
@@ -1681,14 +1681,14 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _swapSelectionMode() {
-		var msel = document.getElementById(id + '_image_mode_sel');
+		var msel = $(id + '_image_mode_sel');
 		/* 
 		 * mode = 0 - SM
 		 * mode = 1 - BM
 		 */
 		var mode = msel.selectedIndex;
-		var sdiv = document.getElementById(id + '_single_sel_div');
-		var bdiv = document.getElementById(id + '_batch_sel_div');
+		var sdiv = $(id + '_single_sel_div');
+		var bdiv = $(id + '_batch_sel_div');
 
 		_selectionMode = mode;
 
@@ -1705,13 +1705,13 @@ function ImageSelector(container_id, varName)
 			bdiv.style.display = 'none';
 		}
 
-		var optdiv = document.getElementById(id + '_mode_options_div');
+		var optdiv = $(id + '_mode_options_div');
 		optdiv.innerHTML = '';
-		optdiv.appendChild(_getOptionsToolbar());
+		optdiv.insert(_getOptionsToolbar());
 
-		var tipdiv = document.getElementById(id + '_mode_options_tip_div');
+		var tipdiv = $(id + '_mode_options_tip_div');
 		tipdiv.innerHTML = '';
-		tipdiv.appendChild(_getContextTip());
+		tipdiv.insert(_getContextTip());
 	}
 
 	/*
@@ -1720,7 +1720,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _updateBatchSavedSelectionArea() {
-		var	seldiv = document.getElementById(id + '_batch_load_saved_sel_div');
+		var	seldiv = $(id + '_batch_load_saved_sel_div');
 	
 		var xhr = new HttpRequest(
 			seldiv,
@@ -1738,21 +1738,21 @@ function ImageSelector(container_id, varName)
 					r[k] = data[k][0];
 				}
 	
-				seldiv.appendChild(document.createTextNode('Or load a saved selection: '));
-				seldiv.appendChild(getSelect(id + '_batch_load_saved_sel', r));
+				seldiv.insert('Or load a saved selection: ');
+				seldiv.insert(getSelect(id + '_batch_load_saved_sel', r));
 	
-				var lbut = document.createElement('input');
+				var lbut = new Element('input');
 				lbut.setAttribute('style', 'margin-left: 10px;');
 				lbut.setAttribute('type', 'button');
 				lbut.setAttribute('onclick', _instance_name + ".loadBatchSavedSelection();");
 				lbut.setAttribute('value', 'Load');
 		
-				seldiv.appendChild(lbut);
+				seldiv.insert(lbut);
 
-				var blog = document.createElement('div');
+				var blog = new Element('div');
 				blog.setAttribute('id', id + '_batch_load_saved_log_div');
 				blog.setAttribute('style', 'float: left;');
-				seldiv.appendChild(blog);
+				seldiv.insert(blog);
 			}
 		);
 	
@@ -1766,11 +1766,11 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.loadBatchSavedSelection = function() {
-		var	div = document.getElementById(id + '_batch_load_saved_log_div');
-		var sel = document.getElementById(id + '_batch_load_saved_sel');
+		var	div = $(id + '_batch_load_saved_log_div');
+		var sel = $(id + '_batch_load_saved_sel');
 		var name = sel.options[sel.selectedIndex].text;
-		document.getElementById(id + '_upload_log_div').innerHTML = '';
-		document.getElementById(id + '_sky_selections_div').innerHTML = '';
+		$(id + '_upload_log_div').innerHTML = '';
+		$(id + '_sky_selections_div').innerHTML = '';
 
 		var xhr = new HttpRequest(
 			div,
@@ -1791,7 +1791,6 @@ function ImageSelector(container_id, varName)
 				for (var k=0; k < sels.length; k++) {
 					count = sels[k].length;
 					log.msg_status('Selection ' + (k+1) + ' contains ' + count + ' images');
-					// link.setAttribute('onclick', _instance_name + ".viewBatchSelection('" + encodeURI(sel[k]['xml']) + "');");
 					// Casts array to string with commas
 					_batchModeSelections[k] = '' + sels[k] + '';
 					total += count;
@@ -1831,45 +1830,45 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function addImageQueryForm(cNode, nbRes) {
-		var sdiv = document.createElement('div');
+		var sdiv = new Element('div');
 		sdiv.setAttribute('class', 'image_mode');
 		var modes = ['Single selection', 'Batch selection'];
-		var lab = document.createElement('label');
-		lab.appendChild(document.createTextNode('Selection mode: '));
+		var lab = new Element('label');
+		lab.insert('Selection mode: ');
 
 		var msel = getSelect(id + '_mode_sel', modes);
 		msel.setAttribute('id', id + '_image_mode_sel');
 		msel.setAttribute('onchange', _instance_name + '.swapSelectionMode()');
 
-		sdiv.appendChild(lab);
-		lab.appendChild(msel);
-		cNode.appendChild(sdiv);
+		sdiv.insert(lab);
+		lab.insert(msel);
+		cNode.insert(sdiv);
 
-		var bltab = document.createElement('table');
+		var bltab = new Element('table');
 		bltab.setAttribute('class', 'optionsPanel');
-		cNode.appendChild(bltab);
+		cNode.insert(bltab);
 
-		var tr = document.createElement('tr');
-		bltab.appendChild(tr);
+		var tr = new Element('tr');
+		bltab.insert(tr);
 
-		var td = document.createElement('td');
-		var ediv = document.createElement('div');
-		ediv.appendChild(_getEditSelectionBox());
-		td.appendChild(ediv);
+		var td = new Element('td');
+		var ediv = new Element('div');
+		ediv.insert(_getEditSelectionBox());
+		td.insert(ediv);
 
-		var optdiv = document.createElement('div');
+		var optdiv = new Element('div');
 		optdiv.setAttribute('id', id + '_mode_options_div');
-		td.appendChild(optdiv);
+		td.insert(optdiv);
 
-		var tipdiv = document.createElement('div');
+		var tipdiv = new Element('div');
 		tipdiv.setAttribute('id', id + '_mode_options_tip_div');
-		td.appendChild(tipdiv);
+		td.insert(tipdiv);
 
-		tr.appendChild(td);
+		tr.insert(td);
 
-		td = document.createElement('td');
+		td = new Element('td');
 		td.setAttribute('style', 'width: 100%;');
-		tr.appendChild(td);
+		tr.insert(td);
 
 		renderSingleSelection(td, nbRes);
 		renderBatchSelection(td, nbRes);
@@ -1907,9 +1906,9 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.selectionMethodChanged = function() {
-		var selNode = document.getElementById(id + '_method_selection_select');
-		var newDiv = document.getElementById(id + '_new_image_selection_div');
-		var mergeDiv = document.getElementById(id + '_merge_image_selection_div');
+		var selNode = $(id + '_method_selection_select');
+		var newDiv = $(id + '_new_image_selection_div');
+		var mergeDiv = $(id + '_merge_image_selection_div');
 
 		switch (selNode.selectedIndex) {
 			case 0:
@@ -1931,7 +1930,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.deleteSavedSelection = function() {
-		var div = document.getElementById(id + '_delete_selection_subdiv');
+		var div = $(id + '_delete_selection_subdiv');
 		var sel = div.getElementsByTagName('select')[0];
 		var name = sel.options[sel.selectedIndex].text;
 
@@ -1946,12 +1945,12 @@ function ImageSelector(container_id, varName)
 			function(resp) {
 				removeAllChildrenNodes(div);
 				removeAllChildrenNodes(div);
-				var p = document.createElement('p');
+				var p = new Element('p');
 				p.setAttribute('class', 'done');
-				p.appendChild(document.createTextNode("Done. Selection '" + name + "'"));
-				p.appendChild(document.createElement('br'));
-				p.appendChild(document.createTextNode('deleted.'));
-				div.appendChild(p);
+				p.insert("Done. Selection '" + name + "'");
+				p.insert(new Element('br'));
+				p.insert('deleted.');
+				div.insert(p);
 			}
 		);
 
@@ -1966,7 +1965,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.mergeSavedSelections = function() {
-		var div = document.getElementById(id + '_merge_selections_subdiv');
+		var div = $(id + '_merge_selections_subdiv');
 		var sel = div.getElementsByTagName('select')[0];
 		var name = sel.options[sel.selectedIndex].text;
 
@@ -2006,16 +2005,16 @@ function ImageSelector(container_id, varName)
 				gIdList = _tableWidget.getSelectedColsValues().split(',');
 
 				// Rebuild grid
-				resultHandler(gIdList.concat(selIdList), document.getElementById('_result_grid_div'));
+				resultHandler(gIdList.concat(selIdList), $('_result_grid_div'));
 
 				removeAllChildrenNodes(div);
 				removeAllChildrenNodes(div);
-				var p = document.createElement('p');
+				var p = new Element('p');
 				p.setAttribute('class', 'done');
-				p.appendChild(document.createTextNode("Done. Selection(s) merged"));
-				p.appendChild(document.createElement('br'));
-				p.appendChild(document.createTextNode('into current one.'));
-				div.appendChild(p);
+				p.insert("Done. Selection(s) merged");
+				p.insert(new Element('br'));
+				p.insert('into current one.');
+				div.insert(p);
 			}
 		);
 
@@ -2033,7 +2032,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.saveSelection = function() {
-		var textNode = document.getElementById(id + '_save_selection_text');
+		var textNode = $(id + '_save_selection_text');
 		var name = textNode.value.replace('+', '%2B');
 
 		if (name.length == 0) {
@@ -2043,7 +2042,7 @@ function ImageSelector(container_id, varName)
 		}
 
 		// Checks for name availability (does not exits in DB)
-		var cnode = document.getElementById(id + '_save_selection_res_div');
+		var cnode = $(id + '_save_selection_res_div');
 		var xhr = new HttpRequest(
 			cnode.id,
 			// Use default error handler
@@ -2052,7 +2051,7 @@ function ImageSelector(container_id, varName)
 			function(resp) {
 				removeAllChildrenNodes(cnode);
 				var nb = resp['data'].length;
-				var p = document.createElement('p');
+				var p = new Element('p');
 				if (nb > 0) {
 					// Name already exists, ask for overwriting
 					var r = confirm("A selection with that name already exists in the database.\nWould you like to overwrite it ?");
@@ -2081,7 +2080,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function saveSelectionToDB(name) {
-		var cnode = document.getElementById(id + '_save_selection_res_div');
+		var cnode = $(id + '_save_selection_res_div');
 		var xhr = new HttpRequest(
 			cnode.id,
 			// Use default error handler
@@ -2090,12 +2089,12 @@ function ImageSelector(container_id, varName)
 			function(resp) {
 				// Selection saved
 				removeAllChildrenNodes(cnode);
-				var p = document.createElement('p');
+				var p = new Element('p');
 				p.setAttribute('class', 'done');
-				p.appendChild(document.createTextNode("Done. Selection saved under"));
-				p.appendChild(document.createElement('br'));
-				p.appendChild(document.createTextNode("'" + name.replace('%2B', '+') + "'."));
-				cnode.appendChild(p);
+				p.insert("Done. Selection saved under");
+				p.insert(new Element('br'));
+				p.insert("'" + name.replace('%2B', '+') + "'.");
+				cnode.insert(p);
 			}
 		);
 
@@ -2119,80 +2118,82 @@ function ImageSelector(container_id, varName)
 		var tr, td, but;
 	
 		// DOM node
-		afterNode = afterNode || alert('after DOM node not defined!');
+		afterNode = $(afterNode);
 	
 		// Use a rather unique TR id
 		var trid = genID('Line');
-		tr = document.createElement('tr');
+		tr = new Element('tr');
 		tr.setAttribute('id', trid);
 		tr.setAttribute('class', 'queryline');
 
 		// Remove button
-		td = document.createElement('td');
+		td = new Element('td');
 		if (currentTR > 0) {
-			but = document.createElement('input');
-			with (but) {
-				var nid = genID('ButtonDel');
-				setAttribute('id', nid);
-				setAttribute('type', 'button');
-				// Try to reach and remove TR DOM element
-				setAttribute('onclick', _instance_name + ".getTopNode().removeChild(document.getElementById('" + nid + "').parentNode.parentNode)");
-				setAttribute('value', '-');
-			}
-			td.appendChild(document.createTextNode('then  '));
-			td.appendChild(but);
+			but = new Element('input', {id: genID('ButtonDel'),
+										type: 'button',
+										value: '-'
+			});
+			// Removes line
+			but.observe('click', function(event) {
+				event.element().up('tr').remove();
+			});
+			td.insert('then  ');
+			td.insert(but);
 		}
-		tr.appendChild(td);
+		tr.insert(td);
 	
 		// Add button
-		td = document.createElement('td');
-		but = document.createElement('input');
+		td = new Element('td');
+		but = new Element('input');
 		with (but) {
 			var nid = genID('ButtonAdd');
 			setAttribute('id', nid);
 			setAttribute('type', 'button');
-			setAttribute('onclick', _instance_name + ".addLine(document.getElementById('" + trid + "'));");
+			// Adds a new line
+			but.observe('click', function(event) {
+				addTRLine(event.element().up('tr'));
+			});
 			setAttribute('value', '+');
 		}
-		td.appendChild(but);
-		tr.appendChild(td);
+		td.insert(but);
+		tr.insert(td);
 
 		// Builds select with search criteria
 		var selNode = getMainCriteriaDOM(currentTR);
-		td = document.createElement('td');
-		td.appendChild(selNode);
-		tr.appendChild(td);
+		td = new Element('td');
+		td.insert(selNode);
+		tr.insert(td);
 
 		// Condition
-		td = document.createElement('td');
-		var cdiv = document.createElement('div');
+		td = new Element('td');
+		var cdiv = new Element('div');
 		cdiv.setAttribute('id', id + '_cond_div_' + currentTR);
 		selNode = eval('get' + fields[0] + 'CondSelect')(currentTR);
-		cdiv.appendChild(selNode);
-		td.appendChild(cdiv);
-		tr.appendChild(td);
+		cdiv.insert(selNode);
+		td.insert(cdiv);
+		tr.insert(td);
 
 		// Condition custom DOM (as returned by get{NAME}DOM())
-		td = document.createElement('td');
-		cdiv = document.createElement('div');
+		td = new Element('td');
+		cdiv = new Element('div');
 		cdiv.setAttribute('id', id + '_custom_div_' + currentTR);
-		td.appendChild(cdiv);
-		tr.appendChild(td);
+		td.insert(cdiv);
+		tr.insert(td);
 
 		if (afterNode.nextSibling) {
 			afterNode.parentNode.insertBefore(tr, afterNode.nextSibling);
 		}
 		else {
-			afterNode.parentNode.appendChild(tr);
+			afterNode.parentNode.insert(tr);
 		}
 
 		// Nb result div (per TR line)
-		td = document.createElement('td');
+		td = new Element('td');
 		td.setAttribute('style', 'text-align: left; vertical-align: middle');
-		var rdiv = document.createElement('div');
+		var rdiv = new Element('div');
 		rdiv.setAttribute('id', id + '_nbResults_div_' + currentTR);
-		td.appendChild(rdiv);
-		tr.appendChild(td);
+		td.insert(rdiv);
+		tr.insert(td);
 
 		// Finally executes appropriate handler for current line
 		eval('build' + fields[0] + 'DataWidget')(currentTR);
@@ -2214,7 +2215,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function getCondText(idx) {
-		var selNode = document.getElementById(id + '_condition_select_' + idx);
+		var selNode = $(id + '_condition_select_' + idx);
 		var selOption = selNode.options[selNode.selectedIndex];
 		return selOption.text;
 	}
@@ -2231,7 +2232,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.executeQuery = function () {
-		var output = document.getElementById(id + '_result_div');
+		var output = $(id + '_result_div');
 		var xhr = new HttpRequest(
 			output.id,
 			// Use default error handler
@@ -2256,7 +2257,7 @@ function ImageSelector(container_id, varName)
 				}
 
 				var count = resp['data'].length;
-				var d = document.createElement('div');
+				var d = new Element('div');
 				// Called twice to prevent a Firebug strange behaviour
 				removeAllChildrenNodes(output);
 				removeAllChildrenNodes(output);
@@ -2274,7 +2275,7 @@ function ImageSelector(container_id, varName)
 				rdiv.setAttribute('style', 'padding: 2px; background-color: lightblue; border: 1px solid #5b80b2; text-align:center; vertical-align: middle;');
 				removeAllChildrenNodes(rdiv);
 				removeAllChildrenNodes(rdiv);
-				rdiv.appendChild(document.createTextNode(count));
+				rdiv.insert(count);
 
 				idResults.splice(xhr.idResultsIdx, 1);
 				if (idResults[xhr.idResultsIdx]) {
@@ -2300,7 +2301,7 @@ function ImageSelector(container_id, varName)
 						}
 
 						showResultCount(count);
-						resultHandler(idList, document.getElementById('_result_grid_div'));
+						resultHandler(idList, $('_result_grid_div'));
 					}
 					else {
 						showResultCount(count);
@@ -2328,15 +2329,15 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function showResultCount(count) {
-		var rg = document.getElementById(id + '_result_count_div');
+		var rg = $(id + '_result_count_div');
 		removeAllChildrenNodes(rg);
 		if (count > 0) {
 			rg.setAttribute('class', 'result_count');
-			rg.appendChild(document.createTextNode(count + (count > 0 ? ' results' : ' result')));
+			rg.insert(count + (count > 0 ? ' results' : ' result'));
 		}
 		else {
 			rg.setAttribute('class', 'result_count_no_match');
-			rg.appendChild(document.createTextNode('No match'));
+			rg.insert('No match');
 		}
 	}
 
@@ -2433,9 +2434,9 @@ function ImageSelector(container_id, varName)
 		rid = rowNode.getAttribute('id');
 		row = rid.substr(rid.search(/\d+$/));
 
-		critNode = document.getElementById(id + '_mainCriteria_select_' + row);
-		condNode = document.getElementById(id + '_condition_select_' + row);
-		valueNode = document.getElementById(id + '_custom_div_' + row).firstChild;
+		critNode = $(id + '_mainCriteria_select_' + row);
+		condNode = $(id + '_condition_select_' + row);
+		valueNode = $(id + '_custom_div_' + row).firstChild;
 
 		// Gets internal prefix for later get + prefix + SQLParams() method call
 		critText = critNode.options[critNode.selectedIndex].text;
@@ -2531,17 +2532,17 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function getMainCriteriaDOM(tr_idx) {
-		var select = document.createElement('select');
+		var select = new Element('select');
 		select.setAttribute('id', id + '_mainCriteria_select_' + tr_idx);
 		// Call matching handler when selection changes
 		select.setAttribute('onchange', _instance_name + '.executeHandler(' + tr_idx + ');');
 
 		var option;
 		for (var j=0; j < fields.length; j++) {
-			option = document.createElement('option');
+			option = new Element('option');
 			option.setAttribute('value', j);
-			option.appendChild(document.createTextNode(labelFields[j]));
-			select.appendChild(option);
+			option.insert(labelFields[j]);
+			select.insert(option);
 		}
 
 		return select;
@@ -2571,12 +2572,12 @@ function ImageSelector(container_id, varName)
 	function fileUploadStartHandler() {
 		// make something useful before submit (onStart)
 
-		var skydiv = document.getElementById(id + '_sky_selections_div');
-		var blog = document.getElementById(_instance_name + '_batch_log_div');
-		var log = document.getElementById(id + '_upload_log_div');
+		var skydiv = $(id + '_sky_selections_div');
+		var blog = $(_instance_name + '_batch_log_div');
+		var log = $(id + '_upload_log_div');
 
 		skydiv.innerHTML = '';
-		document.getElementById(id + '_batch_load_saved_log_div').innerHTML = '';
+		$(id + '_batch_load_saved_log_div').innerHTML = '';
 
 		if (blog) blog.style.display = 'none';
 		log.innerHTML = '';
@@ -2607,7 +2608,7 @@ function ImageSelector(container_id, varName)
 		var error_msg = r['error_msg'];
 		var fileName = r['filename'];
 	
-		var log = document.getElementById(id + '_upload_log_div');
+		var log = $(id + '_upload_log_div');
 		log.innerHTML = '';
 
 		var img_name;
@@ -2624,33 +2625,33 @@ function ImageSelector(container_id, varName)
 		}
 
 		for (var k=0; k<msg.length; k++) {
-			var img = document.createElement('img');
+			var img = new Element('img');
 			img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/' + img_name);
-			log.appendChild(img);
-			log.appendChild(document.createTextNode(msg[k]));
-			log.appendChild(document.createElement('br'));
+			log.insert(img);
+			log.insert(msg[k]);
+			log.insert(new Element('br'));
 		}
 		if (exit_code) return;
 
 		// View file content
-		log.appendChild(document.createTextNode('('));
-		var a = document.createElement('a');
+		log.insert('(');
+		var a = new Element('a');
 		a.setAttribute('target', '_blank');
 		a.setAttribute('href', '/youpi/uploadFile/batch/viewContent/' + fileName + '/');
-		a.appendChild(document.createTextNode('View file content'));
-		log.appendChild(a);
-		log.appendChild(document.createTextNode(')'));
+		a.insert('View file content');
+		log.insert(a);
+		log.insert(')');
 
-		var rdiv = document.createElement('div');
+		var rdiv = new Element('div');
 		rdiv.setAttribute('style', 'color: black;');
 		rdiv.setAttribute('id', id + '_upload_content_div');
-		log.appendChild(rdiv);
+		log.insert(rdiv);
 
-		var bdiv = document.getElementById(id + '_batch_sel_div');
-		var blog = document.createElement('div');
+		var bdiv = $(id + '_batch_sel_div');
+		var blog = new Element('div');
 		blog.setAttribute('id', _instance_name + '_batch_log_div');
 		blog.setAttribute('class', 'ims_batch_log_div');
-		bdiv.appendChild(blog);
+		bdiv.insert(blog);
 
 		var xhr = new HttpRequest(
 			rdiv.id,
@@ -2662,10 +2663,10 @@ function ImageSelector(container_id, varName)
 				var res = resp['result'];
 				rdiv.innerHTML = '';
 				rdiv.style.color = 'green';
-				var img = document.createElement('img');
+				var img = new Element('img');
 				img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/' + img_name);
-				rdiv.appendChild(img);
-				rdiv.appendChild(document.createTextNode('Found ' + res['nbSelections'] + ' selections'));
+				rdiv.insert(img);
+				rdiv.insert('Found ' + res['nbSelections'] + ' selections');
 
 				var sel = res['selections'];
 				var total = 0;
@@ -2673,18 +2674,18 @@ function ImageSelector(container_id, varName)
 				_batchModeSelections.length = 0;
 
 				for(var k=0; k<sel.length; k++) {
-					rdiv.appendChild(document.createElement('br'));
-					rdiv.appendChild(document.createTextNode(k+1 + '. Selection ' + sel[k]['name'] + ' contains '));
-					var link = document.createElement('a');
+					rdiv.insert(new Element('br'));
+					rdiv.insert(k+1 + '. Selection ' + sel[k]['name'] + ' contains ');
+					var link = new Element('a');
 					link.setAttribute('href', '#');
 					link.setAttribute('onclick', _instance_name + ".viewBatchSelection('" + encodeURI(sel[k]['xml']) + "');");
-					link.appendChild(document.createTextNode(sel[k]['count'] + ' images'));
-					rdiv.appendChild(link);
+					link.insert(sel[k]['count'] + ' images');
+					rdiv.insert(link);
 					_batchModeSelections[k] = sel[k]['idList'];
 					total += sel[k]['count'];
 				}	
-				rdiv.appendChild(document.createElement('br'));
-				rdiv.appendChild(document.createTextNode('Total: [ ' + total + ' images ]'));
+				rdiv.insert(new Element('br'));
+				rdiv.insert('Total: [ ' + total + ' images ]');
 
 				// Load sky map
 				_displaySkyVisualization(fileName);
@@ -2709,8 +2710,8 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _displaySkyVisualization(fileName) {
-		if (!document.getElementById(_instance_name + '_batch_display_sky_check').checked) {
-			if (!document.getElementById(_instance_name + '_batch_sky_compute_all_check').checked)
+		if (!$(_instance_name + '_batch_display_sky_check').checked) {
+			if (!$(_instance_name + '_batch_sky_compute_all_check').checked)
 				return;
 			else {
 				alert('You can\'t plot images center if sky visualisation is unchecked!')
@@ -2726,25 +2727,25 @@ function ImageSelector(container_id, varName)
 		else {
 			// Trying to plot sky selections from XML file content
 			post = 'Filename=' + fileName;
-			if (document.getElementById(_instance_name + '_batch_sky_compute_all_check').checked)
+			if ($(_instance_name + '_batch_sky_compute_all_check').checked)
 				post += '&PlotCenter=1';
 		}
 
-		var skydiv = document.getElementById(id + '_sky_selections_div');
+		var skydiv = $(id + '_sky_selections_div');
 		var xhr2 = new HttpRequest(
 			skydiv.id,
 			// Use default error handler
 			null,
 			// Custom handler for results
 			function(resp) {
-				var a = document.createElement('a');
+				var a = new Element('a');
 				a.setAttribute('href', resp['imgName']);
 				a.setAttribute('target', '_blank');
-				var img = document.createElement('img');
+				var img = new Element('img');
 				img.setAttribute('src', resp['tnName']);
 				skydiv.innerHTML = '';
-				a.appendChild(img);
-				skydiv.appendChild(a);
+				a.insert(img);
+				skydiv.insert(a);
 			}
 		);
 
@@ -2763,7 +2764,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.viewBatchSelection = function(xml) {
-		var log = document.getElementById(_instance_name + '_batch_log_div');
+		var log = $(_instance_name + '_batch_log_div');
 		log.style.display = 'block';
 
 		var xhr = new HttpRequest(
@@ -2773,15 +2774,15 @@ function ImageSelector(container_id, varName)
 			// Custom handler for results
 			function(resp) {
 				log.innerHTML = '';
-				var pre = document.createElement('pre');
-				log.appendChild(pre);
-				pre.appendChild(document.createTextNode('Images in ' + resp['name'] + ' selection:'));
-				pre.appendChild(document.createElement('br'));
+				var pre = new Element('pre');
+				log.insert(pre);
+				pre.insert('Images in ' + resp['name'] + ' selection:');
+				pre.insert(new Element('br'));
 
 				var len = resp['data'].length;
 				for (var k=0; k < len; k++) {
-					pre.appendChild(document.createTextNode(resp['data'][k][0] + ' in ' + resp['data'][k][1]));
-					pre.appendChild(document.createElement('br'));
+					pre.insert(resp['data'][k][0] + ' in ' + resp['data'][k][1]);
+					pre.insert(new Element('br'));
 				}
 			}	
 		);
@@ -2792,15 +2793,6 @@ function ImageSelector(container_id, varName)
 		// Send HTTP POST request
 		xhr.setBusyMsg('Retreiving selection content');
 		xhr.send('/youpi/uploadFile/batch/viewSelection/', post);
-	}
-
-	/*
-	 * Return a DOM tr node
-	 * Wrapper for the public interface
-	 *
-	 */
-	this.addLine = function(afterNode) {
-		addTRLine(afterNode);
 	}
 
 	// Main entry point
