@@ -69,16 +69,14 @@ function show_plugin_info() {
 {% block content %}
 
 <div align="center">
+
 	{% include plugin.template %}
+
 	<script type="text/javascript">
-		show_plugin_info();
+		document.observe('dom:loaded', function() {
+			show_plugin_info.defer();
+		});
 	</script>
-	<!-- TODO: include 'About' submenu 
-<div>
-	<img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="float: left; margin-right: 10px;"/>
-	<div style="font-style: italic; padding-top: 16px;">{{ plugin.description }}, version {{ plugin.version }}</div>
-</div>
-	-->
 </div>
 
 {% endblock %}

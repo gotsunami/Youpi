@@ -24,7 +24,7 @@ var {{ plugin.id }} = {
 		{{ plugin.id }}_curSelectionIdx = 0;
 		{{ plugin.id }}_LDAC_error = 0;
 	
-		var container = emptyContainer('menuitem_sub_5');
+		var container = emptyContainer('menuitem_sub_3');
 		var pre = document.createElement('pre');
 		container.appendChild(pre);
 	

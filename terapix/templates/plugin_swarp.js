@@ -358,5 +358,19 @@ var {{ plugin.id }} = {
 					window.location.reload();
 				}
 		);
+	},
+
+	selectImages: function() {
+		var root = document.getElementById('menuitem_sub_0');
+		root.setAttribute('align', 'center');
+		// Container of the ImageSelector widget
+		var div = document.createElement('div');
+		div.setAttribute('id', '{{ plugin.id }}_results_div');
+		div.setAttribute('align', 'center');
+		root.appendChild(div);
+
+		{{ plugin.id }}_ims = new ImageSelector('{{ plugin.id }}_results_div');
+		{{ plugin.id }}_advTab = new AdvancedTable('{{ plugin.id }}_advTab');
+		{{ plugin.id }}_ims.setTableWidget({{ plugin.id }}_advTab);
 	}
 };

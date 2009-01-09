@@ -2,34 +2,16 @@
 {# scamp template #}
 
 <div style="text-align: center;">
-	<div>
-		<ul class="smart_tabnav_sub" id="menu">
-			<li class="enabled">
-				<a 	href="#" id="entry_0" 
-					onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Select images</a>
-			</li>
-			<li class="disabled">
-				<a 	href="#" id="entry_2" 
-					onclick="swap_display(this.id, 'menuitem_sub_2', 'menu', 'menuitem_sub_');">Select a configuration file</a>
-			</li>
-			<li class="disabled">
-				<a 	href="#" id="entry_4" 
-					onclick="swap_display(this.id, 'menuitem_sub_4', 'menu', 'menuitem_sub_'); document.getElementById('output_path_input').focus();">Set output directory</a>
-			</li>
-			<li class="disabled">
-				<a 	href="#" id="entry_5" 
-					onclick="swap_display(this.id, 'menuitem_sub_5', 'menu', 'menuitem_sub_');">Input data validation</a>
-			</li>
-		</ul>
+	<div id="submenu">
 		<div id="{{ plugin.id }}_add_to_cart_div" style="margin-top: 10px; margin-right: 10px; text-align: right">
-			<input type="button" onclick="swap_display('entry_5', 'menuitem_sub_5', 'menu', 'menuitem_sub_'); {{ plugin.id }}.addSelectionToCart();" value="Validate input data"/>
+			<input type="button" onclick="swap_display('entry_3', 'menuitem_sub_3', 'menu', 'menuitem_sub_'); {{ plugin.id }}.addSelectionToCart();" value="Validate input data"/>
 		</div>
 		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0"></div>
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2">
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
 			<div style="width: 500px" id="config_file_div"></div>
 		</div>
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_4"></div>
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_5">
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2"></div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_3">
 			<div class="tip" style="margin-top: 40px; width: 250px;">	
 				<p>Once your images selections have been made and a config file has been selected,
 				checks must be performed to <b>ensure LDAC files are available</b> before proceeding.</p>
@@ -40,9 +22,16 @@
 </div>
 
 <script type="text/javascript">
-	{{ plugin.id }}.selectImages();
-	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+	document.observe('dom:loaded', function() {
+		var m = new SubMenu('submenu', ['Select images', 'Select a configuration file', 'Set output directory', 'Input data validation']);
+		m.setOnClickHandler(2, function() {
+			$('output_path_input').focus();
+		});
 
-	// Enable user output custom directory
-	plugin_enableOutputDirectory('menuitem_sub_4', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+		{{ plugin.id }}.selectImages();
+		var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+
+		// Enable user output custom directory
+		plugin_enableOutputDirectory('menuitem_sub_2', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+	});
 </script>

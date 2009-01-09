@@ -1,16 +1,46 @@
 
 {# Skeleton template #}
 
-<div>
-	<ul class="smart_tabnav_sub" id="menu">
-		<li class="enabled">
-			<a 	href="#" id="entry_0" 
-				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Select images</a>
-		</li>
-	</ul>
-	<div align="center" style="width: 100%" id="menuitem_sub_0">
-		<div style="margin-top: 30px; width: 300px;" class="tip">
-			TODO
+<div style="text-align: center;">
+	<div id="submenu">
+		<div style="margin-top: 10px; margin-right: 10px; text-align: right">
+			<img style="cursor: pointer" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}.addSelectionToCart();"/>
 		</div>
+		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0"></div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
+			<div id="selector_div"></div>
+		</div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2">
+			<div style="width: 500px" id="config_file_div"></div>
+		</div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_3"></div>
 	</div>
 </div>
+
+<script type="text/javascript">
+	document.observe('dom:loaded', function() {
+		var m = new submenu('SubMenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);
+		m.setOnClickHandler(3, function() {
+			$('output_path_input').focus();
+		});
+
+		var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+		fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
+		fm_file_browser.setRootTitle('Terapix Cluster');
+		fm_file_browser.setFilteringPatterns(['*.fits', '*.reg']);
+		fm_file_browser.setRootDataPath('/data');
+
+		// Enable user output custom directory
+		plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+
+		var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
+		selector.addPath('WEIGHT data', 'weights');
+		selector.setFileBrowser(fm_file_browser);
+		selector.render();
+
+		// Now file browser can renders itself
+		fm_file_browser.render();
+
+		//{{ plugin.id }}.doit();
+	});
+</script>

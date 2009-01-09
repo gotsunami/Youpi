@@ -926,8 +926,8 @@ var {{ plugin.id }} = {
 	 * Condor job monitoring
 	 *
 	 */
-	monitorJobs :function() {
-		var container = document.getElementById('menuitem_sub_3');
+	monitorJobs: function(container) {
+		var container = $(container);
 
 		/*
 		 * Stop monitoring jobs when current selected tab is not related to 'Job monitoring'
@@ -957,7 +957,7 @@ var {{ plugin.id }} = {
 					removeAllChildrenNodes(container);
 					container.appendChild(div);
 
-					setTimeout("monitorJobs('" + container.id + "')", 2000);
+					setTimeout("{{ plugin.id }}.monitorJobs('" + container.id + "')", 2000);
 					return;
 				}
 
@@ -1133,7 +1133,7 @@ var {{ plugin.id }} = {
 				removeAllChildrenNodes(container);
 				container.appendChild(div);
 
-				setTimeout("monitorJobs('" + container.id + "')", 2000);
+				setTimeout("{{ plugin.id }}.monitorJobs('" + container.id + "')", 2000);
 			}
 		);
 
@@ -1143,7 +1143,7 @@ var {{ plugin.id }} = {
 
 	doit: function() {
 		{{ plugin.id }}.selectImages();
-		{{ plugin.id }}.monitorJobs();
+		{{ plugin.id }}.monitorJobs('menuitem_sub_4');
 	},
 
 	/*
