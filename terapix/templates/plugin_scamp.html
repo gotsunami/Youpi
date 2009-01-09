@@ -41,7 +41,7 @@
 
 <script type="text/javascript">
 	{{ plugin.id }}.selectImages();
-	var cf = new ConfigFileWidget('config_file_div', 'cf', '{{ plugin.id }}');
+	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
 
 	// Enable user output custom directory
 	plugin_enableOutputDirectory('menuitem_sub_4', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');

@@ -43,7 +43,7 @@
 <script type="text/javascript">
 	{{ plugin.id }}.doit();
 
-	var cf = new ConfigFileWidget('config_file_div', 'cf', '{{ plugin.id }}');
+	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
 	
 	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
 	fm_file_browser.setRootTitle('Terapix Cluster');

@@ -1,161 +1,145 @@
-if (!Youpi)
-	var Youpi = {};
-
 /*
  * Class: ConfigFileWidget
  * Simple widget that allows to select a configuration file to use with a processing plugin
  *
- * Note:
- *
- * Please note that this page documents Javascript code. <ConfigFileWidget> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
- *
  * Constructor Parameters:
  *
- * container_id - string: name of parent DOM block container
- * varName - string: global variable name of instance, used internally for public interface definition
+ * container - string or DOM node: name of parent DOM block container
  * pluginId - string: unique plugin id
  *
  */
-function ConfigFileWidget(container_id, varName, pluginId)
+function ConfigFileWidget(container, pluginId)
 {
-	// Name of instance if global namespace
-	var instance_name = varName;
-	var container = document.getElementById(container_id);
-	var id = varName + '_cfw_';
+	var _container = $(container);
+	var id = 'CFW_' + Math.floor(Math.random() * 999999);
 	var plugin_id = pluginId ? pluginId : null;
 
 	function render() {
 		var tr, th, td;
-		var tab = document.createElement('table');
+		var tab = new Element('table');
 		tab.setAttribute('class', 'fileBrowser');
 
-		tr = document.createElement('tr');
-		th = document.createElement('th');
-		th.appendChild(document.createTextNode('Config File'));
-		tr.appendChild(th);
-		tab.appendChild(tr);
+		tr = new Element('tr');
+		th = new Element('th');
+		th.insert('Config File');
+		tr.insert(th);
+		tab.insert(tr);
 
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('style', 'vertical-align: middle');
-		td.appendChild(document.createTextNode('Select a configuration file to use for processing:'));
+		td.insert('Select a configuration file to use for processing:');
 
-		var butd = document.createElement('div');
-		var bnew = document.createElement('input');
-		bnew.setAttribute('type', 'button');
-		bnew.setAttribute('value', 'New');
-		bnew.setAttribute('style', 'float: left; margin-right: 5px');
-		bnew.setAttribute('onclick', instance_name + '.displayNewConfigFile();');
+		var butd = new Element('div');
+		var bnew = new Element('input', {
+								type: 'button',
+								value: 'New',
+								style: 'float: left; margin-right: 5px'
+		});
+		bnew.observe('click', _displayNewConfigFile);
 
-		var bedit = document.createElement('input');
-		bedit.setAttribute('type', 'button');
-		bedit.setAttribute('value', 'Edit selected');
-		bedit.setAttribute('style', 'float: left; margin-right: 5px');
-		bedit.setAttribute('onclick', instance_name + '.editSelectedConfigFile();');
+		var bedit = new Element('input', {
+								type: 'button',
+								value: 'Edit selected',
+								style: 'float: left; margin-right: 5px'
+		});
+		bedit.observe('click', _editSelectedConfigFile);
 
-		var ndiv = document.createElement('div');
+		var ndiv = new Element('div');
 		ndiv.setAttribute('id', id + '_config_name_div');
 		ndiv.setAttribute('style', 'float: right');
 
-		butd.appendChild(bnew);
-		butd.appendChild(bedit);
-		butd.appendChild(ndiv);
-		td.appendChild(butd);
-		tr.appendChild(td);
-		tab.appendChild(tr);
-		container.appendChild(tab);
+		butd.insert(bnew);
+		butd.insert(bedit);
+		butd.insert(ndiv);
+		td.insert(butd);
+		tr.insert(td);
+		tab.insert(tr);
+		_container.insert(tab);
 
 		// Label div, reports current conf selected file
-		ndiv = document.createElement('div');
+		ndiv = new Element('div');
 		ndiv.setAttribute('id', id + '_config_current_div');
 		ndiv.setAttribute('style', 'margin-top: 15px; color: brown; font-weight: bold');
-		container.appendChild(ndiv);
+		_container.insert(ndiv);
 
 		// Editor div
-		ndiv = document.createElement('div');
+		ndiv = new Element('div');
 		ndiv.setAttribute('id', id + '_config_editor_div');
 		ndiv.setAttribute('style', 'display: none;');
-		tab = document.createElement('table');
+		tab = new Element('table');
 		tab.setAttribute('class', 'fileBrowser');
 
-		tr = document.createElement('tr');
-		th = document.createElement('th');
+		tr = new Element('tr');
+		th = new Element('th');
 		th.setAttribute('colspan', '2');
-		th.appendChild(document.createTextNode('Config File Editor'));
-		tr.appendChild(th);
-		tab.appendChild(tr);
+		th.insert('Config File Editor');
+		tr.insert(th);
+		tab.insert(tr);
 
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('id', id + '_config_editor_td');
-		var ldiv = document.createElement('div');
+		var ldiv = new Element('div');
 		ldiv.setAttribute('id', id + '_editor_loading');
-		var tarea = document.createElement('textarea');
+		var tarea = new Element('textarea');
 		tarea.setAttribute('id', id + '_config_textarea');
 		tarea.setAttribute('rows', '30');
 		tarea.setAttribute('cols', '100');
-		td.appendChild(ldiv);
-		td.appendChild(tarea);
-		tr.appendChild(td);
+		td.insert(ldiv);
+		td.insert(tarea);
+		tr.insert(td);
 
-		td = document.createElement('td');
+		td = new Element('td');
 		td.setAttribute('style', id + 'background-color: #eaeaea; border-left: 2px solid #5b80b2; width: 30%');
-		ldiv = document.createElement('div');
-		var bsave = document.createElement('input');
-		bsave.setAttribute('type', 'button');
-		bsave.setAttribute('value', 'Save config as...');
-		bsave.setAttribute('onclick', instance_name + '.saveConfigFileAs();');
-		var sdiv = document.createElement('div');
+		ldiv = new Element('div');
+		var bsave = new Element('input', {type: 'button', value: 'Save config as...'});
+		bsave.observe('click', _saveConfigFileAs);
+
+		var sdiv = new Element('div');
 		sdiv.setAttribute('id', id + '_config_save_div');
 		sdiv.setAttribute('class', 'imageSelector');
-		ldiv.appendChild(bsave);
-		ldiv.appendChild(sdiv);
-		sdiv = document.createElement('div');
-		var bclose = document.createElement('input');
-		bclose.setAttribute('type', 'button');
-		bclose.setAttribute('value', 'Close editor');
-		bclose.setAttribute('onclick', instance_name + '.closeEditor();');
-		sdiv.appendChild(bclose);
-		td.appendChild(ldiv);
-		td.appendChild(sdiv);
-		tr.appendChild(td);
+		ldiv.insert(bsave);
+		ldiv.insert(sdiv);
+		sdiv = new Element('div');
+		var bclose = new Element('input', {type: 'button', value: 'Close editor'});
+		bclose.observe('click', _closeEditor);
+		sdiv.insert(bclose);
+		td.insert(ldiv);
+		td.insert(sdiv);
+		tr.insert(td);
 
-		tab.appendChild(tr);
-		ndiv.appendChild(tab);
-		container.appendChild(ndiv);
+		tab.insert(tr);
+		ndiv.insert(tab);
+		_container.insert(ndiv);
 	}
 
-	this.displayCurrentConfUsed = function() {
-		displayCurrentConfUsed();
-	}
-
-	function displayCurrentConfUsed() {
-		var selNode = document.getElementById(plugin_id + '_config_name_select');
+	function _displayCurrentConfUsed() {
+		var selNode = $(plugin_id + '_config_name_select');
 		var txt = selNode.options[selNode.selectedIndex].text;
-		var curConfDiv = document.getElementById(id + '_config_current_div');
+		var curConfDiv = $(id + '_config_current_div');
 		removeAllChildrenNodes(curConfDiv);
-		curConfDiv.appendChild(document.createTextNode("The '" + txt + "' configuration file will be used for processing."));
+		curConfDiv.insert("The '" + txt + "' configuration file will be used for processing.");
 	}
 	
-	this.displayNewConfigFile = function() {
+	function _displayNewConfigFile() {
 		editConfigFile('default');
 	}
 
-	this.editSelectedConfigFile = function() {
-		var sel = document.getElementById(plugin_id + '_config_name_select');
+	function _editSelectedConfigFile() {
+		var sel = $(plugin_id + '_config_name_select');
 		var conf = sel.options[sel.selectedIndex].text;
 		editConfigFile(conf);
 	}
 
-	this.closeEditor = function() {
-		var div = document.getElementById(id + '_config_editor_div');
+	function _closeEditor() {
+		var div = $(id + '_config_editor_div');
 		div.setAttribute('style', 'display: none');
 	}
 
 	function editConfigFile(configName) {
-		var ldiv = document.getElementById(id + '_editor_loading');
-		var div = document.getElementById(id + '_config_editor_div');
+		var ldiv = $(id + '_editor_loading');
+		var div = $(id + '_config_editor_div');
 		div.setAttribute('style', 'display: block');
 	
 		var r = new HttpRequest(
@@ -164,7 +148,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 			// Custom handler for results
 			function(resp) {
 				ldiv.innerHTML = '';
-				var edit = document.getElementById(id + '_config_textarea');
+				var edit = $(id + '_config_textarea');
 				edit.value = resp['result'];
 				edit.focus();
 			}
@@ -174,33 +158,31 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		r.send('/youpi/process/plugin/', post);
 	}
 
-	this.saveConfigFileAs = function() {
-		var div = document.getElementById(id + '_config_save_div');
-		var sub = document.getElementById(id + '_config_save_subdiv');
+	function _saveConfigFileAs() {
+		var div = $(id + '_config_save_div');
+		var sub = $(id + '_config_save_subdiv');
 	
 		if (!sub) {
-			sub = document.createElement('div');
+			sub = new Element('div');
 			sub.setAttribute('id', id + '_config_save_subdiv');
 			sub.setAttribute('class', 'show');
 	
-			var txt = document.createElement('input');
+			var txt = new Element('input');
 			txt.setAttribute('style', 'float: left; margin-right: 5px;');
 			txt.setAttribute('id', id + '_config_save_text');
 			txt.setAttribute('type', 'text');
-			sub.appendChild(txt);
+			sub.insert(txt);
 	
-			var save = document.createElement('input');
-			save.setAttribute('type', 'button');
-			save.setAttribute('onclick', instance_name + ".saveConfig();");
-			save.setAttribute('value', 'Save!');
-			sub.appendChild(save);
+			var save = new Element('input', {type: 'button', value: 'Save!'});
+			save.observe('click', _saveConfig);
+			sub.insert(save);
 	
-			var res = document.createElement('div');
+			var res = new Element('div');
 			res.setAttribute('id', id + '_config_save_res_div');
 			res.setAttribute('style', 'vertical-align: middle');
-			sub.appendChild(res);
+			sub.insert(res);
 	
-			div.appendChild(sub);
+			div.insert(sub);
 	
 			// Add auto-completion capabilities
 			try {
@@ -222,15 +204,15 @@ function ConfigFileWidget(container_id, varName, pluginId)
 			}
 			else {
 				sub.setAttribute('class', 'show');
-				var nText = document.getElementById(id + '_config_save_text');
+				var nText = $(id + '_config_save_text');
 				nText.select();
 				nText.focus();
 			}
 		}
 	}
 
-	this.saveConfig = function() {
-		var textNode = document.getElementById(id + '_config_save_text');
+	function _saveConfig() {
+		var textNode = $(id + '_config_save_text');
 		var name = textNode.value.replace('+', '%2B');
 	
 		if (name.length == 0) {
@@ -240,7 +222,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		}
 	
 		// Checks for name availability (does not exits in DB)
-		var cnode = document.getElementById(id + '_config_save_res_div');
+		var cnode = $(id + '_config_save_res_div');
 		var xhr = new HttpRequest(
 			cnode.id,
 			// Use default error handler
@@ -249,7 +231,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 			function(resp) {
 				removeAllChildrenNodes(cnode);
 				var nb = resp['result'];
-				var p = document.createElement('p');
+				var p = new Element('p');
 				if (nb > 0) {
 					// Name already exists, ask for overwriting
 					var r = confirm("A config file with that name already exists in the database.\nWould you like to overwrite it ?");
@@ -257,7 +239,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 				}
 	
 				// Saves to DB
-				saveConfigToDB(name);
+				_saveConfigToDB(name);
 			}
 		);
 	
@@ -268,9 +250,9 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		xhr.send('/youpi/process/checkConfigFileExists/', post);
 	}
 
-	function saveConfigToDB(name) {
-		var cnode = document.getElementById(id + '_config_save_res_div');
-		var area = document.getElementById(id + '_config_textarea');
+	function _saveConfigToDB(name) {
+		var cnode = $(id + '_config_save_res_div');
+		var area = $(id + '_config_textarea');
 	
 		var r = new HttpRequest(
 			cnode.id,
@@ -280,12 +262,12 @@ function ConfigFileWidget(container_id, varName, pluginId)
 			function(resp) {
 				// Selection saved
 				removeAllChildrenNodes(cnode);
-				var p = document.createElement('p');
+				var p = new Element('p');
 				p.setAttribute('class', 'done');
-				p.appendChild(document.createTextNode("Done. Config file saved under"));
-				p.appendChild(document.createElement('br'));
-				p.appendChild(document.createTextNode("'" + name + "'."));
-				cnode.appendChild(p);
+				p.insert("Done. Config file saved under");
+				p.insert(new Element('br'));
+				p.insert("'" + name + "'.");
+				cnode.insert(p);
 	
 				// Refresh content
 				setConfigFile();
@@ -298,7 +280,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 	}
 
 	function setConfigFile() {
-		var cdiv = document.getElementById(id + '_config_name_div');
+		var cdiv = $(id + '_config_name_div');
 		var r = new HttpRequest(
 			id + '_config_name_div',
 			null,
@@ -306,17 +288,18 @@ function ConfigFileWidget(container_id, varName, pluginId)
 			function(resp) {
 				removeAllChildrenNodes(cdiv);
 				var selNode = getSelect(plugin_id + '_config_name_select', resp['result']['configs']);
-				selNode.setAttribute('onchange', instance_name + ".displayCurrentConfUsed();");
-				cdiv.appendChild(selNode);
+				selNode.observe('change', _displayCurrentConfUsed);
+				cdiv.insert(selNode);
 	
 				var txt = selNode.options[selNode.selectedIndex].text;
-				var img = document.createElement('img');
-				img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
-				img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
-				img.setAttribute('onclick', instance_name + ".deleteConfigFile();");
-				cdiv.appendChild(img);
+				var img = new Element('img', {
+								style: 'cursor: pointer; margin-left: 5px;',
+								src: '/media/themes/' + guistyle + '/img/16x16/cancel.png'
+				});
+				img.observe('click', _deleteConfigFile);
+				cdiv.insert(img);
 				
-				displayCurrentConfUsed();
+				_displayCurrentConfUsed();
 			}
 		);
 	
@@ -324,8 +307,8 @@ function ConfigFileWidget(container_id, varName, pluginId)
 		r.send('/youpi/process/plugin/', post);
 	}
 
-	this.deleteConfigFile = function() {
-		var selNode = document.getElementById(plugin_id + '_config_name_select');
+	function _deleteConfigFile() {
+		var selNode = $(plugin_id + '_config_name_select');
 		var txt = selNode.options[selNode.selectedIndex].text;
 	
 		if (txt == 'default') {
@@ -343,7 +326,7 @@ function ConfigFileWidget(container_id, varName, pluginId)
 			// Custom handler for results
 			function(resp) {
 				selNode.remove(selNode.selectedIndex);
-				displayCurrentConfUsed();
+				_displayCurrentConfUsed();
 			}
 		);
 	
