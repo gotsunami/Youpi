@@ -364,6 +364,7 @@ div.imageSelector div.controlPanel {
 	background-color: #5b80b2;
 	margin-right: 5px;
 	text-align: center;
+	padding: 5px;
 }
 
 div.imageSelector table.optionsPanel td {
@@ -371,14 +372,13 @@ div.imageSelector table.optionsPanel td {
 }
 
 div.imageSelector table.optionsPanel td:first-child {
-	padding: 0px;
+dpadding: 0px;
 }
 
 div.imageSelector div.modeOptions {
 	background-color: #5b80b2;
 	margin-right: 5px;
-	padding-top: 5px;
-	padding-bottom: 5px;
+	padding: 5px;
 	text-align: center;
 	border-top: 5px solid lightgray;
 	-moz-border-radius-bottomleft: 5px;

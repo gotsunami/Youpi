@@ -504,8 +504,7 @@ function DropdownBox(container, title)
 				_onClickHandler();
 		});
 
-		_titleNode = document.createElement('label');
-		_titleNode.appendChild(document.createTextNode(_title));
+		_titleNode = new Element('label').insert(_title);
 		var cdiv = document.createElement('div');
 		cdiv.setAttribute('style', 'display: none;');
 		cdiv.setAttribute('id', _container.getAttribute('id') + '_' + Math.random() + '_content');

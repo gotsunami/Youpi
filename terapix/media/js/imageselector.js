@@ -1,31 +1,18 @@
-
-if (!Youpi)
-	var Youpi = {};
-
-Youpi.ImageSelector = {};
-Youpi.ImageSelector.currentId = 1;
-
 /*
  * Class: ImageSelector
  * Widget that allows image selection.
  *
- * Note:
- *
- * Please note that this page documents Javascript code. <ImageSelector> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
- *
  * External Dependancies:
  * 
- * This class uses the <Logger> class defined in 
- * : media/js/common.js
+ * common.js - <Logger>
+ * prototype.js - Enhanced Javascript library
  *
  * Constructor Parameters:
  *
- * container_id - string: name of parent DOM block container
- * varName - string: global variable name of instance, used internally for public interface definition
+ * container - string or DOM node: name of parent block container
  *
  */
-function ImageSelector(container_id, varName)
+function ImageSelector(container)
 {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -92,25 +79,18 @@ function ImageSelector(container_id, varName)
 	 */ 
 	var _selectionMode = _singleMode;
 	/*
-	 * Var: _instance_name
-	 * Name of instance in global namespace
-	 *
-	 */ 
-	var _instance_name = varName;
-	/*
-	 * Var: container
+	 * Var: _container
 	 * Parent DOM container
 	 *
 	 */ 
-	var container = $(container_id);
-	container.setAttribute('class', 'imageSelector');
+	var _container = $(container);
+	_container.setAttribute('class', 'imageSelector');
 	/*
 	 * Var: id
 	 * Unique instance identifier
 	 *
 	 */ 
-	var id = varName + '_imgSel_' + Youpi.ImageSelector.currentId;
-	Youpi.ImageSelector.currentId++;
+	var id = 'IMS_' + Math.floor(Math.random() * 999999);
 
 
 	// Group: Variables
@@ -170,17 +150,17 @@ function ImageSelector(container_id, varName)
 	 */
 	var resultHandler = renderFinalResults;
 	/*
-	 * Var: selectAllHandler
+	 * Var: _selectAllHandler
 	 * Default handler for 'Select All' operation
 	 *
 	 */
-	var selectAllHandler = defaultSelectAllHandler;
+	var _selectAllHandler = _defaultSelectAllHandler;
 	/*
-	 * Var: unselectAllHandler
+	 * Var: _unselectAllHandler
 	 * Default handler for 'Unselect All' operation
 	 *
 	 */
-	var unselectAllHandler = defaultUnselectAllHandler;
+	var _unselectAllHandler = _defaultUnselectAllHandler;
 	/*
 	 * Var: queryIdx
 	 * Index of current query
@@ -200,7 +180,11 @@ function ImageSelector(container_id, varName)
 		frame: function(c) {
 			var n = 'f' + Math.floor(Math.random() * 99999);
 			var d = new Element('DIV');
-			d.innerHTML = '<iframe style="display:none" src="about:blank" id="'+n+'" name="'+n+'" onload="' + _instance_name + '.getAIM().loaded(\''+n+'\')"></iframe>';
+			var iframe = new Element('iframe', {style: 'display: none;', src: 'about:blank', id: n, name: n});
+			iframe.observe('load', function() {
+				AIM.loaded(n);
+			});
+			d.update(iframe);
 			document.body.insert(d);
 	
 			var i = $(n);
@@ -271,19 +255,6 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: executeHandler
-	 * _Public_ Executes handler, wrapper for the public interface
-	 *
-	 * Parameters:
-	 *
-	 * tr_idx - integer: index of TR line in table
-	 *
-	 */ 
-	this.executeHandler = function(tr_idx) {
-		_executeHandler(tr_idx);
-	}
-
-	/*
 	 * Function: setResultHandler
 	 * _Public_ Allows to set an alternate result handler
 	 *
@@ -314,7 +285,7 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: defaultSelectAllHandler
+	 * Function: _defaultSelectAllHandler
 	 * Default handler provided for 'select All' operation
 	 *
 	 * See Also:
@@ -322,8 +293,8 @@ function ImageSelector(container_id, varName)
 	 *  <setSelectAllHandler>, <selectAll>
 	 *
 	 */ 
-	function defaultSelectAllHandler() {
-		toggleSelectAll(true);
+	function _defaultSelectAllHandler() {
+		_toggleSelectAll(true);
 	}
 
 	/*
@@ -336,7 +307,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.setSelectAllHandler = function(func) {
-		selectAllHandler = func ? func : defaultSelectAllHandler;
+		_selectAllHandler = func ? func : _defaultSelectAllHandler;
 	}
 
 
@@ -355,7 +326,7 @@ function ImageSelector(container_id, varName)
 		// Container for new image selection
 		var	topDiv = new Element('div');
 		topDiv.setAttribute('id', id + '_new_image_selection_div');
-		container.insert(topDiv);
+		_container.insert(topDiv);
 		renderCreateNewImageSelection(topDiv);
 	}
 
@@ -466,12 +437,14 @@ function ImageSelector(container_id, varName)
 		addTRLine(tr);
 
 		// Execute query
-		div = new Element('div');
-		div.setAttribute('style', 'text-align: left');
-		var sub = new Element('input');
-		sub.setAttribute('type', 'button');
-		sub.setAttribute('value', 'Find images!');
-		sub.setAttribute('onclick', _instance_name + '.executeQuery();');
+		div = new Element('div', {style: 'text-align: left'});
+		var sub = new Element('input', {
+				type: 'button',
+				value: 'Find images!'
+		});
+		sub.observe('click', function() {
+			_executeQuery();
+		});
 		div.insert(sub);
 		single_div.insert(div);
 
@@ -508,11 +481,10 @@ function ImageSelector(container_id, varName)
 		var batch_div = new Element('div');
 		batch_div.setAttribute('id', id + '_batch_sel_div');
 
-		var form = new Element('form');
-		form.setAttribute('action', '/youpi/uploadFile/');
-		form.setAttribute('enctype', 'multipart/form-data');
-		form.setAttribute('method', 'post');
-		form.setAttribute('onsubmit', "return " + _instance_name + ".getAIM().submit(this, {'onStart' : " + _instance_name + ".getFileUploadStartHandler(), 'onComplete' : " + _instance_name + ".getFileUploadCompleteHandler()});");
+		var form = new Element('form', {action: '/youpi/uploadFile/', enctype: 'multipart/form-data', method: 'post'});
+		form.observe('submit', function() {
+			return AIM.submit(form, {onStart: _fileUploadStartHandler, onComplete: _fileUploadCompleteHandler})
+		});
 
 		var xl = new Element('label');
 		xl.insert('Select an XML file to upload: ');
@@ -538,7 +510,7 @@ function ImageSelector(container_id, varName)
 		batch_div.insert(sdiv);
 
 		var r = new Element('div');
-		r.setAttribute('style', 'color: green; background-color: white; float: left; margin-right: 30px;');
+		r.setAttribute('style', 'color: green; width: 70%; background-color: white; float: left; margin-right: 30px;');
 		r.setAttribute('id', id + '_upload_log_div');
 		batch_div.insert(r);
 
@@ -548,6 +520,15 @@ function ImageSelector(container_id, varName)
 		batch_div.insert(r);
 
 		cNode.insert(batch_div);
+	}
+
+	/*
+	 * Function: _handlerMergeSelections
+	 * 'Merge selections' Dropdown box custom handler
+	 *
+	 */ 
+	function _handlerMergeSelections() {
+		_showMergeSelectionsBox(this.getContentNode());
 	}
 
 	/*
@@ -565,35 +546,34 @@ function ImageSelector(container_id, varName)
 		switch(_selectionMode) {
 			case _singleMode:
 				// Merge saved selections
-				var d = new Element('div');
-				d.setAttribute('id', id + '_merge_selections_div');
-				d.setAttribute('style', 'padding: 5px;');
-				var sub = new Element('input');
-				sub.setAttribute('type', 'button');
-				sub.setAttribute('value', 'Merge with existing selections...');
-				sub.setAttribute('onclick', _instance_name + '.showMergeSelectionsBox();');
-				d.insert(sub);
-				div.insert(d);
+				var dmerge = new DropdownBox(div, 'Merge with selection');
+				dmerge.setOnClickHandler(function() {
+					if (dmerge.isOpen()) 
+						_handlerMergeSelections.bind(dmerge)();
+				});
 
 				// Select all
-				sub = new Element('input');
-				sub.setAttribute('style', 'margin-right: 10px;');
-				sub.setAttribute('type', 'button');
-				sub.setAttribute('value', 'Select all');
-				sub.setAttribute('onclick', _instance_name + '.selectAll();');
+				sub = new Element('input', {
+								style: 'margin-right: 10px;',
+								type: 'button',
+								value: 'Select all'
+				});
+				sub.observe('click', function() {
+					_selectAllHandler();
+				});
 				div.insert(sub);
 
 				// Unselect all
-				sub = new Element('input');
-				sub.setAttribute('type', 'button');
-				sub.setAttribute('value', 'Unselect all');
-				sub.setAttribute('onclick', _instance_name + '.unselectAll();');
+				sub = new Element('input', { type: 'button', value: 'Unselect all' });
+				sub.observe('click', function() {
+					_unselectAllHandler();
+				});
 				div.insert(sub);
 				break;
 
 			case _batchMode:
-				div.insert(_createCheckBox(_instance_name + '_batch_display_sky_check', true, 'Display sky visualization'));
-				div.insert(_createCheckBox(_instance_name + '_batch_sky_compute_all_check', false, 'Plot all images points, not only selections (slower)'));
+				div.insert(_createCheckBox(id + '_batch_display_sky_check', true, 'Display sky visualization'));
+				div.insert(_createCheckBox(id + '_batch_sky_compute_all_check', false, 'Plot all images points, not only selections (slower)'));
 				div.setAttribute('style', 'text-align: left;');
 				break;
 
@@ -618,11 +598,8 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _createCheckBox(id, checked, label) {
-		var s = new Element('div');
-		s.setAttribute('style', 'color: white; margin-left: 10px; margin-right: 5px;');
-		var input = new Element('input');
-		input.setAttribute('id', id);
-		input.setAttribute('type', 'checkbox');
+		var s = new Element('div', {style: 'color: white; margin-left: 10px; margin-right: 5px;'});
+		var input = new Element('input', { 'id': id, type: 'checkbox' });
 		if (checked)
 			input.setAttribute('checked', 'checked');
 
@@ -682,26 +659,36 @@ function ImageSelector(container_id, varName)
 		bdiv.setAttribute('class', 'controlPanel');
 
 		// Save selection
-		div = new Element('div');
-		div.setAttribute('id', id + '_save_selection_div');
-		sub = new Element('input');
-		sub.setAttribute('type', 'button');
-		sub.setAttribute('value', 'Save selection as...');
-		sub.setAttribute('onclick', _instance_name + '.showSaveSelectionBox();');
-		div.insert(sub);
+		div = new Element('div', {'id': id + '_save_selection_div'});
+		var sub = new DropdownBox(div, 'Save selection');
+		sub.setOnClickHandler(_handlerSaveSelectionAs.bind(sub));
 		bdiv.insert(div);
 
 		// Delete existing selection
-		div = new Element('div');
-		div.setAttribute('id', id + '_delete_selection_div');
-		sub = new Element('input');
-		sub.setAttribute('type', 'button');
-		sub.setAttribute('value', 'Delete existing selection...');
-		sub.setAttribute('onclick', _instance_name + '.showDeleteSelectionBox();');
-		div.insert(sub);
+		div = new Element('div', {'id': id + '_delete_selection_div'});
+		sub = new DropdownBox(div, 'Delete selection');
+		sub.setOnClickHandler(_handlerDeleteExistingSelection.bind(sub));
 		bdiv.insert(div);
 
 		return bdiv;
+	}
+
+	/*
+	 * Function: _handlerSaveSelectionAs
+	 * 'Save selection' Dropdown box custom handler
+	 *
+	 */ 
+	function _handlerSaveSelectionAs() {
+		_showSaveSelectionBox(this.getContentNode());
+	}
+
+	/*
+	 * Function: _handlerDeleteExistingSelection
+	 * 'Delete selection' Dropdown box custom handler
+	 *
+	 */ 
+	function _handlerDeleteExistingSelection() {
+		_showDeleteSelectionBox(this.getContentNode());
 	}
 
 	/*
@@ -737,19 +724,21 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: showDeleteSelectionBox
-	 * _Public_ Display selection box used for deleting DB image selections
+	 * Function: _showDeleteSelectionBox
+	 * Displays selection box used for deleting DB image selections
+	 *
+	 * Parameters:
+	 *  container - string or DOM node: parent container
 	 *
 	 */ 
-	this.showDeleteSelectionBox = function() {
-		var div = $(id + '_delete_selection_div');
+	function _showDeleteSelectionBox(container) {
 		var sub = $(id + '_delete_selection_subdiv');
 
 		if (!sub) {
 			sub = new Element('div');
 			sub.setAttribute('id', id + '_delete_selection_subdiv');
 			sub.setAttribute('class', 'show');
-			div.insert(sub);
+			container.insert(sub);
 		}
 		else {
 			if (sub.getAttribute('class') == 'show') {
@@ -783,32 +772,35 @@ function ImageSelector(container_id, varName)
 			var sel = getSelect(id + '_del_selection_combo', options);
 			sub.insert(sel);
 
-			var del = new Element('input');
-			del.setAttribute('type', 'button');
-			del.setAttribute('onclick', _instance_name + '.deleteSavedSelection();');
-			del.setAttribute('value', 'Delete!');
+			var del = new Element('input', {type: 'button', value: 'Delete!'});
+			del.observe('click', function() {
+				_deleteSavedSelection();
+			});
 			sub.insert(del);
 		});
 	}
 
 	/*
-	 * Function: showMergeSelectionBox
-	 * _Public_ Display selection box used for merging DB image selections
+	 * Function: _showMergeSelectionsBox
+	 * Displays selection box used for merging DB image selections
+	 *
+	 * Parameters:
+	 *  container - string or DOM node: parent container
 	 *
 	 */ 
-	this.showMergeSelectionsBox = function() {
+	function _showMergeSelectionsBox(container) {
 		if (!_getListsOfSelections()) {
-			alert(imgSelRequiredMsg);
+			container.update(imgSelRequiredMsg);
 			return;
 		}
-		var div = $(id + '_merge_selections_div');
+		container.update();
 		var sub = $(id + '_merge_selections_subdiv');
 		
 		if (!sub) {
 			sub = new Element('div');
 			sub.setAttribute('id', id + '_merge_selections_subdiv');
 			sub.setAttribute('class', 'show');
-			div.insert(sub);
+			container.insert(sub);
 		}
 		else {
 			if (sub.getAttribute('class') == 'show') {
@@ -849,26 +841,29 @@ function ImageSelector(container_id, varName)
 			var sel = getSelect(id + '_merge_selections_combo', options, combosize);
 			sub.insert(sel);
 
-			var del = new Element('input');
-			del.setAttribute('type', 'button');
-			del.setAttribute('onclick', _instance_name + '.mergeSavedSelections();');
-			del.setAttribute('value', 'Merge!');
+			var del = new Element('input', {type: 'button', value: 'Merge!'});
+			del.observe('click', function() {
+				_mergeSavedSelections();
+			});
 			sub.insert(del);
 		});
 	}
 
 	/*
-	 * Function: showSaveSelectionBox
-	 * _Public_ Display selection box used for saving DB image selections
+	 * Function: _showSaveSelectionBox
+	 * Displays selection box used for saving DB image selections
+	 *
+	 * Parameters:
+	 *  container - string or DOM node: parent container
 	 *
 	 */ 
-	this.showSaveSelectionBox = function() {
+	function _showSaveSelectionBox(container) {
 		if (!_getListsOfSelections()) {
-			alert(imgSelRequiredMsg);
+			container.update(imgSelRequiredMsg);
 			return;
 		}
 
-		var div = $(id + '_save_selection_div');
+		container.update();
 		var sub = $(id + '_save_selection_subdiv');
 
 		if (!sub) {
@@ -882,10 +877,10 @@ function ImageSelector(container_id, varName)
 			txt.setAttribute('type', 'text');
 			sub.insert(txt);
 
-			var save = new Element('input');
-			save.setAttribute('type', 'button');
-			save.setAttribute('onclick', _instance_name + '.saveSelection();');
-			save.setAttribute('value', 'Save!');
+			var save = new Element('input', {type: 'button', value: 'Save!'});
+			save.observe('click', function() {
+				_saveSelection();
+			});
 			sub.insert(save);
 
 			var res = new Element('div');
@@ -893,7 +888,7 @@ function ImageSelector(container_id, varName)
 			res.setAttribute('style', 'vertical-align: middle');
 			sub.insert(res);
 
-			div.insert(sub);
+			container.insert(sub);
 
 			// Add auto-completion capabilities
 			if (_bsn) {
@@ -1731,6 +1726,11 @@ function ImageSelector(container_id, varName)
 				var data = resp['data'];
 				seldiv.innerHTML = '';
 
+				var blog = new Element('div');
+				blog.setAttribute('id', id + '_batch_load_saved_log_div');
+				blog.setAttribute('style', 'float: left;');
+				seldiv.insert(blog);
+
 				if (!data.length) return;
 	
 				var r = new Array();
@@ -1741,18 +1741,12 @@ function ImageSelector(container_id, varName)
 				seldiv.insert('Or load a saved selection: ');
 				seldiv.insert(getSelect(id + '_batch_load_saved_sel', r));
 	
-				var lbut = new Element('input');
-				lbut.setAttribute('style', 'margin-left: 10px;');
-				lbut.setAttribute('type', 'button');
-				lbut.setAttribute('onclick', _instance_name + ".loadBatchSavedSelection();");
-				lbut.setAttribute('value', 'Load');
+				var lbut = new Element('input', {style: 'margin-left: 10px;', type: 'button', value: 'Load'});
+				lbut.observe('click', function() {
+					_loadBatchSavedSelection();
+				});
 		
 				seldiv.insert(lbut);
-
-				var blog = new Element('div');
-				blog.setAttribute('id', id + '_batch_load_saved_log_div');
-				blog.setAttribute('style', 'float: left;');
-				seldiv.insert(blog);
 			}
 		);
 	
@@ -1761,11 +1755,11 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: loadBatchSavedSelection 
+	 * Function: _loadBatchSavedSelection 
 	 * Loads a batch saved selection
 	 *
 	 */ 
-	this.loadBatchSavedSelection = function() {
+	function _loadBatchSavedSelection() {
 		var	div = $(id + '_batch_load_saved_log_div');
 		var sel = $(id + '_batch_load_saved_sel');
 		var name = sel.options[sel.selectedIndex].text;
@@ -1808,18 +1802,6 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: swapSelectionMode 
-	 * _Public_ This function swaps display between selection modes.
-	 *
-	 * See Also:
-	 *  <_swapSelectionMode>
-	 *
-	 */ 
-	this.swapSelectionMode = function() {
-		_swapSelectionMode();
-	}
-
-	/*
 	 * Function: addImageQueryForm
 	 * Displays image query form with a combobox to choose mode selection 
 	 *
@@ -1838,7 +1820,9 @@ function ImageSelector(container_id, varName)
 
 		var msel = getSelect(id + '_mode_sel', modes);
 		msel.setAttribute('id', id + '_image_mode_sel');
-		msel.setAttribute('onchange', _instance_name + '.swapSelectionMode()');
+		msel.observe('change', function() {
+			_swapSelectionMode();
+		});
 
 		sdiv.insert(lab);
 		lab.insert(msel);
@@ -1866,8 +1850,7 @@ function ImageSelector(container_id, varName)
 
 		tr.insert(td);
 
-		td = new Element('td');
-		td.setAttribute('style', 'width: 100%;');
+		td = new Element('td', {style: 'width: 75%;'});
 		tr.insert(td);
 
 		renderSingleSelection(td, nbRes);
@@ -1925,11 +1908,11 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: deleteSavedSelection
-	 * _Public_ Really delete saved image selection by committing changes to DB.
+	 * Function: _deleteSavedSelection
+	 * Effectively deletes saved image selection by committing changes to DB.
 	 *
 	 */ 
-	this.deleteSavedSelection = function() {
+	function _deleteSavedSelection() {
 		var div = $(id + '_delete_selection_subdiv');
 		var sel = div.getElementsByTagName('select')[0];
 		var name = sel.options[sel.selectedIndex].text;
@@ -1960,11 +1943,11 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: mergeSavedSelections
-	 * _Public_ Really merge images selections by committing changes to DB.
+	 * Function: _mergeSavedSelections
+	 * Effectively merges images selections by committing changes to DB.
 	 *
 	 */ 
-	this.mergeSavedSelections = function() {
+	function _mergeSavedSelections() {
 		var div = $(id + '_merge_selections_subdiv');
 		var sel = div.getElementsByTagName('select')[0];
 		var name = sel.options[sel.selectedIndex].text;
@@ -2024,14 +2007,14 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: saveSelection
-	 * _Public_ Really save an image selection by committing changes to DB.
+	 * Function: _saveSelection
+	 * Effectively Really save an image selection by committing changes to DB.
 	 *
 	 * First check that a selection with that name does not 
-	 * already exist in DB. If not, call <saveSelectionToDB>.
+	 * already exist in DB. If not, call <_saveSelectionToDB>.
 	 *
 	 */ 
-	this.saveSelection = function() {
+	function _saveSelection() {
 		var textNode = $(id + '_save_selection_text');
 		var name = textNode.value.replace('+', '%2B');
 
@@ -2059,7 +2042,7 @@ function ImageSelector(container_id, varName)
 				}
 
 				// Saves to DB
-				saveSelectionToDB(name);
+				_saveSelectionToDB(name);
 			}
 		);
 
@@ -2071,16 +2054,18 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: saveSelectionToDB
-	 * _Public_ Really save an image selection by committing changes to DB.
+	 * Function: _saveSelectionToDB
+	 * Saves an image selection by committing changes to DB.
 	 *
 	 * Parameters:
 	 *
 	 * name - string: name of selection to store
 	 *
 	 */ 
-	function saveSelectionToDB(name) {
+	function _saveSelectionToDB(name) {
 		var cnode = $(id + '_save_selection_res_div');
+		var sels = _getListsOfSelections();
+
 		var xhr = new HttpRequest(
 			cnode.id,
 			// Use default error handler
@@ -2088,18 +2073,21 @@ function ImageSelector(container_id, varName)
 			// Custom handler for results
 			function(resp) {
 				// Selection saved
-				removeAllChildrenNodes(cnode);
-				var p = new Element('p');
-				p.setAttribute('class', 'done');
-				p.insert("Done. Selection saved under");
-				p.insert(new Element('br'));
+				cnode.update();
+				var p = new Element('p', {'class': 'done'}).insert("Done. Selection saved under<br/>");
 				p.insert("'" + name.replace('%2B', '+') + "'.");
 				cnode.insert(p);
+
+				if (_selectionMode == _batchMode && eval(sels).length == 1) {
+					alert('Please note that your list of selections only contains one selection,\n' +
+						'so the selection you just saved will only be accessible from the single\n' +
+						'selection mode!');
+				}
 			}
 		);
 
 		// Get name of all saved selections
-		post = 'Name=' + name + '&IdList=' + _getListsOfSelections();
+		post = 'Name=' + name + '&IdList=' + sels;
 
 		// Send HTTP POST request
 		xhr.send('/youpi/process/db/saveSelection/', post);
@@ -2221,7 +2209,7 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: executeQuery
+	 * Function: _executeQuery
 	 * _Public_ Executes server-side SQL query (AJAX query)
 	 *
 	 * Used to find images and build a selection of images in _single_selection_mode_.
@@ -2231,7 +2219,7 @@ function ImageSelector(container_id, varName)
 	 * <sendq>
 	 *
 	 */ 
-	this.executeQuery = function () {
+	function _executeQuery() {
 		var output = $(id + '_result_div');
 		var xhr = new HttpRequest(
 			output.id,
@@ -2325,7 +2313,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 * See Also:
 	 *
-	 * <renderFinalResults>, <executeQuery>
+	 * <renderFinalResults>, <_executeQuery>
 	 *
 	 */ 
 	function showResultCount(count) {
@@ -2347,11 +2335,11 @@ function ImageSelector(container_id, varName)
 	 *
 	 * See Also:
 	 *
-	 *  <setSelectAllHandler>, <defaultSelectAllHandler>
+	 *  <setSelectAllHandler>, <_defaultSelectAllHandler>
 	 *
 	 */ 
 	this.selectAll = function() {
-		selectAllHandler();
+		_selectAllHandler();
 	}
 	
 	/*
@@ -2360,15 +2348,15 @@ function ImageSelector(container_id, varName)
 	 *
 	 * See Also:
 	 *
-	 *  <setUnelectAllHandler>, <defaultUnselectAllHandler>
+	 *  <setUnelectAllHandler>, <_defaultUnselectAllHandler>
 	 *
 	 */ 
 	this.unselectAll = function() {
-		unselectAllHandler();
+		_unselectAllHandler();
 	}
 	
 	/*
-	 * Function: defaultUnselectAllHandler
+	 * Function: _defaultUnselectAllHandler
 	 * Default handler provided for 'unselect All' operation
 	 *
 	 * See Also:
@@ -2376,8 +2364,8 @@ function ImageSelector(container_id, varName)
 	 *  <setUnselectAllHandler>, <unselectAll>
 	 *
 	 */ 
-	function defaultUnselectAllHandler() {
-		toggleSelectAll(false);
+	function _defaultUnselectAllHandler() {
+		_toggleSelectAll(false);
 	}
 
 	/*
@@ -2390,11 +2378,11 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	this.setUnselectAllHandler = function(func) {
-		unselectAllHandler = func ? func : defaultUnselectAllHandler;
+		_unselectAllHandler = func ? func : _defaultUnselectAllHandler;
 	}
 
 	/*
-	 * Function: toggleSelectAll
+	 * Function: _toggleSelectAll
 	 * (Un)selects all table rows by checking checkboxes
 	 *
 	 * Parameters:
@@ -2402,7 +2390,7 @@ function ImageSelector(container_id, varName)
 	 *  on - boolean: (de)selecting table's rows
 	 *
 	 */ 
-	function toggleSelectAll(on) {
+	function _toggleSelectAll(on) {
 		if (!_tableWidget.rowCount()) {
 			alert(imgSelRequiredMsg);
 			return;
@@ -2414,7 +2402,7 @@ function ImageSelector(container_id, varName)
 	 * Function: sendq
 	 * Builds the SQL query then sends an AJAX query
 	 *
-	 * This function can be called many times by the <executeQuery> function (iterative step).
+	 * This function can be called many times by the <_executeQuery> function (iterative step).
 	 *
 	 * Parameters:
 	 *
@@ -2423,7 +2411,7 @@ function ImageSelector(container_id, varName)
 	 *
 	 * See Also:
 	 *
-	 * <executeQuery>
+	 * <_executeQuery>
 	 *
 	 */ 
 	function sendq(k, xhr) {
@@ -2532,10 +2520,11 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function getMainCriteriaDOM(tr_idx) {
-		var select = new Element('select');
-		select.setAttribute('id', id + '_mainCriteria_select_' + tr_idx);
+		var select = new Element('select', {'id': id + '_mainCriteria_select_' + tr_idx});
 		// Call matching handler when selection changes
-		select.setAttribute('onchange', _instance_name + '.executeHandler(' + tr_idx + ');');
+		select.observe('change', function() {
+			_executeHandler(tr_idx);
+		});
 
 		var option;
 		for (var j=0; j < fields.length; j++) {
@@ -2564,16 +2553,14 @@ function ImageSelector(container_id, varName)
 	this.getAIM = function() { return AIM; }
 
 	/*
-	 * Handler called before POST file upload
+	 * Function: _fileUploadStartHandler
+	 * Executes start handler
 	 *
-	 */
-	this.getFileUploadStartHandler = function() { return fileUploadStartHandler; }
-
-	function fileUploadStartHandler() {
+	 */ 
+	function _fileUploadStartHandler() {
 		// make something useful before submit (onStart)
-
 		var skydiv = $(id + '_sky_selections_div');
-		var blog = $(_instance_name + '_batch_log_div');
+		var blog = $(id + '_batch_log_div');
 		var log = $(id + '_upload_log_div');
 
 		skydiv.innerHTML = '';
@@ -2587,13 +2574,7 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Handler called upon upload completion
-	 *
-	 */
-	this.getFileUploadCompleteHandler = function() { return fileUploadCompleteHandler; }
-
-	/*
-	 * Function: fileUploadCompleteHandler
+	 * Function: _fileUploadCompleteHandler
 	 * Executes handler, wrapper for the public interface
 	 *
 	 * Parameters:
@@ -2601,7 +2582,7 @@ function ImageSelector(container_id, varName)
 	 * resp - AJAX response
 	 *
 	 */ 
-	function fileUploadCompleteHandler(resp) {
+	function _fileUploadCompleteHandler(resp) {
 		var r = eval('(' + resp + ')');
 		var len = r['length'];
 		var exit_code = r['exit_code'];
@@ -2628,7 +2609,8 @@ function ImageSelector(container_id, varName)
 			var img = new Element('img');
 			img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/' + img_name);
 			log.insert(img);
-			log.insert(msg[k]);
+			// Dot not call Element#insert method to displaying HTML content
+			log.appendChild(document.createTextNode(msg[k]));
 			log.insert(new Element('br'));
 		}
 		if (exit_code) return;
@@ -2649,7 +2631,7 @@ function ImageSelector(container_id, varName)
 
 		var bdiv = $(id + '_batch_sel_div');
 		var blog = new Element('div');
-		blog.setAttribute('id', _instance_name + '_batch_log_div');
+		blog.setAttribute('id', id + '_batch_log_div');
 		blog.setAttribute('class', 'ims_batch_log_div');
 		bdiv.insert(blog);
 
@@ -2666,7 +2648,7 @@ function ImageSelector(container_id, varName)
 				var img = new Element('img');
 				img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/' + img_name);
 				rdiv.insert(img);
-				rdiv.insert('Found ' + res['nbSelections'] + ' selections');
+				rdiv.insert('Found ' + res['nbSelections'] + ' selection' + (res.nbSelections > 1 ? 's':''));
 
 				var sel = res['selections'];
 				var total = 0;
@@ -2674,18 +2656,18 @@ function ImageSelector(container_id, varName)
 				_batchModeSelections.length = 0;
 
 				for(var k=0; k<sel.length; k++) {
-					rdiv.insert(new Element('br'));
-					rdiv.insert(k+1 + '. Selection ' + sel[k]['name'] + ' contains ');
-					var link = new Element('a');
-					link.setAttribute('href', '#');
-					link.setAttribute('onclick', _instance_name + ".viewBatchSelection('" + encodeURI(sel[k]['xml']) + "');");
-					link.insert(sel[k]['count'] + ' images');
-					rdiv.insert(link);
+					var selbox = new DropdownBox(rdiv, 'View selection <b>' + (k+1) + '</b> - ' + sel[k].name + ', <i>' + 
+						sel[k].count + ' images</i>');
+					selbox.setTopLevelContainer(false);
+					// Trick to pass custom data to the instance
+					selbox.xml = encodeURI(sel[k]['xml']);
+					selbox.xmlLoaded = false;
+					selbox.setOnClickHandler(_handlerViewBatchSelection.bind(selbox));
+
 					_batchModeSelections[k] = sel[k]['idList'];
 					total += sel[k]['count'];
 				}	
-				rdiv.insert(new Element('br'));
-				rdiv.insert('Total: [ ' + total + ' images ]');
+				rdiv.insert('<br/>Total: [ ' + total + ' images ]');
 
 				// Load sky map
 				_displaySkyVisualization(fileName);
@@ -2701,6 +2683,15 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
+	 * Function: _handlerViewBatchSelection
+	 * Dropdown box custom handler to view a batch selection
+	 *
+	 */ 
+	function _handlerViewBatchSelection() {
+		_viewBatchSelection(this.getContentNode(), this.xml);
+	}
+
+	/*
 	 * Function: _displaySkyVisualization
 	 * Display sky visualization widget
 	 *
@@ -2710,8 +2701,8 @@ function ImageSelector(container_id, varName)
 	 *
 	 */ 
 	function _displaySkyVisualization(fileName) {
-		if (!$(_instance_name + '_batch_display_sky_check').checked) {
-			if (!$(_instance_name + '_batch_sky_compute_all_check').checked)
+		if (!$(id + '_batch_display_sky_check').checked) {
+			if (!$(id + '_batch_sky_compute_all_check').checked)
 				return;
 			else {
 				alert('You can\'t plot images center if sky visualisation is unchecked!')
@@ -2727,7 +2718,7 @@ function ImageSelector(container_id, varName)
 		else {
 			// Trying to plot sky selections from XML file content
 			post = 'Filename=' + fileName;
-			if ($(_instance_name + '_batch_sky_compute_all_check').checked)
+			if ($(id + '_batch_sky_compute_all_check').checked)
 				post += '&PlotCenter=1';
 		}
 
@@ -2755,35 +2746,34 @@ function ImageSelector(container_id, varName)
 	}
 
 	/*
-	 * Function: viewBatchSelection
+	 * Function: _viewBatchSelection
 	 * Display a selection's content into a new page
 	 *
 	 * Parameters:
 	 *
+	 * container - DOM container node
 	 * xml - XML data selection
 	 *
 	 */ 
-	this.viewBatchSelection = function(xml) {
-		var log = $(_instance_name + '_batch_log_div');
-		log.style.display = 'block';
+	function _viewBatchSelection(container, xml) {
+		if (container.xmlLoaded) return;
 
 		var xhr = new HttpRequest(
-			log.id,
+			container,
 			// Use default error handler
 			null,
 			// Custom handler for results
 			function(resp) {
-				log.innerHTML = '';
-				var pre = new Element('pre');
-				log.insert(pre);
-				pre.insert('Images in ' + resp['name'] + ' selection:');
-				pre.insert(new Element('br'));
+				container.update();
+				var pre = new Element('pre', {style: 'color: brown;'});
+				pre.insert('Images in ' + resp['name'] + ' selection:<br/>');
 
-				var len = resp['data'].length;
-				for (var k=0; k < len; k++) {
-					pre.insert(resp['data'][k][0] + ' in ' + resp['data'][k][1]);
-					pre.insert(new Element('br'));
-				}
+				$A(resp.data).each(function(image) {
+					pre.insert(image[0] + ' in ' + image[1] + '<br/>');
+				});
+				container.insert(pre);
+				// Trick to prevent future AJAX queries for this DropdownBox instance
+				container.xmlLoaded = true;
 			}	
 		);
 

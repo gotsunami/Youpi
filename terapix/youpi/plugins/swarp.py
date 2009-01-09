@@ -16,7 +16,7 @@ class Swarp(ProcessingPlugin):
 
 		self.id = 'swarp'
 		self.optionLabel = 'Image stacking'
-		self.description = 'Stacking of images'
+		self.description = 'Resampling and coaddition'
 		# Item prefix in shopping cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SWARP'

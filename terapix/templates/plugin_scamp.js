@@ -934,7 +934,7 @@ var {{ plugin.id }} = {
 		div.setAttribute('style', 'padding-top: 20px; width: 80%');
 		root.appendChild(div);
 	
-		ims = new ImageSelector('results_div', 'ims');
+		ims = new ImageSelector('results_div');
 		advTab = new AdvancedTable('advTab');
 		ims.setTableWidget(advTab);
 	},
