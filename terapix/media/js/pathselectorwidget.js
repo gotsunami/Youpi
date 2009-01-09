@@ -1,29 +1,16 @@
-
-if (!Youpi)
-	var Youpi = {};
-
 /*
  * Class: PathSelectorWidget
  * Simple widget that allows to add/select/delete multiple paths from a treeview.
  *
- * Note:
- *
- * Please note that this page documents Javascript code. <PathSelectorWidget> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
- *
  * Constructor Parameters:
  *
- * container_id - string: name of parent DOM block container
- * varName - string: global variable name of instance, used internally for public interface definition
+ * container - string or DOM node: name of parent DOM block container
  * pluginId - string: plugin unique id
  *
  */
-function PathSelectorWidget(container_id, varName, pluginId)
+function PathSelectorWidget(container, pluginId)
 {
-	// Name of instance if global namespace
-	var instance_name = varName;
-	var container = document.getElementById(container_id);
-	var id = varName + '_psw_';
+	var _container = $(container);
 	var NO_SELECTION = '--';
 
 	var plugin_id = pluginId ? pluginId : null;
@@ -37,59 +24,64 @@ function PathSelectorWidget(container_id, varName, pluginId)
 	this.render = function() {
 		var tr, th, td;
 
-		var fd = document.createElement('div');
+		var fd = new Element('div');
 		fd.setAttribute('style', 'float: left; width: 400px');
 		fd.setAttribute('id', plugin_id + '_fbw_div');
-		container.appendChild(fd);
+		_container.insert(fd);
 
-		var d = document.createElement('div');
-		var tab = document.createElement('table');
+		var d = new Element('div');
+		var tab = new Element('table');
 		tab.setAttribute('class', 'flatmask');
 
 		for (var k=0; k < tr_paths.length; k++) {
-			tab.appendChild(tr_paths[k]);
+			tab.insert(tr_paths[k]);
 		}
 
-		d.appendChild(tab);
-		container.appendChild(d);
+		d.insert(tab);
+		_container.insert(d);
 
-		d = document.createElement('div');
-		tab = document.createElement('table');
+		d = new Element('div');
+		tab = new Element('table');
 		tab.setAttribute('class', 'selectedPath');
-		tr = document.createElement('tr');
-		th = document.createElement('th');
-		th.appendChild(document.createTextNode('Selected Path'));
+		tr = new Element('tr');
+		th = new Element('th');
+		th.insert('Selected Path');
 
-		td = document.createElement('td');
-		tdiv = document.createElement('div');
+		td = new Element('td');
+		tdiv = new Element('div');
 		tdiv.setAttribute('class', 'lightTip');
-		tdiv.appendChild(document.createTextNode('Please note that you can append a file name to the selected path by typing its name in the box below.'));
+		tdiv.insert('Please note that you can append a file name to the selected path ' + 
+			'by typing its name in the box below.');
 
-		pin = document.createElement('input');
+		pin = new Element('input');
 		pin.setAttribute('id', plugin_id + '_path_input');
 		pin.setAttribute('type', 'text');
 		pin.setAttribute('size', '80');
 		pin.setAttribute('style', 'font-family: typewritter;');
 
-		td.appendChild(tdiv);
-		td.appendChild(pin);
-		td.appendChild(document.createElement('br'));
+		td.insert(tdiv);
+		td.insert(pin);
+		td.insert(new Element('br'));
 
 		var sin;
 		for (var k=0; k < tr_paths.length; k++) {
-			sin = document.createElement('input');
-			sin.setAttribute('type', 'button');
-			sin.setAttribute('value', 'Save as ' + tr_prefix[k].toUpperCase());
-			sin.setAttribute('style', 'margin-right: 5px');
-			sin.setAttribute('onclick', instance_name + ".savePath('" + tr_prefix[k] + "');");
-			td.appendChild(sin);
+			sin = new Element('input', {
+					type: 'button', 
+					value: 'Save as ' + tr_prefix[k].toUpperCase(),
+					style: 'margin-right: 5px'
+			});
+			sin.tr_prefix = tr_prefix[k];
+			sin.observe('click', function() {
+				_savePath(this.tr_prefix);
+			});
+			td.insert(sin);
 		}
 
-		tr.appendChild(th);
-		tr.appendChild(td);
-		tab.appendChild(tr);
-		d.appendChild(tab);
-		container.appendChild(d);
+		tr.insert(th);
+		tr.insert(td);
+		tab.insert(tr);
+		d.insert(tab);
+		_container.insert(d);
 
 		loadExistingPaths();
 	}
@@ -105,16 +97,16 @@ function PathSelectorWidget(container_id, varName, pluginId)
 
 				for (var k=0; k < tr_prefix.length; k++) {
 					var prefix = tr_prefix[k];
-					var div = document.getElementById(plugin_id + '_' + prefix + '_div');
+					var div = $(plugin_id + '_' + prefix + '_div');
 					var msg_div;
 					removeAllChildrenNodes(div);
 					removeAllChildrenNodes(div);
 
 					if (resp['result'][prefix].length == 0) {
-						msg_div = document.getElementById(plugin_id + '_' + prefix + '_msg_div');
+						msg_div = $(plugin_id + '_' + prefix + '_msg_div');
 						msg_div.innerHTML = '';
 						div.setAttribute('class', 'noFlagWeight');
-						div.appendChild(document.createTextNode('No ' + prefix + ' paths available'));
+						div.insert('No ' + prefix + ' paths available');
 					}
 					else {
 						// Insert element to the beginning
@@ -122,21 +114,28 @@ function PathSelectorWidget(container_id, varName, pluginId)
 
 						if(tr_mandatory[k]) {
 							// This a mandatory path
-							var m = document.createElement('span');
+							var m = new Element('span');
 							m.setAttribute('class', 'mandatory_path');
-							m.appendChild(document.createTextNode('MANDATORY'));
-							div.appendChild(m);
+							m.insert('MANDATORY');
+							div.insert(m);
 						}
 						sel = getSelect(plugin_id + '_' + prefix + '_select', resp['result'][prefix]);
-						sel.setAttribute('onchange', instance_name + ".onPathChange('" + prefix + "', '" + sel.id + "')");
-						div.appendChild(sel);
-						img = document.createElement('img');
-						img.setAttribute('style', 'cursor: pointer; margin-left: 5px;');
-						img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/cancel.png');
-						img.setAttribute('onclick', instance_name + ".deletePath('" + prefix + "')");
-						div.appendChild(img);
+						sel.pathChange = {prefix: prefix, selid: sel.id};
+						sel.observe('change', function() {
+							_onPathChange(this.pathChange.prefix, this.pathChange.selid);
+						});
+						div.insert(sel);
+						img = new Element('img', {
+							style: 'cursor: pointer; margin-left: 5px;',
+							src: '/media/themes/' + guistyle + '/img/16x16/cancel.png'
+						});
+						img.kind_prefix = prefix;
+						img.observe('click', function() {
+							_deletePath(this.kind_prefix);
+						});
+						div.insert(img);
 		
-						onPathChange(prefix, sel ? sel.id : null);
+						_onPathChange(prefix, sel ? sel.id : null);
 					}
 				}
 			}
@@ -146,15 +145,15 @@ function PathSelectorWidget(container_id, varName, pluginId)
 		r.send('/youpi/process/plugin/', post);
 	}
 
-	this.savePath = function(prefix) {
+	function _savePath(prefix) {
 		var div, sel;
-		div = document.getElementById(plugin_id + '_' + prefix + '_div');
-		sel = document.getElementById(plugin_id + '_' + prefix + '_select');
+		div = $(plugin_id + '_' + prefix + '_div');
+		sel = $(plugin_id + '_' + prefix + '_select');
 	
-		var pathNode = document.getElementById(plugin_id + '_path_input');
+		var pathNode = $(plugin_id + '_path_input');
 		var path = pathNode.value;
 	
-		if (!path.replace(/ /g,'').length) {
+		if (path.empty()) {
 			alert('The selected path is empty! There is nothing to add. Please select a path in the path selector on the left.');
 			return;
 		}
@@ -173,8 +172,8 @@ function PathSelectorWidget(container_id, varName, pluginId)
 		r.send('/youpi/process/plugin/', post);
 	}
 
-	this.deletePath = function(prefix) {
-		var sel = document.getElementById(plugin_id + '_' + prefix + '_select');
+	function _deletePath(prefix) {
+		var sel = $(plugin_id + '_' + prefix + '_select');
 		var path = sel.options[sel.selectedIndex].text;
 
 		if (path == NO_SELECTION) {
@@ -203,14 +202,14 @@ function PathSelectorWidget(container_id, varName, pluginId)
 		onPathChange(prefix, selid);
 	}
 		
-	function onPathChange(prefix, selid) {
-		var msg_div = document.getElementById(plugin_id + '_' + prefix + '_msg_div');
+	function _onPathChange(prefix, selid) {
+		var msg_div = $(plugin_id + '_' + prefix + '_msg_div');
 		if (!selid) {
 			msg_div.innerHTML = '';
 			return;
 		}
 
-		var sel = document.getElementById(selid);
+		var sel = $(selid);
 		var txt = sel.options[sel.selectedIndex].text;
 		var d;
 	
@@ -236,27 +235,17 @@ function PathSelectorWidget(container_id, varName, pluginId)
 
 	// mandatory: boolean
 	this.addPath = function(title, prefix, mandatory) {
-		var mandatory = mandatory ? true : false;
+		var mandatory = typeof mandatory == 'boolean' ? mandatory : false;
 		var tr, th, td;
-		tr = document.createElement('tr');
-		th = document.createElement('th');
-		th.appendChild(document.createTextNode('Selected path to ' + title));
-		td = document.createElement('td');
-		td.setAttribute('id', plugin_id + '_' + prefix + '_td');
-		td.setAttribute('style', 'vertical-align: middle');
+		tr = new Element('tr');
+		th = new Element('th').insert('Selected path to ' + title);
+		td = new Element('td', {id: plugin_id + '_' + prefix + '_td', style: 'vertical-align: middle'});
 
-		var md = document.createElement('div');
-		md.setAttribute('id', plugin_id + '_' + prefix + '_msg_div');
-		md.setAttribute('style', 'text-align: center');
+		var md = new Element('div', {id: plugin_id + '_' + prefix + '_msg_div', style: 'text-align: center'});
+		var d = new Element('div', {id: plugin_id + '_' + prefix + '_div', style: 'text-align: center'});
 
-		var d = document.createElement('div');
-		d.setAttribute('id', plugin_id + '_' + prefix + '_div');
-		d.setAttribute('style', 'text-align: center');
-
-		td.appendChild(md);
-		td.appendChild(d);
-		tr.appendChild(th);
-		tr.appendChild(td);
+		td.insert(md).insert(d);
+		tr.insert(th).insert(td);
 
 		tr_paths.push(tr);
 		tr_prefix.push(prefix);
@@ -264,6 +253,9 @@ function PathSelectorWidget(container_id, varName, pluginId)
 	}
 
 	this.setFileBrowser = function(fb_obj) {
+		if (!typeof fb_obj == 'object')
+			console.error('Argument must be a FileBrowser instance, not ' + typeof fb_obj + '!');
+
 		file_browser = fb_obj ? fb_obj : null;
 		file_browser.setBranchClickedHandler(branchClickedHandler);
 	}
@@ -283,11 +275,11 @@ function PathSelectorWidget(container_id, varName, pluginId)
 		if (id == 'root')
 			return;
 	
-		var pathNode = document.getElementById(plugin_id + '_path_input');
+		var pathNode = $(plugin_id + '_path_input');
 		pathNode.value = branch.struct.syspath.replace('//','/');
 	
 		var nb = branch.struct.num_children;
-		var p = document.createElement('p');
+		var p = new Element('p');
 	
 		if (nb > 0) {
 			// directory contains files

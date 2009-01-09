@@ -53,7 +53,7 @@
 	// Enable user output custom directory
 	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
 
-	var selector = new PathSelectorWidget('selector_div', 'selector', '{{ plugin.id }}');
+	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
 	selector.addPath('FLAG data', 'flags');
 	selector.addPath('WEIGHT data', 'weights');
 	selector.addPath('PSF data', 'psf');

@@ -152,7 +152,7 @@ function FileBrowser(container_id, varName) {
 	 */ 
 	this.setSelectionMode = function(mode) {
 		if (mode != _MODES.SINGLE && mode != _MODES.MULTI) {
-			alert(_instance_name + ": unknown selection mode '" + mode + "'");
+			console.error("Unknown selection mode '" + mode + "'");
 			_selectionMode = _MODES.SINGLE;
 			return;
 		}
