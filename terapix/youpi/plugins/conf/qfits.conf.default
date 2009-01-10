@@ -1,0 +1,98 @@
+
+
+# Note to the user: the only configuration directory that might be modified is
+# $config{data_dir}
+
+# directory where qualityFITS files are installed. This should be set to the
+# correct value by the automatic configuration process
+my $base_dir = "/usr/local/qualityFITS";
+
+# directory where qualityFITS tasks' configuration files are located
+$config{config_dir} = $base_dir."/config";
+
+# data directory, described in qualityFITS' man page
+$config{data_dir}   = "";
+
+# this directory is prepended to the PATH; it should mandatory programs (like
+# sex, swarp, etc...) if they are not in the standard PATH.
+# If empty, the PATH is used.
+$config{bin_dir}    = $base_dir."/bin";
+
+# directory containing qualityFITS's scripts
+$config{script_dir} = $base_dir."/scripts";
+
+# directory with some html related material
+$config{html_dir}   = $base_dir."/html";
+
+# filters information file (option --filterfile)
+#$config{filterfile} = "/usr/local/etc/qualityFITS/filters_megacam.dat"
+
+$config{ellipt}     = 1; # plots PSF ellipticity
+$config{scamp}      = 0; # run scamp on the image; scamp software is then needed !
+$config{compress}   = 1; # compress generated weight and flag images using CFITSIO imcopy with RICE compression
+
+# technical web page corresponding to INSTRUME (or DETECTOR) keyword (case
+# insensitive): used to make a link from the generated web page
+%refpage = ("megacam" => "http://www.cfht.hawaii.edu/Instruments/Imaging/MegaPrime/specsinformation.html",
+            "cfh12k"  => "http://www.cfht.hawaii.edu/Instruments/Imaging/CFH12K/",
+            "wfi"     => "http://www.ls.eso.org/lasilla/Telescopes/2p2T/E2p2M/WFI/docs/WFInutshell.html"
+           );
+
+# Two tables of FITS header keyword values are shown on the web page.
+# The first one, with keywords related to the site.
+# The dummy keyword "blackline" is used to draw a separating horizontal black line
+@keywords_to_print_site =
+     (
+       "ORIGIN",
+       "TELESCOP",
+       "DETECTOR",
+       "INSTRUME",
+       "blackline",
+       "DATE",
+       "RUNID"
+      );
+
+# The second one is filled with keywords related to the observation
+@keywords_to_print_obs =
+     (
+       "OBJECT",
+       "EXPTIME",
+       "FILTER",
+       "RA",
+       "DEC",
+       "EQUINOX",
+       "AIRMASS"
+      );
+
+#$config{subimage_size}= 500;     # extracted subimages size in pixels
+
+# the following $config{###_options} variable are command line options which
+# are fed to the task corresponding to the steps listed in the man page. The last columns
+# shows the config files from config_dir which are used. Modification of those
+# files affects every run of the pipeline.  Modification in this custom
+# configuration file (qualityFITS.rc) changes only the run launched with -c
+# this_file.
+#                                                       config files
+$config{cosmic_sextractor_options} = "";       # step 1 cosmic.sex cosmic.param emmi.ret
+$config{dummyflat_weightwatcher_options} = ""; # step 2 dummyflat.ww
+$config{weightwatcher_options} = "";           # step 2 qualityFITS.ww
+$config{sextractor_options} = "";              # step 3 qualityFITS.sex qualityFITS.param 
+                                               #        qualityFITS.nnw gauss_3.0_7x7.conv
+$config{back_sextractor_options} = "";         # step 3a qualityFITS.sex cosmic.param 
+                                               #        qualityFITS.nnw gauss_3.0_7x7.conv
+$config{psfex_sextractor_options} = "";        # step 4 psfex.sex sex_psfex.param 
+                                               #        qualityFITS.nnw gauss_3.0_7x7.conv
+$config{psfex_options} = "";                   # step 5 qualityFITS.psfex
+$config{scamp_options} = "";                   # step 7 qualityFITS.scamp
+$config{mosaic_swarp_options} = "";            # step 7 mosaic.swarp
+$config{mosaic_stiff_options} = "";            # step 8 mosaic.stiff
+$config{weight_swarp_options} = "";            # step 8 weight.swarp
+$config{weight_stiff_options} = "";            # step 8 weight.stiff
+$config{ccd_stiff_options} = "";               # step 8 ccd.stiff
+$config{bkg_swarp_options} = "";               # step 8 background.swarp
+$config{bkg_stiff_options} = "";               # step 8 bkg.stiff
+$config{psf_swarp_options} = "";               # step 8 psf.swarp
+$config{psf_stiff_options} = "";               # step 8 psf.stiff
+
+1;  # Mandatory
+
