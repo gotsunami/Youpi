@@ -261,23 +261,6 @@ requirements            = %s
 					'Log' 		: err_log
 			}
 
-
-
-	def getConfigFileContent(self, request):
-		post = request.POST
-		try:
-			name = str(post['Name'])
-		except:
-			raise PluginError, "Invalid POST parameters"
-
-		# Updates entry
-		try:
-			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
-		except:
-			raise PluginError, "No config file with that name: %s" % name
-
-		return str(config.content)
-
 	def saveConfigFile(self, request):
 		"""
 		Save configuration file to DB

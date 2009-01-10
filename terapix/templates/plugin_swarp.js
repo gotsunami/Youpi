@@ -20,13 +20,14 @@ var {{ plugin.id }} = {
 		var p_data = {	plugin_name : '{{ plugin.id }}', 
 					userData : {resultsOutputDir: output_data_path}
 		};
+		alert('TODO...');
+		return;
 	
 		// Add entry into the shopping cart
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
-									alert(	'One Skeleton-related job has been added to the cart.Since this is\na DEMO plugin, ' +
-											"it will do nothing but running five '/usr/bin/uptime'\njobs on the cluster.");
+									alert('TODO...');
 								}
 		);
 	},

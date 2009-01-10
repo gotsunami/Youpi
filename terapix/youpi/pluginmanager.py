@@ -35,6 +35,21 @@ class ProcessingPlugin:
 		# Used to generate rather unique item ID in shopping cart
 		self.itemCounter = 0
 
+	def getConfigFileContent(self, request):
+		post = request.POST
+		try:
+			name = str(post['Name'])
+		except:
+			raise PluginError, "Invalid POST parameters"
+
+		# Updates entry
+		try:
+			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+		except:
+			raise PluginError, "No config file with that name: %s" % name
+
+		return str(config.content)
+
 	def getConfigFileNames(self, request):
 		# Updates entry
 		configs = ConfigFile.objects.filter(kind__name__exact = self.id)

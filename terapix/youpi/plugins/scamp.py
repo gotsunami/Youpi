@@ -41,21 +41,6 @@ class Scamp(ProcessingPlugin):
 		# Decomment to disable the plugin
 		#self.enable = False
 
-	def getConfigFileContent(self, request):
-		post = request.POST
-		try:
-			name = str(post['Name'])
-		except:
-			raise PluginError, "Invalid POST parameters"
-
-		# Updates entry
-		try:
-			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
-		except:
-			raise PluginError, "No config file with that name: %s" % name
-
-		return str(config.content)
-
 	def getSavedItems(self, request):
 		"""
 		Returns a user's saved items. 

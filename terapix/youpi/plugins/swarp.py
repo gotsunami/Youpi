@@ -103,7 +103,7 @@ class Swarp(ProcessingPlugin):
 			resultsOutputDir = post['ResultsOutputDir']
 			itemId = str(post['ItemId'])
 		except Exception, e:
-				raise PluginError, "POST argument error. Unable to process data: %s" % e
+			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
 		now = time.time()
 		# Condor submission file
@@ -156,9 +156,9 @@ initialdir				= %s
 transfer_output_files   = NOP
 # YOUPI_USER_DATA = %s
 environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
-log                     = /tmp/SKEL.log.$(Cluster).$(Process)
-error                   = /tmp/SKEL.err.$(Cluster).$(Process)
-output                  = /tmp/SKEL.out.$(Cluster).$(Process)
+log                     = /tmp/SWARP.log.$(Cluster).$(Process)
+error                   = /tmp/SWARP.err.$(Cluster).$(Process)
+output                  = /tmp/SWARP.out.$(Cluster).$(Process)
 notification            = Error
 notify_user             = monnerville@iap.fr
 # Computed Req string
@@ -178,7 +178,6 @@ notify_user             = monnerville@iap.fr
 		csf.close()
 
 		return csfPath
-
 
 	def getTaskInfo(self, request):
 		"""
