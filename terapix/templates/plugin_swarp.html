@@ -19,7 +19,7 @@
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
-		var m = new submenu('SubMenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);
+		var m = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);
 		m.setOnClickHandler(3, function() {
 			$('output_path_input').focus();
 		});

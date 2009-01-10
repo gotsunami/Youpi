@@ -19,15 +19,15 @@ var {{ plugin.id }} = {
 		}
 		idList = c.split(',');
 	
-		var div = document.getElementById(container_id);
+		var div = $(container_id);
 		if (div.style.display == 'none') {
 			removeAllChildrenNodes(div);
-			var indiv = document.createElement('div');
+			var indiv = new Element('div');
 			indiv.appendChild(document.createTextNode('View info for image: '));
-			var select = document.createElement('select');
+			var select = new Element('select');
 			var option;
 			for (var k=0; k < idList.length; k++) {
-				option = document.createElement('option');
+				option = new Element('option');
 				option.setAttribute('value', k);
 				option.appendChild(document.createTextNode(idList[k]));
 				select.appendChild(option);
@@ -58,7 +58,7 @@ var {{ plugin.id }} = {
 			if (!r) return;
 		}
 	
-		var logdiv = document.getElementById('master_condor_log_div');
+		var logdiv = $('master_condor_log_div');
 	
 		var r = new HttpRequest(
 				logdiv,
@@ -122,7 +122,7 @@ var {{ plugin.id }} = {
 	},
 
 	runAll: function() {
-		var prefix = document.getElementById('prefix').value.replace(/ /g, '');
+		var prefix = $('prefix').value.replace(/ /g, '');
 		var txt = '';
 	
 		var r = confirm('Are you sure you want to submit ALL items to the cluster?' + txt);
@@ -133,7 +133,7 @@ var {{ plugin.id }} = {
 		data = new Array();
 	
 		{% for data in plugin.getData %}
-			trNode = document.getElementById('{{ plugin.id }}_' + (j+1));
+			trNode = $('{{ plugin.id }}_' + (j+1));
 			data[j] = [trNode, '{{ data.idList }}', prefix + '{{ plugin.itemPrefix }}{{ data.itemCounter }}'];
 			j++;
 		{% endfor %}
@@ -170,9 +170,9 @@ var {{ plugin.id }} = {
 
 	// Mandatory function
 	showSavedItems: function() {
-		var cdiv = document.getElementById('plugin_menuitem_sub_{{ plugin.id }}');
+		var cdiv = $('plugin_menuitem_sub_{{ plugin.id }}');
 		cdiv.innerHTML = '';
-		var div = document.createElement('div');
+		var div = new Element('div');
 		div.setAttribute('class', 'savedItems');
 		div.setAttribute('id', '{{ plugin.id }}_saved_items_div');
 		cdiv.appendChild(div);
@@ -187,7 +187,7 @@ var {{ plugin.id }} = {
 					removeAllChildrenNodes(div);
 	
 					var total = resp['result'].length;
-					var countNode = document.getElementById('plugin_{{ plugin.id }}_saved_count');
+					var countNode = $('plugin_{{ plugin.id }}_saved_count');
 					countNode.innerHTML = '';
 					var txt;
 					if (total > 0)
@@ -196,25 +196,25 @@ var {{ plugin.id }} = {
 						txt = 'No item';
 					countNode.appendChild(document.createTextNode(txt));
 	
-					var table = document.createElement('table');
+					var table = new Element('table');
 					table.setAttribute('class', 'savedItems');
 					var tr, th;
-					var icon = document.createElement('img');
+					var icon = new Element('img');
 					icon.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
 					icon.setAttribute('style', 'vertical-align: middle; margin-right: 10px;');
 
-					tr = document.createElement('tr');
-					th = document.createElement('th');
+					tr = new Element('tr');
+					th = new Element('th');
 					th.setAttribute('colspan', '8');
 					th.appendChild(icon);
 					th.appendChild(document.createTextNode('{{ plugin.description }}: ' + resp['result'].length + ' saved item' + (resp['result'].length > 1 ? 's' : '')));
 					tr.appendChild(th);
 					table.appendChild(tr);
 	
-					tr = document.createElement('tr');
+					tr = new Element('tr');
 					var header = ['Date', 'User', 'Name', '# images', 'Config', 'Paths', 'Action'];
 					for (var k=0; k < header.length; k++) {
-						th = document.createElement('th');
+						th = new Element('th');
 						th.appendChild(document.createTextNode(header[k]));
 						tr.appendChild(th);
 					}
@@ -225,85 +225,85 @@ var {{ plugin.id }} = {
 					var idList, txt;
 					for (var k=0; k < resp['result'].length; k++) {
 						idList = eval(resp['result'][k]['idList']);
-						tr = document.createElement('tr');
+						tr = new Element('tr');
 						trid = '{{ plugin.id }}_saved_item_' + k + '_tr';
 						tr.setAttribute('id', trid);
 	
 						// Date
-						td = document.createElement('td');
+						td = new Element('td');
 						td.appendChild(document.createTextNode(resp['result'][k]['date']));
 						tr.appendChild(td);
 	
 						// User
-						td = document.createElement('td');
+						td = new Element('td');
 						td.setAttribute('class', 'config');
 						td.appendChild(document.createTextNode(resp['result'][k]['username']));
 						tr.appendChild(td);
 	
 						// Name
-						td = document.createElement('td');
+						td = new Element('td');
 						td.setAttribute('class', 'name');
 						td.appendChild(document.createTextNode(resp['result'][k]['name']));
 						tr.appendChild(td);
 
 						// Images count
-						td = document.createElement('td');
+						td = new Element('td');
 						td.setAttribute('class', 'imgCount');
 						idList.length > 1 ? txt = 'Batch' : txt = 'Single';
-						var sp = document.createElement('span');
+						var sp = new Element('span');
 						sp.setAttribute('style', 'font-weight: bold; text-decoration: underline;');
 						sp.appendChild(document.createTextNode(txt));
 						td.appendChild(sp);
-						td.appendChild(document.createElement('br'));
+						td.appendChild(new Element('br'));
 	
 						for (var j=0; j < idList.length; j++) {
 							td.appendChild(document.createTextNode(idList[j].length));
-							td.appendChild(document.createElement('br'));
+							td.appendChild(new Element('br'));
 						}
 						tr.appendChild(td);
 	
 						// Config
-						td = document.createElement('td');
+						td = new Element('td');
 						td.setAttribute('class', 'config');
 						td.appendChild(document.createTextNode(resp['result'][k]['config']));
 						tr.appendChild(td);
 
 						// Flat, Mask, Reg
-						td = document.createElement('td');
-						tabi = document.createElement('table');
+						td = new Element('td');
+						tabi = new Element('table');
 						tabi.setAttribute('class', 'info');
 	
 						// Flat
-						tabitr = document.createElement('tr');
-						tabitd = document.createElement('td');
+						tabitr = new Element('tr');
+						tabitd = new Element('td');
 						tabitd.appendChild(document.createTextNode('Flat: '));
 						tabitd.setAttribute('class', 'label');
 						tabitr.appendChild(tabitd);
-						tabitd = document.createElement('td');
+						tabitd = new Element('td');
 						tabitd.setAttribute('class', 'file');
 						tabitd.appendChild(reduceString(resp['result'][k]['flatPath']));
 						tabitr.appendChild(tabitd);
 						tabi.appendChild(tabitr);
 	
 						// Mask
-						tabitr = document.createElement('tr');
-						tabitd = document.createElement('td');
+						tabitr = new Element('tr');
+						tabitd = new Element('td');
 						tabitd.appendChild(document.createTextNode('Mask: '));
 						tabitd.setAttribute('class', 'label');
 						tabitr.appendChild(tabitd);
-						tabitd = document.createElement('td');
+						tabitd = new Element('td');
 						tabitd.setAttribute('class', 'file');
 						tabitd.appendChild(reduceString(resp['result'][k]['maskPath']));
 						tabitr.appendChild(tabitd);
 						tabi.appendChild(tabitr);
 	
 						// Reg
-						tabitr = document.createElement('tr');
-						tabitd = document.createElement('td');
+						tabitr = new Element('tr');
+						tabitd = new Element('td');
 						tabitd.appendChild(document.createTextNode('Region: '));
 						tabitd.setAttribute('class', 'label');
 						tabitr.appendChild(tabitd);
-						tabitd = document.createElement('td');
+						tabitd = new Element('td');
 						tabitd.setAttribute('class', 'file');
 						if (resp['result'][k]['regPath'].length > 0)
 							tabitd.appendChild(reduceString(resp['result'][k]['regPath']));
@@ -315,13 +315,13 @@ var {{ plugin.id }} = {
 						tr.appendChild(td);
 	
 						// Delete
-						td = document.createElement('td');
-						delImg = document.createElement('img');
+						td = new Element('td');
+						delImg = new Element('img');
 						delImg.setAttribute('style', 'margin-right: 5px');
 						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
 						delImg.setAttribute('onclick', "{{ plugin.id }}.delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
 						td.appendChild(delImg);
-						delImg = document.createElement('img');
+						delImg = new Element('img');
 						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
 						delImg.setAttribute('onclick', "{{ plugin.id }}.addToCart('" + 
 								resp['result'][k]['idList'] + "','" + 
@@ -373,7 +373,7 @@ var {{ plugin.id }} = {
 		var r = confirm("Are you sure you want to delete saved item '" + name + "'?");
 		if (!r) return;
 	
-		var trNode = document.getElementById(trid);
+		var trNode = $(trid);
 		var reload = false;
 	
 		var r = new HttpRequest(
@@ -398,18 +398,18 @@ var {{ plugin.id }} = {
 
 	// Units are in data[z][2], if any
 	getDynTable: function(data, numcols) {
-		var itab = document.createElement('table');
+		var itab = new Element('table');
 		itab.setAttribute('style', 'width: 100%');
 		var itr, itd;
 		var icols = numcols;
 		var irows = Math.floor(data.length/icols);
 		var c = 1;
-		itr = document.createElement('tr');
+		itr = new Element('tr');
 		itab.appendChild(itr);
 		for (var z=0; z < data.length; z++) {
-			itd = document.createElement('td');
+			itd = new Element('td');
 			itd.setAttribute('nowrap', 'nowrap');
-			var span = document.createElement('span');
+			var span = new Element('span');
 			span.setAttribute('style', 'color: brown');
 			var cap  = data[z][0] + ': ';
 			span.appendChild(document.createTextNode(cap));
@@ -421,7 +421,7 @@ var {{ plugin.id }} = {
 			itr.appendChild(itd);
 			c++;
 			if (c > icols) {
-				itr = document.createElement('tr');
+				itr = new Element('tr');
 				itab.appendChild(itr);
 				c = 1;
 			}
@@ -477,50 +477,50 @@ var {{ plugin.id }} = {
 		// See templates/results.html, function showDetails(...)
 		// currentReturnedData: global variable
 		var resp = currentReturnedData;
-		var container = document.getElementById(container_id);
-		var d = document.createElement('div');
+		var container = $(container_id);
+		var d = new Element('div');
 		d.setAttribute('class', 'entryResult');
-		var tab = document.createElement('table');
+		var tab = new Element('table');
 		tab.setAttribute('class', 'fileBrowser');
 		tab.setAttribute('style', 'width: 100%');
 	
-		tr = document.createElement('tr');
-		th = document.createElement('th');
+		tr = new Element('tr');
+		th = new Element('th');
 		th.appendChild(document.createTextNode(resp['Title']));
 		tr.appendChild(th);
 		tab.appendChild(tr);
 	
 		// Duration
-		var tdiv = document.createElement('div');
+		var tdiv = new Element('div');
 		tdiv.setAttribute('class', 'duration');
 		tdiv.appendChild(document.createTextNode(resp['Start']));
-		tdiv.appendChild(document.createElement('br'));
+		tdiv.appendChild(new Element('br'));
 		tdiv.appendChild(document.createTextNode(resp['End']));
-		tdiv.appendChild(document.createElement('br'));
+		tdiv.appendChild(new Element('br'));
 		var src;
 		resp['Success'] ? src = 'success' : src = 'error';
-		var img = document.createElement('img');
+		var img = new Element('img');
 		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 		img.setAttribute('style', 'padding-right: 5px;');
 		tdiv.appendChild(img);
 		tdiv.appendChild(document.createTextNode(resp['Duration'] + ' on'));
-		tdiv.appendChild(document.createElement('br'));
+		tdiv.appendChild(new Element('br'));
 		tdiv.appendChild(document.createTextNode(resp['Hostname']));
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 		td.appendChild(tdiv);
 		tr.appendChild(td);
 		tab.appendChild(tr);
 
 		// User
-		var udiv = document.createElement('div');
+		var udiv = new Element('div');
 		udiv.setAttribute('class', 'user');
 		udiv.appendChild(document.createTextNode('Job initiated by ' + resp['User']));
-		udiv.appendChild(document.createElement('br'));
+		udiv.appendChild(new Element('br'));
 		udiv.appendChild(document.createTextNode('Exit status: '));
-		udiv.appendChild(document.createElement('br'));
-		var exit_s = document.createElement('span');
+		udiv.appendChild(new Element('br'));
+		var exit_s = new Element('span');
 		var txt;
 		resp['Success'] ? txt = 'success' : txt = 'failure';
 		exit_s.setAttribute('class', 'exit_' + txt);
@@ -530,8 +530,8 @@ var {{ plugin.id }} = {
 	
 		// Grading
 		if (resp['Success']) {
-			var gdiv = document.createElement('div');
-			var a = document.createElement('a');
+			var gdiv = new Element('div');
+			var a = new Element('a');
 			if (resp['GradingCount'] > 0) {
 				gdiv.setAttribute('class', 'notgraded');
 				a.setAttribute('href', "/youpi/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
@@ -541,7 +541,7 @@ var {{ plugin.id }} = {
 			else {
 				gdiv.setAttribute('class', 'notgraded');
 				gdiv.appendChild(document.createTextNode('Image not graded yet'));
-				gdiv.appendChild(document.createElement('br'));
+				gdiv.appendChild(new Element('br'));
 				a.setAttribute('href', "/youpi/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
 				a.appendChild(document.createTextNode('Grade it now !'));
 				gdiv.appendChild(a);
@@ -549,10 +549,10 @@ var {{ plugin.id }} = {
 			td.appendChild(gdiv);
 		}
 	
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('style', 'padding: 0px');
-		var tab2 = document.createElement('table');
+		var tab2 = new Element('table');
 		tab2.setAttribute('class', 'qfits-result-entry-params');
 		td.appendChild(tab2);
 		tr.appendChild(td);
@@ -560,9 +560,9 @@ var {{ plugin.id }} = {
 	
 		// Thumbnails when successful
 		if (resp['Success']) {
-			tr = document.createElement('tr');
+			tr = new Element('tr');
 			tr.setAttribute('class', 'qfits-result-entry-tn');
-			td = document.createElement('td');
+			td = new Element('td');
 			td.setAttribute('onclick', "window.open('" + resp['WWW'] + "');");
 			td.setAttribute('onmouseover', "this.setAttribute('class', 'qfits-result-entry-complete-on');");
 			td.setAttribute('onmouseout', "this.setAttribute('class', 'qfits-result-entry-complete-off');");
@@ -570,7 +570,7 @@ var {{ plugin.id }} = {
 			td.appendChild(document.createTextNode('See full QFits web page'));
 			tr.appendChild(td);
 	
-			td = document.createElement('td');
+			td = new Element('td');
 			var tns = ['bkg_histo', 'bkg_m', 'ell', 'fwhm_histo', 'gal_histo', 'm', 'psf_m', 'rhmag_gal', 'rhmag_star', 'rhmag', 'star_histo', 'wmm'];
 			var tn, a;
 			for (var k=0; k < tns.length; k++) {
@@ -596,40 +596,40 @@ var {{ plugin.id }} = {
 		// QFits-in processing history
 		// Header title
 		var hist = resp['QFitsHistory'];
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		td.setAttribute('class', 'qfits-result-header-title');
 		td.appendChild(document.createTextNode('QualityFITS-In processing history (' + hist.length + ')'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
-		htab = document.createElement('table');
+		htab = new Element('table');
 		htab.setAttribute('class', 'qfits-result-history');
 		td.appendChild(htab);
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		for (var k=0; k < hist.length; k++) {
-			tr = document.createElement('tr');
+			tr = new Element('tr');
 			// Emphasis of current history entry
 			if (resp['TaskId'] == hist[k]['TaskId']) {
 				tr.setAttribute('class', 'history-current');
 			}
 	
 			// Icon
-			td = document.createElement('td');
+			td = new Element('td');
 			var src = hist[k]['Success'] ? 'success' : 'error';
-			var img = document.createElement('img');
+			var img = new Element('img');
 			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 			td.appendChild(img);
 			tr.appendChild(td);
 	
 			// Grading count
-			td = document.createElement('td');
+			td = new Element('td');
 			var gtxt = 'Not graded';
 			if (hist[k]['GradingCount'] > 0) 
 				gtxt = 'Graded (x' + hist[k]['GradingCount'] + ')';
@@ -637,27 +637,27 @@ var {{ plugin.id }} = {
 			tr.appendChild(td);
 
 			// Date-time, duration
-			td = document.createElement('td');
-			var a = document.createElement('a');
+			td = new Element('td');
+			var a = new Element('a');
 			a.setAttribute('href', '/youpi/results/{{ plugin.id }}/' + hist[k]['TaskId'] + '/');
 			a.appendChild(document.createTextNode(hist[k]['Start'] + ' (' + hist[k]['Duration'] + ')'));
 			td.appendChild(a);
 			tr.appendChild(td);
 	
 			// Hostname
-			td = document.createElement('td');
+			td = new Element('td');
 			td.appendChild(document.createTextNode(hist[k]['Hostname']));
 			tr.appendChild(td);
 	
 			// User
-			td = document.createElement('td');
+			td = new Element('td');
 			td.appendChild(document.createTextNode(hist[k]['User']));
 			tr.appendChild(td);
 	
 			// Reprocess option
-			td = document.createElement('td');
+			td = new Element('td');
 			td.setAttribute('class', 'reprocess');
-			img = document.createElement('img');
+			img = new Element('img');
 			img.setAttribute('onclick', "{{ plugin.id }}.reprocess_image('" + hist[k]['FitsinId'] + "');");
 			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 			td.appendChild(img);
@@ -668,81 +668,81 @@ var {{ plugin.id }} = {
 	
 		// QualityFits run parameters
 		// Image
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		td.setAttribute('class', 'qfits-result-header-title');
 		td.appendChild(document.createTextNode('QualityFITS run parameters'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.appendChild(document.createTextNode('Image:'));
 		tr.appendChild(td);
 	
-		td = document.createElement('td');
+		td = new Element('td');
 		td.appendChild(document.createTextNode(resp['ImgPath'] + resp['ImgName'] + '.fits'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		// Flat
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.appendChild(document.createTextNode('Flat:'));
 		tr.appendChild(td);
 	
-		td = document.createElement('td');
+		td = new Element('td');
 		td.appendChild(document.createTextNode(resp['Flat']));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		// Mask
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.appendChild(document.createTextNode('Mask:'));
 		tr.appendChild(td);
 	
-		td = document.createElement('td');
+		td = new Element('td');
 		td.appendChild(document.createTextNode(resp['Mask']));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		// Region
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.appendChild(document.createTextNode('Reg:'));
 		tr.appendChild(td);
 
 		var m = resp['Reg'].length > 0 ? reps['Reg'] : '--';
-		td = document.createElement('td');
+		td = new Element('td');
 		td.appendChild(document.createTextNode(m));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		// Output directory
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('nowrap', 'nowrap');
 		td.appendChild(document.createTextNode('Results output dir:'));
 		tr.appendChild(td);
 
-		td = document.createElement('td');
+		td = new Element('td');
 		td.appendChild(document.createTextNode(resp['ResultsOutputDir']));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		// QF Config file
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		if (resp['Success']) {
 			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 		}
-		var cdiv = document.createElement('div');
+		var cdiv = new Element('div');
 		cdiv.setAttribute('id', 'config-' + resp['TaskId']);
 		cdiv.setAttribute('style', 'height: 300px; overflow: auto; background-color: black; padding-left: 5px; display: none; width: 550px;')
-		var pre = document.createElement('pre');
+		var pre = new Element('pre');
 		pre.appendChild(document.createTextNode(resp['Config']));
 		cdiv.appendChild(pre);
 		tr.appendChild(td);
@@ -756,14 +756,14 @@ var {{ plugin.id }} = {
 
 		// Error log file when failure
 		if (!resp['Success']) {
-			tr = document.createElement('tr');
-			td = document.createElement('td');
+			tr = new Element('tr');
+			td = new Element('td');
 			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 			td.setAttribute('colspan', '2');
-			var cdiv = document.createElement('div');
+			var cdiv = new Element('div');
 			cdiv.setAttribute('id', 'log-' + resp['TaskId']);
 			cdiv.setAttribute('style', 'height: 200px; overflow: auto; background-color: black; padding-left: 5px; display: none; width: 550px;')
-			var pre = document.createElement('pre');
+			var pre = new Element('pre');
 			pre.appendChild(document.createTextNode(resp['Log']));
 			cdiv.appendChild(pre);
 			tr.appendChild(td);
@@ -778,16 +778,16 @@ var {{ plugin.id }} = {
 
 		// Image information
 		// Header title
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		td.setAttribute('class', 'qfits-result-header-title');
 		td.appendChild(document.createTextNode('Image information'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		if (resp['Success']) {
 			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
@@ -799,16 +799,16 @@ var {{ plugin.id }} = {
 		// QFits information
 		// Header title
 		if (resp['Success']) {
-			tr = document.createElement('tr');
-			td = document.createElement('td');
+			tr = new Element('tr');
+			td = new Element('td');
 			td.setAttribute('colspan', '2');
 			td.setAttribute('class', 'qfits-result-header-title');
 			td.appendChild(document.createTextNode('QualityFits information'));
 			tr.appendChild(td);
 			tab2.appendChild(tr);
 
-			tr = document.createElement('tr');
-			td = document.createElement('td');
+			tr = new Element('tr');
+			td = new Element('td');
 			td.setAttribute('colspan', '2');
 			tr.appendChild(td);
 			td.appendChild({{ plugin.id }}.getDynTable(resp['QFitsInfo'], 4));
@@ -817,13 +817,13 @@ var {{ plugin.id }} = {
 
 		// QFits results ingestion log, if any (only when QF was successful)
 		if (resp['ResultsLog']) {
-			tr = document.createElement('tr');
-			td = document.createElement('td');
+			tr = new Element('tr');
+			td = new Element('td');
 			td.setAttribute('colspan', '2');
-			var cdiv = document.createElement('div');
+			var cdiv = new Element('div');
 			cdiv.setAttribute('id', 'qflog-' + resp['TaskId']);
 			cdiv.setAttribute('style', 'height: 200px; overflow: auto; background-color: black; padding-left: 5px; display: none')
-			var pre = document.createElement('pre');
+			var pre = new Element('pre');
 			pre.appendChild(document.createTextNode(resp['ResultsLog']));
 			cdiv.appendChild(pre);
 			tr.appendChild(td);
@@ -843,18 +843,18 @@ var {{ plugin.id }} = {
 			if (resp['GradingCount'] > 0) {
 				var graddiv;
 				var gradwid;
-				var gtab = document.createElement('table');
+				var gtab = new Element('table');
 				gtab.setAttribute('class', 'qfits-result-entry-grades');
 				gdiv.appendChild(gtab);
 				for (var g=0; g < resp['Grades'].length; g++) {
-					tr = document.createElement('tr');
-					td = document.createElement('td');
+					tr = new Element('tr');
+					td = new Element('td');
 					td.appendChild(document.createTextNode(resp['Grades'][g][1]));
 					tr.appendChild(td);
 					gtab.appendChild(tr);
 
-					td = document.createElement('td');
-					graddiv = document.createElement('div');
+					td = new Element('td');
+					graddiv = new Element('div');
 					graddiv.setAttribute('align', 'right');
 					graddiv.setAttribute('id', 'grade_div_' + g);
 					td.appendChild(graddiv);
@@ -867,7 +867,7 @@ var {{ plugin.id }} = {
 					gradwid.setActive(false);
 					gradwid.setCharGrade(resp['Grades'][g][1]);
 
-					td = document.createElement('td');
+					td = new Element('td');
 					td.appendChild(document.createTextNode(resp['Grades'][g][0]));
 					tr.appendChild(td);
 				}
@@ -877,8 +877,8 @@ var {{ plugin.id }} = {
 
 	getTabId: function(ul_id) {
 		// Looking for tab's id
-		//var ul = document.getElementById('tabnav2');
-		var ul = document.getElementById(ul_id);
+		//var ul = $('tabnav2');
+		var ul = $(ul_id);
 		var lis = ul.getElementsByTagName('li');
 		var i=0;
 		for (i=0; i < lis.length; i++) {
@@ -891,10 +891,10 @@ var {{ plugin.id }} = {
 	},
 
 	selectImages: function() {
-		var root = document.getElementById('menuitem_sub_0');
+		var root = $('menuitem_sub_0');
 		root.setAttribute('align', 'center');
 		// Container of the ImageSelector widget
-		var div = document.createElement('div');
+		var div = new Element('div');
 		div.setAttribute('id', '{{ plugin.id }}_results_div');
 		div.setAttribute('align', 'center');
 		root.appendChild(div);
@@ -911,7 +911,7 @@ var {{ plugin.id }} = {
 			null,
 			// Custom handler for results
 			function(resp) {
-				var container = document.getElementById(container_id);
+				var container = $(container_id);
 				container.setAttribute('style', 'color: red');
 				r = resp['result'];
 				container.innerHTML = getLoadingHTML('Cancelling job');
@@ -935,7 +935,7 @@ var {{ plugin.id }} = {
 		 * is activated.
 		 *
 		 */
-		var nav = document.getElementById('menu');
+		var nav = $('menu');
 		var current = {{ plugin.id }}.getTabId('menu');
 		var curNode = nav.getElementsByTagName('a')[current];
 		if (curNode.firstChild.nodeValue != 'QualityFITS job monitoring') {
@@ -948,7 +948,7 @@ var {{ plugin.id }} = {
 			// Custom handler for results
 			function(resp) {
 				r = resp['result'][0];
-				var div = document.createElement('div');
+				var div = new Element('div');
 				div.setAttribute('align', 'center');
 
 				if (r.length == 0) {
@@ -961,14 +961,14 @@ var {{ plugin.id }} = {
 					return;
 				}
 
-				var table = document.createElement('table');
+				var table = new Element('table');
 				table.setAttribute('class', 'jobMonitor');
 				var tr, th, td, cls;
 
 				// Page info
 				if (resp['result'][2] > 1) {
 					{{ plugin.id }}_gNextPage = resp['result'][3];
-					var pdiv = document.createElement('div');
+					var pdiv = new Element('div');
 					pdiv.appendChild(document.createTextNode('Show page: '));
 					var a;
 					for (var p=0; p < resp['result'][2]; p++) {
@@ -977,14 +977,14 @@ var {{ plugin.id }} = {
 							continue;
 						}
 
-						a = document.createElement('a');
+						a = new Element('a');
 						a.setAttribute('href', '#');
-						a.setAttribute('onclick', '{{ plugin.id }}_gNextPage=' + (p+1) + "; document.getElementById('{{ plugin.id }}_current_page_div').innerHTML = getLoadingHTML('Loading page " + (p+1) + "');");
+						a.setAttribute('onclick', '{{ plugin.id }}_gNextPage=' + (p+1) + "; $('{{ plugin.id }}_current_page_div').innerHTML = getLoadingHTML('Loading page " + (p+1) + "');");
 						a.appendChild(document.createTextNode(' ' + (p+1) + ' '));
 						pdiv.appendChild(a);
 					}
 					div.appendChild(pdiv);
-					pdiv = document.createElement('div');
+					pdiv = new Element('div');
 					pdiv.setAttribute('id', '{{ plugin.id }}_current_page_div');
 					pdiv.setAttribute('class', 'currentPage');
 					pdiv.appendChild(document.createTextNode('Page ' + {{ plugin.id }}_gNextPage + ' / ' + resp['result'][2]));
@@ -992,11 +992,11 @@ var {{ plugin.id }} = {
 				}
 
 				// Table header
-				tr = document.createElement('tr');
+				tr = new Element('tr');
 				tr.setAttribute('class', 'jobHeader');
 				var header = ['Item ID', 'Job ID', 'Info', 'Remote host', 'Run time', 'Status', 'Action'];
 				for (var j=0; j < header.length; j++) {
-					th = document.createElement('th');
+					th = new Element('th');
 					th.appendChild(document.createTextNode(header[j]));
 					tr.appendChild(th);
 				}
@@ -1005,51 +1005,51 @@ var {{ plugin.id }} = {
 				// Various divs
 				var tabi, tabitr, tabitd;
 				for (var j=0; j < r.length; j++) {
-					tr = document.createElement('tr');
+					tr = new Element('tr');
 
-					td = document.createElement('td');
+					td = new Element('td');
 					td.setAttribute('class', 'jobId');
 					td.appendChild(document.createTextNode(r[j]['UserData']['ItemID']));
 					tr.appendChild(td);
 
-					td = document.createElement('td');
+					td = new Element('td');
 					td.setAttribute('class', 'jobId');
 					td.appendChild(document.createTextNode(r[j]['ClusterId'] + '.' + r[j]['ProcId']));
 					tr.appendChild(td);
 
-					td = document.createElement('td');
+					td = new Element('td');
 					td.setAttribute('class', 'info');
-					tabi = document.createElement('table');
+					tabi = new Element('table');
 					tabi.setAttribute('class', 'info');
 
-					tabitr = document.createElement('tr');
-					tabitd = document.createElement('td');
+					tabitr = new Element('tr');
+					tabitd = new Element('td');
 					tabitd.appendChild(document.createTextNode('File'));
 					tabitd.setAttribute('class', 'label');
 					tabitr.appendChild(tabitd);
-					tabitd = document.createElement('td');
+					tabitd = new Element('td');
 					tabitd.setAttribute('class', 'file');
 					tabitd.appendChild(document.createTextNode(r[j]['FitsFile']));
 					tabitr.appendChild(tabitd);
 					tabi.appendChild(tabitr);
 
-					tabitr = document.createElement('tr');
-					tabitd = document.createElement('td');
+					tabitr = new Element('tr');
+					tabitd = new Element('td');
 					tabitd.appendChild(document.createTextNode('CSF'));
 					tabitd.setAttribute('class', 'label');
 					tabitr.appendChild(tabitd);
-					tabitd = document.createElement('td');
+					tabitd = new Element('td');
 					tabitd.setAttribute('class', 'file');
 					tabitd.appendChild(document.createTextNode(r[j]['UserData']['SubmissionFile']));
 					tabitr.appendChild(tabitd);
 					tabi.appendChild(tabitr);
 
-					tabitr = document.createElement('tr');
-					tabitd = document.createElement('td');
+					tabitr = new Element('tr');
+					tabitd = new Element('td');
 					tabitd.appendChild(document.createTextNode('QF'));
 					tabitd.setAttribute('class', 'label');
 					tabitr.appendChild(tabitd);
-					tabitd = document.createElement('td');
+					tabitd = new Element('td');
 					tabitd.setAttribute('class', 'file');
 					tabitd.appendChild(document.createTextNode(r[j]['UserData']['ConfigFile']));
 					tabitr.appendChild(tabitd);
@@ -1058,12 +1058,12 @@ var {{ plugin.id }} = {
 					try {
 						warns = r[j]['UserData']['Warnings'][r[j]['FitsFile']];
 						for (var k=0; k < warns.length; k++) {
-							tabitr = document.createElement('tr');
-							tabitd = document.createElement('td');
+							tabitr = new Element('tr');
+							tabitd = new Element('td');
 							tabitd.appendChild(document.createTextNode('Warn'));
 							tabitd.setAttribute('class', 'label');
 							tabitr.appendChild(tabitd);
-							tabitd = document.createElement('td');
+							tabitd = new Element('td');
 							tabitd.setAttribute('class', 'warning');
 							tabitd.appendChild(document.createTextNode(warns[k]));
 							tabitr.appendChild(tabitd);
@@ -1074,17 +1074,17 @@ var {{ plugin.id }} = {
 					td.appendChild(tabi);
 					tr.appendChild(td);
 
-					td = document.createElement('td');
+					td = new Element('td');
 					td.setAttribute('class', 'jobRemoteHost');
 					td.appendChild(document.createTextNode(r[j]['RemoteHost'] ? r[j]['RemoteHost'] : '-'));
 					tr.appendChild(td);
 
-					td = document.createElement('td');
+					td = new Element('td');
 					td.setAttribute('class', 'jobDuration');
 					td.appendChild(document.createTextNode(r[j]['JobDuration'] ? r[j]['JobDuration'] : '-'));
 					tr.appendChild(td);
 
-					td = document.createElement('td');
+					td = new Element('td');
 					td.setAttribute('class', 'jobCurrentStatus');
 
 					var st = r[j]['JobStatus'];
@@ -1110,17 +1110,17 @@ var {{ plugin.id }} = {
 					tr.appendChild(td);
 
 					// Actions
-					td = document.createElement('td');
+					td = new Element('td');
 					var tdid = '{{ plugin.internal_name }}_cancel_' + j;
 					td.setAttribute('class', 'jobActions');
 					td.setAttribute('id', tdid);
 					/*
-					but = document.createElement('input');
+					but = new Element('input');
 					but.setAttribute('type', 'button');
 					but.setAttribute('value', 'Cancel');
 					*/
 
-					img = document.createElement('img');
+					img = new Element('img');
 					td.appendChild(img);
 					img.setAttribute('style', 'cursor: pointer');
 					img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/16x16/cancel.png');
@@ -1317,7 +1317,7 @@ var {{ plugin.id }} = {
 	},
 
 	renderOutputDirStats: function(container_id) {
-		var container = document.getElementById(container_id);
+		var container = $(container_id);
 		container.innerHTML = '';
 
 		// global var defined in results.html
@@ -1325,21 +1325,21 @@ var {{ plugin.id }} = {
 		var stats = resp['Stats'];
 		var reprocess_len = stats['ReprocessTaskList'].length;
 
-		var tab = document.createElement('table');
+		var tab = new Element('table');
 		tab.setAttribute('class', 'output_dir_stats');
 		var tr,th,td;
-		var tr = document.createElement('tr');
+		var tr = new Element('tr');
 		// Header
 		var header = ['Image success', 'Image failures', 'Images processed', 'Task success', 'Task failures', 'Total processings'];
 		var cls = ['image_success', 'image_failure', 'image_total', 'task_success', 'task_failure', 'task_total'];
 		for (var k=0; k < header.length; k++) {
-			th = document.createElement('th');
+			th = new Element('th');
 			th.setAttribute('class', cls[k]);
 			th.setAttribute('colspan', '2');
 			th.appendChild(document.createTextNode(header[k]));
 			if (k == 1 && reprocess_len) {
-				th.appendChild(document.createElement('br'));
-				var rimg = document.createElement('img');
+				th.appendChild(new Element('br'));
+				var rimg = new Element('img');
 				rimg.setAttribute('onclick', resp['PluginId'] + "_reprocessAllFailedProcessings('" + stats['ReprocessTaskList'] + "');");
 				rimg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 				rimg.setAttribute('style', 'cursor: pointer;');
@@ -1349,11 +1349,11 @@ var {{ plugin.id }} = {
 		}
 		tab.appendChild(tr);
 
-		tr = document.createElement('tr');
+		tr = new Element('tr');
 		var val, percent, cls;
 		for (var k=0; k < header.length; k++) {
-			c_td = document.createElement('td');
-			p_td = document.createElement('td');
+			c_td = new Element('td');
+			p_td = new Element('td');
 			switch (k) {
 				case 0:
 					val = stats['ImageSuccessCount'][0];
@@ -1398,33 +1398,33 @@ var {{ plugin.id }} = {
 		tab.appendChild(tr);
 		container.appendChild(tab);
 
-		var idiv = document.createElement('div');
+		var idiv = new Element('div');
 		idiv.setAttribute('id', '{{ plugin.id }}_stats_info_div');
 		idiv.setAttribute('style', 'margin-top: 20px;');
 		container.appendChild(idiv);
 
 		if (!reprocess_len) return;
 
-		var ldiv = document.createElement('div');
+		var ldiv = new Element('div');
 		ldiv.setAttribute('style', 'margin-top: 20px;');
 
-		var tdiv = document.createElement('div');
+		var tdiv = new Element('div');
 		tdiv.setAttribute('class', 'stats_error_log_title');
 		tdiv.appendChild(document.createTextNode('Error logs for failed images'));
 		ldiv.appendChild(tdiv);
 
-		var bdiv = document.createElement('div');
+		var bdiv = new Element('div');
 		bdiv.setAttribute('style', 'margin-top: 20px; width: 70%;');
 
-		var imgdiv = document.createElement('div');
+		var imgdiv = new Element('div');
 		imgdiv.setAttribute('style', 'float: left;');
 
-		var imgSel = document.createElement('select');
+		var imgSel = new Element('select');
 		imgSel.setAttribute('id', '{{ plugin.id }}_stats_img_sel_select');
 		imgSel.setAttribute('size', 15);
 		var opt;
 		for (var k=0; k < stats['ImagesTasks'].length; k++) {
-			opt = document.createElement('option');
+			opt = new Element('option');
 			opt.setAttribute('value', stats['ImagesTasks'][k][0]);	
 			opt.appendChild(document.createTextNode(stats['ImagesTasks'][k][1]));	
 			imgSel.appendChild(opt);
@@ -1433,7 +1433,7 @@ var {{ plugin.id }} = {
 		imgdiv.appendChild(imgSel);
 		bdiv.appendChild(imgdiv);
 
-		var logdiv = document.createElement('div');
+		var logdiv = new Element('div');
 		logdiv.setAttribute('id', '{{ plugin.id }}_stats_log_div');
 		logdiv.setAttribute('style', 'width: 700px; height: 300px; text-align: left; overflow: auto; background-color: black; color: white; padding-left: 5px;')
 		bdiv.appendChild(logdiv);
@@ -1448,7 +1448,7 @@ var {{ plugin.id }} = {
 	},
 
 	getTaskLog: function(container_id, taskId) {
-		var container = document.getElementById(container_id);
+		var container = $(container_id);
 		var r = new HttpRequest(
 				container_id,
 				null,	

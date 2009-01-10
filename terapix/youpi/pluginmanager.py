@@ -35,6 +35,42 @@ class ProcessingPlugin:
 		# Used to generate rather unique item ID in shopping cart
 		self.itemCounter = 0
 
+	def getConfigFileNames(self, request):
+		# Updates entry
+		configs = ConfigFile.objects.filter(kind__name__exact = self.id)
+		if not len(configs):
+			self.__saveDefaultConfigFileToDB(request)
+			configs = ConfigFile.objects.filter(kind__name__exact = self.id)
+
+		res = []
+		for config in configs:
+			res.append(str(config.name))
+
+		return { 'configs' : res }
+
+	def __saveDefaultConfigFileToDB(self, request):
+		"""
+		Looks into DB (youpi_configfiles table) if an entry for a default configuration file. 
+		If not creates one with the embedded default content.
+		"""
+
+		try:
+			f = open(os.path.join('terapix', 'youpi', 'plugins', 'conf', self.id + '.conf.default'))
+			config = string.join(f.readlines())
+			f.close()
+		except IOError, e:
+			raise PluginError, "Default config file for %s: %s" % (self.id, e)
+
+		k = Processing_kind.objects.filter(name__exact = self.id)[0]
+		try:
+			m = ConfigFile(kind = k, name = 'default', content = config, user = request.user)
+			m.save()
+		except:
+			# Cannot save, already exits: do nothing
+			pass
+
+		return config
+
 	def getOutputDirStats(self, outputDir):
 		"""
 		Return some skeleton-related statistics about processings from outputDir.
