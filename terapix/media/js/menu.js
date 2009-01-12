@@ -50,7 +50,8 @@ function SubMenu(container, entries) {
 				_entries.each(function(entry, j) {
 					divs.push($('menuitem_sub_' + j));
 				});
-				divs.push($('menuitem_sub_about'));
+				if ($('menuitem_sub_about'))
+					divs.push($('menuitem_sub_about'));
 
 				// Deals with divs
 				divs.each(function(div) { div.hide(); });

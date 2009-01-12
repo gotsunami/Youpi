@@ -140,17 +140,7 @@ function load_config() {
 
 <!-- Main body -->
 {% block content %}
-<div>
-	<ul class="smart_tabnav_sub" id="menu">
-		<li class="enabled">
-			<a 	href="#" id="entry_0" 
-				onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Themes</a>
-		</li>
-		<li class="disabled">
-			<a 	href="#" id="entry_1" 
-				onclick="swap_display(this.id, 'menuitem_sub_1', 'menu', 'menuitem_sub_');">Default Condor Setup</a>
-		</li>
-	</ul>
+<div id="submenu">
 	<div style="width: 100%" id="menuitem_sub_0">
 		<div id="current_theme_div" class="themes">
 			<h1>Current Theme</h1>
@@ -238,9 +228,13 @@ function load_config() {
 </div>
 
 <script type="text/javascript">
-	show_available_themes();
-	show_current_config_button('top_save_div');
-	show_current_config_button('bottom_save_div');
-	load_config();
+	document.observe('dom:loaded', function() {
+		var m = new SubMenu('submenu', ['Themes', 'Default Condor Setup']);
+
+		show_available_themes();
+		show_current_config_button('top_save_div');
+		show_current_config_button('bottom_save_div');
+		load_config();
+	});
 </script>
 {% endblock %}
