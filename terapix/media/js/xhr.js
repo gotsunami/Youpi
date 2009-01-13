@@ -36,42 +36,40 @@ function createXMLHttpRequest() {
  *
  */
 function HttpRequest(cont, errorHandler, resultHandler) {
-	var busy_msg = 'Loading data';
-	var xhr = createXMLHttpRequest();
-	var container;
+	var _busy_msg = 'Loading data';
+	var _xhr;
+	var _container = $(cont);
+	var _errorHandler;
+	var _resultHandler;
 
-	if (typeof cont == 'string')
-		container = document.getElementById(cont);
-	else if (typeof cont == 'object')
-		container = cont;
-	else if (typeof cont != 'undefined') {
-		alert("HttpRequest: bad container of type '" + typeof cont + "'!");
-		return;
-	}
+	function _main() {
+		_xhr = _createXMLHttpRequest();
+		if (!_xhr) 
+			console.error('No XMLHTTP request support found.');
 
-	if (!container) {
-		// Create fake container (does not attach it to the DOM tree)
-		container = document.createElement('div');
-	}
-
-	// Defaut handlers
-	if (!errorHandler) {
-		var errorHandler = function(msg) {
-			var div = document.createElement('div');
-			var p = document.createElement('p');
-
-			div.setAttribute('class', 'warning');
-			div.setAttribute('style', 'width: 40%');
-			p.appendChild(document.createTextNode(msg));
-			div.appendChild(p);
-			removeAllChildrenNodes(container);
-			container.appendChild(div);
+		if (!_container) {
+			// Create fake container (does not attach it to the DOM tree)
+			_container = new Element('div');
 		}
+
+		// Defaut handlers
+		if (!errorHandler) {
+			var errorHandler = function(msg) {
+				var p = new Element('p');
+				p.update(msg);
+				var div = new Element('div', {'class': 'warning', 'style': 'width: 40%'});
+				div.insert(p);
+
+				_container.update();
+				_container.insert(div);
+			}
+		}
+
+		_errorHandler = errorHandler;
+		_resultHandler = typeof resultHandler == 'function' ? resultHandler : function(json) { alert(json); }
 	}
 
-	var resultHandler = resultHandler || function(json) { alert(json); }
-
-	function createXMLHttpRequest() {
+	function _createXMLHttpRequest() {
 		try { return new ActiveXObject(Msxml2.XMLHTTP); } catch (e) {}
 		try { return new ActiveXObject(Microsoft.XMLHTTP); } catch (e) {}
 		try { return new XMLHttpRequest(); } catch(e) {}
@@ -80,14 +78,13 @@ function HttpRequest(cont, errorHandler, resultHandler) {
 		return null;
 	}
 
-	if (!xhr) return;
 
 	this.setBusyMsg = function(msg) {
-		busy_msg = msg ? msg : busy_msg;
+		_busy_msg = typeof msg == 'string' && msg.length ? msg : _busy_msg;
 	}
 
 	this.getBusyMsg = function() {
-		return busy_msg;
+		return _busy_msg;
 	}
 
 	/*
@@ -97,30 +94,32 @@ function HttpRequest(cont, errorHandler, resultHandler) {
 	 *
 	 */
 	this.send = function(path, data) {
-		xhr.open('post', path);
-		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		_xhr.open('post', path);
+		_xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 1) {
+		_xhr.onreadystatechange = function() {
+			if (_xhr.readyState == 1) {
 				try {
-					container.innerHTML = getLoadingHTML(busy_msg);
+					_container.update(getLoadingHTML(_busy_msg));
 				} catch(e) {
-					container.innerHTML = busy_msg + '...';
+					_container.update(_busy_msg + '...');
 				}
 			}
-			else if (xhr.readyState == 4) {
-				if (xhr.status != 200) {
-					var xhrError = 'Request error. ' + xhr.responseText;
-					errorHandler(xhrError);
+			else if (_xhr.readyState == 4) {
+				if (_xhr.status != 200) {
+					var xhrError = 'Request error. ' + _xhr.responseText;
+					_errorHandler(xhrError);
 					return;
 				}
 	
 				// Parses JSON response
-				var resp = eval('(' + xhr.responseText + ')');
+				var resp = eval('(' + _xhr.responseText + ')');
 				this.lastResponse = resp;
-				resultHandler(resp);
+				_resultHandler(resp);
 			}
 		}
-		xhr.send(data)
+		_xhr.send(data)
 	}
+
+	_main();
 }

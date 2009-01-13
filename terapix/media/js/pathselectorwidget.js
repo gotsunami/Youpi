@@ -10,10 +10,39 @@
  */
 function PathSelectorWidget(container, pluginId)
 {
+	// Group: Constants
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _container
+	 * DOM parent container
+	 *
+	 */ 
 	var _container = $(container);
+	/*
+	 * Var: NO_SELECTION
+	 * String used to show that no selection has been made
+	 *
+	 */ 
 	var NO_SELECTION = '--';
 
-	var plugin_id = pluginId ? pluginId : null;
+
+	// Group: Variables
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: plugin_id
+	 * Internal name of plugin. Used to call AJAX functions
+	 *
+	 */ 
+	var plugin_id = typeof pluginId == 'string' ? pluginId : console.error('plugin_id must be a string for plugin unique ID!');
+	/*
+	 * Var: file_browser
+	 * Internal name of plugin. Used to call AJAX functions
+	 *
+	 */ 
 	var file_browser = null;
 
 	// List of tr DOM nodes to paths
@@ -21,6 +50,18 @@ function PathSelectorWidget(container, pluginId)
 	var tr_prefix = new Array();
 	var tr_mandatory = new Array();
 
+
+	// Group: Functions
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Function: render
+	 * Initial rendering step
+	 *
+	 * This is the main entry point.
+	 *
+	 */ 
 	this.render = function() {
 		var tr, th, td;
 
@@ -83,10 +124,18 @@ function PathSelectorWidget(container, pluginId)
 		d.insert(tab);
 		_container.insert(d);
 
-		loadExistingPaths();
+		_loadExistingPaths();
 	}
 
-	function loadExistingPaths(afterLoadingHandler) {
+	/*
+	 * Function: _loadExistingPaths
+	 * Loads stored data paths into the combobox
+	 *
+	 * Parameters:
+	 *  afterLoadingHandler - function: custom handler to execute (NOT YET IMPLEMENTED)
+	 *
+	 */ 
+	function _loadExistingPaths(afterLoadingHandler) {
 		var handler = afterLoadingHandler ? afterLoadingHandler : null;
 		var r = new HttpRequest(
 			null,
@@ -99,8 +148,7 @@ function PathSelectorWidget(container, pluginId)
 					var prefix = tr_prefix[k];
 					var div = $(plugin_id + '_' + prefix + '_div');
 					var msg_div;
-					removeAllChildrenNodes(div);
-					removeAllChildrenNodes(div);
+					div.update();
 
 					if (resp['result'][prefix].length == 0) {
 						msg_div = $(plugin_id + '_' + prefix + '_msg_div');
@@ -145,6 +193,14 @@ function PathSelectorWidget(container, pluginId)
 		r.send('/youpi/process/plugin/', post);
 	}
 
+	/*
+	 * Function: _savePath
+	 * Loads stored data paths into the combobox
+	 *
+	 * Parameters:
+	 *  prefix - string: 2nd arg of <addPath>
+	 *
+	 */ 
 	function _savePath(prefix) {
 		var div, sel;
 		div = $(plugin_id + '_' + prefix + '_div');
@@ -164,7 +220,7 @@ function PathSelectorWidget(container, pluginId)
 			// Custom handler for results
 			function(resp) {
 				// Refresh data
-				loadExistingPaths();
+				_loadExistingPaths();
 			}
 		);
 	
@@ -172,6 +228,14 @@ function PathSelectorWidget(container, pluginId)
 		r.send('/youpi/process/plugin/', post);
 	}
 
+	/*
+	 * Function: _deletePath
+	 * Deletes currently selected data path
+	 *
+	 * Parameters:
+	 *  prefix - string: 2nd arg of <addPath>
+	 *
+	 */ 
 	function _deletePath(prefix) {
 		var sel = $(plugin_id + '_' + prefix + '_select');
 		var path = sel.options[sel.selectedIndex].text;
@@ -190,7 +254,7 @@ function PathSelectorWidget(container, pluginId)
 			// Custom handler for results
 			function(resp) {
 				// Refresh data
-				loadExistingPaths();
+				_loadExistingPaths();
 			}
 		);
 
@@ -198,10 +262,14 @@ function PathSelectorWidget(container, pluginId)
 		r.send('/youpi/process/plugin/', post);
 	}
 	
-	this.onPathChange = function(prefix, selid) {
-		onPathChange(prefix, selid);
-	}
-		
+	/*
+	 * Function: _onPathChange
+	 * Updates the UI when a new data path is selected
+	 *
+	 * Parameters:
+	 *  prefix - string: 2nd arg of <addPath>
+	 *
+	 */ 
 	function _onPathChange(prefix, selid) {
 		var msg_div = $(plugin_id + '_' + prefix + '_msg_div');
 		if (!selid) {
@@ -233,7 +301,19 @@ function PathSelectorWidget(container, pluginId)
 		}
 	}
 
-	// mandatory: boolean
+	/*
+	 * Function: addPath
+	 * Add a new king of path to the widget
+	 *
+	 * Parameters:
+	 *  title - string: title displayed
+	 *  prefix - string: name of internal prefix name to be used (one word)
+	 *  mandatory - boolean: specify whether this path must not be empty (default: false)
+	 *
+	 * Notes:
+	 *  _prefix_ variable must be one word (no spaces allowed)
+	 *
+	 */ 
 	this.addPath = function(title, prefix, mandatory) {
 		var mandatory = typeof mandatory == 'boolean' ? mandatory : false;
 		var tr, th, td;
@@ -252,23 +332,58 @@ function PathSelectorWidget(container, pluginId)
 		tr_mandatory.push(mandatory);
 	}
 
+	/*
+	 * Function: setFileBrowser
+	 * Attaches to a <FileBrowser> instance
+	 *
+	 * Parameters:
+	 *  fb_obj - object: <FileBrowser> instance
+	 *
+	 * Notes:
+	 *  The <FileBrowser> instance is used to select a data path from the tree.
+	 *
+	 */ 
 	this.setFileBrowser = function(fb_obj) {
 		if (!typeof fb_obj == 'object')
 			console.error('Argument must be a FileBrowser instance, not ' + typeof fb_obj + '!');
 
 		file_browser = fb_obj ? fb_obj : null;
-		file_browser.setBranchClickedHandler(branchClickedHandler);
+		file_browser.setBranchClickedHandler(_branchClickedHandler);
 	}
 
+	/*
+	 * Function: getFileBrowser
+	 * Returns current <FileBrowser> instance
+	 *
+	 * Returns:
+	 *  <FileBrowser> instance
+	 *
+	 */ 
 	this.getFileBrowser = function() {
 		return file_browser;
 	}
 
+	/*
+	 * Function: getBranchClickedHandler
+	 * Returns a reference to <branchClickedhandler> function
+	 *
+	 * Returns:
+	 *  <_branchClickedHandler> instance
+	 *
+	 */ 
 	this.getBranchClickedHandler = function() {
-		return branchClickedHandler;
+		return _branchClickedHandler;
 	}
 
-	function branchClickedHandler(branch) {
+	/*
+	 * Function: _branchClickedHandler
+	 * Custom handler for the <file_browser> private instance.
+	 *
+	 * Parameters:
+	 *  branch - object
+	 *
+	 */ 
+	function _branchClickedHandler(branch) {
 		var id = branch.getId();
 	
 		// Exit if root node or FITS image (leaf)
@@ -289,10 +404,26 @@ function PathSelectorWidget(container, pluginId)
 		}
 	}
 
+	/*
+	 * Function: _getNoSelectionPattern
+	 * Returns the <NO_SELECTION> constant string
+	 *
+	 * Parameters:
+	 *  branch - object
+	 *
+	 */ 
 	this.getNoSelectionPattern = function() {
 		return NO_SELECTION;
 	}
 
+	/*
+	 * Function: getMandatoryPrefixes
+	 * Returns an array of mandatory prefixes
+	 *
+	 * Returns:
+	 *  mandvars - array: mandatory prefixes
+	 *
+	 */ 
 	this.getMandatoryPrefixes = function() {
 		var mandvars = new Array();
 		for (var k=0; k < tr_prefix.length; k++) {

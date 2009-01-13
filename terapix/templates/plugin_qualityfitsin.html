@@ -32,25 +32,25 @@
 			{{ plugin.id }}.monitorJobs(div);
 		});
 
-		var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
-		fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
-		fm_file_browser.setRootTitle('Terapix Cluster');
-		fm_file_browser.setFilteringPatterns(['*.fits', '*.reg']);
-		fm_file_browser.setRootDataPath('/data');
-
-		// Enable user output custom directory
-		plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
-
-		var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
-		selector.addPath('FLAT data', 'flats', true);
-		selector.addPath('MASK data', 'masks', true);
-		selector.addPath('REG data', 'regs');
-		selector.setFileBrowser(fm_file_browser);
-		selector.render();
-
-		// Now file browser can renders itself
-		fm_file_browser.render();
-
 		{{ plugin.id }}.doit();
 	});
+
+	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
+	fm_file_browser.setRootTitle('Terapix Cluster');
+	fm_file_browser.setFilteringPatterns(['*.fits', '*.reg']);
+	fm_file_browser.setRootDataPath('/data');
+
+	// Enable user output custom directory
+	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+
+	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
+	selector.addPath('FLAT data', 'flats', true);
+	selector.addPath('MASK data', 'masks', true);
+	selector.addPath('REG data', 'regs');
+	selector.setFileBrowser(fm_file_browser);
+	selector.render();
+
+	// Now file browser can renders itself
+	fm_file_browser.render();
 </script>

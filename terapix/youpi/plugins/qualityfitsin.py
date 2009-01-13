@@ -54,7 +54,6 @@ class QualityFitsIn(ProcessingPlugin):
 		"""
 		post = request.POST
 		try:
-			#idList = post['IdList'].split(',')
 			idList = eval(post['IdList'])
 			itemID = str(post['ItemID'])
 			flatPath = post['FlatPath']
@@ -96,7 +95,6 @@ class QualityFitsIn(ProcessingPlugin):
 			data = marshal.loads(base64.decodestring(str(it.data)))
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
-						#'idList' 			: [str(i) for i in data['idList']], 
 						'idList' 			: str(data['idList']), 
 						'flatPath' 			: str(data['flatPath']), 
 						'maskPath' 			: str(data['maskPath']), 

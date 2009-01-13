@@ -4,32 +4,110 @@
  * JS code for Swarp plugin.
  *
  */
+var uid = '{{ plugin.id }}';
+
 var {{ plugin.id }} = {
+	/*
+	 * Variable: ims
+	 * 
+	 * <ImageSelector> instance
+	 *
+	 */
+	ims: null,
+
 	/*
 	 * Function: addSelectionToCart
 	 *
 	 */
 	addSelectionToCart: function() {
-		// Do your sanity checks here
-		// FIXME: checks...
-	
+		sels = {{ plugin.id }}.ims.getListsOfSelections();
+
+		if (!sels) {
+			alert('No images selected. Nothing to add to cart !');
+			return;
+		}
+
 		// Custom output directory
-		var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
+		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uid + '/';
 	
 		// Set mandatory structures
-		var p_data = {	plugin_name : '{{ plugin.id }}', 
-					userData : {resultsOutputDir: output_data_path}
+		var p_data = {	plugin_name : uid, 
+						userData : {resultsOutputDir: output_data_path}
 		};
-		alert('TODO...');
-		return;
+
+		// OPTIONAL
+		var wSel = $(uid + '_weights_select');
+		var weightPath = '';
+		if (wSel) {
+			var path = wSel.options[wSel.selectedIndex].text;
+			if (path != selector.getNoSelectionPattern())
+				weightPath = path;
+		}
+
+		// Get config file
+		var cSel = $(uid + '_config_name_select');
+		var config = cSel.options[cSel.selectedIndex].text;
+
+		// Gets custom output directory
+		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
+		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uid + '/';
+
+		if (custom_dir)
+			output_data_path += custom_dir + '/';
+
+		// Finally, add to the shopping cart
+		var total = {{ plugin.id }}.ims.getImagesCount();
+		console.log(total, custom_dir);
+
+		p_data = {	plugin_name	: uid,
+					userData 	: {	'config' : config,
+									'imgList' : sels, 
+									'weightPath' : weightPath,
+									'resultsOutputDir' : output_data_path
+					}
+		};
 	
 		// Add entry into the shopping cart
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
-									alert('TODO...');
+									alert('The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+										') has been\nadded to the cart.');
 								}
 		);
+	},
+
+	/*
+	 * Function displayImageCount
+	 * Renders list of images to be processed as a summary (used in the shopping cart plugin rendering)
+	 *
+	 * Parameters:
+	 *
+	 * imgList - array of arrays of idLists
+	 *
+	 */
+	displayImageCount: function(imgList, container_id) {
+		var container = $(container_id);
+		var imgList = eval(imgList);
+		var c = 0;
+		var txt;
+		imgList.length > 1 ? txt = 'Batch' : txt = 'Single';
+		var selDiv = new Element('div', {'class': 'selectionModeTitle'}).update(txt + ' selection mode:');
+		container.insert(selDiv);
+
+		selDiv = new Element('div', {'class': 'listsOfSelections'});
+
+		for (var k=0; k < imgList.length; k++) {
+			c = imgList[k].toString().split(',').length;
+			if (imgList.length > 1)
+				txt = 'Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '');
+			else
+				txt = c + ' image' + (c > 1 ? 's' : '');
+
+			selDiv.update(txt);
+			selDiv.insert(new Element('br'));
+		}
+		container.insert(selDiv);
 	},
 
 	/*
@@ -41,7 +119,7 @@ var {{ plugin.id }} = {
 	 *  row - integer: for row number
 	 *
 	 */ 
-	run: function(trid, itemId, resultsOutputDir, silent) {
+	run: function(trid, idList, itemId, weightPath, config, resultsOutputDir, swarpId, silent) {
 		var silent = silent == true ? true : false;
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
@@ -60,8 +138,12 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}' + 
+		var post = 	'Plugin=' + uid + 
 					'&Method=process' +
+					'&IdList=' + idList + 
+					'&WeightPath=' + weightPath + 
+					'&SwarpId=' + swarpId + 
+					'&Config=' + config +
 					'&ResultsOutputDir=' + resultsOutputDir +
 					// runtime options related
 					'&' + runopts.clusterPolicy +	
@@ -127,10 +209,10 @@ var {{ plugin.id }} = {
 		container.insert(tab);
 	},
 
-	saveItemForLater: function(trid, itemId, resultsOutputDir) {
+	saveItemForLater: function(trid, idList, itemId, weightPath, resultsOutputDir, config, silent) {
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				'{{ plugin.id}}_result',
+				uid + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -141,8 +223,12 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=saveCartItem' + 
+		var post = 	'Plugin=' + uid + 
+					'&Method=saveCartItem' + 
+					'&IdList=' + idList + 
 					'&ItemID=' + runopts.itemPrefix + itemId +
+					'&WeightPath=' + weightPath + 
+					'&Config=' + config +
 					'&ResultsOutputDir=' + resultsOutputDir;
 		r.send('/youpi/process/plugin/', post);
 	},
@@ -227,8 +313,8 @@ var {{ plugin.id }} = {
 	},
 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_{{ plugin.id }}').update();
-		var div = new Element('div', {'class': 'savedItems', id: '{{ plugin.id }}_saved_items_div'});
+		var cdiv = $('plugin_menuitem_sub_' + uid).update();
+		var div = new Element('div', {'class': 'savedItems', id: uid + '_saved_items_div'});
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
@@ -239,7 +325,7 @@ var {{ plugin.id }} = {
 					div.update();
 	
 					var total = resp['result'].length;
-					var countNode = $('plugin_{{ plugin.id }}_saved_count').update();
+					var countNode = $('plugin_' + uid + '_saved_count').update();
 					var txt;
 					if (total > 0)
 						txt = total + ' item' + (total > 1 ? 's' : '');
@@ -249,7 +335,7 @@ var {{ plugin.id }} = {
 	
 					var table = new Element('table', {'class': 'savedItems'});
 					var tr, th;
-					var icon = new Element('img', {	'src': '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png',
+					var icon = new Element('img', {	'src': '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/' + uid + '.png',
 													'style': 'vertical-align:middle; margin-right: 10px;'
 					});
 	
@@ -261,53 +347,94 @@ var {{ plugin.id }} = {
 					table.insert(tr);
 	
 					tr = new Element('tr');
-					var header = $A(['Date', 'User', 'Name', 'Description', 'Action']);
-					header.each(function(elem) {
-						tr.insert(new Element('th').update(elem));
+					var headers = $A(['Date', 'User', 'Name', '# images', 'Config', 'Paths', 'Action']);
+					headers.each(function(header) {
+						tr.insert(new Element('th').update(header));
 					});
 					table.insert(tr);
 	
 					var delImg, trid;
 					var tabi, tabitr, tabitd;
-					for (var k=0; k < resp['result'].length; k++) {
-						trid = '{{ plugin.id }}_saved_item_' + k + '_tr';
+					resp.result.each(function(res, k) {
+						idLists = res.idList.evalJSON();
+						trid = uid + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
-	
+
 						// Date
-						td = new Element('td').update(resp['result'][k]['date']);
+						td = new Element('td').update(res.date);
 						tr.insert(td);
 	
 						// User
-						td = new Element('td', {'class': 'config'}).update(resp['result'][k]['username']);
+						td = new Element('td', {'class': 'config'}).update(res.username);
 						tr.insert(td);
 	
 						// Name
-						td = new Element('td', {'class': 'name'}).update(resp['result'][k]['name']);
+						td = new Element('td', {'class': 'name'}).update(res.name);
+						tr.insert(td);
+
+						// Images count
+						td = new Element('td', {'class': 'imgCount'});
+						var sp = new Element('span', {'style': 'font-weight: bold; text-decoration: underline;'});
+						sp.update(idLists.length > 1 ? 'Batch' : 'Single');
+						td.insert(sp).insert(new Element('br'));
+
+						idLists.each(function(idList) {
+							td.insert(idList.length).insert(new Element('br'));
+						});
+						tr.insert(td);
+
+						// Config
+						td = new Element('td', {'class': 'config'}).update(res.config);
+						tr.insert(td);
+
+						// Handling paths
+						td = new Element('td');
+						tabi = new Element('table', {'class': 'info'});
+						// Weight
+						tabitr = new Element('tr');
+						tabitd = new Element('td', {'class': 'label'});
+						tabitd.update('Weight: ');
+						tabitr.insert(tabitd);
+						tabitd = new Element('td', {'class': 'file'});
+						if (res.weightPath.length)
+							tabitd.update(reduceString(res.weightPath));
+						else
+							tabitd.update('Not specified');
+						tabitr.insert(tabitd);
+						tabi.insert(tabitr);
+						td.insert(tabi);
 						tr.insert(td);
 	
-						// Description
-						td = new Element('td').update(resp['result'][k]['descr']);
-						tr.insert(td);
-						
 						// Delete
 						td = new Element('td');
 						delImg = new Element('img', {	style: 'margin-right: 5px',
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif',
-														onclick: "{{ plugin.id }}.delSavedItem('" + trid + "', '" + 
-															resp['result'][k]['name'] + "')"
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
+//														onclick: uid + ".delSavedItem('" + trid + "', '" + res.name + "')"
+						});
+						delImg.c_data = {trid: trid, name: res.name};
+						delImg.observe('click', function() {
+							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
 						});
 						td.insert(delImg);
 
-						delImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif',
-														onclick: "{{ plugin.id }}.addToCart('" + resp['result'][k]['resultsOutputDir'] + "')"
+						delImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
+											//			onclick: uid + ".addToCart('" + res.resultsOutputDir + "')"
+						});
+						delImg.c_data = { 	idList: res.idList,
+											config: res.config,
+											weightPath: res.weightPath,
+											resultsOutputDir: res.resultsOutputDir
+						};
+						delImg.observe('click', function() {
+							{{ plugin.id }}.addToCart(this.c_data);
 						});
 						td.insert(delImg);
 
 						tr.insert(td);
 						table.insert(tr);
-					}
-	
-					if (resp['result'].length) {
+					});
+
+					if (resp.result.length) {
 						div.insert(table);
 					}
 					else {
@@ -317,7 +444,7 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
+		var post = 	'Plugin=' + uid + '&Method=getSavedItems';
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -329,7 +456,7 @@ var {{ plugin.id }} = {
 		var reload = false;
 	
 		var r = new HttpRequest(
-				'{{ plugin.id}}_result',
+				uid + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -344,13 +471,17 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=deleteCartItem&Name=' + name;
+		var post = 	'Plugin=' + uid + '&Method=deleteCartItem&Name=' + name;
 		r.send('/youpi/process/plugin/', post);
 	},
 
-	addToCart: function(resultsOutputDir) {
-		var p_data = {	plugin_name : '{{ plugin.id }}', 
-						userData : {'resultsOutputDir' : resultsOutputDir}
+	addToCart: function(data) {
+		var p_data = {	plugin_name : uid,
+						userData :	{ 	'config' 			: data.config,
+										'imgList' 			: data.idList,
+										'weightPath' 		: data.weightPath,
+										'resultsOutputDir' 	: data.resultsOutputDir
+						}
 		};
 	
 		s_cart.addProcessing(p_data,
@@ -366,12 +497,11 @@ var {{ plugin.id }} = {
 		root.setAttribute('align', 'center');
 		// Container of the ImageSelector widget
 		var div = document.createElement('div');
-		div.setAttribute('id', '{{ plugin.id }}_results_div');
+		div.setAttribute('id', uid + '_results_div');
 		div.setAttribute('align', 'center');
 		root.appendChild(div);
 
-		{{ plugin.id }}_ims = new ImageSelector('{{ plugin.id }}_results_div');
-		{{ plugin.id }}_advTab = new AdvancedTable();
-		{{ plugin.id }}_ims.setTableWidget({{ plugin.id }}_advTab);
+		{{ plugin.id }}.ims = new ImageSelector(uid + '_results_div');
+		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
 	}
 };

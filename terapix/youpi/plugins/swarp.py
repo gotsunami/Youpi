@@ -235,7 +235,10 @@ notify_user             = monnerville@iap.fr
 
 		post = request.POST
 		try:
+			idList = eval(post['IdList'])
 			itemID = str(post['ItemID'])
+			weightPath = post['WeightPath']
+			config = post['Config']
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
@@ -244,8 +247,10 @@ notify_user             = monnerville@iap.fr
 		itemName = "%s-%d" % (itemID, len(items)+1)
 
 		# Custom data
-		data = { 'Descr' : "Runs %d %s commands on the cluster" % (self.jobCount, self.command),
-				 'resultsOutputDir' : resultsOutputDir }
+		data = { 'idList' : idList, 
+				 'weightPath' : weightPath, 
+				 'resultsOutputDir' : resultsOutputDir, 
+				 'config' : config }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
 		k = Processing_kind.objects.filter(name__exact = self.id)[0]
@@ -265,16 +270,18 @@ notify_user             = monnerville@iap.fr
 		"""
 		Returns a user's saved items for this plugin 
 		"""
-		# TODO: Only items related to user's groups are returned.
 
-		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
+		# per-user items
+		items = CartItem.objects.filter(kind__name__exact = self.id, user = request.user).order_by('-date')
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username'			: str(it.user.username),
-						'descr' 			: str(data['Descr']),
+						'idList' 			: str(data['idList']), 
+						'weightPath' 		: str(data['weightPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
-						'name' 				: str(it.name) })
+						'name' 				: str(it.name),
+						'config' 			: str(data['config'])})
 
 		return res
