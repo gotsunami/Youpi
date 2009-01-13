@@ -201,7 +201,7 @@ var {{ plugin.id }} = {
 		var selArr = eval(sels);
 		ldac_selection_last_idx = 0;
 	
-		ldac_table = new AdvancedTable('ldac_table');
+		ldac_table = new AdvancedTable();
 		ldac_table.setContainer('ldac_selection_div');
 		ldac_table.setHeaders(['LDAC files to use']);
 		ldac_table.setRowIdsFromColumn(0);
@@ -935,7 +935,7 @@ var {{ plugin.id }} = {
 		root.appendChild(div);
 	
 		ims = new ImageSelector('results_div');
-		advTab = new AdvancedTable('advTab');
+		advTab = new AdvancedTable();
 		ims.setTableWidget(advTab);
 	},
 

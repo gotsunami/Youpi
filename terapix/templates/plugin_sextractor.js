@@ -528,7 +528,7 @@ var {{ plugin.id }} = {
 		root.appendChild(div);
 
 		{{ plugin.id }}_ims = new ImageSelector('{{ plugin.id }}_results_div');
-		{{ plugin.id }}_advTab = new AdvancedTable('{{ plugin.id }}_advTab');
+		{{ plugin.id }}_advTab = new AdvancedTable();
 		{{ plugin.id }}_ims.setTableWidget({{ plugin.id }}_advTab);
 
 		// Sets a custom result handler in order to deselect all entries

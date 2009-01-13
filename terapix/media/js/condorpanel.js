@@ -642,7 +642,7 @@ function CondorPanel(container_id, varName) {
 				td.appendChild(ldiv);
 				var nbidle=0, nbbusy=0, total = resp['results'].length;
 
-				_advT = new AdvancedTable(_instance_name + '.getTable()');
+				_advT = new AdvancedTable();
 				_advT.setContainer(ldiv.id);
 				_advT.setColStyles(['slot', 'state']);
 

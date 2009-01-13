@@ -266,6 +266,15 @@ function proceed_cart() {
 	{% include plugin.jsSource %}
 {% endfor %}
 
+/*
+document.observe('dom:loaded', function() {
+		var m = new SubMenu('submenu', ['Cart items', 'Saved items']);
+		m.setOnClickHandler(1, function() {
+			showSavedItems();
+		});
+});
+*/
+
 </script>
 
 {% endblock %}
@@ -275,7 +284,7 @@ function proceed_cart() {
 
 <div align="center">
 <div style="text-align: center;">
-	<div>
+	<div id="submenu">
 		<ul class="smart_tabnav_sub" id="menu">
 			<li class="enabled">
 				<a 	href="#" id="entry_0" 

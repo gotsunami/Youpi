@@ -2,29 +2,22 @@
  * Class: AdvancedTable
  * Widget to display data into a table with some neat features
  *
- * Note:
- *
- * Please note that this page documents Javascript code. <FileBrowser> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
- *
  * For convenience, private data member names (both variables and functions) start with an underscore.
  *
  * Constructor Parameters:
  *
- * varName - string: global variable name of instance, used internally for public interface definition
- *
  */
-function AdvancedTable(varName) {
+function AdvancedTable() {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 
 	/*
-	 * Var: _instance_name
-	 * Name of instance in global namespace
+	 * Var: _uid
+	 * Unique identifier
 	 *
 	 */ 
-	var _instance_name = varName;
+	var _uid = 'ADVT_' + Math.floor(Math.random() * 999999);
 	/*
 	 * Var: _container
 	 * DOM block container element
@@ -50,7 +43,7 @@ function AdvancedTable(varName) {
 	 * Used when when <_colIdxForRowIds> == -1
 	 *
 	 */
-	var _autoRowIdPrefix = _instance_name + '.row_';
+	var _autoRowIdPrefix = _uid + '.row_';
 	/*
 	 * Var: _userRowIdPrefix
 	 * String prefix used for user-defined row id generation
@@ -58,7 +51,7 @@ function AdvancedTable(varName) {
 	 * Used when when <_colIdxForRowIds> >= 0 
 	 *
 	 */
-	var _userRowIdPrefix = _instance_name + '.';
+	var _userRowIdPrefix = _uid + '.';
 	/*
 	 * Var: _styles
 	 * Array of CSS class names
@@ -198,7 +191,7 @@ function AdvancedTable(varName) {
 			return;
 		}
 
-		var c = document.getElementById(container_id);
+		var c = $(container_id);
 		if (!c) {
 			_error("setContainer: container id '" + container_id + "' not found!");
 			return;
@@ -216,7 +209,7 @@ function AdvancedTable(varName) {
 	 *
 	 */ 
 	this.getContainer = function() {
-		return document.getElementById(_container_id);
+		return $(_container_id);
 	}
 
 	/*
@@ -320,19 +313,19 @@ function AdvancedTable(varName) {
 	 *
 	 */ 
 	function _render() {
-		_container = document.getElementById(_container_id);
+		_container = $(_container_id);
 
-		_mainDiv = document.createElement('div');
+		_mainDiv = new Element('div');
 		_mainDiv.setAttribute('class', 'advancedTable');
 
-		_bodyDiv = document.createElement('div');
+		_bodyDiv = new Element('div');
 		_bodyDiv.setAttribute('class', 'body');
-		_bodyTab = document.createElement('table');
+		_bodyTab = new Element('table');
 
 		if (_headers.length) {
-			_headerDiv = document.createElement('div');
+			_headerDiv = new Element('div');
 			_headerDiv.setAttribute('class', 'header');
-			_headerTab = document.createElement('table');
+			_headerTab = new Element('table');
 			_mainDiv.appendChild(_headerDiv);
 			_headerDiv.appendChild(_headerTab);
 		}
@@ -342,14 +335,14 @@ function AdvancedTable(varName) {
 		_container.appendChild(_mainDiv);
 
 		var tr, th;
-		tr = document.createElement('tr');
+		tr = new Element('tr');
 		var cellw = 100.0/_headers.length;
 
 		if (_headers.length) {
 			for (var k=0; k < _headers.length; k++) {
-				th = document.createElement('th');
+				th = new Element('th');
 	//			th.setAttribute('width', cellw + '%;');
-				th.appendChild(document.createTextNode(_headers[k]));
+				th.insert(_headers[k]);
 				tr.appendChild(th);
 			}
 			_headerTab.appendChild(tr);
@@ -357,8 +350,11 @@ function AdvancedTable(varName) {
 
 		var handler;
 		for (var k=0; k < _rows.length; k++) {
-			tr = document.createElement('tr');
-			tr.setAttribute('onclick', _instance_name + '.toggleRowSelection(' + k + ');');
+			tr = new Element('tr');
+			tr.row_idx = k;
+			tr.observe('click', function() {
+				_toggleRowSelection(this.row_idx);
+			});
 
 			// Use custom CSS class style for this row?
 			if(_rowStyles[k])
@@ -376,14 +372,14 @@ function AdvancedTable(varName) {
 					tr.setAttribute('id', _userRowIdPrefix + row[j]);
 					continue;
 				}
-				td = document.createElement('td');
+				td = new Element('td');
 				try {
 					if (_styles[j])
 						td.setAttribute('class', _styles[j]);
 				} catch(e) {}
 
-				td.appendChild(document.createTextNode(row[j]));
-				tr.appendChild(td);
+				td.insert(row[j]);
+				tr.insert(td);
 			}
 			_bodyTab.appendChild(tr);
 		}
@@ -408,7 +404,7 @@ function AdvancedTable(varName) {
 	}
 
 	/*
-	 * Function: toggleRowSelection
+	 * Function: _toggleRowSelection
 	 * Toggles row selection, possibly executes custom handler
 	 *
 	 * Handler note:
@@ -423,9 +419,9 @@ function AdvancedTable(varName) {
 	 *  <attachEvent>, <_getEventHandler>
 	 *
 	 */ 
-	this.toggleRowSelection = function(row) {
+	function _toggleRowSelection(row) {
 		var rowId = _bodyTab.childNodes[row].id;
-		var r = document.getElementById(rowId);
+		var r = $(rowId);
 		var cls;
 		if (r.getAttribute('class') == 'rowSelected')
 			_rowStyles[row] ? cls =  _rowStyles[row] : cls = '';
@@ -477,7 +473,7 @@ function AdvancedTable(varName) {
 		var rowId, r, cls;
 		for (var k=0; k < _rows.length; k++) { 
 			rowId = _bodyTab.childNodes[k].id;
-			r = document.getElementById(rowId);
+			r = $(rowId);
 			if (selected) 
 				cls = 'rowSelected';
 			else {
@@ -504,7 +500,7 @@ function AdvancedTable(varName) {
 		var selection = '';
 		for (var k=0; k < _rows.length; k++) { 
 			rowId = _bodyTab.childNodes[k].id;
-			r = document.getElementById(rowId);
+			r = $(rowId);
 			if (r.getAttribute('class') == 'rowSelected') {
 				colIdx = _colIdxForRowIds == -1 ? 0 : _colIdxForRowIds;
 				selection += _rows[k][colIdx] + ',';
@@ -553,7 +549,7 @@ function AdvancedTable(varName) {
 		var selection = rowIds.split(',');
 		// Then select rows in the selection
 		for (var k=0; k < selection.length; k++) { 
-			r = document.getElementById(selection[k]);
+			r = $(selection[k]);
 			r.setAttribute('class', 'rowSelected');
 		}	
 	}
@@ -615,7 +611,7 @@ function AdvancedTable(varName) {
 			return;
 		}
 
-		_container = document.getElementById(_container_id);
+		_container = $(_container_id);
 
 		var xhr = new HttpRequest(
 			_container.id,
