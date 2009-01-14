@@ -231,10 +231,6 @@ notify_user             = monnerville@iap.fr
 		# Keep data path only
 		ldac_files = [dat[1] for dat in ldac_files]
 
-		#
-		# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
-		# They are later used by the wrapper script to get the name of error log file easily
-		#
 		userData['ImgID'] = idList
 		userData['Descr'] = str("%s from %d SExtractor catalogs" % (self.optionLabel, len(images)))		# Mandatory for Active Monitoring Interface (AMI)
 		userData['LDACFiles'] = ldac_files
@@ -259,6 +255,7 @@ notify_user             = monnerville@iap.fr
 																request.user.username, 
 																userData['Kind'], 
 																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+
 		condor_submit_entry = """
 arguments               = %s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %s %s -c %s 2>/dev/null
 # YOUPI_USER_DATA = %s

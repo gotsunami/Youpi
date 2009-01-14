@@ -343,6 +343,7 @@ def process(userData, kind_id, argv):
 				raise WrapperError, e
 
 			# Copy XSL stylesheet
+			# FIXME: use custom ConfigFile instead of default one
 			pipe = os.popen("/usr/local/bin/scamp -dd|grep XSL_URL 2>&1") 
 			data = pipe.readlines()
 			pipe.close()
@@ -369,7 +370,53 @@ def process(userData, kind_id, argv):
 
 	elif kind == 'swarp':
 		if exit_code == 0:
+			# FIXME: look for swarp.xml; parse it and look for errors in it
 			success = 1
+
+			try:
+				if HAS_CONVERT:
+					convert = 1
+				else:
+					convert = 0
+				g.setTableName('youpi_plugin_swarp')
+				g.insert(	task_id = int(task_id),
+							#
+							# Swarp config file serialization: base64 encoding over zlib compression
+							#
+							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							www = os.path.join(	WWW_SWARP_PREFIX, 
+												username, 
+												userData['Kind'], 
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							thumbnails = convert
+				)
+				swarp_id = g.con.insert_id()
+			except Exception, e:
+				raise WrapperError, e
+
+			# Copy XSL stylesheet
+			# FIXME: use custom ConfigFile instead of default one
+			pipe = os.popen("/usr/bin/swarp -dd|grep XSL_URL 2>&1") 
+			data = pipe.readlines()
+			pipe.close()
+
+			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
+			shutil.copy(xslPath, userData['ResultsOutputDir'])
+
+			# FIXME: use custom ConfigFile instead of default one
+			pipe = os.popen("/usr/bin/swarp -dd|grep IMAGEOUT_NAME 2>&1") 
+			data = pipe.readlines()
+			pipe.close()
+
+			# Gets image name
+			imgout = re.search(r'(\w+.fits)', data[0]).group(1)
+
+			# Converts produced FITS image into PNG format
+			tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
+			os.system("%s %s -OUTFILE_NAME %s -BINNING 40 2>/dev/null" % (CMD_STIFF, imgout, tiff))
+
+			if HAS_CONVERT:
+				os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
 	else:
 		# Put other processing stuff here
 		pass

@@ -282,6 +282,23 @@ class Plugin_scamp(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class Plugin_swarp(models.Model):
+	# Serialized data (base64 encoding over zlib compression)
+	config = models.TextField(null = True)
+	# Results log
+	log = models.TextField(null = True)
+	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Swarp output HTML data")
+	thumbnails = models.BooleanField('Has image thumbnails', default = False)
+
+	# FKs constraints
+	task = models.ForeignKey(Processing_task, db_column = 'task_id')
+	
+	class Meta:
+		verbose_name = "Swarp plugin"
+
+	def __unicode__(self):
+		return self.name
+
 class Plugin_fitsin(models.Model):
 	"""
 	Related to QualityFITSin plugin

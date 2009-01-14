@@ -41,7 +41,7 @@ class Swarp(ProcessingPlugin):
 		"""
 
 		# FIXME
-		return {'Error': 'Plugin not yet implemented.'}
+		#return {'Error': 'Plugin not yet implemented.'}
 
 		try:
 			idList = eval(request.POST['IdList'])	# List of lists
@@ -90,49 +90,80 @@ class Swarp(ProcessingPlugin):
 
 		return stats
 
-	def __getCondorSubmissionFile(self, request):
+	def __getCondorSubmissionFile(self, request, idList):
 		"""
-		Generates a suitable Condor submission for processing self.command jobs on the cluster.
+		Generates a suitable Condor submission for processing images on the cluster.
+
+		Note that the swarpId variable is used to bypass the config variable: it allows to get the 
+		configuration file content for an already processed image rather by selecting content by config 
+		file name.
 		"""
 
 		post = request.POST
 		try:
-			#
-			# Retreive your POST data here
-			#
-			resultsOutputDir = post['ResultsOutputDir']
 			itemId = str(post['ItemId'])
+			weightPath = post['WeightPath']
+			config = post['Config']
+			swarpId = post['SwarpId']
+			resultsOutputDir = post['ResultsOutputDir']
+			reprocessValid = int(post['ReprocessValid'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
-
-		now = time.time()
-		# Condor submission file
-		csfPath = "/tmp/swarp-%s.txt" % now
-		csf = open(csfPath, 'w')
-
-		# Content of YOUPI_USER_DATA env variable passed to Condor
-		# At least those 3 keys
-		userData = {'Descr' 			: str("%s trying %s" % (self.optionLabel, self.command)),		# Mandatory for Active Monitoring Interface (AMI)
-					'Kind'	 			: self.id,														# Mandatory for AMI, Wrapper Processing (WP)
-					'UserID' 			: str(request.user.id),											# Mandatory for AMI, WP
-					'ItemID' 			: itemId, 
-					'ResultsOutputDir'	: str(resultsOutputDir)											# Mandatory for WP
-				} 
 
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
 
-		# Base64 encoding + marshal serialization
-		# Will be passed as argument 1 to the wrapper script
+		#
+		# Config file selection and storage.
+		#
+		# Rules: 	if swarpId has a value, then the config file content is retreive
+		# 			from the existing Swarp processing. Otherwise, the config file content
+		#			is fetched by name from the ConfigFile objects.
+		#
+		# 			Selected config file content is finally saved to a regular file.
+		#
 		try:
-			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
-		except ValueError:
-			raise ValueError, userData
+			if len(swarpId):
+				config = Plugin_swarp.objects.filter(id = int(swarpId))[0]
+				content = str(zlib.decompress(base64.decodestring(config.config)))
+			else:
+				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
+				content = config.content
+		except Exception, e:
+			raise PluginError, "Unable to use a suitable config file: %s" % e
 
-		# Real command to perform here
-		args = ''
-		for x in range(self.jobCount):
-			args += "arguments = %s %s\nqueue\n" % (encUserData, self.command)
+		now = time.time()
+
+		# Swarp config file
+		customrc = os.path.join('/tmp/', "swarp-config-%s.rc" % now)
+		swrc = open(customrc, 'w')
+		swrc.write(content)
+		swrc.close()
+
+		# Condor submission file
+		csfPath = "/tmp/swarp-condor-%s.txt" % now
+		csf = open(csfPath, 'w')
+
+		# Swarp file containing a list of images to process (one per line)
+		images = Image.objects.filter(id__in = idList)
+		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % now)
+		imgPaths = [os.path.join(img.path, img.name + '.fits') for img in images]
+		swif = open(swarpImgsFile, 'w')
+		swif.write(string.join(imgPaths, '\n'))
+		swif.close()
+
+		# Content of YOUPI_USER_DATA env variable passed to Condor
+		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
+					'UserID' 			: str(request.user.id),				# Mandatory for AMI, WP
+					'ItemID' 			: itemId,
+					'SubmissionFile'	: csfPath, 
+					'ConfigFile' 		: customrc, 
+					'Weight' 			: str(weightPath), 
+					'Descr' 			: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
+					'ResultsOutputDir'	: str(resultsOutputDir)				# Mandatory for WP
+		} 
+
+		step = 0 							# At least step seconds between two job start
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
@@ -144,37 +175,73 @@ class Swarp(ProcessingPlugin):
 # http://clix.iap.fr/youpi/
 #
 
-# Plugin: %s
+# Plugin: %(description)s
 
-executable              = %s/wrapper_processing.py
+executable              = %(wrapper)s/wrapper_processing.py
 universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
-initialdir				= %s
+transfer_input_files    = %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(nop)s/NOP
+initialdir				= %(initdir)s
 transfer_output_files   = NOP
-# YOUPI_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
 log                     = /tmp/SWARP.log.$(Cluster).$(Process)
 error                   = /tmp/SWARP.err.$(Cluster).$(Process)
 output                  = /tmp/SWARP.out.$(Cluster).$(Process)
 notification            = Error
 notify_user             = monnerville@iap.fr
 # Computed Req string
-%s
-%s""" % (	self.description,
-			os.path.join(submit_file_path, 'script'),
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			userData, 
-			base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
-			req, 
-			args )
+%(requirements)s
+""" % {	'description'	: self.description,
+		'wrapper' 		: os.path.join(submit_file_path, 'script'),
+		'settings' 		: submit_file_path, 
+		'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
+		'config' 		: customrc,
+		'swarplist' 	: swarpImgsFile,
+		'nop' 			: submit_file_path, 
+		'initdir' 		: os.path.join(submit_file_path, 'script'),
+		'requirements' 	: req }
 
 		csf.write(condor_submit_file)
+
+		userData['ImgID'] = idList
+		userData['Descr'] = str("%s of %d FITS images" % (self.optionLabel, len(images)))		# Mandatory for Active Monitoring Interface (AMI)
+
+		#
+		# Delaying job startup will prevent "Too many connections" MySQL errors
+		# and will decrease the load of the node that will receive all qualityFITS data
+		# results (PROCESSING_OUTPUT) back. Every job queued will be put to sleep StartupDelay 
+		# seconds
+		#
+		userData['StartupDelay'] = step
+		userData['Warnings'] = {}
+
+		# Base64 encoding + marshal serialization
+		# Will be passed as argument 1 to the wrapper script
+		try:
+			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+		except ValueError:
+			raise ValueError, userData
+
+		swarp_params = "-XSL_URL %sswarp.xsl" % os.path.join(	WWW_SWARP_PREFIX, 
+																request.user.username, 
+																userData['Kind'], 
+																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+
+
+		condor_submit_entry = """
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/swarp %(params)s @%(imgsfile)s -c %(config)s 2>/dev/null
+# YOUPI_USER_DATA = %(userdata)s
+environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
+queue""" %  {	'encuserdata' 	: encUserData, 
+				'params'		: swarp_params,
+				'config'		: os.path.basename(customrc),
+				'userdata'		: userData, 
+				'user'			: request.user.username,
+				'imgsfile'		: os.path.basename(swarpImgsFile),
+				'tpxupload'		: FTP_URL + resultsOutputDir }
+
+		csf.write(condor_submit_entry)
 		csf.close()
 
 		return csfPath
