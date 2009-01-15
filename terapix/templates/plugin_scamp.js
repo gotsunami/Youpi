@@ -659,7 +659,7 @@ var {{ plugin.id }} = {
 	
 		td = document.createElement('td');
 		var ldac_div = document.createElement('div');
-		ldac_div.setAttribute('style', 'height: 100px; overflow: auto; width: 500px;');
+		ldac_div.setAttribute('class', 'min_size');
 		td.appendChild(ldac_div);
 		for (var k=0; k < resp['LDACFiles'].length; k++) {
 			ldac_div.appendChild(document.createTextNode(resp['LDACFiles'][k]));
@@ -689,7 +689,7 @@ var {{ plugin.id }} = {
 		}
 		var cdiv = document.createElement('div');
 		cdiv.setAttribute('id', 'config-' + resp['TaskId']);
-		cdiv.setAttribute('style', 'height: 300px; overflow: auto; background-color: black; padding-left: 5px; display: none; width: 550px;')
+		cdiv.setAttribute('class', 'config_file');
 		var pre = document.createElement('pre');
 		pre.appendChild(document.createTextNode(resp['Config']));
 		cdiv.appendChild(pre);
@@ -698,9 +698,6 @@ var {{ plugin.id }} = {
 
 		var confbox = new DropdownBox(td, 'Toggle Scamp config file view');
 		$(confbox.getContentNode()).insert(cdiv);
-		confbox.setOnClickHandler(function() {
-			$('config-' + resp['TaskId']).toggle();
-		});
 	
 		// Error log file when failure
 		if (!resp['Success']) {

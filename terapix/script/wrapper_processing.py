@@ -415,6 +415,7 @@ def process(userData, kind_id, argv):
 			tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
 			os.system("%s %s -OUTFILE_NAME %s -BINNING 40 2>/dev/null" % (CMD_STIFF, imgout, tiff))
 
+			os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'swarp.png')))
 			if HAS_CONVERT:
 				os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
 	else:

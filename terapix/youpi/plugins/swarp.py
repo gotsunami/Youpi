@@ -258,6 +258,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			raise PluginError, "POST argument error. Unable to process data."
 
 		task = Processing_task.objects.filter(id = taskid)[0]
+		data = Plugin_swarp.objects.filter(task__id = taskid)[0]
 
 		# Error log content
 		if task.error_log:
@@ -265,25 +266,62 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		else:
 			err_log = ''
 
-		#
-		# Result log content, if any show be saved in a custom DB table for the plugin
-		#
-		# data = YourDjangoModel.objects.filter(task__id = taskid)[0]
-		# if data.rlog:
-		#	rlog = str(zlib.decompress(base64.decodestring(data.qflog)))
-		# else:
-		#	rlog = ''
-		#
+		if data.log:
+			swarplog = str(zlib.decompress(base64.decodestring(data.log)))
+		else:
+			swarplog = ''
 
-		return {	'TaskId'	: str(taskid),
-					'Title' 	: str("%s" % self.description),
-					'User' 		: str(task.user.username),
-					'Success' 	: task.success,
-					'Start' 	: str(task.start_date),
-					'End' 		: str(task.end_date),
-					'Duration' 	: str(task.end_date-task.start_date),
-					'Log' 		: err_log
-			}
+		# Get related images
+		rels = Rel_it.objects.filter(task__id = taskid)
+		imgs = [r.image for r in rels]
+
+		# Looks for groups of swarp
+		swarpHistory = Rel_it.objects.filter(image__in = imgs, task__kind__name = self.id).order_by('task')
+		# Finds distinct tasks
+		tasksRelated = []
+		for sh in swarpHistory:
+			if sh.task not in tasksRelated:
+				tasksRelated.append(sh.task)
+
+		gtasks = []
+		# Remove all tasks than depends on more images
+		for t in tasksRelated:
+			r = Rel_it.objects.filter(task = t)
+			if len(r) == len(imgs):
+				gtasks.append(t)
+
+		history = []
+		for st in gtasks:
+			history.append({'User' 			: str(st.user.username),
+							'Success' 		: st.success,
+							'Start' 		: str(st.start_date),
+							'Duration' 		: str(st.end_date-st.start_date),
+							'Hostname' 		: str(st.hostname),
+							'TaskId'		: str(st.id),
+							})
+
+		thumbs = ['swarp.png']
+		if data.thumbnails:
+			thumbs = ['tn_' + thumb for thumb in thumbs]
+
+		return {	'TaskId'			: str(taskid),
+					'Title' 			: str("%s" % self.description),
+					'User' 				: str(task.user.username),
+					'Success' 			: task.success,
+					'Start' 			: str(task.start_date),
+					'End' 				: str(task.end_date),
+					'Duration' 			: str(task.end_date-task.start_date),
+					'WWW' 				: str(data.www),
+					'ResultsOutputDir' 	: str(task.results_output_dir),
+					'ResultsLog'		: swarplog,
+					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
+					'Previews'			: thumbs,
+					'HasThumbnails'		: data.thumbnails,
+					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
+					'History'			: history,
+					'Log' 				: err_log,
+					'Weight'			: str(data.weight),
+		}
 
 	def getResultEntryDescription(self, task):
 		"""

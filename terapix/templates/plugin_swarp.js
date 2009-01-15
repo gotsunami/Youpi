@@ -286,6 +286,153 @@ var {{ plugin.id }} = {
 		td.insert(tab2);
 		tr.insert(td);
 		tab.insert(tr);
+
+		// Thumbnails when successful
+		if (resp.Success) {
+			tr = new Element('tr', {'class': 'scamp-result-entry-tn'});
+			td = new Element('td', {
+					onclick: "window.open('" + resp['WWW'] + "swarp.xml');",
+					onmouseover: "this.setAttribute('class', 'scamp-result-entry-complete-on');",
+					onmouseout: "this.setAttribute('class', 'scamp-result-entry-complete-off');",
+					'class': 'scamp-result-entry-complete-off'
+			});
+			td.update('See Swarp XML file');
+			tr.insert(td);
+	
+			td = new Element('td');
+			var tn, imgpath, a;
+			resp.Previews.each(function(thumb, k) {
+				imgpath = resp.WWW + thumb;
+				a = new Element('a', { href: imgpath.replace(/tn_/, ''), rel: 'lightbox[swarp]', title: 'Swarp bitmap of coadded images' });
+				tn = new Element('img', {
+					src: resp.HasThumbnails ? imgpath : imgpath.replace(/tn_/, ''),
+					'class' : 'scamp-result-entry-tn'
+				}).hide();
+				// Adds a cool fade-in effect
+				$(tn).appear({duration: k/3});
+	
+				if (!resp.HasThumbnails)
+					tn.setAttribute('width', '60px');
+	
+				a.insert(tn);
+				td.insert(a);
+			});
+			tr.insert(td);
+			tab2.insert(tr);
+		}
+
+		// Processing history
+		// Header title
+		var hist = resp.History;
+		tr = new Element('tr');
+		td = new Element('td', { colspan: 2, 'class': 'qfits-result-header-title'});
+		td.insert('Swarp processing history (' + hist.length + ')');
+		tr.insert(td);
+		tab2.insert(tr);
+
+		tr = new Element('tr');
+		td = new Element('td', {colspan: '2'});
+		htab = new Element('table', {'class': 'qfits-result-history'});
+		td.insert(htab);
+		tr.insert(td);
+		tab2.insert(tr);
+	
+		hist.each(function(task) {
+			tr = new Element('tr');
+			// Emphasis of current history entry
+			if (resp.TaskId == task.TaskId)
+				tr.setAttribute('class', 'history-current');
+	
+			// Icon
+			td = new Element('td');
+			var src = task.Success ? 'success' : 'error';
+			var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'});
+			td.insert(img);
+			tr.insert(td);
+	
+			// Date-time, duration
+			td = new Element('td');
+			var a = new Element('a', {href: '/youpi/results/' + uid + '/' + task.TaskId + '/'});
+			a.insert(task.Start + ' (' + task.Duration + ')');
+			td.insert(a);
+			tr.insert(td);
+	
+			// Hostname
+			tr.insert(new Element('td').update(task.Hostname));
+	
+			// User
+			tr.insert(new Element('td').update(task.User));
+	
+			// Reprocess option
+			td = new Element('td', {'class': 'reprocess'});
+			img = new Element('img', {
+				onclick: uid + ".reprocess_image('" + task.TaskId + "');",
+				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
+			});
+			td.insert(img);
+			tr.insert(td);
+	
+			htab.insert(tr);
+		});
+
+		// Run parameters
+		tr = new Element('tr');
+		td = new Element('td');
+		td.setAttribute('colspan', '2');
+		td.setAttribute('class', 'qfits-result-header-title');
+		td.insert('Swarp run parameters');
+		tr.insert(td);
+		tab2.insert(tr);
+
+		tr = new Element('tr');
+		td = new Element('td');
+		td.insert('Input FITS files (' + resp.FITSImages.length + '):');
+		tr.insert(td);
+	
+		td = new Element('td');
+		var img_div = new Element('div', {'class': 'min_size'});
+		td.insert(img_div);
+		resp.FITSImages.each(function(image) {
+			img_div.insert(image).insert(new Element('br'));
+		});
+		tr.insert(td);
+		tab2.insert(tr);
+
+		// Weight
+		tr = new Element('tr');
+		td = new Element('td').insert('Weight:');
+		tr.insert(td);
+
+		td = new Element('td').insert(resp.Weight.length > 0 ? resp.Weight : '--');
+		tr.insert(td);
+		tab2.insert(tr);
+
+		// Output directory
+		tr = new Element('tr');
+		td = new Element('td', {nowrap: 'nowrap'}).update('Results output dir:');
+		tr.insert(td);
+	
+		td = new Element('td').update(resp.ResultsOutputDir);
+		tr.insert(td);
+		tab2.insert(tr);
+	
+		// Config file
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2});
+		if (resp.Success) {
+			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
+		}
+		var cdiv = new Element('div', {
+						id: 'config-' + resp.TaskId,
+						'class': 'config_file'
+		});
+		var pre = new Element('pre').insert(resp.Config);
+		cdiv.insert(pre);
+		tr.insert(td);
+		tab2.insert(tr);
+
+		var confbox = new DropdownBox(td, 'Toggle Swarp config file view');
+		$(confbox.getContentNode()).insert(cdiv);
 	
 		// Error log file when failure
 		if (!resp['Success']) {
@@ -306,6 +453,8 @@ var {{ plugin.id }} = {
 			td.insert(cdiv);
 			tr.insert(td);
 			tab2.insert(tr);
+
+			return;
 		}
 	
 		d.insert(tab);

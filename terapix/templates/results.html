@@ -5,6 +5,15 @@
 <script type="text/javascript" src="/media/js/gradingwidget.js"></script>
 <script type="text/javascript" src="/media/js/processinghistorywidget.js"></script>
 
+<script type="text/javascript">
+// Overwrites default lightbox2 options
+window.LightboxOptions = {
+	resizeSpeed: 8, 
+	overlayOpacity: 0.7,
+	fileLoadingImage: '/media/js/3rdParty/lightbox2/images/loading.gif',
+	fileBottomNavCloseImage: '/media/js/3rdParty/lightbox2/images/closelabel.gif'
+};
+</script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
 <script type="text/javascript" src="/media/js/3rdParty/lightbox2/lightbox.js"></script>
 
@@ -126,12 +135,15 @@ function get_stats() {
 	</table>
 </div>
 <script type="text/javascript">
-	var p = new ProcessingHistoryWidget('history_div', 'p');
-	var pInfo = new Array();
-	{% for plugin in plugins %}
-	pInfo[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.optionLabel }}'];
-	{% endfor %}
-	p.setActivePlugins(pInfo);
-	p.render();
+	var p, pInfo;
+	document.observe('dom:loaded', function() {
+		p = new ProcessingHistoryWidget('history_div', 'p');
+		pInfo = new Array();
+		{% for plugin in plugins %}
+		pInfo[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.optionLabel }}'];
+		{% endfor %}
+		p.setActivePlugins(pInfo);
+		p.render();
+	});
 </script>
 {% endblock %}

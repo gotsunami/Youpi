@@ -1246,3 +1246,18 @@ table.defaultCondorSetup td:first-child {
 	font-weight: bold;
 	color: brown;
 }
+
+div.config_file {
+	height: 300px; 
+	overflow: auto; 
+	background-color: black; 
+	padding-left: 5px; 
+	width: 550px;
+}
+
+div.min_size {
+	height: -moz-fit-content;	
+	max-height: 100px; 
+	overflow: auto; 
+	width: 500px;'
+}

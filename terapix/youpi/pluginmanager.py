@@ -86,6 +86,49 @@ class ProcessingPlugin:
 
 		return config
 
+	def saveConfigFile(self, request):
+		"""
+		Save configuration file to DB
+		"""
+		post = request.POST
+		try:
+			name = str(post['Name'])
+			config = str(post['Content'])
+		except Exception, e:
+			raise PluginError, "Unable to save config file: no name given"
+
+		try:
+			# Updates entry
+			m = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+			m.content = config
+		except:
+			# ... or inserts a new one
+			k = Processing_kind.objects.filter(name__exact = self.id)[0]
+			m = ConfigFile(kind = k, name = name, content = config, user = request.user)
+
+		m.save()
+
+		return name + ' saved'
+
+	def deleteConfigFile(self, request):
+		"""
+		Deletes configuration file to DB
+		"""
+		post = request.POST
+		try:
+			name = str(post['Name'])
+		except Exception, e:
+			raise PluginError, "Unable to delete config file: no name given"
+
+		try:
+			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+		except:
+			raise PluginError, "No config file with that name: %s" % name
+
+		config.delete()
+
+		return name + ' deleted'
+
 	def getOutputDirStats(self, outputDir):
 		"""
 		Return some skeleton-related statistics about processings from outputDir.

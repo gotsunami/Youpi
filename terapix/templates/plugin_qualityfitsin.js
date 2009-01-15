@@ -714,7 +714,7 @@ var {{ plugin.id }} = {
 		td.appendChild(document.createTextNode('Reg:'));
 		tr.appendChild(td);
 
-		var m = resp['Reg'].length > 0 ? reps['Reg'] : '--';
+		var m = resp['Reg'].length > 0 ? resp['Reg'] : '--';
 		td = new Element('td');
 		td.appendChild(document.createTextNode(m));
 		tr.appendChild(td);
