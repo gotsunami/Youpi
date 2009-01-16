@@ -323,6 +323,11 @@ class QualityFitsIn(ProcessingPlugin):
 			else:
 				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
 				content = config.content
+		except IndexError:
+			# Config file not found, maybe one is trying to process data from a saved item 
+			# with a delete configuration file
+			raise PluginError, "The configuration file you want to use for this processing has not been found " + \
+				"in the database... Are you trying to process data with a config file that has been deleted?"
 		except Exception, e:
 			raise PluginError, "Unable to use a suitable config file: %s" % e
 

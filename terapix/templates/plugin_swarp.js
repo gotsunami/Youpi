@@ -400,7 +400,7 @@ var {{ plugin.id }} = {
 
 		// Weight
 		tr = new Element('tr');
-		td = new Element('td').insert('Weight:');
+		td = new Element('td').insert('Weight path:');
 		tr.insert(td);
 
 		td = new Element('td').insert(resp.Weight.length > 0 ? resp.Weight : '--');
