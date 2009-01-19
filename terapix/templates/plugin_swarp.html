@@ -37,7 +37,14 @@
 	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
 
 	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
-	selector.addPath('WEIGHT data', 'weights');
+	selector.addPath('WEIGHT data', 'weights', {
+						mandatory: true, 
+						extra: {
+							title: 'Use qualityFITS-generated WEIGHT maps', 
+							selected: true,
+							help: 'This option will handle WEIGHT maps selection automatically'
+						}
+	});
 	selector.setFileBrowser(fm_file_browser);
 	selector.render();
 

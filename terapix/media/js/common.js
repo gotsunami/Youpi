@@ -79,20 +79,18 @@ function reduceString(msg, max) {
  */
 function getSelect(id, options, size) {
 	size = size ? size : 1;
-	var select = document.createElement('select');
-	select.setAttribute('id', id);
+	var select = new Element('select', {'id': id});
 	if (size > 1) {
 		select.setAttribute('size', size);
 		select.setAttribute('multiple', 'true');
 	}
 
-	var option = null;
-	for(var i=0; i<options.length; i++) {
-		option = document.createElement('option');
-		option.setAttribute('value', i);
-		option.appendChild(document.createTextNode(options[i]));
-		select.appendChild(option);
-	}
+	var opt = null;
+	options.each(function(option) {
+		opt = new Element('option', {value: option});
+		opt.update(option);
+		select.insert(opt);
+	});
 
 	if (size > 1) {
 		// Select first option by default

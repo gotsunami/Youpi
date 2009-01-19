@@ -49,7 +49,16 @@ function PathSelectorWidget(container, pluginId)
 	var tr_paths = new Array();
 	var tr_prefix = new Array();
 	var tr_mandatory = new Array();
-
+	/*
+	 * Var: _extra
+	 * Object of options for extra entry
+	 * : _extra = {title: null, selected: false, help: null};
+	 *
+	 * See Also:
+	 *  <addPath>
+	 *
+	 */ 
+	var _extra = {title: null, selected: false, help: null};
 
 	// Group: Functions
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -89,16 +98,16 @@ function PathSelectorWidget(container, pluginId)
 		th.insert('Selected Path');
 
 		td = new Element('td');
-		tdiv = new Element('div');
-		tdiv.setAttribute('class', 'lightTip');
+		tdiv = new Element('div', {'class': 'lightTip'});
 		tdiv.insert('Please note that you can append a file name to the selected path ' + 
 			'by typing its name in the box below.');
 
-		pin = new Element('input');
-		pin.setAttribute('id', plugin_id + '_path_input');
-		pin.setAttribute('type', 'text');
-		pin.setAttribute('size', '80');
-		pin.setAttribute('style', 'font-family: typewritter;');
+		pin = new Element('input', {
+					id: plugin_id + '_path_input',
+					type: 'text',
+					size: 80,
+					style: 'font-family: typewritter;'
+		});
 
 		td.insert(tdiv);
 		td.insert(pin);
@@ -150,7 +159,7 @@ function PathSelectorWidget(container, pluginId)
 					var msg_div;
 					div.update();
 
-					if (resp['result'][prefix].length == 0) {
+					if (resp.result[prefix].length == 0 && !_extra.title) {
 						msg_div = $(plugin_id + '_' + prefix + '_msg_div');
 						msg_div.innerHTML = '';
 						div.setAttribute('class', 'noFlagWeight');
@@ -158,7 +167,9 @@ function PathSelectorWidget(container, pluginId)
 					}
 					else {
 						// Insert element to the beginning
-						resp['result'][prefix].unshift(NO_SELECTION);
+						if (_extra.title)
+							resp.result[prefix].unshift(_extra.title);
+						resp.result[prefix].unshift(NO_SELECTION);
 
 						if(tr_mandatory[k]) {
 							// This a mandatory path
@@ -172,6 +183,8 @@ function PathSelectorWidget(container, pluginId)
 						sel.observe('change', function() {
 							_onPathChange(this.pathChange.prefix, this.pathChange.selid);
 						});
+						if (_extra.selected)
+							sel.options[1].writeAttribute({selected: 'selected'});
 						div.insert(sel);
 						img = new Element('img', {
 							style: 'cursor: pointer; margin-left: 5px;',
@@ -191,6 +204,23 @@ function PathSelectorWidget(container, pluginId)
 
 		var post = 'Plugin=' + plugin_id + '&Method=getMiscDataPaths&Keys=' + tr_prefix;
 		r.send('/youpi/process/plugin/', post);
+	}
+
+	/*
+	 * Function: setDefaultEntry
+	 * Creates a new entry and selects it
+	 *
+	 * Parameters:
+	 *  label - string: text for entry
+	 *
+	 */ 
+	this.setDefaultEntry = function(label) {
+		if (!typeof label == 'string')
+			console.error('label must be a string!');
+
+		_hasDefaultEntry = true;
+		_defaultEntry = label;
+		$(plugin_id + '_' + prefix + '_select')
 	}
 
 	/*
@@ -273,7 +303,7 @@ function PathSelectorWidget(container, pluginId)
 	function _onPathChange(prefix, selid) {
 		var msg_div = $(plugin_id + '_' + prefix + '_msg_div');
 		if (!selid) {
-			msg_div.innerHTML = '';
+			msg_div.update();
 			return;
 		}
 
@@ -282,40 +312,102 @@ function PathSelectorWidget(container, pluginId)
 		var d;
 	
 		var msg = prefix.toUpperCase();
-	
+		msg_div.setAttribute('class', 'lightTip');
+
 		if (txt == NO_SELECTION) {
 			// No selection (default)
-			msg_div.setAttribute('class', 'lightTip');
-			msg_div.innerHTML = 'Please make a selection below:';
-
+			msg_div.update('Please make a selection below:');
 		}
-		else if (txt[txt.length-1] != '/') {
+		else if (txt[txt.length-1] != '/' && !_extra.title) {
 			// This is a file
-			msg_div.setAttribute('class', 'lightTip');
-			msg_div.innerHTML = 'This following file will <strong>overwrite</strong> paths to ' + msg + ' data. This ' + msg + ' file will be used for all images in the selection:';
+			msg_div.update('This following file will <strong>overwrite</strong> paths to ' + msg + ' data. This ' + msg + ' file will be used for all images in the selection:');
+		}
+		else if (txt == _extra.title) {
+			msg_div.update(_extra.help + ':');
 		}
 		else {
 			// This is a directory
-			msg_div.setAttribute('class', 'lightTip');
-			msg_div.innerHTML = msg + ' files will be searched in the following directory:';
+			msg_div.update(' files will be searched in the following directory:');
 		}
 	}
 
 	/*
+	 * Function: hasExtra
+	 * Returns true is an extra path option has been defined with <addPath>
+	 *
+	 * Returns:
+	 *  boolean
+	 *
+	 */
+	this.hasExtra = function() {
+		return _extra.title ? true : false;
+	}
+
+	/*
+	 * Function: getExtra
+	 * Returns extra option value for a path entry (See <addPath> for more info)
+	 *
+	 * Returns:
+	 *  <_extra>: object
+	 *
+	 */
+	this.getExtra = function() {
+		return _extra;
+	}
+
+	/*
 	 * Function: addPath
-	 * Add a new king of path to the widget
+	 * Add a new data path combobox to the widget
 	 *
 	 * Parameters:
 	 *  title - string: title displayed
 	 *  prefix - string: name of internal prefix name to be used (one word)
-	 *  mandatory - boolean: specify whether this path must not be empty (default: false)
+	 *  options - object: hash for options (see below)
+	 *
+	 * Options:
+	 *  The *options* parameter is an object of the form: 
+	 *  (code)
+	 *  {mandatory: true, extra: {
+	 *			title: "My option's title", 
+	 *			help: 'Use it to do anything',
+	 *			selected: true
+	 *  }} 
+	 *  (end)
+	 *  Optional properties are:
+	 *
+	 *  mandatory - boolean: specify whether this path is mandatory (i.e. no <NO_SELECTION> allowed)
+	 *  extra - object: adds an extra entry (not a path name) to combo box (See below)
+	 *
+	 * The extra property:
+	 *  The *extra* option has the following properties:
+	 *
+	 *  title - string: option's title (required)
+	 *  help - string: help string used to display information on item selection (required)
+	 *  selected -  boolean: true if you want it selected instead of the <NO_SELECTION> (optional)
 	 *
 	 * Notes:
-	 *  _prefix_ variable must be one word (no spaces allowed)
+	 *  _prefix_ variable must be one word (no spaces allowed).
+	 *
+	 * See Also:
+	 *  <hasExtra>, <getExtra>
 	 *
 	 */ 
-	this.addPath = function(title, prefix, mandatory) {
-		var mandatory = typeof mandatory == 'boolean' ? mandatory : false;
+	this.addPath = function(title, prefix, options) {
+		if (typeof options != 'object')
+			options = {mandatory: false};
+
+		var mandatory = typeof options.mandatory == 'boolean' ? options.mandatory : false;
+
+		if (typeof options.extra == 'object') {
+			if (typeof options.extra.title != 'string')
+				console.error('extra object does not have its title property set (required)');
+
+			if (typeof options.extra.help != 'string')
+				console.error("'extra object does not have its 'help' property set (required)");
+			
+			_extra = options.extra;
+		}
+
 		var tr, th, td;
 		tr = new Element('tr');
 		th = new Element('th').insert('Selected path to ' + title);

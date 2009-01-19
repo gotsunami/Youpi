@@ -45,8 +45,8 @@
 	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
 
 	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
-	selector.addPath('FLAT data', 'flats', true);
-	selector.addPath('MASK data', 'masks', true);
+	selector.addPath('FLAT data', 'flats', {mandatory: true});
+	selector.addPath('MASK data', 'masks', {mandatory: true});
 	selector.addPath('REG data', 'regs');
 	selector.setFileBrowser(fm_file_browser);
 	selector.render();
