@@ -722,10 +722,9 @@ function Logger(container)
 	 *
 	 */ 
 	this.msg_status = function(msg) {
-		var line = document.createElement('div');
-		line.setAttribute('class', 'logger_status');
-		line.appendChild(document.createTextNode(msg));
-		_log.appendChild(line);
+		var line = new Element('div', {'class': 'logger_status'});
+		line.insert(msg);
+		_log.insert(line);
 	}
 
 	/*
@@ -746,10 +745,9 @@ function Logger(container)
 	 *
 	 */ 
 	this.msg_ok = function(msg) {
-		var line = document.createElement('div');
-		line.setAttribute('class', 'logger_ok');
-		line.appendChild(document.createTextNode(msg));
-		_log.appendChild(line);
+		var line = new Element('div', {'class': 'logger_ok'});
+		line.insert(msg);
+		_log.insert(line);
 	}
 
 	/*
@@ -761,10 +759,9 @@ function Logger(container)
 	 *
 	 */ 
 	this.msg_warning = function(msg) {
-		var line = document.createElement('div');
-		line.setAttribute('class', 'logger_warning');
-		line.appendChild(document.createTextNode(msg));
-		_log.appendChild(line);
+		var line = new Element('div', {'class': 'logger_warning'});
+		line.insert(msg);
+		_log.insert(line);
 	}
 
 	/*
@@ -778,10 +775,9 @@ function Logger(container)
 	 */ 
 	this.msg_error = function(msg, alertBox) {
 		var do_ab = alertBox ? true : false;
-		var line = document.createElement('div');
-		line.setAttribute('class', 'logger_error');
-		line.appendChild(document.createTextNode(msg));
-		_log.appendChild(line);
+		var line = new Element('div', {'class': 'logger_error'});
+		line.insert(msg);
+		_log.insert(line);
 		if (do_ab)
 			alert('Error: ' + msg);
 	}

@@ -39,6 +39,37 @@ function SubMenu(container, entries) {
 	var _entries = $A(entries);
 	var _ul;
 
+	this.activate = function(idx) {
+		_activate(idx);	
+	}
+
+	function _activate(idx) {
+		var lis = $$('ul#menu li');
+		lis.each(function(li) {
+			li.setAttribute('class', 'disabled');
+		});
+
+		if (typeof idx == 'number')
+			lis[idx].writeAttribute({'class': 'enabled'});
+		else if(typeof idx == 'object') {
+			idx.up().writeAttribute({'class': 'enabled'});
+			idx = idx.getAttribute('id').gsub(/entry_/, '');
+		}
+		else
+			console.error('idx must be an integer or a LI DOM object');
+
+		var divs = new Array();
+		_entries.each(function(entry, j) {
+			divs.push($('menuitem_sub_' + j));
+		});
+		if ($('menuitem_sub_about'))
+			divs.push($('menuitem_sub_about'));
+
+		// Deals with divs
+		divs.each(function(div) { div.hide(); });
+		$('menuitem_sub_' + idx).show();
+	}
+
 	function _main() {
 		_ul = new Element('ul', {'class': 'smart_tabnav_sub', id: 'menu'});
 		var li, a;
@@ -46,24 +77,7 @@ function SubMenu(container, entries) {
 			li = new Element('li', {'class': 'disabled'});
 			a = new Element('a', {href: '#', id: 'entry_' + k}).update(entry);
 			a.observe('click', function() {
-				var divs = new Array();
-				_entries.each(function(entry, j) {
-					divs.push($('menuitem_sub_' + j));
-				});
-				if ($('menuitem_sub_about'))
-					divs.push($('menuitem_sub_about'));
-
-				// Deals with divs
-				divs.each(function(div) { div.hide(); });
-				$('menuitem_sub_' + k).show();
-
-				// Deals with lis
-				var lis = $$('ul#menu li');
-				lis.each(function(li) {
-					li.setAttribute('class', 'disabled');
-				});
-				this.up().setAttribute('class', 'enabled');
-
+				_activate(this);
 				// Finally, executes custom handler, if any
 				if (this.up().customClickHandler)
 					this.up().customClickHandler();
@@ -74,8 +88,9 @@ function SubMenu(container, entries) {
 			// Setup null custom handlers as default
 			_ul.childElements()[k].customClickHandler = null;
 		});
-		_ul.select('li').first().setAttribute('class', 'enabled');
+
 		_container.insertBefore(_ul, _container.childElements().first());
+		_activate(0);
 	}
 
 	this.getEntry = function(idx) {

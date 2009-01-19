@@ -14,13 +14,21 @@
 			<div style="width: 500px" id="config_file_div"></div>
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_3"></div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_4">
+			<div class="tip" style="margin-top: 40px; width: 300px;">	
+				<p>If the <i>selected path to WEIGHT data</i> is not a data path but the 'Use QualityFITS-generated WEIGHT map' option, additionnal checks will 
+				be performed here before processing to ensure that all your images already have been successfully QualityFITSed (so that valid weight images can 
+				be found and used during processing).</p>
+			</div>
+		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
+	var menu;
 	document.observe('dom:loaded', function() {
-		var m = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);
-		m.setOnClickHandler(3, function() {
+		menu = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory', 'Input data validation']);
+		menu.setOnClickHandler(3, function() {
 			$('output_path_input').focus();
 		});
 
@@ -42,7 +50,8 @@
 						extra: {
 							title: 'Use qualityFITS-generated WEIGHT maps', 
 							selected: true,
-							help: 'This option will handle WEIGHT maps selection automatically'
+							help: 'This option will handle WEIGHT maps selection automatically, using for each image WEIGHT maps from <b>your last successful ' + 
+								'qualityFITS</b>'
 						}
 	});
 	selector.setFileBrowser(fm_file_browser);

@@ -38,10 +38,23 @@ var {{ plugin.id }} = {
 		// OPTIONAL
 		var wSel = $(uid + '_weights_select');
 		var weightPath = '';
-		if (wSel) {
-			var path = wSel.options[wSel.selectedIndex].text;
-			if (path != selector.getNoSelectionPattern())
-				weightPath = path;
+		var path = wSel.options[wSel.selectedIndex].text;
+		if (path != selector.getNoSelectionPattern()) {
+			weightPath = (path == selector.getExtra().title) ? 'Use QFits-generated weight maps' : path;
+		}
+
+		// Checks that all weight maps are available if EXTRA option has been selected
+		if (path == selector.getExtra().title) {
+			var c = $('menuitem_sub_4').update();
+			var pre = new Element('pre');
+			c.insert(pre);
+		
+			var log = new Logger(pre);
+			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
+			log.msg_status('Checking <b>weight maps</b> availability (from output of QualityFITS-in)...');
+
+			menu.activate(4);
+			return;
 		}
 
 		// Get config file
@@ -57,7 +70,6 @@ var {{ plugin.id }} = {
 
 		// Finally, add to the shopping cart
 		var total = {{ plugin.id }}.ims.getImagesCount();
-		console.log(total, custom_dir);
 
 		p_data = {	plugin_name	: uid,
 					userData 	: {	'config' : config,

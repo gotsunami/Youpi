@@ -909,8 +909,9 @@ div.logger_status, div.logger_error, div.logger_ok, div.logger_warning {
 	text-align: left;
 	background-position: 1px center;
 	background-repeat: no-repeat; 
+	padding: 0px;
 	padding-left: 20px;
-	min-height: 20px;
+	min-height: 18px;
 	margin-top: 2px;
 	padding-top: 5px;
 }
