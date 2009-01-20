@@ -488,10 +488,6 @@ function DropdownBox(container, title)
 	function _main() {
 		_title = title;
 
-		if (!_container.hasAttribute('id')) {
-			_container.setAttribute('id', 'dropdown_box_' + Math.random() + '_div');
-		}
-
 		var topDiv = document.createElement('div');
 		topDiv.setAttribute('class', 'ebox');
 		_mainDiv = document.createElement('div');
@@ -503,14 +499,12 @@ function DropdownBox(container, title)
 		});
 
 		_titleNode = new Element('label').insert(_title);
-		var cdiv = document.createElement('div');
-		cdiv.setAttribute('style', 'display: none;');
-		cdiv.setAttribute('id', _container.getAttribute('id') + '_' + Math.random() + '_content');
+		var cdiv = new Element('div', {'style': 'display: none;', id: 'ddbox_' + Math.random() + '_content'});
 		_contentContainer = cdiv;
-		_mainDiv.appendChild(_titleNode);
-		topDiv.appendChild(_mainDiv);
-		topDiv.appendChild(cdiv);
-		_container.appendChild(topDiv);
+		_mainDiv.insert(_titleNode);
+		topDiv.insert(_mainDiv);
+		topDiv.insert(cdiv);
+		_container.insert(topDiv);
 
 		_setOpen(false);
 	}
@@ -785,3 +779,33 @@ function Logger(container)
 	_init();
 }
 
+/*
+ * Function: getQueryString
+ * Converts an object to a Hash then builds a QueryString
+ *
+ * Parameters:
+ *  hash - object: object to convert
+ *  strip - boolean: remove leading '&' if true. (default: true)
+ *
+ * Note:
+ *  Unlike prototype's Hash#toQueryString(), this function does not convert special chars
+ *  (useful for POST HTTP queries)
+ *
+ * Returns:
+ *  query string - string
+ *
+ */ 
+function getQueryString(hash, strip) {
+	var strip = typeof strip == 'boolean' ? strip : true;
+	if (typeof hash != 'object')
+		console.error('hash must be an object!');
+
+	var qs = '';
+	var tmp = $H(hash).map(function(pair) {
+		return '&' + pair.key + '=' + pair.value;
+	}).each(function(entry) {
+		qs += entry;
+	})
+	
+	return (strip ? qs.sub(/&/, '') : qs);
+}

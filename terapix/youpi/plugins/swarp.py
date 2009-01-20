@@ -107,8 +107,11 @@ class Swarp(ProcessingPlugin):
 			swarpId = post['SwarpId']
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
+			useQFITSWeights = int(post['UseQFITSWeights'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
+
+		raise PluginError, useQFITSWeights
 
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
@@ -251,7 +254,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 
 		return csfPath
 
-	def checkForQFITSInData(self, request, imgList = None):
+	def checkForQFITSData(self, request, imgList = None):
 		"""
 		Check if every image in this selection has been successfully processed with QFits-in.
 		Policy: only the lastest successful qfits-in of current logged-in user is looked for.
@@ -276,7 +279,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		for img in imgList:
 			rels = Rel_it.objects.filter(image = img)
 			if not rels:
-				missing.extend([str(img.name)])
+				missing.extend([str(os.path.join(img.path, img.name + '.fits'))])
 				continue
 
 			relTaskIds = [rel.task.id for rel in rels]
@@ -288,7 +291,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 													success = True).order_by('-end_date')
 
 			if not tasks:
-				missing.append(str(img.name))
+				missing.append(str(os.path.join(img.path, img.name + '.fits')))
 				continue
 
 			tasksIds.append(int(tasks[0].id))
@@ -394,8 +397,9 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			weightPath = post['WeightPath']
 			config = post['Config']
 			resultsOutputDir = post['ResultsOutputDir']
+			useQFITSWeights = int(post['UseQFITSWeights'])
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
 		items = CartItem.objects.filter(kind__name__exact = self.id)
 		itemName = "%s-%d" % (itemID, len(items)+1)
@@ -404,6 +408,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		data = { 'idList' : idList, 
 				 'weightPath' : weightPath, 
 				 'resultsOutputDir' : resultsOutputDir, 
+				 'useQFITSWeights' : useQFITSWeights,
 				 'config' : config }
 
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
@@ -436,6 +441,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 						'idList' 			: str(data['idList']), 
 						'weightPath' 		: str(data['weightPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
+				 		'useQFITSWeights' 	: str(data['useQFITSWeights']),
 						'name' 				: str(it.name),
 						'config' 			: str(data['config'])})
 

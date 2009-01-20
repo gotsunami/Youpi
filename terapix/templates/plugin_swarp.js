@@ -14,12 +14,25 @@ var {{ plugin.id }} = {
 	 *
 	 */
 	ims: null,
-
+	/*
+	 * Variable: curSelectionIdx
+	 * Used by <checkForQFITSData>
+	 *
+	 */
+	curSelectionIdx: 0,
+	/*
+	 * Variable: weightMissingError
+	 * Used by <checkForQFITSData>
+	 *
+	 */
+	weightMissingError: false,
 	/*
 	 * Function: addSelectionToCart
 	 *
 	 */
 	addSelectionToCart: function() {
+		{{ plugin.id }}.curSelectionIdx = 0;
+		{{ plugin.id }}.weightMissingError = false;
 		sels = {{ plugin.id }}.ims.getListsOfSelections();
 
 		if (!sels) {
@@ -43,19 +56,7 @@ var {{ plugin.id }} = {
 			weightPath = (path == selector.getExtra().title) ? 'Use QFits-generated weight maps' : path;
 		}
 
-		// Checks that all weight maps are available if EXTRA option has been selected
-		if (path == selector.getExtra().title) {
-			var c = $('menuitem_sub_4').update();
-			var pre = new Element('pre');
-			c.insert(pre);
-		
-			var log = new Logger(pre);
-			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
-			log.msg_status('Checking <b>weight maps</b> availability (from output of QualityFITS-in)...');
-
-			menu.activate(4);
-			return;
-		}
+		var total = {{ plugin.id }}.ims.getImagesCount();
 
 		// Get config file
 		var cSel = $(uid + '_config_name_select');
@@ -68,15 +69,53 @@ var {{ plugin.id }} = {
 		if (custom_dir)
 			output_data_path += custom_dir + '/';
 
-		// Finally, add to the shopping cart
+		// Checks that all weight maps are available if EXTRA option has been selected
+		var c = $('menuitem_sub_4').update();
+		if (path == selector.getExtra().title) {
+			menu.activate(4);
+			var pre = new Element('pre');
+			c.insert(pre);
+		
+			var log = new Logger(pre);
+			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
+			log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection');
+			log.msg_status("Using output data path '" + output_data_path + "'");
+			log.msg_status("Using '" + config + "' as configuration file");
+			log.msg_status('Checking <b>weight maps</b> availability (from QualityFITS)...');
+			{{ plugin.id }}.checkForQFITSData(pre, function() {
+				{{ plugin.id }}.do_addSelectionToCart({
+					useQFITSWeights: 1,
+					config: config, 
+					imgList: sels, 
+					weightPath: weightPath, 
+					resultsOutputDir: output_data_path
+				});
+			});
+
+			return;
+		}
+		else {
+			var msg = new Element('div', {'class': 'tip'}).setStyle({width: '300px'});
+			msg.update('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no additionnal checks are run</b>. ' + 
+				'Your item has been directly added to the shopping cart.');
+			c.update(msg);
+		}
+
+		{{ plugin.id }}.do_addSelectionToCart({
+			useQFITSWeights: 0,
+			config: config, 
+			imgList: sels, 
+			weightPath: weightPath, 
+			resultsOutputDir: output_data_path
+		});
+	},
+
+	do_addSelectionToCart: function(data) {
 		var total = {{ plugin.id }}.ims.getImagesCount();
 
+		// Add to the shopping cart
 		p_data = {	plugin_name	: uid,
-					userData 	: {	'config' : config,
-									'imgList' : sels, 
-									'weightPath' : weightPath,
-									'resultsOutputDir' : output_data_path
-					}
+					userData 	: data
 		};
 	
 		// Add entry into the shopping cart
@@ -87,6 +126,86 @@ var {{ plugin.id }} = {
 										') has been\nadded to the cart.');
 								}
 		);
+	},
+
+	/*
+	 * Function: checkForQFITSData
+	 * Check if every images in that selection has associated WEIGHT maps data
+	 *
+	 * Parameters:
+	 *  container - DOM element: DOM block container
+	 *  handler - function: custom handler executed once checks are successful
+	 *
+	 */ 
+	checkForQFITSData: function(container, handler) {
+		var handler = typeof handler == 'function' ? handler : null;
+		var div = new Element('div');
+		var log = new Logger(div);
+		var sels = {{ plugin.id }}.ims.getListsOfSelections();
+		var total = {{ plugin.id }}.ims.getImagesCount();
+
+		var selArr = eval(sels);
+		//console.log(selArr, sels); return;
+		var idList = selArr[{{ plugin.id }}.curSelectionIdx];
+	
+		div.setStyle({textAlign: 'left'});
+		container.insert(div);
+	
+		var r = new HttpRequest(
+				div,
+				null,	
+				// Custom handler for results
+				function(resp) {
+					div.update();
+					missing = resp.result.missingQFITS;
+	
+					if (missing.length > 0) {
+						log.msg_warning('Missing WEIGHT data for selection ' + ({{ plugin.id }}.curSelectionIdx+1) + 
+							' (' + missing.length + ' image' + (missing.length > 1 ? 's' : '') + ' failed!)');
+						{{ plugin.id }}.weightMissingError = true;
+					}	
+					else {
+						log.msg_ok('WEIGHT data for selection ' + ({{ plugin.id }}.curSelectionIdx+1) + 
+							' (' + idList.length + ' image' + (idList.length > 1 ? 's' : '') + ') is OK');
+					}
+	
+					{{ plugin.id }}.curSelectionIdx++;
+	
+					if ({{ plugin.id }}.curSelectionIdx < selArr.length) {
+						{{ plugin.id }}.checkForQFITSData(container);
+					}
+					else {
+						if ({{ plugin.id }}.weightMissingError) {
+							var c = new Element('div').setStyle({paddingLeft: '3px'});
+							div.insert(c);
+							var wm = new DropdownBox(c, 'View list of images with missing weight maps');
+							var pre = new Element('pre').setStyle({
+								color: 'brown',
+								overflow: 'auto',
+								maxHeight: '200px'
+							});
+
+							missing.each(function(miss) {
+								pre.insert(miss + '<br/>');
+							});
+							wm.getContentNode().update(pre);
+
+							log.msg_error('Missing WEIGHT information. Selection(s) not added to cart!', true);
+							return;
+						}
+
+						// All checks are OK. Executes custom handler, if any
+						if (handler) handler();
+					}
+				}
+		);
+	
+		var post = 	'Plugin={{ plugin.id }}&' + 
+					'Method=checkForQFITSData&' +
+					'IdList=' + idList;
+		// Send query
+		r.setBusyMsg('Checking selection ' + ({{ plugin.id }}.curSelectionIdx+1) + ' (' + idList.length + ' images)');
+		r.send('/youpi/process/plugin/', post);
 	},
 
 	/*
@@ -131,8 +250,8 @@ var {{ plugin.id }} = {
 	 *  row - integer: for row number
 	 *
 	 */ 
-	run: function(trid, idList, itemId, weightPath, config, resultsOutputDir, swarpId, silent) {
-		var silent = silent == true ? true : false;
+	run: function(trid, opts, silent) {
+		var silent = typeof silent == 'boolean' ? silent : false;
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
 	
@@ -150,17 +269,16 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin=' + uid + 
-					'&Method=process' +
-					'&IdList=' + idList + 
-					'&WeightPath=' + weightPath + 
-					'&SwarpId=' + swarpId + 
-					'&Config=' + config +
-					'&ResultsOutputDir=' + resultsOutputDir +
-					// runtime options related
-					'&' + runopts.clusterPolicy +	
-					'&ItemId=' + runopts.itemPrefix + itemId + 
-					'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0);
+		// Adds various options
+		opts = $H(opts);
+		opts.set('Plugin', uid);
+		opts.set('Method', 'process');
+		opts.set('ReprocessValid', (runopts.reprocessValid ?  1 : 0));
+
+		var post = getQueryString(opts) +
+			'&' + runopts.clusterPolicy;
+		console.log(post); return;
+
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -221,7 +339,12 @@ var {{ plugin.id }} = {
 		container.insert(tab);
 	},
 
-	saveItemForLater: function(trid, idList, itemId, weightPath, resultsOutputDir, config, silent) {
+	saveItemForLater: function(trid, opts, silent) {
+	//idList, itemId, weightPath, resultsOutputDir, config, silent) {
+		opts = $H(opts);
+		opts.set('Plugin', uid);
+		opts.set('Method', 'saveCartItem');
+
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
 				uid + '_result',
@@ -235,13 +358,7 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin=' + uid + 
-					'&Method=saveCartItem' + 
-					'&IdList=' + idList + 
-					'&ItemID=' + runopts.itemPrefix + itemId +
-					'&WeightPath=' + weightPath + 
-					'&Config=' + config +
-					'&ResultsOutputDir=' + resultsOutputDir;
+		var post = getQueryString(opts);
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -579,7 +696,6 @@ var {{ plugin.id }} = {
 						td.insert(delImg);
 
 						delImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
-											//			onclick: uid + ".addToCart('" + res.resultsOutputDir + "')"
 						});
 						delImg.c_data = { 	idList: res.idList,
 											config: res.config,
@@ -641,7 +757,8 @@ var {{ plugin.id }} = {
 						userData :	{ 	'config' 			: data.config,
 										'imgList' 			: data.idList,
 										'weightPath' 		: data.weightPath,
-										'resultsOutputDir' 	: data.resultsOutputDir
+										'resultsOutputDir' 	: data.resultsOutputDir,
+										'useQFITSWeights'	: data.useQFITSWeights
 						}
 		};
 	
