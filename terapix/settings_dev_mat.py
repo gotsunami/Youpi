@@ -18,11 +18,11 @@ CONDOR_LOG 		= '/tmp/condor.mathias.log'
 #
 HAS_CONVERT 		= True
 CMD_CONVERT			= '/usr/bin/convert'
-# Default thumbnail size width: 60px
-CONVERT_THUMB_OPT 	= '-resize 60x'
+CONVERT_THUMB_OPT 	= '-resize 60x' # Default thumbnail size width: 60px
 CMD_CONVERT_THUMB	= "%s %s" % (CMD_CONVERT, CONVERT_THUMB_OPT)
-
+#
 CMD_STIFF			= '/usr/bin/stiff'
+CMD_IMCOPY			= '/usr/local/bin/imcopy'
 
 #
 # Software info (to get versioning information)

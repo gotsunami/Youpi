@@ -263,13 +263,32 @@ def process(userData, kind_id, argv):
 
 	start = getNowDateTime(time.time())
 
-	# First, Execute process and wait for completion
+
+	################### PRE-PROCESSING STUFF GOES HERE ########################################
+
+
+	# Swarp preprocessing: uncompress .fz weight maps
+	if kind == 'swarp':
+		fzs = glob.glob('*.fits.fz')
+		for fz in fzs:
+			print "SWARP PREPROCESSING: uncompressing", fz
+			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
+
+
+	################### END OF PRE-PROCESSING  ################################################
+
+
+	# Execute process, waiting for completion
 	try:
 		exit_code = os.system(string.join(argv, ' '))
 	except:
 		pass
 
 	(imgName, task_id, g) = task_start_log(userData, start, kind_id)
+
+
+	################### POST-PROCESSING STUFF GOES HERE ########################################
+
 
 	# QualityFITS-In processing
 	if kind == 'fitsin':
@@ -336,7 +355,7 @@ def process(userData, kind_id, argv):
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
-							thumbnails = convert
+							thumbnails = convert,
 				)
 				scamp_id = g.con.insert_id()
 			except Exception, e:
@@ -388,6 +407,7 @@ def process(userData, kind_id, argv):
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							weight = userData['Weight'],
 							thumbnails = convert
 				)
 				swarp_id = g.con.insert_id()
@@ -421,6 +441,10 @@ def process(userData, kind_id, argv):
 	else:
 		# Put other processing stuff here
 		pass
+
+
+	################### END OF POST-PROCESSING  ################################################
+
 
 	task_end_log(userData, g, storeLog, task_id, success, kind)
 

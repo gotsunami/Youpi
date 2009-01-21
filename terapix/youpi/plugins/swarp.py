@@ -111,8 +111,6 @@ class Swarp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
-		raise PluginError, useQFITSWeights
-
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
 
@@ -155,7 +153,7 @@ class Swarp(ProcessingPlugin):
 		# Swarp file containing a list of images to process (one per line)
 		images = Image.objects.filter(id__in = idList)
 		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % now)
-		imgPaths = [os.path.join(img.path, img.name + '.fits') for img in images]
+		imgPaths = [img.name + '.fits' for img in images]
 		swif = open(swarpImgsFile, 'w')
 		swif.write(string.join(imgPaths, '\n'))
 		swif.close()
@@ -175,6 +173,12 @@ class Swarp(ProcessingPlugin):
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
+		if useQFITSWeights:
+			weight_files = self.getWeightPathsFromImageSelection(request, idList)
+			weight_files = string.join([dat[1] for dat in weight_files], ', ')
+		else:
+			weight_files = string.join([os.path.join(weigthPath, img.name + '_weight.fits.fz') for img in images], ', ')
+
 	 	# Generates CSF
 		condor_submit_file = """
 #
@@ -190,7 +194,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(nop)s/NOP
+transfer_input_files    = %(weights)s, %(images)s, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(nop)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = /tmp/SWARP.log.$(Cluster).$(Process)
@@ -207,6 +211,8 @@ notify_user             = monnerville@iap.fr
 		'config' 		: customrc,
 		'swarplist' 	: swarpImgsFile,
 		'nop' 			: submit_file_path, 
+		'weights'		: weight_files,
+		'images'		: string.join([os.path.join(img.path, img.name + '.fits') for img in images], ', '),
 		'initdir' 		: os.path.join(submit_file_path, 'script'),
 		'requirements' 	: req }
 
@@ -297,6 +303,33 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			tasksIds.append(int(tasks[0].id))
 
 		return {'missingQFITS' : missing, 'tasksIds' : tasksIds}
+
+	def getWeightPathsFromImageSelection(self, request, imgList = None):
+		"""
+		Compute data path of weight images for a given image selection
+		@return List of paths to WEIGHT files
+		"""
+
+		post = request.POST
+		try:
+			idList = request.POST['IdList'].split(',')
+			checks = self.checkForQFITSData(request)
+		except Exception, e:
+			if imgList:
+				idList = imgList
+				checks = self.checkForQFITSData(request, idList)
+			else:
+				raise PluginError, "POST argument error. Unable to process data."
+
+		weight_files = []
+		tasks = Processing_task.objects.filter(id__in = checks['tasksIds'])
+
+		for task in tasks:
+			img = Rel_it.objects.filter(task = task)[0].image
+			weight_files.append([int(img.id), str(os.path.join(task.results_output_dir, img.name, 'qualityFITS', img.name + 
+				'_weight.fits.fz'))])
+
+		return weight_files
 
 	def getTaskInfo(self, request):
 		"""

@@ -53,7 +53,7 @@ var {{ plugin.id }} = {
 		var weightPath = '';
 		var path = wSel.options[wSel.selectedIndex].text;
 		if (path != selector.getNoSelectionPattern()) {
-			weightPath = (path == selector.getExtra().title) ? 'Use QFits-generated weight maps' : path;
+			weightPath = (path == selector.getExtra().title) ? 'QFits-generated weight maps' : path;
 		}
 
 		var total = {{ plugin.id }}.ims.getImagesCount();
@@ -145,7 +145,6 @@ var {{ plugin.id }} = {
 		var total = {{ plugin.id }}.ims.getImagesCount();
 
 		var selArr = eval(sels);
-		//console.log(selArr, sels); return;
 		var idList = selArr[{{ plugin.id }}.curSelectionIdx];
 	
 		div.setStyle({textAlign: 'left'});
@@ -273,11 +272,10 @@ var {{ plugin.id }} = {
 		opts = $H(opts);
 		opts.set('Plugin', uid);
 		opts.set('Method', 'process');
-		opts.set('ReprocessValid', (runopts.reprocessValid ?  1 : 0));
+		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 
 		var post = getQueryString(opts) +
 			'&' + runopts.clusterPolicy;
-		console.log(post); return;
 
 		r.send('/youpi/process/plugin/', post);
 	},
@@ -687,7 +685,6 @@ var {{ plugin.id }} = {
 						td = new Element('td');
 						delImg = new Element('img', {	style: 'margin-right: 5px',
 														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
-//														onclick: uid + ".delSavedItem('" + trid + "', '" + res.name + "')"
 						});
 						delImg.c_data = {trid: trid, name: res.name};
 						delImg.observe('click', function() {
@@ -695,17 +692,18 @@ var {{ plugin.id }} = {
 						});
 						td.insert(delImg);
 
-						delImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
+						var addImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
 						});
-						delImg.c_data = { 	idList: res.idList,
+						addImg.c_data = { 	idList: res.idList,
 											config: res.config,
 											weightPath: res.weightPath,
+											useQFITSWeights: res.useQFITSWeights,
 											resultsOutputDir: res.resultsOutputDir
 						};
-						delImg.observe('click', function() {
+						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);
 						});
-						td.insert(delImg);
+						td.insert(addImg);
 
 						tr.insert(td);
 						table.insert(tr);

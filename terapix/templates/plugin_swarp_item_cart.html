@@ -50,7 +50,6 @@
 				UseQFITSWeights: 	'{{ data.userData.useQFITSWeights }}'
 			});
 		});
-		console.log('WEIGHT', '{{ data.userData.useQFITSWeights }}');
 
 		$('{{ plugin.id }}_{{ forloop.counter}}_save').observe('click', function() {
 			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', {
