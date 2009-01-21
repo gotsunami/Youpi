@@ -37,12 +37,9 @@ class Skeleton(ProcessingPlugin):
 		self.itemPrefix = 'SKEL'
 		self.index = 65535
 
-		# Main template, rendered in the processing page
-		self.template = 'plugin_skeleton.html'
-		# Template for custom rendering into the shopping cart
-		self.itemCartTemplate = 'plugin_skeleton_item_cart.html'
-		# Custom javascript
-		self.jsSource = 'plugin_skeleton.js'
+		self.template = 'plugins/skeleton.html' 						# Main template, rendered in the processing page
+		self.itemCartTemplate = 'plugins/skeleton_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.jsSource = 'plugins/skeleton.js' 							# Custom javascript
 
 		# Decomment to disable the plugin
 		self.enable = PROCESSING_SKELETON_ENABLE

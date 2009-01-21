@@ -29,14 +29,11 @@ class Sextractor(ProcessingPlugin):
 		self.itemPrefix = 'SEX'
 		self.index = 1
 
-		# Main template, rendered in the processing page
-		self.template = 'plugin_sextractor.html'
-		# Template for custom rendering into the shopping cart
-		self.itemCartTemplate = 'plugin_sextractor_item_cart.html'
-		# Custom javascript
-		self.jsSource = 'plugin_sextractor.js'
-		#self.enable = False
+		self.template = 'plugins/sextractor.html' 						# Main template, rendered in the processing page
+		self.itemCartTemplate = 'plugins/sextractor_item_cart.html' 	# Template for custom rendering into the shopping cart
+		self.jsSource = 'plugins/sextractor.js' 						# Custom javascript
 
+		#self.enable = False
 		self.jobCount = 10
 
 	def saveCartItem(self, request):

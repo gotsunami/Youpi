@@ -29,12 +29,10 @@ class Scamp(ProcessingPlugin):
 		self.itemPrefix = 'SCAMP'
 		self.index = 20
 
-		# Main template, rendered in the processing page
-		self.template = 'plugin_scamp.html'
-		# Template for custom rendering into the shopping cart
-		self.itemCartTemplate = 'plugin_scamp_item_cart.html'
-		# Custom javascript
-		self.jsSource = 'plugin_scamp.js'
+		self.template = 'plugins/scamp.html' 						# Main template, rendered in the processing page
+		self.itemCartTemplate = 'plugins/scamp_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.jsSource = 'plugins/scamp.js' 							# Custom javascript
+
 		# Scamp's output XML filename
 		self.XMLFile = 'scamp.xml'
 

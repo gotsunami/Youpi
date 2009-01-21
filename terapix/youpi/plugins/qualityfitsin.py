@@ -35,12 +35,10 @@ class QualityFitsIn(ProcessingPlugin):
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'QF'
 		self.index = 0
-		# Main template, rendered in the processing page
-		self.template = 'plugin_qualityfitsin.html'
-		# Template for custom rendering into the shopping cart
-		self.itemCartTemplate = 'plugin_qualityfitsin_item_cart.html'
-		# Custom javascript
-		self.jsSource = 'plugin_qualityfitsin.js'
+
+		self.template = 'plugins/qualityfitsin.html' 						# Main template, rendered in the processing page
+		self.itemCartTemplate = 'plugins/qualityfitsin_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.jsSource = 'plugins/qualityfitsin.js' 							# Custom javascript
 
 		# Decomment to disable the plugin
 		#self.enable = False

@@ -22,12 +22,9 @@ class Swarp(ProcessingPlugin):
 		self.itemPrefix = 'SWARP'
 		self.index = 50
 
-		# Main template, rendered in the processing page
-		self.template = 'plugin_swarp.html'
-		# Template for custom rendering into the shopping cart
-		self.itemCartTemplate = 'plugin_swarp_item_cart.html'
-		# Custom javascript
-		self.jsSource = 'plugin_swarp.js'
+		self.template = 'plugins/swarp.html' 						# Main template, rendered in the processing page
+		self.itemCartTemplate = 'plugins/swarp_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.jsSource = 'plugins/swarp.js' 							# Custom javascript
 
 		# Decomment to disable the plugin
 		#self.enable = False
