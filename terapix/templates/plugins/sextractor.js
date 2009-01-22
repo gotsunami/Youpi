@@ -38,7 +38,7 @@ var {{ plugin.id }} = {
 			return;
 		}
 
-		console.warn('TODO...'); return;
+		//console.warn('TODO...'); return;
 
 		// CHECK 2: non-empty flag, weight and PSF data paths?
 
@@ -71,7 +71,7 @@ var {{ plugin.id }} = {
 		*/
 
 		// OPTIONAL
-		var fSel = document.getElementById('{{plugin.id}}_flags_select');
+		var fSel = $('{{plugin.id}}_flags_select');
 		var flagPath = '';
 		if (fSel) {
 			var path = fSel.options[fSel.selectedIndex].text;
@@ -79,7 +79,7 @@ var {{ plugin.id }} = {
 				flagPath = path;
 		}
 
-		var wSel = document.getElementById('{{plugin.id}}_weights_select');
+		var wSel = $('{{plugin.id}}_weights_select');
 		var weightPath = '';
 		if (wSel) {
 			var path = wSel.options[wSel.selectedIndex].text;
@@ -88,7 +88,7 @@ var {{ plugin.id }} = {
 		}
 
 
-		var pSel = document.getElementById('{{plugin.id}}_psf_select');
+		var pSel = $('{{plugin.id}}_psf_select');
 		var psfPath = '';
 		if (pSel) {
 			var path = pSel.options[pSel.selectedIndex].text;
@@ -96,25 +96,24 @@ var {{ plugin.id }} = {
 				psfPath = path;
 		}
 
+		var total = {{ plugin.id }}_ims.getImagesCount();
+		
 		// CHECK 3: get config file
-		var cSel = document.getElementById('{{ plugin.id }}_config_name_select');
+		var cSel = $('{{ plugin.id }}_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		// CHECK 4: custom output directory
-		var custom_dir = document.getElementById('{{ plugin.id }}_output_path_input').value;
+		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
 		var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
 
-		if (custom_dir && custom_dir.replace(/\ /g, '').length) {
-			custom_dir = custom_dir.replace(/\ /g, '');
-			if (custom_dir.length) {
-				output_data_path += custom_dir + '/';
-			}
-		}
+		if (custom_dir) 
+			output_data_path += custom_dir + '/';
+		
 
 		// Finally, add to the shopping cart
 		var p_data = {	plugin_name : '{{ plugin.id }}', 
 						userData : {'config' : config, 
-									'imgList' : sel, 
+									'imgList' : sels, 
 									'flagPath' : flagPath, 
 									'weightPath' : weightPath,
 									'psfPath' : psfPath,
@@ -125,7 +124,7 @@ var {{ plugin.id }} = {
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
-									alert('The current image selection (' + nb + ' ' + (nb > 1 ? 'images' : 'image') + 
+									alert('The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
 										') has been\nadded to the cart.');
 								}
 		);
@@ -164,7 +163,7 @@ var {{ plugin.id }} = {
 	},
 
 	saveItemForLater: function(trid, idList, itemId, flag, weight, psf, resultsOutputDir, config, silent) {
-		var prefix = document.getElementById('prefix').value.replace(/ /g, '');
+	//	var prefix = document.getElementById('prefix').value.replace(/ /g, '');
 		var r = new HttpRequest(
 				'{{ plugin.id}}_result',
 				null,	
@@ -178,7 +177,7 @@ var {{ plugin.id }} = {
 		);
 
 		var post = 	'Plugin={{ plugin.id }}&Method=saveCartItem&IdList=' + idList + 
-					'&ItemID=' + prefix + itemId + 
+					'&ItemID=' + itemId + 
 					'&FlagPath=' + flag +
 					'&WeightPath=' + weight + 
 					'&PsfPath=' + psf + 

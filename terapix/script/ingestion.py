@@ -268,7 +268,7 @@ def run_ingestion():
 	debug("Number of images to process: %d" % total)
 
 	# 
-	# Due to integrity constraints, entries have to created into
+	# Due to integrity constraints, entries have to be created into
 	# youpi_ingestion
 	#
 
