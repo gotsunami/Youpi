@@ -585,7 +585,7 @@ function ClusterPolicyWidget(container, varName) {
 			// Last td
 			ltd = tds[tds.length-1];
 			var msels = ltd.getElementsByTagName('select');
-			var ov = parseInt(sel.options[sel.selectedIndex].value);
+			var ov = parseInt(sel.selectedIndex);
 			if (ov == 0) {
 				// Memory
 				kind = 'MEM';
