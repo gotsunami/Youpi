@@ -542,6 +542,15 @@ var {{ plugin.id }} = {
 		td = new Element('td').update(resp.ResultsOutputDir);
 		tr.insert(td);
 		tab2.insert(tr);
+
+		// Total exposure time
+		tr = new Element('tr');
+		td = new Element('td').insert('Exposure time (s):');
+		tr.insert(td);
+
+		td = new Element('td').insert(resp.TotalExposureTime);
+		tr.insert(td);
+		tab2.insert(tr);
 	
 		// Config file
 		tr = new Element('tr');

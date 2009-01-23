@@ -357,6 +357,11 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		rels = Rel_it.objects.filter(task__id = taskid)
 		imgs = [r.image for r in rels]
 
+		# Computes total exposure time
+		totalExpTime = 0
+		for img in imgs:
+			totalExpTime += img.exptime
+
 		# Looks for groups of swarp
 		swarpHistory = Rel_it.objects.filter(image__in = imgs, task__kind__name = self.id).order_by('task')
 		# Finds distinct tasks
@@ -392,6 +397,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'Success' 			: task.success,
 					'Start' 			: str(task.start_date),
 					'End' 				: str(task.end_date),
+					'TotalExposureTime'	: str(round(totalExpTime, 2)),
 					'Duration' 			: str(task.end_date-task.start_date),
 					'WWW' 				: str(data.www),
 					'ResultsOutputDir' 	: str(task.results_output_dir),
