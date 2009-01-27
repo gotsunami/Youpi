@@ -18,31 +18,34 @@
 </div>
 
 <script type="text/javascript">
+	var menu;
 	document.observe('dom:loaded', function() {
-		var m = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);
-		m.setOnClickHandler(3, function() {
+		menu = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);
+		menu.setOnClickHandler(3, function() {
 			$('output_path_input').focus();
 		});
 
-		var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
-		fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
-		fm_file_browser.setRootTitle('Terapix Cluster');
-		fm_file_browser.setFilteringPatterns(['*_flag.fits', '*_weight.fits']);
-		fm_file_browser.setRootDataPath('/data');
-
-		// Enable user output custom directory
-		plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
-
-		var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
-		selector.addPath('FLAG data', 'flags');
-		selector.addPath('WEIGHT data', 'weights');
-		selector.addPath('PSF data', 'psf');
-		selector.setFileBrowser(fm_file_browser);
-		selector.render();
-
-		// Now file browser can renders itself
-		fm_file_browser.render();
-
-		{{ plugin.id }}.doit();
+		{{ plugin.id }}.selectImages();
 	});
+			
+
+	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
+	fm_file_browser.setRootTitle('Terapix Cluster');
+	fm_file_browser.setFilteringPatterns(['*_flag.fits', '*_weight.fits', '*_psf.fits']);
+	fm_file_browser.setRootDataPath('/data');
+
+	// Enable user output custom directory
+	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+		
+	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
+	selector.addPath('FLAG data', 'flags');
+	selector.addPath('WEIGHT data', 'weights');
+	selector.addPath('PSF data', 'psf');
+	selector.setFileBrowser(fm_file_browser);
+	selector.render();
+
+	// Now file browser can renders itself
+	fm_file_browser.render();
+
 </script>
