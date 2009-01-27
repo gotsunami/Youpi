@@ -71,42 +71,48 @@ var {{ plugin.id }} = {
 
 		// Checks that all weight maps are available if EXTRA option has been selected
 		var c = $('menuitem_sub_4').update();
+		menu.activate(4);
+		var pre = new Element('pre');
+		c.insert(pre);
+		var log = new Logger(pre);
+
 		if (path == selector.getExtra().title) {
-			menu.activate(4);
-			var pre = new Element('pre');
-			c.insert(pre);
-		
-			var log = new Logger(pre);
 			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
 			log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection');
 			log.msg_status("Using output data path '" + output_data_path + "'");
 			log.msg_status("Using '" + config + "' as configuration file");
 			log.msg_status('Checking <b>weight maps</b> availability (from QualityFITS)...');
 			{{ plugin.id }}.checkForQFITSData(pre, function() {
-				{{ plugin.id }}.do_addSelectionToCart({
-					useQFITSWeights: 1,
-					config: config, 
-					imgList: sels, 
-					weightPath: weightPath, 
-					resultsOutputDir: output_data_path
+				// Reset
+				{{ plugin.id }}.curSelectionIdx = 0;
+				// Now do Scamp-related checks
+				{{ plugin.id }}.checkForScampData(pre, function() {
+					{{ plugin.id }}.do_addSelectionToCart({
+						useQFITSWeights: 1,
+						config: config, 
+						imgList: sels, 
+						weightPath: weightPath, 
+						resultsOutputDir: output_data_path
+					});
 				});
 			});
 
 			return;
 		}
 		else {
-			var msg = new Element('div', {'class': 'tip'}).setStyle({width: '300px'});
-			msg.update('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no additionnal checks are run</b>. ' + 
-				'Your item has been directly added to the shopping cart.');
-			c.update(msg);
+			log.msg_status('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no checks for successful QFITS are ' +
+				'made at this time</b>. ');
 		}
 
-		{{ plugin.id }}.do_addSelectionToCart({
-			useQFITSWeights: 0,
-			config: config, 
-			imgList: sels, 
-			weightPath: weightPath, 
-			resultsOutputDir: output_data_path
+		// Checks for Scamp processings (for .head files support)
+		{{ plugin.id }}.checkForScampData(pre, function() {
+			{{ plugin.id }}.do_addSelectionToCart({
+				useQFITSWeights: 0,
+				config: config, 
+				imgList: sels, 
+				weightPath: weightPath, 
+				resultsOutputDir: output_data_path
+			});
 		});
 	},
 
@@ -171,7 +177,7 @@ var {{ plugin.id }} = {
 					{{ plugin.id }}.curSelectionIdx++;
 	
 					if ({{ plugin.id }}.curSelectionIdx < selArr.length) {
-						{{ plugin.id }}.checkForQFITSData(container);
+						{{ plugin.id }}.checkForQFITSData(container, handler);
 					}
 					else {
 						if ({{ plugin.id }}.weightMissingError) {
@@ -204,6 +210,104 @@ var {{ plugin.id }} = {
 					'IdList=' + idList;
 		// Send query
 		r.setBusyMsg('Checking selection ' + ({{ plugin.id }}.curSelectionIdx+1) + ' (' + idList.length + ' images)');
+		r.send('/youpi/process/plugin/', post);
+	},
+
+	/*
+	 * Function: checkForScampData
+	 * Check if every images in that selection has associated WEIGHT maps data
+	 *
+	 * Parameters:
+	 *  container - DOM element: DOM block container
+	 *  handler - function: custom handler executed once checks are successful
+	 *
+	 */ 
+	checkForScampData: function(container, handler) {
+		var handler = typeof handler == 'function' ? handler : null;
+		var div = new Element('div');
+		var log = new Logger(div);
+		var sels = {{ plugin.id }}.ims.getListsOfSelections();
+		var total = {{ plugin.id }}.ims.getImagesCount();
+
+		var selArr = eval(sels);
+		var idList = selArr[{{ plugin.id }}.curSelectionIdx];
+	
+		div.setStyle({textAlign: 'left'});
+		container.insert(div);
+	
+		var r = new HttpRequest(
+				div,
+				null,	
+				// Custom handler for results
+				function(resp) {
+					div.update();
+					var res = resp.result;
+					if (res.Warning) {
+						log.msg_warning('Selection ' + ({{ plugin.id }}.curSelectionIdx + 1) + ': ' + res.Warning);
+
+						{{ plugin.id }}.curSelectionIdx++;
+						if ({{ plugin.id }}.curSelectionIdx < selArr.length)
+							{{ plugin.id }}.checkForScampData(container, handler);
+						else {
+							// All checks are OK. Executes final custom handler, if any
+							if (handler) handler();
+						}
+					}
+					else {
+						log.msg_ok('Selection ' + ({{ plugin.id }}.curSelectionIdx + 1) + ': found ' + res.Tasks.length + ' matches. Please ' +
+							'select one in the list:');
+						var dat = new Element('div').setStyle({
+							width: '60%', 
+							maxHeight: '130px', 
+							overflow: 'auto',
+							marginLeft: '15px'
+						});
+						var bdiv = new Element('div').setStyle({marginLeft: '15px'});
+
+						var at = new AdvancedTable();
+						at.setContainer(dat);
+						at.setExclusiveSelectioMode(true);
+						at.attachEvent('onRowClicked', function() {
+							var txt = {{ plugin.id }}.curSelectionIdx == selArr.length - 1 ? 'Validate' : 'Validate and show next selection';
+							var but = new Element('input', {type: 'button', value: txt});
+							but.observe('click', function() {
+								this.hide();
+								{{ plugin.id }}.curSelectionIdx++;
+
+								if ({{ plugin.id }}.curSelectionIdx < selArr.length)
+									{{ plugin.id }}.checkForScampData(container, handler);
+								else {
+									at.attachEvent('onRowClicked', null);
+									//at.lock();
+
+									// No selection left, executes final custom handler, if any
+									if (handler) handler();
+									console.log('CUSTOM HANDLER');
+								}
+								
+								console.log(this);
+							});
+							bdiv.update(but);
+						});
+						at.setRowIdsFromColumn(0);
+						res.Tasks.each(function(task) {
+							at.appendRow(task);
+						});
+
+						div.insert(dat);
+						div.insert(bdiv);
+						at.render();
+						return;
+					}
+				}
+		);
+	
+		var post = 	'Plugin={{ plugin.id }}&' + 
+					'Method=checkForScampData&' +
+					'IdList=' + idList;
+		// Send query
+		r.setBusyMsg('Running Scamp checks for selection ' + ({{ plugin.id }}.curSelectionIdx+1) + ' (' + 
+			idList.length + ' images)');
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -282,6 +386,44 @@ var {{ plugin.id }} = {
 
 	reprocessAllFailedProcessings: function(tasksList) {
 		alert('TODO...');
+	},
+
+	/*
+	 * Schedule an image reprocessing by adding a new item in the shopping cart.
+	 *
+	 */
+	reprocess_image: function(taskId) {
+		console.log(taskId); return;
+		var r = new HttpRequest(
+				null,
+				null,	
+				// Custom handler for results
+				function(resp) {
+					data = resp.result;
+					p_data = {	plugin_name : '{{ plugin.id }}', 
+								userData : { 	'config' : 'The one used for the last processing',
+												'fitsinId' : fitsinId,
+												'imgList' : '[[' + data.ImageId + ']]',
+												'flatPath' : data.Flat, 
+												'maskPath' : data.Mask, 
+												'regPath' : data.Reg,
+												'resultsOutputDir' : data.ResultsOutputDir
+								}
+					};
+	
+					s_cart.addProcessing(
+							p_data,
+							// Custom handler
+							function() {
+								alert('The current image has been scheduled for reprocessing. \n' +
+									'An item has been added to the shopping cart.');
+							}
+					);
+				}
+		);
+
+		var post = 'Plugin={{ plugin.id }}&Method=getReprocessingParams&FitsinId=' + fitsinId;
+		r.send('/youpi/process/plugin/', post);
 	},
 
 	renderOutputDirStats: function(container_id) {

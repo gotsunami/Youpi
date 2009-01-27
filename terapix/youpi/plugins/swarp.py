@@ -301,6 +301,38 @@ queue""" %  {	'encuserdata' 	: encUserData,
 
 		return {'missingQFITS' : missing, 'tasksIds' : tasksIds}
 
+	def checkForScampData(self, request, imgList = None):
+		"""
+		Check if the image selection matches a successful Scamp involving the same image selection.
+		@return List of Scamp processings, if any
+		"""
+
+		post = request.POST
+		if imgList:
+			idList = imgList
+		else:
+			try:
+				idList = request.POST['IdList'].split(',')
+			except Exception, e:
+				raise PluginError, "POST argument error. Unable to process data."
+
+		tasksIds = []
+		missing = []
+		imgList = Image.objects.filter(id__in = idList)
+
+		tasks = Processing_task.objects.filter(	user = request.user, 
+												kind__name__exact = 'scamp',
+												success = True).order_by('-end_date')
+		mTasks = []
+		for t in tasks:
+			rels = Rel_it.objects.filter(task = t, image__in = imgList)
+			if not rels or len(rels) != len(imgList):
+				return {'Warning': 'no scamp processing found matching that image selection. Will not use .head files for that selection.'}
+			else:
+				mTasks.append(t)
+
+		return {'Tasks' : [[str(t.id), str(t.start_date), str(t.end_date), str(t.hostname), str(t.results_output_dir)] for t in mTasks]}
+
 	def getWeightPathsFromImageSelection(self, request, imgList = None):
 		"""
 		Compute data path of weight images for a given image selection

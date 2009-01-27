@@ -25,12 +25,6 @@ function AdvancedTable() {
 	 */
 	var _container = null;
 	/*
-	 * Var: _container_id
-	 * ID of container element
-	 *
-	 */
-	var _container_id;
-	/*
 	 * Var: _events
 	 * Array of available events name that can be registered with custom handlers
 	 *
@@ -73,6 +67,18 @@ function AdvancedTable() {
 	 *
 	 */
 	var _colIdxForRowIds = -1;
+	/*
+	 * Var: _exclusiveSelectionMode;
+	 * Exclusive selection mode operation (boolean)
+	 *
+	 */
+	var _exclusiveSelectionMode = false;
+	/*
+	 * Var: _lock;
+	 * Is _true_ to lock the table
+	 *
+	 */
+	var _lock = false;
 	/*
 	 * Var: _mainDiv
 	 * Top-level DOM parent div container
@@ -181,23 +187,38 @@ function AdvancedTable() {
 	 * Sets container parent to use for rendering contents
 	 *
 	 * Parameters:
-	 *  container_id - string: id of container element
+	 *  container - string or object: id or DOM node of container element
 	 *
 	 */ 
-	this.setContainer = function(container_id) {
-		/*
-		if (typeof container_id != 'string') {
-			_error("setContainer: container must be a string id!");
-			return;
-		}
+	this.setContainer = function(container) {
+		_container = container;
+	}
 
-		var c = $(container_id);
-		if (!c) {
-			_error("setContainer: container id '" + container_id + "' not found!");
-			return;
-		}
-		*/
-		_container_id = container_id;
+	/*
+	 * Function: setExclusiveSelectionMode
+	 * Defines whether the selection mode should be exclusive.
+	 *
+	 * Note:
+	 *  *Exclusive* means that only _one row can be selected_ at a time.
+	 *
+	 * Parameters:
+	 *  mode - boolean (default: false)
+	 *
+	 */ 
+	this.setExclusiveSelectioMode = function(mode) {
+		_exclusiveSelectionMode = typeof mode == 'boolean' ? mode : false;
+	}
+
+	/*
+	 * Function: getExclusiveSelectionMode
+	 * Returns whether the selection mode should be exclusive.
+	 *
+	 * Returns:
+	 *  mode - boolean
+	 *
+	 */ 
+	this.getExclusiveSelectioMode = function(mode) {
+		return _exclusiveSelectionMode;
 	}
 
 	/*
@@ -209,7 +230,7 @@ function AdvancedTable() {
 	 *
 	 */ 
 	this.getContainer = function() {
-		return $(_container_id);
+		return _container;
 	}
 
 	/*
@@ -218,7 +239,7 @@ function AdvancedTable() {
 	 *
 	 * Parameters:
 	 *  eventName - string: name of available event
-	 *  handler - function: custom handler for that event
+	 *  handler - function: custom handler for that event (can be set to _null_)
 	 *
 	 * See Also:
 	 *  <_events>
@@ -226,21 +247,21 @@ function AdvancedTable() {
 	 */ 
 	this.attachEvent = function(eventName, handler) {
 		if (typeof handler != 'function' && handler) {
-			_error('attachEvent: bad handler function!');
-			return;
-		}
-		if (!handler) {
-			_error('attachEvent: undefined handler!');
+			console.error('bad handler function!');
 			return;
 		}
 
 		var k = _checkForEventAvailability(eventName);
 		if (k == -1) {
-			_error('attachEvent: could not attach event');
+			console.error('could not attach unknown event: ' + eventName);
 			return;
 		}
 
 		_events[k][1] = handler;
+	}
+
+	this.lock = function(lock) {
+		_lock = typeof lock == 'boolean' ? lock : false;
 	}
 
 	/*
@@ -263,10 +284,8 @@ function AdvancedTable() {
 			if (eventName == _events[k][0])
 				break;
 		}
-		if (k == _events.length) {
-			_error("event '" + eventName + "' not available!");
+		if (k == _events.length)
 			return -1;
-		}	
 
 		return k;
 	}
@@ -313,8 +332,7 @@ function AdvancedTable() {
 	 *
 	 */ 
 	function _render() {
-		_container = $(_container_id);
-
+		_container = $(_container);
 		_mainDiv = new Element('div');
 		_mainDiv.setAttribute('class', 'advancedTable');
 
@@ -353,7 +371,10 @@ function AdvancedTable() {
 			tr = new Element('tr');
 			tr.row_idx = k;
 			tr.observe('click', function() {
-				_toggleRowSelection(this.row_idx);
+				if (!_lock) {
+					if (_exclusiveSelectionMode) _selectAll(false);
+					_toggleRowSelection(this.row_idx);
+				}
 			});
 
 			// Use custom CSS class style for this row?
@@ -611,15 +632,15 @@ function AdvancedTable() {
 			return;
 		}
 
-		_container = $(_container_id);
+		_container = $(_container);
 
 		var xhr = new HttpRequest(
-			_container.id,
+			_container,
 			// Use default error handler
 			null,
 			// Custom handler for results
 			function(resp) {
-				_container.innerHTML = '';
+				_container.update();
 				_headers = eval(resp['Headers']);
 				_rows.length = 0;
 				_rows = eval(resp['Content']);
