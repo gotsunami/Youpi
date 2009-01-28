@@ -74,12 +74,6 @@ function AdvancedTable() {
 	 */
 	var _exclusiveSelectionMode = false;
 	/*
-	 * Var: _lock;
-	 * Is _true_ to lock the table
-	 *
-	 */
-	var _lock = false;
-	/*
 	 * Var: _mainDiv
 	 * Top-level DOM parent div container
 	 *
@@ -260,10 +254,6 @@ function AdvancedTable() {
 		_events[k][1] = handler;
 	}
 
-	this.lock = function(lock) {
-		_lock = typeof lock == 'boolean' ? lock : false;
-	}
-
 	/*
 	 * Function: _checkForEventAvailability
 	 * Check if an event is available
@@ -327,6 +317,21 @@ function AdvancedTable() {
 	}
 
 	/*
+	 * Function: getRowData
+	 * Returns an array of a row's cells content
+	 *
+	 * Parameters:
+	 *  row - integer: 0-indexed row selected
+	 *
+	 */ 
+	this.getRowData = function(row) {
+		if (typeof row != 'number')
+			console.error('row must be an integer!');
+
+		return _rows[row];
+	}
+
+	/*
 	 * Function: _render
 	 * Renders widget
 	 *
@@ -359,7 +364,6 @@ function AdvancedTable() {
 		if (_headers.length) {
 			for (var k=0; k < _headers.length; k++) {
 				th = new Element('th');
-	//			th.setAttribute('width', cellw + '%;');
 				th.insert(_headers[k]);
 				tr.appendChild(th);
 			}
@@ -371,10 +375,8 @@ function AdvancedTable() {
 			tr = new Element('tr');
 			tr.row_idx = k;
 			tr.observe('click', function() {
-				if (!_lock) {
-					if (_exclusiveSelectionMode) _selectAll(false);
-					_toggleRowSelection(this.row_idx);
-				}
+				if (_exclusiveSelectionMode) _selectAll(false);
+				_toggleRowSelection(this.row_idx);
 			});
 
 			// Use custom CSS class style for this row?
@@ -573,6 +575,25 @@ function AdvancedTable() {
 			r = $(selection[k]);
 			r.setAttribute('class', 'rowSelected');
 		}	
+	}
+
+	/*
+	 * Function: getSelectedRows
+	 * Returns an array of unsigned integer (selected row index in table)
+	 *
+	 * Returns:
+	 *  array of 0-based indexes
+	 *
+	 */ 
+	this.getSelectedRows = function() {
+		var idxs = new Array();
+		var trs = _bodyDiv.select('tr');
+		trs.each(function(tr, k) {
+			if (tr.hasClassName('rowSelected'))
+				idxs.push(k);
+		});
+
+		return idxs;
 	}
 
 	/*

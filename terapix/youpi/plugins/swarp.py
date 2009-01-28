@@ -42,18 +42,19 @@ class Swarp(ProcessingPlugin):
 
 		try:
 			idList = eval(request.POST['IdList'])	# List of lists
+			headDataPaths = request.POST['HeadDataPaths'].split(',')
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
 		cluster_ids = []
-		k = 1
+		k = 0
 		error = condorError = '' 
 
 		try:
 			for imgList in idList:
 				if not len(imgList):
 					continue
-				csfPath = self.__getCondorSubmissionFile(request, imgList)
+				csfPath = self.__getCondorSubmissionFile(request, imgList, headDataPaths[k])
 				pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
 				data = pipe.readlines()
 				pipe.close()
@@ -62,7 +63,7 @@ class Swarp(ProcessingPlugin):
 		except CondorSubmitError, e:
 				condorError = str(e)
 		except Exception, e:
-				error = "Error while processing list #%d: %s" % (k, e)
+				error = "Error while processing list #%d: %s" % (k+1, e)
 
 		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
@@ -87,13 +88,16 @@ class Swarp(ProcessingPlugin):
 
 		return stats
 
-	def __getCondorSubmissionFile(self, request, idList):
+	def __getCondorSubmissionFile(self, request, idList, headDataPath):
 		"""
 		Generates a suitable Condor submission for processing images on the cluster.
 
 		Note that the swarpId variable is used to bypass the config variable: it allows to get the 
 		configuration file content for an already processed image rather by selecting content by config 
 		file name.
+
+		headDataPath is a path to (possibly an empty string) .head files to use with current image 
+		selection.
 		"""
 
 		post = request.POST
@@ -170,11 +174,19 @@ class Swarp(ProcessingPlugin):
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
+		# Weight maps support
 		if useQFITSWeights:
 			weight_files = self.getWeightPathsFromImageSelection(request, idList)
 			weight_files = string.join([dat[1] for dat in weight_files], ', ')
 		else:
 			weight_files = string.join([os.path.join(weigthPath, img.name + '_weight.fits.fz') for img in images], ', ')
+
+		# .head files support
+		head_files = os.path.join(submit_file_path, 'NOP')
+		userData['Head'] =  'No .head files used'
+		if len(headDataPath):
+			head_files = string.join([os.path.join(headDataPath, img.name + '.head') for img in images], ', ')
+			userData['Head'] =  str(headDataPath)
 
 	 	# Generates CSF
 		condor_submit_file = """
@@ -191,7 +203,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(weights)s, %(images)s, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(nop)s/NOP
+transfer_input_files    = %(heads)s, %(weights)s, %(images)s, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(nop)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = /tmp/SWARP.log.$(Cluster).$(Process)
@@ -208,6 +220,7 @@ notify_user             = monnerville@iap.fr
 		'config' 		: customrc,
 		'swarplist' 	: swarpImgsFile,
 		'nop' 			: submit_file_path, 
+		'heads'			: head_files,
 		'weights'		: weight_files,
 		'images'		: string.join([os.path.join(img.path, img.name + '.fits') for img in images], ', '),
 		'initdir' 		: os.path.join(submit_file_path, 'script'),
@@ -441,6 +454,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'History'			: history,
 					'Log' 				: err_log,
 					'Weight'			: str(data.weight),
+					'Head'				: str(data.head),
 		}
 
 	def getResultEntryDescription(self, task):
@@ -466,6 +480,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			config = post['Config']
 			resultsOutputDir = post['ResultsOutputDir']
 			useQFITSWeights = int(post['UseQFITSWeights'])
+			headDataPaths = post['HeadDataPaths'].split(',')
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
@@ -473,11 +488,12 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		itemName = "%s-%d" % (itemID, len(items)+1)
 
 		# Custom data
-		data = { 'idList' : idList, 
-				 'weightPath' : weightPath, 
+		data = { 'idList' 			: idList, 
+				 'weightPath' 		: weightPath, 
 				 'resultsOutputDir' : resultsOutputDir, 
-				 'useQFITSWeights' : useQFITSWeights,
-				 'config' : config }
+				 'useQFITSWeights' 	: useQFITSWeights,
+				 'headDataPaths' 	: headDataPaths,
+				 'config' 			: config }
 
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
@@ -511,6 +527,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
 				 		'useQFITSWeights' 	: str(data['useQFITSWeights']),
 						'name' 				: str(it.name),
+						'headDataPaths'		: string.join([str(p) for p in data['headDataPaths']], ','),
 						'config' 			: str(data['config'])})
 
 		return res

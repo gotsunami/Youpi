@@ -289,7 +289,8 @@ class Plugin_swarp(models.Model):
 	log = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Swarp output HTML data")
 	thumbnails = models.BooleanField('Has image thumbnails', default = False)
-	weight = models.CharField(max_length = 255, null = True, help_text = "Associated weight image")
+	weight = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
+	head = models.CharField(max_length = 255, null = True, help_text = "Path to .head images")
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')
