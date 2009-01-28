@@ -2,12 +2,12 @@
 
 
 var uid = '{{ plugin.id }}';
-
+console.log(uid);
 var {{ plugin.id }} = {
 	/*
 	 * Variable: ims
 	 *
-	 * <ImageSelector> instamce
+	 * <ImageSelector> instance
 	 *
 	 */
 	 ims: null,
@@ -222,7 +222,7 @@ var {{ plugin.id }} = {
 	},
 
 	saveItemForLater: function(trid, opts, silent) {
-	//idList, itemId, weightPath, resultsOutputDir, config, silent) {
+	//idList, itemId,flagPath, weightPath, psfPath, resultsOutputDir, config, silent) {
 		opts = $H(opts);
 		opts.set('Plugin', uid);
 		opts.set('Method', 'saveCartItem');
@@ -493,6 +493,11 @@ var {{ plugin.id }} = {
 					var total = resp['result'].length;
 					var countNode = $('plugin_' + uid + '_saved_count').update();
 					var txt;
+					// FIXME
+					txt = 'Not implemented';
+					countNode.update(txt);
+					return;
+					// END OF FIXME
 					if (total > 0)
 						txt = total + ' item' + (total > 1 ? 's' : '');
 					else
@@ -563,12 +568,12 @@ var {{ plugin.id }} = {
 						tabitd.update('Flag: ');
 						tabitr.insert(tabitd);
 						tabitd = new Element('td', {'class': 'file'});
-						if (res.flagPath.length)
+				/*		if (res.flagPath.length)
 							tabitd.update(reduceString(res.flagPath));
 						else
 							tabitd.update('Not specified');
 						tabitr.insert(tabitd);
-						
+				*/		
 						// Weight
 						tabitr = new Element('tr');
 						tabitd = new Element('td', {'class': 'label'});
@@ -697,7 +702,7 @@ var {{ plugin.id }} = {
 		div.setAttribute('id', uid + '_results_div');
 		div.setAttribute('align', 'center');
 		root.appendChild(div);
-
+		console.log(uid);
 		{{ plugin.id }}.ims = new ImageSelector(uid + '_results_div');
 		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
 	}
