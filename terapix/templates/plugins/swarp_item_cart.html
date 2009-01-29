@@ -5,7 +5,7 @@
 		<td style="width: 100%; padding: 3px">
 			<div id="{{ plugin.id }}_{{ forloop.counter }}_selections_div"></div>
 			<script type="text/javascript">
-				{{ plugin.id }}.displayImageCount('{{ data.userData.imgList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
+				{{ plugin.id }}.displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
 			</script>
 			<table class="plugin_small">
 				{% if data.userData.weightPath %}
@@ -40,28 +40,15 @@
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
 		$('{{ plugin.id }}_{{ forloop.counter}}_run').observe('click', function() {
-			{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter }}', {
-				IdList:				'{{ data.userData.imgList }}', 
-				ItemId: 			'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
-				WeightPath: 		'{{ data.userData.weightPath }}',
-				Config: 			'{{ data.userData.config }}',
-				ResultsOutputDir: 	'{{ data.userData.resultsOutputDir }}',
-				SwarpId: 			'{{ data.userData.swarpId }}',
-				UseQFITSWeights: 	'{{ data.userData.useQFITSWeights }}',
-				HeadDataPaths: 		'{{ data.userData.headDataPaths }}'
-			});
+			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
+			{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter }}', capitalizeHashKeys(userData));
 		});
 
 		$('{{ plugin.id }}_{{ forloop.counter}}_save').observe('click', function() {
-			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', {
-				IdList: 			'{{ data.userData.imgList }}', 
-				ItemID: 			'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
-				WeightPath: 		'{{ data.userData.weightPath }}',
-				ResultsOutputDir: 	'{{ data.userData.resultsOutputDir }}',
-				UseQFITSWeights: 	'{{ data.userData.useQFITSWeights }}',
-				HeadDataPaths: 		'{{ data.userData.headDataPaths }}',
-				Config: 			'{{ data.userData.config }}'
-			});
+			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
+			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', capitalizeHashKeys(userData));
 		});
 	});
 </script>

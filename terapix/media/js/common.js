@@ -6,6 +6,31 @@ function toggleDisplay(id) {
 }
 
 /*
+ * Function: capitalizeHashKeys
+ * Returns a copy of a hash with its keys's first letter capitalized
+ *
+ * Parameters:
+ *  obj - object - hash
+ *
+ * Returns:
+ *  Hash transformed
+ *
+ */
+function capitalizeHashKeys(obj) {
+	if (typeof obj != 'object')
+		return null;
+
+	obj = $H(obj);
+	var tmp = new Hash();
+
+	obj.keys().each(function(k) { 
+		tmp.set(k.charAt(0).toUpperCase() + k.sub(/^./, ''), obj.get(k)); 
+	});
+
+	return tmp;
+}
+
+/*
  * Deletes all children nodes of a child
  *
  */

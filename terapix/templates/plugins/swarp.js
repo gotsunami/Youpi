@@ -97,7 +97,7 @@ var {{ plugin.id }} = {
 					{{ plugin.id }}.do_addSelectionToCart({
 						useQFITSWeights: 1,
 						config: config, 
-						imgList: sels, 
+						idList: sels, 
 						weightPath: weightPath, 
 						resultsOutputDir: output_data_path,
 						headDataPaths: {{ plugin.id }}.headDataPaths.join(',')
@@ -107,17 +107,16 @@ var {{ plugin.id }} = {
 
 			return;
 		}
-		else {
-			log.msg_status('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no checks for successful QFITS are ' +
-				'made at this time</b>. ');
-		}
+	
+		log.msg_status('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no checks for successful QFITS are ' +
+			'made at this time</b>. ');
 
 		// Checks for Scamp processings (for .head files support)
 		{{ plugin.id }}.checkForScampData(pre, function() {
 			{{ plugin.id }}.do_addSelectionToCart({
 				useQFITSWeights: 0,
 				config: config, 
-				imgList: sels, 
+				idList: sels, 
 				weightPath: weightPath, 
 				resultsOutputDir: output_data_path,
 				headDataPaths: {{ plugin.id }}.headDataPaths.join(',')
@@ -268,7 +267,7 @@ var {{ plugin.id }} = {
 						log.msg_ok('Selection ' + ({{ plugin.id }}.curSelectionIdx + 1) + ': found ' + res.Tasks.length + ' matches. Please ' +
 							'select one in the list:');
 						var dat = new Element('div').setStyle({
-							width: '60%', 
+							width: '80%', 
 							maxHeight: '130px', 
 							overflow: 'auto',
 							marginLeft: '15px'
@@ -333,23 +332,23 @@ var {{ plugin.id }} = {
 	 *
 	 * Parameters:
 	 *
-	 * imgList - array of arrays of idLists
+	 * idList - array of arrays of idLists
 	 *
 	 */
-	displayImageCount: function(imgList, container_id) {
+	displayImageCount: function(idList, container_id) {
 		var container = $(container_id);
-		var imgList = eval(imgList);
+		var idList = eval(idList);
 		var c = 0;
 		var txt;
-		imgList.length > 1 ? txt = 'Batch' : txt = 'Single';
+		idList.length > 1 ? txt = 'Batch' : txt = 'Single';
 		var selDiv = new Element('div', {'class': 'selectionModeTitle'}).update(txt + ' selection mode:');
 		container.insert(selDiv);
 
 		selDiv = new Element('div', {'class': 'listsOfSelections'});
 
-		for (var k=0; k < imgList.length; k++) {
-			c = imgList[k].toString().split(',').length;
-			if (imgList.length > 1)
+		for (var k=0; k < idList.length; k++) {
+			c = idList[k].toString().split(',').length;
+			if (idList.length > 1)
 				txt = 'Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '');
 			else
 				txt = c + ' image' + (c > 1 ? 's' : '');
@@ -869,15 +868,7 @@ var {{ plugin.id }} = {
 
 						var addImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
 						});
-						// FIXME
-						//addImg.c_data = $H(res);
-						addImg.c_data = { 	idList: res.idList,
-											config: res.config,
-											weightPath: res.weightPath,
-											useQFITSWeights: res.useQFITSWeights,
-											headDataPaths: 	res.headDataPaths,
-											resultsOutputDir: res.resultsOutputDir
-						};
+						addImg.c_data = $H(res);
 						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);
 						});
@@ -930,15 +921,7 @@ var {{ plugin.id }} = {
 
 	addToCart: function(data) {
 		var p_data = {	plugin_name : uidswarp,
-	// FIXME
-	//					userData :	data
-						userData :	{ 	'config' 			: data.config,
-										'imgList' 			: data.idList,
-										'weightPath' 		: data.weightPath,
-										'resultsOutputDir' 	: data.resultsOutputDir,
-										'useQFITSWeights'	: data.useQFITSWeights,
-				 						'headDataPaths' 	: data.headDataPaths
-						}
+						userData :	data
 		};
 	
 		s_cart.addProcessing(p_data,

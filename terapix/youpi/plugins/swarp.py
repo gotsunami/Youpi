@@ -105,7 +105,7 @@ class Swarp(ProcessingPlugin):
 			itemId = str(post['ItemId'])
 			weightPath = post['WeightPath']
 			config = post['Config']
-			swarpId = post['SwarpId']
+			swarpId = post.get('SwarpId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
 			useQFITSWeights = int(post['UseQFITSWeights'])
@@ -475,7 +475,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		post = request.POST
 		try:
 			idList = eval(post['IdList'])
-			itemID = str(post['ItemID'])
+			itemID = str(post['ItemId'])
 			weightPath = post['WeightPath']
 			config = post['Config']
 			resultsOutputDir = post['ResultsOutputDir']
