@@ -1,0 +1,17 @@
+# Describe Swarp DB entity
+# Fields are ; separated
+# First line is table title
+# Second line defines table's header
+# Lines starting with # are comments (and ignored)
+
+
+Data dictionnary of Swarp entity
+Full name;DB field name;Description;Unit;Type;Display Format
+Results ingestion log;log;Results ingestion log;-;string;%s
+Swarp configuration;config;Swarp configuration file serialized content (base64 encoding over zlib compression);-;string;%s
+HTTP url;www;URL to Swarp output data;-;string;%s
+Thumbnails;thumbnails;True if thumbnails of output images have been created during processing;-;boolean;%d
+Weight Path;weightPath;Path to WEIGHT data used for this processing;-;string;%s
+Use QFITS Weights;useQFITSWeights;True if QFits weight maps have been used;-;boolean;%d
+Head Path;headPath;Path to .head files used for this processing;-;string;%s
+Use Head Files;useHeadFiles;True if .head files from Scamp processings have been used;-;boolean;%d

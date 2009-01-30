@@ -26,6 +26,7 @@ digraph codasyl {
 	plugfitsin [label="FITSin Plugin"];
 	plugfitsout [label="FITSout Plugin"];
 	plugscamp [label="SCAMP Plugin"];
+	plugswarp [label="SWARP Plugin"];
 	plugother [label="Other Plugin", style=dotted];
 	user [label="Django User", style=dashed];
 	miscdata [label="Misc Data"];
@@ -51,6 +52,7 @@ digraph codasyl {
 	task -> plugfitsin;
 	task -> plugfitsout;
 	task -> plugscamp;
+	task -> plugswarp;
 	task -> plugother[style=dotted];
 	Run -> relri;
 

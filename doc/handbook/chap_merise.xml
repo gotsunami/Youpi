@@ -17,6 +17,10 @@
 		&dict_scamp;
 	</sect2>
 	<sect2>
+		<title>Swarp Entity</title>
+		&dict_swarp;
+	</sect2>
+	<sect2>
 		<title>Astrophoto Calibration Entity</title>
 	</sect2>
 	<sect2>
@@ -196,6 +200,10 @@
 		<varlistentry>
 			<term><varname>Survey-Instrument Relation</varname></term>
 			<listitem><para>Survey-Instrument Relation (<emphasis>S--I Id, Survey Id, Instrument Id</emphasis>)</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term><varname>SWARP Plugin</varname></term>
+			<listitem><para>SWARP Plugin (<emphasis>SWARP Id</emphasis>, Processing Task Id, Config, Results Ingestion Log, HTTP Url, Thumbnails, Weight Path, Use QFITS Weights, Head Path, Use Head Files)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>User-Release Relation</varname></term>

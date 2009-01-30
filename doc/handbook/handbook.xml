@@ -12,6 +12,7 @@
 	<!ENTITY dict_image 					SYSTEM "image.dict.xml">
 	<!ENTITY dict_fitsin 					SYSTEM "fitsin.dict.xml">
 	<!ENTITY dict_scamp 					SYSTEM "scamp.dict.xml">
+	<!ENTITY dict_swarp 					SYSTEM "swarp.dict.xml">
 	<!ENTITY tab_name_mappings		SYSTEM "name_mappings.dict.xml">
 
 	<!ENTITY ajax 					"<acronym>AJAX</acronym>">
