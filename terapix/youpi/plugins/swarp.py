@@ -160,14 +160,17 @@ class Swarp(ProcessingPlugin):
 		swif.close()
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
-		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
-					'UserID' 			: str(request.user.id),				# Mandatory for AMI, WP
+		userData = {'Kind'	 			: self.id,						# Mandatory for AMI, Wrapper Processing (WP)
+					'UserID' 			: str(request.user.id),			# Mandatory for AMI, WP
+					'Descr' 			: '',							# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
+					'ResultsOutputDir'	: str(resultsOutputDir),		# Mandatory for WP
 					'ItemID' 			: itemId,
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
-					'Weight' 			: str(weightPath), 
-					'Descr' 			: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
-					'ResultsOutputDir'	: str(resultsOutputDir)				# Mandatory for WP
+					'WeightPath'		: str(weightPath), 
+					'UseQFITSWeights'	: int(useQFITSWeights),
+					'HeadPath'			: 'No .head files used',		# Default value
+					'UseHeadFiles'		: 0,							# Default value
 		} 
 
 		step = 0 							# At least step seconds between two job start
@@ -183,10 +186,10 @@ class Swarp(ProcessingPlugin):
 
 		# .head files support
 		head_files = os.path.join(submit_file_path, 'NOP')
-		userData['Head'] =  'No .head files used'
 		if len(headDataPath):
 			head_files = string.join([os.path.join(headDataPath, img.name + '.head') for img in images], ', ')
-			userData['Head'] =  str(headDataPath)
+			userData['HeadPath'] =  str(headDataPath)
+			userData['UseHeadFiles'] =  1
 
 	 	# Generates CSF
 		condor_submit_file = """
@@ -453,8 +456,10 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
 					'History'			: history,
 					'Log' 				: err_log,
-					'Weight'			: str(data.weight),
-					'Head'				: str(data.head),
+					'WeightPath'		: str(data.weightPath),
+					'UseQFITSWeights'	: int(data.useQFITSWeights),
+					'HeadPath'			: str(data.headPath),
+					'UseHeadFiles'		: int(data.useHeadFiles),
 		}
 
 	def getResultEntryDescription(self, task):

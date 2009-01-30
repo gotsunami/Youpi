@@ -407,8 +407,10 @@ def process(userData, kind_id, argv):
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
-							weight = userData['Weight'],
-							head = userData['Head'],
+							weightPath = userData['WeightPath'],
+							useQFITSWeights = userData['UseQFITSWeights'],
+							headPath = userData['HeadPath'],
+							useHeadFiles = userData['UseHeadFiles'],
 							thumbnails = convert
 				)
 				swarp_id = g.con.insert_id()

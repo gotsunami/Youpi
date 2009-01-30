@@ -681,21 +681,21 @@ var {{ plugin.id }} = {
 		tr.insert(td);
 		tab2.insert(tr);
 
-		// Weight
+		// Weight path
 		tr = new Element('tr');
 		td = new Element('td').insert('Weight path:');
 		tr.insert(td);
 
-		td = new Element('td').insert(resp.Weight.length > 0 ? resp.Weight : '--');
+		td = new Element('td').insert(resp.WeightPath.length > 0 ? resp.WeightPath : '--');
 		tr.insert(td);
 		tab2.insert(tr);
 
-		// Head
+		// Head path
 		tr = new Element('tr');
 		td = new Element('td').insert('Head path:');
 		tr.insert(td);
 
-		td = new Element('td').insert(resp.Head.length > 0 ? resp.Head : '--');
+		td = new Element('td').insert(resp.HeadPath.length > 0 ? resp.HeadPath : '--');
 		tr.insert(td);
 		tab2.insert(tr);
 
