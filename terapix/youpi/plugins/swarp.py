@@ -92,7 +92,7 @@ class Swarp(ProcessingPlugin):
 		"""
 		Generates a suitable Condor submission for processing images on the cluster.
 
-		Note that the swarpId variable is used to bypass the config variable: it allows to get the 
+		Note that the taskId variable is used to bypass the config variable: it allows to get the 
 		configuration file content for an already processed image rather by selecting content by config 
 		file name.
 
@@ -105,7 +105,7 @@ class Swarp(ProcessingPlugin):
 			itemId = str(post['ItemId'])
 			weightPath = post['WeightPath']
 			config = post['Config']
-			swarpId = post.get('SwarpId', '')
+			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
 			useQFITSWeights = int(post['UseQFITSWeights'])
@@ -118,15 +118,15 @@ class Swarp(ProcessingPlugin):
 		#
 		# Config file selection and storage.
 		#
-		# Rules: 	if swarpId has a value, then the config file content is retreive
+		# Rules: 	if taskId has a value, then the config file content is retreive
 		# 			from the existing Swarp processing. Otherwise, the config file content
 		#			is fetched by name from the ConfigFile objects.
 		#
 		# 			Selected config file content is finally saved to a regular file.
 		#
 		try:
-			if len(swarpId):
-				config = Plugin_swarp.objects.filter(id = int(swarpId))[0]
+			if len(taskId):
+				config = Plugin_swarp.objects.filter(task__id = int(taskId))[0]
 				content = str(zlib.decompress(base64.decodestring(config.config)))
 			else:
 				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
@@ -462,6 +462,28 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'UseHeadFiles'		: int(data.useHeadFiles),
 		}
 
+	def getReprocessingParams(self, request):
+		"""
+		Returns all information for reprocessing a stack (so that it can be added to the shopping cart).
+		"""
+
+		try:
+			taskId = request.POST['TaskId']
+		except KeyError, e:
+			raise PluginError, 'Bad parameters'
+
+		data = Plugin_swarp.objects.filter(task__id = int(taskId))[0]
+		rels = Rel_it.objects.filter(task__id = int(taskId))
+		# Must be a list of list
+		idList = [[int(r.image.id) for r in rels]]
+
+		return {'resultsOutputDir' 	: str(data.task.results_output_dir),
+				'useQFITSWeights'	: str(data.useQFITSWeights),
+				'idList'			: str(idList), 
+				'weightPath'		: str(data.weightPath), 
+				'headDataPaths'		: str(data.headPath),
+		}
+
 	def getResultEntryDescription(self, task):
 		"""
 		Returns custom result entry description for a task.
@@ -483,6 +505,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			itemID = str(post['ItemId'])
 			weightPath = post['WeightPath']
 			config = post['Config']
+			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 			useQFITSWeights = int(post['UseQFITSWeights'])
 			headDataPaths = post['HeadDataPaths'].split(',')
@@ -498,6 +521,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 				 'resultsOutputDir' : resultsOutputDir, 
 				 'useQFITSWeights' 	: useQFITSWeights,
 				 'headDataPaths' 	: headDataPaths,
+				 'taskId'			: taskId,
 				 'config' 			: config }
 
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
@@ -528,6 +552,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username'			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
+						'taskId' 			: str(data['taskId']), 
 						'weightPath' 		: str(data['weightPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
 				 		'useQFITSWeights' 	: str(data['useQFITSWeights']),

@@ -404,41 +404,46 @@ var {{ plugin.id }} = {
 	},
 
 	/*
-	 * Schedule an image reprocessing by adding a new item in the shopping cart.
+	 * Function: reprocessStack
+	 * Schedule a Swarp reprocessing
 	 *
-	 */
-	reprocess_image: function(taskId) {
-		console.log(taskId); return;
+	 * Parameters:
+	 *	taskId - string: DB task ID
+	 *
+	 */ 
+	reprocessStack: function(taskId) {
 		var r = new HttpRequest(
 				null,
 				null,	
 				// Custom handler for results
 				function(resp) {
 					data = resp.result;
-					p_data = {	plugin_name : '{{ plugin.id }}', 
-								userData : { 	'config' : 'The one used for the last processing',
-												'fitsinId' : fitsinId,
-												'imgList' : '[[' + data.ImageId + ']]',
-												'flatPath' : data.Flat, 
-												'maskPath' : data.Mask, 
-												'regPath' : data.Reg,
-												'resultsOutputDir' : data.ResultsOutputDir
-								}
+					var total = eval(data.idList)[0].length;
+
+					var userData = $H(data);
+					userData.set('config', 'The one used for this Swarp processing');
+					userData.set('taskId', taskId);
+
+					// Add to the shopping cart
+					var p_data = {	plugin_name	: uidswarp,
+								userData 	: userData,
 					};
-	
-					s_cart.addProcessing(
-							p_data,
-							// Custom handler
-							function() {
-								alert('The current image has been scheduled for reprocessing. \n' +
-									'An item has been added to the shopping cart.');
-							}
+				
+					s_cart.addProcessing(	p_data,
+											// Custom handler
+											function() {
+												alert('Swarp scheduled for reprocessing (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+													') and\nadded to the shopping cart.');
+											}
 					);
 				}
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=getReprocessingParams&FitsinId=' + fitsinId;
-		r.send('/youpi/process/plugin/', post);
+		var post = { Plugin: '{{ plugin.id }}',
+					 Method: 'getReprocessingParams',
+					 TaskId: taskId
+		};
+		r.send('/youpi/process/plugin/', getQueryString(post));
 	},
 
 	renderOutputDirStats: function(container_id) {
@@ -649,7 +654,7 @@ var {{ plugin.id }} = {
 			// Reprocess option
 			td = new Element('td', {'class': 'reprocess'});
 			img = new Element('img', {
-				onclick: uidswarp + ".reprocess_image('" + task.TaskId + "');",
+				onclick: uidswarp + ".reprocessStack('" + task.TaskId + "');",
 				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
 			});
 			td.insert(img);
