@@ -481,9 +481,7 @@ var {{ plugin.id }} = {
 		container.appendChild(tab);
 	},
 
-	//saveItemForLater: function(trid, idList, itemId, resultsOutputDir, config) {
 	saveItemForLater: function(trid, opts, silent) {
-	//	var runopts = get_runtime_options(trid);
 		opts = $H(opts);
 		opts.set('Plugin', uidscamp);
 		opts.set('Method', 'saveCartItem');
@@ -500,14 +498,6 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		/*
-		var post = 	'Plugin={{ plugin.id }}' + 
-					'&Method=saveCartItem' +
-					'&IdList=' + idList + 
-					'&ItemID=' + runopts.itemPrefix + itemId + 
-					'&ResultsOutputDir=' + resultsOutputDir + 
-					'&Config=' + config;
-					*/
 		var post = getQueryString(opts);
 		r.send('/youpi/process/plugin/', post);
 	},
