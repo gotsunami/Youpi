@@ -3,7 +3,7 @@
 import sys, os.path, re, time, string
 import marshal, base64, zlib
 import xml.dom.minidom as dom
-from pluginmanager import ProcessingPlugin, PluginError
+from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
 from terapix.youpi.models import *
 #
 from terapix.settings import *
@@ -29,23 +29,23 @@ class Sextractor(ProcessingPlugin):
 		self.itemPrefix = 'SEX'
 		self.index = 1
 
-		self.template = 'plugins/sextractor.html' 						# Main template, rendered in the processing page
-		self.itemCartTemplate = 'plugins/sextractor_item_cart.html' 	# Template for custom rendering into the shopping cart
-		self.jsSource = 'plugins/sextractor.js' 						# Custom javascript
+		self.template 			= 'plugins/sextractor.html' 							# Main template, rendered in the processing page
+		self.itemCartTemplate 	= 'plugins/sextractor_item_cart.html' 					# Template for custom rendering into the shopping cart
+		self.jsSource 			= 'plugins/sextractor.js' 								# Custom javascript
 
-		#self.enable = False
+		self.enable = True 
 		self.jobCount = 10
 
 	def saveCartItem(self, request):
 		post = request.POST
 		try:
-			idList = post['IdList'].split(',')
-			itemID = str(post['ItemID'])
-			flagPath = post['FlagPath']
-			weightPath = post['WeightPath']
-			psfPath = post['PsfPath']
-			config = post['Config']
-			resultsOutputDir = post['ResultsOutputDir']
+			idLis				= eval(post['IdList'])
+			itemID				= str(post['ItemID'])
+			flagPath		 	= post['FlagPath']
+			weightPath 			= post['WeightPath']
+			psfPath 			= post['PsfPath']
+			config 				= post['Config']
+			resultsOutputDir 	= post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -69,6 +69,12 @@ class Sextractor(ProcessingPlugin):
 
 		return "Item %s saved" % itemName
 
+	def reprocessAllFailedProcessings(self, request):
+		"""
+		Returns parameters to allow reprocessing of failed processings
+		"""
+		pass
+
 	def getSavedItems(self, request):
 		"""
 		Returns a user's saved items. 
@@ -82,7 +88,7 @@ class Sextractor(ProcessingPlugin):
 			res.append({
 						'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
-						'idList' 			: [str(i) for i in data['idList']], 
+						'idList' 			: str(data['idList']), 
 						'flagPath' 			: str(data['flagPath']), 
 						'weightPath' 		: str(data['weightPath']), 
 						'psfPath' 			: str(data['psfPath']), 
@@ -92,22 +98,6 @@ class Sextractor(ProcessingPlugin):
 						})
 		return res 
 
-	def hasSavedItems(self):
-		sItems = CartItem.object.filter(kind__name__exact = self.id)
-		return 'mat1!'
-
-
-	def format(self, data, format):
-		try:
-			if data:
-				return format % data
-			else:
-				return None
-		except TypeError:
-			return None
-
-
-
 	def process(self, request):
 		"""
 		Do the job.
@@ -115,69 +105,148 @@ class Sextractor(ProcessingPlugin):
 		2. Executes condor_submit on that file
 		3. Returns info related to ClusterId and number of jobs submitted
 		"""
-		post = request.POST
-
-		csfContent, csfPath = self.__getCondorSubmissionFile(request)
-
-		f = open(csfPath, 'w')
-		f.write(csfContent)
-		f.close()
-
-		pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
-		data = pipe.readlines()
-		pipe.close()
-
-		return self.getClusterId(data)
-
-	def __getCondorSubmissionFile(self, request):
-		"""
-		Generates a suitable Condor submission for processing /usr/bin/uptime jobs on the cluster.
-		"""
-
-		post = request.POST
 		try:
-			#
-			# Retreive your POST data here
-			#
-			idList = post['IdList'].split(',')
-			itemId = str(post['ItemId'])
-			flagPath = post['FlagPath']
-			weightPath = post['WeightPath']
-			psfPath = post['PsfPath']
-			config = post['Config']
-			sexId = post['sexId']
-			resultsOutputDir = post['ResultsOutputDir']
-			condorHosts = post['CondorHosts'].split(',')
+			idList = eval(request.POST['IdList'])	# List of lists
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
+		cluster_ids = []
+		k = 1
+		error = condorError = '' 
+
+		try:
+			for imgList in idList:
+				if not len(imgList):
+					continue
+				csfPath = self.__getCondorSubmissionFile(request, imgList)
+				pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
+				data = pipe.readlines()
+				pipe.close()
+				cluster_ids.append(self.getClusterId(data))
+				k += 1
+		except CondorSubmitError, e:
+				condorError = str(e)
+		except Exception, e:
+				error = "Error while processing list #%d: %s" % (k, e)
+
+		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
+
+	def getOutputDirStats(self, outputDir):
+		"""
+		Return some sextractor-related statistics about processings from outputDir.
+		"""
+
+		headers = ['Task success', 'Task failures', 'Total processings']
+		cols = []
+		tasks = Processing_task.objects.filter(results_output_dir = outputDir)
+		tasks_success = tasks_failure = 0
+		for t in tasks:
+			if t.success == 1:
+				tasks_success += 1
+			else:
+				tasks_failure += 1
+
+		stats = {	'TaskSuccessCount' 	: [tasks_success, "%.2f" % (float(tasks_success)/len(tasks)*100)],
+					'TaskFailureCount' 	: [tasks_failure, "%.2f" % (float(tasks_failure)/len(tasks)*100)],
+					'Total' 			: len(tasks) }
+
+		return stats
+
+
+	def __getCondorSubmissionFile(self, request, idList):
+		"""
+		Generates a suitable Condor submission for processing /usr/bin/uptime jobs on the cluster.
+
+		Note that the sexId variable is used to bypass the config variable: it allows to get the 
+		configuration file content for an already processed image rather by selecting content by config 
+		file name.
+		"""
+
+		post = request.POST
+		try:
+			itemId 				= str(post['ItemId'])
+			flagPath 			= post['FlagPath']
+			weightPath 			= post['WeightPath']
+			psfPath 			= post['PsfPath']
+			config 				= post['Config']
+			sexId 				= post['SexId']
+			resultsOutputDir 	= post['ResultsOutputDir']
+			reprocessValid 		= int(post['ReprocessValid'])
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data: %s" % e
+
+		# Builds realtime Condor requirements string
+		req = self.getCondorRequirementString(request)
+
+		#
+		# Config file selection and storage.
+		#
+		# Rules: 	if sexId has a value, then the config file content is retreive
+		# 			from the existing Sextractor processing. Otherwise, the config file content
+		#			is fetched by name from the ConfigFile objects.
+		#
+		# 			Selected config file content is finally saved to a regular file.
+		#
+		try:
+			if len(sexId):
+				config = Plugin_sex.objects.filter(id = int(sexId))[0]
+				content = str(zlib.decompress(base64.decodestring(config.config)))
+			else:
+				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
+				content = config.content
+		except IndexError:
+			# Config file not found, maybe one is trying to process data from a saved item 
+			# with a delete configuration file
+			raise PluginError, "The configuration file you want to use for this processing has not been found " + \
+				"in the database... Are you trying to process data with a config file that has been deleted?"
+		except Exception, e:
+			raise PluginError, "Unable to use a suitable config file: %s" % e
+
 		now = time.time()
+
+		# Sex config file
+		customrc = os.path.join('/tmp/', "sex-config-%s.rc" % now)
+		sexrc = open(customrc, 'w')
+		sexrc.write(content)
+		sexrc.close()
+
 		# Condor submission file
-		csfPath = "/tmp/skel-%s.txt" % now
+		csfPath = "/tmp/sex-condor-%s.txt" % now
+		csf = open(csfPath, 'w')
+#FIXME
+		# Swarp file containing a list of images to process (one per line)
+#		images = Image.objects.filter(id__in = idList)
+#		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % now)
+#		imgPaths = [img.name + '.fits' for img in images]
+#		swif = open(swarpImgsFile, 'w')
+#		swif.write(string.join(imgPaths, '\n'))
+#		swif.close()
+#END OF FIXME
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
-		# At least those 3 keys
-		userData = {'Descr' 		: str("%s trying /usr/bin/uptime" % self.optionLabel),		# Mandatory for Active Monitoring Interface (AMI)
-					'Kind'	 		: self.id,												# Mandatory for AMI
-					'UserID' 		: str(request.user.id)									# Mandatory for AMI
-				} 
+		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
+					'UserID' 			: str(request.user.id),				# Mandatory for AMI, WP
+					'ItemID' 			: itemId,
+					'SubmissionFile'	: csfPath, 
+					'ConfigFile' 		: customrc, 
+					'Weight' 			: str(weightPath), 
+					'Flag	' 			: str(flagPath), 
+					'Psf'	 			: str(psfPath), 
+					'Descr' 			: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
+					'ResultsOutputDir'	: str(resultsOutputDir)				# Mandatory for WP
+		} 
 
-		# Base64 encoding + marshal serialization
-		# Will be passed as argument 1 to the wrapper script
-		try:
-			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
-		except ValueError:
-			raise ValueError, userData
-
-		# Real command to perform here
-		args = ''
-		for x in range(self.jobCount):
-			args += "arguments = %s /usr/bin/uptime\nqueue\n" % encUserData
-
-		# Builds Condor requirements string
-		req = self.getCondorRequirementString(condorHosts)
+		step = 0 							# At least step seconds between two job start
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
+#FIX ME
+#
+#		if useQFITSWeights:
+#			weight_files = self.getWeightPathsFromImageSelection(request, idList)
+#			weight_files = string.join([dat[1] for dat in weight_files], ', ')
+#		else:
+#			weight_files = string.join([os.path.join(weigthPath, img.name + '_weight.fits.fz') for img in images], ', ')
+#END OF FIX ME
 
 	 	# Generates CSF
 		condor_submit_file = """
@@ -187,36 +256,78 @@ class Sextractor(ProcessingPlugin):
 # http://clix.iap.fr/youpi/
 #
 
-# Plugin: %s
+# Plugin: %(description)s
 
-executable              = %s/wrapper_processing.py
+executable              = %(wrapper)s/wrapper_processing.py
 universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
-initialdir				= %s
+transfer_input_files    = %(weights)s, %(flags)s, %(psfs)s, %(images)s, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP
+initialdir				= %(initdir)s
 transfer_output_files   = NOP
-# YOUPI_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
-log                     = /tmp/SKEL.log.$(Cluster).$(Process)
-error                   = /tmp/SKEL.err.$(Cluster).$(Process)
-output                  = /tmp/SKEL.out.$(Cluster).$(Process)
+log                     = /tmp/SEX.log.$(Cluster).$(Process)
+error                   = /tmp/SEX.err.$(Cluster).$(Process)
+output                  = /tmp/SEX.out.$(Cluster).$(Process)
 notification            = Error
-notify_user             = monnerville@iap.fr
-requirements            = %s
-%s""" % (	self.description,
-			os.path.join(submit_file_path, 'script'),
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			userData, 
-			base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
-			req, 
-			args )
+notify_user             = semah@iap.fr
+# Computed Req string
+%(requirements)s
+""" % {	'description'	: self.description,
+		'wrapper' 		: os.path.join(submit_file_path, 'script'),
+		'settings' 		: submit_file_path, 
+		'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
+		'config' 		: customrc,
+		'nop' 			: submit_file_path, 
+#		'weights'		: weight_files,
+#		'flags'			: flags_files,
+#		'psfs'			: psf_files,
+#		'images'		: string.join([os.path.join(img.path, img.name + '.fits') for img in images], ', '),
+		'initdir' 		: os.path.join(submit_file_path, 'script'),
+		'requirements' 	: req }
 
-		return (condor_submit_file, csfPath)
+		csf.write(condor_submit_file)
+
+		userData['ImgID'] = idList
+		userData['Descr'] = str("%s of %d FITS images" % (self.optionLabel, len(images)))		# Mandatory for Active Monitoring Interface (AMI)
+
+		#
+		# Delaying job startup will prevent "Too many connections" MySQL errors
+		# and will decrease the load of the node that will receive all qualityFITS data
+		# results (PROCESSING_OUTPUT) back. Every job queued will be put to sleep StartupDelay 
+		# seconds
+		#
+		userData['StartupDelay'] = step
+		userData['Warnings'] = {}
+
+		# Base64 encoding + marshal serialization
+		# Will be passed as argument 1 to the wrapper script
+		try:
+			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+		except ValueError:
+			raise ValueError, userData
+
+		sex_params = "-XSL_URL %ssextractor.xsl" % os.path.join(	WWW_SEX_PREFIX, 
+																request.user.username, 
+																userData['Kind'], 
+																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+
+
+		condor_submit_entry = """
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s  -c %(config)s 2>/dev/null
+# YOUPI_USER_DATA = %(userdata)s
+environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
+queue""" %  {	'encuserdata' 	: encUserData, 
+				'params'		: sex_params,
+				'config'		: os.path.basename(customrc),
+				'userdata'		: userData, 
+				'user'			: request.user.username,
+				'tpxupload'		: FTP_URL + resultsOutputDir }
+
+		csf.write(condor_submit_entry)
+		csf.close()
+
+		return csfPath
 
 
 	def getTaskInfo(self, request):
@@ -231,6 +342,7 @@ requirements            = %s
 			raise PluginError, "POST argument error. Unable to process data."
 
 		task = Processing_task.objects.filter(id = taskid)[0]
+		data = Plugin_sex.objects.filter(task__id = taskid)[0]
 
 		# Error log content
 		if task.error_log:
@@ -238,177 +350,80 @@ requirements            = %s
 		else:
 			err_log = ''
 
-		#
-		# Result log content, if any show be saved in a custom DB table for the plugin
-		#
-		# data = YourDjangoModel.objects.filter(task__id = taskid)[0]
-		# if data.rlog:
-		#	rlog = str(zlib.decompress(base64.decodestring(data.qflog)))
-		# else:
-		#	rlog = ''
-		#
+		if data.log:
+			sexlog = str(zlib.decompress(base64.decodestring(data.log)))
+		else:
+			sexlog = ''
 
-		return {	'TaskId'	: str(taskid),
-					'Title' 	: str("%s" % self.description),
-					'User' 		: str(task.user.username),
-					'Success' 	: task.success,
-					'Start' 	: str(task.start_date),
-					'End' 		: str(task.end_date),
-					'Duration' 	: str(task.end_date-task.start_date),
-					'Log' 		: err_log
-			}
+		# Get related images
+		rels = Rel_it.objects.filter(task__id = taskid)
+		imgs = [r.image for r in rels]
 
-	def saveConfigFile(self, request):
+#FIX ME
+		# Computes total exposure time
+	#	totalExpTime = 0
+	#	for img in imgs:
+	#		totalExpTime += img.exptime
+
+		# Looks for groups of swarp
+	#	swarpHistory = Rel_it.objects.filter(image__in = imgs, task__kind__name = self.id).order_by('task')
+		# Finds distinct tasks
+	#	tasksRelated = []
+	#	for sh in swarpHistory:
+	#		if sh.task not in tasksRelated:
+	#			tasksRelated.append(sh.task)
+
+		gtasks = []
+		# Remove all tasks than depends on more images
+		for t in tasksRelated:
+			r = Rel_it.objects.filter(task = t)
+			if len(r) == len(imgs):
+				gtasks.append(t)
+
+		history = []
+		for st in gtasks:
+			history.append({'User' 			: str(st.user.username),
+							'Success' 		: st.success,
+							'Start' 		: str(st.start_date),
+							'Duration' 		: str(st.end_date-st.start_date),
+							'Hostname' 		: str(st.hostname),
+							'TaskId'		: str(st.id),
+							})
+
+		thumbs = ['sex.png']
+		if data.thumbnails:
+			thumbs = ['tn_' + thumb for thumb in thumbs]
+
+		return {	'TaskId'			: str(taskid),
+					'Title' 			: str("%s" % self.description),
+					'User' 				: str(task.user.username),
+					'Success' 			: task.success,
+					'Start' 			: str(task.start_date),
+					'End' 				: str(task.end_date),
+#					'TotalExposureTime'	: str(round(totalExpTime, 2)),
+					'Duration' 			: str(task.end_date-task.start_date),
+					'WWW' 				: str(data.www),
+					'ResultsOutputDir' 	: str(task.results_output_dir),
+					'ResultsLog'		: sexlog,
+					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
+					'Previews'			: thumbs,
+					'HasThumbnails'		: data.thumbnails,
+					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
+					'History'			: history,
+					'Log' 				: err_log,
+					'Weight'			: str(data.weight),
+					'Flag'				: str(data.flag),
+					'Psf'				: str(data.psf),
+		}
+
+
+	def getResultEntryDescription(self, task):
 		"""
-		Save configuration file to DB
-		"""
-		post = request.POST
-		try:
-			name = str(post['Name'])
-			config = str(post['Content'])
-		except Exception, e:
-			raise PluginError, "Unable to save config file: no name given"
+		Returns custom result entry description for a task.
+		task: django object
 
-		try:
-			# Updates entry
-			m = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
-			m.content = config
-		except:
-			# ... or inserts a new one
-			k = Processing_kind.objects.filter(name__exact = self.id)[0]
-			m = ConfigFile(kind = k, name = name, content = config, user = request.user)
-
-		m.save()
-
-		return name + ' saved'
-
-
-	def jobStatus(self, request):
-		"""
-		Parses XML output from Condor and returns a JSON object.
-		Only Youpi's related job are monitored. A Youpi job must have 
-		an environment variable named YOUPI_USER_DATA which can contain
-		serialized base64-encoded data to be parsed.
-
-		nextPage: id of the page of 'limit' results to display
-		"""
-
-		try:
-			nextPage = int(request.POST['NextPage'])
-		except KeyError, e:
-			raise PluginError, 'Bad parameters'
-
-		pipe = os.popen("/opt/condor/bin/condor_q -xml")
-		data = pipe.readlines()
-		pipe.close()
-
-		res = []
-		# Max jobs per page
-		limit = 10
-
-		# Removes first 3 lines (not XML)
-		doc = dom.parseString(string.join(data[3:]))
-		jNode = doc.getElementsByTagName('c')
-
-		# Youpi Condor job count
-		jobCount = 0
-
-		for job in jNode:
-			jobData = {}
-			data = job.getElementsByTagName('a')
-
-			for a in data:
-				if a.getAttribute('n') == 'ClusterId':
-					jobData['ClusterId'] = str(a.firstChild.firstChild.nodeValue)
-
-				elif a.getAttribute('n') == 'ProcId':
-					jobData['ProcId'] = str(a.firstChild.firstChild.nodeValue)
-
-				elif a.getAttribute('n') == 'JobStatus':
-					# 2: running, 1: pending
-					jobData['JobStatus'] = str(a.firstChild.firstChild.nodeValue)
-
-				elif a.getAttribute('n') == 'RemoteHost':
-					jobData['RemoteHost'] = str(a.firstChild.firstChild.nodeValue)
-
-				elif a.getAttribute('n') == 'Args':
-					fitsFile = str(a.firstChild.firstChild.nodeValue)
-					jobData['FitsFile'] = fitsFile.split('/')[-1]
-				
-				elif a.getAttribute('n') == 'JobStartDate':
-					secs = (time.time() - int(a.firstChild.firstChild.nodeValue))
-					h = m = 0
-					s = int(secs)
-					if s > 60:
-						m = s/60
-						s = s%60
-						if m > 60:
-							h = m/60
-							m = m%60
-	
-					jobData['JobDuration'] = "%02d:%02d:%02d" % (h, m, s)
-
-				elif a.getAttribute('n') == 'Env':
-					# Try to look for YOUPI_USER_DATA environment variable
-					# If this is variable is found then this is a Youpi's job so we can keep it
-					env = str(a.firstChild.firstChild.nodeValue)
-					if env.find('YOUPI_USER_DATA') >= 0:
-						m = re.search('YOUPI_USER_DATA=(.*?)$', env)
-						userData = m.groups(0)[0]	
-						c = userData.find(';')
-						if c > 0:
-							userData = userData[:c]
-						jobData['UserData'] = marshal.loads(base64.decodestring(str(userData)))
-
-						if jobData['UserData'].has_key('Kind'):
-							if jobData['UserData']['Kind'] == self.id:
-								res.append(jobData)
-								jobCount += 1
-
-		# Computes total pages
-		pageCount = 1
-		if jobCount  > limit:
-			pageCount = jobCount / limit
-			if jobCount % limit > 0:
-				pageCount += 1
-	
-		# Selects res subset according to NextPage and limit
-		if nextPage > pageCount:
-			nextPage = pageCount
-		res = res[(nextPage-1)*limit:limit*nextPage]
-
-		return [res, jobCount, pageCount, nextPage]
-
-	def cancelJob(self, request):
-		"""
-		Cancel a Job. POST arg used are clusterId and procId
+		returned value: HTML tags allowed
 		"""
 
-		post = request.POST
-		cluster = str(post['ClusterId'])
-		proc = str(post['ProcId'])
+		return "%s <tt>%s</tt>" % (self.optionLabel, self.command)
 
-		pipe = os.popen("/opt/condor/bin/condor_rm %s.%s" % (cluster, proc))
-		data = pipe.readlines()
-		pipe.close()
-
-		return 'Job cancelled'
-
-	def deleteConfigFile(self, request):
-		"""
-		Deletes configuration file to DB
-		"""
-		post = request.POST
-		try:
-			name = str(post['Name'])
-		except Exception, e:
-			raise PluginError, "Unable to delete config file: no name given"
-
-		try:
-			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
-		except:
-			raise PluginError, "No config file with that name: %s" % name
-
-		config.delete()
-
-		return name + ' deleted'

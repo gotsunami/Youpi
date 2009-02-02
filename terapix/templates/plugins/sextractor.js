@@ -1,8 +1,7 @@
 // JS code for Sextractor plugin
 
 
-var uid = '{{ plugin.id }}';
-console.log(uid);
+var uidsex = '{{ plugin.id }}';
 var {{ plugin.id }} = {
 	/*
 	 * Variable: ims
@@ -19,7 +18,7 @@ var {{ plugin.id }} = {
 	addSelectionToCart: function() {
 		//Checks for images
 		sels = {{ plugin.id }}.ims.getListsOfSelections();
-		
+		console.log(sels);	
 
 		if (!sels) {
 			alert('No images selected. Nothing to add to cart !');
@@ -27,46 +26,41 @@ var {{ plugin.id }} = {
 		}
 
 		// OPTIONAL
-		var flagPath = '';
-		var weightPath = '';
-		var psfPath = '';
-		var optPath = [flagPath, weightPath, psfPath]
-		var optSel = $(uid + '_flags_select', uid + '_weights_select', uid + '_psf_select');
-		/*
-		optSel.each(function(id) {
-			if (id == null) {
-				alert('There is no path selected !\n Try to create one in Select Data Paths subsections...');
-			}
-		});
-		return;
+		var optPath = new Array();
+		var optSel = $(uidsex + '_flags_select', uidsex + '_weights_select', uidsex + '_psf_select');
 		
 		optSel.each(function(select, j) {
-			var path = select.options[select.selectedIndex].text;
-			if (path != selector.getNoSelectionPattern()) {
-				optPath[j] = path;
+			if (optSel[j] == null) { 
+				return;
+			}
+			else {
+				var path = select.options[select.selectedIndex].text;
+				if (path != selector.getNoSelectionPattern()) {
+					optPath[j] = path;
+				}
 			}
 		});
-		*/
+		
 
 		var total = {{ plugin.id }}.ims.getImagesCount();
 		
 		//Get config file
-		var cSel = $(uid + '_config_name_select');
+		var cSel = $(uidsex + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		//Gets custom output directory
 		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
-		var output_data_path = '{{ processing_output }}{{ user.username }}/i' + uid + '/';
+		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidsex + '/';
 
 		if (custom_dir) 
 			output_data_path += custom_dir + '/';
-		
+
 		{{ plugin.id }}.do_addSelectionToCart({
 			config: config, 
 			imgList: sels,
-			weightPath: weightPath,
-			flagPath: flagPath,
-			psfPath: psfPath,
+			weightPath: optPath[1],
+			flagPath: optPath[0],
+			psfPath: optPath[2],
 			resultsOutputDir: output_data_path
 		});
 	},
@@ -76,7 +70,7 @@ var {{ plugin.id }} = {
 
 
 		// Finally, add to the shopping cart
-		p_data = {	plugin_name : uid , 
+		p_data = {	plugin_name : uidsex , 
 					userData 	: data
 		};
 
@@ -154,7 +148,7 @@ var {{ plugin.id }} = {
 	
 		// Adds various options
 		opts = $H(opts);
-		opts.set('Plugin', uid);
+		opts.set('Plugin', uidsex);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 
@@ -224,12 +218,12 @@ var {{ plugin.id }} = {
 	saveItemForLater: function(trid, opts, silent) {
 	//idList, itemId,flagPath, weightPath, psfPath, resultsOutputDir, config, silent) {
 		opts = $H(opts);
-		opts.set('Plugin', uid);
+		opts.set('Plugin', uidsex);
 		opts.set('Method', 'saveCartItem');
 
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				uid + '_result',
+				uidsex + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -363,7 +357,7 @@ var {{ plugin.id }} = {
 	
 			// Date-time, duration
 			td = new Element('td');
-			var a = new Element('a', {href: '/youpi/results/' + uid + '/' + task.TaskId + '/'});
+			var a = new Element('a', {href: '/youpi/results/' + uidsex + '/' + task.TaskId + '/'});
 			a.insert(task.Start + ' (' + task.Duration + ')');
 			td.insert(a);
 			tr.insert(td);
@@ -377,7 +371,7 @@ var {{ plugin.id }} = {
 			// Reprocess option
 			td = new Element('td', {'class': 'reprocess'});
 			img = new Element('img', {
-				onclick: uid + ".reprocess_image('" + task.TaskId + "');",
+				onclick: uidsex + ".reprocess_image('" + task.TaskId + "');",
 				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
 			});
 			td.insert(img);
@@ -479,8 +473,8 @@ var {{ plugin.id }} = {
 
 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_' + uid).update();
-		var div = new Element('div', {'class': 'savedItems', id: uid + '_saved_items_div'});
+		var cdiv = $('plugin_menuitem_sub_' + uidsex).update();
+		var div = new Element('div', {'class': 'savedItems', id: uidsex + '_saved_items_div'});
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
@@ -491,13 +485,9 @@ var {{ plugin.id }} = {
 					div.update();
 	
 					var total = resp['result'].length;
-					var countNode = $('plugin_' + uid + '_saved_count').update();
+					var countNode = $('plugin_' + uidsex + '_saved_count').update();
 					var txt;
-					// FIXME
-					txt = 'Not implemented';
-					countNode.update(txt);
-					return;
-					// END OF FIXME
+					
 					if (total > 0)
 						txt = total + ' item' + (total > 1 ? 's' : '');
 					else
@@ -506,7 +496,7 @@ var {{ plugin.id }} = {
 	
 					var table = new Element('table', {'class': 'savedItems'});
 					var tr, th;
-					var icon = new Element('img', {	'src': '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/' + uid + '.png',
+					var icon = new Element('img', {	'src': '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/' + uidsex + '.png',
 													'style': 'vertical-align:middle; margin-right: 10px;'
 					});
 	
@@ -527,8 +517,9 @@ var {{ plugin.id }} = {
 					var delImg, trid;
 					var tabi, tabitr, tabitd;
 					resp.result.each(function(res, k) {
-						idLists = res.idList.evalJSON();
-						trid = uid + '_saved_item_' + k + '_tr';
+						console.log(eval(res.idList));
+						idList = eval(res.idList);
+						trid = uidsex + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
 
 						// Date
@@ -546,11 +537,13 @@ var {{ plugin.id }} = {
 						// Images count
 						td = new Element('td', {'class': 'imgCount'});
 						var sp = new Element('span', {'style': 'font-weight: bold; text-decoration: underline;'});
-						sp.update(idLists.length > 1 ? 'Batch' : 'Single');
+						sp.update(idList.length > 1 ? 'Batch' : 'Single');
 						td.insert(sp).insert(new Element('br'));
+						tr.insert(td);
+						
 
-						idLists.each(function(idList) {
-							td.insert(idList.length).insert(new Element('br'));
+						idList.each(function(i) {
+							td.insert(i.length).insert(new Element('br'));
 						});
 						tr.insert(td);
 
@@ -568,12 +561,13 @@ var {{ plugin.id }} = {
 						tabitd.update('Flag: ');
 						tabitr.insert(tabitd);
 						tabitd = new Element('td', {'class': 'file'});
-				/*		if (res.flagPath.length)
+						if (res.flagPath.length)
 							tabitd.update(reduceString(res.flagPath));
 						else
 							tabitd.update('Not specified');
 						tabitr.insert(tabitd);
-				*/		
+						tabi.insert(tabitr);					
+						
 						// Weight
 						tabitr = new Element('tr');
 						tabitd = new Element('td', {'class': 'label'});
@@ -618,9 +612,9 @@ var {{ plugin.id }} = {
 						});
 						addImg.c_data = { 	idList: res.idList,
 											config: res.config,
-											flagPath: res.weightPath,
+											flagPath: res.flagPath,
 											weightPath: res.weightPath,
-											psfPath: res.weightPath,
+											psfPath: res.psfPath,
 											resultsOutputDir: res.resultsOutputDir
 						};
 						addImg.observe('click', function() {
@@ -642,7 +636,7 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin=' + uid + '&Method=getSavedItems';
+		var post = 	'Plugin=' + uidsex + '&Method=getSavedItems';
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -655,7 +649,7 @@ var {{ plugin.id }} = {
 		var reload = false;
 	
 		var r = new HttpRequest(
-				uid + '_result',
+				uidsex + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -670,13 +664,13 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin=' + uid + '&Method=deleteCartItem&Name=' + name;
+		var post = 	'Plugin=' + uidsex + '&Method=deleteCartItem&Name=' + name;
 		r.send('/youpi/process/plugin/', post);
 	},
 
 
 	addToCart: function(data) {
-		var p_data = {	plugin_name : uid,
+		var p_data = {	plugin_name : uidsex,
 						userData :	{ 	'config' 			: data.config,
 										'imgList' 			: data.idList,
 										'flagPath' 			: data.flagPath,
@@ -699,11 +693,10 @@ var {{ plugin.id }} = {
 		root.setAttribute('align', 'center');
 		// Container of the ImageSelector widget
 		var div = document.createElement('div');
-		div.setAttribute('id', uid + '_results_div');
+		div.setAttribute('id', uidsex + '_results_div');
 		div.setAttribute('align', 'center');
 		root.appendChild(div);
-		console.log(uid);
-		{{ plugin.id }}.ims = new ImageSelector(uid + '_results_div');
+		{{ plugin.id }}.ims = new ImageSelector(uidsex + '_results_div');
 		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
 	}
 };

@@ -73,6 +73,7 @@ TPX_CONDOR_UPLOAD_URL = FTP_URL + PROCESSING_OUTPUT
 WWW_FITSIN_PREFIX = 'http://clix.iap.fr:9000/'
 WWW_SCAMP_PREFIX = WWW_FITSIN_PREFIX
 WWW_SWARP_PREFIX = WWW_FITSIN_PREFIX
+WWW_SEX_PREFIX = WWW_FITSIN_PREFIX
 #
 # Enabe Skeleton demo plugin if True. Should be turned off on production system
 #
