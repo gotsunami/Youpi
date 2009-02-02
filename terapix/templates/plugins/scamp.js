@@ -9,10 +9,47 @@ var xmlParser;
 // Used in checkForSelectionLDACData()
 var {{ plugin.id }}_curSelectionIdx = 0;
 var {{ plugin.id }}_LDAC_error = 0;
+var uidscamp = '{{ plugin.id }}';
 
 var {{ plugin.id }} = {
-	reprocess_image: function() {
-		console.log('TODO...');
+	/*
+	 * Function: reprocessCalibration
+	 * Schedule a Swarp reprocessing
+	 *
+	 * Parameters:
+	 *	taskId - string: DB task ID
+	 *
+	 */ 
+	reprocessCalibration: function(taskId) {
+		var r = new HttpRequest(
+				null,
+				null,	
+				// Custom handler for results
+				function(resp) {
+					data = resp.result;
+					var total = eval(data.idList)[0].length;
+
+					var userData = $H(data);
+					userData.set('config', 'The one used for this Scamp processing');
+					userData.set('taskId', taskId);
+
+					// Add to the shopping cart
+					var p_data = {	plugin_name	: uidscamp,
+									userData 	: userData,
+					};
+				
+					s_cart.addProcessing(p_data, function() {
+						alert('Scamp scheduled for reprocessing (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+							') and\nadded to the shopping cart.');
+					});
+				}
+		);
+
+		var post = { Plugin: '{{ plugin.id }}',
+					 Method: 'getReprocessingParams',
+					 TaskId: taskId
+		};
+		r.send('/youpi/process/plugin/', getQueryString(post));
 	},
 
 	/*
@@ -335,21 +372,25 @@ var {{ plugin.id }} = {
 	},
 
 	/*
-	 * scampId allows to retreive config file by content (not by name) when reprocessing data
+	 * Function: run
+	 * Run processing
 	 *
-	 */
-	run: function(trid, idList, itemId, config, resultsOutputDir, scampId, silent) {
-		var silent = silent == true ? true : false;
-		var scampId = scampId ? scampId : '';
+	 * Parameters:
+	 *  trid - string: for row number
+	 *  opts - hash: options
+	 *  silent - boolean: silently submit item to the cluster
+	 *
+	 */ 
+	run: function(trid, opts, silent) {
+		var silent = typeof silent == 'boolean' ? silent : false;
 		var txt = '';
 		var runopts = get_runtime_options(trid);
+		var logdiv = $('master_condor_log_div');
 	
 		if (!silent) {
 			var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
 			if (!r) return;
 		}
-	
-		var logdiv = document.getElementById('master_condor_log_div');
 	
 		var r = new HttpRequest(
 				logdiv,
@@ -365,16 +406,14 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}' + 
-					'&Method=process' + 
-					'&IdList=' + idList + 
-					'&ScampId=' + scampId + 
-					'&ResultsOutputDir=' + resultsOutputDir + 
-					'&Config=' + config +
-					// runtime options related
-					'&' + runopts.clusterPolicy +	
-					'&ItemId=' + runopts.itemPrefix + itemId + 
-					'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0);
+		// Adds various options
+		opts = $H(opts);
+		opts.set('Plugin', uidscamp);
+		opts.set('Method', 'process');
+		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
+
+		var post = getQueryString(opts) +
+			'&' + runopts.clusterPolicy;
 	
 		r.send('/youpi/process/plugin/', post);
 	},
@@ -442,8 +481,13 @@ var {{ plugin.id }} = {
 		container.appendChild(tab);
 	},
 
-	saveItemForLater: function(trid, idList, itemId, resultsOutputDir, config) {
-		var runopts = get_runtime_options(trid);
+	//saveItemForLater: function(trid, idList, itemId, resultsOutputDir, config) {
+	saveItemForLater: function(trid, opts, silent) {
+	//	var runopts = get_runtime_options(trid);
+		opts = $H(opts);
+		opts.set('Plugin', uidscamp);
+		opts.set('Method', 'saveCartItem');
+
 		var r = new HttpRequest(
 				'result',
 				null,	
@@ -456,12 +500,15 @@ var {{ plugin.id }} = {
 				}
 		);
 	
+		/*
 		var post = 	'Plugin={{ plugin.id }}' + 
 					'&Method=saveCartItem' +
 					'&IdList=' + idList + 
 					'&ItemID=' + runopts.itemPrefix + itemId + 
 					'&ResultsOutputDir=' + resultsOutputDir + 
 					'&Config=' + config;
+					*/
+		var post = getQueryString(opts);
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -579,12 +626,12 @@ var {{ plugin.id }} = {
 	
 		// Scamp processing history
 		// Header title
-		var hist = resp['History'];
+		var hists = resp.History;
 		tr = document.createElement('tr');
 		td = document.createElement('td');
 		td.setAttribute('colspan', '2');
 		td.setAttribute('class', 'qfits-result-header-title');
-		td.appendChild(document.createTextNode('Scamp processing history (' + hist.length + ')'));
+		td.appendChild(document.createTextNode('Scamp processing history (' + hists.length + ')'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 
@@ -597,50 +644,50 @@ var {{ plugin.id }} = {
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
-		for (var k=0; k < hist.length; k++) {
-			tr = document.createElement('tr');
+
+		hists.each(function(hist) {
+			tr = new Element('tr');
 			// Emphasis of current history entry
-			if (resp['TaskId'] == hist[k]['TaskId']) {
+			if (resp.TaskId == hist.TaskId) {
 				tr.setAttribute('class', 'history-current');
 			}
 	
 			// Icon
-			td = document.createElement('td');
-			var src = hist[k]['Success'] ? 'success' : 'error';
-			var img = document.createElement('img');
-			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
-			td.appendChild(img);
-			tr.appendChild(td);
+			td = new Element('td');
+			var src = hist.Success ? 'success' : 'error';
+			var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'});
+			td.insert(img);
+			tr.insert(td);
 	
 			// Date-time, duration
-			td = document.createElement('td');
-			var a = document.createElement('a');
-			a.setAttribute('href', '/youpi/results/{{ plugin.id }}/' + hist[k]['TaskId'] + '/');
-			a.appendChild(document.createTextNode(hist[k]['Start'] + ' (' + hist[k]['Duration'] + ')'));
-			td.appendChild(a);
-			tr.appendChild(td);
+			td = new Element('td');
+			var a = new Element('a', {href: '/youpi/results/{{ plugin.id }}/' + hist.TaskId + '/'});
+			a.insert(hist.Start + ' (' + hist.Duration + ')');
+			td.insert(a);
+			tr.insert(td);
 	
 			// Hostname
-			td = document.createElement('td');
-			td.appendChild(document.createTextNode(hist[k]['Hostname']));
-			tr.appendChild(td);
+			td = new Element('td');
+			td.insert(hist.Hostname);
+			tr.insert(td);
 	
 			// User
-			td = document.createElement('td');
-			td.appendChild(document.createTextNode(hist[k]['User']));
-			tr.appendChild(td);
+			td = new Element('td');
+			td.insert(hist.User);
+			tr.insert(td);
 	
 			// Reprocess option
-			td = document.createElement('td');
-			td.setAttribute('class', 'reprocess');
-			img = document.createElement('img');
-			img.setAttribute('onclick', "{{ plugin.id }}.reprocess_image('" + hist[k]['FitsinId'] + "');");
-			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
-			td.appendChild(img);
-			tr.appendChild(td);
+			td = new Element('td', {'class': 'reprocess'});
+			img = new Element('img', { src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'});
+			img.taskId = hist.TaskId;
+			img.observe('click', function() {
+				{{ plugin.id }}.reprocessCalibration(this.taskId);
+			});
+			td.insert(img);
+			tr.insert(td);
 	
-			htab.appendChild(tr);
-		}
+			htab.insert(tr);
+		});
 	
 		// Scamp run parameters
 		// Image
@@ -799,69 +846,59 @@ var {{ plugin.id }} = {
 					var delImg, trid;
 					var tabi, tabitr, tabitd;
 					var idList, txt;
-					for (var k=0; k < resp['result'].length; k++) {
-						idList = eval(resp['result'][k]['idList']);
-						tr = document.createElement('tr');
-						trid = 'saved_item_' + k + '_tr';
-						tr.setAttribute('id', trid);
+					resp.result.each(function(res, k) {
+						idLists = res.idList.evalJSON();
+						trid = uidscamp + '_saved_item_' + k + '_tr';
+						tr = new Element('tr', {id: trid});
 	
 						// Date
-						td = document.createElement('td');
-						td.appendChild(document.createTextNode(resp['result'][k]['date']));
-						tr.appendChild(td);
+						td = new Element('td').update(res.date);
+						tr.insert(td);
 
 						// User
-						td = document.createElement('td');
-						td.setAttribute('class', 'config');
-						td.appendChild(document.createTextNode(resp['result'][k]['username']));
-						tr.appendChild(td);
+						td = new Element('td', {'class': 'config'}).update(res.username);
+						tr.insert(td);
 	
 						// Name
-						td = document.createElement('td');
-						td.setAttribute('class', 'name');
-						td.appendChild(document.createTextNode(resp['result'][k]['name']));
-						tr.appendChild(td);
+						td = new Element('td', {'class': 'name'}).update(res.name);
+						tr.insert(td);
 	
 						// Images count
-						td = document.createElement('td');
-						td.setAttribute('class', 'imgCount');
-						idList.length > 1 ? txt = 'Batch' : txt = 'Single';
-						var sp = document.createElement('span');
-						sp.setAttribute('style', 'font-weight: bold; text-decoration: underline;');
-						sp.appendChild(document.createTextNode(txt));
-						td.appendChild(sp);
-						td.appendChild(document.createElement('br'));
+						td = new Element('td', {'class': 'imgCount'});
+						var sp = new Element('span', {'style': 'font-weight: bold; text-decoration: underline;'});
+						sp.update(idLists.length > 1 ? 'Batch' : 'Single');
+						td.insert(sp).insert(new Element('br'));
 
-						for (var j=0; j < idList.length; j++) {
-							td.appendChild(document.createTextNode(idList[j].length));
-							td.appendChild(document.createElement('br'));
-						}
-						tr.appendChild(td);
+						idLists.each(function(idList) {
+							td.insert(idList.length).insert(new Element('br'));
+						});
+						tr.insert(td);
 	
 						// Config
-						td = document.createElement('td');
-						td.setAttribute('class', 'config');
-						td.appendChild(document.createTextNode(resp['result'][k]['config']));
-						tr.appendChild(td);
+						td = new Element('td', {'class': 'config'}).update(res.config);
+						tr.insert(td);
 	
 						// Delete
-						td = document.createElement('td');
-						delImg = document.createElement('img');
-						delImg.setAttribute('style', 'margin-right: 5px');
-						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
-						delImg.setAttribute('onclick', "{{ plugin.id }}.delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
-						td.appendChild(delImg);
-						delImg = document.createElement('img');
-						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
-						delImg.setAttribute('onclick', "{{ plugin.id }}.addToCart('" + 
-								resp['result'][k]['idList'] + "','" + 
-								resp['result'][k]['config'] + "','" + 
-								resp['result'][k]['resultsOutputDir'] + "')");
-						td.appendChild(delImg);
-						tr.appendChild(td);
-		
-						table.appendChild(tr);
-					}
+						td = new Element('td');
+						delImg = new Element('img', {	style: 'margin-right: 5px',
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
+						});
+						delImg.c_data = {trid: trid, name: res.name};
+						delImg.observe('click', function() {
+							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
+						});
+						td.insert(delImg);
+
+						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
+						addImg.c_data = $H(res);
+						addImg.observe('click', function() {
+							{{ plugin.id }}.addToCart(this.c_data);
+						});
+						td.insert(addImg);
+
+						tr.insert(td);
+						table.insert(tr);
+					});
 	
 					if (resp['result'].length) {
 						div.appendChild(table);
@@ -904,20 +941,14 @@ var {{ plugin.id }} = {
 		r.send('/youpi/process/plugin/', post);
 	},
 
-	addToCart: function(idList, config, resultsOutputDir) {
-		var p_data = {	plugin_name : '{{ plugin.id }}', 
-						userData : {'config' : config, 
-									'imgList' : idList,
-									'resultsOutputDir' : resultsOutputDir
-						}
+	addToCart: function(data) {
+		var p_data = {	plugin_name : uidscamp,
+						userData :	data
 		};
-	
-		s_cart.addProcessing(p_data,
-				// Custom hanlder
-				function() {
-					window.location.reload();
-				}
-		);
+
+		s_cart.addProcessing(p_data, function() {
+			window.location.reload();
+		});
 	},
 
 	selectImages: function() {

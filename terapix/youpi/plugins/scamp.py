@@ -51,10 +51,10 @@ class Scamp(ProcessingPlugin):
 			data = marshal.loads(base64.decodestring(str(it.data)))
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
-						#'idList' 			: [str(i) for i in data['idList']], 
 						'idList' 			: str(data['idList']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
 						'name' 				: str(it.name),
+						'taskId' 			: str(data['taskId']), 
 						'config' 			: str(data['config'])})
 
 		return res
@@ -69,8 +69,9 @@ class Scamp(ProcessingPlugin):
 		post = request.POST
 		try:
 			idList = eval(post['IdList'])
-			itemID = str(post['ItemID'])
+			itemID = str(post['ItemId'])
 			config = post['Config']
+			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
@@ -79,9 +80,10 @@ class Scamp(ProcessingPlugin):
 		itemName = "%s-%d" % (itemID, len(items)+1)
 
 		# Custom data
-		data = { 'idList' : idList, 
+		data = { 'idList' 			: idList, 
 				 'resultsOutputDir' : resultsOutputDir, 
-				 'config' : config }
+				 'taskId'			: taskId,
+				 'config' 			: config }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
 		k = Processing_kind.objects.filter(name__exact = self.id)[0]
@@ -129,7 +131,7 @@ class Scamp(ProcessingPlugin):
 		"""
 		Generates a suitable Condor submission for processing images on the cluster.
 
-		Note that the scampId variable is used to bypass the config variable: it allows to get the 
+		Note that the taskId variable is used to bypass the config variable: it allows to get the 
 		configuration file content for an already processed image rather by selecting content by config 
 		file name.
 		"""
@@ -138,7 +140,7 @@ class Scamp(ProcessingPlugin):
 		try:
 			itemId = str(post['ItemId'])
 			config = post['Config']
-			scampId = post['ScampId']
+			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
@@ -149,15 +151,15 @@ class Scamp(ProcessingPlugin):
 		#
 		# Config file selection and storage.
 		#
-		# Rules: 	if scampId has a value, then the config file content is retreive
+		# Rules: 	if taskId has a value, then the config file content is retreive
 		# 			from the existing scamp processing. Otherwise, the config file content
 		#			is fetched by name from the ConfigFile objects.
 		#
 		# 			Selected config file content is finally saved to a regular file.
 		#
 		try:
-			if len(scampId):
-				config = Plugin_scamp.objects.filter(id = int(scampId))[0]
+			if len(taskId):
+				config = Plugin_scamp.objects.filter(task__id = int(taskId))[0]
 				content = str(zlib.decompress(base64.decodestring(config.config)))
 			else:
 				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
@@ -182,7 +184,6 @@ class Scamp(ProcessingPlugin):
 		images = Image.objects.filter(id__in = idList)
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'ItemID' 			: itemId, 
-					'ScampId' 			: str(scampId),
 					'Warnings' 			: {}, 
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
@@ -546,7 +547,6 @@ queue""" %  (	encUserData,
 				'TaskId'	: int(task.id),
 				'DataPath' : str(os.path.dirname(qfits_ldac_files[0])) }
 
-
 	def getImgIdListFromLDACFiles(self, request):
 		post = request.POST
 		try:
@@ -571,3 +571,22 @@ queue""" %  (	encUserData,
 		return {'IdList' : idList,
 				'ScampId' : int(data.id),
 				'ResultsOutputDir' : os.path.join(str(task.results_output_dir), 'subprocess/' )}
+
+	def getReprocessingParams(self, request):
+		"""
+		Returns all information for reprocessing a calibration (so that it can be added to the shopping cart).
+		"""
+
+		try:
+			taskId = request.POST['TaskId']
+		except KeyError, e:
+			raise PluginError, 'Bad parameters'
+
+		data = Plugin_scamp.objects.filter(task__id = int(taskId))[0]
+		rels = Rel_it.objects.filter(task__id = int(taskId))
+		# Must be a list of list
+		idList = [[int(r.image.id) for r in rels]]
+
+		return {'resultsOutputDir' 	: str(data.task.results_output_dir),
+				'idList'			: str(idList), 
+		}

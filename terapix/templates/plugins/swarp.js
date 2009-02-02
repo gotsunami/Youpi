@@ -364,14 +364,20 @@ var {{ plugin.id }} = {
 	 * Run processing
 	 *
 	 * Parameters:
-	 *	name - string: name part of ID 
-	 *  row - integer: for row number
+	 *  trid - string: for row number
+	 *  opts - hash: options
+	 *  silent - boolean: silently submit item to the cluster
 	 *
 	 */ 
 	run: function(trid, opts, silent) {
 		var silent = typeof silent == 'boolean' ? silent : false;
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
+
+		if (!silent) {
+			var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
+			if (!r) return;
+		}
 	
 		var r = new HttpRequest(
 				logdiv,
@@ -871,8 +877,7 @@ var {{ plugin.id }} = {
 						});
 						td.insert(delImg);
 
-						var addImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
-						});
+						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
 						addImg.c_data = $H(res);
 						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);
