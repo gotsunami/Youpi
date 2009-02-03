@@ -225,7 +225,7 @@ notify_user             = monnerville@iap.fr
 			raise PluginError, "POST argument error. Unable to process data."
 
 		items = CartItem.objects.filter(kind__name__exact = self.id)
-		itemName = "%s-%d" % (itemID, len(items)+1)
+		itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
 
 		# Custom data
 		data = { 'Descr' : "Runs %d %s commands on the cluster" % (self.jobCount, self.command),

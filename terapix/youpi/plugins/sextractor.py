@@ -1,6 +1,6 @@
 # vim: set ts=4
 
-import sys, os.path, re, time, string
+import sys, os.path, re, time, string, re
 import marshal, base64, zlib
 import xml.dom.minidom as dom
 from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
@@ -50,7 +50,7 @@ class Sextractor(ProcessingPlugin):
 			raise PluginError, "POST argument error. Unable to process data."
 
 		items = CartItem.objects.filter(kind__name__exact = self.id)
-		itemName = "%s-%d" % (itemID, len(items)+1)
+		itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
 
 		# Custom data
 		data = { 'idList' 			: idList,

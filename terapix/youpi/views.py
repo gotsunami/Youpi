@@ -1330,10 +1330,10 @@ def pref_save_condor_config(request):
 	"""
 	Save per-user default condor setup
 	"""
+
+	kinds = ('DB', 'DP', 'DS')
 	try:
-		db = request.POST['DB'].split(',')
-		dp = request.POST['DP'].split(',')
-		ds = request.POST['DS'].split(',')
+		defaults = [request.POST[p].split(',') for p in kinds]
 	except Exception, e:
 		return HttpResponseBadRequest('Incorrect POST data')
 
@@ -1341,9 +1341,16 @@ def pref_save_condor_config(request):
 	k = 0
 	for plugin in manager.plugins:
 		condor_setup[plugin.id] = {}
-		condor_setup[plugin.id]['DB'] = str(db[k])
-		condor_setup[plugin.id]['DP'] = str(dp[k])
-		condor_setup[plugin.id]['DS'] = str(ds[k])
+		j = 0
+		for kind in kinds:
+			try:
+				if len(defaults[j][k]):
+					condor_setup[plugin.id][kind] = str(defaults[j][k])
+				else:
+					condor_setup[plugin.id][kind] = ''
+			except IndexError:
+				condor_setup[plugin.id][kind] = ''
+			j += 1
 		k += 1
 
 	try:

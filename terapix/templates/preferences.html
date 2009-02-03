@@ -64,37 +64,37 @@ function show_available_themes() {
 	d.appendChild(tab);
 }
 
-function show_current_config_button(container_id) {
-	var c = document.getElementById(container_id);
-	var but = document.createElement('input');
-	but.setAttribute('type', 'button');
-	but.setAttribute('value', 'Save current configuration');
-	but.setAttribute('onclick', "save_config(this.nextSibling);");
-	c.appendChild(but);
-
-	var ldiv = document.createElement('div');
-	c.appendChild(ldiv);
-
+function show_current_config_button() {
+	$('top_save_div', 'bottom_save_div').each(function(div) {
+		var but = new Element('input', {type: 'button', value: 'Save current configuration'});
+		but.observe('click', function() {
+			save_config(this.next());
+		});
+		div.insert(but);
+		div.insert(new Element('div'));
+	});
 }
 
-function save_config(logNode) {
-	var log = new Logger(logNode);
-
-	// Build POST data
-	// Default Behaviour
+function save_config(div) {
+	var log = new Logger(div);
+	var data = new Hash();
+	var kinds = ['DB', 'DP', 'DS'];
 	var selsuff = ['_def_behaviour_select', '_pol_select', '_sel_select'];
-	var kind = ['DB', 'DP', 'DS'];
-	var post = '';
-	var sel;
-
-	for (var k=0; k < selsuff.length; k++) {
-		post += (k > 0 ? '&' : '') + kind[k] + '=';
+	var pids = new Array();
 {% for plugin in plugins %}
-		sel = document.getElementById('{{ plugin.id }}' + selsuff[k]);
-		post += sel.options[sel.selectedIndex].value + ','
+	pids.push('{{ plugin.id }}');
 {% endfor %}
-		post = post.substr(0, post.length-1);
-	}
+
+	kinds.each(function(kind, k) {
+		data.set(kind, new Array());
+		pids.map(function(pid) {
+			return $(pid + selsuff[k]);
+		}).each(function(sel) {
+			if (!sel) return;
+			data.get(kind).push(sel.options[sel.selectedIndex].value);
+		});
+		data.set(kind, data.get(kind).join(','));
+	});
 
 	var r = new HttpRequest(
 		null,
@@ -109,31 +109,34 @@ function save_config(logNode) {
 		}
 	);
 
-	r.send('/youpi/preferences/condor/saveCurrentConfig/', post);
+	r.send('/youpi/preferences/condor/saveCurrentConfig/', getQueryString(data));
 }
 
 function load_config() {
-	var config = "{{ config }}".replace(/&#39;/g, "'");
-	if (config == 'None') return;
+	var config = '{{ config }}'.unescapeHTML().evalJSON();
+	if (!config) return;
 
-	config = eval('(' + config + ')');
 	var selsuff = ['_def_behaviour_select', '_pol_select', '_sel_select'];
 	var kind = ['DB', 'DP', 'DS'];
 	var sel;
-	var pid;
-
-	for (var k=0; k < selsuff.length; k++) {
+	var pids = new Array();
 {% for plugin in plugins %}
-		pid = '{{ plugin.id }}';
-		sel = document.getElementById(pid + selsuff[k]);
-		for (var j=0; j < sel.options.length; j++) {
-			if (sel.options[j].value == config[pid][kind[k]]) {
-				sel.options[j].setAttribute('selected', 'selected');
-				break;
-			}
-		}
+	pids.push('{{ plugin.id }}');
 {% endfor %}
-	}
+
+	pids.each(function(pid) {
+		selsuff.map(function(suf, k) {
+			return $(pid + suf);
+		}).each(function(sel, k) {
+			if (!sel) return;
+			$A(sel.options).each(function(option) {
+				if (option.value == config[pid][kind[k]]) {
+					option.setAttribute('selected', 'selected');
+					throw $break;
+				}
+			});
+		});
+	});
 }
 </script>
 {% endblock %}
@@ -191,37 +194,45 @@ function load_config() {
 		</div>
 		<div class="prefs_condor">
 			<h1>Default Policy</h1>
+			{% if policies %}
 			<table class="defaultCondorSetup">
-			{% for plugin in plugins %}
+				{% for plugin in plugins %}
 				<tr>
 					<td>{{ plugin.optionLabel }}</td>
 					<td>
 						<select id="{{ plugin.id }}_pol_select">
-				{% for pol in policies %}
+					{% for pol in policies %}
 							<option>{{ pol.label }}</option>	
-				{% endfor %}
+					{% endfor %}
 						</select>
 					</td>
 				</tr>
-			{% endfor %}
+				{% endfor %}
 			</table>
+			{% else %}
+			<div class="tip" style="width: 150px">None available. Please <a href="/youpi/condor/setup/">create at least one policy</a>.</div>
+			{% endif %}
 		</div>
 		<div class="prefs_condor">
 			<h1>Default Selection</h1>
+			{% if selections %}
 			<table class="defaultCondorSetup">
-			{% for plugin in plugins %}
+				{% for plugin in plugins %}
 				<tr>
 					<td>{{ plugin.optionLabel }}</td>
 					<td>
 						<select id="{{ plugin.id }}_sel_select">
-				{% for sel in selections %}
+					{% for sel in selections %}
 							<option>{{ sel.label }}</option>	
-				{% endfor %}
+					{% endfor %}
 						</select>
 					</td>
 				</tr>
-			{% endfor %}
+				{% endfor %}
 			</table>
+			{% else %}
+			<div class="tip" style="width: 150px">None available. Please <a href="/youpi/condor/setup/">create at least one selection</a>.</div>
+			{% endif %}
 		</div>
 		<div id="bottom_save_div" class="prefs_condor"></div>
 	</div>
@@ -232,8 +243,7 @@ function load_config() {
 		var m = new SubMenu('submenu', ['Themes', 'Default Condor Setup']);
 
 		show_available_themes();
-		show_current_config_button('top_save_div');
-		show_current_config_button('bottom_save_div');
+		show_current_config_button();
 		load_config();
 	});
 </script>
