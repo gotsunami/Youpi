@@ -1173,7 +1173,6 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.submitQuery = function() {
-		console.log(_fields);
 		var container = document.getElementById('{{ plugin.id }}_xml_fields_result_div');
 		container.setAttribute('style', 'border-top: 3px solid #5b80b2; margin-top: 10px; padding-top: 5px;');
 		var tab = document.getElementById('{{ plugin.id }}_xml_fields_tab');
