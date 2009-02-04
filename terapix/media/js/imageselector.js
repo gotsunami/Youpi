@@ -572,7 +572,7 @@ function ImageSelector(container)
 				break;
 
 			case _batchMode:
-				div.insert(_createCheckBox(id + '_batch_display_sky_check', true, 'Display sky visualization'));
+				div.insert(_createCheckBox(id + '_batch_display_sky_check', false, 'Display sky visualization'));
 				div.insert(_createCheckBox(id + '_batch_sky_compute_all_check', false, 'Plot all images points, not only selections (slower)'));
 				div.setAttribute('style', 'text-align: left;');
 				break;

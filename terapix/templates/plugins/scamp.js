@@ -118,7 +118,7 @@ var {{ plugin.id }} = {
 	 *
 	 */ 
 	checkForSelectionLDACData: function(container) {
-		var div = document.createElement('div');
+		var div = new Element('div');
 		var log = new Logger(div);
 		var sels = ims.getListsOfSelections();
 		var total = ims.getImagesCount();
@@ -133,7 +133,7 @@ var {{ plugin.id }} = {
 				null,	
 				// Custom handler for results
 				function(resp) {
-					div.innerHTML = '';
+					div.update();
 					missing = resp['result']['missingLDACImages'];
 	
 					if (missing.length > 0) {
@@ -341,7 +341,7 @@ var {{ plugin.id }} = {
 	
 		ldac_selection_last_idx = idx;
 	
-		var container = ldac_table.getContainer();
+		var container = $(ldac_table.getContainer());
 		var xhr = new HttpRequest(
 				container,
 				null,	
@@ -349,7 +349,7 @@ var {{ plugin.id }} = {
 				function(resp) {
 					var d = resp['result'];
 	
-					container.innerHTML = '';
+					container.update();
 					ldac_table.empty();
 	
 					for (var k=0; k < d.length; k++) {
