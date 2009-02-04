@@ -24,7 +24,11 @@
 				{% endif %}
 				<tr>
 					<td><span class="confLetter">Config:</span></td>
+				{% if data.userData.taskId %}
+					<td><a target="blank" href="/youpi/results/{{ plugin.id }}/{{ data.userData.taskId }}/">{{ data.userData.config }}</a></td>
+				{% else %}
 					<td>{{ data.userData.config }}</td>
+				{% endif %}
 				</tr>
 				<tr>
 					<td><span class="confLetter">Results output dir:</span></td>
@@ -45,7 +49,7 @@
 														'{{ data.userData.regPath }}',
 														'{{ data.userData.config }}',
 														'{{ data.userData.resultsOutputDir }}',
-														'{{ data.userData.fitsinId }}');"/>
+														'{{ data.userData.taskId }}');"/>
 				</p>
 			</div>
 			<div>or</div>
@@ -56,7 +60,8 @@
 				'{{ data.userData.maskPath }}',
 				'{{ data.userData.regPath }}',
 				'{{ data.userData.resultsOutputDir }}',
-				'{{ data.userData.config }}');"/>
+				'{{ data.userData.config }}',
+				'{{ data.userData.taskId }}');"/>
 		</td>
 	</tr>
 </table>

@@ -47,9 +47,8 @@ var {{ plugin.id }} = {
 	 *  trid is also used as an element prefix id
 	 *
 	 */
-	run: function(trid, idList, itemId, flat, mask, reg, config, resultsOutputDir, fitsinId, silent) {
+	run: function(trid, idList, itemId, flat, mask, reg, config, resultsOutputDir, taskId, silent) {
 		var silent = silent == true ? true : false;
-		var fitsinId = fitsinId ? fitsinId : '';
 		var txt = '';
 		var runopts = get_runtime_options(trid);
 	
@@ -80,7 +79,7 @@ var {{ plugin.id }} = {
 					'&FlatPath=' + flat +
 					'&MaskPath=' + mask + 
 					'&RegPath=' + reg + 
-					'&FitsinId=' + fitsinId + 
+					'&TaskId=' + taskId + 
 					'&ResultsOutputDir=' + resultsOutputDir + 
 					'&Config=' + config +
 					// runtime options related
@@ -142,7 +141,7 @@ var {{ plugin.id }} = {
 	},
 
 	// Mandatory function
-	saveItemForLater: function(trid, idList, itemId, flat, mask, reg, resultsOutputDir, config, silent) {
+	saveItemForLater: function(trid, idList, itemId, flat, mask, reg, resultsOutputDir, config, taskId, silent) {
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
 				'{{ plugin.id}}_result',
@@ -163,6 +162,7 @@ var {{ plugin.id }} = {
 					'&FlatPath=' + flat +
 					'&MaskPath=' + mask + 
 					'&RegPath=' + reg + 
+					'&TaskId=' + taskId + 
 					'&ResultsOutputDir=' + resultsOutputDir + 
 					'&Config=' + config;
 		r.send('/youpi/process/plugin/', post);
@@ -329,7 +329,8 @@ var {{ plugin.id }} = {
 								resp['result'][k]['flatPath'] + "','" +
 								resp['result'][k]['maskPath'] + "','" +
 								resp['result'][k]['regPath'] + "','" +
-								resp['result'][k]['resultsOutputDir'] + "')");
+								resp['result'][k]['resultsOutputDir'] + "','" +
+								resp['result'][k]['taskId'] + "')");
 						td.appendChild(delImg);
 						tr.appendChild(td);
 		
@@ -350,12 +351,13 @@ var {{ plugin.id }} = {
 		r.send('/youpi/process/plugin/', post);
 	},
 
-	addToCart: function(idList, config, flatPath, maskPath, regPath, resultsOutputDir) {
+	addToCart: function(idList, config, flatPath, maskPath, regPath, resultsOutputDir, taskId) {
 		var p_data = {	plugin_name : '{{ plugin.id }}', 
 						userData :	{ 	'config' : config,
 										'imgList' : idList,
 										'flatPath' : flatPath,
 										'maskPath' : maskPath,
+										'taskId' : taskId,
 										'regPath' : regPath,
 										'resultsOutputDir' : resultsOutputDir
 						}
@@ -431,10 +433,14 @@ var {{ plugin.id }} = {
 	},
 	
 	/*
-	 * Schedule an image reprocessing by adding a new item in the shopping cart.
+	 * Function: reprocessImage
+	 * Schedule a QFits reprocessing
 	 *
-	 */
-	reprocess_image: function(fitsinId) {
+	 * Parameters:
+	 *	taskId - string: DB task ID
+	 *
+	 */ 
+	reprocessImage: function(taskId) {
 		var r = new HttpRequest(
 				null,
 				null,	
@@ -443,7 +449,7 @@ var {{ plugin.id }} = {
 					data = resp.result;
 					p_data = {	plugin_name : '{{ plugin.id }}', 
 								userData : { 	'config' : 'The one used for the last processing',
-												'fitsinId' : fitsinId,
+												'taskId' : taskId,
 												'imgList' : '[[' + data.ImageId + ']]',
 												'flatPath' : data.Flat, 
 												'maskPath' : data.Mask, 
@@ -463,7 +469,7 @@ var {{ plugin.id }} = {
 				}
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=getReprocessingParams&FitsinId=' + fitsinId;
+		var post = 'Plugin={{ plugin.id }}&Method=getReprocessingParams&TaskId=' + taskId;
 		r.send('/youpi/process/plugin/', post);
 	},
 	
@@ -658,7 +664,9 @@ var {{ plugin.id }} = {
 			td = new Element('td');
 			td.setAttribute('class', 'reprocess');
 			img = new Element('img');
-			img.setAttribute('onclick', "{{ plugin.id }}.reprocess_image('" + hist[k]['FitsinId'] + "');");
+			// FIXME
+			//img.setAttribute('onclick', "{{ plugin.id }}.reprocess_image('" + hist[k]['FitsinId'] + "');");
+			img.setAttribute('onclick', "{{ plugin.id }}.reprocessImage('" + hist[k]['TaskId'] + "');");
 			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 			td.appendChild(img);
 			tr.appendChild(td);

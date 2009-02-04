@@ -58,6 +58,7 @@ class QualityFitsIn(ProcessingPlugin):
 			maskPath = post['MaskPath']
 			regPath = post['RegPath']
 			config = post['Config']
+			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
@@ -73,6 +74,7 @@ class QualityFitsIn(ProcessingPlugin):
 				 'flatPath' : flatPath, 
 				 'maskPath' : maskPath, 
 				 'regPath' : regPath, 
+				 'taskId'			: taskId,
 				 'resultsOutputDir' : resultsOutputDir, 
 				 'config' : config }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
@@ -98,6 +100,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'username' 			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
 						'flatPath' 			: str(data['flatPath']), 
+						'taskId' 			: str(data['taskId']), 
 						'maskPath' 			: str(data['maskPath']), 
 						'regPath' 			: str(data['regPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
@@ -297,9 +300,9 @@ class QualityFitsIn(ProcessingPlugin):
 			itemId = str(post['ItemId'])
 			flatPath = post['FlatPath']
 			maskPath = post['MaskPath']
+			taskId = post.get('TaskId', '')
 			regPath = post['RegPath']
 			config = post['Config']
-			fitsinId = post['FitsinId']
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
 		except Exception, e:
@@ -311,15 +314,15 @@ class QualityFitsIn(ProcessingPlugin):
 		#
 		# Config file selection and storage.
 		#
-		# Rules: 	if fitsinId has a value, then the config file content is retreive
+		# Rules: 	if taskId has a value, then the config file content is retreive
 		# 			from the existing qfitsin processing. Otherwise, the config file content
 		#			is fetched by name from the ConfigFile objects.
 		#
 		# 			Selected config file content is finally saved to a regular file.
 		#
 		try:
-			if len(fitsinId):
-				config = Plugin_fitsin.objects.filter(id = int(fitsinId))[0]
+			if len(taskId):
+				config = Plugin_fitsin.objects.filter(task__id = int(taskId))[0]
 				content = str(zlib.decompress(base64.decodestring(config.qfconfig)))
 			else:
 				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
@@ -344,7 +347,7 @@ class QualityFitsIn(ProcessingPlugin):
 		images = Image.objects.filter(id__in = idList)
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'ItemID' 			: itemId, 
-					'FitsinId' 			: str(fitsinId),
+#					'FitsinId' 			: str(fitsinId),
 					'Warnings' 			: {}, 
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
@@ -564,11 +567,11 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		"""
 
 		try:
-			fitsinId = request.POST['FitsinId']
+			taskId = request.POST['TaskId']
 		except KeyError, e:
 			raise PluginError, 'Bad parameters'
 
-		data = Plugin_fitsin.objects.filter(id = int(fitsinId))[0]
+		data = Plugin_fitsin.objects.filter(task__id = int(taskId))[0]
 		img = Rel_it.objects.filter(task = data.task)[0].image
 
 		return {'ImageId' 			: int(img.id), 
