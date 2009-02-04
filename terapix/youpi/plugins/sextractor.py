@@ -50,7 +50,10 @@ class Sextractor(ProcessingPlugin):
 			raise PluginError, "POST argument error. Unable to process data."
 
 		items = CartItem.objects.filter(kind__name__exact = self.id)
-		itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
+		if items:
+			itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
+		else:
+			itemName = "%s-%d" % (itemID, len(items)+1)
 
 		# Custom data
 		data = { 'idList' 			: idList,

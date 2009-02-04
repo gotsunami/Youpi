@@ -216,7 +216,7 @@ var {{ plugin.id }} = {
 		// Finally, add to the shopping cart
 		p_data = {	plugin_name	: 	'{{ plugin.id }}', 
 					userData 	: 	{	'config' : config,
-										'imgList' : selIds,
+										'idList' : selIds,
 										'resultsOutputDir' : output_data_path
 					}
 		};
@@ -963,15 +963,15 @@ var {{ plugin.id }} = {
 	 *
 	 * Parameters:
 	 *
-	 * imgList - array of arrays of idLists
+	 * idList - array of arrays of idLists
 	 *
 	 */
-	displayImageCount: function(imgList, container_id) {
-		var container = document.getElementById(container_id);
-		var imgList = eval(imgList);
+	displayImageCount: function(idList, container_id) {
+		var container = $(container_id);
+		var idList = eval(idList);
 		var c = 0;
 		var txt;
-		imgList.length > 1 ? txt = 'Batch' : txt = 'Single';
+		idList.length > 1 ? txt = 'Batch' : txt = 'Single';
 		var selDiv = document.createElement('div');
 		selDiv.setAttribute('class', 'selectionModeTitle');
 		selDiv.appendChild(document.createTextNode(txt + ' selection mode:'));
@@ -980,9 +980,9 @@ var {{ plugin.id }} = {
 		selDiv = document.createElement('div');
 		selDiv.setAttribute('class', 'listsOfSelections');
 	
-		for (var k=0; k < imgList.length; k++) {
-			c = imgList[k].toString().split(',').length;
-			if (imgList.length > 1)
+		for (var k=0; k < idList.length; k++) {
+			c = idList[k].toString().split(',').length;
+			if (idList.length > 1)
 				selDiv.appendChild(document.createTextNode('Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '')));
 			else
 				selDiv.appendChild(document.createTextNode(c + ' image' + (c > 1 ? 's' : '')));
@@ -1012,10 +1012,10 @@ var {{ plugin.id }} = {
 	
 				// Add to cart
 				p_data = {	plugin_name	: 	'{{ plugin.id }}', 
-							userData 	: 	{	config : 'The one used for the same processing',
-												imgList : idList,
-												scampId : d['ScampId'],
-												resultsOutputDir : d['ResultsOutputDir'],
+							userData 	: 	{	config : 'The one used for this Scamp processing',
+												idList : idList,
+												taskId : d.TaskId,
+												resultsOutputDir : d.ResultsOutputDir,
 							}
 				};
 	
@@ -1173,6 +1173,7 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.submitQuery = function() {
+		console.log(_fields);
 		var container = document.getElementById('{{ plugin.id }}_xml_fields_result_div');
 		container.setAttribute('style', 'border-top: 3px solid #5b80b2; margin-top: 10px; padding-top: 5px;');
 		var tab = document.getElementById('{{ plugin.id }}_xml_fields_tab');
@@ -1182,12 +1183,12 @@ function ScampXMLParser(taskId, container) {
 			var tds = trs[k].getElementsByTagName('td');
 			var sel = tds[2].firstChild;
 			var condSel = tds[3].firstChild;
-			var idx = sel.options[sel.selectedIndex].value;
+			var idx = sel.selectedIndex;
 			var type = _fields[idx][1];
 
 			query[k] = new Array();
-			query[k][0] = sel.options[sel.selectedIndex].value;
-			query[k][1] = condSel.options[condSel.selectedIndex].value;
+			query[k][0] = sel.selectedIndex;
+			query[k][1] = condSel.selectedIndex;
 			type != 'boolean' ? query[k][2] = tds[4].firstChild.value : query[k][2] = '';
 		}
 
@@ -1318,7 +1319,7 @@ function ScampXMLParser(taskId, container) {
 
 	this.selectionHasChanged = function(curRowIdx) {
 		var sel = document.getElementById('{{ plugin.id }}_xml_fields_select_' + curRowIdx);
-		var idx = sel.options[sel.selectedIndex].value;
+		var idx = sel.selectedIndex;
 		var type = _fields[idx][1];
 
 		var cond = document.getElementById('{{ plugin.id }}_xml_fields_cond_td_' + curRowIdx);
