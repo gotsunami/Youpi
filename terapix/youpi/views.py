@@ -41,6 +41,7 @@ app_menu = { 	'normal' :
 					{'title' : 'Home', 				'id' : 'home', 			'href' : AUP},
 					{'title' : 'Pre-ingestion',		'id' : 'preingestion',	'href' : AUP + '/preIngestion/'},
 					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : AUP + '/ingestion/'},
+					{'title' : 'Release', 			'id' : 'release',		'href' : AUP + '/release/'},
 					{'title' : 'Processing', 		'id' : 'processing', 	'href' : AUP + '/processing/'},
 					{'title' : 'Processing Results','id' : 'results',	 	'href' : AUP + '/results/'},
 					{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : AUP + '/monitoring/'}
@@ -241,6 +242,20 @@ def monitoring(request):
 					{	'Debug' 			: DEBUG, 
 						'menu'				: app_menu,
 						'selected_entry_id'	: 'monitoring' }, 
+					context_instance = RequestContext(request))
+
+@login_required
+@profile
+def release(request):
+	"""
+	Related to relases.
+	This is a callback function (as defined in django's urls.py file).
+	"""
+
+	return render_to_response('release.html', 
+					{	'Debug' 			: DEBUG, 
+						'menu'				: app_menu,
+						'selected_entry_id'	: 'release' }, 
 					context_instance = RequestContext(request))
 
 @login_required
