@@ -7,8 +7,6 @@
 Record-Table name mappings
 CODASYL Record name;DB table name;Django's class(model) name
 
-Astrophoto Calibration;<emphasis>youpi_astrophotocalibration</emphasis>;<emphasis>Astrophotocalibration</emphasis>
-AstrophotoCalibration-Image Relation;<emphasis>youpi_rel_ai</emphasis>;<emphasis>Rel_ai</emphasis>
 Calibration Kit;<emphasis>youpi_calibrationkit</emphasis>;<emphasis>CalibrationKit</emphasis>
 Cart Item;<emphasis>youpi_cartitem</emphasis>;<emphasis>CartItem</emphasis>
 Channel;<emphasis>youpi_channel</emphasis>;<emphasis>Channel</emphasis>
@@ -23,6 +21,7 @@ FITS Tables;<emphasis>youpi_fitstables</emphasis>;<emphasis>Fitstables</emphasis
 FITSIn Plugin;<emphasis>youpi_plugin_fitsin</emphasis>;<emphasis>Plugin_fitsin</emphasis>
 FITSOut Plugin;<emphasis>youpi_plugin_fitsout</emphasis>;<emphasis>Plugin_fitsout</emphasis>
 Image;<emphasis>youpi_image</emphasis>;<emphasis>Image</emphasis>
+Image-Release Relation;<emphasis>youpi_rel_imgrel</emphasis>;<emphasis>Rel_imgrel</emphasis>
 Image-Task Relation;<emphasis>youpi_rel_it</emphasis>;<emphasis>Rel_it</emphasis>
 Image Selections;<emphasis>youpi_imageselections</emphasis>;<emphasis>ImageSelections</emphasis>
 Ingestion;<emphasis>youpi_ingestion</emphasis>;<emphasis>Ingestion</emphasis>
@@ -31,7 +30,6 @@ Misc Data;<emphasis>youpi_miscdata</emphasis>;<emphasis>MiscData</emphasis>
 Processing Kind;<emphasis>youpi_processing_kind</emphasis>;<emphasis>Processing_kind</emphasis>
 Processing Task;<emphasis>youpi_processing_task</emphasis>;<emphasis>Processing_task</emphasis>
 Release;<emphasis>youpi_release</emphasis>;<emphasis>Release</emphasis>
-Release-Instrument Relation;<emphasis>youpi_rel_rinst</emphasis>;<emphasis>Rel_rinst</emphasis>
 Run;<emphasis>youpi_run</emphasis>;<emphasis>Run</emphasis>
 Run-Image Relation;<emphasis>youpi_rel_ri</emphasis>;<emphasis>Rel_ri</emphasis>
 SCAMP Plugin;<emphasis>youpi_plugin_scamp</emphasis>;<emphasis>Plugin_scamp</emphasis>

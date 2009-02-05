@@ -8,7 +8,6 @@ graph mcd {
 
 	/* Entities */
 	node [shape=record];
-	astro [label="{ Astrophotocalibration | [ Astrefcat ]\nXml path\nFlat field\nOutput zp }"];
 	calib [label="{ Calibration Kit | [ Calibration Kit Id ]\nName\nBad pixel mask\nFlat field }"];
 	cartitem [label="{ Cart Item | [ Cart Item Id ]\nName\nData }"];
 	channel [label="{ Channel | [ Channel Id ]\nName\nWavelength\nUrl\nWavecurve\nTranscurve\nMag offsets }"];
@@ -43,7 +42,6 @@ graph mcd {
 	node7 [label="belongs to"];
 	node8 [label="belongs to"];
 	node10 [label="coaddition"];
-	node11 [label="belongs to"];
 	node12 [label="observed through"];
 	node13 [label="processed with"];
 	node14 [label="is captured by"];
@@ -61,8 +59,10 @@ graph mcd {
 	node28 [label="has profile", style=dashed, shape=Mrecord];
 	node29 [label="defines", style=dashed, shape=Mrecord];
 	node30 [label="processes data", style=dashed, shape=Mrecord];
-	node31 [label="has results"];
+	node31 [label="belongs to"];
 	node32 [label="builds", style=dashed, shape=Mrecord];
+	node33 [label="part of"];
+	node34 [label="current release"];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
@@ -71,11 +71,17 @@ graph mcd {
 	authuser -- node30 [label="  0,n", style=dashed]; 
 	node30 -- survey [label="  1,n", style=dashed]; 
 
-	release -- node31 [label="  1,n"];
-	node31 -- instrument [label="  0,n"];
-
 	authuser -- node32 [label="  1,n", style=dashed]; 
 	node32 -- release [label="  1,n", style=dashed];
+
+	siteprofile -- node34 [label="  0,1"];
+	node34 -- release [label="  1,n"];
+
+	task -- node31 [label="  1,1"];
+	node31 -- release[label="  1,n"];
+
+	image -- node33 [label="  0,n"];
+	node33 -- release [label="  0,n"];
 
 	instrument -- node5 [label="  0,n"]; 
 	node5 -- run [label="  1,1"]; 
@@ -91,9 +97,6 @@ graph mcd {
 
 	image -- node10 [label="  0,n"];
 	node10 -- image [label="  1,n"];
-
-	image -- node11 [label="  0,n"];
-	node11 -- astro [label="  1,n"];
 
 	image -- node12 [label="  1,1"];
 	node12 -- channel [label="  1,n"];

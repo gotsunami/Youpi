@@ -11,17 +11,15 @@ digraph codasyl {
 
 	/* Linked records */
 	calib [label="Calibration Kit"];
-	imgac [label="AstrophotoCalibration-Image Relation"];
 	imgsel [label="Image Selections"];
-	astro [label="Astrophoto calibration"];
 	task [label="Processing Task"];
 	relri [label="Run-Image Relation"];
 	carti [label="Cart Item"];
 	relsi [label="Survey-Instrument Relation"];
 	relit [label="Image-Task Relation"];
-	relrinst [label="Release-Instrument Relation"];
 	relus [label="User-Survey Relation"];
 	relur [label="User-Release Relation"];
+	relimgrel [label="Image-Release Relation"];
 	kind [label="Processing Kind"];
 	plugfitsin [label="FITSin Plugin"];
 	plugfitsout [label="FITSout Plugin"];
@@ -43,12 +41,11 @@ digraph codasyl {
 	Channel -> Image;
 	Ingestion -> Image;
 	Instrument -> Image;
-	Image -> imgac;
-	astro -> imgac;
 	Image -> Coaddition;
 	Image -> Coaddition;
 	Image -> relri;
 	Image -> relit;
+	Image -> relimgrel;
 	task -> plugfitsin;
 	task -> plugfitsout;
 	task -> plugscamp;
@@ -78,7 +75,9 @@ digraph codasyl {
 	Instrument -> relsi;
 	Instrument -> relrinst;
 	Release -> relur;
-	Release -> relrinst;
+	Release -> task;
+	Release -> relimgrel;
+	Release -> siteprofile;
 
 	kind -> task;
 	kind -> configfile;
