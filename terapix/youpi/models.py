@@ -200,7 +200,7 @@ class CartItem(models.Model):
 		return self.name
 
 class Image(models.Model):
-	name = models.CharField(max_length = 20,blank=True,unique = True,help_text="name of image")
+	name = models.CharField(max_length = 255, help_text="name of image")
 	skyfootprint = models.MultiPolygonField()
 	centerfield = models.PointField()
 	objects = models.GeoManager()
@@ -234,6 +234,7 @@ class Image(models.Model):
 	instrument = models.ForeignKey(Instrument, db_column = 'instrument_id')
 	
 	class Meta:
+		unique_together = ('name', 'checksum')
 		verbose_name = "Ingested image"
 		verbose_name_plural = "Ingested images"
 
@@ -242,6 +243,15 @@ class Image(models.Model):
 
 	def __unicode__(self):
 		return self.name
+
+class Release(models.Model):
+	"""
+	Release
+	"""
+
+	label = models.CharField(max_length = 255, unique = True)
+	creationdate = models.DateTimeField(auto_now_add = True)
+	releasedate = models.DateTimeField(null = True)
 
 class Processing_task(models.Model):
 	bools = ((False, 'No'), (True, 'Yes'))
@@ -257,6 +267,7 @@ class Processing_task(models.Model):
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
+	release = models.ForeignKey(Release)
 	
 	class Meta:
 		verbose_name = "Processing task"
@@ -449,24 +460,6 @@ class Ingestion(models.Model):
 	def __unicode__(self):
 		return "Ingestion" + str(self.id)
 	
-class Astrophotocalibration(models.Model):
-	astrefcat = models.CharField(max_length = 80,blank=True,null=True,help_text="")
-	xmlpath = models.CharField(max_length = 512,blank=True,null=True,help_text="")
-	flatfield = models.CharField(max_length = 512,blank=True,null=True,help_text="")
-	outputzp = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text="")
-
-	class Meta:
-		verbose_name = "Astrometric/Photometric Calibration"
-		verbose_name_plural = "Astrometric/Photometric Calibrations"
-
-	class Admin:
-		list_display = ('astrefcat','xmlpath','flatfield','outputzp')
-		list_filter = ('astrefcat','xmlpath','flatfield','outputzp',)
-		fields = (('General Informations', {'fields':('astrefcat','xmlpath','flatfield','outputzp',)}),)
-
-	def __unicode__(self):
-		return self.listname
-       
 class Coaddition(models.Model):
 	image = models.ForeignKey(Image,null=True,blank= True,db_column='image_id')
 	listname = models.CharField(max_length = 20,blank=True,null=True,help_text="")
@@ -478,24 +471,6 @@ class Coaddition(models.Model):
 	def __unicode__(self):
 		return self.listname
        
-# class Image_has_coaddition(models.Model):
-# 	image = models.ForeignKey(Image,null=True,blank= True,db_column='image_id')
-# 	coaddition = models.ForeignKey(Coaddition,null=True,blank= True,db_column='coaddition_id')
-# 	astrophotocalibration = models.ForeignKey(Astrophotocalibration,null=True,blank= True,db_column='astrophotocalibration_id')
-# 	class Meta:
-# 		unique_together = ('astrophotocalibration','image','coaddition')
-# 		verbose_name ="Ingested Image involved in Coaddition"
-# 		verbose_name_plural ="Ingested Images involved in Coaddition"
-# 	class Admin:
-# 	       pass
-#                list_display = ('image','coaddition')
-# 	       list_filter = ('coaddition','image')
-# 	       search_fields = ('image_name','coaddition')
-# 	       #fields=(('Informations generales', {'fields':('astrophotocalibration','image','coaddition')}),
-# 		#)
-# 	def __str__(self):
-# 		return self.image
-
 class Fitstables(models.Model):
     # Image name
 	name = models.CharField(max_length = 80,blank=True,null=True)
@@ -565,26 +540,6 @@ class Rel_us(models.Model):
 	class Meta:
 		unique_together = ('user', 'survey')
 
-class Release(models.Model):
-	"""
-	Release
-	"""
-
-	label = models.CharField(max_length = 255, unique = True)
-	creationdate = models.DateTimeField(auto_now_add = True)
-	releasedate = models.DateTimeField(null = True)
-
-class Rel_rinst(models.Model):
-	"""
-	Release-Instrument relation
-	"""
-
-	release = models.ForeignKey(Release)
-	instrument = models.ForeignKey(Instrument)
-
-	class Meta:
-		unique_together = ('release', 'instrument')
-
 class Rel_ur(models.Model):
 	"""
 	User-Release relation
@@ -596,31 +551,29 @@ class Rel_ur(models.Model):
 	class Meta:
 		unique_together = ('user', 'release')
 
-class Rel_ai(models.Model):
+class Rel_imgrel(models.Model):
 	"""
-	Astrophotocalibration-Image relation
+	Image-Release relation
 	"""
 
-	# FKs constraints
-	astrophotocalibration = models.ForeignKey(Astrophotocalibration,null=True,blank= True,db_column='astrophotocalibration_id')
-	image = models.ForeignKey(Image,null=True,blank= True,db_column='image_id')
-
+	image = models.ForeignKey(Image)
+	release = models.ForeignKey(Release)
+	
 	class Meta:
-		unique_together = ('astrophotocalibration','image')
-		verbose_name="Ingested Image involved in Astrometric/Photometric Calibration"
-		verbose_name_plural="Ingested Images involved in Astrometric/Photometric Calibration"
+		unique_together = ('image', 'release')
 
 	def __unicode__(self):
-		return self.astrophotocalibration
+		return self.name
        
 class SiteProfile(models.Model):
-	# Mandatory
-	user = models.ForeignKey(User, unique = True)
 
 	# Current user GUI style
 	guistyle = models.CharField(max_length = 255, default = 'default')
 	# Serialized data (base64 encoding over marshal serialization)
 	dflt_condor_setup = models.TextField()
+
+	user = models.ForeignKey(User, unique = True)
+	release = models.ForeignKey(Release)
 
 class CondorNodeSel(models.Model):
 	"""
