@@ -175,6 +175,7 @@ def task_start_log(userData, start, kind_id = None):
 		g.setTableName('youpi_processing_task')
 		g.insert(	user_id = int(user_id),
 					kind_id = int(kind_id),
+					release_id = 1,
 					start_date = start,
 					end_date = getNowDateTime(),
 					title = userData['Descr'],
@@ -274,7 +275,7 @@ def process(userData, kind_id, argv):
 			print "SWARP PREPROCESSING: uncompressing", fz
 			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
 	
-	if kind == 'sex':
+#	if kind == 'sex':
 
 
 
@@ -405,7 +406,7 @@ def process(userData, kind_id, argv):
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
-							thumbnails = convert
+							thumbnails = convert,
 				)
 				sex_id = g.con.insert_id()
 			except Exception, e:
