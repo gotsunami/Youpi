@@ -9,10 +9,7 @@ var {{ plugin.id }} = {
 	 * <ImageSelector> instance
 	 *
 	 */
-	 ims: null,
-	 
-	//var {{ plugin.id }}_gNextPage = 1;
-	//var {{ plugin.id }}_fm_file_browser;
+	ims: null,
 
 
 	addSelectionToCart: function() {
@@ -389,7 +386,7 @@ var {{ plugin.id }} = {
 		tr.insert(td);
 		tab2.insert(tr);
 
-
+/*
 		//Flag 
 		tr = new Element('tr');
 		td = new Element('td').insert('Flag path:');
@@ -416,7 +413,7 @@ var {{ plugin.id }} = {
 		td = new Element('td').insert(resp.Psf.length > 0 ? resp.Psf : '--');
 		tr.insert(td);
 		tab2.insert(tr);
-
+*/
 		// Output directory
 		tr = new Element('tr');
 		td = new Element('td', {nowrap: 'nowrap'}).update('Results output dir:');

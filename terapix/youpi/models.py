@@ -314,6 +314,26 @@ class Plugin_swarp(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class Plugin_sex(models.Model):
+	# Serialized data (base64 encoding over zlib compression)
+	config = models.TextField(null = True)
+	# Results log
+	log = models.TextField(null = True)
+	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Sex output HTML data")
+	thumbnails = models.BooleanField('Has image thumbnails', default = False)
+	weightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
+	flagPath = models.CharField(max_length = 255, null = True, help_text = "Path to flag images")
+	psfPath = models.CharField(max_length = 255, null = True, help_text = "Path to psf images")
+
+	# FKs constraints
+	task = models.ForeignKey(Processing_task, db_column = 'task_id')
+	
+	class Meta:
+		verbose_name = "Sex plugin"
+
+	def __unicode__(self):
+		return self.name
+
 class Plugin_fitsin(models.Model):
 	"""
 	Related to QualityFITSin plugin
@@ -369,7 +389,7 @@ class Plugin_fitsin(models.Model):
 
 class Plugin_fitsout(models.Model):
 	"""
-	Related to QualityFITSout plugin
+	 Related to QualityFITSout plugin
 	"""
 	
 	# FKs constraints

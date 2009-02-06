@@ -273,6 +273,9 @@ def process(userData, kind_id, argv):
 		for fz in fzs:
 			print "SWARP PREPROCESSING: uncompressing", fz
 			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
+	
+	if kind == 'sex':
+
 
 
 	################### END OF PRE-PROCESSING  ################################################
@@ -386,6 +389,56 @@ def process(userData, kind_id, argv):
 	elif kind == 'sex':
 		if exit_code == 0:
 			success = 1
+
+			try:
+				if HAS_CONVERT:
+					convert = 1
+				else:
+					convert = 0
+				g.setTableName('youpi_plugin_sex')
+				g.insert(	task_id = int(task_id),
+							#
+							# Sex config file serialization: base64 encoding over zlib compression
+							#
+							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							www = os.path.join(	WWW_SEX_PREFIX, 
+												username, 
+												userData['Kind'], 
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							thumbnails = convert
+				)
+				sex_id = g.con.insert_id()
+			except Exception, e:
+				raise WrapperError, e
+
+			# Copy XSL stylesheet
+			# FIXME: use custom ConfigFile instead of default one
+			pipe = os.popen("/usr/bin/sex -dd|grep XSL_URL 2>&1") 
+			data = pipe.readlines()
+			pipe.close()
+
+			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
+			shutil.copy(xslPath, userData['ResultsOutputDir'])
+
+			# Gets image name
+			#FIXME
+			#catch the right name with the associate parameter CHECKIMAGE_NAME in configFile Sex table instead of glob 'fits'
+			imgout = glob.glob('*.fits')[0]
+			#end OF FIXME
+
+			os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (imgout, os.path.join(userData['ResultsOutputDir'],'out.fits')))
+
+			# Converts produced FITS image into PNG format
+			tiff = os.path.join(userData['ResultsOutputDir'], 'sex.tif')
+			os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'],'out.fits'), tiff))
+			os.remove(os.path.join(userData['ResultsOutputDir'],'out.fits'))
+
+			os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'sex.png')))
+			if HAS_CONVERT:
+				os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_sex.png')))
+
+			os.remove(tiff)
+
 
 	elif kind == 'swarp':
 		if exit_code == 0:

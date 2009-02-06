@@ -39,7 +39,7 @@ class Sextractor(ProcessingPlugin):
 	def saveCartItem(self, request):
 		post = request.POST
 		try:
-			idLis				= eval(post['IdList'])
+			idList				= eval(post['IdList'])
 			itemID				= str(post['ItemID'])
 			flagPath		 	= post['FlagPath']
 			weightPath 			= post['WeightPath']
@@ -168,15 +168,16 @@ class Sextractor(ProcessingPlugin):
 		post = request.POST
 		try:
 			itemId 				= str(post['ItemId'])
-			flagPath 			= post['FlagPath']
-			weightPath 			= post['WeightPath']
-			psfPath 			= post['PsfPath']
+	#		flagPath 			= post['FlagPath']
+	#		weightPath 			= post['WeightPath']
+	#		psfPath 			= post['PsfPath']
 			config 				= post['Config']
 			sexId 				= post['SexId']
 			resultsOutputDir 	= post['ResultsOutputDir']
 			reprocessValid 		= int(post['ReprocessValid'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
+		
 
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
@@ -216,15 +217,9 @@ class Sextractor(ProcessingPlugin):
 		# Condor submission file
 		csfPath = "/tmp/sex-condor-%s.txt" % now
 		csf = open(csfPath, 'w')
-#FIXME
-		# Swarp file containing a list of images to process (one per line)
-#		images = Image.objects.filter(id__in = idList)
-#		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % now)
-#		imgPaths = [img.name + '.fits' for img in images]
-#		swif = open(swarpImgsFile, 'w')
-#		swif.write(string.join(imgPaths, '\n'))
-#		swif.close()
-#END OF FIXME
+		
+		images = Image.objects.filter(id__in = idList)
+		img_files = string.join([os.path.join(img.path, img.name + '.fits') for img in images], ' ')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
@@ -232,9 +227,9 @@ class Sextractor(ProcessingPlugin):
 					'ItemID' 			: itemId,
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
-					'Weight' 			: str(weightPath), 
-					'Flag	' 			: str(flagPath), 
-					'Psf'	 			: str(psfPath), 
+	#				'Weight' 			: str(weightPath), 
+	#				'Flag	' 			: str(flagPath), 
+	#				'Psf'	 			: str(psfPath), 
 					'Descr' 			: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
 					'ResultsOutputDir'	: str(resultsOutputDir)				# Mandatory for WP
 		} 
@@ -242,16 +237,7 @@ class Sextractor(ProcessingPlugin):
 		step = 0 							# At least step seconds between two job start
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
-#FIX ME
-#
-#		if useQFITSWeights:
-#			weight_files = self.getWeightPathsFromImageSelection(request, idList)
-#			weight_files = string.join([dat[1] for dat in weight_files], ', ')
-#		else:
-#			weight_files = string.join([os.path.join(weigthPath, img.name + '_weight.fits.fz') for img in images], ', ')
-#END OF FIX ME
-
-	 	# Generates CSF
+		# Generates CSF
 		condor_submit_file = """
 #
 # Condor submission file
@@ -266,7 +252,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(weights)s, %(flags)s, %(psfs)s, %(images)s, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP
+transfer_input_files    =  %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(mandpath)s/sex.default.param, %(mandpath)s/sex.default.conv
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = /tmp/SEX.log.$(Cluster).$(Process)
@@ -285,8 +271,8 @@ notify_user             = semah@iap.fr
 #		'weights'		: weight_files,
 #		'flags'			: flags_files,
 #		'psfs'			: psf_files,
-#		'images'		: string.join([os.path.join(img.path, img.name + '.fits') for img in images], ', '),
 		'initdir' 		: os.path.join(submit_file_path, 'script'),
+		'mandpath' 		: os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
 		'requirements' 	: req }
 
 		csf.write(condor_submit_file)
@@ -310,18 +296,21 @@ notify_user             = semah@iap.fr
 		except ValueError:
 			raise ValueError, userData
 
-		sex_params = "-XSL_URL %ssextractor.xsl" % os.path.join(	WWW_SEX_PREFIX, 
-																request.user.username, 
-																userData['Kind'], 
-																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+		sex_params = "-XSL_URL %ssextractor.xsl -PARAMETERS_NAME %s -FILTER_NAME %s -WRITE_XML YES" % (os.path.join(	WWW_SEX_PREFIX, 
+																					request.user.username, 
+																					userData['Kind'], 
+																					userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]),
+																					'sex.default.param',
+																					'sex.default.conv')
 
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s  -c %(config)s 2>/dev/null
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s 2>/dev/null
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
 				'params'		: sex_params,
+				'img'			: img_files,
 				'config'		: os.path.basename(customrc),
 				'userdata'		: userData, 
 				'user'			: request.user.username,
@@ -346,7 +335,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 
 		task = Processing_task.objects.filter(id = taskid)[0]
 		data = Plugin_sex.objects.filter(task__id = taskid)[0]
-
+#
 		# Error log content
 		if task.error_log:
 			err_log = str(zlib.decompress(base64.decodestring(task.error_log)))
@@ -362,19 +351,13 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		rels = Rel_it.objects.filter(task__id = taskid)
 		imgs = [r.image for r in rels]
 
-#FIX ME
-		# Computes total exposure time
-	#	totalExpTime = 0
-	#	for img in imgs:
-	#		totalExpTime += img.exptime
 
-		# Looks for groups of swarp
-	#	swarpHistory = Rel_it.objects.filter(image__in = imgs, task__kind__name = self.id).order_by('task')
+		sexHistory = Rel_it.objects.filter(image__in = imgs, task__kind__name = self.id).order_by('task')
 		# Finds distinct tasks
-	#	tasksRelated = []
-	#	for sh in swarpHistory:
-	#		if sh.task not in tasksRelated:
-	#			tasksRelated.append(sh.task)
+		tasksRelated = []
+		for sh in sexHistory:
+			if sh.task not in tasksRelated:
+				tasksRelated.append(sh.task)
 
 		gtasks = []
 		# Remove all tasks than depends on more images
@@ -403,7 +386,6 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'Success' 			: task.success,
 					'Start' 			: str(task.start_date),
 					'End' 				: str(task.end_date),
-#					'TotalExposureTime'	: str(round(totalExpTime, 2)),
 					'Duration' 			: str(task.end_date-task.start_date),
 					'WWW' 				: str(data.www),
 					'ResultsOutputDir' 	: str(task.results_output_dir),
@@ -414,9 +396,9 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
 					'History'			: history,
 					'Log' 				: err_log,
-					'Weight'			: str(data.weight),
-					'Flag'				: str(data.flag),
-					'Psf'				: str(data.psf),
+				#	'Weight'			: str(data.weight),
+				#	'Flag'				: str(data.flag),
+				#	'Psf'				: str(data.psf),
 		}
 
 
