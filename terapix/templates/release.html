@@ -18,10 +18,17 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 {% block bodyclass %}dashboard{% endblock %}
 
 {% block content %}
-<div align="center">
-	<div id="submenu">
-		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0">
-			TODO...	
+<div id="submenu">
+	<div id="menuitem_sub_0">
+		<div class="themes">
+			<h1>Current User Release</h1>
+			The release you are currently using: <span style="font-size: 20px; font-weight: bold; color: orange">{{ user.get_profile.release.label }}</span>
+			<div id="change_current_rel_div" style="margin-top: 30px; width: 50%"/>
+		</div>
+	</div>
+	<div align="center" style="margin-left: 30px;" id="menuitem_sub_1">
+		<div style="margin-top: 40px;" align="center">
+		TODO2	
 		</div>
 	</div>
 </div>
@@ -29,7 +36,27 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 <script type="text/javascript">
 	var menu;
 	document.observe('dom:loaded', function() {
-		menu = new SubMenu('submenu', ['Test']);
+		menu = new SubMenu('submenu', ['Current Release', 'Edit Releases']);
+	});
+
+	var relchg = new DropdownBox('change_current_rel_div', 'Change Current Release');
+	relchg.setOnClickHandler(function() {
+		if (!relchg.isOpen()) return;
+
+		var content = relchg.getContentNode();
+		content.update('Please select a release name in the list and validate by clicking on the button:');
+		var rels = new Array();
+		{% for r in releases %}
+		rels.push('{{ r.label }}');
+		{% endfor %}
+
+		var d = new Element('div');
+		var sel = new Element('select');
+		rels.each(function(rel) {
+			sel.insert(new Element('option').update(rel));
+		});
+		d.insert(sel);
+		content.insert(d);
 	});
 </script>
 {% endblock %}

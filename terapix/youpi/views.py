@@ -252,9 +252,13 @@ def release(request):
 	This is a callback function (as defined in django's urls.py file).
 	"""
 
+	# FIXME: handle groups
+	rels = Release.objects.all().order_by('-creationdate')
+
 	return render_to_response('release.html', 
 					{	'Debug' 			: DEBUG, 
 						'menu'				: app_menu,
+						'releases'			: rels,
 						'selected_entry_id'	: 'release' }, 
 					context_instance = RequestContext(request))
 
