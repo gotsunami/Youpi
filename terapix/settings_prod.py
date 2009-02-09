@@ -73,6 +73,7 @@ TPX_CONDOR_UPLOAD_URL = FTP_URL + PROCESSING_OUTPUT
 WWW_FITSIN_PREFIX = 'http://clix.iap.fr:9900/'
 WWW_SCAMP_PREFIX = WWW_FITSIN_PREFIX
 WWW_SWARP_PREFIX = WWW_FITSIN_PREFIX
+WWW_SEX_PREFIX = WWW_FITSIN_PREFIX
 #
 # Enabe Skeleton demo plugin if True. Should be turned off on production system
 #
@@ -137,6 +138,16 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
 #     'django.template.loaders.eggs.load_template_source',
+)
+
+# Django default processors + custom ones from Youpi
+TEMPLATE_CONTEXT_PROCESSORS = (
+	'django.core.context_processors.auth',
+	'django.core.context_processors.debug',
+	'django.core.context_processors.i18n',
+	'django.core.context_processors.media',
+	'terapix.youpi.context_processors.release',
+	'terapix.youpi.context_processors.appmenu',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -22,7 +22,15 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	<div id="menuitem_sub_0">
 		<div class="themes">
 			<h1>Current User Release</h1>
-			The release you are currently using: <span style="font-size: 20px; font-weight: bold; color: orange">{{ user.get_profile.release.label }}</span>
+			The release you are currently using is <span style="font-size: 18px; font-weight: bold; color: orange">{{ user.get_profile.release.label }}</span>
+			 and contains 
+			<span style="font-style: italic">
+			{% ifequal activeImgsCount 0 %}
+			 	<span style="color: red">no images</span>.
+			{% else %}
+				{{ activeImgsCount }} images.
+			{% endifequal %}
+			</span>
 			<div id="change_current_rel_div" style="margin-top: 30px; width: 50%"/>
 		</div>
 	</div>

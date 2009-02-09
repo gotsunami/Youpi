@@ -36,25 +36,6 @@ from terapix.youpi.cviews.preingestion import *
 from terapix.youpi.cviews.plot import *
 from terapix.youpi.cviews.processing import *
 
-app_menu = { 	'normal' : 
-				( 	
-					{'title' : 'Home', 				'id' : 'home', 			'href' : AUP},
-					{'title' : 'Pre-ingestion',		'id' : 'preingestion',	'href' : AUP + '/preIngestion/'},
-					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : AUP + '/ingestion/'},
-					{'title' : 'Release', 			'id' : 'release',		'href' : AUP + '/release/'},
-					{'title' : 'Processing', 		'id' : 'processing', 	'href' : AUP + '/processing/'},
-					{'title' : 'Processing Results','id' : 'results',	 	'href' : AUP + '/results/'},
-					{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : AUP + '/monitoring/'}
-				),
-				'apart' :
-				( 	
-					# Display order is inverted
-					{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : AUP + '/preferences/'},
-					{'title' : 'Condor Setup', 		'id' : 'condorsetup', 	'href' : AUP + '/condor/setup/'},
-					{'title' : 'Shopping cart',		'id' : 'shoppingcart', 	'href' : AUP + '/cart/'}
-				)
-			}
-
 @login_required
 @profile
 def index(request):
@@ -67,12 +48,11 @@ def index(request):
 	for i in s:
 		k.append(str(i))
 
-	return render_to_response('index.html', 
-					{	'Debug' 			: DEBUG,
-						'menu'				: app_menu,
+	return render_to_response('index.html', {	
 						'selected_entry_id'	: 'home' ,
-						'list_survey' : k},
-					context_instance = RequestContext(request))
+						'list_survey' : k
+						},
+						context_instance = RequestContext(request))
 
 @login_required
 @profile
@@ -118,16 +98,15 @@ def preferences(request):
 	except EOFError:
 		config = None
 
-	return render_to_response('preferences.html', 
-					{	'Debug' 			: DEBUG,
+	return render_to_response('preferences.html', {	
 						'themes'			: themes,
 						'plugins' 			: manager.plugins, 
 						'current_theme'		: themes[k],
 						'policies'			: policies,
 						'selections'		: selections,
 						'config'			: config,
-						'menu'				: app_menu,
-						'selected_entry_id'	: 'preferences' }, 
+						'selected_entry_id'	: 'preferences', 
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -136,10 +115,9 @@ def condor_setup(request):
 	"""
 	Condor cluster setup
 	"""
-	return render_to_response('condorsetup.html', 
-					{	'Debug' 			: DEBUG,
-						'menu'				: app_menu,
-						'selected_entry_id'	: 'condorsetup' }, 
+	return render_to_response('condorsetup.html', {	
+						'selected_entry_id'	: 'condorsetup', 
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -148,10 +126,9 @@ def documentation(request):
 	"""
 	Documentation template
 	"""
-	return render_to_response('documentation.html', 
-					{	'Debug' 			: DEBUG,
-						'menu'				: app_menu,
-						'selected_entry_id'	: 'documentation' }, 
+	return render_to_response('documentation.html', {	
+						'selected_entry_id'	: 'documentation',
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -176,28 +153,25 @@ def cart_view(request):
 	policies = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
 	selections = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
 
-	return render_to_response('shoppingcart.html', 
-				{	'plugins' 			: manager.plugins, 
+	return render_to_response('shoppingcart.html', {	
+					'plugins' 			: manager.plugins, 
 					'cartHasData' 		: cartHasData, 
-					'Debug' 			: DEBUG, 
-					'menu'				: app_menu,
 					# Cluster node available policies + selections
 					'policies'			: policies,
 					'selections'		: selections,
 					'selected_entry_id'	: 'shoppingcart', 
-					'misc' 				: manager
+					'misc' 				: manager,
 				},
 				context_instance = RequestContext(request))
 
 @login_required
 @profile
 def processing(request):
-	return render_to_response('processing.html', 
-					{ 	'plugins' 			: manager.plugins,
-						'Debug' 			: DEBUG,
+	return render_to_response('processing.html', { 	
+						'plugins' 			: manager.plugins,
 						'processing_output' : PROCESSING_OUTPUT,
-						'menu'				: app_menu,
-						'selected_entry_id'	: 'processing' }, 
+						'selected_entry_id'	: 'processing',
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -207,11 +181,10 @@ def preingestion(request):
 	Related to preIngestion step
 	"""
 	
-	return render_to_response('preingestion.html', 
-					{	'hostname'			: socket.gethostname(), 
-						'menu'				: app_menu,
+	return render_to_response('preingestion.html', {	
+						'hostname'			: socket.gethostname(), 
 						'selected_entry_id'	: 'preingestion', 
-						'Debug' 			: DEBUG },
+					},
 					context_instance = RequestContext(request))
 
 @login_required
@@ -223,11 +196,10 @@ def ing(request):
 	"""
 
 	q = Image.objects.all().count()
-	return render_to_response('ingestion.html', 
-					{	'ingested' 			: q, 
-						'menu'				: app_menu,
+	return render_to_response('ingestion.html', {	
+						'ingested' 			: q, 
 						'selected_entry_id'	: 'ing', 
-						'Debug' 			: DEBUG }, 
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -238,10 +210,9 @@ def monitoring(request):
 	This is a callback function (as defined in django's urls.py file).
 	"""
 
-	return render_to_response('monitoring.html', 
-					{	'Debug' 			: DEBUG, 
-						'menu'				: app_menu,
-						'selected_entry_id'	: 'monitoring' }, 
+	return render_to_response('monitoring.html', {	
+						'selected_entry_id'	: 'monitoring',
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -254,12 +225,14 @@ def release(request):
 
 	# FIXME: handle groups
 	rels = Release.objects.all().order_by('-creationdate')
+	activeRel = request.user.get_profile().release
+	imgs = Rel_imgrel.objects.filter(release = activeRel)
 
-	return render_to_response('release.html', 
-					{	'Debug' 			: DEBUG, 
-						'menu'				: app_menu,
+	return render_to_response('release.html', {	
 						'releases'			: rels,
-						'selected_entry_id'	: 'release' }, 
+						'activeImgsCount'	: len(imgs),
+						'selected_entry_id'	: 'release',
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -276,12 +249,11 @@ def results(request):
 		if t.results_output_dir not in dirs:
 			dirs.append(t.results_output_dir)
 
-	return render_to_response('results.html', 
-					{	'Debug' 			: DEBUG, 
+	return render_to_response('results.html', {	
 						'plugins' 			: manager.plugins, 
-						'menu'				: app_menu,
 						'selected_entry_id'	: 'results', 
-						'outputDirs' 		: dirs }, 
+						'outputDirs' 		: dirs,
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
@@ -292,23 +264,20 @@ def render_plugin(request, pluginId):
 	except PluginManagerError, msg:
 		return HttpResponseNotFound("Error: %s" % msg)
 
-	return render_to_response('processing_plugin.html',
-					{ 	'plugin' 			: plugin,
-						'Debug' 			: DEBUG,
-						'menu'				: app_menu,
+	return render_to_response('processing_plugin.html', { 	
+						'plugin' 			: plugin,
 						'selected_entry_id'	: 'processing', 
-						'processing_output' : PROCESSING_OUTPUT }, 
+						'processing_output' : PROCESSING_OUTPUT,
+					}, 
 					context_instance = RequestContext(request))
 
 @login_required
 @profile
 def soft_version_monitoring(request):
-	return render_to_response(
-			'softs_versions.html', 
-			{	'report' 			: len(SOFTS), 
-				'menu'				: app_menu,
+	return render_to_response( 'softs_versions.html', {	
+				'report' 			: len(SOFTS), 
 				'selected_entry_id'	: 'monitoring', 
-				'Debug' 			: DEBUG },
+			},
 			context_instance = RequestContext(request))
 
 @login_required
@@ -321,12 +290,10 @@ def show_ingestion_report(request, ingestionId):
 	else:
 		report = 'No report found... maybe the processing is not finished yet?'
 
-	return render_to_response(
-			'ingestion_report.html', 
-			{	'report' 			: report, 
-				'menu'				: app_menu,
+	return render_to_response( 'ingestion_report.html', {	
+				'report' 			: report, 
 				'selected_entry_id'	: 'ing', 
-				'Debug' 			: DEBUG },
+			},
 			context_instance = RequestContext(request))
 
 @login_required
@@ -346,14 +313,12 @@ def single_result(request, pluginId, taskId):
 		# TODO: set a better page for that
 		return HttpResponseNotFound("""<h1><span style="color: red;">Result not found.</h1></span>""")
 
-	return render_to_response(
-				'single_result.html', 
-				{	'pid' 				: pluginId, 
+	return render_to_response( 'single_result.html', {	
+					'pid' 				: pluginId, 
 					'tid'	 			: taskId,
-					'Debug' 			: DEBUG,
-					'menu'				: app_menu,
 					'selected_entry_id'	: 'results', 
-					'plugin' 			: plugin }, 
+					'plugin' 			: plugin,
+				}, 
 				context_instance = RequestContext(request))
 
 

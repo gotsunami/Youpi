@@ -57,7 +57,7 @@ def image_grading(request, pluginName, fitsId):
 	else:
 		return HttpResponseRedirect(AUP + '/results/')
 
-	return render_to_response('grading.html', {'www' : path, 'pluginName' : pluginName, 'Debug' : DEBUG, 'fitsId' : fitsId}, context_instance = RequestContext(request))
+	return render_to_response('grading.html', {'www' : path, 'pluginName' : pluginName, 'fitsId' : fitsId}, context_instance = RequestContext(request))
 
 @login_required
 @profile
@@ -85,18 +85,19 @@ def grading_panel(request, pluginId, fitsId):
 		userPCommentId = None
 		customComment = None
 	
-	return render_to_response('grading_panel.html', {	'www' 		: path, 
-														'pluginId' 	: pluginId,
-														'fitsId' 	: fitsId,
-														'userGrade'	: grade,
-														'Debug'		: DEBUG,
-														'comments'	: comments,
-														'userPCommentId' : userPCommentId,
-														'customComment' : customComment,
-														'evals' 	: evals,
-														'prev_releaseinfo'	: prev_releaseinfo,
-													}, 
-													context_instance = RequestContext(request))
+	return render_to_response('grading_panel.html', {	
+						'www' 		: path, 
+						'pluginId' 	: pluginId,
+						'fitsId' 	: fitsId,
+						'userGrade'	: grade,
+						'comments'	: comments,
+						'userPCommentId' : userPCommentId,
+						'customComment' : customComment,
+						'evals' 	: evals,
+						'prev_releaseinfo'	: prev_releaseinfo,
+					}, 
+					context_instance = RequestContext(request))
+
 @login_required
 @profile
 def grading_cancel(request, pluginId, fitsId):
@@ -120,7 +121,6 @@ def grading_cancel(request, pluginId, fitsId):
 	return render_to_response('grading_panel.html', {	'pluginId' 	: pluginId,
 														'fitsId' 	: fitsId,
 														'comments'	: comments,
-														'Debug'		: DEBUG,
 														'evals' 	: evals,
 														'prev_releaseinfo'	: prev_releaseinfo,
 													}, 
