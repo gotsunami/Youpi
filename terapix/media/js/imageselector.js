@@ -10,9 +10,10 @@
  * Constructor Parameters:
  *
  * container - string or DOM node: name of parent block container
+ * release_id - integer: release DB id (optional, defaults to null)
  *
  */
-function ImageSelector(container)
+function ImageSelector(container, release_id)
 {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +31,12 @@ function ImageSelector(container)
 	 *
 	 */
 	var imgSelRequiredMsg = 'Not available until you make an image selection!';
+	/*
+	 * Var: _release_id
+	 * Release DB id to use to query only images associated to that release
+	 *
+	 */
+	var _release_id = typeof release_id == 'number' ? parseInt(release_id) : null;
 	/*
 	 * Var: caption
 	 * Widget label
@@ -84,7 +91,6 @@ function ImageSelector(container)
 	 *
 	 */ 
 	var _container = $(container);
-	_container.setAttribute('class', 'imageSelector');
 	/*
 	 * Var: id
 	 * Unique instance identifier
@@ -323,9 +329,9 @@ function ImageSelector(container)
 	 *
 	 */ 
 	function render() {
+		_container.setAttribute('class', 'imageSelector');
 		// Container for new image selection
-		var	topDiv = new Element('div');
-		topDiv.setAttribute('id', id + '_new_image_selection_div');
+		var	topDiv = new Element('div', {id: id + '_new_image_selection_div'});
 		_container.insert(topDiv);
 		renderCreateNewImageSelection(topDiv);
 	}
@@ -372,7 +378,7 @@ function ImageSelector(container)
 
 		// Send HTTP POST request
 		var post = 'IdList=' + idList;
-		xhr.send('/youpi/process/query/remapIds/', post);
+		xhr.send('/youpi/process/query/remapIds/', _post(post));
 	}
 
 	/*
@@ -696,31 +702,44 @@ function ImageSelector(container)
 	 * Queries number of images ingested into DB and initiates widget rendering
 	 *
 	 * Parameters:
-	 *
 	 *   containerNode - DOM node parent container
 	 *
 	 */ 
 	function renderCreateNewImageSelection(containerNode) {
 		var xhr = new HttpRequest(
-			containerNode.id,
+			containerNode,
 			// Use default error handler
 			null,
 			// Custom handler for results
 			function(resp) {
 				var nb = resp['Total'];
-
-				// x3 (firebug issue)
-				removeAllChildrenNodes(containerNode);
-				removeAllChildrenNodes(containerNode);
-				removeAllChildrenNodes(containerNode);
-
+				containerNode.update();
 				addImageQueryForm(containerNode, nb);
-
 			}
 		);
 
 		// Send HTTP POST request
-		xhr.send('/youpi/ingestion/imgCount/');
+		xhr.send('/youpi/ingestion/imgCount/', _post());
+	}
+
+	/*
+	 * Function: _post
+	 * Builds full POST query string (with support for ReleaseId)
+	 *
+	 * Parameters:
+	 *  post - string: POST query string (optional)
+	 *
+	 */ 
+	function _post(post) {
+		if (_release_id) {
+			if (typeof post != 'undefined')
+				return post + '&ReleaseId=' + _release_id;
+			else
+				return 'ReleaseId=' + _release_id;
+		}
+		else {
+			return typeof post != 'undefined' ? post : '';
+		}
 	}
 
 	/*
@@ -954,7 +973,7 @@ function ImageSelector(container)
 		// Build custom query
 		var data = 'Distinct=&Table=youpi_image&DisplayField=object&Lines=0&Line0Field=object&Line0Cond=contains&Line0Text=&Hide=&OrderBy=object';
 		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', _post(data));
 	}
 
 	/*
@@ -1025,7 +1044,7 @@ function ImageSelector(container)
 		// Build custom query
 		var data = 'Distinct=&Table=youpi_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=contains&Line0Text=&Hide=&OrderBy=label';
 		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', _post(data));
 	}
 
 	/*
@@ -1098,7 +1117,7 @@ function ImageSelector(container)
 		// Build custom query
 		var data = 'Distinct=&Table=youpi_channel&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', _post(data));
 	}
 
 	/*
@@ -1171,7 +1190,7 @@ function ImageSelector(container)
 		var data = 'Distinct=&Table=youpi_instrument&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 
 		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', _post(data));
 	}
 
 	/*
@@ -1244,7 +1263,7 @@ function ImageSelector(container)
 		var data = 'Distinct=&Table=youpi_run&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
 
 		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/process/preingestion/query/', _post(data));
 	}
 
 	/*
@@ -1329,7 +1348,7 @@ function ImageSelector(container)
 		);
 
 		var post = 'Mode=Single';
-		xhr.send('/youpi/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', _post(post));
 	}
 
 	/*
@@ -1751,7 +1770,7 @@ function ImageSelector(container)
 		);
 	
 		var post = 'Mode=Batch';
-		xhr.send('/youpi/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', _post(post));
 	}
 
 	/*
@@ -1798,7 +1817,7 @@ function ImageSelector(container)
 
 		post = 'Name=' + name + '&Mode=Batch';
 		xhr.setBusyMsg("Loading content for list '" + name + "'");
-		xhr.send('/youpi/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', _post(post));
 	}
 
 	/*
@@ -1880,7 +1899,7 @@ function ImageSelector(container)
 		);
 
 		var post = 'Mode=' + (_selectionMode == _singleMode ? 'Single' : 'Batch');
-		xhr.send('/youpi/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', _post(post));
 	}
 
 	/*
@@ -1939,7 +1958,7 @@ function ImageSelector(container)
 
 		post = 'Name=' + name.replace('+', '%2B');
 		// Send HTTP POST request
-		xhr.send('/youpi/process/db/delSelection/', post);
+		xhr.send('/youpi/process/db/delSelection/', _post(post));
 	}
 
 	/*
@@ -2003,7 +2022,7 @@ function ImageSelector(container)
 
 		// Get all selections
 		var post = 'Mode=' + (_selectionMode == _singleMode ? 'Single' : 'Batch');
-		xhr.send('/youpi/process/db/getSelections/', post);
+		xhr.send('/youpi/process/db/getSelections/', _post(post));
 	}
 
 	/*
@@ -2050,7 +2069,7 @@ function ImageSelector(container)
 		post = 'Table=youpi_imageselections&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=is equal to&Line0Text=' + name + '&Hide=&OrderBy=id';
 
 		// Send HTTP POST request
-		xhr.send('/youpi/process/preingestion/query/', post);
+		xhr.send('/youpi/process/preingestion/query/', _post(post));
 	}
 
 	/*
@@ -2090,7 +2109,7 @@ function ImageSelector(container)
 		post = 'Name=' + name + '&IdList=' + sels;
 
 		// Send HTTP POST request
-		xhr.send('/youpi/process/db/saveSelection/', post);
+		xhr.send('/youpi/process/db/saveSelection/', _post(post));
 	}
 
 	/*
@@ -2463,7 +2482,7 @@ function ImageSelector(container)
 		/** SPECIAL CASE **/
 		if (params['special']) {
 			post = 'Name=' + valueText + '&Mode=Single';
-			xhr.send('/youpi/process/db/getSelections/', post);
+			xhr.send('/youpi/process/db/getSelections/', _post(post));
 			return;
 		}
 
@@ -2499,7 +2518,7 @@ function ImageSelector(container)
 		}
 	
 		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', post);
+		xhr.send('/youpi/process/preingestion/query/', _post(post));
 	}
 
 	/*
@@ -2679,7 +2698,7 @@ function ImageSelector(container)
 
 		// Send HTTP POST request
 		xhr.setBusyMsg('Parsing XML content');
-		xhr.send('/youpi/uploadFile/batch/parseContent/', post);
+		xhr.send('/youpi/uploadFile/batch/parseContent/', _post(post));
 	}
 
 	/*
@@ -2742,7 +2761,7 @@ function ImageSelector(container)
 
 		// Send HTTP POST request
 		xhr2.setBusyMsg('Loading sky visualization');
-		xhr2.send('/youpi/plot/sky/selections/', post);
+		xhr2.send('/youpi/plot/sky/selections/', _post(post));
 	}
 
 	/*
@@ -2782,7 +2801,7 @@ function ImageSelector(container)
 
 		// Send HTTP POST request
 		xhr.setBusyMsg('Retreiving selection content');
-		xhr.send('/youpi/uploadFile/batch/viewSelection/', post);
+		xhr.send('/youpi/uploadFile/batch/viewSelection/', _post(post));
 	}
 
 	// Main entry point

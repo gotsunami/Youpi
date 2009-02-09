@@ -951,7 +951,7 @@ var {{ plugin.id }} = {
 		div.setAttribute('align', 'center');
 		root.appendChild(div);
 
-		{{ plugin.id }}.ims = new ImageSelector(uidswarp + '_results_div');
+		{{ plugin.id }}.ims = new ImageSelector(uidswarp + '_results_div', {{ user_release.id }});
 		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
 	}
 };
