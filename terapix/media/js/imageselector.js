@@ -10,10 +10,10 @@
  * Constructor Parameters:
  *
  * container - string or DOM node: name of parent block container
- * release_id - integer: release DB id (optional, defaults to null)
+ * release - object: release data (optional, defaults to null. See <_release>.)
  *
  */
-function ImageSelector(container, release_id)
+function ImageSelector(container, release)
 {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -32,11 +32,16 @@ function ImageSelector(container, release_id)
 	 */
 	var imgSelRequiredMsg = 'Not available until you make an image selection!';
 	/*
-	 * Var: _release_id
-	 * Release DB id to use to query only images associated to that release
+	 * Var: _release
+	 * Release to use to query only images associated to that release
+	 *
+	 * Properties:
+	 *  release = {label: 'release_label', id: 'release_id'}
+	 *  label - string: release's label
+	 *  id - integer: release's DB id
 	 *
 	 */
-	var _release_id = typeof release_id == 'number' ? parseInt(release_id) : null;
+	var _release = null;
 	/*
 	 * Var: caption
 	 * Widget label
@@ -329,6 +334,19 @@ function ImageSelector(container, release_id)
 	 *
 	 */ 
 	function render() {
+		if (typeof release == 'object') {
+			var r = $H(release); 
+			if (typeof r.get('label') != 'string' || typeof r.get('id') != 'number') {
+				throw 'release must be an object with label(string) and id(integer) properties set';
+			}
+			r.set('id', parseInt(r.get('id')));
+			_release = r;
+		}
+		else {
+			if (typeof release != 'undefined')
+				throw 'release must be an object with label(string) and id(integer) properties set';
+		};
+
 		_container.setAttribute('class', 'imageSelector');
 		// Container for new image selection
 		var	topDiv = new Element('div', {id: id + '_new_image_selection_div'});
@@ -439,8 +457,8 @@ function ImageSelector(container, release_id)
 		single_div.insert(tab);
 		cNode.insert(single_div);
 
-		// Second row
-		addTRLine(tr);
+		// Whether adds a 'Current release' line or a multi-criteria line
+		_release ? addReleaseLine() : addTRLine(tr);
 
 		// Execute query
 		div = new Element('div', {style: 'text-align: left'});
@@ -731,11 +749,11 @@ function ImageSelector(container, release_id)
 	 *
 	 */ 
 	function _post(post) {
-		if (_release_id) {
+		if (_release) {
 			if (typeof post != 'undefined')
-				return post + '&ReleaseId=' + _release_id;
+				return post + '&ReleaseId=' + _release.get('id');
 			else
-				return 'ReleaseId=' + _release_id;
+				return 'ReleaseId=' + _release.get('id');
 		}
 		else {
 			return typeof post != 'undefined' ? post : '';
@@ -2209,6 +2227,42 @@ function ImageSelector(container, release_id)
 	}
 
 	/*
+	 * Function: addReleaseLine
+	 * Adds a new line based on current release
+	 *
+	 */ 
+	function addReleaseLine() {
+		var tr, td, but;
+	
+		// Use a rather unique TR id
+		var trid = genID('Line');
+		tr = new Element('tr', {id: trid, 'class': 'queryline'});
+
+		// Add button
+		td = new Element('td', {colspan: 2}).setStyle({textAlign: 'right'});
+		but = new Element('input', {id: genID('ButtonAdd'), type: 'button', value: '+'});
+		but.observe('click', function(event) {
+			addTRLine(event.element().up('tr'));
+		});
+		td.insert(but);
+		tr.insert(td);
+
+		// Title
+		td = new Element('td', {colspan: 3});
+		td.update('Release is equal to <b>' + _release.get('label') + '</b>');
+		tr.insert(td);
+
+		// Nb result div (per TR line)
+		td = new Element('td', {style: 'text-align: left; vertical-align: middle'});
+		var rdiv = new Element('div', {id: id + '_nbResults_div_' + currentTR});
+		td.insert(rdiv);
+		tr.insert(td);
+
+		topNode.insert(tr);
+		currentTR++;
+	}
+
+	/*
 	 * Function: getCondText
 	 * Get conditionnal text value selected in ComboBox
 	 *
@@ -2319,7 +2373,11 @@ function ImageSelector(container, release_id)
 
 		// Index of row
 		xhr.idResultsIdx = 0;
-		sendq(1, xhr);
+		if (_release) {
+			xhr.send('/youpi/process/imgsIdsFromRelease/', _post());
+		}
+		else
+			sendq(1, xhr);
 	}
 
 	/*
@@ -2345,6 +2403,8 @@ function ImageSelector(container, release_id)
 		else {
 			rg.setAttribute('class', 'result_count_no_match');
 			rg.insert('No match');
+			var g = $('_result_grid_div');
+			if (g) g.update();
 		}
 	}
 

@@ -320,6 +320,7 @@ def preingestion_custom_query(request):
 		lines = request.POST['Lines'].split(',')
 		orderBy = request.POST['OrderBy']
 		hide = request.POST['Hide']
+		releaseId = request.POST.get('ReleaseId', None)
 	except Exception, e:
 		return HttpResponseForbidden()
 
@@ -504,3 +505,19 @@ def preingestion_custom_query(request):
 
 	return HttpResponse(str({'query' : str(query), 'fields' : tableFields, 'data' : data, 'hidden' : str(hide).split(',')}), mimetype = 'text/plain')
 
+def processing_get_imgs_ids_from_release(request):
+	"""
+	Returns a dictionnary with images Ids that belong to a release
+	"""
+
+	try:
+		releaseId = request.POST['ReleaseId']
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	rels = Rel_imgrel.objects.filter(release__id = int(releaseId))
+	data = []
+	for rel in rels:
+		data.append([str(rel.image.id)])
+
+	return HttpResponse(str({'fields' : ['id'], 'data' : data}))

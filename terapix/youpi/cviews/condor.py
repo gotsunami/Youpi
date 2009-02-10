@@ -38,7 +38,16 @@ def ingestion_img_count(request):
 	Returns number of ingested images
 	"""
 
-	q = Image.objects.all().count()
+	try:
+		releaseId = request.POST.get('ReleaseId', None)
+	except KeyError, e:
+		raise HttpResponseServerError('Bad parameters')
+
+	if releaseId:
+		q = Rel_imgrel.objects.filter(release__id = int(releaseId)).count()
+	else:
+		q = Image.objects.all().count()
+
 	return HttpResponse(str({'Total' : int(q)}), mimetype = 'text/plain')
 
 @login_required

@@ -81,6 +81,7 @@ urlpatterns = patterns(
 	(r'^youpi/process/db/getSelections/$', 'processing_get_image_selections'),
 	(r'^youpi/process/db/delSelection/$', 'processing_delete_image_selection'),
 	(r'^youpi/process/checkConfigFileExists/$', 'processing_check_config_file_exists'),
+	(r'^youpi/process/imgsIdsFromRelease/$', 'processing_get_imgs_ids_from_release'),
 
 	# History
 	(r'^youpi/history/ingestion/$', 'history_ingestion'),
