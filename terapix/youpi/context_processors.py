@@ -12,8 +12,13 @@ def release(request):
 	Returns context variables for Youpi's release system.
 	"""
 
+	try:
+		rel = request.user.get_profile().release
+	except AttributeError:
+		rel = None
+
 	return {
-		'user_release': request.user.get_profile().release,
+		'user_release': rel,
 	}
 
 def appmenu(request):
