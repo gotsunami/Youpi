@@ -500,6 +500,13 @@ class Fitstables(models.Model):
 	class Meta:
 		unique_together = [('name', 'run', 'fitstable')]
 
+class Tag(models.Model):
+
+	name = models.CharField(max_length = 255, blank = False, null = False, unique = True, help_text = 'Tag name')
+	style = models.CharField(max_length = 255, help_text = 'Tag CSS style')
+	date = models.DateTimeField(auto_now_add = True)
+	comment = models.CharField(max_length = 255, help_text = 'Comment')
+
 class Rel_si(models.Model):
 	"""
 	Survey-Instrument relation
@@ -549,6 +556,17 @@ class Rel_us(models.Model):
 
 	class Meta:
 		unique_together = ('user', 'survey')
+
+class Rel_tagi(models.Model):
+	"""
+	Tag-Image relation
+	"""
+
+	image = models.ForeignKey(Image)
+	tag = models.ForeignKey(Tag)
+
+	class Meta:
+		unique_together = ('image', 'tag')
 
 class SiteProfile(models.Model):
 
