@@ -244,15 +244,6 @@ class Image(models.Model):
 	def __unicode__(self):
 		return self.name
 
-class Release(models.Model):
-	"""
-	Release
-	"""
-
-	label = models.CharField(max_length = 255, unique = True)
-	creationdate = models.DateTimeField(auto_now_add = True)
-	releasedate = models.DateTimeField(null = True)
-
 class Processing_task(models.Model):
 	bools = ((False, 'No'), (True, 'Yes'))
 	start_date = models.DateTimeField(auto_now_add = True, help_text = 'Beginning of processing')
@@ -267,7 +258,6 @@ class Processing_task(models.Model):
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
-	release = models.ForeignKey(Release)
 	
 	class Meta:
 		verbose_name = "Processing task"
@@ -560,31 +550,6 @@ class Rel_us(models.Model):
 	class Meta:
 		unique_together = ('user', 'survey')
 
-class Rel_ur(models.Model):
-	"""
-	User-Release relation
-	"""
-
-	user = models.ForeignKey(User)
-	release = models.ForeignKey(Release)
-
-	class Meta:
-		unique_together = ('user', 'release')
-
-class Rel_imgrel(models.Model):
-	"""
-	Image-Release relation
-	"""
-
-	image = models.ForeignKey(Image)
-	release = models.ForeignKey(Release)
-	
-	class Meta:
-		unique_together = ('image', 'release')
-
-	def __unicode__(self):
-		return self.name
-       
 class SiteProfile(models.Model):
 
 	# Current user GUI style
@@ -593,7 +558,6 @@ class SiteProfile(models.Model):
 	dflt_condor_setup = models.TextField()
 
 	user = models.ForeignKey(User, unique = True)
-	release = models.ForeignKey(Release)
 
 class CondorNodeSel(models.Model):
 	"""

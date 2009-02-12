@@ -7,20 +7,6 @@ These are referenced from the setting TEMPLATE_CONTEXT_PROCESSORS and used by
 RequestContext.
 """
 
-def release(request):
-	"""
-	Returns context variables for Youpi's release system.
-	"""
-
-	try:
-		rel = request.user.get_profile().release
-	except AttributeError:
-		rel = None
-
-	return {
-		'user_release': rel,
-	}
-
 def appmenu(request):
 	"""
 	Returns context variables for Youpi's release system (Application menu).
@@ -32,7 +18,7 @@ def appmenu(request):
 					{'title' : 'Home', 				'id' : 'home', 			'href' : AUP},
 					{'title' : 'Pre-ingestion',		'id' : 'preingestion',	'href' : AUP + '/preIngestion/'},
 					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : AUP + '/ingestion/'},
-					{'title' : 'Release', 			'id' : 'release',		'href' : AUP + '/release/'},
+				#	{'title' : 'Release', 			'id' : 'release',		'href' : AUP + '/release/'},
 					{'title' : 'Processing', 		'id' : 'processing', 	'href' : AUP + '/processing/'},
 					{'title' : 'Processing Results','id' : 'results',	 	'href' : AUP + '/results/'},
 					{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : AUP + '/monitoring/'},

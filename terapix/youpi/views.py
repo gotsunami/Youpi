@@ -217,26 +217,6 @@ def monitoring(request):
 
 @login_required
 @profile
-def release(request):
-	"""
-	Related to relases.
-	This is a callback function (as defined in django's urls.py file).
-	"""
-
-	# FIXME: handle groups
-	rels = Release.objects.all().order_by('-creationdate')
-	activeRel = request.user.get_profile().release
-	imgs = Rel_imgrel.objects.filter(release = activeRel)
-
-	return render_to_response('release.html', {	
-						'releases'			: rels,
-						'activeImgsCount'	: len(imgs),
-						'selected_entry_id'	: 'release',
-					}, 
-					context_instance = RequestContext(request))
-
-@login_required
-@profile
 def results(request):
 	"""
 	Related to results page.

@@ -46,7 +46,6 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				[ <a href="{% url django.contrib.auth.views.password_change %}">{% trans 'Change password' %}</a>
 				- <a href="/youpi/accounts/logout/">{% trans 'Log out' %}</a> ]
 			{% endblock %}
-			<br/>Release: <a href="/youpi/release">{{ user_release.label }}</a>
 	        </div>
 			<div id="youpi_cart_id" style="float: right"></div>
 			<script type="text/javascript">

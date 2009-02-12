@@ -175,7 +175,6 @@ def task_start_log(userData, start, kind_id = None):
 		g.setTableName('youpi_processing_task')
 		g.insert(	user_id = int(user_id),
 					kind_id = int(kind_id),
-					release_id = 1,
 					start_date = start,
 					end_date = getNowDateTime(),
 					title = userData['Descr'],
