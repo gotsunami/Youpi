@@ -507,6 +507,8 @@ class Tag(models.Model):
 	date = models.DateTimeField(auto_now_add = True)
 	comment = models.CharField(max_length = 255, help_text = 'Comment')
 
+	user = models.ForeignKey(User, unique = True)
+
 class Rel_si(models.Model):
 	"""
 	Survey-Instrument relation
