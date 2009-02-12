@@ -135,6 +135,10 @@
 			<listitem><para>Image-Task Relation (<emphasis>I--T Id, Image Id, Processing Task Id</emphasis>)</para></listitem>
 		</varlistentry>
 		<varlistentry>
+			<term><varname>Image-Tag Relation</varname></term>
+			<listitem><para>Image-Tag Relation (<emphasis>I--T Id, Image Id, Tag Id</emphasis>)</para></listitem>
+		</varlistentry>
+		<varlistentry>
 			<term><varname>Image Selections</varname></term>
 			<listitem><para>Image Selections (<emphasis>Selection Id</emphasis>, Django's User Id, Name, Data, Date)</para></listitem>
 		</varlistentry>
@@ -185,6 +189,10 @@
 		<varlistentry>
 			<term><varname>SWARP Plugin</varname></term>
 			<listitem><para>SWARP Plugin (<emphasis>SWARP Id</emphasis>, Processing Task Id, Config, Results Ingestion Log, HTTP Url, Thumbnails, Weight Path, Use QFITS Weights, Head Path, Use Head Files)</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term><varname>Tag</varname></term>
+			<listitem><para>Tag (<emphasis>Tag Id</emphasis>, Name, Style, Date, Comment)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>User-Survey Relation</varname></term>

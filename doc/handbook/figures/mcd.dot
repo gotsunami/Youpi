@@ -32,6 +32,7 @@ graph mcd {
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
 	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style\nDefault Condor Setup}"];
 	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection\nDate\nIs policy}"];
+	tag [label="{ Tag | [ Id ]\nName\nCSS Style\nDate\nComment}"];
 
 	/* Relations */
 	node [shape=ellipse];
@@ -58,6 +59,7 @@ graph mcd {
 	node28 [label="has profile", style=dashed, shape=Mrecord];
 	node29 [label="defines", style=dashed, shape=Mrecord];
 	node30 [label="processes data", style=dashed, shape=Mrecord];
+	node31 [label="is marked"];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
@@ -83,6 +85,9 @@ graph mcd {
 
 	image -- node12 [label="  1,1"];
 	node12 -- channel [label="  1,n"];
+
+	image -- node31 [label="  0,n"];
+	node31 -- tag [label="  0,n"];
 
 	image -- node13 [label="  0,1"];
 	node13 -- calib [label="  1,n"];

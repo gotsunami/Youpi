@@ -18,6 +18,7 @@ digraph codasyl {
 	relsi [label="Survey-Instrument Relation"];
 	relit [label="Image-Task Relation"];
 	relus [label="User-Survey Relation"];
+	reltagi [label="Tag-Image Relation"];
 	kind [label="Processing Kind"];
 	plugfitsin [label="FITSin Plugin"];
 	plugfitsout [label="FITSout Plugin"];
@@ -43,6 +44,7 @@ digraph codasyl {
 	Image -> Coaddition;
 	Image -> relri;
 	Image -> relit;
+	Image -> reltagi;
 	task -> plugfitsin;
 	task -> plugfitsout;
 	task -> plugscamp;
@@ -75,6 +77,7 @@ digraph codasyl {
 	kind -> carti;
 
 	task -> relit;
+	Tag -> reltagi;
 
 	incomment -> ingrading;
 	outcomment -> outgrading;
