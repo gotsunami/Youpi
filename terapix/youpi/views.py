@@ -238,6 +238,17 @@ def results(request):
 
 @login_required
 @profile
+def tags(request):
+	"""
+	Related to tags page.
+	This is a callback function (as defined in django's urls.py file).
+	"""
+
+	return render_to_response('tags.html', { 'selected_entry_id': 'tags' }, 
+			context_instance = RequestContext(request))
+
+@login_required
+@profile
 def render_plugin(request, pluginId):
 	try:
 		plugin = manager.getPluginByName(pluginId)
