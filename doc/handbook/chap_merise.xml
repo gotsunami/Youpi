@@ -192,7 +192,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Tag</varname></term>
-			<listitem><para>Tag (<emphasis>Tag Id</emphasis>, Name, Style, Date, Comment)</para></listitem>
+			<listitem><para>Tag (<emphasis>Tag Id</emphasis>, User Id, Name, Style, Date, Comment)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>User-Survey Relation</varname></term>

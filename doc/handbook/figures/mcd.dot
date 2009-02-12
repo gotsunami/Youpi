@@ -32,7 +32,7 @@ graph mcd {
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
 	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style\nDefault Condor Setup}"];
 	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection\nDate\nIs policy}"];
-	tag [label="{ Tag | [ Id ]\nName\nCSS Style\nDate\nComment}"];
+	tag [label="{ Tag | [ Id ]\nName\nCSS Style\nComment}"];
 
 	/* Relations */
 	node [shape=ellipse];
@@ -60,6 +60,7 @@ graph mcd {
 	node29 [label="defines", style=dashed, shape=Mrecord];
 	node30 [label="processes data", style=dashed, shape=Mrecord];
 	node31 [label="is marked"];
+	node32 [label="{ defines | Date }", style=dashed, shape=Mrecord];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
@@ -130,6 +131,9 @@ graph mcd {
 	imageselections -- node22 [label="  1,1", style=dashed];
 	miscdata -- node22 [label="  1,1", style=dashed];
 	node22 -- authuser [label="  0,n", style=dashed];
+
+	authuser -- node32 [label="  0,n", style=dashed];
+	node32 -- tag [label="  1,1", style=dashed];
 
 	authuser -- node24 [label="  0,n", style=dashed];
 	node24 -- pluginfitsin [label="  0,n", style=dashed];
