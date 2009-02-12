@@ -18,8 +18,6 @@ digraph codasyl {
 	relsi [label="Survey-Instrument Relation"];
 	relit [label="Image-Task Relation"];
 	relus [label="User-Survey Relation"];
-	relur [label="User-Release Relation"];
-	relimgrel [label="Image-Release Relation"];
 	kind [label="Processing Kind"];
 	plugfitsin [label="FITSin Plugin"];
 	plugfitsout [label="FITSout Plugin"];
@@ -45,7 +43,6 @@ digraph codasyl {
 	Image -> Coaddition;
 	Image -> relri;
 	Image -> relit;
-	Image -> relimgrel;
 	task -> plugfitsin;
 	task -> plugfitsout;
 	task -> plugscamp;
@@ -64,7 +61,6 @@ digraph codasyl {
 	user -> siteprofile[style=dashed];
 	user -> condornodesel[style=dashed];
 	user -> relus[style=dashed];
-	user -> relur[style=dashed];
 	plugfitsin -> ingrading[style=dashed];
 	plugfitsout -> outgrading[style=dashed];
 	
@@ -73,11 +69,6 @@ digraph codasyl {
 	Survey -> relsi;
 	Survey -> relus;
 	Instrument -> relsi;
-	Instrument -> relrinst;
-	Release -> relur;
-	Release -> task;
-	Release -> relimgrel;
-	Release -> siteprofile;
 
 	kind -> task;
 	kind -> configfile;

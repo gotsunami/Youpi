@@ -131,10 +131,6 @@
 			<listitem><para>Image (<emphasis>Image Id</emphasis>, Calibration Kit Id, Ingestion Id, Channel Id, Instrument Id, Name, Sky Footprint, Path, Alpha, Delta, Equinox, Object, Date Obs, Exp time, Photc Header, Photc Custom, Photk, Airmass, Absorption, Checksum, Gain, Ingestion Date, Flat, Mask, Reg, QSO Status)</para></listitem>
 		</varlistentry>
 		<varlistentry>
-			<term><varname>Image-Release Relation</varname></term>
-			<listitem><para>Image-Release Relation (<emphasis>I--R Id, Image Id, Release Id</emphasis>)</para></listitem>
-		</varlistentry>
-		<varlistentry>
 			<term><varname>Image-Task Relation</varname></term>
 			<listitem><para>Image-Task Relation (<emphasis>I--T Id, Image Id, Processing Task Id</emphasis>)</para></listitem>
 		</varlistentry>
@@ -160,11 +156,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Processing Task</varname></term>
-			<listitem><para>Processing Task (<emphasis>Processing Task Id</emphasis>, Django's User Id, Processing Kind Id, Release Id, Start Date, End Date, Success, Error Log, Hostname, Results Output Directory, Title)</para></listitem>
-		</varlistentry>
-		<varlistentry>
-			<term><varname>Release</varname></term>
-			<listitem><para>Release (<emphasis>Release Id</emphasis>, Label, Creation Date, Release Date)</para></listitem>
+			<listitem><para>Processing Task (<emphasis>Processing Task Id</emphasis>, Django's User Id, Processing Kind Id, Start Date, End Date, Success, Error Log, Hostname, Results Output Directory, Title)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Run</varname></term>
@@ -176,7 +168,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Site Profile</varname></term>
-			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, Release Id, GUI Style, Default Condor Setup)</para></listitem>
+			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, GUI Style, Default Condor Setup)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>SCAMP Plugin</varname></term>
@@ -193,10 +185,6 @@
 		<varlistentry>
 			<term><varname>SWARP Plugin</varname></term>
 			<listitem><para>SWARP Plugin (<emphasis>SWARP Id</emphasis>, Processing Task Id, Config, Results Ingestion Log, HTTP Url, Thumbnails, Weight Path, Use QFITS Weights, Head Path, Use Head Files)</para></listitem>
-		</varlistentry>
-		<varlistentry>
-			<term><varname>User-Release Relation</varname></term>
-			<listitem><para>User-Release Relation (<emphasis>U--R Id, User Id, Release Id</emphasis>)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>User-Survey Relation</varname></term>
