@@ -219,7 +219,6 @@ class Sextractor(ProcessingPlugin):
 		csf = open(csfPath, 'w')
 		
 		images = Image.objects.filter(id__in = idList)
-		img_files = string.join([os.path.join(img.path, img.name + '.fits') for img in images], ' ')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
@@ -231,7 +230,6 @@ class Sextractor(ProcessingPlugin):
 	#				'Flag	' 			: str(flagPath), 
 	#				'Psf'	 			: str(psfPath), 
 					'Descr' 			: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
-					'ResultsOutputDir'	: str(resultsOutputDir)				# Mandatory for WP
 		} 
 
 		step = 0 							# At least step seconds between two job start
@@ -277,9 +275,6 @@ notify_user             = semah@iap.fr
 
 		csf.write(condor_submit_file)
 
-		userData['ImgID'] = idList
-		userData['Descr'] = str("%s of %d FITS images" % (self.optionLabel, len(images)))		# Mandatory for Active Monitoring Interface (AMI)
-
 		#
 		# Delaying job startup will prevent "Too many connections" MySQL errors
 		# and will decrease the load of the node that will receive all qualityFITS data
@@ -289,38 +284,51 @@ notify_user             = semah@iap.fr
 		userData['StartupDelay'] = step
 		userData['Warnings'] = {}
 
-		# Base64 encoding + marshal serialization
-		# Will be passed as argument 1 to the wrapper script
-		try:
-			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
-		except ValueError:
-			raise ValueError, userData
+		# One image per job
+		for img in images:
+			path = os.path.join(img.path, img.name + '.fits')
+			#
+			# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
+			# They are later used by the wrapper script to get the name of error log file easily
+			#
+			userData['ImgID'] = str(img.id)
+			userData['Descr'] = str("%s of %s" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
+			userData['ResultsOutputDir'] = str(os.path.join(resultsOutputDir, img.name))
 
-		sex_params = "-XSL_URL %ssextractor.xsl -PARAMETERS_NAME %s -FILTER_NAME %s -WRITE_XML YES" % (os.path.join(	WWW_SEX_PREFIX, 
-																					request.user.username, 
-																					userData['Kind'], 
-																					userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]),
-																					'sex.default.param',
-																					'sex.default.conv')
+			# Parameters to use for each job
+			sex_params = "-XSL_URL %s/sextractor.xsl -PARAMETERS_NAME %s -FILTER_NAME %s -WRITE_XML YES" % (os.path.join(	
+																						WWW_SEX_PREFIX, 
+																						request.user.username, 
+																						userData['Kind'], 
+																						userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]),
+																						'sex.default.param',
+																						'sex.default.conv')
 
+			# Base64 encoding + marshal serialization
+			# Will be passed as argument 1 to the wrapper script
+			try:
+				encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+			except ValueError:
+				raise ValueError, userData
 
-		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s 2>/dev/null
+#arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s 2>/dev/null
+			condor_submit_entry = """
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s 
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
 				'params'		: sex_params,
-				'img'			: img_files,
+				'img'			: path,
 				'config'		: os.path.basename(customrc),
 				'userdata'		: userData, 
 				'user'			: request.user.username,
-				'tpxupload'		: FTP_URL + resultsOutputDir }
+				'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }
 
-		csf.write(condor_submit_entry)
+			csf.write(condor_submit_entry)
+
 		csf.close()
 
 		return csfPath
-
 
 	def getTaskInfo(self, request):
 		"""

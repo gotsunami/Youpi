@@ -153,6 +153,7 @@ AND r.image_id=i.id;
 	print log
 
 def task_start_log(userData, start, kind_id = None):
+	
 	user_id = userData['UserID']
 	kind = userData['Kind']
 
@@ -261,6 +262,13 @@ def process(userData, kind_id, argv):
 	storeLog = '_condor_stderr'
 	success = 0
 
+	db = DB(host = DATABASE_HOST,
+			user = DATABASE_USER,
+			passwd = DATABASE_PASSWORD,
+			db = DATABASE_NAME)
+
+	g = DBGeneric(db.con)
+
 	start = getNowDateTime(time.time())
 
 
@@ -274,7 +282,16 @@ def process(userData, kind_id, argv):
 			print "SWARP PREPROCESSING: uncompressing", fz
 			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
 	
-#	if kind == 'sex':
+	if kind == 'sex':
+		img_id = userData['ImgID']
+
+		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
+		os.mkdir(imgName)
+		os.system("mv sex.default.* sex-config* %s" %(imgName))
+		os.chdir(imgName)
+
+
+
 
 
 
@@ -404,7 +421,7 @@ def process(userData, kind_id, argv):
 							www = os.path.join(	WWW_SEX_PREFIX, 
 												username, 
 												userData['Kind'], 
-												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]) + '/',
 							thumbnails = convert,
 				)
 				sex_id = g.con.insert_id()
@@ -418,7 +435,7 @@ def process(userData, kind_id, argv):
 			pipe.close()
 
 			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
-			shutil.copy(xslPath, userData['ResultsOutputDir'])
+			shutil.copy(xslPath, userData['ResultsOutputDir'] +'/')
 
 			# Gets image name
 			#FIXME
@@ -426,16 +443,16 @@ def process(userData, kind_id, argv):
 			imgout = glob.glob('*.fits')[0]
 			#end OF FIXME
 
-			os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (imgout, os.path.join(userData['ResultsOutputDir'],'out.fits')))
+			os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (imgout, os.path.join(userData['ResultsOutputDir'], 'out.fits')))
 
 			# Converts produced FITS image into PNG format
 			tiff = os.path.join(userData['ResultsOutputDir'], 'sex.tif')
-			os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'],'out.fits'), tiff))
+			os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'out.fits'), tiff))
 			os.remove(os.path.join(userData['ResultsOutputDir'],'out.fits'))
 
 			os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'sex.png')))
 			if HAS_CONVERT:
-				os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_sex.png')))
+				os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_sex.png')))
 
 			os.remove(tiff)
 
@@ -578,7 +595,6 @@ if __name__ == '__main__':
 	# De-serialize data passed as a string into arg 1
 	#
 	userData = marshal.loads(base64.decodestring(sys.argv[1]))
-
 	# Connection object to MySQL database 
 	try:
 		init_job(userData)
