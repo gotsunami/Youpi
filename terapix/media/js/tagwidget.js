@@ -20,6 +20,12 @@ function TagWidget(container, name) {
 	 *
 	 */
 	var _container = null;
+	/*
+	 * Var: _root
+	 * Base DOM container
+	 *
+	 */
+	var _root;
 
 
 	// Group: Variables
@@ -31,7 +37,7 @@ function TagWidget(container, name) {
 	 * Tag's attributes
 	 *
 	 */
-	var _attrs = new Hash();
+	var _attrs;
 
 
 	// Group: Functions
@@ -39,29 +45,112 @@ function TagWidget(container, name) {
 
 
 	/*
-	 * Function: _render
-	 * Main rendering function
+	 * Function: update
+	 * Updates widget rendering
 	 *
 	 */ 
-	function _render() {
+	this.update = function() {
+		_update();
+	}
+
+	/*
+	 * Function: _update
+	 * Updates widget rendering
+	 *
+	 */ 
+	function _update() {
+		if (!_attrs.get('name')) return;
+
+		_root.writeAttribute('style', _attrs.get('style'));
+		_root.update(_attrs.get('name'));
+	}
+
+	/*
+	 * Function: setName
+	 * Sets tag name
+	 *
+	 */ 
+	this.setName = function(name) {
+		if (typeof name != 'string') {
+			throw "setName expects a string!";
+			return;
+		}
+		_attrs.set('name', name);
+	}
+
+	/*
+	 * Function: reset
+	 * Reset all attributes to default values
+	 *
+	 */ 
+	this.reset = function() {
+		_reset();
+	}
+
+	/*
+	 * Function: _reset
+	 * Reset all attributes to default values
+	 *
+	 */ 
+	function _reset () {
+		// Default attributes
+		_attrs = $H({
+			name: null, 
+			cdate: null, 
+			owner: null, 
+			style: 'background-color: brown; color: white', 
+			comment: null
+		});
+
+		_update();
+	}
+
+	/*
+	 * Function: setStyle
+	 * Sets tag CSS style
+	 *
+	 * Parameters:
+	 *  style - string: raw CSS style
+	 *
+	 */ 
+	this.setStyle = function(style) {
+		if (typeof style != 'string') {
+			throw "setStyle expects a string!";
+			return;
+		}
+
+		_attrs.update({style: style});
+		_update();
+	}
+
+	/*
+	 * Function: getAttributes
+	 * Returns tag's attributes
+	 *
+	 * Return:
+	 *  attributes - object: <_attrs> object
+	 *
+	 */ 
+	this.getAttributes = function() {
+		return _attrs;
+	}
+
+	/*
+	 * Function: _main
+	 * Entry point
+	 *
+	 */ 
+	function _main() {
 		_container = $(container);
 		if (!container) {
 			throw "Please supply a valid DOM container!";
 			return;
 		}
 
-		if (!name) {
-			_showEditForm(_container);
-			return;
-		}
-
-		if (typeof name != 'string') {
-			throw "Tag name must be a string";
-			return;
-		}
-		_attrs.update({ name: name });
-
+		_root = new Element('div').addClassName('tagwidget');
+		_container.insert(_root);
+		_reset();
 	}
 
-	_render();
+	_main();
 }

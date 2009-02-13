@@ -1276,3 +1276,32 @@ div.min_size {
 	border: none;
 	vertical-align: middle;
 }
+
+.tagwidget {
+	-moz-border-radius: 2px;
+	padding-left: 2px;
+	padding-right: 3px;
+	font-size: 9px;
+	width: -moz-fit-content;	
+}
+
+.stylepicker, .colorpicker {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+	text-align: center;
+	vertical-align: middle;
+}
+	
+.colorpicker {
+	width: 12px;
+	height: 12px;
+}
+
+table.palette td {
+	padding: 2px;
+}
+
+.context {
+	font-weight: bold;
+}

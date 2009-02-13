@@ -4,6 +4,9 @@
  *
  * For convenience, private data member names (both variables and functions) start with an underscore.
  *
+ * Dependancies:
+ *  <TagWidget> module, <StylePicker> module.
+ *
  * Constructor Parameters:
  *
  * container - string or DOM object: name of parent DOM block container
@@ -50,7 +53,18 @@ function TagPanel(container) {
 	 *
 	 */
 	var _tags = new Array();
-
+	/*
+	 * Var: _previewTag
+	 * <TagWidget> used for previewing
+	 *
+	 */
+	var _previewTag = null;
+	/*
+	 * Var: _picker
+	 * <StylePicker> used for picking a custom CSS style
+	 *
+	 */
+	var _picker = null;
 
 
 	// Group: Functions
@@ -74,7 +88,7 @@ function TagPanel(container) {
 		td.insert(lab);
 		tr.insert(td);
 
-		td = new Element('td');
+		td = new Element('td', {id: _id + 'preview_td'});
 		tr.insert(td);
 		tab.insert(tr);
 
@@ -86,7 +100,11 @@ function TagPanel(container) {
 		tr.insert(td);
 
 		td = new Element('td');
-		inp = new Element('input', {id: _id + 'tag_name_input'});
+		inp = new Element('input', {type: 'text', id: _id + 'tag_name_input'});
+		inp.observe('keyup', function() {
+			_previewTag.setName(this.value);
+			_previewTag.update();
+		});
 		td.insert(inp);
 		tr.insert(td);
 		tab.insert(tr);
@@ -99,7 +117,7 @@ function TagPanel(container) {
 		tr.insert(td);
 
 		td = new Element('td');
-		inp = new Element('input');
+		inp = new Element('input', {type: 'text', id: _id + 'tag_comment_input'});
 		td.insert(inp);
 		tr.insert(td);
 		tab.insert(tr);
@@ -111,7 +129,7 @@ function TagPanel(container) {
 		td.insert(lab);
 		tr.insert(td);
 
-		td = new Element('td').update('stylepicker');
+		td = new Element('td', {id: _id + 'picker_td'});
 		tr.insert(td);
 		tab.insert(tr);
 
@@ -119,6 +137,10 @@ function TagPanel(container) {
 		tr = new Element('tr');
 		td = new Element('td', {colspan: 2}).setStyle({textAlign: 'right'});
 		var addb = new Element('input', {type: 'button', value: 'Add!'});
+		addb.observe('click', function() {
+			_saveTag();
+		});
+
 		var cancelb = new Element('input', {type: 'button', value: 'Cancel', style: 'margin-right: 10px'});
 		cancelb.observe('click', function() {
 			_editDiv.slideUp();
@@ -131,11 +153,28 @@ function TagPanel(container) {
 
 		f.insert(tab);
 		_editDiv.insert(f);
-		_editDiv.slideDown({afterFinish: function() {
-			$(_id + 'tag_name_input').focus();
-		} });
+		_editDiv.slideDown({
+			afterFinish: function() {
+				$(_id + 'tag_name_input').focus();
+			}
+		});
+
+		if (_previewTag) delete _previewTag;
+		_previewTag = new TagWidget(_id + 'preview_td');
+
+		if (_picker) delete _picker;
+		_picker = new StylePicker(_id + 'picker_td');
+		_previewTag.setStyle(_picker.getStyle());
 	}
 
+	/*
+	 * Function: _saveTag
+	 * Saves tag to DB
+	 *
+	 */ 
+	function _saveTag() {
+		console.log(_previewTag.getAttributes().inspect());
+	}
 
 	/*
 	 * Function: _checkForTags
@@ -151,7 +190,7 @@ function TagPanel(container) {
 				_infoDiv.update();
 				if (!r.tags.length) {
 					_infoDiv.update('No tags have been created so far. ');
-					var s = new Element('span', {id: _id + 'add_new_span'}).update('Please ');
+					var s = new Element('span', {id: _id + 'add_new_span'}).update('You can ');
 					var l = new Element('a', {href: '#'}).update('add a new tag');
 					l.observe('click', function() {
 						s.fade();
@@ -184,6 +223,10 @@ function TagPanel(container) {
 		_container.insert(_infoDiv).insert(_editDiv);
 
 		_checkForTags();
+
+		document.observe('stylePicker:styleChanged', function(event) {
+			_previewTag.setStyle(_picker.getStyle());
+		});
 	}
 
 	_render();
