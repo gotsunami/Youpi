@@ -1261,5 +1261,18 @@ div.min_size {
 	height: -moz-fit-content;	
 	max-height: 100px; 
 	overflow: auto; 
-	width: 500px;'
+	width: 500px;
+}
+
+/***************** tags ***********************/
+
+.tagform table {
+	background-color: #e9f3ff;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+}
+
+.tagform table td {
+	border: none;
+	vertical-align: middle;
 }

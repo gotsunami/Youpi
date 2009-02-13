@@ -49,7 +49,9 @@ urlpatterns = patterns(
 	(r'^youpi/results/filter/$', 'task_filter'),
 	(r'^youpi/results/stats/$', 'dir_stats'),
 	(r'^youpi/results/(.*?)/(.*?)/$', 'single_result'),
+
 	(r'^youpi/tags/$', 'tags'),
+	(r'^youpi/tags/fetchtags/$', 'fetch_tags'),
 
 	# Prefs and docs
 	(r'^youpi/preferences/$', 'preferences'),

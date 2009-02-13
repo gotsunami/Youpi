@@ -35,6 +35,7 @@ from terapix.youpi.cviews.condor import *
 from terapix.youpi.cviews.preingestion import *
 from terapix.youpi.cviews.plot import *
 from terapix.youpi.cviews.processing import *
+from terapix.youpi.cviews.tags import *
 
 @login_required
 @profile

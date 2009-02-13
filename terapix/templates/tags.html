@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% block extrahead %}
+<script type="text/javascript" src="/media/js/tagpanel.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
 <script type="text/javascript" src="/media/js/3rdParty/lightbox2/lightbox.js"></script>
 
@@ -20,14 +21,40 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 {% block content %}
 <div id="submenu">
 	<div id="menuitem_sub_0">
-		TODO...
+		<div align="center">
+			<table style="width: 90%;">
+				<tr>
+					<td style="border: none; width: 50%;">
+						<div class="themes">
+							<h1>Available Tags</h1>
+							<div id="tagpanel-div"/>
+						</div>
+					</td>
+					<td style="border: none; width: 50%;">
+						<div class="themes">
+							<h1>Image Tagging</h1>
+							<div id="imgselector-div"/>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
-	var menu;
+	var menu, panel;
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['Edit tags']);
+		panel = new TagPanel('tagpanel-div');
+		/*
+		$('notags-a').observe('click', function() {
+			$('notags-div').fade();
+			$('newtag-div').hide();
+			tw = new TagWidget('newtag-div');
+			$('newtag-div').slideDown();
+		});
+		*/
 	});
 </script>
 {% endblock %}
