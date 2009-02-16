@@ -38,6 +38,18 @@ function TagWidget(container, name) {
 	 *
 	 */
 	var _attrs;
+	/*
+	 * Var: _dragNDropEnabled
+	 * True if drag'n drop enabled (default: false)
+	 *
+	 */
+	var _dragNDropEnabled = false;
+	/*
+	 * Var: _drag
+	 * Draggable instance (default: null)
+	 *
+	 */
+	var _drag = null;
 
 
 	// Group: Functions
@@ -71,6 +83,15 @@ function TagWidget(container, name) {
 	 *
 	 */ 
 	this.setName = function(name) {
+		_setName(name);
+	}
+
+	/*
+	 * Function: _setName
+	 * Sets tag name
+	 *
+	 */ 
+	function _setName(name) {
 		if (typeof name != 'string') {
 			throw "setName expects a string!";
 			return;
@@ -136,6 +157,50 @@ function TagWidget(container, name) {
 	}
 
 	/*
+	 * Function: enableDragNDrop
+	 * Enables drag and drop
+	 *
+	 * Paramters:
+	 *  enable - boolean: Enable or Disable drag'n drop
+	 *
+	 */ 
+	this.enableDragNDrop = function(enable) {
+		if (typeof enable != 'boolean') {
+			throw "enableDragNDrop: must provide a boolean";
+			return;
+		}
+
+		_dragNDropEnabled = enable;
+		if (enable) {
+			_root.addClassName('dragndrop');
+			_drag = new Draggable(_root, {revert: true});	
+		}
+		else {
+			_root.removeClassName('dragndrop');
+			if (_drag) {
+				_drag.destroy();
+				delete _drag;
+				_drag = null;
+			}
+		}
+	}
+
+	/*
+	 * Function: setEditable
+	 * Sets widget editable
+	 *
+	 * Paramters:
+	 *  enable - boolean: Enable or Disable drag'n drop
+	 *
+	 */ 
+	this.setEditable = function(enable) {
+		if (typeof enable != 'boolean') {
+			throw "setEditable: must provide a boolean";
+			return;
+		}
+	}
+
+	/*
 	 * Function: _main
 	 * Entry point
 	 *
@@ -147,9 +212,12 @@ function TagWidget(container, name) {
 			return;
 		}
 
-		_root = new Element('div').addClassName('tagwidget');
+		_root = new Element('span').addClassName('tagwidget');
 		_container.insert(_root);
 		_reset();
+
+		if (name)
+			_setName(name);
 	}
 
 	_main();

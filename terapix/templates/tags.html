@@ -31,16 +31,17 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		<div align="center">
 			<table style="width: 90%;">
 				<tr>
-					<td style="border: none; width: 50%;">
+					<td style="border: none; max-width: 40%">
 						<div class="themes">
 							<h1>Available Tags</h1>
 							<div id="tagpanel-div"/>
 						</div>
 					</td>
-					<td style="border: none; width: 50%;">
+					<td style="border: none; width: 60%;">
 						<div class="themes">
 							<h1>Image Tagging</h1>
 							<div id="imgselector-div"/>
+							<div id="drop" class="dropzone"/>
 						</div>
 					</td>
 				</tr>
@@ -54,14 +55,6 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['Edit tags']);
 		panel = new TagPanel('tagpanel-div');
-		/*
-		$('notags-a').observe('click', function() {
-			$('notags-div').fade();
-			$('newtag-div').hide();
-			tw = new TagWidget('newtag-div');
-			$('newtag-div').slideDown();
-		});
-		*/
 	});
 </script>
 {% endblock %}

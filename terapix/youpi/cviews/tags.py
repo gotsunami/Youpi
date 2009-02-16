@@ -19,8 +19,9 @@ def fetch_tags(request):
 	"""
 
 	tags = Tag.objects.all().order_by('name')
+	data = [{'name': str(tag.name), 'style': str(tag.style)} for tag in tags] 
 
-	return HttpResponse(str({'tags' : [str(tag.name) for tag in tags]}), mimetype = 'text/plain')
+	return HttpResponse(str({'tags' : data}), mimetype = 'text/plain')
 
 def get_tag_info(request):
 	"""

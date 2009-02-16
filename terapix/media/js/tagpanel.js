@@ -36,6 +36,12 @@ function TagPanel(container) {
 	 */
 	var _editDiv = null;
 	/*
+	 * Var: _tagsDiv
+	 * DOM div displaying available tags
+	 *
+	 */
+	var _tagsDiv = null;
+	/*
 	 * Var: _id
 	 * Tag panel id
 	 *
@@ -52,7 +58,7 @@ function TagPanel(container) {
 	 * Available tags
 	 *
 	 */
-	var _tags = new Array();
+	var _tags = $A();
 	/*
 	 * Var: _previewTag
 	 * <TagWidget> used for previewing
@@ -223,7 +229,7 @@ function TagPanel(container) {
 							afterFinish: function() {
 								log.msg_ok('Tag <b>' + name + '</b> has been added successfully.');
 								_infoDiv.fade({
-									delay: 2.0,
+									delay: 1.5,
 									afterFinish: function() {
 										_checkForTags();
 									}
@@ -258,26 +264,62 @@ function TagPanel(container) {
 			// Custom handler for results
 			function(r) {
 				_infoDiv.update();
+
+				// Link to add a new tag
+				var s = new Element('span', {id: _id + 'add_new_span'}).update('You can ');
+				var l = new Element('a', {href: '#'}).update('add a new tag');
+				l.observe('click', function() {
+					s.fade();
+					_editDiv.update();
+					_showEditForm();
+				});
+				s.insert(l).insert('.');
+
 				if (!r.tags.length) {
 					_infoDiv.update('No tags have been created so far. ');
-					var s = new Element('span', {id: _id + 'add_new_span'}).update('You can ');
-					var l = new Element('a', {href: '#'}).update('add a new tag');
-					l.observe('click', function() {
-						s.fade();
-						_editDiv.update();
-						_showEditForm();
-					});
-					s.insert(l).insert('.');
 					_infoDiv.insert(s);
 					return;
 				}
 
 				_infoDiv.appear();
 				_infoDiv.update(r.tags.length + ' tag' + (r.tags.length > 1 ? 's' : '') + ' available.');
+				_infoDiv.insert(s);
+				_tagsDiv.update();
+
+				// Show available tags
+				_tags.clear();
+				r.tags.each(function(tag) {
+					_tags.push(tag);
+				});
+
+				_updateTagsZone();
+				_tagsDiv.appear();
 			}
 		);
 	
 		r.send('/youpi/tags/fetchtags/');
+	}
+
+	/*
+	 * Function: _updateTagsZone
+	 * Clear tags div and fill it with available tags
+	 *
+	 * Note:
+	 *  Provided for convenience since it uses internal <_tags> for rendering
+	 *  tags instead of making an AJAX query.
+	 *
+	 */ 
+	function _updateTagsZone() {
+		var t;
+		_tagsDiv.update();
+		_tags.each(function(tag) {
+			t = new TagWidget(_tagsDiv, tag.name);
+			t.setStyle(tag.style);
+			t.update();
+			// Use it _after_ update() call so that Draggable instance
+			// can overwrite CSS properties
+			t.enableDragNDrop(true);
+		});
 	}
 
 	/*
@@ -293,13 +335,45 @@ function TagPanel(container) {
 		}
 
 		_infoDiv = new Element('div');
+		_tagsDiv = new Element('div', {id: _id + 'tags_div'}).setStyle({marginTop: '10px'}).addClassName('tags').hide();
 		_editDiv = new Element('div').setStyle({marginTop: '10px'}).hide();
-		_container.insert(_infoDiv).insert(_editDiv);
+		_container.insert(_infoDiv).insert(_tagsDiv).insert(_editDiv);
 
 		_checkForTags();
 
 		document.observe('stylePicker:styleChanged', function(event) {
 			_previewTag.setStyle(_picker.getStyle());
+		});
+
+		// Add drop zones
+		Droppables.add('drop', {
+			containment: _id + 'tags_div',
+			hoverclass: 'dropzone_hover',
+			onDrop: function(src, dest, event) {
+				var found = false;
+				$('drop').select('.tagwidget').each(function(tag) {
+					if (src.innerHTML == tag.innerHTML) {
+						found = true;
+					}
+				});
+				if (found) return;
+
+				// Adds tag to drop zone
+				dest.insert(src);
+				src.setStyle({left: '5px', top: '0px'});
+				dest.highlight();
+				_updateTagsZone();
+			}
+		});
+
+		Droppables.add(_id + 'tags_div', {
+			containment: 'drop',
+			hoverclass: 'dropzone_hover',
+			onDrop: function(src, dest, event) {
+				src.remove();
+				dest.highlight();
+				_updateTagsZone();
+			}
 		});
 	}
 
