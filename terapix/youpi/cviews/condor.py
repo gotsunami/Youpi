@@ -287,6 +287,12 @@ def autocomplete(request, key, value):
 		for d in data:
 			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.date))})
 
+	elif key == 'Tag':
+		data = Tag.objects.filter(name__istartswith = value).order_by('name')
+
+		for d in data:
+			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.date))})
+
 	return HttpResponse(str({'results' : res}), mimetype = 'text/plain')
 
 def get_live_monitoring(request, nextPage = -1):

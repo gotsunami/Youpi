@@ -52,6 +52,8 @@ urlpatterns = patterns(
 
 	(r'^youpi/tags/$', 'tags'),
 	(r'^youpi/tags/fetchtags/$', 'fetch_tags'),
+	(r'^youpi/tags/info/$', 'get_tag_info'),
+	(r'^youpi/tags/save/$', 'save_tag'),
 
 	# Prefs and docs
 	(r'^youpi/preferences/$', 'preferences'),

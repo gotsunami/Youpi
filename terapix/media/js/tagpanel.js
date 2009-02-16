@@ -100,7 +100,7 @@ function TagPanel(container) {
 		tr.insert(td);
 
 		td = new Element('td');
-		inp = new Element('input', {type: 'text', id: _id + 'tag_name_input'});
+		inp = new Element('input', {type: 'text', id: _id + 'tag_name_input', maxlength: 15});
 		inp.observe('keyup', function() {
 			_previewTag.setName(this.value);
 			_previewTag.update();
@@ -165,6 +165,18 @@ function TagPanel(container) {
 		if (_picker) delete _picker;
 		_picker = new StylePicker(_id + 'picker_td');
 		_previewTag.setStyle(_picker.getStyle());
+
+		// Add auto-completion capabilities
+		if (_bsn) {
+			var options = {
+				script: '/youpi/autocompletion/Tag/',
+				varname: 'Value',
+				json: true,
+				maxresults: 20,
+				timeout: 2000
+			};
+			var au = new _bsn.AutoSuggest(_id + 'tag_name_input', options);
+		}
 	}
 
 	/*
@@ -173,7 +185,65 @@ function TagPanel(container) {
 	 *
 	 */ 
 	function _saveTag() {
-		console.log(_previewTag.getAttributes().inspect());
+		var name = $F(_id + 'tag_name_input').strip();
+
+		if (name.length == 0) {
+			alert("Can't save a tag with an empty name!");
+			inp.highlight();
+			inp.focus();
+			return;
+		}
+
+		var xhr = new HttpRequest(
+			null,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				var r = resp.info;
+				if (r.name) {
+					// Name already exists
+					var r = alert("A tag with that name already exists in the database.\nPlease submit another tag name.");
+					return;
+				}
+
+				// Save to DB
+				var s = new HttpRequest(
+					null,
+					null,
+					function(r) {
+						var log = new Logger(_infoDiv);
+						if (r.Error) {
+							log.msg_error(r.Error);
+							return;
+						}
+
+						_infoDiv.update();
+						_editDiv.slideUp({
+							afterFinish: function() {
+								log.msg_ok('Tag <b>' + name + '</b> has been added successfully.');
+								_infoDiv.fade({
+									delay: 2.0,
+									afterFinish: function() {
+										_checkForTags();
+									}
+								});
+							}
+						});
+					}
+				);
+
+				var post = {
+					Name: name,
+					Comment: $F(_id + 'tag_comment_input').strip(),
+					Style: _picker.getStyle()
+				};
+				s.send('/youpi/tags/save/', $H(post).toQueryString());
+			}
+		);
+
+		// Send HTTP POST request
+		xhr.send('/youpi/tags/info/', 'Name=' + name);
 	}
 
 	/*
@@ -199,7 +269,11 @@ function TagPanel(container) {
 					});
 					s.insert(l).insert('.');
 					_infoDiv.insert(s);
+					return;
 				}
+
+				_infoDiv.appear();
+				_infoDiv.update(r.tags.length + ' tag' + (r.tags.length > 1 ? 's' : '') + ' available.');
 			}
 		);
 	

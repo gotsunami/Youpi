@@ -1305,3 +1305,12 @@ table.palette td {
 .context {
 	font-weight: bold;
 }
+
+input[type=text].validation_sucess {
+	background: white url(../img/admin/icon-yes.gif) no-repeat right center;
+}
+
+input[type=text].validation_failure {
+	background: white url(../img/admin/icon_error.gif) no-repeat right center;
+}
+
