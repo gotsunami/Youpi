@@ -322,19 +322,6 @@ function ImageSelector(container)
 	 *
 	 */ 
 	function render() {
-		if (typeof release == 'object') {
-			var r = $H(release); 
-			if (typeof r.get('label') != 'string' || typeof r.get('id') != 'number') {
-				throw 'release must be an object with label(string) and id(integer) properties set';
-			}
-			r.set('id', parseInt(r.get('id')));
-			_release = r;
-		}
-		else {
-			if (typeof release != 'undefined')
-				throw 'release must be an object with label(string) and id(integer) properties set';
-		};
-
 		_container.setAttribute('class', 'imageSelector');
 		// Container for new image selection
 		var	topDiv = new Element('div', {id: id + '_new_image_selection_div'});
@@ -445,8 +432,7 @@ function ImageSelector(container)
 		single_div.insert(tab);
 		cNode.insert(single_div);
 
-		// Whether adds a 'Current release' line or a multi-criteria line
-		_release ? addReleaseLine() : addTRLine(tr);
+		addTRLine(tr);
 
 		// Execute query
 		div = new Element('div', {style: 'text-align: left'});
@@ -2195,42 +2181,6 @@ function ImageSelector(container)
 	}
 
 	/*
-	 * Function: addReleaseLine
-	 * Adds a new line based on current release
-	 *
-	 */ 
-	function addReleaseLine() {
-		var tr, td, but;
-	
-		// Use a rather unique TR id
-		var trid = genID('Line');
-		tr = new Element('tr', {id: trid, 'class': 'queryline'});
-
-		// Add button
-		td = new Element('td', {colspan: 2}).setStyle({textAlign: 'right'});
-		but = new Element('input', {id: genID('ButtonAdd'), type: 'button', value: '+'});
-		but.observe('click', function(event) {
-			addTRLine(event.element().up('tr'));
-		});
-		td.insert(but);
-		tr.insert(td);
-
-		// Title
-		td = new Element('td', {colspan: 3});
-		td.update('Release is equal to <b>' + _release.get('label') + '</b>');
-		tr.insert(td);
-
-		// Nb result div (per TR line)
-		td = new Element('td', {style: 'text-align: left; vertical-align: middle'});
-		var rdiv = new Element('div', {id: id + '_nbResults_div_' + currentTR});
-		td.insert(rdiv);
-		tr.insert(td);
-
-		topNode.insert(tr);
-		currentTR++;
-	}
-
-	/*
 	 * Function: getCondText
 	 * Get conditionnal text value selected in ComboBox
 	 *
@@ -2341,11 +2291,7 @@ function ImageSelector(container)
 
 		// Index of row
 		xhr.idResultsIdx = 0;
-		if (_release) {
-			xhr.send('/youpi/process/imgsIdsFromRelease/', _post());
-		}
-		else
-			sendq(1, xhr);
+		sendq(1, xhr);
 	}
 
 	/*
