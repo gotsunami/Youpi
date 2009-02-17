@@ -8,8 +8,10 @@
  *  <TagWidget> module, <StylePicker> module.
  *
  * Constructor Parameters:
+ *  container - string or DOM object: name of parent DOM block container
  *
- * container - string or DOM object: name of parent DOM block container
+ * Custom Events:
+ *  imageSelector:loaded - signal emitted when the image selector is fully loaded (i.e after AJAX initial queries have returned)
  *
  */
 function TagPanel(container) {
@@ -59,6 +61,12 @@ function TagPanel(container) {
 	 *
 	 */
 	var _tags = $A();
+	/*
+	 * Var: _dropZone
+	 * DOM container acting like a drop zone
+	 *
+	 */
+	var _dropZone = null;
 	/*
 	 * Var: _previewTag
 	 * <TagWidget> used for previewing
@@ -282,7 +290,7 @@ function TagPanel(container) {
 				}
 
 				_infoDiv.appear();
-				_infoDiv.update(r.tags.length + ' tag' + (r.tags.length > 1 ? 's' : '') + ' available.');
+				_infoDiv.update('<b>' + r.tags.length + '</b> tag' + (r.tags.length > 1 ? 's' : '') + ' available.');
 				_infoDiv.insert(s);
 				_tagsDiv.update();
 
@@ -323,6 +331,58 @@ function TagPanel(container) {
 	}
 
 	/*
+	 * Function: setDropZone
+	 * Declares a drop zone container to drop tags to
+	 *
+	 * Parameters:
+	 *  zone - DOM or string: container
+	 *
+	 */ 
+	this.setDropZone = function(zone) {
+		var zone = $(zone);
+		if (!zone) {
+			throw "setDropZone: zone must be a DOM container";
+			return;
+		}
+
+		// Set up drop zones
+		if (_dropZone)
+			Droppables.remove(_dropZone);
+
+		Droppables.add(zone, {
+			containment: _id + 'tags_div',
+			hoverclass: 'dropzone_hover',
+			onDrop: function(src, dest, event) {
+				var found = false;
+				zone.select('.tagwidget').each(function(tag) {
+					if (src.innerHTML == tag.innerHTML) {
+						found = true;
+					}
+				});
+				if (found) return;
+
+				// Adds tag to drop zone
+				dest.insert(src);
+				src.setStyle({left: '5px', top: '0px'});
+				dest.highlight();
+				_updateTagsZone();
+			}
+		});
+
+		Droppables.add(_id + 'tags_div', {
+			containment: zone,
+			hoverclass: 'dropzone_hover',
+			onDrop: function(src, dest, event) {
+				src.remove();
+				dest.highlight();
+				_updateTagsZone();
+			}
+		});
+
+		_dropZone = zone;
+	}
+
+	/*
 	 * Function: _render
 	 * Main rendering function
 	 *
@@ -345,36 +405,6 @@ function TagPanel(container) {
 			_previewTag.setStyle(_picker.getStyle());
 		});
 
-		// Add drop zones
-		Droppables.add('drop', {
-			containment: _id + 'tags_div',
-			hoverclass: 'dropzone_hover',
-			onDrop: function(src, dest, event) {
-				var found = false;
-				$('drop').select('.tagwidget').each(function(tag) {
-					if (src.innerHTML == tag.innerHTML) {
-						found = true;
-					}
-				});
-				if (found) return;
-
-				// Adds tag to drop zone
-				dest.insert(src);
-				src.setStyle({left: '5px', top: '0px'});
-				dest.highlight();
-				_updateTagsZone();
-			}
-		});
-
-		Droppables.add(_id + 'tags_div', {
-			containment: 'drop',
-			hoverclass: 'dropzone_hover',
-			onDrop: function(src, dest, event) {
-				src.remove();
-				dest.highlight();
-				_updateTagsZone();
-			}
-		});
 	}
 
 	_render();

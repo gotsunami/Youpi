@@ -367,12 +367,16 @@ div.imageSelector div.controlPanel {
 	padding: 5px;
 }
 
+div.imageSelector table.optionsPanel {
+	width: 100%;
+}
+
 div.imageSelector table.optionsPanel td {
 	border: none;
 }
 
 div.imageSelector table.optionsPanel td:first-child {
-dpadding: 0px;
+	padding: 0px;
 }
 
 div.imageSelector div.modeOptions {
@@ -1284,6 +1288,7 @@ div.min_size {
 	font-size: 9px;
 	width: -moz-fit-content;	
 	margin-right: 8px;
+	margin-bottom: 4px;
 }
 
 .dragndrop {
@@ -1326,11 +1331,22 @@ div.tags {
 	max-width: 90%;
 }
 
+div.tags  *, .dropzone * {
+	display: inline-block;
+}
+
 .dropzone {
 	-moz-border-radius: 5px;
 	background-color: #e9f3ff;
 	padding: 10px;
 	width: 100%;
+	color: red;
+}
+
+.dropzoneEmbedded {
+	width: 75%;
+	height: 80px;
+	margin: 10px;
 }
 
 .dropzone_hover {

@@ -5,6 +5,8 @@
 <script type="text/javascript" src="/media/js/stylepicker.js"></script>
 <script type="text/javascript" src="/media/js/tagwidget.js"></script>
 <script type="text/javascript" src="/media/js/tagpanel.js"></script>
+<script type="text/javascript" src="/media/js/imageselector.js"></script>
+<script type="text/javascript" src="/media/js/advancedtable.js"></script>
 
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
 <script type="text/javascript" src="/media/js/3rdParty/lightbox2/lightbox.js"></script>
@@ -29,19 +31,18 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 <div id="submenu">
 	<div id="menuitem_sub_0">
 		<div align="center">
-			<table style="width: 90%;">
+			<table style="width: 95%;">
 				<tr>
-					<td style="border: none; max-width: 40%">
+					<td style="border: none; max-width: 30%">
 						<div class="themes">
 							<h1>Available Tags</h1>
 							<div id="tagpanel-div"/>
 						</div>
 					</td>
-					<td style="border: none; width: 60%;">
+					<td style="border: none; width: 70%;">
 						<div class="themes">
-							<h1>Image Tagging</h1>
-							<div id="imgselector-div"/>
-							<div id="drop" class="dropzone"/>
+							<h1>Select Images</h1>
+							<div id="imgselector-div" style="width: 100%"></div>
 						</div>
 					</td>
 				</tr>
@@ -54,7 +55,13 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	var menu, panel;
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['Edit tags']);
+		var ims = new ImageSelector('imgselector-div', {help: false, editing: false, dropzone: true});
+		ims.setTableWidget(new AdvancedTable());
+
 		panel = new TagPanel('tagpanel-div');
+		document.observe('imageSelector:loaded', function() {
+			panel.setDropZone(ims.getDropZone());
+		});
 	});
 </script>
 {% endblock %}

@@ -6,13 +6,19 @@
  * 
  * common.js - <Logger>
  * prototype.js - Enhanced Javascript library
+ * scriptaculous.js - Visual effects library
  *
  * Constructor Parameters:
+ *  container - string or DOM node: name of parent block container
+ *  options - object: options parsed before rendering widget
  *
- * container - string or DOM node: name of parent block container
+ * Available Options:
+ *  editing - boolean: whether to display options related to edition (save, delete, merge) (default: true)
+ *  help - boolean: whether to display tooltips (default: true)
+ *  dropzone - boolean: whether to show the drop zone (default: false)
  *
  */
-function ImageSelector(container)
+function ImageSelector(container, options)
 {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -108,6 +114,16 @@ function ImageSelector(container)
 	 *
 	 */ 
 	var _imagesCount = 0;
+	/*
+	 * Var: _options;
+	 * Hash - Image selector options
+	 *
+	 */ 
+	var _options = $H({
+		editing: true,
+		help: true,
+		dropzone: false
+	});
 	/*
 	 * Var: _batchModeSelections
 	 * Array of current image selections in batch Mode
@@ -315,14 +331,20 @@ function ImageSelector(container)
 
 
 	/*
-	 * Function: render
+	 * Function: _render
 	 * Initial rendering step
 	 *
-	 * This is the main entry point of this pseudo-class
-	 *
 	 */ 
-	function render() {
-		_container.setAttribute('class', 'imageSelector');
+	function _render() {
+		if (options) {
+			if (typeof options != 'object') {
+				throw '_render: options must be an object';
+				return;
+			}
+			_options.update(options);
+		}
+
+		_container.addClassName('imageSelector');
 		// Container for new image selection
 		var	topDiv = new Element('div', {id: id + '_new_image_selection_div'});
 		_container.insert(topDiv);
@@ -411,8 +433,7 @@ function ImageSelector(container)
 	 */ 
 	function renderSingleSelection(cNode, nbRes) {
 		// div for single selection
-		var single_div = new Element('div');
-		single_div.setAttribute('id', id + '_single_sel_div');
+		var single_div = new Element('div', {id: id + '_single_sel_div'}).setStyle({width: '100%'});
 
 		var div = new Element('div');
 		div.setAttribute('class', 'headerText');
@@ -454,7 +475,7 @@ function ImageSelector(container)
 		// Result grid
 		div = new Element('div');
 		div.setAttribute('id', '_result_grid_div');
-		div.setAttribute('style', 'width: ' + div.width + 'px; height: 90%;');
+		div.setAttribute('style', 'width: 100%; height: 90%;');
 		single_div.insert(div);
 
 		// Result div
@@ -544,11 +565,13 @@ function ImageSelector(container)
 		switch(_selectionMode) {
 			case _singleMode:
 				// Merge saved selections
-				var dmerge = new DropdownBox(div, 'Merge with selection');
-				dmerge.setOnClickHandler(function() {
-					if (dmerge.isOpen()) 
-						_handlerMergeSelections.bind(dmerge)();
-				});
+				if (_options.get('editing')) {
+					var dmerge = new DropdownBox(div, 'Merge with selection');
+					dmerge.setOnClickHandler(function() {
+						if (dmerge.isOpen()) 
+							_handlerMergeSelections.bind(dmerge)();
+					});
+				}
 
 				// Select all
 				sub = new Element('input', {
@@ -707,6 +730,8 @@ function ImageSelector(container)
 				var nb = resp['Total'];
 				containerNode.update();
 				addImageQueryForm(containerNode, nb);
+				// Emit signal when widget is fully loaded
+				document.fire('imageSelector:loaded');
 			}
 		);
 
@@ -1695,9 +1720,15 @@ function ImageSelector(container)
 		optdiv.innerHTML = '';
 		optdiv.insert(_getOptionsToolbar());
 
+		var dropdiv = $(id + '_dropzone_div');
+		dropdiv.update();
+		if (_options.get('dropzone'))
+			dropdiv.appear();
+
 		var tipdiv = $(id + '_mode_options_tip_div');
-		tipdiv.innerHTML = '';
-		tipdiv.insert(_getContextTip());
+		tipdiv.update();
+		if (_options.get('help'))
+			tipdiv.insert(_getContextTip());
 	}
 
 	/*
@@ -1828,12 +1859,18 @@ function ImageSelector(container)
 
 		var td = new Element('td');
 		var ediv = new Element('div');
-		ediv.insert(_getEditSelectionBox());
+		if (_options.get('editing'))
+			ediv.insert(_getEditSelectionBox());
 		td.insert(ediv);
 
 		var optdiv = new Element('div');
 		optdiv.setAttribute('id', id + '_mode_options_div');
 		td.insert(optdiv);
+
+		var dropdiv = new Element('div', {id: id + '_dropzone_div'});
+		dropdiv.addClassName('dropzone').addClassName('dropzoneEmbedded');
+		dropdiv.insert('Drag tag here');
+		td.insert(dropdiv.hide());
 
 		var tipdiv = new Element('div');
 		tipdiv.setAttribute('id', id + '_mode_options_tip_div');
@@ -1849,6 +1886,18 @@ function ImageSelector(container)
 
 		// Default mode: single selection
 		_swapSelectionMode();
+	}
+
+	/*
+	 * Function: getDropZone
+	 * Returns DOM container used as a drop zone
+	 *
+	 * Returns:
+	 *  container - DOM node container or null if options.dropzone is false
+	 *
+	 */ 
+	this.getDropZone = function() {
+		return _options.get('dropzone') ? $(id + '_dropzone_div') : null;
 	}
 
 	/*
@@ -2779,5 +2828,5 @@ function ImageSelector(container)
 	}
 
 	// Main entry point
-	render();
+	_render();
 }
