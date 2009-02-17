@@ -303,8 +303,14 @@ var {{ plugin.id }} = {
 	
 			td = new Element('td');
 			var tn, imgpath, a;
+				
+			var nb = resp['ResultsOutputDir'].length;
+
 			resp.Previews.each(function(thumb, k) {
+				
+				thumb = thumb.substring(nb + 1);
 				imgpath = resp.WWW + thumb;
+				console.log(imgpath)
 				a = new Element('a', { href: imgpath.replace(/tn_/, ''), rel: 'lightbox[sex]', title: 'Sources extracted images' });
 				tn = new Element('img', {
 					src: resp.HasThumbnails ? imgpath : imgpath.replace(/tn_/, ''),

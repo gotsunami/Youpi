@@ -438,23 +438,36 @@ def process(userData, kind_id, argv):
 			shutil.copy(xslPath, userData['ResultsOutputDir'] +'/')
 
 			# Gets image name
-			#FIXME
-			#catch the right name with the associate parameter CHECKIMAGE_NAME in configFile Sex table instead of glob 'fits'
-			imgout = glob.glob('*.fits')[0]
-			#end OF FIXME
+			motif = "CHECKIMAGE_NAME"
 
-			os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (imgout, os.path.join(userData['ResultsOutputDir'], 'out.fits')))
+			path_cf = userData['ConfigFile']
 
-			# Converts produced FITS image into PNG format
-			tiff = os.path.join(userData['ResultsOutputDir'], 'sex.tif')
-			os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'out.fits'), tiff))
-			os.remove(os.path.join(userData['ResultsOutputDir'],'out.fits'))
+			cfile = path_cf.split('/')[2]
+			f = open(cfile,'r')
+			for ligne in f :
+				if motif in ligne:
+					m = re.findall(r'(\w+\.fits)', ligne)
+			
+			f.close()
 
-			os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'sex.png')))
-			if HAS_CONVERT:
-				os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_sex.png')))
+			for current in m:
+				name = current.split('.')
+				cur = name[0]
 
-			os.remove(tiff)
+				print cur
+
+				os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (cur + '.fits', os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
+
+				# Converts produced FITS image into PNG format
+				tiff = os.path.join(userData['ResultsOutputDir'], cur + '.tif')
+				os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'temp.fits'), tiff))
+				os.remove(os.path.join(userData['ResultsOutputDir'], 'temp.fits'))
+
+				os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], cur + '.png')))
+				if HAS_CONVERT:
+					os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_' + cur + '.png')))
+
+				os.remove(tiff)
 
 
 	elif kind == 'swarp':

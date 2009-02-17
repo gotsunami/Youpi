@@ -1,6 +1,6 @@
 # vim: set ts=4
 
-import sys, os.path, re, time, string, re
+import sys, os.path, re, time, string, re, glob
 import marshal, base64, zlib
 import xml.dom.minidom as dom
 from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
@@ -383,10 +383,10 @@ queue""" %  {	'encuserdata' 	: encUserData,
 							'Hostname' 		: str(st.hostname),
 							'TaskId'		: str(st.id),
 							})
-
-		thumbs = ['sex.png']
+		
+		thumbs = glob.glob(os.path.join(str(task.results_output_dir),'tn_*.png')) 
 		if data.thumbnails:
-			thumbs = ['tn_' + thumb for thumb in thumbs]
+			thumbs = [ thumb for thumb in thumbs]
 
 		return {	'TaskId'			: str(taskid),
 					'Title' 			: str("%s" % self.description),
