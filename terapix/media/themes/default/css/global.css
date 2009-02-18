@@ -1279,6 +1279,13 @@ div.min_size {
 .tagform table td {
 	border: none;
 	vertical-align: middle;
+	padding: 2px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.tagform * {
+	font-size: 9px;
 }
 
 .tagwidget {
@@ -1340,15 +1347,18 @@ div.tags  *, .dropzone * {
 	background-color: #e9f3ff;
 	padding: 10px;
 	width: 100%;
-	color: red;
 }
 
 .dropzoneEmbedded {
 	width: 75%;
-	height: 80px;
+	min-height: 80px;
 	margin: 10px;
 }
 
 .dropzone_hover {
 	border: 2px dashed lightgray;
+}
+
+.clickable {
+	cursor: pointer;
 }

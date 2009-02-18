@@ -19,7 +19,7 @@ def fetch_tags(request):
 	"""
 
 	tags = Tag.objects.all().order_by('name')
-	data = [{'name': str(tag.name), 'style': str(tag.style)} for tag in tags] 
+	data = [{'name': str(tag.name), 'style': str(tag.style), 'comment': str(tag.comment), 'username': str(tag.user.username), 'date': str(tag.date)} for tag in tags] 
 
 	return HttpResponse(str({'tags' : data}), mimetype = 'text/plain')
 
@@ -69,4 +69,46 @@ def save_tag(request):
 		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 
 	return HttpResponse(str({'saved' : str(name)}), mimetype = 'text/plain')
+
+def update_tag(request):
+	"""
+	Updates tag
+	"""
+
+	try:
+		key = request.POST['NameOrig']
+		name = request.POST['Name']
+		comment = request.POST.get('Comment', '')
+		style = request.POST['Style'] # CSS style
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	tag = Tag.objects.filter(name__exact = key)[0]
+	try:
+		tag.name = name
+		tag.comment = comment
+		tag.style = style
+		tag.save()
+	except Exception, e:
+		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
+
+	return HttpResponse(str({'updated' : str(name), 'oldname' : str(key)}), mimetype = 'text/plain')
+
+def delete_tag(request):
+	"""
+	Deletes tag
+	"""
+
+	try:
+		name = request.POST['Name']
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	try:
+		tag = Tag.objects.filter(name__exact = name)[0]
+		tag.delete()
+	except Exception, e:
+		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
+
+	return HttpResponse(str({'deleted' : str(name)}), mimetype = 'text/plain')
 

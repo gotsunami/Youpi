@@ -2,11 +2,13 @@
  * Class: TagWidget
  * Widget implementing tags
  *
- * For convenience, private data member names (both variables and functions) start with an underscore.
+ * Private data member names (both variables and functions) start with an underscore.
  *
  * Constructor Parameters:
+ *  container - string or DOM object: name of parent DOM block container
  *
- * container - string or DOM object: name of parent DOM block container
+ * Custom Events:
+ *  tagWidget:edit - signal emitted when a tag is double-clicked and the widget is set editable (See <setEditable>)
  *
  */
 function TagWidget(container, name) {
@@ -44,6 +46,15 @@ function TagWidget(container, name) {
 	 *
 	 */
 	var _dragNDropEnabled = false;
+	/*
+	 * Var: _editable
+	 * True if widget is editable (default: false)
+	 *
+	 * Note:
+	 *  If true, a tagWidget:edit signal is sent with tag attributes as parameter
+	 *
+	 */
+	var _editable = false;
 	/*
 	 * Var: _drag
 	 * Draggable instance (default: null)
@@ -120,7 +131,7 @@ function TagWidget(container, name) {
 			cdate: null, 
 			owner: null, 
 			style: 'background-color: brown; color: white', 
-			comment: null
+			comment: null,
 		});
 
 		_update();
@@ -142,6 +153,57 @@ function TagWidget(container, name) {
 
 		_attrs.update({style: style});
 		_update();
+	}
+
+	/*
+	 * Function: setComment
+	 * Sets tag comment
+	 *
+	 * Parameters:
+	 *  msg - string
+	 *
+	 */ 
+	this.setComment = function(msg) {
+		if (typeof msg != 'string') {
+			throw "setComment expects a string!";
+			return;
+		}
+
+		_attrs.update({comment: msg});
+	}
+
+	/*
+	 * Function: setOwner
+	 * Sets tag owner
+	 *
+	 * Parameters:
+	 *  owner - string
+	 *
+	 */ 
+	this.setOwner = function(owner) {
+		if (typeof owner != 'string') {
+			throw "setOwner expects a string!";
+			return;
+		}
+
+		_attrs.update({owner: owner});
+	}
+
+	/*
+	 * Function: setCreationDate
+	 * Sets tag creation date
+	 *
+	 * Parameters:
+	 *  date - string
+	 *
+	 */ 
+	this.setCreationDate = function(date) {
+		if (typeof date != 'string') {
+			throw "setCreationDate expects a string!";
+			return;
+		}
+
+		_attrs.update({cdate: date});
 	}
 
 	/*
@@ -189,14 +251,30 @@ function TagWidget(container, name) {
 	 * Function: setEditable
 	 * Sets widget editable
 	 *
-	 * Paramters:
+	 * Parameters:
 	 *  enable - boolean: Enable or Disable drag'n drop
+	 *
+	 * Signals:
+	 *  If _enable_ is true, a *tagWidget:edit* signal is sent along with tag attributes as parameter when
+	 *  the widget is double-clicked.
 	 *
 	 */ 
 	this.setEditable = function(enable) {
 		if (typeof enable != 'boolean') {
 			throw "setEditable: must provide a boolean";
 			return;
+		}
+
+		_editable = enable;
+		if (enable) {
+			_root.observe('dblclick', function() {
+				document.fire('tagWidget:edit', _attrs);
+			});
+			_root.writeAttribute('title', 'Double click to edit');
+		}
+		else {
+			_root.stopObserving('dblclick');
+			_root.writeAttribute('title', '');
 		}
 	}
 

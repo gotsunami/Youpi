@@ -108,10 +108,37 @@ function StylePicker(container) {
 	function _reset () {
 	}
 
+	/*
+	 * Function: getStyle
+	 * Returns CSS style 
+	 *
+	 * Returns:
+	 *  string - Raw CSS style
+	 *
+	 */ 
 	this.getStyle = function() {
 		return 	'background-color: ' + _root.getStyle('backgroundColor') + 
 				'; color:' + _root.getStyle('color') +
 				'; border:' + _root.getStyle('border') + ';';
+	}
+
+	/*
+	 * Function: setStyle
+	 * Sets picker CSS style 
+	 *
+	 * Parameters:
+	 *  string - Raw CSS style
+	 *
+	 */ 
+	this.setStyle = function(style) {
+		if(typeof style != 'string') {
+			throw 'setStyle: style must be a CSS string';
+			return;
+		}
+
+		_root.writeAttribute('style', style);
+		// Emit signal
+		document.fire('stylePicker:styleChanged');
 	}
 
 	/*

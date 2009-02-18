@@ -17,6 +17,9 @@
  *  help - boolean: whether to display tooltips (default: true)
  *  dropzone - boolean: whether to show the drop zone (default: false)
  *
+ * Custom Events:
+ *  imageSelector:loaded - signal emitted when the image selector is fully loaded (i.e after AJAX initial queries have returned)
+ *
  */
 function ImageSelector(container, options)
 {
@@ -114,6 +117,12 @@ function ImageSelector(container, options)
 	 *
 	 */ 
 	var _imagesCount = 0;
+	/*
+	 * Var: _tags;
+	 * Hash - Available tags in drop zone (used only if the dropzone option is true)
+	 *
+	 */ 
+	var _tags = $H();
 	/*
 	 * Var: _options;
 	 * Hash - Image selector options
@@ -349,6 +358,23 @@ function ImageSelector(container, options)
 		var	topDiv = new Element('div', {id: id + '_new_image_selection_div'});
 		_container.insert(topDiv);
 		renderCreateNewImageSelection(topDiv);
+
+		// Monitor signals
+		document.observe('tagPanel:tagDroppedOnZone', function(event) {
+			// Do nothing if not concerned
+			if (!_options.get('dropzone')) return;
+
+			_tags.set(event.memo.name, true)
+			$(id + '_dropzone_commit_div').appear();
+		});
+
+		document.observe('tagPanel:tagRemovedFromZone', function(event) {
+			// Do nothing if not concerned
+			if (!_options.get('dropzone')) return;
+
+			_tags.unset(event.memo);
+			$(id + '_dropzone_commit_div').appear();
+		});
 	}
 
 	/*
@@ -1871,6 +1897,16 @@ function ImageSelector(container, options)
 		dropdiv.addClassName('dropzone').addClassName('dropzoneEmbedded');
 		dropdiv.insert('Drag tag here');
 		td.insert(dropdiv.hide());
+
+		var comdiv = new Element('div', {id: id + '_dropzone_commit_div'});
+		comdiv.setStyle({paddingRight: '20px', textAlign: 'right'});
+		var comb = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/commit.gif'});
+		comb.addClassName('clickable');
+		comb.observe('click', function() {
+			$(id + '_dropzone_commit_div').fade();
+		});
+		comdiv.insert(comb);
+		td.insert(comdiv.hide());
 
 		var tipdiv = new Element('div');
 		tipdiv.setAttribute('id', id + '_mode_options_tip_div');

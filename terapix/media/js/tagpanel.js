@@ -11,7 +11,8 @@
  *  container - string or DOM object: name of parent DOM block container
  *
  * Custom Events:
- *  imageSelector:loaded - signal emitted when the image selector is fully loaded (i.e after AJAX initial queries have returned)
+ *  tagPanel:tagDroppedOnZone - signal emitted when a tag has been dropped successfully to a drop zone
+ *  tagPanel:tagRemovedFromZone - signal emitted when a tag has been removed successfully from a drop zone
  *
  */
 function TagPanel(container) {
@@ -79,6 +80,12 @@ function TagPanel(container) {
 	 *
 	 */
 	var _picker = null;
+	/*
+	 * Var: _oldTagData
+	 * In tag edition mode, used to store initial tag data (before updates)
+	 *
+	 */
+	var _oldTagData = null;
 
 
 	// Group: Functions
@@ -90,7 +97,18 @@ function TagPanel(container) {
 	 * Show edition form
 	 *
 	 */ 
-	function _showEditForm() {
+	function _showEditForm(data) {
+		if (typeof data == 'undefined') {
+			data = $H({
+				name: '',
+				comment: '',
+				style: null
+			});
+		}
+		else
+			_oldTagData = data;
+
+		_editDiv.update();
 		var f = new Element('form', {'class': 'tagform'});
 		var tab = new Element('table');
 		var tr, td, lab, inp;
@@ -114,7 +132,12 @@ function TagPanel(container) {
 		tr.insert(td);
 
 		td = new Element('td');
-		inp = new Element('input', {type: 'text', id: _id + 'tag_name_input', maxlength: 15});
+		inp = new Element('input', {
+			type: 'text', 
+			id: _id + 'tag_name_input', 
+			maxlength: 15,
+			value: data.get('name')
+		});
 		inp.observe('keyup', function() {
 			_previewTag.setName(this.value);
 			_previewTag.update();
@@ -131,10 +154,38 @@ function TagPanel(container) {
 		tr.insert(td);
 
 		td = new Element('td');
-		inp = new Element('input', {type: 'text', id: _id + 'tag_comment_input'});
+		inp = new Element('input', {
+			type: 'text', 
+			id: _id + 'tag_comment_input',
+			value: data.get('comment')
+		});
 		td.insert(inp);
 		tr.insert(td);
 		tab.insert(tr);
+
+		if (data.get('style')) {
+			// Owner
+			tr = new Element('tr');
+			td = new Element('td');
+			lab = new Element('label').update('Owner:');
+			td.insert(lab);
+			tr.insert(td);
+
+			td = new Element('td').update(data.get('owner'));
+			tr.insert(td);
+			tab.insert(tr);
+
+			// Creation date
+			tr = new Element('tr');
+			td = new Element('td');
+			lab = new Element('label').update('Created:');
+			td.insert(lab);
+			tr.insert(td);
+
+			td = new Element('td').update(data.get('cdate'));
+			tr.insert(td);
+			tab.insert(tr);
+		}
 
 		// Style
 		tr = new Element('tr');
@@ -150,9 +201,9 @@ function TagPanel(container) {
 		// Buttons
 		tr = new Element('tr');
 		td = new Element('td', {colspan: 2}).setStyle({textAlign: 'right'});
-		var addb = new Element('input', {type: 'button', value: 'Add!'});
+		var addb = new Element('input', {type: 'button', value: data.get('style') ? 'Update' : 'Add'});
 		addb.observe('click', function() {
-			_saveTag();
+			data.get('style') ? _updateTag() : _saveTag();
 		});
 
 		var cancelb = new Element('input', {type: 'button', value: 'Cancel', style: 'margin-right: 10px'});
@@ -161,17 +212,30 @@ function TagPanel(container) {
 			$(_id + 'add_new_span').appear();
 		});
 		td.insert(cancelb);
+
+		if (data.get('style')) {
+			var delb = new Element('input', {type: 'button', value: 'Delete', style: 'margin-right: 10px'});
+			delb.observe('click', function() {
+				_deleteTag();
+			});
+			td.insert(delb);
+		}
+
 		td.insert(addb);
 		tr.insert(td);
 		tab.insert(tr);
 
 		f.insert(tab);
 		_editDiv.insert(f);
-		_editDiv.slideDown({
-			afterFinish: function() {
-				$(_id + 'tag_name_input').focus();
-			}
-		});
+		if (!_editDiv.visible()) {
+			_editDiv.slideDown({
+				afterFinish: function() {
+					$(_id + 'tag_name_input').focus();
+				}
+			});
+		}
+		else
+			$(_id + 'tag_name_input').focus();
 
 		if (_previewTag) delete _previewTag;
 		_previewTag = new TagWidget(_id + 'preview_td');
@@ -179,6 +243,12 @@ function TagPanel(container) {
 		if (_picker) delete _picker;
 		_picker = new StylePicker(_id + 'picker_td');
 		_previewTag.setStyle(_picker.getStyle());
+
+		if (data.get('style')) {
+			_picker.setStyle(data.get('style'));
+			_previewTag.setName($(_id + 'tag_name_input').value);
+			_previewTag.update();
+		}
 
 		// Add auto-completion capabilities
 		if (_bsn) {
@@ -261,6 +331,109 @@ function TagPanel(container) {
 	}
 
 	/*
+	 * Function: _updateTag
+	 * Updates tag to DB
+	 *
+	 */ 
+	function _updateTag() {
+		var name = $F(_id + 'tag_name_input').strip();
+
+		if (name.length == 0) {
+			alert("Can't update a tag with an empty name!");
+			inp.highlight();
+			inp.focus();
+			return;
+		}
+
+		var xhr = new HttpRequest(
+			null,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				if (resp.Error) {
+					alert('A tag with that name already exists! Please\nchoose another name.');
+					$(_id + 'tag_name_input').addClassName('validation_failure');
+					$(_id + 'tag_name_input').select();
+					console.warn(resp.Error);
+					return;
+				}
+
+				var log = new Logger(_infoDiv);
+				_infoDiv.update();
+				_editDiv.slideUp({
+					afterFinish: function() {
+						log.msg_ok('Tag <b>' + resp.oldname + '</b> has been updated successfully.');
+						_infoDiv.fade({
+							delay: 1.5,
+							afterFinish: function() {
+								_checkForTags();
+							}
+						});
+					}
+				});
+			}
+		);
+
+		var post = {
+			// Original name
+			NameOrig: _oldTagData.get('name'),
+			Name: name,
+			Comment: $F(_id + 'tag_comment_input').strip(),
+			Style: _picker.getStyle()
+		};
+
+		// Send HTTP POST request
+		xhr.send('/youpi/tags/update/', $H(post).toQueryString());
+	}
+
+	/*
+	 * Function: _deleteTag
+	 * Deletes tag to DB
+	 *
+	 */ 
+	function _deleteTag() {
+		var name = _oldTagData.get('name');
+		var r = confirm("Are you sure you want to delete the '" + name + "' tag?");
+		if (!r) return;
+
+		var xhr = new HttpRequest(
+			null,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				if (resp.Error) {
+					console.warn(resp.Error);
+					return;
+				}
+
+				var log = new Logger(_infoDiv);
+				_infoDiv.update();
+				_editDiv.slideUp({
+					afterFinish: function() {
+						log.msg_ok('Tag <b>' + resp.deleted + '</b> has been deleted successfully.');
+						_infoDiv.fade({
+							delay: 1.5,
+							afterFinish: function() {
+								_checkForTags();
+							}
+						});
+					}
+				});
+			}
+		);
+
+		var post = {
+			// Original name
+			Name: name
+		};
+
+		// Send HTTP POST request
+		xhr.send('/youpi/tags/delete/', $H(post).toQueryString());
+	}
+
+	/*
 	 * Function: _checkForTags
 	 * Fetches any tag information from DB then updates the UI
 	 *
@@ -278,7 +451,6 @@ function TagPanel(container) {
 				var l = new Element('a', {href: '#'}).update('add a new tag');
 				l.observe('click', function() {
 					s.fade();
-					_editDiv.update();
 					_showEditForm();
 				});
 				s.insert(l).insert('.');
@@ -323,6 +495,10 @@ function TagPanel(container) {
 		_tags.each(function(tag) {
 			t = new TagWidget(_tagsDiv, tag.name);
 			t.setStyle(tag.style);
+			t.setComment(tag.comment);
+			t.setOwner(tag.username);
+			t.setCreationDate(tag.date);
+			t.setEditable(true);
 			t.update();
 			// Use it _after_ update() call so that Draggable instance
 			// can overwrite CSS properties
@@ -354,7 +530,7 @@ function TagPanel(container) {
 			hoverclass: 'dropzone_hover',
 			onDrop: function(src, dest, event) {
 				var found = false;
-				zone.select('.tagwidget').each(function(tag) {
+				zone.select('.tagwidget').each(function(tag, k) {
 					if (src.innerHTML == tag.innerHTML) {
 						found = true;
 					}
@@ -366,6 +542,18 @@ function TagPanel(container) {
 				src.setStyle({left: '5px', top: '0px'});
 				dest.highlight();
 				_updateTagsZone();
+
+				// Find src object
+				var obj;
+				_tags.each(function(tag) {
+					if (tag.name == src.innerHTML) {
+						obj = tag;
+						throw $break;
+					}
+				});
+
+				// Then emit signal
+				document.fire('tagPanel:tagDroppedOnZone', obj);
 			}
 		});
 
@@ -376,6 +564,9 @@ function TagPanel(container) {
 				src.remove();
 				dest.highlight();
 				_updateTagsZone();
+
+				// Emit signal
+				document.fire('tagPanel:tagRemovedFromZone', src.innerHTML);
 			}
 		});
 
@@ -394,15 +585,21 @@ function TagPanel(container) {
 			return;
 		}
 
-		_infoDiv = new Element('div');
-		_tagsDiv = new Element('div', {id: _id + 'tags_div'}).setStyle({marginTop: '10px'}).addClassName('tags').hide();
+		_infoDiv = new Element('div').setStyle({marginTop: '5px'});
+		_tagsDiv = new Element('div', {id: _id + 'tags_div'}).setStyle({marginTop: '5px'}).addClassName('tags').hide();
 		_editDiv = new Element('div').setStyle({marginTop: '10px'}).hide();
-		_container.insert(_infoDiv).insert(_tagsDiv).insert(_editDiv);
+		_container.insert(_tagsDiv).insert(_infoDiv).insert(_editDiv);
 
 		_checkForTags();
 
+		// Custom events
 		document.observe('stylePicker:styleChanged', function(event) {
 			_previewTag.setStyle(_picker.getStyle());
+		});
+
+		document.observe('tagWidget:edit', function(event) {
+			// User wants tag edition panel
+			_showEditForm(event.memo);
 		});
 
 	}

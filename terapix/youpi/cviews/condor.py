@@ -291,7 +291,7 @@ def autocomplete(request, key, value):
 		data = Tag.objects.filter(name__istartswith = value).order_by('name')
 
 		for d in data:
-			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.date))})
+			res.append({'value' : str(d.name), 'info' : str("%s - %s" % (d.user.username, d.date))})
 
 	return HttpResponse(str({'results' : res}), mimetype = 'text/plain')
 
