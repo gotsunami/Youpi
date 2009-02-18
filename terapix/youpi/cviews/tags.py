@@ -107,6 +107,8 @@ def delete_tag(request):
 	try:
 		tag = Tag.objects.filter(name__exact = name)[0]
 		tag.delete()
+		# FIXME
+		# Delete associations in youpi_rel_tagi
 	except Exception, e:
 		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 

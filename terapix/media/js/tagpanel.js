@@ -10,9 +10,11 @@
  * Constructor Parameters:
  *  container - string or DOM object: name of parent DOM block container
  *
- * Custom Events:
+ * Signals:
  *  tagPanel:tagDroppedOnZone - signal emitted when a tag has been dropped successfully to a drop zone
  *  tagPanel:tagRemovedFromZone - signal emitted when a tag has been removed successfully from a drop zone
+ *  tagPanel:tagDeleted - signal emitted when a tag has been deleted successfully
+ *  tagPanel:tagUpdated - signal emitted when a tag has been updated successfully
  *
  */
 function TagPanel(container) {
@@ -372,6 +374,9 @@ function TagPanel(container) {
 						});
 					}
 				});
+
+				// Send signal
+				document.fire('tagPanel:tagUpdated', {oldname: resp.oldname, name: name, style: _picker.getStyle()});
 			}
 		);
 
@@ -421,6 +426,9 @@ function TagPanel(container) {
 						});
 					}
 				});
+
+				// Send signal
+				document.fire('tagPanel:tagDeleted', name);
 			}
 		);
 

@@ -17,7 +17,7 @@
  *  help - boolean: whether to display tooltips (default: true)
  *  dropzone - boolean: whether to show the drop zone (default: false)
  *
- * Custom Events:
+ * Signals:
  *  imageSelector:loaded - signal emitted when the image selector is fully loaded (i.e after AJAX initial queries have returned)
  *
  */
@@ -358,8 +358,15 @@ function ImageSelector(container, options)
 		var	topDiv = new Element('div', {id: id + '_new_image_selection_div'});
 		_container.insert(topDiv);
 		renderCreateNewImageSelection(topDiv);
+	}
 
-		// Monitor signals
+	/*
+	 * Function: _setupSlots
+	 * Defines slots to handle external signals
+	 *
+	 */ 
+	function _setupSlots() {
+		// Slots for signals
 		document.observe('tagPanel:tagDroppedOnZone', function(event) {
 			// Do nothing if not concerned
 			if (!_options.get('dropzone')) return;
@@ -374,6 +381,32 @@ function ImageSelector(container, options)
 
 			_tags.unset(event.memo);
 			$(id + '_dropzone_commit_div').appear();
+		});
+
+		document.observe('tagPanel:tagDeleted', function(event) {
+			// Do nothing if not concerned
+			if (!_options.get('dropzone')) return;
+
+			$(id + '_dropzone_div').select('.tagwidget').each(function(tag) {
+				if (tag.innerHTML == event.memo) {
+					tag.remove();
+					_tags.unset(event.memo);
+					throw $break;
+				}
+			});
+		});
+
+		document.observe('tagPanel:tagUpdated', function(event) {
+			// Do nothing if not concerned
+			if (!_options.get('dropzone')) return;
+
+			$(id + '_dropzone_div').select('.tagwidget').each(function(tag) {
+				if (tag.innerHTML == event.memo.oldname) {
+					tag.update(event.memo.name);
+					tag.writeAttribute('style', event.memo.style);
+					throw $break;
+				}
+			});
 		});
 	}
 
@@ -2863,6 +2896,16 @@ function ImageSelector(container, options)
 		xhr.send('/youpi/uploadFile/batch/viewSelection/', post);
 	}
 
+	/*
+	 * Function: _main
+	 * Entry point
+	 *
+	 */ 
+	function _main() {
+		_render();
+		_setupSlots();
+	}
+
 	// Main entry point
-	_render();
+	_main();
 }
