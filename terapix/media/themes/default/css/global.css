@@ -1355,6 +1355,19 @@ div.tags  *, .dropzone * {
 	margin: 10px;
 }
 
+.commitEmbedded {
+	text-align: center;
+	min-height: 0;
+}
+
+.commitEmbedded input {
+	margin-right: 10px;
+}
+
+.commitEmbedded * {
+	font-size: 9px;
+}
+
 .dropzone_hover {
 	border: 2px dashed lightgray;
 }

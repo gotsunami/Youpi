@@ -3,10 +3,9 @@
  * Widget that allows image selection.
  *
  * External Dependancies:
- * 
- * common.js - <Logger>
- * prototype.js - Enhanced Javascript library
- * scriptaculous.js - Visual effects library
+ *  common.js - <Logger>
+ *  prototype.js - Enhanced Javascript library
+ *  scriptaculous.js - Visual effects library
  *
  * Constructor Parameters:
  *  container - string or DOM node: name of parent block container
@@ -380,7 +379,7 @@ function ImageSelector(container, options)
 			if (!_options.get('dropzone')) return;
 
 			_tags.unset(event.memo);
-			$(id + '_dropzone_commit_div').appear();
+			_tags.keys().length ? $(id + '_dropzone_commit_div').appear() : $(id + '_dropzone_commit_div').fade();
 		});
 
 		document.observe('tagPanel:tagDeleted', function(event) {
@@ -1625,7 +1624,7 @@ function ImageSelector(container, options)
 	 * Returns selection(s) of images, if any.
 	 *
 	 * Returns:
-	 *  array of selections, null if no selection
+	 *  string - array of selections; null if no selection
 	 *
 	 */ 
 	function _getListsOfSelections() {
@@ -1932,13 +1931,9 @@ function ImageSelector(container, options)
 		td.insert(dropdiv.hide());
 
 		var comdiv = new Element('div', {id: id + '_dropzone_commit_div'});
-		comdiv.setStyle({paddingRight: '20px', textAlign: 'right'});
-		var comb = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/commit.gif'});
-		comb.addClassName('clickable');
-		comb.observe('click', function() {
-			$(id + '_dropzone_commit_div').fade();
+		['dropzone', 'dropzoneEmbedded', 'commitEmbedded'].each(function(cls) {
+			comdiv.addClassName(cls);
 		});
-		comdiv.insert(comb);
 		td.insert(comdiv.hide());
 
 		var tipdiv = new Element('div');
@@ -1950,11 +1945,87 @@ function ImageSelector(container, options)
 		td = new Element('td', {style: 'width: 75%;'});
 		tr.insert(td);
 
+		_addDropZoneCommitButtons();
+
 		renderSingleSelection(td, nbRes);
 		renderBatchSelection(td, nbRes);
 
 		// Default mode: single selection
 		_swapSelectionMode();
+	}
+
+	/*
+	 * Function: _addDropZoneCommitButtons
+	 * Adds _mark_ and _unmark_ commit buttons to the drop zone
+	 *
+	 */ 
+	function _addDropZoneCommitButtons() {
+		var c = $(id + '_dropzone_commit_div');
+		var markb = new Element('input', {type: 'button', value: 'Mark'});
+		markb.observe('click', function() {
+			_markActiveSelection(true);
+		});
+		var unmarkb = new Element('input', {type: 'button', value: 'Unmark'});
+		unmarkb.observe('click', function() {
+			_markActiveSelection(false);
+		});
+		c.insert(unmarkb).insert(markb);
+	}
+
+	/*
+	 * Function: _markActiveSelection
+	 * Marks active image selection with tags in drop zone
+	 *
+	 * Parameters:
+	 *  mark - boolean: tag images if true, unmark them if false
+	 *
+	 */ 
+	function _markActiveSelection(mark) {
+		if (typeof mark != 'boolean') {
+			throw "_markActiveSelection: mark must be a boolean"
+			return;
+		}
+
+		var sel = _getListsOfSelections();
+		if (!sel) {
+			alert("Can't " + (mark ? '' : 'un') + "mark an empty selection!");
+			return;
+		}
+
+		var c = $(id + '_dropzone_commit_div');
+		var xhr = new HttpRequest(
+			c,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				if (resp.Error) {
+					console.warn(resp.Error);
+					return;
+				}
+
+				var log = new Logger(c);
+				c.update();
+				log.msg_ok('Current selection has been <b>' + (mark ? '' : 'un') + 'marked</b> successfully.');
+				c.fade({ 
+					delay: 1.5,
+					afterFinish: function() {
+						c.update();
+						c.appear();
+						_addDropZoneCommitButtons();
+					}
+				});
+			}
+		);
+
+		var post = {
+			IdList: sel,
+			Tags: _tags.keys().toJSON()
+		};
+
+		// Send HTTP POST request
+		xhr.setBusyMsg('Committing');
+		xhr.send('/youpi/tags/' + (mark ? '' : 'un') + 'mark/', $H(post).toQueryString());
 	}
 
 	/*

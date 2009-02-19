@@ -4,6 +4,7 @@ from types import *
 #
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -113,4 +114,63 @@ def delete_tag(request):
 		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 
 	return HttpResponse(str({'deleted' : str(name)}), mimetype = 'text/plain')
+
+def tag_mark_images(request):
+	"""
+	Marks image(s) with tag(s)
+	"""
+
+	try:
+		tags = eval(request.POST['Tags'])
+		idList = eval(request.POST['IdList'])[0]
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	# Marked image count
+	marked = 0
+	images = Image.objects.filter(id__in = idList)
+	tags = Tag.objects.filter(name__in = tags)
+	imgtags = Rel_tagi.objects.filter(image__in = images)
+
+	try:
+		for img in images:
+			newrel = False
+			for tag in tags:
+				try:
+					tagi = Rel_tagi(image = img, tag = tag)
+					tagi.save()
+					newrel = True
+				except IntegrityError:
+					# Already tagged
+					pass
+			if newrel:
+				marked += 1
+	except Exception, e:
+		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
+
+	return HttpResponse(str({'marked' : marked}), mimetype = 'text/plain')
+
+def tag_unmark_images(request):
+	"""
+	Unmarks image(s) with tag(s)
+	"""
+
+	try:
+		tags = eval(request.POST['Tags'])
+		idList = eval(request.POST['IdList'])[0]
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	# Unmarked image count
+	unmarked = 0
+	images = Image.objects.filter(id__in = idList)
+	tags = Tag.objects.filter(name__in = tags)
+	imgtags = Rel_tagi.objects.filter(image__in = images, tag__in = tags)
+
+	for rel in imgtags:
+		rel.delete()
+		unmarked += 1
+
+	return HttpResponse(str({'unmarked' : int(unmarked)}), mimetype = 'text/plain')
+
 
