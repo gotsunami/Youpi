@@ -332,14 +332,25 @@ function AdvancedTable() {
 	}
 
 	/*
+	 * Function: getRoot
+	 * Returns root DOM node
+	 *
+	 * Returns:
+	 *  root - DOM node
+	 *
+	 */ 
+	this.getRoot = function() {
+		return _mainDiv;
+	}		
+
+	/*
 	 * Function: _render
 	 * Renders widget
 	 *
 	 */ 
 	function _render() {
 		_container = $(_container);
-		_mainDiv = new Element('div');
-		_mainDiv.setAttribute('class', 'advancedTable');
+		_mainDiv = new Element('div').addClassName('advancedTable');
 
 		_bodyDiv = new Element('div');
 		_bodyDiv.setAttribute('class', 'body');

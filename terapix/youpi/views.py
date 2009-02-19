@@ -909,34 +909,17 @@ def processing_imgs_from_idlist_post(request):
 		return HttpResponseBadRequest('Incorrect POST data')
 
 	# Build integer list from ranges
-	ids = unremap(ids)
-
-	# Now executes query
-	db = DB(host = DATABASE_HOST,
-			user = DATABASE_USER,
-			passwd = DATABASE_PASSWORD,
-			db = DATABASE_NAME)
-
-	g = DBGeneric(db.con)
-	query = """
-SELECT a.id, a.name, b.name, a.object, c.name, a.alpha, a.delta 
-FROM youpi_image AS a, youpi_run AS b, youpi_channel AS c
-WHERE a.id IN (%s)
-AND a.run_id = b.id
-AND a.channel_id = c.id
-ORDER BY a.name
-""" % ids
-
-	try:
-		res = g.execute(query);
-	except MySQLdb.DatabaseError, e:
-		return HttpResponseServerError("Error: %s [Query: \"%s\"]" % (e, query))
+	ids = unremap(ids).split(',')
+	images = Image.objects.filter(id__in = ids)
 
 	content  =[]
-	for img in res:
-		content.append([str(i) for i in img])
+	for img in images:
+		rels = Rel_tagi.objects.filter(image = img)
+		content.append([int(img.id), 
+						str(img.name), 
+						string.join([str("<span class=\"tagwidget\" style=\"%s\">%s</span>" % (r.tag.style, r.tag.name)) for r in rels], '')])
 
-	return HttpResponse(str({'Headers': ['Name', 'Run ID', 'Object', 'Channel', 'Ra', 'Dec'], 'Content' : content}), mimetype = 'text/plain')
+	return HttpResponse(str({'Headers': ['Name', 'Tags'], 'Content' : content}), mimetype = 'text/plain')
 
 def processing_plugin(request):
 	"""

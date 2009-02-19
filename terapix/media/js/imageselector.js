@@ -437,6 +437,8 @@ function ImageSelector(container, options)
 			null,
 			// Custom handler for results
 			function(resp) {
+				// FIXME
+		//		_tableWidget.getRoot().addClassName('table_imageSelector');
 				_tableWidget.setRowIdsFromColumn(0);
 				_tableWidget.loadDataFromQuery(	'/youpi/process/query/imgsFromIdList/', 	// path
 												'Ids=' + resp['mapList'],					// POST data

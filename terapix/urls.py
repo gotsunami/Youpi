@@ -82,7 +82,6 @@ urlpatterns = patterns(
 
 	# Processing
 	(r'^youpi/process/plugin/$', 'processing_plugin'),
-	#(r'^youpi/process/query/imgsFromIdList/(.*)$', 'processing_imgs_from_idlist'),
 	(r'^youpi/process/query/imgsFromIdList/$', 'processing_imgs_from_idlist_post'),
 	(r'^youpi/process/query/remapIds/$', 'processing_imgs_remap_ids'),
 	(r'^youpi/process/db/saveSelection/$', 'processing_save_image_selection'),

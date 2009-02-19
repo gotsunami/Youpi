@@ -339,6 +339,10 @@ div.imageSelector {
 	text-align: left;
 }
 
+.table_imageSelector td:last-child {
+	text-align: left;
+}
+
 div.imageSelector div.show {
 	vertical-align: middle;
 	display: block;
@@ -889,7 +893,7 @@ div.advancedTable div.body table tr td:first-child {
 }
 
 div.advancedTable div.body table tr.rowSelected td {
-	background-color: #A6FFBA;
+	background-color: #e9f3ff;
 	color: blue;
 }
 

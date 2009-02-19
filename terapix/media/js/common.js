@@ -144,7 +144,7 @@ function getMessageNode(msg, cssClass, width, mtop) {
 
 function getLoadingHTML(msg)
 {
-	return '<span><img src="/media/themes/' + guistyle + '/img/misc/running_bar.gif"/> ' + msg + '...</span>';
+	return '<span><img src="/media/themes/' + guistyle + '/img/misc/snake-loader.gif"/> ' + msg + '...</span>';
 }
 
 /*
