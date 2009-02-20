@@ -409,9 +409,11 @@ function ImageSelector(container, options)
 			});
 		});
 
-		document.observe('imageSelector:tagsCommitted', function(event) {
-			// Refresh image list
-			_executeQuery();
+		$A(['imageSelector:tagsCommitted', 'tagPanel:tagDeleted', 'tagPanel:tagUpdated']).each(function(signal) {
+			document.observe(signal, function(event) {
+				// Refresh image list
+				_executeQuery();
+			});
 		});
 	}
 
