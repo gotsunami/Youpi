@@ -50,6 +50,37 @@ def get_tag_info(request):
 
 	return HttpResponse(str({'info' : info}), mimetype = 'text/plain')
 
+def get_images_from_tags(request):
+	"""
+	Returns list of matching images ids (formatted for Image Selector)
+	"""
+
+	try:
+		tags = eval(request.POST['Tags'])
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	rels = Rel_tagi.objects.filter(tag__name__in = tags)
+
+	candidates = {}
+	for t in tags:
+		candidates[t] = []
+		for r in rels:
+			if r.tag.name == t:
+				candidates[t].append(r.image.id)
+
+	idList = []
+	for id in candidates[candidates.keys()[0]]:
+		keep = True
+		for t in candidates.keys()[1:]:
+			if id not in candidates[t]:
+				keep = False
+				break
+		if keep:
+			idList.append([str(id)])
+
+	return HttpResponse(str({'fields': ['id'], 'data': idList, 'hidden': ['']}), mimetype = 'text/plain')
+
 def save_tag(request):
 	"""
 	Saves new tag to DB.

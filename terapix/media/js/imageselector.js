@@ -18,6 +18,7 @@
  *
  * Signals:
  *  imageSelector:loaded - signal emitted when the image selector is fully loaded (i.e after AJAX initial queries have returned)
+ *  imageSelector:tagsCommitted - signal emitted when tags are committed successfuly
  *
  */
 function ImageSelector(container, options)
@@ -58,13 +59,13 @@ function ImageSelector(container, options)
 	 * Supported search criteria are Run, Object, Instrument, Channel, Name, Ra, Dec, Saved selection and IngestionId.
 	 *
 	 */
-	var fields = 		[	'Run', 'Object', 'Instrument', 'Channel', 'Name', 'Ra', 'Dec', 'Saved', 'IngestionId' ];
+	var fields = 		[	'Run', 'Object', 'Instrument', 'Channel', 'Name', 'Ra', 'Dec', 'Saved', 'IngestionId', 'Tag' ];
 	/*
 	 * Var: labelFields
 	 * Array of labels to use with <fields> entries.
 	 *
 	 */
-	var labelFields = 	[	'Run', 'Object', 'Instrument', 'Channel', 'Image name', 'Ra (deg)', 'Dec (deg)', 'Saved selection', 'Ingestion ID' ];
+	var labelFields = 	[	'Run', 'Object', 'Instrument', 'Channel', 'Image name', 'Ra (deg)', 'Dec (deg)', 'Saved selection', 'Ingestion ID', 'Tag' ];
 
 	var actions = [	'Create a new image selection',
 					'Merge saved selections' ];
@@ -407,6 +408,11 @@ function ImageSelector(container, options)
 				}
 			});
 		});
+
+		document.observe('imageSelector:tagsCommitted', function(event) {
+			// Refresh image list
+			_executeQuery();
+		});
 	}
 
 	/*
@@ -437,17 +443,21 @@ function ImageSelector(container, options)
 			null,
 			// Custom handler for results
 			function(resp) {
-				// FIXME
-		//		_tableWidget.getRoot().addClassName('table_imageSelector');
 				_tableWidget.setRowIdsFromColumn(0);
 				_tableWidget.loadDataFromQuery(	'/youpi/process/query/imgsFromIdList/', 	// path
 												'Ids=' + resp['mapList'],					// POST data
 												function() {								// Custom handler
 													if (handler && typeof handler == 'function')
 														handler();
+													// Sets AdvancedTable instance CSS style here
+													// because .getRoot() is only available after table 
+													// rendering
+													_tableWidget.getRoot().select('.body td:last-child').each(function(td) {
+														td.writeAttribute('width', '80%');
+														td.setStyle({textAlign: 'left'});
+													});
 												}
 											);
-
 			}
 		);
 
@@ -1360,6 +1370,79 @@ function ImageSelector(container, options)
 	}
 
 
+	// Group: Tag Field
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Function: buildTagDataWidget
+	 * Dynamically builds DOM content for the 'Tag' search criteria
+	 *
+	 * Parameters:
+	 *  tr_idx - string: id of DOM container element
+	 *
+	 */ 
+	function buildTagDataWidget(tr_idx) {
+		var output = $(id + '_custom_div_' + tr_idx);
+
+		var xhr = new HttpRequest(
+			output.id,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				// Rendering
+				output.update();
+				var selNode = getSelect(id + '_tag_select_' + tr_idx, resp['data'], 6);
+				output.insert(selNode);
+			}
+		);
+
+		// Build custom query
+		var data = 'Distinct=&Table=youpi_tag&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
+
+		// Send POST HTTP query
+		xhr.send('/youpi/process/preingestion/query/', data);
+	}
+
+	/*
+	 * Function: getTagCondSelect
+	 * Returns DOM select object for the 'Tag' search criteria
+	 *
+	 * Parameters:
+	 *
+	 *  tr_idx - string: id of DOM container element
+	 *
+	 * Returns:
+	 *  DOM select element
+	 *
+	 */ 
+	function getTagCondSelect(tr_idx) {
+		var conds = ['is equal to', 'is different from'];
+		return getSelect(id + '_condition_select_' + tr_idx, conds);
+	}
+
+	/*
+	 * Function: getTagSQLParams
+	 * Returns a JSON object with custom SQL parameters for the 'Tag' search criteria
+	 *
+	 * These parameters will be used by <sendq> when sending POST request to the server.
+	 *
+	 * Returns:
+	 *  JSON element
+	 *
+	 */ 
+	function getTagSQLParams() {
+		return null;
+		/*
+		return {'ftable' 		: 'youpi_tag',
+				'ftable_field' 	: 'name',
+				'fkid'			: 'tag_id',
+				'ftable_id' 	: 'id' };
+				*/
+	}
+
+
 	// Group: Saved Selection Field
 	// -----------------------------------------------------------------------------------------------------------------------------
 
@@ -2017,6 +2100,9 @@ function ImageSelector(container, options)
 						_addDropZoneCommitButtons();
 					}
 				});
+
+				// Emit signal when tags are committed
+				document.fire('imageSelector:tagsCommitted');
 			}
 		);
 
@@ -2609,9 +2695,20 @@ function ImageSelector(container, options)
 		critNode = $(id + '_mainCriteria_select_' + row);
 		condNode = $(id + '_condition_select_' + row);
 		valueNode = $(id + '_custom_div_' + row).firstChild;
+		critText = critNode.options[critNode.selectedIndex].text;
+
+		// Ugly hack for tags
+		if (critText == 'Tag') {
+			var tags = $A();
+			$A(valueNode.options).each(function(opt) {
+				if (opt.selected) tags.push(opt.text);
+			});
+			var post = {Tags: tags.toJSON()};
+			xhr.send('/youpi/tags/images/', $H(post).toQueryString());
+			return;
+		}
 
 		// Gets internal prefix for later get + prefix + SQLParams() method call
-		critText = critNode.options[critNode.selectedIndex].text;
 		for (var k=0; k < labelFields.length; k++) {
 			if (labelFields[k] == critText) {
 				critText = fields[k];

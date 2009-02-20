@@ -58,6 +58,7 @@ urlpatterns = patterns(
 	(r'^youpi/tags/delete/$', 'delete_tag'),
 	(r'^youpi/tags/mark/$', 'tag_mark_images'),
 	(r'^youpi/tags/unmark/$', 'tag_unmark_images'),
+	(r'^youpi/tags/images/$', 'get_images_from_tags'),
 
 	# Prefs and docs
 	(r'^youpi/preferences/$', 'preferences'),

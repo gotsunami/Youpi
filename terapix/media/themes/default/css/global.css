@@ -339,10 +339,6 @@ div.imageSelector {
 	text-align: left;
 }
 
-.table_imageSelector td:last-child {
-	text-align: left;
-}
-
 div.imageSelector div.show {
 	vertical-align: middle;
 	display: block;
@@ -836,12 +832,20 @@ div.advancedTable {
 }
 
 div.advancedTable div.header table th {
-	background-color: lightgray;
-	color: black;
+	background-color: #5b80b2;
+	color: white;
 	font-weight: bold;
   	width: 100%;
 	margin: 0px;
 	white-space: nowrap;
+}
+
+div.advancedTable div.header table th:first-child {
+	-moz-border-radius-topleft: 5px;
+}
+
+div.advancedTable div.header table th:last-child {
+	-moz-border-radius-topright: 5px;
 }
 
 div.advancedTable div.body {
