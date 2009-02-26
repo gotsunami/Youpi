@@ -1,14 +1,32 @@
 
 {# Sextractor template #}
-
+<script type="text/javascript" src="/media/js/3rdParty/scriptaculous/scriptaculous.js"></script>
 <div style="text-align: center;">
-		<div id="submenu">
+	<div id="submenu">
 		<div style="margin-right: 10px; margin-top: 10px; text-align: right;">
 			<img style="cursor: pointer" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}.addSelectionToCart();"/>
 		</div>
-		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0"></div>
+		<div style="margin-left: 30px;" id="menuitem_sub_0">
+			<div id ="{{plugin.id}}_results_div" style="float:left"></div>
+			<div style="float:left">
+				<table class="sex_mode">
+					<tr><b>Select the SExtractor processing mode</b></tr>
+						<tr>
+							<td style="text-align: center;vertical-align:middle;">
+								<table>
+									<tr><td><input id = "single" type="radio" name="mode" value="single"> Single Image Mode</input></td></tr>
+									<tr><td><input id = "dual" type="radio" name="mode" value="dual"> Dual Image Mode</input></td></tr>
+								</table>
+							</td>
+						</tr>
+				</table>
+			</div>
+			<div id="help_mode" class="tip" style="float:right;width:30%;display:none"></div>
+		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
-			<div id="selector_div"></div>
+			<div style="float:left;" id="selector_div"></div>
+		</div>
+
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2">
 			<div style="width: 500px" id="config_file_div"></div>
@@ -18,6 +36,32 @@
 </div>
 
 <script type="text/javascript">
+	var text_single = "<b> Single Image Mode Option:</b><li>Creation a catalogue of objects from an astronomic image<br><li>support for WeightMaps<br><li>support for FlagMaps<br>";
+	var text_dual = "<b>Dual Image Mode Option:</b><li>Image1 is used for detection of sources, image2 for measurements only.<br><li>Image1 and image2 must have the same dimensions.<br><li>For most photometric parameters,image1 will use image2 pixel values, which allows one to easily measurepixel-to-pixel colours.";
+$('single','dual').each(function (id) {
+	if (id.value == 'single') {
+		id.observe('mouseover', function() {
+			$('help_mode').update(text_single);
+			$('help_mode').appear();
+			});
+
+		id.observe('mouseout', function() {
+			$('help_mode').fade();
+			});
+		}
+	else if (id.value == 'dual') { 
+		id.observe('mouseover', function() {
+			$('help_mode').update(text_dual);
+			$('help_mode').appear();
+			});
+		
+		id.observe('mouseout', function() {
+			$('help_mode').fade();
+			});
+		}	
+	}
+);
+
 	var menu;
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);

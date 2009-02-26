@@ -414,6 +414,9 @@ def process(userData, kind_id, argv):
 					convert = 0
 				g.setTableName('youpi_plugin_sex')
 				g.insert(	task_id = int(task_id),
+							weightPath = userData['Weight'],
+							flagPath = userData['Flag'],
+							psfPath = userData['Psf'],
 							#
 							# Sex config file serialization: base64 encoding over zlib compression
 							#
@@ -454,20 +457,19 @@ def process(userData, kind_id, argv):
 				name = current.split('.')
 				cur = name[0]
 
-				print cur
+				if (os.path.exists(cur +'.fits')):
 
-				os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (cur + '.fits', os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
+					os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (cur + '.fits', os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
+					# Converts produced FITS image into PNG format
+					tiff = os.path.join(userData['ResultsOutputDir'], cur + '.tif')
+					os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'temp.fits'), tiff))
+					os.remove(os.path.join(userData['ResultsOutputDir'], 'temp.fits'))
 
-				# Converts produced FITS image into PNG format
-				tiff = os.path.join(userData['ResultsOutputDir'], cur + '.tif')
-				os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'temp.fits'), tiff))
-				os.remove(os.path.join(userData['ResultsOutputDir'], 'temp.fits'))
-
-				os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], cur + '.png')))
-				if HAS_CONVERT:
-					os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_' + cur + '.png')))
-
-				os.remove(tiff)
+					os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], cur + '.png')))
+					if HAS_CONVERT:
+						os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_' + cur + '.png')))
+				
+					os.remove(tiff)
 
 
 	elif kind == 'swarp':

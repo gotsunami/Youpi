@@ -92,13 +92,14 @@ class Sextractor(ProcessingPlugin):
 						'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
-						'flagPath' 			: str(data['flagPath']), 
 						'weightPath' 		: str(data['weightPath']), 
+						'flagPath' 			: str(data['flagPath']), 
 						'psfPath' 			: str(data['psfPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
 						'name' 				: str(it.name),
 						'config' 			: str(data['config'])
 						})
+
 		return res 
 
 	def process(self, request):
@@ -168,17 +169,15 @@ class Sextractor(ProcessingPlugin):
 		post = request.POST
 		try:
 			itemId 				= str(post['ItemId'])
-	#		flagPath 			= post['FlagPath']
-	#		weightPath 			= post['WeightPath']
-	#		psfPath 			= post['PsfPath']
+			flagPath 			= post['FlagPath']
+			weightPath 			= post['WeightPath']
+			psfPath 			= post['PsfPath']
 			config 				= post['Config']
 			sexId 				= post['SexId']
 			resultsOutputDir 	= post['ResultsOutputDir']
 			reprocessValid 		= int(post['ReprocessValid'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
-		
-
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
 
@@ -219,16 +218,15 @@ class Sextractor(ProcessingPlugin):
 		csf = open(csfPath, 'w')
 		
 		images = Image.objects.filter(id__in = idList)
-
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),				# Mandatory for AMI, WP
 					'ItemID' 			: itemId,
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
-	#				'Weight' 			: str(weightPath), 
-	#				'Flag	' 			: str(flagPath), 
-	#				'Psf'	 			: str(psfPath), 
+					'Weight' 			: str(weightPath), 
+					'Flag'	 			: str(flagPath), 
+					'Psf'	 			: str(psfPath), 
 					'Descr' 			: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
 		} 
 
@@ -266,9 +264,6 @@ notify_user             = semah@iap.fr
 		'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
 		'config' 		: customrc,
 		'nop' 			: submit_file_path, 
-#		'weights'		: weight_files,
-#		'flags'			: flags_files,
-#		'psfs'			: psf_files,
 		'initdir' 		: os.path.join(submit_file_path, 'script'),
 		'mandpath' 		: os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
 		'requirements' 	: req }
@@ -287,6 +282,35 @@ notify_user             = semah@iap.fr
 		# One image per job
 		for img in images:
 			path = os.path.join(img.path, img.name + '.fits')
+			# WEIGHT checks
+			if weightPath:
+				if os.path.isdir(weightPath):
+					#then catch the img.name + "_weight.fits"
+					weight = os.path.join(weightPath, img.name + '_weight.fits')
+
+				elif os.path.isfile(weightPath):
+					weight = weightPath
+
+			# flag checks
+			if flagPath:
+				if os.path.isdir(flagPath):
+					#then catch the img.name + "_weight.fits"
+					flag = os.path.join(flagPath, img.name + '_flag.fits')
+
+				elif os.path.isfile(flagPath):
+					flag = flagPath
+
+			
+			# PSF checks
+			if psfPath:
+				if os.path.isdir(psfPath):
+					#then catch the img.name + "_weight.fits"
+					psf = os.path.join(psfPath, img.name + '.psf')
+
+				elif os.path.isfile(psfPath):
+					psf = psfPath
+
+
 			#
 			# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
 			# They are later used by the wrapper script to get the name of error log file easily
@@ -296,13 +320,33 @@ notify_user             = semah@iap.fr
 			userData['ResultsOutputDir'] = str(os.path.join(resultsOutputDir, img.name))
 
 			# Parameters to use for each job
-			sex_params = "-XSL_URL %s/sextractor.xsl -PARAMETERS_NAME %s -FILTER_NAME %s -WRITE_XML YES" % (os.path.join(	
+			sex_params = "-XSL_URL %s/sextractor.xsl -PARAMETERS_NAME %s -FILTER_NAME %s -WRITE_XML YES " % (os.path.join(	
 																						WWW_SEX_PREFIX, 
 																						request.user.username, 
 																						userData['Kind'], 
 																						userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]),
 																						'sex.default.param',
 																						'sex.default.conv')
+			#Addding weight support 
+			if weightPath:
+				if not os.path.exists(weight):
+					raise PluginError, "the weight file %s doesn't exists" %weight
+				else:
+					sex_params += "-WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE %s" % (weight)
+
+			#Addding flag support 
+			if flagPath:
+				if not os.path.exists(flag):
+					raise PluginError, "the flag file %s doesn't exists" %flag
+				else:
+					sex_params += " -FLAG_IMAGE %s" % (flag)	
+				
+			#Addding weight support 
+			if psfPath:
+				if not os.path.exists(psf):
+					raise PluginError, "the psf file %s doesn't exists" %psf
+				else:
+					sex_params += " -PSF_NAME %s" % (psf)
 
 			# Base64 encoding + marshal serialization
 			# Will be passed as argument 1 to the wrapper script
@@ -343,7 +387,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 
 		task = Processing_task.objects.filter(id = taskid)[0]
 		data = Plugin_sex.objects.filter(task__id = taskid)[0]
-#
+		
 		# Error log content
 		if task.error_log:
 			err_log = str(zlib.decompress(base64.decodestring(task.error_log)))
@@ -383,7 +427,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 							'Hostname' 		: str(st.hostname),
 							'TaskId'		: str(st.id),
 							})
-		
+
 		thumbs = glob.glob(os.path.join(str(task.results_output_dir),'tn_*.png')) 
 		if data.thumbnails:
 			thumbs = [ thumb for thumb in thumbs]
@@ -404,9 +448,9 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
 					'History'			: history,
 					'Log' 				: err_log,
-				#	'Weight'			: str(data.weight),
-				#	'Flag'				: str(data.flag),
-				#	'Psf'				: str(data.psf),
+					'Weight'			: str(data.weightPath),
+					'Flag'				: str(data.flagPath),
+					'Psf'				: str(data.psfPath),
 		}
 
 

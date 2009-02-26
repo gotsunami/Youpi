@@ -70,7 +70,7 @@ var {{ plugin.id }} = {
 		p_data = {	plugin_name : uidsex , 
 					userData 	: data
 		};
-
+		console.log(data);
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
@@ -392,7 +392,7 @@ var {{ plugin.id }} = {
 		tr.insert(td);
 		tab2.insert(tr);
 
-/*
+
 		//Flag 
 		tr = new Element('tr');
 		td = new Element('td').insert('Flag path:');
@@ -419,7 +419,7 @@ var {{ plugin.id }} = {
 		td = new Element('td').insert(resp.Psf.length > 0 ? resp.Psf : '--');
 		tr.insert(td);
 		tab2.insert(tr);
-*/
+
 		// Output directory
 		tr = new Element('tr');
 		td = new Element('td', {nowrap: 'nowrap'}).update('Results output dir:');
@@ -569,7 +569,8 @@ var {{ plugin.id }} = {
 						else
 							tabitd.update('Not specified');
 						tabitr.insert(tabitd);
-						tabi.insert(tabitr);					
+						tabi.insert(tabitr);				
+						
 						
 						// Weight
 						tabitr = new Element('tr');
@@ -595,7 +596,8 @@ var {{ plugin.id }} = {
 						else
 							tabitd.update('Not specified');
 						tabitr.insert(tabitd);
-						
+					
+
 						tabi.insert(tabitr);
 						td.insert(tabi);
 						tr.insert(td);
@@ -692,14 +694,9 @@ var {{ plugin.id }} = {
 	},
 
 	selectImages: function() {
-		var root = document.getElementById('menuitem_sub_0');
-		root.setAttribute('align', 'center');
+		var root = $('{{plugin.id}}_results_div');
 		// Container of the ImageSelector widget
-		var div = document.createElement('div');
-		div.setAttribute('id', uidsex + '_results_div');
-		div.setAttribute('align', 'center');
-		root.appendChild(div);
-		{{ plugin.id }}.ims = new ImageSelector(uidsex + '_results_div');
+		{{ plugin.id }}.ims = new ImageSelector(root);
 		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
 	}
 };

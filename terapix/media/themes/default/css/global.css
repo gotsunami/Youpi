@@ -1383,3 +1383,12 @@ div.tags  *, .dropzone * {
 .clickable {
 	cursor: pointer;
 }
+
+.sex_mode  {
+	background-color: #e9f3ff;
+	-moz-border-radius: 5px;
+}
+
+.sex_mode td {
+	text-align: left;
+}
