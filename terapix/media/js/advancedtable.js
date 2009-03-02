@@ -608,6 +608,55 @@ function AdvancedTable() {
 	}
 
 	/*
+	 * Function: rowSelected
+	 * Returns true if the row is checked
+	 *
+	 * Parameters
+	 *  row - integer: row 0-based idx
+	 *
+	 * Returns:
+	 *  checked - boolean
+	 *
+	 */ 
+	this.rowSelected = function(row) {
+		if (typeof row != 'number') {
+			throw "row must be an integer";
+			return;
+		}
+
+		var tr = $(_bodyTab.childNodes[row].id);
+		return tr.hasClassName('rowSelected');
+	}
+
+	/*
+	 * Function: selectRow
+	 * Un/select row
+	 *
+	 * Parameters
+	 *  row - integer: row 0-based idx
+	 *  select - boolean: true for selecting row, false to uncheck it (default: true) [optional]
+	 *
+	 */ 
+	this.selectRow = function(row, select) {
+		var sel = true;
+		if (typeof row != 'number') {
+			throw "row must be an integer";
+			return;
+		}
+
+		if (typeof select != 'undefined') {
+			if (typeof select != 'boolean') {
+				throw "select must be a boolean";
+				return;
+			}
+			sel = select;
+		}
+
+		var tr = $(_bodyTab.childNodes[row].id);
+		select ? tr.addClassName('rowSelected') : tr.removeClassName('rowSelected');
+	}
+
+	/*
 	 * Function: setRowIdsFromColumn
 	 * Uses column n value for row unique Id  
 	 *

@@ -5,8 +5,7 @@
  * For convenience, private data member names (both variables and functions) start with an underscore.
  *
  * Constructor Parameters:
- *
- * container - string or DOM object: name of parent DOM block container
+ *  container - string or DOM object: name of parent DOM block container
  *
  * Custom Events:
  *  stylepicker:styleChanged - signal emitted when the picker's CSS style has changed

@@ -6,6 +6,7 @@
  *  common.js - <Logger>
  *  prototype.js - Enhanced Javascript library
  *  scriptaculous.js - Visual effects library
+ *  imageinfowidget.js - <ImageInfoWidget> embedding
  *
  * Constructor Parameters:
  *  container - string or DOM node: name of parent block container
@@ -45,6 +46,12 @@ function ImageSelector(container, options)
 	 *
 	 */
 	var caption = 'Select among ';
+	/*
+	 * Var: _imageInfoWidget;
+	 * Widget for selected image info
+	 *
+	 */
+	var _imageInfoWidget = null;
 	/*
 	 * Var: fields 
 	 * List of criteria to choose from to build a query. Each entry will be 
@@ -451,12 +458,27 @@ function ImageSelector(container, options)
 												function() {								// Custom handler
 													if (handler && typeof handler == 'function')
 														handler();
+
 													// Sets AdvancedTable instance CSS style here
 													// because .getRoot() is only available after table 
 													// rendering
 													_tableWidget.getRoot().select('.body td:last-child').each(function(td) {
 														td.writeAttribute('width', '80%');
 														td.setStyle({textAlign: 'left'});
+													});
+
+													// Sets ImageInfoWidget events
+													_tableWidget.getRoot().select('.body td:first-child span').each(function(span) {
+														span.observe('click', function() {
+															// Since a click event (for the td) is catched by AdvancedTable, we have 
+															// to ensure that the row's state does not change
+															var rowidx = this.up('tr').previousSiblings().length;
+															var selected = _tableWidget.rowSelected(rowidx);
+															_tableWidget.selectRow(rowidx, !selected);
+
+															$(id + '_image_info_div').appear();
+															_imageInfoWidget.update(_tableWidget.getRowData(rowidx)[0]);
+														});
 													});
 												}
 											);
@@ -2027,11 +2049,15 @@ function ImageSelector(container, options)
 		tipdiv.setAttribute('id', id + '_mode_options_tip_div');
 		td.insert(tipdiv);
 
+		var infodiv = new Element('div', {id: id + '_image_info_div'});
+		td.insert(infodiv.hide());
+
 		tr.insert(td);
 
 		td = new Element('td', {style: 'width: 75%;'});
 		tr.insert(td);
 
+		_imageInfoWidget = new ImageInfoWidget(infodiv);
 		_addDropZoneCommitButtons();
 
 		renderSingleSelection(td, nbRes);

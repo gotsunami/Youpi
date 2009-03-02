@@ -917,7 +917,7 @@ def processing_imgs_from_idlist_post(request):
 		rels = Rel_tagi.objects.filter(image = img)
 		tags = Tag.objects.filter(id__in = [r.tag.id for r in rels]).order_by('name')
 		content.append([int(img.id), 
-						str(img.name), 
+						str("<span>%s</span>" % img.name), 
 						string.join([str("<span class=\"tagwidget\" style=\"%s\">%s</span>" % (t.style, t.name)) for t in tags], '')])
 
 	return HttpResponse(str({'Headers': ['Name', 'Tags'], 'Content' : content}), mimetype = 'text/plain')
@@ -1338,6 +1338,20 @@ def pref_load_condor_config(request):
 		config = None
 
 	return HttpResponse(str({'config': str(data)}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def get_image_info(request):
+	"""
+	Returns information about image
+	"""
+
+	try:
+		id = request.POST['Id']
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	return HttpResponse(str({'config': str(id)}), mimetype = 'text/plain')
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'

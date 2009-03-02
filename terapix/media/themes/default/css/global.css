@@ -1392,3 +1392,12 @@ div.tags  *, .dropzone * {
 .sex_mode td {
 	text-align: left;
 }
+
+.imageInfoWidget {
+	-moz-border-radius: 5px;
+	background-color: #e9f3ff;
+	padding: 10px;
+	width: 100%;
+	width: 75%;
+	margin: 10px;
+}
