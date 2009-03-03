@@ -1054,7 +1054,7 @@ def batch_parse_content(request):
 	
 def upload_file(request):
 	"""
-	Checks for file upload. Must be name xmlfile, must be a valid XML file.
+	Uploads a file into temporary directory.
 	exit_code != 0 if any problem found.
 	"""
 
@@ -1073,8 +1073,8 @@ def upload_file(request):
 		else:
 			raise Exception, "Could not get file content (Maybe check that your <input> file has a name and that your form definition is correct)."
 
-		import xml.dom.minidom as dom
-		doc = dom.parseString(content)
+	#	import xml.dom.minidom as dom
+	#	doc = dom.parseString(content)
 
 		# Valid XML file, save it to disk
 		filename = files[k]['filename']
@@ -1370,6 +1370,10 @@ def get_image_info(request):
 		'instrument': 	str(img.instrument.name),
 		'run': 			str(img.run.name),
 		'channel': 		str(img.channel.name),
+		'ingestion':		str(img.ingestion.label),
+		'ing start':	str(img.ingestion.start_ingestion_date),
+		'ing end':	str(img.ingestion.end_ingestion_date),
+		'ing by':	str(img.ingestion.user.username),
 	}
 
 	return HttpResponse(str({'info': data}), mimetype = 'text/plain')

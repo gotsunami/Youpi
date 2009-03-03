@@ -210,6 +210,7 @@ function ImageSelector(container, options)
 	var AIM = {
 		frame: function(c) {
 			var n = 'f' + Math.floor(Math.random() * 99999);
+			alert(n);
 			var d = new Element('DIV');
 			var iframe = new Element('iframe', {style: 'display: none;', src: 'about:blank', id: n, name: n});
 			iframe.observe('load', function() {
@@ -230,6 +231,8 @@ function ImageSelector(container, options)
 		},
 
 		submit: function(f, c) {
+			// FIXME
+			alert('toto');
 			AIM.form(f, AIM.frame(c));
 			if (c && typeof(c.onStart) == 'function') {
 				return c.onStart();
@@ -527,6 +530,9 @@ function ImageSelector(container, options)
 	function renderSingleSelection(cNode, nbRes) {
 		// div for single selection
 		var single_div = new Element('div', {id: id + '_single_sel_div'}).setStyle({width: '100%'});
+		// Container for other widgets except for advancedTable div
+		var critdiv = new Element('div');
+		single_div.insert(critdiv);
 
 		var div = new Element('div');
 		div.setAttribute('class', 'headerText');
@@ -536,14 +542,14 @@ function ImageSelector(container, options)
 		snb.insert(nbRes);
 		div.insert(snb);
 		div.insert(' images those for which:');
-		single_div.insert(div);
+		critdiv.insert(div);
 
 		// Table
 		topNode = new Element('table');
 		var tab = topNode;
 		var tr = new Element('tr');
 		tab.insert(tr);
-		single_div.insert(tab);
+		critdiv.insert(tab);
 		cNode.insert(single_div);
 
 		addTRLine(tr);
@@ -558,7 +564,21 @@ function ImageSelector(container, options)
 			_executeQuery();
 		});
 		div.insert(sub);
-		single_div.insert(div);
+		critdiv.insert(div);
+
+		// Upload text file to make a single selection
+		tea = new Element('a', {href: '#'}).update('upload a text file');
+		tea.observe('click', function() {
+			critdiv.fade({ 
+				delay: 0.2,
+				afterFinish: function() {
+					_showSingleSelFormUpload(critdiv);
+					critdiv.appear();
+				}
+			});
+		});
+		tediv = new Element('div').setStyle({fontSize: '9px'}).update('(or ').insert(tea).insert(' describing a selection)');
+		critdiv.insert(tediv);
 
 		// Div that display results count
 		div = new Element('div');
@@ -632,6 +652,108 @@ function ImageSelector(container, options)
 		batch_div.insert(r);
 
 		cNode.insert(batch_div);
+	}
+
+	/*
+	 * Function: _showSingleSelFormUpload
+	 * Show form for file upload in single sel mode
+	 *
+	 * Parameters:
+	 *  div - DOM container
+	 *
+	 */ 
+	function _showSingleSelFormUpload(div) {
+		var form = new Element('form', {action: '/youpi/uploadFile/', enctype: 'multipart/form-data', method: 'post'});
+		form.observe('submit', function() {
+			// FIXME
+			console.log('submit'); return;
+			//return AIM.submit(form, {onStart: _singleSelFileUploadStartHandler, onComplete: _singleSelfileUploadCompleteHandler})
+		});
+
+		var l = new Element('label');
+		l.insert('Select a plain text file to upload: ');
+
+		var filei = new Element('input');
+		filei.setAttribute('type', 'file');
+		filei.setAttribute('name', 'singleselfile');
+		l.insert(filei);
+
+		var subi = new Element('input');
+		subi.setAttribute('style', 'margin-left: 10px;');
+		subi.setAttribute('type', 'submit');
+		subi.setAttribute('value', 'Upload');
+
+		form.insert(l).insert(subi);
+		div.update(form);
+
+		var bdiv = new Element('div').setStyle({fontSize: '9px'});
+		ba = new Element('a', {href: '#'}).update('go back');
+		ba.observe('click', function() {
+			div.fade({ 
+				delay: 0.2,
+				afterFinish: function() {
+					renderCreateNewImageSelection($(id + '_new_image_selection_div'));
+					div.appear();
+				}
+			});
+		});
+		bdiv.insert('(Or ').insert(ba).insert(' to criteria-based selection page)');
+		div.insert(bdiv);
+
+		// Log div
+		div.insert(new Element('div', {id: id + '_single_upload_log_div'}));
+	}
+
+	/*
+	 * Function: _singleSelFileUploadStartHandler
+	 * Executes start handler
+	 *
+	 * Returns:
+	 *  true
+	 *
+	 */ 
+	function _singleSelFileUploadStartHandler() {
+		// make something useful before submit (onStart)
+		$(id + '_single_upload_log_div').update(getLoadingHTML('Uploading file...'));
+
+		return true;
+	}
+
+	/*
+	 * Function: _singleSelFileUploadCompleteHandler
+	 * Executes handler, wrapper for the public interface
+	 *
+	 * Parameters:
+	 *  resp - AJAX response
+	 *
+	 */ 
+	function _singleSelFileUploadCompleteHandler(resp) {
+		var r = eval('(' + resp + ')');
+		var len = r.length;
+		var exit_code = r.exit_code;
+		var error_msg = r.error_msg;
+		var fileName = r.filename;
+	
+		var log = $(id + '_single_upload_log_div').update();
+
+		var img_name;
+		if (exit_code) {
+			// Error
+			log.setStyle({color: 'red'});
+			var msg = ['Error: ' + error_msg, 'Exit code: ' + r['exit_code']];
+			img_name = 'icon_error.gif';
+		}
+		else {
+			log.style.color = 'green';
+			var msg = ['File \'' + fileName + '\' succesfully uploaded (' + r['length'] + ' bytes)', 'Valid XML file detected'];
+			img_name = 'icon-yes.gif';
+		}
+
+		var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/' + img_name});
+		log.update(img);
+		// Dot not call Element#insert method to displaying HTML content
+		log.insert(msg);
+		log.insert(new Element('br'));
 	}
 
 	/*
@@ -1866,6 +1988,7 @@ function ImageSelector(container, options)
 		var mode = msel.selectedIndex;
 		var sdiv = $(id + '_single_sel_div');
 		var bdiv = $(id + '_batch_sel_div');
+		$(id + '_image_info_div').fade();
 
 		_selectionMode = mode;
 

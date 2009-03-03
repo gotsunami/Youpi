@@ -84,7 +84,8 @@ function ImageInfoWidget(container, dbid) {
 				var tr, td;
 
 				var order = [	'name', 'checksum', 'instrument', 'run', 'channel', 'path', 
-								'qsostatus', 'alpha', 'delta', 'exptime', 'flat', 'mask', 'reg'];
+								'qsostatus', 'alpha', 'delta', 'exptime', 'flat', 'mask', 'reg',
+								'ingestion', 'ing start', 'ing end', 'ing by'];
 
 				order.each(function(key) {
 					tr = new Element('tr');
