@@ -1351,7 +1351,28 @@ def get_image_info(request):
 	except Exception, e:
 		return HttpResponseBadRequest('Incorrect POST data')
 
-	return HttpResponse(str({'config': str(id)}), mimetype = 'text/plain')
+	try:
+		img = Image.objects.filter(id = int(id))[0]
+	except Exception, e:
+		return HttpResponse(str({'Error': "%s" % e}), mimetype = 'text/plain')
+
+	data = {
+		'name': 		str(img.name + '.fits'),
+		'path': 		str(img.path),
+		'alpha': 		str(img.alpha),
+		'delta': 		str(img.delta),
+		'exptime': 		str(img.exptime),
+		'checksum': 	str(img.checksum),
+		'flat': 		str(img.flat),
+		'mask': 		str(img.mask),
+		'reg': 			str(img.reg),
+		'qsostatus': 	str(img.QSOstatus),
+		'instrument': 	str(img.instrument.name),
+		'run': 			str(img.run.name),
+		'channel': 		str(img.channel.name),
+	}
+
+	return HttpResponse(str({'info': data}), mimetype = 'text/plain')
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'

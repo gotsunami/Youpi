@@ -1393,6 +1393,21 @@ div.tags  *, .dropzone * {
 	text-align: left;
 }
 
+.imageInfoWidget * {
+	font-size: 9px;
+}
+
+.imageInfoWidget table td {
+	vertical-align: middle;
+	padding: 2px;
+	border: 1px solid red;
+}
+
+.imageInfoWidget table td:first-child {
+	font-weight: bold;
+	padding-right: 5px;
+}
+
 .imageInfoWidget {
 	-moz-border-radius: 5px;
 	background-color: #e9f3ff;
@@ -1400,4 +1415,9 @@ div.tags  *, .dropzone * {
 	width: 100%;
 	width: 75%;
 	margin: 10px;
+}
+
+.imageInfoWidget .checksum {
+	color: brown;
+	text-align: center;
 }

@@ -79,7 +79,34 @@ function ImageInfoWidget(container, dbid) {
 					return;
 				}
 
-				_body.update(_dbid);
+				var info = $H(resp.info);
+				var tab = new Element('table');
+				var tr, td;
+
+				var order = [	'name', 'checksum', 'instrument', 'run', 'channel', 'path', 
+								'qsostatus', 'alpha', 'delta', 'exptime', 'flat', 'mask', 'reg'];
+
+				order.each(function(key) {
+					tr = new Element('tr');
+					td = new Element('td');
+					if (key == 'checksum') {
+						td.writeAttribute('colspan', 2);
+						td.addClassName('checksum');
+						td.setStyle({fontWeight: 'normal'});
+						td.update(info.get(key));
+						tr.insert(td);
+					}
+					else {
+						td.update(key.capitalize());
+						tr.insert(td);
+						td = new Element('td');
+						td.update(info.get(key));
+						tr.insert(td);
+					}
+					tab.insert(tr);
+				});
+
+				_body.update(tab);
 			}
 		);
 
@@ -89,7 +116,7 @@ function ImageInfoWidget(container, dbid) {
 
 		// Send HTTP POST request
 		xhr.setBusyMsg('Getting info');
-		xhr.send('/youpi/img/info/', $H(post).toQueryString());
+		xhr.send('/youpi/image/info/', $H(post).toQueryString());
 	}
 
 	/*

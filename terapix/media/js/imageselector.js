@@ -480,8 +480,7 @@ function ImageSelector(container, options)
 															_imageInfoWidget.update(_tableWidget.getRowData(rowidx)[0]);
 														});
 													});
-												}
-											);
+												});
 			}
 		);
 
