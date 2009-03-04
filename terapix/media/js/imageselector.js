@@ -210,7 +210,6 @@ function ImageSelector(container, options)
 	var AIM = {
 		frame: function(c) {
 			var n = 'f' + Math.floor(Math.random() * 99999);
-			alert(n);
 			var d = new Element('DIV');
 			var iframe = new Element('iframe', {style: 'display: none;', src: 'about:blank', id: n, name: n});
 			iframe.observe('load', function() {
@@ -231,8 +230,6 @@ function ImageSelector(container, options)
 		},
 
 		submit: function(f, c) {
-			// FIXME
-			alert('toto');
 			AIM.form(f, AIM.frame(c));
 			if (c && typeof(c.onStart) == 'function') {
 				return c.onStart();
@@ -433,9 +430,9 @@ function ImageSelector(container, options)
 	 *
 	 * Parameters:
 	 *
-	 *  idList - array of array of comma-separated list of images' DB ids
+	 *  idList - object: array of images' DB ids
 	 *  output - DOM node: grid container
-	 *  handler - function: custom code to execute once results are loaded into the grid
+	 *  handler - function: custom code to execute once results are loaded into the grid (optional)
 	 *
 	 * See Also:
 	 *
@@ -443,8 +440,7 @@ function ImageSelector(container, options)
 	 *
 	 */ 
 	function renderFinalResults(idList, output, handler) {
-		removeAllChildrenNodes(output);
-
+		output.update();
 		/*
 		 * idList may be too long. This is a workaround to prevent "URI too long" issues.
 		 *
@@ -665,9 +661,7 @@ function ImageSelector(container, options)
 	function _showSingleSelFormUpload(div) {
 		var form = new Element('form', {action: '/youpi/uploadFile/', enctype: 'multipart/form-data', method: 'post'});
 		form.observe('submit', function() {
-			// FIXME
-			console.log('submit'); return;
-			//return AIM.submit(form, {onStart: _singleSelFileUploadStartHandler, onComplete: _singleSelfileUploadCompleteHandler})
+			return AIM.submit(form, {onStart: _singleSelFileUploadStartHandler, onComplete: _singleSelFileUploadCompleteHandler})
 		});
 
 		var l = new Element('label');
@@ -751,9 +745,45 @@ function ImageSelector(container, options)
 
 		var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/' + img_name});
 		log.update(img);
+
 		// Dot not call Element#insert method to displaying HTML content
-		log.insert(msg);
+		// so that HTML code returned by server is not interpreted
+		log.appendChild(document.createTextNode(msg[0]));
 		log.insert(new Element('br'));
+		if (exit_code) return;
+
+		var idiv = new Element('div');
+		log.insert(idiv);
+
+		var xhr = new HttpRequest(
+			idiv,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				idiv.update();
+				var logger = new Logger(idiv);
+
+				if (resp.error) {
+					logger.msg_error(resp.error);
+					return;
+				}
+
+				// All queries are done, we can display information about images, if any
+				if (resp.count > 0)
+					resultHandler(resp.idList, $('_result_grid_div'));
+
+				showResultCount(resp.count);
+			}
+		);
+
+		var post = {
+			Filename: fileName
+		};
+
+		// Send HTTP POST request
+		xhr.setBusyMsg('Parsing file');
+		xhr.send('/youpi/uploadFile/imageSelector/imageList/', $H(post).toQueryString());
 	}
 
 	/*
@@ -3041,6 +3071,7 @@ function ImageSelector(container, options)
 			img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/' + img_name);
 			log.insert(img);
 			// Dot not call Element#insert method to displaying HTML content
+			// so that HTML code returned by server is not interpreted
 			log.appendChild(document.createTextNode(msg[k]));
 			log.insert(new Element('br'));
 		}

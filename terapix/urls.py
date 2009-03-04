@@ -120,6 +120,7 @@ urlpatterns = patterns(
     (r'^youpi/accounts/logout/$', logout),
 
 	(r'^youpi/uploadFile/$', 'upload_file'),
+	(r'^youpi/uploadFile/imageSelector/imageList/$', 'ims_get_image_list'),
 	(r'^youpi/uploadFile/batch/parseContent/$', 'batch_parse_content'),
 	(r'^youpi/uploadFile/batch/viewContent/(.*)/$', 'batch_view_content'),
 	(r'^youpi/uploadFile/batch/viewSelection/$', 'batch_view_selection'),

@@ -1073,9 +1073,6 @@ def upload_file(request):
 		else:
 			raise Exception, "Could not get file content (Maybe check that your <input> file has a name and that your form definition is correct)."
 
-	#	import xml.dom.minidom as dom
-	#	doc = dom.parseString(content)
-
 		# Valid XML file, save it to disk
 		filename = files[k]['filename']
 		f = open('/tmp/' + request.user.username + '_' + filename, 'w')
@@ -1089,6 +1086,54 @@ def upload_file(request):
 		errMsg = str(str(e))
 
 	return HttpResponse(str({'filename' : str(filename), 'length' : len(content), 'exit_code' : exitCode, 'error_msg' : errMsg }), mimetype = 'text/html')
+
+def ims_get_image_list(request):
+	"""
+	Parse content of fileName and returns an image selection
+	"""
+
+	try:
+		fileName = request.POST['Filename']
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	errMsg = ''
+	try:
+		f = open('/tmp/' + request.user.username + '_' + fileName)
+		lines = f.readlines()
+		f.close()
+	except Exception, e:
+		errMsg = "%s" % e
+
+	lines = [li[:-1] for li in lines]
+	# Separate lines with image name only (to issue only one SQL query)
+	nameonly = []
+	# ...from lines with image name and checksum (one SQL query per line)
+	namemd5 = []
+	j = 0
+	for line in lines:
+		sp = line.split(',')
+		if len(sp) == 1:
+			nameonly.append(sp[0])
+		elif len(sp) == 2:
+			namemd5.append(sp)
+		else:
+			# Line not well-formatted
+			errMsg = "Line %d is not well-formatted: should be image_name[, md5sum]" % j
+			break
+		j += 1
+
+	images = Image.objects.filter(name__in = nameonly)
+	idList = [int(image.id) for image in images]
+
+	for entry in namemd5:
+		try:
+			image = Image.objects.filter(name = entry[0].strip(), checksum = entry[1].strip())[0]
+			idList.append(int(image.id))
+		except:
+			pass
+
+	return HttpResponse(str({'error' : str(errMsg), 'count' : len(idList), 'idList' : idList}), mimetype = 'text/plain')
 
 def save_condor_node_selection(request):
 	"""
