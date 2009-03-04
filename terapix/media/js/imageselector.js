@@ -510,7 +510,7 @@ function ImageSelector(container, options)
 	 */ 
 	this.setTableWidget = function(widget) {
 		_tableWidget = widget;
-		widget.setContainer('_result_grid_div');
+		widget.setContainer(id + '_result_grid_div');
 	}
 
 	/*
@@ -583,7 +583,7 @@ function ImageSelector(container, options)
 
 		// Result grid
 		div = new Element('div');
-		div.setAttribute('id', '_result_grid_div');
+		div.setAttribute('id', id + '_result_grid_div');
 		div.setAttribute('style', 'width: 100%; height: 90%;');
 		single_div.insert(div);
 
@@ -771,7 +771,7 @@ function ImageSelector(container, options)
 
 				// All queries are done, we can display information about images, if any
 				if (resp.count > 0)
-					resultHandler(resp.idList, $('_result_grid_div'));
+					resultHandler(resp.idList, $(id + '_result_grid_div'));
 
 				showResultCount(resp.count);
 			}
@@ -2436,7 +2436,7 @@ function ImageSelector(container, options)
 				gIdList = _tableWidget.getSelectedColsValues().split(',');
 
 				// Rebuild grid
-				resultHandler(gIdList.concat(selIdList), $('_result_grid_div'));
+				resultHandler(gIdList.concat(selIdList), $(id + '_result_grid_div'));
 
 				removeAllChildrenNodes(div);
 				removeAllChildrenNodes(div);
@@ -2737,7 +2737,7 @@ function ImageSelector(container, options)
 						}
 
 						showResultCount(count);
-						resultHandler(idList, $('_result_grid_div'));
+						resultHandler(idList, $(id + '_result_grid_div'));
 					}
 					else {
 						showResultCount(count);
@@ -2774,7 +2774,7 @@ function ImageSelector(container, options)
 		else {
 			rg.setAttribute('class', 'result_count_no_match');
 			rg.insert('No match');
-			var g = $('_result_grid_div');
+			var g = $(id + '_result_grid_div');
 			if (g) g.update();
 		}
 	}
