@@ -199,7 +199,7 @@ function AdvancedTable() {
 	 *  mode - boolean (default: false)
 	 *
 	 */ 
-	this.setExclusiveSelectioMode = function(mode) {
+	this.setExclusiveSelectionMode = function(mode) {
 		_exclusiveSelectionMode = typeof mode == 'boolean' ? mode : false;
 	}
 
@@ -211,7 +211,7 @@ function AdvancedTable() {
 	 *  mode - boolean
 	 *
 	 */ 
-	this.getExclusiveSelectioMode = function(mode) {
+	this.getExclusiveSelectionMode = function(mode) {
 		return _exclusiveSelectionMode;
 	}
 
