@@ -289,8 +289,11 @@ def process(userData, kind_id, argv):
 		os.mkdir(imgName)
 		os.system("mv sex.default.* sex-config* %s" %(imgName))
 		os.chdir(imgName)
-
-
+#		fzs = glob.glob('*.fits.fz')
+#		for fz in fzs:
+#			print "SEx PREPROCESSING: uncompressing", fz
+#			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
+	
 
 
 

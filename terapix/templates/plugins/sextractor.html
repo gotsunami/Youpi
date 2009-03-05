@@ -7,21 +7,25 @@
 			<img style="cursor: pointer" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}.addSelectionToCart();"/>
 		</div>
 		<div style="margin-left: 30px;" id="menuitem_sub_0">
-			<div id ="{{plugin.id}}_results_div" style="float:left"></div>
-			<div style="float:left">
-				<table class="sex_mode">
-					<tr><b>Select the SExtractor processing mode</b></tr>
-						<tr>
-							<td style="text-align: center;vertical-align:middle;">
-								<table>
-									<tr><td><input id = "single" type="radio" name="mode" value="single"> Single Image Mode</input></td></tr>
-									<tr><td><input id = "dual" type="radio" name="mode" value="dual"> Dual Image Mode</input></td></tr>
-								</table>
-							</td>
-						</tr>
-				</table>
+			<div>
+				<b style="text-align:left;">Select the SExtractor processing mode</b>
+				<tr>
+					<table class="sex_mode">
+							<tr>
+								<td style="text-align: center;vertical-align:middle;">
+									<table>
+										<tr><td><input id = "single" type="radio" name="mode" value="single" selected="selected"> Single Image Mode</input></td></tr>
+										<tr><td><input id = "dual" type="radio" name="mode" value="dual"> Dual Image Mode</input></td></tr>
+									</table>
+								</td>
+							</tr>
+					</table>
+				</tr>
 			</div>
-			<div id="help_mode" class="tip" style="float:right;width:30%;display:none"></div>
+			<div id="help_mode" class="tip" style="display:none;width:50%"></div></td></tr>
+			<div id ="{{plugin.id}}_results_div" style="float:left"></div>
+			<div id ="{{plugin.id}}_results_div2" style="float:left"></div>
+		</div>
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
 			<div style="float:left;" id="selector_div"></div>

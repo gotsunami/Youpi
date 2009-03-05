@@ -9,7 +9,8 @@ var {{ plugin.id }} = {
 	 * <ImageSelector> instance
 	 *
 	 */
-	ims: null,
+	ims1: null,
+	ims2: null,
 
 
 	addSelectionToCart: function() {
@@ -694,9 +695,42 @@ var {{ plugin.id }} = {
 	},
 
 	selectImages: function() {
-		var root = $('{{plugin.id}}_results_div');
-		// Container of the ImageSelector widget
-		{{ plugin.id }}.ims = new ImageSelector(root);
-		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
+		var root1 = $('{{plugin.id}}_results_div');
+		var root2 = $('{{plugin.id}}_results_div2');
+		{{ plugin.id }}.ims1 = new ImageSelector(root1);
+		{{ plugin.id }}.ims1.setTableWidget(new AdvancedTable());
+
+		$('single','dual').each( function(id) {
+			id.observe('click', function() {
+				if (id.value == 'dual') {
+					if (!{{ plugin.id }}.ims2) {
+						{{ plugin.id }}.ims1.getTableWidget().setExclusiveSelectionMode(true);
+						{{ plugin.id }}.ims2 = new ImageSelector(root2);
+						var at = new AdvancedTable();
+						at.setExclusiveSelectionMode(true);
+						{{ plugin.id }}.ims2.setTableWidget(at);
+					}
+					else {
+					root2.show();
+					}
+				}
+				else if (id.value == 'single') {
+					if ({{ plugin.id }}.ims2) {
+						root2.hide();
+						{{ plugin.id }}.ims1.getTableWidget().setExclusiveSelectionMode(false);
+					
+					}
+				}
+			}
+		);
+		}
+	);
 	}
 };
+
+/*
+				var root1 = $('{{plugin.id}}_results_div');
+				{{ plugin.id }}.ims1 = new ImageSelector(root1);
+				{{ plugin.id }}.ims1.setTableWidget(new AdvancedTable());
+*/
+	
