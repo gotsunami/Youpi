@@ -942,19 +942,15 @@ var {{ plugin.id }} = {
 	},
 
 	selectImages: function() {
-		var root = document.getElementById('menuitem_sub_0');
-		root.setAttribute('align', 'center');
+		var root = $('menuitem_sub_0');
+		root.writeAttribute('align', 'center');
 	
 		// Container of the ImageSelector widget
-		var div = document.createElement('div');
-		div.setAttribute('id', 'results_div');
-		div.setAttribute('align', 'center');
-		div.setAttribute('style', 'padding-top: 20px; width: 80%');
-		root.appendChild(div);
+		var div = new Element('div', {id: 'results_div', align: 'center'}).setStyle({paddingTop: '20px', width: '90%'});
+		root.insert(div);
 	
 		ims = new ImageSelector('results_div');
-		advTab = new AdvancedTable();
-		ims.setTableWidget(advTab);
+		ims.setTableWidget(new AdvancedTable());
 	},
 
 	/*

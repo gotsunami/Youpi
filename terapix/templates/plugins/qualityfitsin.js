@@ -900,12 +900,10 @@ var {{ plugin.id }} = {
 
 	selectImages: function() {
 		var root = $('menuitem_sub_0');
-		root.setAttribute('align', 'center');
+		root.writeAttribute('align', 'center');
 		// Container of the ImageSelector widget
-		var div = new Element('div');
-		div.setAttribute('id', '{{ plugin.id }}_results_div');
-		div.setAttribute('align', 'center');
-		root.appendChild(div);
+		var div = new Element('div', {id: '{{ plugin.id }}_results_div', align: 'center'}).setStyle({width: '90%'});
+		root.insert(div);
 
 		{{ plugin.id }}_ims = new ImageSelector('{{ plugin.id }}_results_div');
 		{{ plugin.id }}_advTab = new AdvancedTable();

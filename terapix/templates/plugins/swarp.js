@@ -943,13 +943,11 @@ var {{ plugin.id }} = {
 	},
 
 	selectImages: function() {
-		var root = document.getElementById('menuitem_sub_0');
-		root.setAttribute('align', 'center');
+		var root = $('menuitem_sub_0');
+		root.writeAttribute('align', 'center');
 		// Container of the ImageSelector widget
-		var div = document.createElement('div');
-		div.setAttribute('id', uidswarp + '_results_div');
-		div.setAttribute('align', 'center');
-		root.appendChild(div);
+		var div = new Element('div', {id: uidswarp + '_results_div', align: 'center'}).setStyle({width: '90%'});
+		root.insert(div);
 
 		{{ plugin.id }}.ims = new ImageSelector(uidswarp + '_results_div');
 		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
