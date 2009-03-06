@@ -488,6 +488,7 @@ function AdvancedTable() {
 	 */ 
 	this.empty = function() {
 		_rows.length = 0;
+		_container.update();
 	}	
 
 	/*
@@ -514,7 +515,7 @@ function AdvancedTable() {
 				// Use custom CSS class style for this row?
 				_rowStyles[k] ? cls =  _rowStyles[k] : cls = '';
 			}
-			r.setAttribute('class', cls);
+			if (r) r.addClassName(cls);
 		}	
 	}
 

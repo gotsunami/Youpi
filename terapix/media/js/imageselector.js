@@ -526,9 +526,14 @@ function ImageSelector(container, options)
 	function renderSingleSelection(cNode, nbRes) {
 		// div for single selection
 		var single_div = new Element('div', {id: id + '_single_sel_div'}).setStyle({width: '100%'});
-		// Container for other widgets except for advancedTable div
-		var critdiv = new Element('div');
+
+		// Container for search criteria related widgets
+		var critdiv = new Element('div', {id: id + '_crit_div'});
 		single_div.insert(critdiv);
+
+		// Container for file upload related widgets
+		var updiv = new Element('div', {id: id + '_single_upload_div'}).hide();
+		single_div.insert(updiv);
 
 		var div = new Element('div');
 		div.setAttribute('class', 'headerText');
@@ -565,33 +570,53 @@ function ImageSelector(container, options)
 		// Upload text file to make a single selection
 		tea = new Element('a', {href: '#'}).update('upload a text file');
 		tea.observe('click', function() {
+		//	$(id + '_results_div').fade();
 			critdiv.fade({ 
 				delay: 0.2,
 				afterFinish: function() {
-					_showSingleSelFormUpload(critdiv);
-					critdiv.appear();
+					_showSingleSelFormUpload(updiv);
+					updiv.appear();
+					// Cleaning up
+					$(id + '_image_info_div').fade();
+					$(id + '_result_count_div').update();
+					_tableWidget.empty();
 				}
 			});
 		});
 		tediv = new Element('div').setStyle({fontSize: '9px'}).update('(or ').insert(tea).insert(' describing a selection)');
 		critdiv.insert(tediv);
 
+		_buildResultsDiv(single_div);
+	}
+
+	/*
+	 * Function: _buildResultsDiv
+	 * Adds a result div (with inner divs) to the DOM
+	 *
+	 * Parameters:
+	 *   container - DOM node parent container
+	 *
+	 */ 
+	function _buildResultsDiv(container) {
+		var rdiv = new Element('div', {id: id + '_results_div'});
+		container.insert(rdiv);
+		
 		// Div that display results count
-		div = new Element('div');
+		var div = new Element('div');
 		div.setAttribute('id', id + '_result_count_div');
-		single_div.insert(div);
+		rdiv.insert(div);
 
 		// Result grid
 		div = new Element('div');
 		div.setAttribute('id', id + '_result_grid_div');
 		div.setAttribute('style', 'width: 100%; height: 90%;');
-		single_div.insert(div);
+		rdiv.insert(div);
 
 		// Result div
 		div = new Element('div');
 		div.setAttribute('id', id + '_result_div');
 		div.setAttribute('style', 'height: 100%; width: 100%; overflow: hidden;');
-		single_div.insert(div);
+		rdiv.insert(div);
 	}
 
 	/*
@@ -686,8 +711,9 @@ function ImageSelector(container, options)
 			div.fade({ 
 				delay: 0.2,
 				afterFinish: function() {
-					renderCreateNewImageSelection($(id + '_new_image_selection_div'));
-					div.appear();
+					_tableWidget.empty();
+					$(id + '_result_count_div').update();
+					$(id + '_crit_div').appear();
 				}
 			});
 		});
@@ -2692,11 +2718,9 @@ function ImageSelector(container, options)
 					resp['data'] = ids;
 				}
 
+				output.update();
 				var count = resp['data'].length;
 				var d = new Element('div');
-				// Called twice to prevent a Firebug strange behaviour
-				removeAllChildrenNodes(output);
-				removeAllChildrenNodes(output);
 
 				// +1 Skip first empty TR node
 				var ds = topNode.childNodes[xhr.idResultsIdx+1].getElementsByTagName('div');
@@ -2709,8 +2733,7 @@ function ImageSelector(container, options)
 				}
 
 				rdiv.setAttribute('style', 'padding: 2px; background-color: lightblue; border: 1px solid #5b80b2; text-align:center; vertical-align: middle;');
-				removeAllChildrenNodes(rdiv);
-				removeAllChildrenNodes(rdiv);
+				rdiv.update();
 				rdiv.insert(count);
 
 				idResults.splice(xhr.idResultsIdx, 1);
@@ -2845,6 +2868,9 @@ function ImageSelector(container, options)
 			alert(imgSelRequiredMsg);
 			return;
 		}
+
+		// FIXME
+		$(id + '_results_div').show();
 		_tableWidget.selectAll(on);
 	}
 

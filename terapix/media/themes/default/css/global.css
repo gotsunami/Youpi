@@ -1170,7 +1170,7 @@ div.condor_setup {
 .ebox .banner_opened label, .ebox .banner_closed label, .ebox .banner_opened_child label, .ebox .banner_closed_child label {
 	color: #686868;
 	font-weight: bold;
-	font-size: 11px;
+	font-size: 10px;
 	white-space: nowrap;
 }
 

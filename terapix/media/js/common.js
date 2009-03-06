@@ -524,7 +524,7 @@ function DropdownBox(container, title)
 		});
 
 		_titleNode = new Element('label').insert(_title);
-		var cdiv = new Element('div', {'style': 'display: none;', id: 'ddbox_' + Math.random() + '_content'});
+		var cdiv = new Element('div', {id: 'ddbox_' + Math.random() + '_content'}).hide();
 		_contentContainer = cdiv;
 		_mainDiv.insert(_titleNode);
 		topDiv.insert(_mainDiv);
@@ -669,7 +669,7 @@ function DropdownBox(container, title)
 	function _setOpen(open) {
 		var gfx;
 		_stateOpen = (typeof open == 'boolean' && open) ? true : false;
-		_mainDiv.setAttribute('class', 'banner_' + (_stateOpen ? 'opened' : 'closed') + (!_isTopLevelContainer ? '_child' : ''));
+		_mainDiv.addClassName('banner_' + (_stateOpen ? 'opened' : 'closed') + (!_isTopLevelContainer ? '_child' : ''));
 		_stateOpen ? $(_contentContainer).show() : $(_contentContainer).hide();
 	}
 
