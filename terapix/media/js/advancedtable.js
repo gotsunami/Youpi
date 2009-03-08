@@ -515,7 +515,6 @@ function AdvancedTable() {
 				// Use custom CSS class style for this row?
 				_rowStyles[k] ? cls =  _rowStyles[k] : cls = '';
 			}
-			console.log(cls);
 			if (r) r.writeAttribute('class', cls);
 		}	
 	}

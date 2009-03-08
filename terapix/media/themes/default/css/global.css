@@ -1347,7 +1347,7 @@ div.tags {
 	max-width: 90%;
 }
 
-div.tags  *, .dropzone * {
+div.tags *, .dropzone * {
 	display: inline-block;
 }
 

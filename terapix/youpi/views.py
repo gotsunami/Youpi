@@ -917,7 +917,7 @@ def processing_imgs_from_idlist_post(request):
 		rels = Rel_tagi.objects.filter(image = img)
 		tags = Tag.objects.filter(id__in = [r.tag.id for r in rels]).order_by('name')
 		content.append([int(img.id), 
-						str("<span>%s</span>" % img.name), 
+						str("<span>%s.fits</span>" % img.name), 
 						string.join([str("<span class=\"tagwidget\" style=\"%s\">%s</span>" % (t.style, t.name)) for t in tags], '')])
 
 	return HttpResponse(str({'Headers': ['Name', 'Tags'], 'Content' : content}), mimetype = 'text/plain')
