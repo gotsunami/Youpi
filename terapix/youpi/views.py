@@ -916,11 +916,18 @@ def processing_imgs_from_idlist_post(request):
 	for img in images:
 		rels = Rel_tagi.objects.filter(image = img)
 		tags = Tag.objects.filter(id__in = [r.tag.id for r in rels]).order_by('name')
+		if tags:
+			cls = 'hasTags'
+		else:
+			cls = ''
 		content.append([int(img.id), 
-						str("<span>%s.fits</span>" % img.name), 
-						string.join([str("<span class=\"tagwidget\" style=\"%s\">%s</span>" % (t.style, t.name)) for t in tags], '')])
+						str("<span class=\"imageTag %s\">%s.fits</span><div style=\"width: 200px;\">%s</div>" % 
+							(cls, 		# Class name
+							 img.name, 	# Image name
+							 string.join([str("<span class=\"tagwidget\" style=\"%s;\">%s</span>" % (t.style, t.name)) for t in tags], '')))])
 
-	return HttpResponse(str({'Headers': ['Name', 'Tags'], 'Content' : content}), mimetype = 'text/plain')
+	#return HttpResponse(str({'Headers': ['Name', 'Tags'], 'Content' : content}), mimetype = 'text/plain')
+	return HttpResponse(str({'Headers': ['Image Name/Tags'], 'Content' : content}), mimetype = 'text/plain')
 
 def processing_plugin(request):
 	"""

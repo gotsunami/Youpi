@@ -407,6 +407,7 @@ div.imageSelector div.controlPanel input {
 	margin: 5px;
 }
 
+
 div.methodSelector {
 	background-color: lightblue;
 	border-top: 1px solid #5b80b2; 
@@ -1303,7 +1304,7 @@ div.min_size {
 	padding-right: 3px;
 	font-size: 9px;
 	width: -moz-fit-content;	
-	margin-right: 8px;
+	margin-right: 6px;
 	margin-bottom: 4px;
 }
 
@@ -1423,4 +1424,16 @@ div.tags *, .dropzone * {
 .imageInfoWidget .checksum {
 	color: brown;
 	text-align: center;
+}
+
+.imageTag {
+	float: left;
+}
+
+.hasTags {
+	padding-right: 10px;
+	margin-right: 3px;
+	background-image: url(../img/admin/arrow-right.gif);
+	background-position: right center;
+	background-repeat: no-repeat; 
 }

@@ -461,13 +461,12 @@ function ImageSelector(container, options)
 													// Sets AdvancedTable instance CSS style here
 													// because .getRoot() is only available after table 
 													// rendering
-													_tableWidget.getRoot().select('.body td:last-child').each(function(td) {
-														td.writeAttribute('width', '80%');
-														td.setStyle({textAlign: 'left'});
+													_tableWidget.getRoot().select('.body td:first-child').each(function(td) {
+														td.setStyle({paddingLeft: '30px', textAlign: 'left'});
 													});
 
 													// Sets ImageInfoWidget events
-													_tableWidget.getRoot().select('.body td:first-child span').each(function(span) {
+													_tableWidget.getRoot().select('.body td:first-child span.imageTag').each(function(span) {
 														span.observe('click', function() {
 															// Since a click event (for the td) is catched by AdvancedTable, we have 
 															// to ensure that the row's state does not change
