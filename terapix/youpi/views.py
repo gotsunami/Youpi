@@ -1078,7 +1078,7 @@ def upload_file(request):
 			k = keys[0]
 			content = files[k]['content']
 		else:
-			raise Exception, "Could not get file content (Maybe check that your <input> file has a name and that your form definition is correct)."
+			raise Exception, "Could not get file content"
 
 		# Valid XML file, save it to disk
 		filename = files[k]['filename']
@@ -1113,34 +1113,38 @@ def ims_get_image_list(request):
 		errMsg = "%s" % e
 
 	lines = [li[:-1] for li in lines]
+	warnings = []
 	# Separate lines with image name only (to issue only one SQL query)
 	nameonly = []
 	# ...from lines with image name and checksum (one SQL query per line)
 	namemd5 = []
+	idList = []
 	j = 0
 	for line in lines:
 		sp = line.split(',')
 		if len(sp) == 1:
-			nameonly.append(sp[0])
+			sp[0] = sp[0].strip()
+			imgs = Image.objects.filter(name = sp[0])
+			if not imgs:
+				warnings.append(str("Line %d: image '%s' not found") % (j+1, sp[0]))
+			else:
+				idList.append(int(imgs[0].id))
 		elif len(sp) == 2:
+			sp[0] = sp[0].strip()
+			sp[1] = sp[1].strip()
 			namemd5.append(sp)
+			imgs = Image.objects.filter(name = sp[0], checksum = sp[1])
+			if not imgs:
+				warnings.append(str("Line %d: image '%s' (%s) not found") % (j+1, sp[0], sp[1]))
+			else:
+				idList.append(int(imgs[0].id))
 		else:
 			# Line not well-formatted
-			errMsg = "Line %d is not well-formatted: should be image_name[, md5sum]" % j
+			errMsg = "Line %d is not well-formatted: should be image_name[, md5sum]" % j+1
 			break
 		j += 1
 
-	images = Image.objects.filter(name__in = nameonly)
-	idList = [int(image.id) for image in images]
-
-	for entry in namemd5:
-		try:
-			image = Image.objects.filter(name = entry[0].strip(), checksum = entry[1].strip())[0]
-			idList.append(int(image.id))
-		except:
-			pass
-
-	return HttpResponse(str({'error' : str(errMsg), 'count' : len(idList), 'idList' : idList}), mimetype = 'text/plain')
+	return HttpResponse(str({'warnings': warnings, 'error' : str(errMsg), 'foundCount' : len(idList), 'total' : len(lines), 'idList' : idList}), mimetype = 'text/plain')
 
 def save_condor_node_selection(request):
 	"""

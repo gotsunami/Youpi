@@ -752,33 +752,22 @@ function ImageSelector(container, options)
 		var exit_code = r.exit_code;
 		var error_msg = r.error_msg;
 		var fileName = r.filename;
-	
 		var log = $(id + '_single_upload_log_div').update();
-
+		var ldiv = new Element('div');
+		log.insert(ldiv);
+		var flog = new Logger(ldiv);
 		var img_name;
+
 		if (exit_code) {
-			// Error
-			log.setStyle({color: 'red'});
-			var msg = ['Error: ' + error_msg, 'Exit code: ' + r['exit_code']];
-			img_name = 'icon_error.gif';
+			flog.msg_error('Error: ' + error_msg + ' (code ' + r.exit_code + ')');
+			return;
 		}
-		else {
-			log.style.color = 'green';
-			var msg = ['File \'' + fileName + '\' succesfully uploaded (' + r['length'] + ' bytes)', 'Valid XML file detected'];
-			img_name = 'icon-yes.gif';
-		}
-
-		var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/' + img_name});
-		log.update(img);
-
-		// Dot not call Element#insert method to displaying HTML content
-		// so that HTML code returned by server is not interpreted
-		log.appendChild(document.createTextNode(msg[0]));
-		log.insert(new Element('br'));
-		if (exit_code) return;
+		else 
+			flog.msg_ok("File '" + fileName + "' succesfully uploaded (" + r.length + " bytes)");
 
 		var idiv = new Element('div');
 		log.insert(idiv);
+		var logger = new Logger(idiv);
 
 		var xhr = new HttpRequest(
 			idiv,
@@ -787,18 +776,25 @@ function ImageSelector(container, options)
 			// Custom handler for results
 			function(resp) {
 				idiv.update();
-				var logger = new Logger(idiv);
 
 				if (resp.error) {
 					logger.msg_error(resp.error);
 					return;
 				}
 
+				if (resp.warnings) {
+					resp.warnings.each(function(warn) {
+						logger.msg_warning(warn);
+					});
+				}
+
+				logger.msg_ok('Found <b>' + resp.foundCount + '</b> images out of ' + resp.total);
+
 				// All queries are done, we can display information about images, if any
-				if (resp.count > 0)
+				if (resp.foundCount > 0)
 					resultHandler(resp.idList, $(id + '_result_grid_div'));
 
-				showResultCount(resp.count);
+				showResultCount(resp.foundCount);
 			}
 		);
 

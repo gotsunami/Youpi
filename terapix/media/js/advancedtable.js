@@ -488,7 +488,8 @@ function AdvancedTable() {
 	 */ 
 	this.empty = function() {
 		_rows.length = 0;
-		_container.update();
+		if (_container)
+			$(_container).update();
 	}	
 
 	/*

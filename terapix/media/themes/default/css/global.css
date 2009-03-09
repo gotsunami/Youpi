@@ -927,7 +927,7 @@ div.logger_status, div.logger_error, div.logger_ok, div.logger_warning {
 	padding-left: 20px;
 	min-height: 18px;
 	margin-top: 2px;
-	padding-top: 5px;
+	padding-top: 4px;
 }
 
 div.logger_status {
