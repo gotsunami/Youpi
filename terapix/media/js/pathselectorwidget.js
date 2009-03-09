@@ -483,7 +483,11 @@ function PathSelectorWidget(container, pluginId)
 			return;
 	
 		var pathNode = $(plugin_id + '_path_input');
-		pathNode.value = branch.struct.syspath.replace('//','/');
+		try {
+			pathNode.value = branch.struct.syspath.replace('//','/');
+		} catch(err) {
+			// Click on a leaf; no syspath defined
+		}
 	
 		var nb = branch.struct.num_children;
 		var p = new Element('p');
