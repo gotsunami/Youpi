@@ -15,9 +15,20 @@ var {{ plugin.id }} = {
 
 	addSelectionToCart: function() {
 		//Checks for images
-		sels = {{ plugin.id }}.ims.getListsOfSelections();
-		console.log(sels);	
-
+		$('single','dual').each( function(id) {
+			if(id.checked) {
+				if(id.value == 'single') {
+					sels = {{ plugin.id }}.ims1.getListsOfSelections();
+				}
+				else {
+					sels1 = {{ plugin.id }}.ims1.getListsOfSelections();
+					sels2 = {{ plugin.id }}.ims2.getListsOfSelections();
+					sels = sels1 + sels2;
+					}
+				}
+			}
+		)
+		
 		if (!sels) {
 			alert('No images selected. Nothing to add to cart !');
 			return;
@@ -39,8 +50,8 @@ var {{ plugin.id }} = {
 			}
 		});
 		
-
-		var total = {{ plugin.id }}.ims.getImagesCount();
+		var total = {{ plugin.id }}.ims1.getImagesCount();
+	
 		
 		//Get config file
 		var cSel = $(uidsex + '_config_name_select');
@@ -64,8 +75,8 @@ var {{ plugin.id }} = {
 	},
 
 	do_addSelectionToCart: function(data) {
-		var total = {{ plugin.id }}.ims.getImagesCount();
 
+		var total = {{ plugin.id }}.ims1.getImagesCount();
 
 		// Finally, add to the shopping cart
 		p_data = {	plugin_name : uidsex , 
@@ -727,10 +738,4 @@ var {{ plugin.id }} = {
 	);
 	}
 };
-
-/*
-				var root1 = $('{{plugin.id}}_results_div');
-				{{ plugin.id }}.ims1 = new ImageSelector(root1);
-				{{ plugin.id }}.ims1.setTableWidget(new AdvancedTable());
-*/
 	

@@ -7,8 +7,8 @@
 			<img style="cursor: pointer" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}.addSelectionToCart();"/>
 		</div>
 		<div style="margin-left: 30px;" id="menuitem_sub_0">
-			<div>
-				<b style="text-align:left;">Select the SExtractor processing mode</b>
+			<hr>	
+			<div style="float:left">
 				<tr>
 					<table class="sex_mode">
 							<tr>
@@ -22,9 +22,12 @@
 					</table>
 				</tr>
 			</div>
-			<div id="help_mode" class="tip" style="display:none;width:50%"></div></td></tr>
-			<div id ="{{plugin.id}}_results_div" style="float:left"></div>
-			<div id ="{{plugin.id}}_results_div2" style="float:left"></div>
+			<div id="help_mode" class="tip" style="display:none;float:left;width:40%;"></div>
+			<br>
+			<hr>
+			<div id ="{{plugin.id}}_results_div"></div>
+			<div id ="{{plugin.id}}_results_div2"></div>
+			<hr>
 		</div>
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">

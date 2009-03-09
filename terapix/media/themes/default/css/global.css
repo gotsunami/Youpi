@@ -1387,7 +1387,9 @@ div.tags *, .dropzone * {
 
 .sex_mode  {
 	background-color: #e9f3ff;
-	-moz-border-radius: 5px;
+	-moz-border-radius : 5px;
+	margin-bottom : 0.5em;
+	margin-top : 0.5em;
 }
 
 .sex_mode td {
