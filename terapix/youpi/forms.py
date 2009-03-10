@@ -1,6 +1,6 @@
 # vim: set ts=4
 # Create your forms here.
-
+#
 from django import newforms as forms
 
 TOPIC_CHOICES = (
