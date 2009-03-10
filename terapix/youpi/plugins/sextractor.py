@@ -38,16 +38,18 @@ class Sextractor(ProcessingPlugin):
 
 	def saveCartItem(self, request):
 		post = request.POST
+		
 		try:
-			idList				= eval(post['IdList'])
-			itemID				= str(post['ItemID'])
+			idList				= eval(post['ImgList'])
+			itemID				= str(post['ItemId'])
 			flagPath		 	= post['FlagPath']
 			weightPath 			= post['WeightPath']
 			psfPath 			= post['PsfPath']
 			config 				= post['Config']
 			resultsOutputDir 	= post['ResultsOutputDir']
+			dualMode		 	= post['DualMode']
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+				raise PluginError, "POST argument error. Unable to process data:  %s" %e
 
 		items = CartItem.objects.filter(kind__name__exact = self.id)
 		if items:
@@ -61,7 +63,8 @@ class Sextractor(ProcessingPlugin):
 				 'weightPath' 		: weightPath,
 				 'psfPath' 			: psfPath,
 				 'resultsOutputDir' : resultsOutputDir, 
-				 'config' 			: config
+				 'config' 			: config,
+				 'dualMode' 		: dualMode
 				 }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
@@ -88,6 +91,7 @@ class Sextractor(ProcessingPlugin):
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
+#			raise PluginError, "%s" % data
 			res.append({
 						'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
@@ -97,7 +101,8 @@ class Sextractor(ProcessingPlugin):
 						'psfPath' 			: str(data['psfPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
 						'name' 				: str(it.name),
-						'config' 			: str(data['config'])
+						'config' 			: str(data['config']),
+						'dualMode'			: str(data['dualMode']),
 						})
 
 		return res 

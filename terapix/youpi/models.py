@@ -314,6 +314,7 @@ class Plugin_sex(models.Model):
 	weightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
 	flagPath = models.CharField(max_length = 255, null = True, help_text = "Path to flag images")
 	psfPath = models.CharField(max_length = 255, null = True, help_text = "Path to psf images")
+	dualMode = models.BooleanField('Dual Image Mode', default = False)
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')

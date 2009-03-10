@@ -13,7 +13,10 @@ var {{ plugin.id }} = {
 	ims2: null,
 
 
+
 	addSelectionToCart: function() {
+		
+		var dualMode = 0;
 		//Checks for images
 		$('single','dual').each( function(id) {
 			if(id.checked) {
@@ -21,9 +24,10 @@ var {{ plugin.id }} = {
 					sels = {{ plugin.id }}.ims1.getListsOfSelections();
 				}
 				else {
-					sels1 = {{ plugin.id }}.ims1.getListsOfSelections();
-					sels2 = {{ plugin.id }}.ims2.getListsOfSelections();
-					sels = sels1 + sels2;
+					dualMode = 1;
+					sels1 = {{ plugin.id }}.ims1.getListsOfSelections().evalJSON();
+					sels2 = {{ plugin.id }}.ims2.getListsOfSelections().evalJSON();
+					sels = '[[' + sels1 + ', ' + sels2 + ']]';
 					}
 				}
 			}
@@ -51,7 +55,6 @@ var {{ plugin.id }} = {
 		});
 		
 		var total = {{ plugin.id }}.ims1.getImagesCount();
-	
 		
 		//Get config file
 		var cSel = $(uidsex + '_config_name_select');
@@ -67,22 +70,21 @@ var {{ plugin.id }} = {
 		{{ plugin.id }}.do_addSelectionToCart({
 			config: config, 
 			imgList: sels,
-			weightPath: optPath[1],
-			flagPath: optPath[0],
-			psfPath: optPath[2],
-			resultsOutputDir: output_data_path
+			weightPath: optPath[1] ? optPath[1] : '',
+			flagPath: optPath[0] ? optPath[0] : '',
+			psfPath: optPath[2]  ? optPath[2] : '',
+			resultsOutputDir: output_data_path,
+			dualMode: dualMode,
 		});
 	},
 
 	do_addSelectionToCart: function(data) {
-
 		var total = {{ plugin.id }}.ims1.getImagesCount();
 
 		// Finally, add to the shopping cart
 		p_data = {	plugin_name : uidsex , 
 					userData 	: data
 		};
-		console.log(data);
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
@@ -225,7 +227,6 @@ var {{ plugin.id }} = {
 	},
 
 	saveItemForLater: function(trid, opts, silent) {
-	//idList, itemId,flagPath, weightPath, psfPath, resultsOutputDir, config, silent) {
 		opts = $H(opts);
 		opts.set('Plugin', uidsex);
 		opts.set('Method', 'saveCartItem');
@@ -322,7 +323,6 @@ var {{ plugin.id }} = {
 				
 				thumb = thumb.substring(nb + 1);
 				imgpath = resp.WWW + thumb;
-				console.log(imgpath)
 				a = new Element('a', { href: imgpath.replace(/tn_/, ''), rel: 'lightbox[sex]', title: 'Sources extracted images' });
 				tn = new Element('img', {
 					src: resp.HasThumbnails ? imgpath : imgpath.replace(/tn_/, ''),
@@ -523,7 +523,7 @@ var {{ plugin.id }} = {
 					table.insert(tr);
 	
 					tr = new Element('tr');
-					var headers = $A(['Date', 'User', 'Name', '# images', 'Config', 'Paths', 'Action']);
+					var headers = $A(['Date', 'User', 'Name', '# images', 'Mode', 'Config', 'Paths', 'Action']);
 					headers.each(function(header) {
 						tr.insert(new Element('th').update(header));
 					});
@@ -532,7 +532,6 @@ var {{ plugin.id }} = {
 					var delImg, trid;
 					var tabi, tabitr, tabitd;
 					resp.result.each(function(res, k) {
-						console.log(eval(res.idList));
 						idList = eval(res.idList);
 						trid = uidsex + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
@@ -548,18 +547,42 @@ var {{ plugin.id }} = {
 						// Name
 						td = new Element('td', {'class': 'name'}).update(res.name);
 						tr.insert(td);
-
+						
 						// Images count
 						td = new Element('td', {'class': 'imgCount'});
 						var sp = new Element('span', {'style': 'font-weight: bold; text-decoration: underline;'});
-						sp.update(idList.length > 1 ? 'Batch' : 'Single');
-						td.insert(sp).insert(new Element('br'));
-						tr.insert(td);
-						
+						if (res.dualMode == 1) {
 
-						idList.each(function(i) {
-							td.insert(i.length).insert(new Element('br'));
-						});
+							sp.update('Single');
+							td.insert(sp).insert(new Element('br'));
+							tr.insert(td);
+							td.insert(idList.length).insert(new Element('br'));
+							tr.insert(td);
+
+						}
+						else {
+							sp.update(res.idList > 1 ? 'Batch' : 'Single');
+							td.insert(sp).insert(new Element('br'));
+							tr.insert(td);
+
+							idList.each(function(i) {
+								td.insert(i.length).insert(new Element('br'));
+							});
+							tr.insert(td);
+						}
+	
+						//Mode
+						td = new Element('td', {'class': 'mode'});
+						var spa = new Element('span');
+						if (res.dualMode == 1) {
+							spa.update('Dual');
+							td.insert(spa);
+						}
+						else {
+							spa.update('Single');
+							td.insert(spa);
+						}
+
 						tr.insert(td);
 
 						// Config
@@ -694,6 +717,7 @@ var {{ plugin.id }} = {
 										'weightPath' 		: data.weightPath,
 										'psfPath' 			: data.psfPath,
 										'resultsOutputDir' 	: data.resultsOutputDir,
+										'dualMode'		 	: data.dualMode,
 						}
 		};
 	
