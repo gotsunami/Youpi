@@ -6,7 +6,7 @@ Javascript doc:
 	naturaldocs -i ~/youpi/terapix/media/js/ -i ~/youpi/terapix/templates/ -o HTML ~/tmp/youpi/api/js/ -p ~/tmp/youpi/api/prj/
 
 Python doc:
-	doxygen config.doxy
+	doxygen pyapi.doxy
 
 	Note: Python doc uses doxypy, an input filter for Doxygen. It preprocesses python files so that docstrings of 
 	classes and functions are reformatted into Doxygen conform documentation blocks. 

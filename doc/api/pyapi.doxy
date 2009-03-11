@@ -89,7 +89,7 @@ EXAMPLE_PATH           =
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = 
-INPUT_FILTER           = /usr/local/bin/doxypy.py
+INPUT_FILTER           = ../../tools/doxypy.py
 FILTER_PATTERNS        = 
 FILTER_SOURCE_FILES    = YES
 #---------------------------------------------------------------------------
