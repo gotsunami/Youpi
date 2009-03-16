@@ -4,7 +4,11 @@
  *
  * For convenience, private data member names (both variables and functions) start with an underscore.
  *
- * Constructor Parameters:
+ * External Dependancies:
+ *  pageswitcher.js - Pagination support with the <PageSwitcher> widget
+ *
+ * Signals:
+ *  advancedTable:selectedImages - signal emitted when calling the <getSelectedColValues> member function
  *
  */
 function AdvancedTable() {
@@ -55,6 +59,18 @@ function AdvancedTable() {
 	 *
 	 */ 
 	var _styles;
+	/*
+	 * Var: SERIAL_SELECTED
+	 * Char used when all elements in a page are selected (used to fill <_pageStatus>)
+	 *
+	 */
+	var SERIAL_SELECTED = 's';
+	/*
+	 * Var: SERIAL_UNSELECTED
+	 * Char used when all elements in a page are selected (used to fill <_pageStatus>)
+	 *
+	 */
+	var SERIAL_UNSELECTED = 'u';
 
 
 	// Group: Variables
@@ -68,17 +84,78 @@ function AdvancedTable() {
 	 */
 	var _colIdxForRowIds = -1;
 	/*
-	 * Var: _exclusiveSelectionMode;
+	 * Var: _exclusiveSelectionMode
 	 * Exclusive selection mode operation (boolean)
 	 *
 	 */
 	var _exclusiveSelectionMode = false;
+	/*
+	 * Var: _locked
+	 * Lock to prevent overwritting _pageStatus
+	 *
+	 */
+	var _locked = false;
+	/*
+	 * Var: _postData
+	 * Saved POST data
+	 *
+	 * See Also:
+	 *  <loadDataFromQuery>
+	 *
+	 */
+	var _postData = null;
+	/*
+	 * Var: _pagination
+	 * Boolean: whether pagination mode is on [default: false]
+	 *
+	 */
+	var _pagination = false;
+	/*
+	 * Var: _pageSwitcher
+	 * A reference to a pageSwitcher object.
+	 *
+	 */
+	var _pageSwitcher = null;
+	/*
+	 * Var: _pageStatus
+	 * Array of string defining every page status
+	 *
+	 * Note:
+	 * Pagination mode has to be turnedOn (see <activatePagination>)
+	 *
+	 * Array format:
+	 * Each page is formatted 's', 'u' if one chooses 'select all/page' or 'unselect all/page'.
+	 * Entries that are manually un/checked add additional information to the page status. 
+	 *
+	 * For example, if all entries on the page are selected and one manually unchecks rows 2 and 5 
+	 * then the pageStatus for this page will be 's,1,4' (0-based indexes, meaning that everything is 
+	 * selected on the page except those two rows). Concatenation may occur if 2 (or more) consecutive rows 
+	 * are selected on a page: 's,5-15' or 's,5-15,20-21' and so on.
+	 *
+	 * Example:
+	 * A three pages result set may have a page status of
+	 * > _pageStatus = ['u,0-1', 's', 's,3']
+	 * which means everything on the first page is unselected except the first two rows. The second 
+	 * page is fully selected and the third page is almost fully checked except for the fourth row.
+	 *
+	 * Data Access:
+	 * _pageStatus data will be read when restoring (loading) a page. Its data will be written each time the 
+	 * current page changes.
+	 *
+	 */
+	var _pageStatus = new Array();
 	/*
 	 * Var: _mainDiv
 	 * Top-level DOM parent div container
 	 *
 	 */
 	var _mainDiv;
+	/*
+	 * Var: _pageDiv
+	 * DOM div for pagination-related stuff
+	 *
+	 */
+	var _pageDiv;
 	/*
 	 * Var: _headerDiv
 	 * DOM div containing table's header
@@ -352,21 +429,22 @@ function AdvancedTable() {
 		_container = $(_container);
 		_mainDiv = new Element('div').addClassName('advancedTable');
 
-		_bodyDiv = new Element('div');
-		_bodyDiv.setAttribute('class', 'body');
+		_bodyDiv = new Element('div').addClassName('body');
 		_bodyTab = new Element('table');
 
+		_pageDiv = new Element('div').addClassName('pagination').hide();
+		_mainDiv.insert(_pageDiv);
+
 		if (_headers.length) {
-			_headerDiv = new Element('div');
-			_headerDiv.setAttribute('class', 'header');
+			_headerDiv = new Element('div').addClassName('header');
 			_headerTab = new Element('table');
-			_mainDiv.appendChild(_headerDiv);
+			_mainDiv.insert(_headerDiv);
 			_headerDiv.appendChild(_headerTab);
 		}
 
-		_mainDiv.appendChild(_bodyDiv);
-		_bodyDiv.appendChild(_bodyTab);
-		_container.appendChild(_mainDiv);
+		_mainDiv.insert(_bodyDiv);
+		_bodyDiv.insert(_bodyTab);
+		_container.insert(_mainDiv);
 
 		var tr, th;
 		tr = new Element('tr');
@@ -461,12 +539,54 @@ function AdvancedTable() {
 			_rowStyles[row] ? cls =  _rowStyles[row] : cls = '';
 		else
 			cls = 'rowSelected';
-		r.setAttribute('class', cls);
+		r.writeAttribute('class', cls);
 
 	 	// Executes custom handler, if any
 		 handler = _getEventHandler('onRowClicked');
 		 if (typeof handler == 'function')
 		 	handler(cls == 'rowSelected' ? true : false);
+
+		if (!_pageSwitcher) return;
+		// In pagination mode
+
+		var cur = _pageSwitcher.getCurrentPage()-1;
+		var state = _pageStatus[cur][0] == SERIAL_SELECTED ? false : true;
+		if (_pageStatus[cur].length > 1) {
+			var sel = _getCurrentPageRowsIdx(state);
+			if (sel.length)
+				_pageStatus[cur] = _pageStatus[cur].sub(/,.*$/, ',' + sel.toString());
+			else
+				_pageStatus[cur] = _pageStatus[cur].sub(/,.*$/, '');
+		}
+		else
+			_pageStatus[cur] += ',' + _getCurrentPageRowsIdx(state).toString();
+	}
+
+	/*
+	 * Function: _getCurrentPageRowsIdx
+	 * Get 0-based row indexes on the current page
+	 *
+	 * Parameters:
+	 *  checked - boolean: whether the indexes are related to selected rows
+	 *
+	 */ 
+	function _getCurrentPageRowsIdx(checked) {
+		if (typeof checked != 'boolean')
+			throw 'checked must be a boolean';
+
+		var idx = new Array();
+		_bodyTab.childElements().each(function(tr, k) {
+			if (checked) {
+				if (tr.hasClassName('rowSelected'))
+					idx.push(k);
+			}
+			else {
+				if (!tr.hasClassName('rowSelected'))
+					idx.push(k)
+			}
+		})
+
+		return idx;
 	}
 
 	/*
@@ -474,11 +594,11 @@ function AdvancedTable() {
 	 * Un/select all rows in table
 	 *
 	 * Parameters:
-	 *  on - boolean: 0-indexed row selected
+	 *  See <_selectAll>
 	 *
 	 */ 
-	this.selectAll = function(selected) {
-		_selectAll(selected);
+	this.selectAll = function(selected, force) {
+		_selectAll(selected, force);
 	}	
 
 	/*
@@ -494,18 +614,25 @@ function AdvancedTable() {
 
 	/*
 	 * Function: _selectAll
-	 * Un/select all rows in table
+	 * Un/select all rows in table (current page)
 	 *
 	 * Note: can only be called after rendering
 	 *
 	 * Parameters:
-	 *  on - boolean: 0-indexed row selected
+	 *  selected - boolean: if true select all entries of current page
+	 *  force - boolean:  if true select all entries on _all_ pages [default: false]
 	 *
 	 * See Also:
 	 *  <render>
 	 *
 	 */ 
-	function _selectAll(selected) {
+	function _selectAll(selected, force) {
+		if (typeof selected != 'boolean') {
+			throw 'selected must be a boolean';
+			return;
+		}
+		force = typeof force == 'boolean' ? force : false;
+
 		var rowId, r, cls;
 		for (var k=0; k < _rows.length; k++) { 
 			rowId = _bodyTab.childNodes[k].id;
@@ -518,6 +645,18 @@ function AdvancedTable() {
 			}
 			if (r) r.writeAttribute('class', cls);
 		}	
+
+		if (_pageSwitcher)
+			_pageStatus[_pageSwitcher.getCurrentPage()-1] = selected ? SERIAL_SELECTED : SERIAL_UNSELECTED;
+
+		if (!force)
+			if (!_pageSwitcher || _locked) return;
+
+		// In pagination mode, reset pages status
+		_pageStatus.clear();
+		$R(0, _pageSwitcher.getTotalPages()-1).each(function(page) {
+			_pageStatus.push(selected ? SERIAL_SELECTED : SERIAL_UNSELECTED);
+		});
 	}
 
 	/*
@@ -532,18 +671,42 @@ function AdvancedTable() {
 	 *
 	 */ 
 	this.getSelectedColsValues = function() {
-		var rowId, r, cls, colIdx;
-		var selection = '';
-		for (var k=0; k < _rows.length; k++) { 
-			rowId = _bodyTab.childNodes[k].id;
-			r = $(rowId);
-			if (r.getAttribute('class') == 'rowSelected') {
-				colIdx = _colIdxForRowIds == -1 ? 0 : _colIdxForRowIds;
-				selection += _rows[k][colIdx] + ',';
-			}
-		}	
+		if (!_pagination) {
+			var rowId, r, cls, colIdx;
+			var selection = '';
+			for (var k=0; k < _rows.length; k++) { 
+				rowId = _bodyTab.childNodes[k].id;
+				r = $(rowId);
+				if (r.getAttribute('class') == 'rowSelected') {
+					colIdx = _colIdxForRowIds == -1 ? 0 : _colIdxForRowIds;
+					selection += _rows[k][colIdx] + ',';
+				}
+			}	
 
-		return selection.substr(0, selection.length-1);
+			return selection.substr(0, selection.length-1);
+		}
+		else {
+			// Pagination mode, we send _pageStatus to the server-side
+			// script in order to rebuild the selection
+			var xhr = new HttpRequest(
+				null,
+				// Use default error handler
+				null,
+				// Custom handler for results
+				function(resp) {
+					if (resp.Error) {
+						throw 'AdvancedTable::getSelectedColValues' + resp.Error;
+						return;
+					}
+
+					document.fire('advancedTable:selectedImages', resp.idList);
+				}	
+			);
+
+			// Send HTTP _synchronous_ request
+			var post = _postData + '&PageStatus=' + _pageStatus.join('_');
+			xhr.send('/youpi/process/query/idListPagination/', post, false);
+		}
 	}
 
 	/*
@@ -695,7 +858,48 @@ function AdvancedTable() {
 	}
 
 	/*
+	 * Function: activatePagination
+	 * Activates pagination mode used to navigate through pages
+	 *
+	 * Parameters:
+	 *  on - boolean: true to activate pagination
+	 *
+	 */ 
+	this.activatePagination = function(on) {
+		if (typeof on != 'boolean') {
+			throw 'on must be a boolean';
+			return;
+		}
+
+		_pagination = on;
+	}
+
+	/*
+	 * Function: paginationActivated
+	 * Returns true if pagination has been activated
+	 *
+	 * Returns:
+	 *  boolean
+	 *
+	 */ 
+	this.paginationActivated = function() {
+		return _pagination;
+	}
+
+	/*
 	 * Function: loadDataFromQuery
+	 * Sends POST data to URL (Ajax query)
+	 *
+	 * See Also:
+	 * <_loadDataFromQuery>
+	 *
+	 */ 
+	this.loadDataFromQuery = function(serverPath, post, handler) {
+		_loadDataFromQuery(serverPath, post, handler);
+	}
+
+	/*
+	 * Function: _loadDataFromQuery
 	 * Sends POST data to URL (Ajax query)
 	 *
 	 * Response format:
@@ -707,14 +911,17 @@ function AdvancedTable() {
 	 *  serverPath - string: path to server script
 	 *  post - string: raw POST data to send to <serverPath>
 	 *  handler - function: Callback function when data has been loaded
+	 *  locked - boolean: if true, do not purge _pageStatus content (on page change) [default: false]
 	 *
 	 */ 
-	this.loadDataFromQuery = function(serverPath, post, handler) {
+	function _loadDataFromQuery(serverPath, post, handler, locked) {
 		if (typeof serverPath != 'string' || typeof post != 'string') {
 			_error('loadDataFromQuery: serverPath or POST must be strings!');
 			return;
 		}
 
+		_locked = typeof locked == 'boolean' ? locked : false;
+		_postData = post.sub(/&Page=.*$/, '');
 		_container = $(_container);
 
 		var xhr = new HttpRequest(
@@ -728,18 +935,98 @@ function AdvancedTable() {
 				_rows.length = 0;
 				_rows = eval(resp['Content']);
 				_render();
-				_selectAll(true);
 
 				if (typeof handler != 'function' && handler) {
 					_error('loadDataFromQuery: bad handler function!');
 					return;
 				}
 				if (handler) handler();
+
+				// Pagination support?
+				if (resp.TotalPages && resp.CurrentPage) {
+					if (_pagination) {
+						_buildPageDiv(serverPath, handler, resp.CurrentPage, resp.TotalPages);
+						if (_locked) {
+							_setPageState(resp.CurrentPage);
+							return;
+						}
+					}
+				}
+
+				_selectAll(true);
 			}	
 		);
 
 		// Send HTTP POST request
 		xhr.send(serverPath, post);
+	}
+
+	function _setPageState(page) {
+		if (typeof page != 'number')
+			throw 'page must be a positive integer';
+
+		var stat = _pageStatus[page-1];
+		if (stat == SERIAL_SELECTED) {
+			// All selected
+			_selectAll(true);
+
+		}
+		else if (stat == SERIAL_UNSELECTED) {
+			// All unselected
+			_selectAll(false);
+		}
+		else {
+			// More complex selection state
+			stat[0] == SERIAL_SELECTED ? _selectAll(true) : _selectAll(false);
+
+			// FIXME: serialization
+			var rowids = stat.sub(/^.,/, '').split(',');
+			rowids.each(function(idx) {
+				_toggleRowSelection(idx);
+			});
+		}
+	}
+
+	/*
+	 * Function: _buildPageDiv
+	 * Add content to the page div
+	 *
+	 * Parameters:
+	 *  serverPath - string: URI for server-side query
+	 *  current - integer: current page being displayed
+	 *  total - integer: total page count
+	 *
+	 */ 
+	function _buildPageDiv(serverPath, handler, current, total) {
+		_pageDiv.update();
+		var sall = new Element('input', {type: 'button', value: 'Select page'});
+		var uall = new Element('input', {type: 'button', value: 'Unselect page'});
+		var pdiv = new Element('span', {id: _uid + 'page_switch_div'});
+
+		// Page switcher widget
+		if (!_pageSwitcher) {
+			_pageSwitcher = new PageSwitcher(pdiv, function(page) {
+				// locked = true to lock _pageStatus content
+				_loadDataFromQuery(serverPath, _postData + '&Page=' + page, handler, true);
+			});
+			_pageSwitcher.setMarginsWidth(6);
+		}
+		else
+			_pageSwitcher.setContainer(pdiv);
+
+		_pageSwitcher.render(current, total);
+
+		sall.observe('click', function() {
+			_selectAll(true);
+		});
+
+		uall.observe('click', function() {
+			_selectAll(false);
+		});
+
+		_pageDiv.insert(sall).insert(uall);
+		_pageDiv.insert(pdiv);
+		_pageDiv.appear();
 	}
 
 	/*

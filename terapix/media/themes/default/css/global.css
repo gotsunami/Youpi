@@ -832,6 +832,24 @@ div.advancedTable {
 	height: 300px;
 }
 
+div.advancedTable .pagination {
+	background-color: #D5FFE0;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	margin-left: 10%;
+	margin-right: 10%;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+div.advancedTable .pagination * {
+	font-size: 9px;
+}
+
+div.advancedTable .pagination input {
+	margin-right: 5px;
+}
+
 div.advancedTable div.header table th {
 	background-color: #5b80b2;
 	color: white;
@@ -991,14 +1009,14 @@ div.cartSavedItems div.content {
 	margin-top: 20px;
 }
 
-/********************* PAGINATION STYLE FOR ProcessingHistoryWidget CLASS **********************************/
+/********************* STYLE FOR PageSwitcher CLASS **********************************/
 
-div.pagination {
+.pageSwitcher {
 	padding-top: 5px; 
 	padding-bottom: 6px;
 }
 
-div.pagination span, div.pagination a {
+.pageSwitcher span, .pageSwitcher a {
 	border: 1px solid rgb(91, 128, 178); 
 	background-color: rgb(91, 128, 178); 
 	color: white;
@@ -1009,14 +1027,14 @@ div.pagination span, div.pagination a {
 	font-weight: bold;
 }
 
-div.pagination a {
+.pageSwitcher a {
 	cursor: pointer; 
 	background-color: white; 
 	border: 1px solid lightgray;
 	color: rgb(91, 128, 178); 
 }
 
-div.pagination a:hover {
+.pageSwitcher a:hover {
 	border: 1px solid gray;
 	color: darkred;
 }

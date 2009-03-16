@@ -217,10 +217,8 @@ function ProcessingHistoryWidget(container, varName) {
 		rtab.appendChild(rtr);
 
 		// Pages div
-		var pdiv = document.createElement('div');
-		pdiv.setAttribute('id', _instance_name + '_pages_div');
-		pdiv.setAttribute('class', 'pagination');
-		td.appendChild(pdiv);
+		var pdiv = new Element('div', {id: _instance_name + '_pages_div'}).addClassName('pageSwitcher');
+		td.insert(pdiv);
 
 		// Results div
 		var rdiv = document.createElement('div');
@@ -280,8 +278,8 @@ function ProcessingHistoryWidget(container, varName) {
 	}
 
 	/*
-	 * Function: _applyFilter
-	 * Sends AJAX query along with search criterias; show results
+	 * Function: _updatePagesNavigation
+	 * Updates page navigator
 	 *
 	 */ 
 	function _updatePagesNavigation(curPage, pageCount) {

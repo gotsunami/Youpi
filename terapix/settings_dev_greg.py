@@ -23,6 +23,8 @@ CMD_CONVERT_THUMB	= "%s %s" % (CMD_CONVERT, CONVERT_THUMB_OPT)
 #
 CMD_STIFF			= '/usr/bin/stiff'
 CMD_IMCOPY			= '/usr/local/bin/imcopy'
+#
+IMS_MAX_PER_PAGE	= 50
 
 #
 # Software info (to get versioning information)

@@ -905,14 +905,36 @@ def processing_imgs_from_idlist_post(request):
 
 	try:
 		ids = request.POST['Ids']
+		page = request.POST.get('Page', 0)
+		pageStatus = request.POST.get('PageStatus', None)
 	except Exception, e:
 		return HttpResponseBadRequest('Incorrect POST data')
 
 	# Build integer list from ranges
 	ids = unremap(ids).split(',')
-	images = Image.objects.filter(id__in = ids)
 
-	content  =[]
+	# Pagination handling
+	count = len(ids)
+	if page == 0:
+		currentPage = 1
+	else:
+		currentPage = int(page)
+	maxPerPage = IMS_MAX_PER_PAGE
+	nbPages = count / maxPerPage
+	if count % maxPerPage > 0:
+		nbPages += 1
+
+	# Finds window boundaries
+	wmin = maxPerPage * (currentPage-1)
+	if count - wmin > maxPerPage:
+		window = ids[wmin: wmin + maxPerPage]
+	else:
+		window = ids[wmin:]
+
+	# Get image data for currentPage
+	images = Image.objects.filter(id__in = window)
+
+	content = []
 	for img in images:
 		rels = Rel_tagi.objects.filter(image = img)
 		tags = Tag.objects.filter(id__in = [r.tag.id for r in rels]).order_by('name')
@@ -926,8 +948,52 @@ def processing_imgs_from_idlist_post(request):
 							 img.name, 	# Image name
 							 string.join([str("<span class=\"tagwidget\" style=\"%s;\">%s</span>" % (t.style, t.name)) for t in tags], '')))])
 
-	#return HttpResponse(str({'Headers': ['Name', 'Tags'], 'Content' : content}), mimetype = 'text/plain')
-	return HttpResponse(str({'Headers': ['Image Name/Tags'], 'Content' : content}), mimetype = 'text/plain')
+	return HttpResponse(str({'TotalPages': int(nbPages), 'CurrentPage': currentPage, 'Headers': ['Image Name/Tags'], 'Content' : content}), mimetype = 'text/plain')
+
+def get_selected_ids_from_pagination(request):
+	"""
+	Returns a list of ids of selected images (in pagination mode)
+	"""
+
+	try:
+		ids = request.POST['Ids']
+		pageStatus = request.POST['PageStatus'].split('_')
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	# Build integer list from ranges
+	ids = unremap(ids).split(',')
+	range = IMS_MAX_PER_PAGE
+	idList = []
+
+	k = j = 0
+	pages = []
+	while j < len(pageStatus):
+		pages.append(ids[k:k+range])
+		k += range
+		j += 1
+
+	k = 0
+	for page in pages:
+		ps = pageStatus[k].split(',')
+		if ps[0] == 's':
+			for unchecked in ps[1:]:
+				del page[int(unchecked)]
+		elif ps[0] == 'u':
+			tmp = []
+			for checked in ps[1:]:
+				tmp.append(page[int(checked)])
+			page = tmp
+		else:
+			return HttpResponse(str({'Error': 'pageStatus POST data bad formatted'}))
+
+		idList.extend(page)
+		k += 1
+
+	count = len(idList)
+	idList = string.join(idList, ',')
+
+	return HttpResponse(str({'idList': str(idList), 'count': int(count)}), mimetype = 'text/plain')
 
 def processing_plugin(request):
 	"""

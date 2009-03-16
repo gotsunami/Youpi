@@ -125,6 +125,13 @@ function ImageSelector(container, options)
 	 */ 
 	var _imagesCount = 0;
 	/*
+	 * Var: _paginationImageSelection;
+	 * String of list of images ids part of the current selection.
+	 * Used in pagination mode only (otherwise null)
+	 *
+	 */ 
+	var _paginationImageSelection = null; 
+	/*
 	 * Var: _tags;
 	 * Hash - Available tags in drop zone (used only if the dropzone option is true)
 	 *
@@ -422,6 +429,10 @@ function ImageSelector(container, options)
 				_executeQuery();
 			});
 		});
+
+		document.observe('advancedTable:selectedImages', function(event) {
+			_paginationImageSelection = event.memo;
+		});
 	}
 
 	/*
@@ -509,7 +520,8 @@ function ImageSelector(container, options)
 	 */ 
 	this.setTableWidget = function(widget) {
 		_tableWidget = widget;
-		widget.setContainer(id + '_result_grid_div');
+		_tableWidget.setContainer(id + '_result_grid_div');
+		_tableWidget.activatePagination(true);
 	}
 
 	/*
@@ -561,6 +573,7 @@ function ImageSelector(container, options)
 				value: 'Find images!'
 		});
 		sub.observe('click', function() {
+			_paginationImageSelection = null;
 			_executeQuery();
 		});
 		div.insert(sub);
@@ -1911,7 +1924,11 @@ function ImageSelector(container, options)
 	function _getListsOfSelections() {
 		switch(_selectionMode) {
 			case _singleMode:
+				// This function issues a synchonous call in pagination mode;
+				// the result of this call is then stored in _paginationImageSelection
 				var sel = _tableWidget.getSelectedColsValues();
+				if (_tableWidget.paginationActivated())
+					sel = _paginationImageSelection;
 				var nb = 0;
 
 				if (sel.length > 0)
@@ -2866,7 +2883,7 @@ function ImageSelector(container, options)
 
 		// FIXME
 		$(id + '_results_div').show();
-		_tableWidget.selectAll(on);
+		_tableWidget.selectAll(on, true);
 	}
 
 	/*

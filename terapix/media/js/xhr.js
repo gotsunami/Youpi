@@ -27,10 +27,9 @@ function createXMLHttpRequest() {
  * it provides encapsulation and basic public/private features.
  *
  * Constructor Parameters:
- *
- * cont - string or DOM element: name of parent DOM block container
- * errorHandler - function code with one argument (error message)
- * resultHandler - function code with one argument (json object ready to be parsed)
+ *  cont - string or DOM element: name of parent DOM block container
+ *  errorHandler - function code with one argument (error message)
+ *  resultHandler - function code with one argument (json object ready to be parsed)
  *
  * Please note that default hanlders are provided if related constructor args are missing.
  *
@@ -88,37 +87,49 @@ function HttpRequest(cont, errorHandler, resultHandler) {
 	}
 
 	/*
-	 * Send async HTTP request.
-	 * path: path to server-side script
-	 * data: string for POST data (i.e. "a=2&c=try")
+	 * Sends async HTTP request
+	 *
+	 * Parameters:
+	 *  path - string: path to server-side script
+	 *  data - string for POST data (i.e. "a=2&c=try")
+	 *  async - boolean: whether the call is asynchronous [default: true]
 	 *
 	 */
-	this.send = function(path, data) {
-		_xhr.open('post', path);
+	this.send = function(path, data, async) {
+		async = typeof async == 'boolean' ? async : true;
+		_xhr.open('post', path, async);
 		_xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-		_xhr.onreadystatechange = function() {
-			if (_xhr.readyState == 1) {
-				try {
-					_container.update(getLoadingHTML(_busy_msg));
-				} catch(e) {
-					_container.update(_busy_msg + '...');
+		if (async) {
+			_xhr.onreadystatechange = function() {
+				if (_xhr.readyState == 1) {
+					try {
+						_container.update(getLoadingHTML(_busy_msg));
+					} catch(e) {
+						_container.update(_busy_msg + '...');
+					}
 				}
-			}
-			else if (_xhr.readyState == 4) {
-				if (_xhr.status != 200) {
-					var xhrError = 'Request error. ' + _xhr.responseText;
-					_errorHandler(xhrError);
-					return;
+				else if (_xhr.readyState == 4) {
+					if (_xhr.status != 200) {
+						var xhrError = 'Request error. ' + _xhr.responseText;
+						_errorHandler(xhrError);
+						return;
+					}
+		
+					// Parses JSON response
+					var resp = eval('(' + _xhr.responseText + ')');
+					this.lastResponse = resp;
+					_resultHandler(resp);
 				}
-	
-				// Parses JSON response
-				var resp = eval('(' + _xhr.responseText + ')');
-				this.lastResponse = resp;
-				_resultHandler(resp);
 			}
 		}
 		_xhr.send(data)
+
+		if (!async) {
+			var resp = eval('(' + _xhr.responseText + ')');
+			this.lastResponse = resp;
+			_resultHandler(resp);
+		}
 	}
 
 	_main();
