@@ -9,12 +9,12 @@
 				{% if data.userData.dualMode %}
 						{{ plugin.id }}.displayImageCount('[[1]]', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
 				{% else %}
-						{{ plugin.id }}.displayImageCount('{{ data.userData.imgList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
+					{{ plugin.id }}.displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
 				{% endif %}
 				</script>
 				{% if data.userData.dualMode %}
 				<tr>
-					<td><span class="regLetter">Dual Image Mode: </span></td>
+					<td><span class="regLetter">Dual Image Mode:</span></td>
 					<td> 1 image + 1 image for measurements</td>
 				</tr>
 				{% endif %}

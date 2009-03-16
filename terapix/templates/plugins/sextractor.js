@@ -69,7 +69,7 @@ var {{ plugin.id }} = {
 
 		{{ plugin.id }}.do_addSelectionToCart({
 			config: config, 
-			imgList: sels,
+			idList: sels,
 			weightPath: optPath[1] ? optPath[1] : '',
 			flagPath: optPath[0] ? optPath[0] : '',
 			psfPath: optPath[2]  ? optPath[2] : '',
@@ -650,13 +650,18 @@ var {{ plugin.id }} = {
 
 						var addImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
 						});
-						addImg.c_data = { 	idList: res.idList,
-											config: res.config,
-											flagPath: res.flagPath,
-											weightPath: res.weightPath,
-											psfPath: res.psfPath,
-											resultsOutputDir: res.resultsOutputDir
+						
+
+						addImg.c_data = {
+								 		'idList'           : res.idList,
+										'flagPath'         : res.flagPath,
+										'weightPath'       : res.weightPath,
+										'psfPath'          : res.psfPath,
+										'resultsOutputDir' : res.resultsOutputDir,
+										'config'           : res.config,
+										'dualMode'         : res.dualMode
 						};
+
 						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);
 						});
@@ -711,15 +716,9 @@ var {{ plugin.id }} = {
 
 	addToCart: function(data) {
 		var p_data = {	plugin_name : uidsex,
-						userData :	{ 	'config' 			: data.config,
-										'imgList' 			: data.idList,
-										'flagPath' 			: data.flagPath,
-										'weightPath' 		: data.weightPath,
-										'psfPath' 			: data.psfPath,
-										'resultsOutputDir' 	: data.resultsOutputDir,
-										'dualMode'		 	: data.dualMode,
-						}
+						userData :	data
 		};
+
 	
 		s_cart.addProcessing(p_data,
 				// Custom hanlder

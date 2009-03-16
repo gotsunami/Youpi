@@ -40,7 +40,7 @@ class Sextractor(ProcessingPlugin):
 		post = request.POST
 		
 		try:
-			idList				= eval(post['ImgList'])
+			idList				= eval(post['IdList'])
 			itemID				= str(post['ItemId'])
 			flagPath		 	= post['FlagPath']
 			weightPath 			= post['WeightPath']
@@ -115,9 +115,9 @@ class Sextractor(ProcessingPlugin):
 		3. Returns info related to ClusterId and number of jobs submitted
 		"""
 		try:
-			idList = eval(request.POST['IdList'])	# List of lists
+			idList = eval(request.POST['ImgList'])	# List of lists
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+			raise PluginError, "POST argument error. Unable to process data. %s" % idList
 
 		cluster_ids = []
 		k = 1
@@ -125,6 +125,7 @@ class Sextractor(ProcessingPlugin):
 
 		try:
 			for imgList in idList:
+				raise PluginError, "%s" % imgList
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList)
@@ -172,15 +173,17 @@ class Sextractor(ProcessingPlugin):
 		"""
 
 		post = request.POST
+		
 		try:
 			itemId 				= str(post['ItemId'])
 			flagPath 			= post['FlagPath']
 			weightPath 			= post['WeightPath']
 			psfPath 			= post['PsfPath']
 			config 				= post['Config']
-			sexId 				= post['SexId']
+			taskId 				= post.get('TaskId', '')
 			resultsOutputDir 	= post['ResultsOutputDir']
 			reprocessValid 		= int(post['ReprocessValid'])
+			dualMode 			= post['DualMode']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 		# Builds realtime Condor requirements string
@@ -196,8 +199,8 @@ class Sextractor(ProcessingPlugin):
 		# 			Selected config file content is finally saved to a regular file.
 		#
 		try:
-			if len(sexId):
-				config = Plugin_sex.objects.filter(id = int(sexId))[0]
+			if len(taskId):
+				config = Plugin_sex.objects.filter(id = int(taskId))[0]
 				content = str(zlib.decompress(base64.decodestring(config.config)))
 			else:
 				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
@@ -223,6 +226,14 @@ class Sextractor(ProcessingPlugin):
 		csf = open(csfPath, 'w')
 		
 		images = Image.objects.filter(id__in = idList)
+#		if dualMode:
+#			try:
+#				idList = eval(request.POST['ImgList'])	# List of lists
+#			except Exception, e:
+#				raise PluginError, "POST argument error. Unable to process data. %s" % idList
+#			dualImage = idList[0][1]
+#			imgdual = Image.objects.filter(id__in = dualImage)
+
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),				# Mandatory for AMI, WP
@@ -287,6 +298,11 @@ notify_user             = semah@iap.fr
 		# One image per job
 		for img in images:
 			path = os.path.join(img.path, img.name + '.fits')
+
+			# dual mode check
+#			if dualMode:
+#				path2 = os.path.join(imgdual.path, imgdual.name + '.fits')
+
 			# WEIGHT checks
 			if weightPath:
 				if os.path.isdir(weightPath):
@@ -360,7 +376,21 @@ notify_user             = semah@iap.fr
 			except ValueError:
 				raise ValueError, userData
 
-#arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s 2>/dev/null
+#			if dualMode:
+#				condor_submit_entry = """
+#	arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s, %(img2)s -c %(config)s 
+	# YOUPI_USER_DATA = %(userdata)s
+#	environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
+#	queue""" %  {	'encuserdata' 	: encUserData, 
+#					'params'		: sex_params,
+#					'img'			: path,
+#					'img2'			: path2,
+#					'config'		: os.path.basename(customrc),
+#					'userdata'		: userData, 
+#					'user'			: request.user.username,
+#					'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }
+#			else:
+
 			condor_submit_entry = """
 arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s 
 # YOUPI_USER_DATA = %(userdata)s
