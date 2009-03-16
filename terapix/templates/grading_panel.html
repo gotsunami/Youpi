@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css"/>
+		<script type="text/javascript" src="/media/js/3rdParty/scriptaculous/prototype.js"></script>
 		<script type="text/javascript" src="/media/js/xhr.js"></script>
 		<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
 		<script type="text/javascript">
@@ -86,7 +87,15 @@
 									);
 
 									var sel = document.getElementById('predefined_comment_select');
-									var prCommentId = sel.options[sel.selectedIndex].value;
+									var prCommentId;
+
+									try {
+										prCommentId = sel.options[sel.selectedIndex].value;
+									} 
+									catch(e) {
+										// In case of empty predegined values in combo box
+										prCommentId = '';
+									}
 									var customComment = document.getElementById('custom_comment_input').value;
 
 									var post = 'Plugin={{ pluginId }}&Method=grade&Grade=' + mygrade.getGrade() 
