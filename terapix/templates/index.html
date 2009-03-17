@@ -1,100 +1,192 @@
-<HEAD></HEAD>
 {% extends "base_site.html" %}
 {% load i18n %}
-
-
-{% block extrahead %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
-<script language="javascript" type="text/javascript" src="/media/js/javascript.js"></script>
-<!-- Menu handling -->
-<script type="text/javascript" src="/media/js/menu.js"></script>
-<script type="text/javascript" src="/media/js/3rdParty/progressbar/js/bramus/jsProgressBarHandler.js"></script>
-<script type="text/javascript" src="/media/js/index.js"></script>
-<script type="text/javascript">
-</script>
-
-<script type="text/javascript" src="/media/js/sqlform.js"></script>
-
-<script type="text/javascript">var guistyle = '{{ user.get_profile.guistyle }}';</script>
-{% endblock %}
-
 {% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/progressbar/js/bramus/jsProgressBarHandler.js"></script>
+<script type="text/javascript" src="/media/js/sqlform.js"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+
+function ingestion_stats() {
+	var container = $('stats_ingestion_div');
+	var xhr = new HttpRequest(
+		container,
+		// Use default error handler
+		null,
+		// Custom handler for results
+		function(resp) {
+			container.update();
+			container.hide().appear();
+
+			if (resp.error) {
+				container.update(resp.error);
+				return;
+			}
+			var tab = new Element('table').addClassName('ingestedImages');
+			var tr, td, span;
+
+			resp.info.totalPerInstrument.each(function(entry) {
+				// Adds progress bars
+				tr = new Element('tr');
+				td = new Element('td');
+				span = new Element('span', {id: 'p_' + entry.instrument}).addClassName('progressBar');
+				span.custom = new Object();
+				span.custom.percent = Math.round(entry.percent*10)/10;
+				span.update(0);
+				td.insert(span);
+				tr.insert(td);
+
+				// Instrument name
+				td = new Element('td').addClassName('name').update(entry.instrument);
+				tr.insert(td);
+
+				// Count
+				td = new Element('td').addClassName('count').update(entry.count);
+				tr.insert(td);
+				tab.insert(tr);
+			});
+
+			// Total
+			tr = new Element('tr');
+			td = new Element('td');
+			span = new Element('span', {id: 'ingestion_total_span'}).addClassName('progressBar');
+			span.custom = new Object();
+			span.custom.percent = 100;
+			span.update(0);
+			td.insert(span);
+			tr.insert(td);
+
+			td = new Element('td').addClassName('name').update('Total');
+			tr.insert(td);
+
+			td = new Element('td').addClassName('count').update(resp.info.totalImages);
+			tr.insert(td);
+			tab.insert(tr);
+			container.insert(tab);
+
+			$$('table.ingestedImages span.progressBar').each(function(span) {
+				var pb = new JS_BRAMUS.jsProgressBar(span, 0);
+				pb.setPercentage(span.custom.percent);
+			});
+		}
+	);
+
+	// Send HTTP POST request
+	xhr.send('/youpi/stats/ingestion/');
+}
+
+function get_stat_line(pbar_id, pbar_value, title, total) {
+	var tr, td, span;
+	// Adds progress bars
+	tr = new Element('tr');
+	td = new Element('td');
+	span = new Element('span', {id: pbar_id}).addClassName('progressBar');
+	span.custom = new Object();
+	span.custom.percent = Math.round(pbar_value*10)/10;
+	span.update(0);
+	td.insert(span);
+	tr.insert(td);
+
+	// Kind
+	td = new Element('td').addClassName('name').update(title);
+	tr.insert(td);
+
+	// Count
+	td = new Element('td').addClassName('count').update(total);
+	tr.insert(td);
+
+	return tr;
+}
+
+function processing_stats() {
+	var container = $('stats_processing_div');
+	var xhr = new HttpRequest(
+		container,
+		// Use default error handler
+		null,
+		// Custom handler for results
+		function(resp) {
+			container.update();
+			container.hide().appear();
+
+			if (resp.error) {
+				container.update(resp.error);
+				return;
+			}
+			var tab = new Element('table').addClassName('processing');
+			var tr, td, span;
+
+			resp.info.tasksPerKind.each(function(entry) {
+				tab.insert(get_stat_line('p_' + entry.kind, entry.percent, entry.kind, entry.count));
+			});
+
+			var failed_per =  resp.info.failedTasks*100/resp.info.tasksTotal;
+			tab.insert(get_stat_line('processing_failed_span', failed_per, 'Failed', resp.info.failedTasks));
+			tab.insert(get_stat_line('processing_success_span', 100 - failed_per, 'Success', resp.info.tasksTotal - resp.info.failedTasks));
+			tab.insert(get_stat_line('processing_total_span', 100, 'Total', resp.info.tasksTotal));
+
+			container.insert(tab);
+
+			$$('table.processing span.progressBar').each(function(span) {
+				var pb;
+				if (span.id.include('failed'))
+					pb = new JS_BRAMUS.jsProgressBar(span, 0, {barImage: '/media/js/3rdParty/progressbar/images/bramus/percentImage_back4.png'});
+				else if(span.id.include('success'))
+					pb = new JS_BRAMUS.jsProgressBar(span, 0, {barImage: '/media/js/3rdParty/progressbar/images/bramus/percentImage_back1.png'});
+				else
+					pb = new JS_BRAMUS.jsProgressBar(span, 0);
+				pb.setPercentage(span.custom.percent);
+
+			});
+		}
+	);
+
+	// Send HTTP POST request
+	xhr.send('/youpi/stats/processing/');
+}
+
+</script>
+{% endblock %}
 
 {% block content %}
-	<div id="pre_submenu">
-		<ul class="smart_tabnav_sub" id="tabnav2">
-			<li class="enabled"><a href="#" id="link_global" onclick="swap_display(this.id, 'menuitem_sub_0', 'tabnav2', 'menuitem_');">Global Informations</a></li>
-		</ul>
-	</div>
-	<div id="menuitem_sub_0" style="margin-top: 10px;" align="center">
-		<div align="center" class="homepage">
-			<div>
-				<div id="create_survey">
-					Add survey :
-					<input type="text" size="20" id="create_survey_input"></input>
-					<input type="button" value="add!" id="add_survey_button" onclick="setup(this.parentNode.id);"></input>
-					<div id="create_survey_log"></div>
+<div id="pre_submenu">
+	<ul class="smart_tabnav_sub" id="tabnav2">
+		<li class="enabled"><a href="#" id="link_global" onclick="swap_display(this.id, 'menuitem_sub_0', 'tabnav2', 'menuitem_');">Global Informations</a></li>
+	</ul>
+</div>
+<div id="menuitem_sub_0" class="home" style="margin-top: 10px;">
+	<table style="width: 100%">
+		<tr>
+			<td>
+				<div class="themes">
+					<h1>Ingested Images</h1>
+					<div id="stats_ingestion_div"/>
 				</div>
-				<div id="or1">or</div>
+			</td>
+			<td>
+				<div id="ingested_div" class="themes">
+					<h1>Processing tasks</h1>
+					<div id="stats_processing_div"/>
+				</div>
+			</td>
+		<tr>
+	<table>
+</div>
 
-				<div id="select_survey">
-				choose survey from list :	
-					<select  id="select_survey_list">
-						<option> -- </option>
-					{% for i in list_survey %}
-						<option> {{ i }} </option>
-					{% endfor %}
-					</select>
-					<input type="button" value="Use it!" id="choose_survey" onclick="kselect('select_survey_list');"></input>
-					<div id="select_survey_list_log"></div>
-				</div>
-			</div>
-			<HR width="15%" size="2" align="center">
-			<div>
-				<div id="create_instrument">
-					<div id="instrument_text"></div>
-					<input type="text" size="20" id="create_instrument_input"></input>
-					<input type="button" value="add!" id="add_instrument_button" onclick="setup(this.parentNode.id);"></input>
-					<div id="create_instrument_log"></div>
-				</div>
+<script type="text/javascript">
+	// Progress bar default options
+	defaultOptions.boxImage = '/media/js/3rdParty/progressbar/images/bramus/percentImage.png';
+	defaultOptions.barImage = '/media/js/3rdParty/progressbar/images/bramus/percentImage_back1.png';
+	defaultOptions.height = 10;
+	defaultOptions.animate = false;
 
-				<div id = "or2">or</div>
-
-				<div id="select_instrument">
-				choose instrument from list :
-					<select  id="select_instrument_list">
-						<option> -- </option>
-					</select>
-					<input type="button" value="Use it!" id="choose_instrument" onclick="kselect('select_instrument_list');"></input>
-					<div id="select_instrument_list_log"></div>
-				</div>
-			</div>
-			<HR width="15%" size="2" align="center">
-			<div>
-				<div id="create_release">
-					<div id="release_text"></div>
-					<input type="text" size="20" id="create_release_input"></input>
-					<input type="button" value="add!" id="add_release_button" onclick="setup(this.parentNode.id);"></input>
-					<div id="create_release_log"></div>
-				</div>
-
-				<div id = "or3">or</div>
-
-				<div id="select_release">
-				choose release from list :
-					<select  id="select_release_list">
-						<option> -- </option>
-					</select>
-					<input type="button" value="Use it!" id="choose_release" onclick="kselect('select_release_list');"></input>
-					<div id="select_release_list_log"></div>
-				</div>
-			</div>
-			<HR width="15%" size="2" align="center">
-		</div>
-	</div>
-	
+	document.observe('dom:loaded', function() {
+		ingestion_stats();
+		processing_stats();
+	});
+</script>
 {% endblock %}
-	
-</body>

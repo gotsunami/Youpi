@@ -12,7 +12,6 @@ urlpatterns = patterns(
 	
 	# Callback functions depending on urls matches
 	(r'^youpi/$', 'index'),
-	(r'^youpi/newindex/$', 'index2'),
 	(r'^youpi/ingestion/$', 'ing'),
 	(r'^youpi/ingestion/ingestion1/$', 'local_ingestion'),
 	(r'^youpi/ingestion/ingestion2/$', 'condor_ingestion'),
@@ -125,6 +124,10 @@ urlpatterns = patterns(
 	(r'^youpi/uploadFile/batch/parseContent/$', 'batch_parse_content'),
 	(r'^youpi/uploadFile/batch/viewContent/(.*)/$', 'batch_view_content'),
 	(r'^youpi/uploadFile/batch/viewSelection/$', 'batch_view_selection'),
+
+	# Stats
+	(r'^youpi/stats/ingestion/$', 'stats_ingestion'),
+	(r'^youpi/stats/processing/$', 'stats_processing'),
 
 	# Plots
 	(r'^youpi/plot/sky/selections/$', 'plot_sky_selections'),

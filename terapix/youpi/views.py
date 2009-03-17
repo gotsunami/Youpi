@@ -44,14 +44,9 @@ def index(request):
 	This is the main entry point (root) of the web application.
 	This is a callback function (as defined in django's urls.py file).
 	"""
-	k = []
-	s = Survey.objects.filter(rel_us__user = request.user.id)
-	for i in s:
-		k.append(str(i))
 
 	return render_to_response('index.html', {	
-						'selected_entry_id'	: 'home' ,
-						'list_survey' : k
+							'selected_entry_id'			: 'home',
 						},
 						context_instance = RequestContext(request))
 
@@ -329,83 +324,6 @@ def browse_api(request, type):
 
 	# Redirect to API doc
 	return HttpResponseRedirect('http://clix.iap.fr:8001/' + path)
-
-def index2(request):
-	try:
-		param = request.POST['Param']
-		value = request.POST['Value']
-	except Exception, e:
-		return HttpResponseServerError('Incorrect POST data: %s' % e)
-	
-	error = warning = ''
-	l_i = []
-	l_r = []
-
-	try:
-		if param == 'create_survey':
-			if not Survey.objects.filter(name__iexact = value):
-				if len(value) == 0 :
-					warning = 'Please, enter a non-empty string'
-				else:
-					sur = Survey(name = value)
-					sur.save()
-					m = Rel_us(user_id = request.user.id, survey_id = sur.id)
-					m.save()
-			else:
-				warning = 'Survey already existing'
-
-		elif param == 'create_instrument':
-			survey = request.POST['Survey']
-
-			if not Instrument.objects.filter(name__iexact = value):
-				if len(value) == 0 :
-					warning = 'Please, enter a non-empty string'
-				else:
-					ins = Instrument(name = value)
-					ins.save()
-					g = Survey.objects.filter(name__iexact = survey)[0]
-					i = Rel_si(survey_id = g.id, instrument_id = ins.id)
-					i.save()
-			else:
-				warning = 'Instrument already existing'
-
-		elif param == 'create_release':
-			instrument = request.POST['Instrument']
-
-			if not Release.objects.filter(label__iexact = value):
-				if len(value) == 0 :
-					warning = 'Please, enter a non-empty string'
-				else:
-					rel = Release(label = value,creationdate = getNowDateTime())
-					rel.save()
-					ins = Instrument.objects.filter(name__iexact = instrument)[0]
-					i = Rel_rinst(release_id =rel.id, instrument_id = ins.id)
-					i.save()
-			else:
-				warning = 'Instrument already existing'
-
-		elif param == 'select_survey_list':
-			survey = request.POST['Value']
-			l = Instrument.objects.filter(rel_si__survey__name = survey)
-			for li in l :
-				l_i.append(str(li))
-
-		elif param == 'select_instrument_list':
-			instrument = request.POST['Value']
-			l = Release.objects.filter(rel_rinst__instrument__name = instrument)
-			for lr in l :
-				l_r.append(str(lr.label))
-
-
-
-
-	except Exception, e:
-		error = e
-
-	resp = {'Survey' : str(value),'Instrument' : str(value),'list_instrument' : l_i,'list_release' : l_r, 'Release' : str(value), 'Error' : str(error),'Warning' : warning}
-	
-	return HttpResponse(str(resp), mimetype = 'text/plain')
-	
 
 def local_ingestion(request):
 	"""
@@ -1496,6 +1414,54 @@ def get_image_info(request):
 		'ing start':	str(img.ingestion.start_ingestion_date),
 		'ing end':	str(img.ingestion.end_ingestion_date),
 		'ing by':	str(img.ingestion.user.username),
+	}
+
+	return HttpResponse(str({'info': data}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def stats_ingestion(request):
+	"""
+	Returns stats about ingestion
+	"""
+
+	total_images = Image.objects.all().count()
+	instruments = Instrument.objects.all().order_by('name')
+	imgs_per_instru = []
+	for inst in instruments:
+		imgcount = Image.objects.filter(instrument = inst).count()
+		percent = imgcount*100./total_images
+		imgs_per_instru.append({'instrument': str(inst.name), 'count': int(imgcount), 'percent': percent})
+
+
+	data = {
+		'totalImages' 			: int(total_images),
+		'totalPerInstrument' 	: imgs_per_instru,
+	}
+
+	return HttpResponse(str({'info': data}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def stats_processing(request):
+	"""
+	Returns stats about processings
+	"""
+
+	total_tasks = Processing_task.objects.all().count()
+	kinds = Processing_kind.objects.all().order_by('name')
+	tasks_per_kind = []
+	for k in kinds:
+		taskcount = Processing_task.objects.filter(kind = k).count()
+		percent = taskcount*100./total_tasks
+		tasks_per_kind.append({'kind': str(k.name), 'count': int(taskcount), 'percent': percent})
+
+	failed_tasks = Processing_task.objects.filter(success = 0).count()
+
+	data = {
+		'tasksTotal' 	: int(total_tasks),
+		'failedTasks'	: int(failed_tasks),
+		'tasksPerKind' 	: tasks_per_kind,
 	}
 
 	return HttpResponse(str({'info': data}), mimetype = 'text/plain')

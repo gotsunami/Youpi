@@ -1455,3 +1455,17 @@ div.tags *, .dropzone * {
 	background-position: right center;
 	background-repeat: no-repeat; 
 }
+
+.home td {
+	border: none;
+}
+
+.home table.ingestedImages td.name, table.processing td.name {
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.home table.ingestedImages td.count, table.processing td.count  {
+	text-align: right;
+	color: brown;
+}
