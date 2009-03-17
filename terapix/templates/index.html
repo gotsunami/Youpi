@@ -29,27 +29,18 @@ function ingestion_stats() {
 			var tab = new Element('table').addClassName('ingestedImages');
 			var tr, td, span;
 
+			tab.insert(get_separator('Instruments'));
 			resp.info.totalPerInstrument.each(function(entry) {
-				// Adds progress bars
-				tr = new Element('tr');
-				td = new Element('td');
-				span = new Element('span', {id: 'p_' + entry.instrument}).addClassName('progressBar');
-				span.custom = new Object();
-				span.custom.percent = Math.round(entry.percent*10)/10;
-				span.update(0);
-				td.insert(span);
-				tr.insert(td);
-
-				// Instrument name
-				td = new Element('td').addClassName('name').update(entry.instrument);
-				tr.insert(td);
-
-				// Count
-				td = new Element('td').addClassName('count').update(entry.count);
-				tr.insert(td);
-				tab.insert(tr);
+				tab.insert(get_stat_line('p_' + entry.instrument, entry.percent, entry.instrument, entry.count));
 			});
 
+			tab.insert(get_separator('Filters'));
+			// Per filter (channel)
+			resp.info.imgsPerChannel.each(function(entry) {
+				tab.insert(get_stat_line('p_' + entry.channel, entry.percent, entry.channel, entry.count));
+			});
+
+			tab.insert(get_separator('Total'));
 			// Total
 			tr = new Element('tr');
 			td = new Element('td');
@@ -102,6 +93,17 @@ function get_stat_line(pbar_id, pbar_value, title, total) {
 	return tr;
 }
 
+function get_separator(title) {
+	var tr, td, span;
+	// Adds progress bars
+	tr = new Element('tr').addClassName('separator');
+	td = new Element('td', {colspan: 3});
+	td.update(title);
+	tr.insert(td);
+
+	return tr;
+}
+
 function processing_stats() {
 	var container = $('stats_processing_div');
 	var xhr = new HttpRequest(
@@ -120,10 +122,12 @@ function processing_stats() {
 			var tab = new Element('table').addClassName('processing');
 			var tr, td, span;
 
+			tab.insert(get_separator('Kind'));
 			resp.info.tasksPerKind.each(function(entry) {
 				tab.insert(get_stat_line('p_' + entry.kind, entry.percent, entry.kind, entry.count));
 			});
 
+			tab.insert(get_separator('Total'));
 			var failed_per =  resp.info.failedTasks*100/resp.info.tasksTotal;
 			tab.insert(get_stat_line('processing_failed_span', failed_per, 'Failed', resp.info.failedTasks));
 			tab.insert(get_stat_line('processing_success_span', 100 - failed_per, 'Success', resp.info.tasksTotal - resp.info.failedTasks));
@@ -164,13 +168,13 @@ function processing_stats() {
 			<td>
 				<div class="themes">
 					<h1>Ingested Images</h1>
-					<div id="stats_ingestion_div"/>
+					<div id="stats_ingestion_div"></div>
 				</div>
 			</td>
 			<td>
 				<div id="ingested_div" class="themes">
 					<h1>Processing tasks</h1>
-					<div id="stats_processing_div"/>
+					<div id="stats_processing_div"></div>
 				</div>
 			</td>
 		<tr>

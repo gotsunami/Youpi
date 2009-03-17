@@ -1433,10 +1433,17 @@ def stats_ingestion(request):
 		percent = imgcount*100./total_images
 		imgs_per_instru.append({'instrument': str(inst.name), 'count': int(imgcount), 'percent': percent})
 
+	channels = Channel.objects.all().order_by('name')
+	imgs_per_channel = []
+	for c in channels:
+		imgCount = Image.objects.filter(channel = c).count()
+		percent = imgCount*100./total_images
+		imgs_per_channel.append({'channel': str(c.name), 'count': int(imgCount), 'percent': percent})
 
 	data = {
 		'totalImages' 			: int(total_images),
 		'totalPerInstrument' 	: imgs_per_instru,
+		'imgsPerChannel': imgs_per_channel,
 	}
 
 	return HttpResponse(str({'info': data}), mimetype = 'text/plain')
@@ -1465,6 +1472,7 @@ def stats_processing(request):
 	}
 
 	return HttpResponse(str({'info': data}), mimetype = 'text/plain')
+
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'
