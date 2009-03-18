@@ -48,13 +48,17 @@ function ProgressBar(container, percent, options) {
 	 * Options
 	 *
 	 * Allowed options:
-	 *  
+	 *  color - string: bar color
+	 *  borderColor - string: box border color
+	 *  caption - boolean: display caption [default: true]
+	 *  animate - boolean: use animation to render [default: true]
 	 *
 	 */
 	var _options = $H({
 		color: 'green',
 		borderColor: 'green',
 		caption: true,
+		animate: true
 	});
 
 
@@ -124,12 +128,16 @@ function ProgressBar(container, percent, options) {
 	function _render() {
 		_container.update();
 		_container.addClassName('youpi_progressBar');
-		_container.setStyle({borderColor: _options.get('borderColor')});
+		_container.setStyle({
+			height: _height + 'px', 
+			width: _width + 'px', 
+			borderColor: _options.get('borderColor')
+		});
 
 		var d = new Element('div').addClassName('bar');
 		d.setStyle({
 			left: '0px',
-			width: (_percent * _width / 100) + 'px',
+			width: '0px',
 			height: _height + 'px', 
 			backgroundColor: _options.get('color')
 		});
@@ -141,6 +149,18 @@ function ProgressBar(container, percent, options) {
 		}
 
 		_container.insert(d).insert(cd);
+
+		if (_options.get('animate')) {
+			new Effect.Morph(d, {
+				style: { width: (_percent * _width / 100) + 'px' },
+				duration: 2.0
+			});
+		}
+		else {
+			d.setStyle({
+				width: (_percent * _width / 100) + 'px'
+			});
+		}
 	}
 
 	/*

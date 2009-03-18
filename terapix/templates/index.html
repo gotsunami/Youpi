@@ -15,7 +15,8 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 pb_options = {
 	borderColor: 'grey', 
 	color: 'lightblue',
-	caption: true
+	caption: true,
+	animate: true
 };
 
 function ingestion_stats() {
@@ -154,13 +155,13 @@ function processing_stats() {
 		<tr>
 			<td>
 				<div class="themes">
-					<h1>Ingested Images</h1>
+					<h1>Ingested Images <span>[<a href="#" onclick="ingestion_stats();">Refresh</a>]</span></h1>
 					<div id="stats_ingestion_div"></div>
 				</div>
 			</td>
 			<td>
 				<div id="ingested_div" class="themes">
-					<h1>Processing tasks</h1>
+					<h1>Processing tasks <span>[<a href="#" onclick="processing_stats();">Refresh</a>]</span></h1>
 					<div id="stats_processing_div"></div>
 				</div>
 			</td>

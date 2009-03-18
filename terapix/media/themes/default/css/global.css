@@ -1042,7 +1042,7 @@ div.cartSavedItems div.content {
 /***** themes prefs ******/
 
 div.themes, div.prefs_condor {
-	margin-top: 40px;
+	margin-top: 30px;
 	margin-left: 20px;
 }
 
@@ -1061,6 +1061,10 @@ div.themes h1, div.prefs_condor h1 {
 	padding-bottom: 7px;
 	margin-bottom: 20px;
 	width: 70%;
+}
+
+div.themes h1 span {
+	font-size: 9px;
 }
 
 div.allthemes table img {
