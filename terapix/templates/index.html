@@ -11,6 +11,13 @@
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 
+// Progressbar options
+pb_options = {
+	borderColor: 'grey', 
+	color: 'lightblue',
+	caption: true
+};
+
 function ingestion_stats() {
 	var container = $('stats_ingestion_div');
 	var xhr = new HttpRequest(
@@ -46,7 +53,7 @@ function ingestion_stats() {
 			container.insert(tab);
 
 			$$('table.ingestedImages div.youpi_progressBar').each(function(div) {
-				var pb = new ProgressBar(div, div.custom.percent);
+				var pb = new ProgressBar(div, div.custom.percent, pb_options);
 			});
 		}
 	);
@@ -120,7 +127,11 @@ function processing_stats() {
 			container.insert(tab);
 
 			$$('table.processing div.youpi_progressBar').each(function(div) {
-				var pb = new ProgressBar(div, div.custom.percent);
+				var pb = new ProgressBar(div, div.custom.percent, pb_options);
+				if (div.id.include('failed'))
+					pb.setOptions({color: 'red'});
+				else if (div.id.include('success'))
+					pb.setOptions({color: 'lightgreen'});
 			});
 		}
 	);

@@ -5,7 +5,7 @@
  * Constructor Parameters:
  *  container - string or DOM node: name of parent DOM block container
  *  percent - integer: initial percentage
- *  options - object: options
+ *  options - object: options (optional)
  *
  */
 function ProgressBar(container, percent, options) {
@@ -42,13 +42,20 @@ function ProgressBar(container, percent, options) {
 	 * Progress bar's height
 	 *
 	 */
-	var _height = 8;
+	var _height = 9;
 	/*
-	 * Var: _bgcolor
-	 * Progress bar's background color
+	 * Var: _options
+	 * Options
+	 *
+	 * Allowed options:
+	 *  
 	 *
 	 */
-	var _bgcolor = 'green';
+	var _options = $H({
+		color: 'green',
+		borderColor: 'green',
+		caption: true,
+	});
 
 
 	// Group: Functions
@@ -70,15 +77,43 @@ function ProgressBar(container, percent, options) {
 	}
 
 	/*
-	 * Function: getContainer
-	 * Return widget parent container
+	 * Function: setOptions
+	 * Sets options
 	 *
-	 * Returns:
-	 *  DOM container
+	 * Parameters:
+	 *  options - object
 	 *
 	 */ 
-	this.getContainer = function() {
-		return _container;
+	this.setOptions = function(options) {
+		if (typeof options != 'object') 
+			throw 'options must be a valid object';
+		_options = _options.merge(options);
+		// Update
+		_render();
+	}
+
+	/*
+	 * Function: getOptions
+	 * Returns current options
+	 *
+	 * Returns:
+	 *  object - current pb options
+	 *
+	 */ 
+	this.getOptions = function() {
+		return _options;
+	}
+
+	/*
+	 * Function: getPourcentage
+	 * Returns current pourcentage
+	 *
+	 * Returns:
+	 *  number - current pourcentage
+	 *
+	 */ 
+	this.getPourcentage = function() {
+		return _pourcent;
 	}
 
 	/*
@@ -89,15 +124,23 @@ function ProgressBar(container, percent, options) {
 	function _render() {
 		_container.update();
 		_container.addClassName('youpi_progressBar');
+		_container.setStyle({borderColor: _options.get('borderColor')});
 
 		var d = new Element('div').addClassName('bar');
 		d.setStyle({
-			left: (_percent * _width / 100 - _width) + 'px', 
-			width: _width + 'px', 
+			left: '0px',
+			width: (_percent * _width / 100) + 'px',
 			height: _height + 'px', 
-			backgroundColor: _bgcolor
+			backgroundColor: _options.get('color')
 		});
-		_container.insert(d);
+
+		// Caption div
+		if (_options.get('caption')) {
+			var cd = new Element('div').addClassName('caption');
+			cd.update((Math.round(_percent*10)/10) + '%');
+		}
+
+		_container.insert(d).insert(cd);
 	}
 
 	/*
@@ -111,7 +154,11 @@ function ProgressBar(container, percent, options) {
 			throw 'container must be a valid DOM container';
 		if (typeof percent != 'number') 
 			throw 'percent must be a valid number';
-
+		if (options) {
+			if (typeof options != 'object') 
+				throw 'options must be a valid object';
+			_options = _options.merge(options);
+		}
 		_percent = percent;
 		_render();
 	}
