@@ -2,10 +2,20 @@
  * Class: ProgressBar
  * ProgressBar widget
  *
+ * External Dependancies:
+ *  prototype.js - Enhanced Javascript library
+ *  scriptaculous.js - Visual effects library
+ *
  * Constructor Parameters:
  *  container - string or DOM node: name of parent DOM block container
  *  percent - integer: initial percentage
  *  options - object: options (optional)
+ *
+ * Available options:
+ *  color - string: bar color
+ *  borderColor - string: box border color
+ *  caption - boolean: display caption [default: true]
+ *  animate - boolean: use animation to render [default: true]
  *
  */
 function ProgressBar(container, percent, options) {
@@ -46,12 +56,6 @@ function ProgressBar(container, percent, options) {
 	/*
 	 * Var: _options
 	 * Options
-	 *
-	 * Allowed options:
-	 *  color - string: bar color
-	 *  borderColor - string: box border color
-	 *  caption - boolean: display caption [default: true]
-	 *  animate - boolean: use animation to render [default: true]
 	 *
 	 */
 	var _options = $H({

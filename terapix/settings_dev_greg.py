@@ -1,6 +1,6 @@
 # Django settings for terapix project.
 
-import os
+import os, os.path
 
 #
 # Local configuration file (site specific)
