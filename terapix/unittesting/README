@@ -1,0 +1,5 @@
+
+To run the tests:
+
+$ export YOUPISRC=/path/to/youpi
+$ export PYTHONPATH=$PYTHONPATH:$YOUPISRC:$YOUPISRC/terapix python test_ingestion.py
