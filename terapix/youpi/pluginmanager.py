@@ -70,7 +70,7 @@ class ProcessingPlugin:
 		"""
 
 		try:
-			f = open(os.path.join('terapix', 'youpi', 'plugins', 'conf', self.id + '.conf.default'))
+			f = open(os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', self.id + '.conf.default'))
 			config = string.join(f.readlines())
 			f.close()
 		except IOError, e:
