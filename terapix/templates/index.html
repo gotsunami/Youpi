@@ -6,7 +6,7 @@
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
-<script type="text/javascript" src="/media/js/3rdParty/progressbar/js/bramus/jsProgressBarHandler.js"></script>
+<script type="text/javascript" src="/media/js/progressbar.js"></script>
 <script type="text/javascript" src="/media/js/sqlform.js"></script>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -42,26 +42,11 @@ function ingestion_stats() {
 
 			tab.insert(get_separator('Total'));
 			// Total
-			tr = new Element('tr');
-			td = new Element('td');
-			span = new Element('span', {id: 'ingestion_total_span'}).addClassName('progressBar');
-			span.custom = new Object();
-			span.custom.percent = 100;
-			span.update(0);
-			td.insert(span);
-			tr.insert(td);
-
-			td = new Element('td').addClassName('name').update('Total');
-			tr.insert(td);
-
-			td = new Element('td').addClassName('count').update(resp.info.totalImages);
-			tr.insert(td);
-			tab.insert(tr);
+			tab.insert(get_stat_line('ingestion_total_div', 100, 'Total', resp.info.totalImages));
 			container.insert(tab);
 
-			$$('table.ingestedImages span.progressBar').each(function(span) {
-				var pb = new JS_BRAMUS.jsProgressBar(span, 0);
-				pb.setPercentage(span.custom.percent);
+			$$('table.ingestedImages div.youpi_progressBar').each(function(div) {
+				var pb = new ProgressBar(div, div.custom.percent);
 			});
 		}
 	);
@@ -75,11 +60,10 @@ function get_stat_line(pbar_id, pbar_value, title, total) {
 	// Adds progress bars
 	tr = new Element('tr');
 	td = new Element('td');
-	span = new Element('span', {id: pbar_id}).addClassName('progressBar');
-	span.custom = new Object();
-	span.custom.percent = Math.round(pbar_value*10)/10;
-	span.update(0);
-	td.insert(span);
+	var d = new Element('div', {id: pbar_id}).addClassName('youpi_progressBar');
+	d.custom = new Object();
+	d.custom.percent = pbar_value;
+	td.insert(d);
 	tr.insert(td);
 
 	// Kind
@@ -135,16 +119,8 @@ function processing_stats() {
 
 			container.insert(tab);
 
-			$$('table.processing span.progressBar').each(function(span) {
-				var pb;
-				if (span.id.include('failed'))
-					pb = new JS_BRAMUS.jsProgressBar(span, 0, {barImage: '/media/js/3rdParty/progressbar/images/bramus/percentImage_back4.png'});
-				else if(span.id.include('success'))
-					pb = new JS_BRAMUS.jsProgressBar(span, 0, {barImage: '/media/js/3rdParty/progressbar/images/bramus/percentImage_back1.png'});
-				else
-					pb = new JS_BRAMUS.jsProgressBar(span, 0);
-				pb.setPercentage(span.custom.percent);
-
+			$$('table.processing div.youpi_progressBar').each(function(div) {
+				var pb = new ProgressBar(div, div.custom.percent);
 			});
 		}
 	);
@@ -182,12 +158,6 @@ function processing_stats() {
 </div>
 
 <script type="text/javascript">
-	// Progress bar default options
-	defaultOptions.boxImage = '/media/js/3rdParty/progressbar/images/bramus/percentImage.png';
-	defaultOptions.barImage = '/media/js/3rdParty/progressbar/images/bramus/percentImage_back1.png';
-	defaultOptions.height = 10;
-	defaultOptions.animate = false;
-
 	document.observe('dom:loaded', function() {
 		ingestion_stats();
 		processing_stats();

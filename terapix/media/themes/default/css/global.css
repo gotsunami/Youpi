@@ -1484,3 +1484,15 @@ div.tags *, .dropzone * {
 	padding-left: 3px;
 }
 
+.youpi_progressBar {
+	overflow: hidden;
+	position: relative;
+	-moz-border-radius: 2px;
+	padding: 1px;
+	background-color: none;
+	border: 1px solid green;
+}
+
+.youpi_progressBar div.bar {
+	position: relative;
+}
