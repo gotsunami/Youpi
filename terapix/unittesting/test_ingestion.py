@@ -1,17 +1,48 @@
 import unittest
 from terapix.script.ingestion import *
 
-class TestIngestion(unittest.TestCase):
+clog = StringBuffer()
+
+def showPart(title):
+	"""
+	Display title to stdout
+	"""
+	print "%s %s %s" % ('-' * 11, title, '-' * 10)
+
+class TestDB(unittest.TestCase):
+	def __init__(self, methodName='runTest'):
+		unittest.TestCase.__init__(self, methodName)
+		showPart('MYSQL')
+
+		db = DB(host = DATABASE_HOST,
+				user = DATABASE_USER,
+				passwd = DATABASE_PASSWORD,
+				db = DATABASE_NAME)
+		self.g = DBGeneric(db.con)
+
 	def setUp(self):
-		clog = StringBuffer()
 		pass
 
-	def testdebug(self):
-		try:
-			self.assertRaises(TypeError, debug, 'msg', INFOS)
-		except NameError:
-			# global clog not found
-			pass
+	def testSetupDB(self):
+		"Setting up test db"
+		self.g.execute("drop database if exists test");
+		self.g.execute("create database test");
+
+class TestIngestion(unittest.TestCase):
+	showPart('INGESTION')
+	def setUp(self):
+		pass
+
+#	def testdebug(self):
+#		try:
+#		global clog
+#		self.assertRaises(TypeError, debug, 'msg', INFO)
+#		except NameError:
+#			# global clog not found
+#			pass
+
+	def testb(self):
+		pass
 
 #	def testchoice(self):
 #		"Test the choice"
