@@ -669,7 +669,7 @@ function DropdownBox(container, title)
 	function _setOpen(open) {
 		var gfx;
 		_stateOpen = (typeof open == 'boolean' && open) ? true : false;
-		_mainDiv.addClassName('banner_' + (_stateOpen ? 'opened' : 'closed') + (!_isTopLevelContainer ? '_child' : ''));
+		_mainDiv.writeAttribute('class', 'banner_' + (_stateOpen ? 'opened' : 'closed') + (!_isTopLevelContainer ? '_child' : ''));
 		_stateOpen ? $(_contentContainer).show() : $(_contentContainer).hide();
 	}
 

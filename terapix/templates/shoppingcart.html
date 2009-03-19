@@ -250,11 +250,11 @@ function show_runtime_options(pid, container_id) {
 }
 
 function toggle_node_policy_radio(def_id, cus_id, cus_div_id) {
-	var def = document.getElementById(def_id);
-	var cus = document.getElementById(cus_id);
-	var cusdiv = document.getElementById(cus_div_id);
+	var def = $(def_id);
+	var cus = $(cus_id);
+	var cusdiv = $(cus_div_id);
 
-	cus.checked ? cusdiv.setAttribute('style', 'display: block; padding-left: 20px;') : cusdiv.style.display = 'none';
+	cus.checked ? cusdiv.setStyle({paddingLeft: '20px'}).appear() : cusdiv.fade();
 }
 
 function proceed_cart() {
@@ -266,14 +266,14 @@ function proceed_cart() {
 	{% include plugin.jsSource %}
 {% endfor %}
 
-/*
+// Menu handling
+var menu;
 document.observe('dom:loaded', function() {
-		var m = new SubMenu('submenu', ['Cart items', 'Saved items']);
-		m.setOnClickHandler(1, function() {
-			showSavedItems();
-		});
+	menu = new SubMenu('submenu', ['Cart items', 'Saved items']);
+	menu.setOnClickHandler(1, function() {
+		showSavedItems();
+	});
 });
-*/
 
 </script>
 
@@ -285,16 +285,6 @@ document.observe('dom:loaded', function() {
 <div align="center">
 <div style="text-align: center;">
 	<div id="submenu">
-		<ul class="smart_tabnav_sub" id="menu">
-			<li class="enabled">
-				<a 	href="#" id="entry_0" 
-					onclick="swap_display(this.id, 'menuitem_sub_0', 'menu', 'menuitem_sub_');">Cart items</a>
-			</li>
-			<li class="disabled">
-				<a 	href="#" id="entry_1" 
-					onclick="swap_display(this.id, 'menuitem_sub_1', 'menu', 'menuitem_sub_'); showSavedItems();">Saved items</a>
-			</li>
-		</ul>
 		<div align="center" style="width: 100%" id="menuitem_sub_0">
 			{# Cart items #}
 			{% if cartHasData %}
@@ -343,7 +333,7 @@ document.observe('dom:loaded', function() {
 			</div>
 			{% endif %}
 		</div>
-		<div class="cartSavedItems" align="center" id="menuitem_sub_1">
+		<div style="display: none" class="cartSavedItems" align="center" id="menuitem_sub_1">
 			{# Saved items #}
 			<p class="title">
 				Please select a type of processing in order to display relevant saved items:

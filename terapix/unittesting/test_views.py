@@ -8,6 +8,13 @@ def showPart(title):
 	"""
 	print "%s %s %s" % ('-' * 11, title, '-' * 10)
 
+#class FakePlugin(ProcessingPlugin):
+#	def __init__(self):
+#		ProcessingPlugin.__init__(self)
+#
+#	def main(self):
+#		return 'my result'
+
 class Test_processing_plugin(unittest.TestCase):
 	def setUp(self):
 		self.client = Client()
@@ -23,6 +30,10 @@ class Test_processing_plugin(unittest.TestCase):
 	def testBadMethodCall(self):
 		self.assertRaises(PluginEvalError, self.client.post, '/youpi/process/plugin/', {'Plugin': 'skel', 'Method': 'badmethodcall'})
 
+#	def testReturnData(self):
+#		# return HttpResponse(str({'result' : res}), mimetype = 'text/plain')
+#		self.assertRaises(PluginEvalError, self.client.post, '/youpi/process/plugin/', {'Plugin': 'skel', 'Method': 'badmethodcall'})
 
 if __name__ == '__main__':
 	unittest.main()
+

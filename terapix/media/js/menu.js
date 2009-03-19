@@ -1,4 +1,5 @@
 /*
+ * Function: swap_display
  * This function activates a link and disables all 'li' elements that 
  * does not match the li_id
  *
@@ -34,15 +35,70 @@ function swap_display(li_id, div_on, ul_id, div_prefix) {
 	nodeTurnOn.focus();
 }
 
+/*
+ * Class: SubMenu
+ * Creates a sub menu on the page
+ *
+ * Constructor Parameters:
+ *  container - string or DOM object: name of parent DOM block container
+ *  entries - object: array of string part of the menu
+ *
+ * Custom Events:
+ *  subMenu:clicked - signal emitted when a submenu item is clicked
+ *
+ */
 function SubMenu(container, entries) {
+
+	// Group: Variables
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Var: _container
+	 * DOM node container
+	 *
+	 */
 	var _container = $(container);
+	/*
+	 * Var: _entries
+	 * Menu entries
+	 *
+	 */
 	var _entries = $A(entries);
+	/*
+	 * Var: _ul
+	 * Top-level ul DOM node containing li entries
+	 *
+	 */
 	var _ul;
 
+
+	// Group: Functions
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Function: activate
+	 * Activates a submenu and disables all others
+	 *
+	 * See <_activate>
+	 *
+	 */
 	this.activate = function(idx) {
 		_activate(idx);	
 	}
 
+	/*
+	 * Function: _activate
+	 * Activates a submenu and disables all others
+	 *
+	 * Parameters:
+	 * idx - integer: 0-based item number
+	 *
+	 * Signal:
+	 *  subMenu:clicked with _idx_ as a parameter
+	 *
+	 */
 	function _activate(idx) {
 		var lis = $$('ul#menu li');
 		lis.each(function(li) {
@@ -56,7 +112,7 @@ function SubMenu(container, entries) {
 			idx = idx.getAttribute('id').gsub(/entry_/, '');
 		}
 		else
-			console.error('idx must be an integer or a LI DOM object');
+			throw 'idx must be an integer or a LI DOM object';
 
 		var divs = new Array();
 		_entries.each(function(entry, j) {
@@ -68,8 +124,15 @@ function SubMenu(container, entries) {
 		// Deals with divs
 		divs.each(function(div) { div.hide(); });
 		$('menuitem_sub_' + idx).show();
+
+		document.fire('subMenu:clicked', idx);
 	}
 
+	/*
+	 * Function: _main
+	 * Builds the menu (main entry point)
+	 *
+	 */
 	function _main() {
 		_ul = new Element('ul', {'class': 'smart_tabnav_sub', id: 'menu'});
 		var li, a;
@@ -93,26 +156,57 @@ function SubMenu(container, entries) {
 		_activate(0);
 	}
 
+	/*
+	 * Function: getEntry
+	 * Returns an LI DOM elemeent
+	 *
+	 * Parameters:
+	 *  idx - integer: entry index
+	 *
+	 * Returns:
+	 *  li DOM node
+	 *
+	 */
 	this.getEntry = function(idx) {
 		if (typeof idx != 'number')
-			console.error('idx parameter must be an integer!');
+			throw 'idx parameter must be an integer!';
 
 		return _ul.childElements()[idx];
 	}
 
+	/*
+	 * Function: getContentNodeForEntry
+	 * Returns div DOM container for one entry
+	 *
+	 * Parameters:
+	 *  li - object: DOM node element
+	 *
+	 * Returns:
+	 *  li DOM node
+	 *
+	 */
 	this.getContentNodeForEntry = function(li) {
 		if (typeof li != 'object')
-			console.error('li must be a DOM li object!');
+			throw 'li must be a DOM li object!';
 
 		var idx = li.down().id.gsub(/entry_/, '');
 		return $('menuitem_sub_' + idx);
 	}
 
+	/*
+	 * Function: setOnClickHandler
+	 * Attaches an handler function to one menu's entry
+	 *
+	 * Parameters:
+	 *  idx - integer: entry index
+	 *  handler - function: custom handler
+	 *
+	 */
 	this.setOnClickHandler = function(idx, handler) {
 		if (typeof handler != 'function')
-			console.error('Handler must be a function!');
+			throw 'Handler must be a function!';
 		if (typeof idx != 'number')
-			console.error('idx parameter must be an integer!');
+			throw 'idx parameter must be an integer!';
 
 		// Adds handler to li DOM element
 		_ul.childElements()[idx].customClickHandler = handler;
