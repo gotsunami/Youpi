@@ -1,7 +1,8 @@
 # vim: set ts=4
 
 import sys
-from pluginmanager import ProcessingPlugin
+from terapix.youpi.pluginmanager import ProcessingPlugin
+from terapix.exceptions import *
 
 class QualityFitsIn(ProcessingPlugin):
 	"""

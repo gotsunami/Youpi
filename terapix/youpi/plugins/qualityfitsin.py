@@ -3,11 +3,12 @@
 import sys, os.path, re, time, string, re
 import xml.dom.minidom as dom
 import marshal, base64, zlib
-from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError, PluginAllDataAlreadyProcessed
-from terapix.youpi.models import *
 from types import *
 from sets import Set
 #
+from terapix.youpi.pluginmanager import ProcessingPlugin
+from terapix.exceptions import *
+from terapix.youpi.models import *
 from terapix.settings import *
 
 class QualityFitsIn(ProcessingPlugin):

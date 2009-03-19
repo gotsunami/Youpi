@@ -15,9 +15,10 @@
 
 import sys, os.path, re, time, string
 import marshal, base64, zlib
-from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
-from terapix.youpi.models import *
 #
+from terapix.youpi.pluginmanager import ProcessingPlugin
+from terapix.exceptions import *
+from terapix.youpi.models import *
 from terapix.settings import *
 
 class Skeleton(ProcessingPlugin):

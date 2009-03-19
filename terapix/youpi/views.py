@@ -29,6 +29,7 @@ from copy import deepcopy
 from settings import *
 
 # Custom views
+from terapix.exceptions import *
 from terapix.youpi.pluginmanager import PluginManagerError, PluginError
 from terapix.youpi.cviews.shoppingcart import *
 from terapix.youpi.cviews.condor import *
@@ -922,13 +923,13 @@ def processing_plugin(request):
 		pluginName = request.POST['Plugin']
 		method = request.POST['Method']
 	except Exception, e:
-		return HttpResponseBadRequest('Incorrect POST data')
+		raise PostDataError, e
 
 	plugin = manager.getPluginByName(pluginName)
 	try:
 		res = eval('plugin.' + method + '(request)')
 	except Exception, e:
-		raise PluginError, e
+		raise PluginEvalError, e
 
 	# Response must be a JSON-like object
 	return HttpResponse(str({'result' : res}), mimetype = 'text/plain')

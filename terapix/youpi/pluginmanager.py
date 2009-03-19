@@ -1,22 +1,18 @@
 # vim: set ts=4
 
 from django.contrib.sessions.models import Session
+#
 import glob, sys, types, re, os, string
 import marshal, base64
 from types import *
-from settings import *
 #
 from terapix.youpi.models import *
+from terapix.exceptions import *
+from terapix.settings import *
 
 PLUGIN_DIRS = os.path.join(HOME, 'youpi', 'terapix', 'youpi', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
-
-class CondorSetupError(Exception): pass
-class CondorSubmitError(Exception): pass
-class PluginError(Exception): pass
-class PluginManagerError(Exception): pass
-class PluginAllDataAlreadyProcessed(Exception): pass
 
 class ProcessingPlugin: 
 	type = 'YOUPIPLUGIN'

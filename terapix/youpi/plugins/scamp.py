@@ -4,9 +4,10 @@ import sys, os.path, time, string, re
 import xml.dom.minidom as dom
 import marshal, base64, zlib
 from types import *
-from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
-from terapix.youpi.models import *
 #
+from terapix.youpi.pluginmanager import ProcessingPlugin
+from terapix.exceptions import *
+from terapix.youpi.models import *
 from terapix.settings import *
 
 class Scamp(ProcessingPlugin):

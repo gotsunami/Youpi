@@ -3,9 +3,10 @@
 import sys, os.path, re, time, string, re, glob
 import marshal, base64, zlib
 import xml.dom.minidom as dom
-from pluginmanager import ProcessingPlugin, PluginError, CondorSubmitError
-from terapix.youpi.models import *
 #
+from terapix.youpi.pluginmanager import ProcessingPlugin
+from terapix.exceptions import *
+from terapix.youpi.models import *
 from terapix.settings import *
 
 class Sextractor(ProcessingPlugin):
