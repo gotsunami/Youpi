@@ -38,12 +38,22 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
-<img class="/media/themes/{{ user.get_profile.guistyle }}/img/misc/goback.gif" style="cursor: pointer" onclick="window.location.replace('/youpi/results/');"/>
-<div align="center">
-	<div id="infopanel" style="width: 75%"></div>
+<div id="submenu">
+	<div style="margin-top: 20px; margin-left: 30px;" id="menuitem_sub_0">
+		<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/goback.gif" 
+			style="cursor: pointer" 
+			onclick="window.location.replace('/youpi/results/');"/>
+		<div align="center">
+			<div id="infopanel" style="width: 75%"></div>
+		</div>
+	</div>
 </div>
 <script type="text/javascript">
-	{# in js/common.js #}
-	results_showDetails('{{ pid }}', '{{ tid }}', false);
+	var menu;
+	document.observe('dom:loaded', function() {
+		menu = new SubMenu('submenu', ['{{ plugin.optionLabel }}']);
+		{# in js/common.js #}
+		results_showDetails('{{ pid }}', '{{ tid }}', false);
+	});
 </script>
 {% endblock %}
