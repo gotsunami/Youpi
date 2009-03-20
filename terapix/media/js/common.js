@@ -834,3 +834,57 @@ function getQueryString(hash, strip) {
 	
 	return (strip ? qs.sub(/&/, '') : qs);
 }
+
+
+/*
+ * Namespace: Notifier
+ * Provides some functions to notify user
+ *
+ */
+Notifier = {
+	/*
+	 * Function: notify
+	 * Static popup message
+	 *
+	 * Parameters:
+	 *  msg - string: message to display
+	 *  timeout - float: time in seconds before message timeout
+	 * 
+	 */
+	notify: function (msg, timeout) {
+		if (typeof msg != 'string')
+			throw 'msg must be a string';
+
+		if (timeout && typeof timeout != 'number')
+			throw 'timeout must be a number';
+
+		timeout = timeout ? timeout : 5.0;
+		timeout = timeout > 10 ? 10.0 : parseFloat(timeout);
+
+		var d = $('notify_div');
+		if (!d) {
+			var d = new Element('div', {id: 'notify_div'}).setStyle({
+				position: 'absolute', 
+				zIndex: 100, 
+				top: '95px', 
+				left: '100px',
+				width: '110px',
+				padding: '20px'
+			});
+			d.addClassName('notify');
+			d.hide();
+			document.body.insert(d);
+		}
+
+		if (d.visible()) return;
+		d.update(new Element('div').update(msg));
+		d.setStyle({left: (document.body.clientWidth - 170) + 'px'});
+		d.appear({to: 0.9});
+		d.fade({from: 0.9, delay: timeout});
+	}
+};
+
+// Monitors notify events
+document.observe('notifier:notify', function(event) {
+	Notifier.notify(event.memo);
+});

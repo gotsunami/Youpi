@@ -491,6 +491,7 @@ var {{ plugin.id }} = {
 				null,	
 				// Custom handler for results
 				function(resp) {
+					document.fire('notifier:notify', 'Scamp item saved successfully');
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
 				}
