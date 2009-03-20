@@ -166,8 +166,7 @@ function get_runtime_options(prefix_id) {
 
 {% for plugin in plugins %}
 var {{ plugin.id }}_drop_box;
-// Same as forloop.counter
-var {{ plugin.id }}_item_counter = 1;
+var {{ plugin.id }}_item_counter = 0;
 {% endfor %}
 
 function show_runtime_options(pid, container_id) {

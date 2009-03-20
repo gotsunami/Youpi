@@ -11,11 +11,7 @@ var {{ plugin.id }} = {
 	 */
 	ims1: null,
 	ims2: null,
-
-
-
 	addSelectionToCart: function() {
-		
 		var dualMode = 0;
 		//Checks for images
 		$('single','dual').each( function(id) {
@@ -239,8 +235,6 @@ var {{ plugin.id }} = {
 				function(resp) {
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
-					// Global function (in shoppingcart.html)
-					showSavedItems();
 				}
 		);
 	

@@ -506,8 +506,6 @@ var {{ plugin.id }} = {
 	},
 
 	saveItemForLater: function(trid, opts, silent) {
-		// FIXME
-		console.log(trid, opts); return;
 		opts = $H(opts);
 		opts.set('Plugin', uidswarp);
 		opts.set('Method', 'saveCartItem');
@@ -520,8 +518,6 @@ var {{ plugin.id }} = {
 				function(resp) {
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
-					// Global function (in shoppingcart.html)
-					showSavedItems();
 				}
 		);
 	

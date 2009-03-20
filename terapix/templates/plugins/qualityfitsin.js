@@ -150,8 +150,6 @@ var {{ plugin.id }} = {
 				function(resp) {
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
-					// Global function (in shoppingcart.html)
-					showSavedItems();
 				}
 		);
 	

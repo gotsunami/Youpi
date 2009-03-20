@@ -46,7 +46,7 @@ function ShoppingCart(container)
 	 */ 
 	function _getArticlesCountMsg() {
 		return itemsCount ? itemsCount + ' item' + 
-			(itemsCount > 1 ? 's' : '') + ' to process' : 'Empty cart';
+			(itemsCount > 1 ? 's' : '') : 'Empty cart';
 	}
 
 	/*

@@ -3,13 +3,13 @@
 <table class="cleantd">
 	<tr>
 		<td style="width: 100%; padding: 3px">
-			<div id="{{ plugin.id }}_{{ forloop.counter }}_selections_div"></div>
+			<div id="{{ plugin.id }}_{{ forloop.counter0 }}_selections_div"></div>
 			<table class="plugin_small">
 				<script type="text/javascript">
 				{% if data.userData.dualMode %}
-						{{ plugin.id }}.displayImageCount('[[1]]', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
+						{{ plugin.id }}.displayImageCount('[[1]]', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
 				{% else %}
-					{{ plugin.id }}.displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter }}_selections_div');
+					{{ plugin.id }}.displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
 				{% endif %}
 				</script>
 				{% if data.userData.dualMode %}
@@ -46,32 +46,32 @@
 					<td>{{ data.userData.resultsOutputDir }}</td>
 				</tr>
 			</table>
-			<div id="{{ plugin.id }}_images_div_{{ forloop.counter }}" style="display: none;"></div>
+			<div id="{{ plugin.id }}_images_div_{{ forloop.counter0 }}" style="display: none;"></div>
 		</td>
 		<td style="text-align: center; vertical-align: middle">
 			<div class="submitItem">
 				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
-				<p><img id="{{ plugin.id }}_{{ forloop.counter}}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster"/> 
+				<p><img id="{{ plugin.id }}_{{ forloop.counter0 }}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster"/> 
 				</p>
 			</div>
 			<div>or</div>
-			<img id="{{ plugin.id }}_{{ forloop.counter}}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.gif"/>
+			<img id="{{ plugin.id }}_{{ forloop.counter0 }}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.gif"/>
 		</td>
 	</tr>
 </table>
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
-		$('{{ plugin.id }}_{{ forloop.counter}}_run').observe('click', function() {
+		$('{{ plugin.id }}_{{ forloop.counter0 }}_run').observe('click', function() {
 			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
 			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
-			{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter }}', capitalizeHashKeys(userData));
+			{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
 		});
 
-		$('{{ plugin.id }}_{{ forloop.counter}}_save').observe('click', function() {
+		$('{{ plugin.id }}_{{ forloop.counter0 }}_save').observe('click', function() {
 			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
 			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
-			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter }}', capitalizeHashKeys(userData));
+			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
 		});
 	});
 </script>
