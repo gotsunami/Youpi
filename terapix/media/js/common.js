@@ -876,12 +876,25 @@ Notifier = {
 			document.body.insert(d);
 		}
 
-		if (d.visible()) return;
+		if (d.visible()) {
+			// Busy, add to queue
+			this.queue.push(msg);
+			return;
+		}
 		d.update(new Element('div').update(msg));
 		d.setStyle({left: (document.body.clientWidth - 170) + 'px'});
 		d.appear({to: 0.9});
-		d.fade({from: 0.9, delay: timeout});
-	}
+		d.fade({
+			from: 0.9, 
+			delay: timeout,
+			afterFinish: function() {
+				if (Notifier.queue.length)
+					Notifier.notify(Notifier.queue.shift());
+			}
+		});
+	},
+
+	queue: new Array()
 };
 
 // Monitors notify events
