@@ -84,8 +84,8 @@ var {{ plugin.id }} = {
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
-									alert('The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
-										') has been\nadded to the cart.');
+									document.fire('notifier:notify', 'The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+										') has been added to the cart.');
 								}
 		);
 

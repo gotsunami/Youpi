@@ -867,8 +867,7 @@ Notifier = {
 				position: 'absolute', 
 				zIndex: 100, 
 				top: '95px', 
-				left: '100px',
-				width: '110px',
+				width: '130px',
 				padding: '20px'
 			});
 			d.addClassName('notify');
@@ -878,11 +877,12 @@ Notifier = {
 
 		if (d.visible()) {
 			// Busy, add to queue
-			this.queue.push(msg);
+			if (this.queue.length < this.max)
+				this.queue.push(msg);
 			return;
 		}
 		d.update(new Element('div').update(msg));
-		d.setStyle({left: (document.body.clientWidth - 170) + 'px'});
+		d.setStyle({left: (document.body.clientWidth - 190) + 'px'});
 		d.appear({to: 0.9});
 		d.fade({
 			from: 0.9, 
@@ -893,8 +893,18 @@ Notifier = {
 			}
 		});
 	},
-
-	queue: new Array()
+	/*
+	 * Var: queue
+	 * Holds data awaiting to be processed (FIFO queue)
+	 *
+	 */
+	queue: new Array(),
+	/*
+	 * Var: max
+	 * Max elements in the queue
+	 *
+	 */
+	max: 10
 };
 
 // Monitors notify events

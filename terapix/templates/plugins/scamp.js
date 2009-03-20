@@ -39,8 +39,8 @@ var {{ plugin.id }} = {
 					};
 				
 					s_cart.addProcessing(p_data, function() {
-						alert('Scamp scheduled for reprocessing (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
-							') and\nadded to the shopping cart.');
+						document.fire('notifier:notify', 'Scamp scheduled for reprocessing (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+							') and added to the shopping cart.');
 					});
 				}
 		);
@@ -228,7 +228,7 @@ var {{ plugin.id }} = {
 									msg = totalSels + ' selection' + (totalSels > 1 ? 's' : '') + ' (' + totalImgs + 
 										' image' + (totalImgs > 1 ? 's' : '') + ') ha' + (totalSels > 1 ? 've' : 's') + 
 										' been\nadded to the cart.';
-									alert(msg);
+									document.fire('notifier:notify', msg);
 								}
 		);
 	},
@@ -1019,7 +1019,7 @@ var {{ plugin.id }} = {
 										// Custom handler
 										function() {
 											msg = totalSels + ' LDAC file' + (totalSels > 1 ? 's' : '') + ' ha' + 
-												(totalSels > 1 ? 've' : 's') + ' been\nadded to the cart.';
+												(totalSels > 1 ? 've' : 's') + ' been added to the cart.';
 											log.msg_ok(msg);
 										}
 				);

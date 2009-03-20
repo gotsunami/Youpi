@@ -41,8 +41,8 @@ var {{ plugin.id }} = {
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
-									alert(	'One Skeleton-related job has been added to the cart.Since this is\na DEMO plugin, ' +
-											"it will do nothing but running five '/usr/bin/uptime'\njobs on the cluster.");
+									document.fire('notifier:notify', 'One Skeleton-related job has been added to the cart.Since this is a DEMO plugin, ' +
+											"it will do nothing but running five '/usr/bin/uptime' jobs on the cluster.");
 								}
 		);
 	},

@@ -74,7 +74,7 @@ function removeItemFromCart(trid, force) {
 
 	var trNode = $(trid);
 	var pluginName = trid.sub(/_\d+$/, '');
-	var idx = parseInt(trid.sub(/^.*_/, ''));
+	var idx = trNode.previousSiblings().length - 1;
 
 	// Ask for item deletion
 	s_cart.deletePluginItem(

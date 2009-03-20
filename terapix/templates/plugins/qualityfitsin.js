@@ -461,7 +461,7 @@ var {{ plugin.id }} = {
 							p_data,
 							// Custom handler
 							function() {
-								alert('The current image has been scheduled for reprocessing. \n' +
+								document.fire('notifier:notify', 'The current image has been scheduled for reprocessing. ' +
 									'An item has been added to the shopping cart.');
 							}
 					);
@@ -1231,7 +1231,7 @@ var {{ plugin.id }} = {
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
-									alert('The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+									document.fire('notifier:notify', 'The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
 										') has been\nadded to the cart.');
 								}
 		);
