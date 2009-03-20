@@ -71,6 +71,12 @@ function SubMenu(container, entries) {
 	 *
 	 */
 	var _ul;
+	/*
+	 * Var: _currentIdx
+	 * Current activated menu's 0-based index
+	 *
+	 */
+	var _currentIdx;
 
 
 	// Group: Functions
@@ -125,6 +131,7 @@ function SubMenu(container, entries) {
 		divs.each(function(div) { div.hide(); });
 		$('menuitem_sub_' + idx).show();
 
+		_currentIdx = idx;
 		document.fire('subMenu:clicked', idx);
 	}
 
@@ -182,7 +189,7 @@ function SubMenu(container, entries) {
 	 *  li - object: DOM node element
 	 *
 	 * Returns:
-	 *  li DOM node
+	 *  div DOM node
 	 *
 	 */
 	this.getContentNodeForEntry = function(li) {
@@ -191,6 +198,18 @@ function SubMenu(container, entries) {
 
 		var idx = li.down().id.gsub(/entry_/, '');
 		return $('menuitem_sub_' + idx);
+	}
+
+	/*
+	 * Function: getContentNodeForCurrentEntry
+	 * Returns div DOM container for current menu entry
+	 *
+	 * Returns:
+	 *  div DOM node
+	 *
+	 */
+	this.getContentNodeForCurrentEntry = function() {
+		return $('menuitem_sub_' + _currentIdx);
 	}
 
 	/*

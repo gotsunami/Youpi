@@ -506,6 +506,8 @@ var {{ plugin.id }} = {
 	},
 
 	saveItemForLater: function(trid, opts, silent) {
+		// FIXME
+		console.log(trid, opts); return;
 		opts = $H(opts);
 		opts.set('Plugin', uidswarp);
 		opts.set('Method', 'saveCartItem');

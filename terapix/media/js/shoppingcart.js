@@ -143,8 +143,8 @@ function ShoppingCart(container)
 	 * Note:
 	 * The *obj* object must have the following properties.
 	 *
-	 *  plugin_name - string: internal plugin name
-	 *  idx - int: row index (in plugin context)
+	 * plugin_name - string: internal plugin name
+	 * idx - int: row index (in plugin context)
 	 *
 	 */ 
 	this.deletePluginItem = function(obj, handler, deleteAll) {

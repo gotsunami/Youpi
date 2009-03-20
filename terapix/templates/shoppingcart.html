@@ -65,48 +65,34 @@ function update_condor_submission_log(resp, silent) {
 	return true;
 }
 
-// trNode: parent TR node
-function removeItemFromCart(rid, force) {
-	var silent = force == true ? true : false;
-	
+function removeItemFromCart(trid, force) {
+	var silent = typeof force == 'boolean' ? force : false;
 	if (!silent) {
 		var r = confirm('Are you sure you want to delete this item from the cart?');
 		if (!r) return;
 	}
 
-	var trNode = $(rid);
-	var pluginName = rid.substr(0, rid.search(/_\d+$/));
-
-	var trs = $$('tr');
-	var trid, idx, j=0;
-	var cartItemsCount = 0;
-
-	for (var k=0; k < trs.length; k++) {
-		trid = 	trs[k].getAttribute('id');
-		if (!trid) continue;
-		if (trid.search(pluginName) == 0) {
-			cartItemsCount++;
-			if (trs[k] == trNode) {
-				idx = j
-				break;
-			}
-			j++;
-		}
-	}
+	var trNode = $(trid);
+	var pluginName = trid.sub(/_\d+$/, '');
+	var idx = parseInt(trid.sub(/^.*_/, ''));
 
 	// Ask for item deletion
 	s_cart.deletePluginItem(
 		{'plugin_name' : pluginName, 'idx' : idx},
 		// Custom handler called when item deletion is complete
 		function() {
-			if (cartItemsCount == 1) {
-				// No data left in cart, force a page reload
-				window.location.reload();
-			}
-			else {
-				// Removes from DOM on successful deletion
-				trNode.remove();
-			}
+			var table = trNode.up('table.shoppingCart');
+			// Number of items left for that plugin
+			var left = table.select('tr[id]').length;
+			var n = left == 1 ? table : trNode;
+
+			n.fade({ 
+				delay: 1.0,
+				afterFinish: function() { 
+					n.remove(); 
+					document.fire('shoppingCart:itemRemoved');
+				}
+			});
 		}
 	);
 }
@@ -266,6 +252,10 @@ function proceed_cart() {
 	{% include plugin.jsSource %}
 {% endfor %}
 
+/*
+ * Slots
+ *
+ */
 // Menu handling
 var menu;
 document.observe('dom:loaded', function() {
@@ -275,6 +265,18 @@ document.observe('dom:loaded', function() {
 	});
 });
 
+// A shopping cart item has just been removed
+document.observe('shoppingCart:itemRemoved', function() {
+	// Is the shopping cart empty?
+	var container = menu.getContentNodeForCurrentEntry();
+	if (!container.select('table.shoppingCart').length) {
+		container.update();
+		var d = new Element('div', {id: 'emptycart_div'}).setStyle({marginTop: '70px', padding: '5px'}).hide();
+		d.update(new Element('h1').update('Your cart is currently empty'));
+		container.insert(d);
+		d.appear();
+	}
+});
 </script>
 
 {% endblock %}
@@ -290,9 +292,9 @@ document.observe('dom:loaded', function() {
 			{% if cartHasData %}
 			<div style="padding-top: 20px;">
 			<div id="master_condor_log_div"></div>
-			<table width="50%" class="shoppingCart">
 			{% for plugin in plugins %}
 				{% if plugin.hasItemsInCart %}
+			<table width="50%" class="shoppingCart">
 				<tr>
 					<th>
 						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/runall.gif" onclick="{{ plugin.id }}.runAll()"/>
@@ -301,10 +303,10 @@ document.observe('dom:loaded', function() {
 				</tr>
 					{% for data in plugin.getData %}
 						{# Invoke custom template rendering #}
-				<tr id="{{ plugin.id }}_{{ forloop.counter }}">
+				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
 					<td style="text-align: right">
 						<p style="text-align: right; font-size: 80%">Item <b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> added on {{ data.date }}</p>
-						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter }}');"/>
+						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="removeItemFromCart('{{ plugin.id }}_{{ forloop.counter0 }}');"/>
 					</td>
 					<td width="100%" colspan="2">
 						<div id="{{ plugin.id }}_options_div_{{ forloop.counter }}"></div>
@@ -315,6 +317,7 @@ document.observe('dom:loaded', function() {
 					</td>
 				</tr>
 					{% endfor %}
+			</table>
 				{% endif %}
 			{% endfor %}
 				<!--
@@ -324,10 +327,9 @@ document.observe('dom:loaded', function() {
 					</td>
 				</tr>
 				-->
-			</table>
 			</div>
 			{% else %}
-			<div style="margin-top: 70px; padding: 5px;">
+			<div id="emptycart_div" style="margin-top: 70px; padding: 5px;">
 				{# No data in cart ! #}
 				<h1>Your cart is currently empty</h1>
 			</div>
