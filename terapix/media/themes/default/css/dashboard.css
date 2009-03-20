@@ -89,6 +89,11 @@ div.note, div.notify, div.tip, div.important, div.caution, div.warning {
 }
 
 div.notify {
+	position: fixed;
+	z-index: 100;
+	top: 95px;
+	width: 130px;
+	padding: 20px;
 	background: #F0F8FF url('../img/34x34/tip.png') no-repeat top left;
 }
 

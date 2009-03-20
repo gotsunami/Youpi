@@ -863,15 +863,7 @@ Notifier = {
 
 		var d = $('notify_div');
 		if (!d) {
-			var d = new Element('div', {id: 'notify_div'}).setStyle({
-				position: 'absolute', 
-				zIndex: 100, 
-				top: '95px', 
-				width: '130px',
-				padding: '20px'
-			});
-			d.addClassName('notify');
-			d.hide();
+			var d = new Element('div', {id: 'notify_div'}).addClassName('notify').hide();
 			document.body.insert(d);
 		}
 
