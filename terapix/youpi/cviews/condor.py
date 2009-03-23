@@ -637,6 +637,7 @@ queue
 		jobid = re.findall('(\d+)', resp[2])[1]
 	except Exception, e:
 		error = resp
+		jobid = 'null'
 
 	return HttpResponse(str({	'Path' 			: str(path), 
 								'IngestionId' 	: str(ingestionId), 
