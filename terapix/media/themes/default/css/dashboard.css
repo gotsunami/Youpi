@@ -95,6 +95,7 @@ div.notify {
 	width: 130px;
 	padding: 20px;
 	background: #F0F8FF url('../img/34x34/tip.png') no-repeat top left;
+	border: 1px solid #B0C4DE;
 }
 
 div.notify div {

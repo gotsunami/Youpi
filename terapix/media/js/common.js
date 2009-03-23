@@ -858,7 +858,7 @@ Notifier = {
 		if (timeout && typeof timeout != 'number')
 			throw 'timeout must be a number';
 
-		timeout = timeout ? timeout : 5.0;
+		timeout = timeout ? timeout : this.defaultTimeout;
 		timeout = timeout > 10 ? 10.0 : parseFloat(timeout);
 
 		var d = $('notify_div');
@@ -885,6 +885,12 @@ Notifier = {
 			}
 		});
 	},
+	/*
+	 * Var: defaultTimeout
+	 * Default timeout in seconds
+	 *
+	 */
+	defaultTimeout: 3.0,
 	/*
 	 * Var: queue
 	 * Holds data awaiting to be processed (FIFO queue)
