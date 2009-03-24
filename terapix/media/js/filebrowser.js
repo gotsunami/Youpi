@@ -690,7 +690,6 @@ function FileBrowser(container_id, varName) {
 	this.clearAllSelections = function() {
 		var count = _selectedDataPaths.length;
 		for (var k=0; k < count; k++) {
-			alert(k);
 			this.removeDataPath(k);
 		}
 	}
