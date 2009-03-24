@@ -9,6 +9,8 @@ var {{ plugin.id }}_itemIdx = 0;
 var {{ plugin.id }}_fm_file_browser;
 var {{ plugin.id }}_advTab;
 
+var uidfitsin = '{{ plugin.id }}';
+
 var {{ plugin.id }} = {
 	viewImageList: function(container_id, idList) {
 		var idList = eval(idList);
@@ -375,26 +377,41 @@ var {{ plugin.id }} = {
 		if (!r) return;
 	
 		var trNode = $(trid);
-		var reload = false;
-	
 		var r = new HttpRequest(
-				'{{ plugin.id}}_result',
+				uidfitsin + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
-					// 3 = 2 rows of header + 1 row of data
-					if (trNode.parentNode.childNodes.length == 3)
-						reload = true;
+					var node = trNode;
+					var last = false;
+					if (trNode.up('table').select('tr[id]').length == 1) {
+						last = true;
+						node = trNode.parentNode;
+					}
 		
-					if (reload) 
-						window.location.reload();
-					else
-						trNode.parentNode.removeChild(trNode);
+					trNode.highlight({
+						afterFinish: function() {
+							node.fade({
+								afterFinish: function() {
+									node.remove();
+									if (last) eval(uidfitsin + '.showSavedItems()');
+
+									// Notify user
+									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
+								}
+							});
+						}
+					});
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=deleteCartItem&Name=' + name;
-		r.send('/youpi/process/plugin/', post);
+		var post = {
+			'Plugin': uidfitsin,
+			'Method': 'deleteCartItem',
+			'Name'	: name
+		};
+
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
 	// Units are in data[z][2], if any

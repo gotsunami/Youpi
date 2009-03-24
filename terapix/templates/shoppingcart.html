@@ -246,12 +246,6 @@ function proceed_cart() {
 	alert('TODO...');
 }
 
-function buildShoppingCart() {
-	console.log('Building SC');
-
-}
-
-
 {# Load custom plugin's javascript code if available #}
 {% for plugin in plugins %}
 	{% include plugin.jsSource %}
@@ -268,8 +262,6 @@ document.observe('dom:loaded', function() {
 	menu.setOnClickHandler(1, function() {
 		showSavedItems();
 	});
-
-	buildShoppingCart();
 });
 
 // A shopping cart item has just been removed

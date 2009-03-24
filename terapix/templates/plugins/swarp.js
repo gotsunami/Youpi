@@ -906,26 +906,41 @@ var {{ plugin.id }} = {
 		if (!r) return;
 	
 		var trNode = $(trid);
-		var reload = false;
-	
 		var r = new HttpRequest(
 				uidswarp + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
-					// 3 = 2 rows of header + 1 row of data
-					if (trNode.parentNode.childNodes.length == 3)
-						reload = true;
+					var node = trNode;
+					var last = false;
+					if (trNode.up('table').select('tr[id]').length == 1) {
+						last = true;
+						node = trNode.parentNode;
+					}
 		
-					if (reload) 
-						window.location.reload();
-					else
-						trNode.remove();
+					trNode.highlight({
+						afterFinish: function() {
+							node.fade({
+								afterFinish: function() {
+									node.remove();
+									if (last) eval(uidswarp + '.showSavedItems()');
+
+									// Notify user
+									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
+								}
+							});
+						}
+					});
 				}
 		);
 	
-		var post = 	'Plugin=' + uidswarp + '&Method=deleteCartItem&Name=' + name;
-		r.send('/youpi/process/plugin/', post);
+		var post = {
+			'Plugin': uidswarp,
+			'Method': 'deleteCartItem',
+			'Name'	: name
+		};
+
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
 	addToCart: function(data) {
