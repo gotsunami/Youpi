@@ -16,38 +16,39 @@ var runIngestionsClickedCount = 0;
  */
 function force_fitsverify()
 {
-	var check = document.getElementById("check_verify");
-	var d = document.getElementById('warn');
+	var check = $("check_verify");
+	var d = $('warn');
 	if (check.checked == false) {
-				d.setAttribute('style', 'display:block');
-				d.setAttribute('width', '50%');
-				d.innerHTML = "<p>Fits format integrity could be corrupted<br>This box could be checked to limit <strong>ingestion</strong> problems</p>";
-				}
+		d.setAttribute('style', 'display:block');
+		d.setAttribute('width', '50%');
+		d.innerHTML = "<p>Fits format integrity could be corrupted<br>This box could be checked to limit <strong>ingestion</strong> problems</p>";
+	}
 	else {
-	d.setAttribute('style', 'display:none');
+		d.setAttribute('style', 'display:none');
 	}
 }
+
 function force_qso_status()
 {
-	var check = document.getElementById("check_qso_status");
-	var d = document.getElementById('warn2');
+	var check = $("check_qso_status");
+	var d = $('warn2');
 	if (check.checked == false) {
-				d.setAttribute('style', 'display:block');
-				d.innerHTML = "<p>When QSO status is validated, we ensure that Fits data integrity is relevant for real science issues<br>This box could be checked to limit <strong>processing</strong> problems</p>";
-				}
+		d.setAttribute('style', 'display:block');
+		d.innerHTML = "<p>When QSO status is validated, we ensure that Fits data integrity is relevant for real science issues<br>This box could be checked to limit <strong>processing</strong> problems</p>";
+	}
 	else {
-	d.setAttribute('style', 'display:none');
+		d.setAttribute('style', 'display:none');
 	}
 }
 
 function force_check_allow_several_times()
 {
-	var check = document.getElementById("check_allow_several_times");
-	var d = document.getElementById('warn3');
+	var check = $("check_allow_several_times");
+	var d = $('warn3');
 	if (check.checked == false) {
 		d.setAttribute('style', 'display:block');
-		d.innerHTML="<table width=\"100%\"><tr><td colspan=\"2\"><p>If <strong>checked</strong>, an image already ingested will be ingested again with a <q><tt class=\"filename\">_#.fits</tt></q> (underscore + number) appended to its db name.<br>For example, <tt class=\"filename\">image.fits</tt> will be renamed to <tt class=\"filename\">image_1.fits</tt> if it has been already ingested.</p><tr><th>Ingestion</th><th>Name</th></tr><tr><td align=\"center\" class=\"number\">1</td><td><tt class=\"filename\">image.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">2</td><td><tt class=\"filename\">image_1.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">...</td></tr><tr><td align=\"center\" class=\"number\">n</td><td><tt class=\"filename\">image_(n-1).fits</tt></td></tr></td></tr></table>";
-				}
+		d.innerHTML="<table><tr><td colspan=\"2\"><p>If <strong>checked</strong>, an image already ingested will be ingested again with a <q><tt class=\"filename\">_#.fits</tt></q> (underscore + number) appended to its db name.<br>For example, <tt class=\"filename\">image.fits</tt> will be renamed to <tt class=\"filename\">image_1.fits</tt> if it has been already ingested.</p><tr><th>Ingestion</th><th>Name</th></tr><tr><td align=\"center\" class=\"number\">1</td><td><tt class=\"filename\">image.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">2</td><td><tt class=\"filename\">image_1.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">...</td></tr><tr><td align=\"center\" class=\"number\">n</td><td><tt class=\"filename\">image_(n-1).fits</tt></td></tr></td></tr></table>";
+	}
 	else {
 		d.setAttribute('style', 'display:none');
 	}
@@ -55,7 +56,7 @@ function force_check_allow_several_times()
 
 function ingestionType()
 {
-	var div_ing = document.getElementById("ingestion");
+	var div_ing = $("ingestion");
 	var div_tree = document.createElement('div');
 	div_tree.setAttribute('id', 'div_tree');
 	div_tree.setAttribute('style', 'width: 400px');
@@ -93,7 +94,7 @@ var email_report = {
 	styleDisabled : 'font-style:italic;color:gray',
 
 	init : function(idname) {
-		email_report.id = document.getElementById(idname);
+		email_report.id = $(idname);
 		email_report.id.value = email_report.defaultEmailMsg;
 	},
 
@@ -130,7 +131,7 @@ var email_report = {
 
 function validate_email(fieldname, msg)
 {
-	var f = document.getElementById(fieldname);
+	var f = $(fieldname);
 	if (!f) return;
 
 	with (f) {
@@ -202,7 +203,7 @@ function process_form() {
 					}
 				}
 				else  {
-					var d = document.getElementById('cluster_log_div');
+					var d = $('cluster_log_div');
 					d.innerHTML = '';
 					var idv = document.createElement('div');
 					idv.appendChild(document.createTextNode('Submitting ingestion jobs to the cluster:'));
@@ -260,13 +261,13 @@ var ingestionPathCurrentIndex = 0;
  *
  */ 
 function submitIngestion(ingestionId) {
-	var log = document.getElementById('cluster_log_div');
+	var log = $('cluster_log_div');
 	var paths = file_browser.getSelectedDataPaths();
 	var path = paths[ingestionPathCurrentIndex][0];
 	var host = path.substr(file_browser.getRootDataPath().length+1);
 	host = host.substr(0, host.search('/'));
 
-	var tab = document.getElementById('cluster_log_table');
+	var tab = $('cluster_log_table');
 	var tr, td;
 	tr = document.createElement('tr');
 	td = document.createElement('td');
@@ -328,10 +329,10 @@ function submitIngestion(ingestionId) {
 
 	post = 	'Path=' + path + 
 			'&IngestionId=' + ingestionId + '_' + (ingestionPathCurrentIndex+1) + 
-			'&ReportEmail=' + document.getElementById('input_email').value +
-			'&CheckSkipVerify=' + (document.getElementById('check_verify').checked ? 'yes' : 'no') +
-			'&CheckQSOStatus=' + (document.getElementById('check_qso_status').checked  ? 'yes' : 'no') +
-			'&CheckAllowSeveralTimes=' + (document.getElementById('check_allow_several_times').checked  ? 'yes' : 'no') +
+			'&ReportEmail=' + $('input_email').value +
+			'&CheckSkipVerify=' + ($('check_verify').checked ? 'yes' : 'no') +
+			'&CheckQSOStatus=' + ($('check_qso_status').checked  ? 'yes' : 'no') +
+			'&CheckAllowSeveralTimes=' + ($('check_allow_several_times').checked  ? 'yes' : 'no') +
 			'&Host=' + host;
 
 	// Send HTTP POST request
