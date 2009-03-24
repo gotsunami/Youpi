@@ -41,14 +41,17 @@ class Sextractor(ProcessingPlugin):
 		post = request.POST
 		
 		try:
-			idList				= eval(post['IdList'])
-			itemID				= str(post['ItemId'])
-			flagPath		 	= post['FlagPath']
-			weightPath 			= post['WeightPath']
-			psfPath 			= post['PsfPath']
-			config 				= post['Config']
-			resultsOutputDir 	= post['ResultsOutputDir']
-			dualMode		 	= post['DualMode']
+			idList					= eval(post['IdList'])
+			itemID					= str(post['ItemId'])
+			flagPath			 	= post['FlagPath']
+			dualFlagPath		 	= post['DualFlagPath']
+			weightPath 				= post['WeightPath']
+			dualWeightPath 			= post['DualWeightPath']
+			psfPath 				= post['PsfPath']
+			config 					= post['Config']
+			resultsOutputDir 		= post['ResultsOutputDir']
+			dualMode		 		= int(post['DualMode'])
+
 		except Exception, e:
 				raise PluginError, "POST argument error. Unable to process data:  %s" %e
 
@@ -59,13 +62,15 @@ class Sextractor(ProcessingPlugin):
 			itemName = "%s-%d" % (itemID, len(items)+1)
 
 		# Custom data
-		data = { 'idList' 			: idList,
-				 'flagPath' 		: flagPath,
-				 'weightPath' 		: weightPath,
-				 'psfPath' 			: psfPath,
-				 'resultsOutputDir' : resultsOutputDir, 
-				 'config' 			: config,
-				 'dualMode' 		: dualMode
+		data = { 'idList' 				: idList,
+				 'flagPath' 			: flagPath,
+				 'dualflagPath' 		: dualFlagPath,
+				 'weightPath' 			: weightPath,
+				 'dualweightPath' 		: dualWeightPath,
+				 'psfPath' 				: psfPath,
+				 'resultsOutputDir'		: resultsOutputDir, 
+				 'config' 				: config,
+				 'dualMode' 			: dualMode
 				 }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
@@ -94,16 +99,18 @@ class Sextractor(ProcessingPlugin):
 			data = marshal.loads(base64.decodestring(str(it.data)))
 #			raise PluginError, "%s" % data
 			res.append({
-						'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
-						'username' 			: str(it.user.username),
-						'idList' 			: str(data['idList']), 
-						'weightPath' 		: str(data['weightPath']), 
-						'flagPath' 			: str(data['flagPath']), 
-						'psfPath' 			: str(data['psfPath']), 
-						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
-						'name' 				: str(it.name),
-						'config' 			: str(data['config']),
-						'dualMode'			: str(data['dualMode']),
+						'date' 					: "%s %s" % (it.date.date(), it.date.time()), 
+						'username' 				: str(it.user.username),
+						'idList' 				: str(data['idList']), 
+						'weightPath' 			: str(data['weightPath']), 
+						'dualweightPath' 		: str(data['dualweightPath']), 
+						'flagPath' 				: str(data['flagPath']), 
+						'dualflagPath' 			: str(data['dualflagPath']), 
+						'psfPath' 				: str(data['psfPath']), 
+						'resultsOutputDir' 		: str(data['resultsOutputDir']), 
+						'name' 					: str(it.name),
+						'config' 				: str(data['config']),
+						'dualMode'				: int(data['dualMode']),
 						})
 
 		return res 
@@ -116,17 +123,26 @@ class Sextractor(ProcessingPlugin):
 		3. Returns info related to ClusterId and number of jobs submitted
 		"""
 		try:
-			idList = eval(request.POST['ImgList'])	# List of lists
+			idList = eval(request.POST['IdList'])	# List of lists
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data. %s" % idList
-
+			raise PluginError, "POST argument error. Unable to process data. %s" % e
+		
 		cluster_ids = []
 		k = 1
 		error = condorError = '' 
+		
+		try:
+			dualMode = request.POST['DualMode']
+		except Exception, e:
+			raise PluginError, "%s" % e
+		
+		if dualMode == '1':
+			idList = eval('[[' + str(idList[0][0]) + ']]')
+
+		
 
 		try:
 			for imgList in idList:
-				raise PluginError, "%s" % imgList
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList)
@@ -139,6 +155,7 @@ class Sextractor(ProcessingPlugin):
 				condorError = str(e)
 		except Exception, e:
 				error = "Error while processing list #%d: %s" % (k, e)
+		
 
 		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
@@ -174,19 +191,22 @@ class Sextractor(ProcessingPlugin):
 		"""
 
 		post = request.POST
-		
 		try:
-			itemId 				= str(post['ItemId'])
-			flagPath 			= post['FlagPath']
-			weightPath 			= post['WeightPath']
-			psfPath 			= post['PsfPath']
-			config 				= post['Config']
-			taskId 				= post.get('TaskId', '')
-			resultsOutputDir 	= post['ResultsOutputDir']
-			reprocessValid 		= int(post['ReprocessValid'])
-			dualMode 			= post['DualMode']
+			itemId 					= str(post['ItemId'])
+			flagPath	 			= post['FlagPath']
+			dualFlagPath	 		= post['DualFlagPath']
+			weightPath 				= post['WeightPath']
+			dualWeightPath 			= post['DualWeightPath']
+			psfPath 				= post['PsfPath']
+			config 					= post['Config']
+			taskId 					= post.get('TaskId', '')
+			resultsOutputDir 		= post['ResultsOutputDir']
+			reprocessValid 			= int(post['ReprocessValid'])
+			dualMode 				= post['DualMode']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
+		
+
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
 
@@ -227,25 +247,30 @@ class Sextractor(ProcessingPlugin):
 		csf = open(csfPath, 'w')
 		
 		images = Image.objects.filter(id__in = idList)
-#		if dualMode:
-#			try:
-#				idList = eval(request.POST['ImgList'])	# List of lists
-#			except Exception, e:
-#				raise PluginError, "POST argument error. Unable to process data. %s" % idList
-#			dualImage = idList[0][1]
-#			imgdual = Image.objects.filter(id__in = dualImage)
+				
+
+		if dualMode == '1':
+			try:
+				idList = eval(post['IdList'])	# List of lists
+			except Exception, e:
+				raise PluginError, "POST argument error. Unable to process data. %s" % e
+			dualImage = idList[0][1]
+			imgdual = Image.objects.filter(id = dualImage)
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
-		userData = {'Kind'	 			: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
-					'UserID' 			: str(request.user.id),				# Mandatory for AMI, WP
-					'ItemID' 			: itemId,
-					'SubmissionFile'	: csfPath, 
-					'ConfigFile' 		: customrc, 
-					'Weight' 			: str(weightPath), 
-					'Flag'	 			: str(flagPath), 
-					'Psf'	 			: str(psfPath), 
-					'Descr' 			: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
-		} 
+		userData = {'Kind'	 				: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
+					'UserID' 				: str(request.user.id),				# Mandatory for AMI, WP
+					'ItemID' 				: itemId,
+					'SubmissionFile'		: csfPath, 
+					'ConfigFile' 			: customrc, 
+					'Weight' 				: str(weightPath), 
+					'DualWeight' 			: str(dualWeightPath), 
+					'Flag'	 				: str(flagPath), 
+					'DualFlag'	 			: str(dualFlagPath), 
+					'Psf'		 			: str(psfPath), 
+					'Descr' 				: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
+					'DualMode' 				: int(dualMode),
+				} 
 
 		step = 0 							# At least step seconds between two job start
 
@@ -301,8 +326,9 @@ notify_user             = semah@iap.fr
 			path = os.path.join(img.path, img.name + '.fits')
 
 			# dual mode check
-#			if dualMode:
-#				path2 = os.path.join(imgdual.path, imgdual.name + '.fits')
+			if dualMode == '1':
+				path2 = os.path.join(imgdual[0].path, imgdual[0].name + '.fits')
+				print path2
 
 			# WEIGHT checks
 			if weightPath:
@@ -332,6 +358,25 @@ notify_user             = semah@iap.fr
 				elif os.path.isfile(psfPath):
 					psf = psfPath
 
+			#Dual WEIGHT checks
+			if dualWeightPath:
+				if os.path.isdir(dualWeightPath):
+					#then catch the img.name + "_weight.fits"
+					dualWeight = os.path.join(dualWeightPath, img.name + '_weight.fits')
+
+				elif os.path.isfile(dualWeightPath):
+					dualWeight = dualWeightPath
+
+			#Dual flag checks
+			if dualFlagPath:
+				if os.path.isdir(dualFlagPath):
+					#then catch the img.name + "_weight.fits"
+					dualFlag = os.path.join(dualFlagPath, img.name + '_flag.fits')
+
+				elif os.path.isfile(dualFlagPath):
+					dualFlag = dualFlagPath
+
+
 
 			#
 			# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
@@ -355,6 +400,18 @@ notify_user             = semah@iap.fr
 					raise PluginError, "the weight file %s doesn't exists" %weight
 				else:
 					sex_params += "-WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE %s" % (weight)
+					#support for dual weight
+					if dualWeightPath:
+						if not os.path.exists(dualWeight):
+							raise PluginError, "the dual weight file %s doesn't exists" %dualWeight
+						else:
+							sex_params += ", %s" % (dualWeight)
+			elif (not weightPath and dualWeightPath):
+				if not os.path.exists(dualWeight):
+					raise PluginError, "the dual weight file %s doesn't exists" %dualWeight
+				else:
+					sex_params += "-WEIGHT_TYPE NONE, MAP_WEIGHT -WEIGHT_IMAGE NONE, %s" % (dualWeight)
+
 
 			#Addding flag support 
 			if flagPath:
@@ -362,8 +419,21 @@ notify_user             = semah@iap.fr
 					raise PluginError, "the flag file %s doesn't exists" %flag
 				else:
 					sex_params += " -FLAG_IMAGE %s" % (flag)	
+					#support for dual weight
+					if dualFlagPath:
+						if not os.path.exists(dualFlag):
+							raise PluginError, "the dual flag file %s doesn't exists" %dualFlag
+						else:
+							sex_params += ", %s" % (dualFlag)
+			elif (not flagPath and dualFlagPath):
+				if not os.path.exists(dualFlag):
+					raise PluginError, "the dual flag file %s doesn't exists" %dualFlag
+				else:
+					sex_params += "-FLAG_IMAGE NONE,%s" % (dualFlag)
+
+
 				
-			#Addding weight support 
+			#Addding psf support 
 			if psfPath:
 				if not os.path.exists(psf):
 					raise PluginError, "the psf file %s doesn't exists" %psf
@@ -377,30 +447,31 @@ notify_user             = semah@iap.fr
 			except ValueError:
 				raise ValueError, userData
 
-#			if dualMode:
-#				condor_submit_entry = """
-#	arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s, %(img2)s -c %(config)s 
-	# YOUPI_USER_DATA = %(userdata)s
-#	environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
-#	queue""" %  {	'encuserdata' 	: encUserData, 
-#					'params'		: sex_params,
-#					'img'			: path,
-#					'img2'			: path2,
-#					'config'		: os.path.basename(customrc),
-#					'userdata'		: userData, 
-#					'user'			: request.user.username,
-#					'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }
-#			else:
-
-			condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s 
-# YOUPI_USER_DATA = %(userdata)s
+			if dualMode == '1':
+				condor_submit_entry = """
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s, %(img2)s -c %(config)s
+# YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
 				'params'		: sex_params,
 				'img'			: path,
+				'img2'			: path2,
 				'config'		: os.path.basename(customrc),
-				'userdata'		: userData, 
+				'userdata'		: userData,
+				'user'			: request.user.username,
+				'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }
+
+			else:
+
+				condor_submit_entry = """
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s
+# YOUPI_USER_DATA 		= %(userdata)s
+environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
+queue""" %  {	'encuserdata' 	: encUserData,
+				'params'		: sex_params,
+				'img'			: path,
+				'config'		: os.path.basename(customrc),
+				'userdata'		: userData,
 				'user'			: request.user.username,
 				'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }
 
@@ -468,25 +539,28 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		if data.thumbnails:
 			thumbs = [ thumb for thumb in thumbs]
 
-		return {	'TaskId'			: str(taskid),
-					'Title' 			: str("%s" % self.description),
-					'User' 				: str(task.user.username),
-					'Success' 			: task.success,
-					'Start' 			: str(task.start_date),
-					'End' 				: str(task.end_date),
-					'Duration' 			: str(task.end_date-task.start_date),
-					'WWW' 				: str(data.www),
-					'ResultsOutputDir' 	: str(task.results_output_dir),
-					'ResultsLog'		: sexlog,
-					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
-					'Previews'			: thumbs,
-					'HasThumbnails'		: data.thumbnails,
-					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
-					'History'			: history,
-					'Log' 				: err_log,
-					'Weight'			: str(data.weightPath),
-					'Flag'				: str(data.flagPath),
-					'Psf'				: str(data.psfPath),
+		return {	'TaskId'				: str(taskid),
+					'Title' 				: str("%s" % self.description),
+					'User' 					: str(task.user.username),
+					'Success' 				: task.success,
+					'Start' 				: str(task.start_date),
+					'End' 					: str(task.end_date),
+					'Duration' 				: str(task.end_date-task.start_date),
+					'WWW' 					: str(data.www),
+					'ResultsOutputDir' 		: str(task.results_output_dir),
+					'ResultsLog'			: sexlog,
+					'Config' 				: str(zlib.decompress(base64.decodestring(data.config))),
+					'Previews'				: thumbs,
+					'HasThumbnails'			: data.thumbnails,
+					'FITSImages'			: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
+					'History'				: history,
+					'Log' 					: err_log,
+					'Weight'				: str(data.weightPath),
+					'DualWeight'			: str(data.dualweightPath),
+					'Flag'					: str(data.flagPath),
+					'DualFlag'				: str(data.dualflagPath),
+					'Psf'					: str(data.psfPath),
+					'DualMode'				: str(data.dualMode),
 		}
 
 

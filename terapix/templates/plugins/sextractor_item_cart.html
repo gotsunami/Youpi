@@ -6,18 +6,18 @@
 			<div id="{{ plugin.id }}_{{ forloop.counter0 }}_selections_div"></div>
 			<table class="plugin_small">
 				<script type="text/javascript">
-				{% if data.userData.dualMode %}
+				{% ifequal data.userData.dualMode 1 %}
 						{{ plugin.id }}.displayImageCount('[[1]]', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
 				{% else %}
 					{{ plugin.id }}.displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
-				{% endif %}
+				{% endifequal %}
 				</script>
-				{% if data.userData.dualMode %}
+				{% ifequal data.userData.dualMode 1 %}
 				<tr>
-					<td><span class="regLetter">Dual Image Mode:</span></td>
-					<td> 1 image + 1 image for measurements</td>
+						<td><span class="regLetter">Dual Image Mode:</span></td>
+						<td> 1 image + 1 image for measurements</td>
 				</tr>
-				{% endif %}
+				{% endifequal %}
 				{% if data.userData.flagPath %}
 				<tr>
 					<td><span class="regLetter">Flag:</span></td>
@@ -37,6 +37,22 @@
 					<td>{{ data.userData.psfPath }}</td>
 				</tr>
 				{% endif %}
+
+				{% ifequal data.userData.dualMode 1 %}
+					{% if data.userData.dualWeightPath %}
+						<tr>
+							<td><span class="regLetter">Weight for 2nd image:</span></td>
+							<td>{{ data.userData.dualWeightPath }}</td>
+						</tr>
+						{% endif %}
+					{% if data.userData.dualFlagPath %}
+						<tr>
+							<td><span class="regLetter">Flag for 2nd image:</span></td>
+							<td>{{ data.userData.dualFlagPath }}</td>
+						</tr>
+					{% endif %}
+				{% endifequal %}
+
 				<tr>
 					<td><span class="confLetter">Config:</span></td>
 					<td>{{ data.userData.config }}</td>

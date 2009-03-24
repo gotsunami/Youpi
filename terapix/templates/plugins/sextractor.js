@@ -11,7 +11,11 @@ var {{ plugin.id }} = {
 	 */
 	ims1: null,
 	ims2: null,
+
+
+
 	addSelectionToCart: function() {
+		
 		var dualMode = 0;
 		//Checks for images
 		$('single','dual').each( function(id) {
@@ -36,7 +40,7 @@ var {{ plugin.id }} = {
 
 		// OPTIONAL
 		var optPath = new Array();
-		var optSel = $(uidsex + '_flags_select', uidsex + '_weights_select', uidsex + '_psf_select');
+		var optSel = $(uidsex + '_flags_select', uidsex + '_weights_select', uidsex + '_psf_select', uidsex + '_flag_dual_select', uidsex + '_weight_dual_select');
 		
 		optSel.each(function(select, j) {
 			if (optSel[j] == null) { 
@@ -44,7 +48,7 @@ var {{ plugin.id }} = {
 			}
 			else {
 				var path = select.options[select.selectedIndex].text;
-				if (path != selector.getNoSelectionPattern()) {
+				if (path != (selector1.getNoSelectionPattern() || selector2.getNoSelectionPattern())) {
 					optPath[j] = path;
 				}
 			}
@@ -69,6 +73,8 @@ var {{ plugin.id }} = {
 			weightPath: optPath[1] ? optPath[1] : '',
 			flagPath: optPath[0] ? optPath[0] : '',
 			psfPath: optPath[2]  ? optPath[2] : '',
+			dualWeightPath: optPath[4] ? optPath[4] : '',
+			dualFlagPath: optPath[3] ? optPath[3] : '',
 			resultsOutputDir: output_data_path,
 			dualMode: dualMode,
 		});
@@ -84,8 +90,8 @@ var {{ plugin.id }} = {
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
-									document.fire('notifier:notify', 'The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
-										') has been added to the cart.');
+									alert('The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
+										') has been\nadded to the cart.');
 								}
 		);
 
@@ -233,9 +239,10 @@ var {{ plugin.id }} = {
 				null,	
 				// Custom handler for results
 				function(resp) {
-					document.fire('notifier:notify', 'Sextractor item saved successfully');
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
+					// Global function (in shoppingcart.html)
+					showSavedItems();
 				}
 		);
 	
@@ -626,9 +633,36 @@ var {{ plugin.id }} = {
 						else
 							tabitd.update('Not specified');
 						tabitr.insert(tabitd);
-					
-
 						tabi.insert(tabitr);
+
+						//Weight and Flag for the dual mode
+						if (res.dualMode == 1) {
+							tabitr = new Element('tr');
+							tabitd = new Element('td', {'class': 'label'});
+							tabitd.update('Weight(dual): ');
+							tabitr.insert(tabitd);
+							tabitd = new Element('td', {'class': 'file'});
+							if (res.dualweightPath.length)
+								tabitd.update(reduceString(res.dualweightPath));
+							else
+								tabitd.update('Not specified');
+							tabitr.insert(tabitd);
+							tabi.insert(tabitr);				
+
+							tabitr = new Element('tr');
+							tabitd = new Element('td', {'class': 'label'});
+							tabitd.update('Flag(dual): ');
+							tabitr.insert(tabitd);
+							tabitd = new Element('td', {'class': 'file'});
+							if (res.dualflagPath.length)
+								tabitd.update(reduceString(res.dualflagPath));
+							else
+								tabitd.update('Not specified');
+							tabitr.insert(tabitd);
+							tabi.insert(tabitr);					
+
+						}
+						
 						td.insert(tabi);
 						tr.insert(td);
 	
@@ -648,13 +682,15 @@ var {{ plugin.id }} = {
 						
 
 						addImg.c_data = {
-								 		'idList'           : res.idList,
-										'flagPath'         : res.flagPath,
-										'weightPath'       : res.weightPath,
-										'psfPath'          : res.psfPath,
-										'resultsOutputDir' : res.resultsOutputDir,
-										'config'           : res.config,
-										'dualMode'         : res.dualMode
+								 		'idList' 				: res.idList,
+										'flagPath'				: res.flagPath,
+										'dualFlagPath'			: res.dualflagPath,
+										'weightPath'			: res.weightPath,
+										'dualWeightPath'		: res.dualweightPath,
+										'psfPath'				: res.psfPath,
+										'resultsOutputDir'		: res.resultsOutputDir,
+										'config'				: res.config,
+										'dualMode'				: res.dualMode
 						};
 
 						addImg.observe('click', function() {

@@ -14,7 +14,7 @@
 							<tr>
 								<td style="text-align: center;vertical-align:middle;">
 									<table>
-										<tr><td><input id = "single" type="radio" name="mode" value="single" selected="selected"> Single Image Mode</input></td></tr>
+										<tr><td><input id = "single" type="radio" name="mode" value="single" checked="checked"> Single Image Mode</input></td></tr>
 										<tr><td><input id = "dual" type="radio" name="mode" value="dual"> Dual Image Mode</input></td></tr>
 									</table>
 								</td>
@@ -31,7 +31,13 @@
 		</div>
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
-			<div style="float:left;" id="selector_div"></div>
+				<div id="selector1_div"></div>
+				<HR>
+				<div id="selector2_div" style="display:none;">
+					<br>
+					<br>
+					<div class="tip" id="infodual" style="float:left;width:270px;margin-left:40px;"></div>
+				</div>
 		</div>
 
 		</div>
@@ -45,6 +51,7 @@
 <script type="text/javascript">
 	var text_single = "<b> Single Image Mode Option:</b><li>Creation a catalogue of objects from an astronomic image<br><li>support for WeightMaps<br><li>support for FlagMaps<br>";
 	var text_dual = "<b>Dual Image Mode Option:</b><li>Image1 is used for detection of sources, image2 for measurements only.<br><li>Image1 and image2 must have the same dimensions.<br><li>For most photometric parameters,image1 will use image2 pixel values, which allows one to easily measurepixel-to-pixel colours.";
+	var info_dual = "<b> SExtractor is in DUAL IMAGE MODE </b><BR><br>You can specify for each image of this mode :<BR><br><li> A <b>WEIGHT MAP</b><li> A <b>FLAG MAP</b><br><br> Use the path selector to choose:<br><br><li><b>TOP</b> selection for the first image<br><li><b>BOTTOM</b> selection for the image used for measurements"
 $('single','dual').each(function (id) {
 	if (id.value == 'single') {
 		id.observe('mouseover', function() {
@@ -81,22 +88,42 @@ $('single','dual').each(function (id) {
 			
 
 	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+
 	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
 	fm_file_browser.setRootTitle('Terapix Cluster');
 	fm_file_browser.setFilteringPatterns(['*_flag.fits', '*_weight.fits', '*_psf.fits']);
 	fm_file_browser.setRootDataPath('/data');
 
+	
+
 	// Enable user output custom directory
 	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
 		
-	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
-	selector.addPath('FLAG data', 'flags');
-	selector.addPath('WEIGHT data', 'weights');
-	selector.addPath('PSF data', 'psf');
-	selector.setFileBrowser(fm_file_browser);
-	selector.render();
-
-	// Now file browser can renders itself
-	fm_file_browser.render();
-
+	var selector1 = new PathSelectorWidget('selector1_div', '{{ plugin.id }}');
+	selector1.addPath('FLAG data', 'flags');
+	selector1.addPath('WEIGHT data', 'weights');
+	selector1.addPath('PSF data', 'psf');
+	selector1.setFileBrowser(fm_file_browser);
+	selector1.render();
+	var selector2 = new PathSelectorWidget('selector2_div', '{{ plugin.id }}');
+	selector2.addPath('2nd FLAG data', 'flag_dual');
+	selector2.addPath('2nd WEIGHT data', 'weight_dual');
+	selector2.setFileBrowser(fm_file_browser);
+	selector2.render();
+			
+	$('single','dual').each(function (id) {
+		if (id.value == 'dual') {
+			id.observe('click',function() {
+				$('selector2_div').style.display = 'block';
+				$('infodual').update(info_dual);
+			});
+		}
+		else {
+			id.observe('click', function () {
+				$('selector2_div').style.display = 'none';
+				$('infodual').update('');
+			});
+		}
+	});
+fm_file_browser.render();
 </script>
