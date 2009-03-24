@@ -147,19 +147,24 @@ function validate_email(fieldname, msg)
 }
 
 function process_form() {
-	var email = document.getElementById('input_email');
-	var ing_id = document.getElementById('input_ingestion_id');
+	var email = $('input_email');
+	var ing_id = $('input_ingestion_id');
 
-	if (!validate_email('input_email', 'Please fill in an email address to send report to')) {
-		email.focus();
-		email.select();
+	if (!validate_email('input_email', 'Please fill in a valid email address to send report to')) {
+		email.highlight({ afterFinish: 
+			function() { 
+				email.focus();
+				email.select();
+			}
+		});
 		return false;
 	}
 
-	var iid = ing_id.value.replace(/\s+/, '');
+	var iid = ing_id.value.strip();
 	if (iid.length == 0) {
 		alert('Please fill in an ingestion ID (mandatory)!');
 		ing_id.focus();
+		ing_id.highlight();
 		return false;
 	}
 	else {
@@ -176,12 +181,25 @@ function process_form() {
 			null,
 			// Custom handler for results
 			function(resp) {
-				var nb = resp['data'].length;
+				var nb = resp.data.length;
 				if (nb > 0) {
-					// ID already exists: not allowed
-					alert("An ingestion with this ID already exists. Please choose another ingestion ID.");
-					ing_id.focus();
-					ing_id.select();
+					// Do not allow to submit ingestion if ingestion names already exists
+					var alike = new Array();
+					resp.data.each(function(name) {
+						if (new RegExp('^' + iid + '_\\d+').test(name[0]))
+							alike.push(name[0]);
+					});
+					if (alike.length) {
+						// ID already exists: not allowed
+						alert("This ingestion ID has been already used for ingestion" + (alike.length > 1 ? 's' : '') + '\n' + 
+								alike + '\nPlease choose another ingestion ID.');
+						ing_id.highlight({ afterFinish: 
+							function() { 
+								ing_id.focus();
+								ing_id.select();
+							}
+						});
+					}
 				}
 				else  {
 					var d = document.getElementById('cluster_log_div');
@@ -214,11 +232,19 @@ function process_form() {
 			}
 		);
 
-		post = 	'Table=youpi_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=is equal to&Line0Text=' + iid +
-				'&Hide=&OrderBy=id';
+		var post = {
+			Table		: 'youpi_ingestion',
+			DisplayField: 'label',
+			Lines		: 0,
+			Line0Field	: 'label',
+			Line0Cond	: 'contains',
+			Line0Text	: iid + '_%',
+			Hide		: '',
+			OrderBy		: 'id'
+		};
 
 		// Send HTTP POST request
-		xhr.send('/youpi/process/preingestion/query/', post);
+		xhr.send('/youpi/process/preingestion/query/', $H(post).toQueryString());
 	}
 
 	return false;
