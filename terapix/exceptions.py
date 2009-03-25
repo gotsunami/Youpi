@@ -7,3 +7,6 @@ class PluginError(Exception): pass
 class PluginAllDataAlreadyProcessed(PluginError): pass
 class PluginEvalError(PluginError): pass
 class PluginManagerError(PluginError): pass
+#
+# For debugging
+class DebugError(Exception): pass

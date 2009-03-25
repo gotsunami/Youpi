@@ -10,7 +10,7 @@ from terapix.youpi.models import *
 from terapix.exceptions import *
 from terapix.settings import *
 
-PLUGIN_DIRS = os.path.join(HOME, 'youpi', 'terapix', 'youpi', 'plugins')
+PLUGIN_DIRS = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 
