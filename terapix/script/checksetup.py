@@ -3,8 +3,22 @@ import sys, os
 
 YOUPI_USER = 'youpiadm'
 
+def setup_db():
+	"""
+	Database setup.
+	"""
+
+	print "Init database with mandatoy data...",
+	# FIXME
+	print 'FIXME'
+	return
+	surveys = Survey.objects.all()
+	if surveys:
+		# Check that MEGACAM and WIRCAM instruments exist
+		instrus = Instrument.objects.filter(Q(name = 'MEGACAM') | Q(name = 'WIRCAM'))
+
 def setup_users():
-	print "Check there is at least one user...",
+	print "Check if there is at least one user...",
 	users = User.objects.all().order_by('username')
 	if users:
 		print "OK (%d)" % len(users)
@@ -28,6 +42,7 @@ def setup_policies():
 	print "OK"	
 
 def setup():
+	setup_db()
 	setup_users()
 	setup_policies()
 	
@@ -37,7 +52,12 @@ if __name__ == '__main__':
 	if '..' not in sys.path:
 		sys.path.insert(0, '..')
 
-	from django.contrib.auth.models import User
-	from terapix.youpi.models import *
+	try:
+		from django.contrib.auth.models import User
+		from django.db.models import Q
+		from terapix.youpi.models import *
+	except ImportError:
+		print 'Please run this command from the terapix subdirectory.'
+		sys.exit(1)
 
 	setup()
