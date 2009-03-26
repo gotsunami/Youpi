@@ -405,7 +405,7 @@ notify_user             = semah@iap.fr
 						if not os.path.exists(dualWeight):
 							raise PluginError, "the dual weight file %s doesn't exists" %dualWeight
 						else:
-							sex_params += ", %s" % (dualWeight)
+							sex_params += ",%s" % (dualWeight)
 			elif (not weightPath and dualWeightPath):
 				if not os.path.exists(dualWeight):
 					raise PluginError, "the dual weight file %s doesn't exists" %dualWeight
@@ -424,7 +424,7 @@ notify_user             = semah@iap.fr
 						if not os.path.exists(dualFlag):
 							raise PluginError, "the dual flag file %s doesn't exists" %dualFlag
 						else:
-							sex_params += ", %s" % (dualFlag)
+							sex_params += ",%s" % (dualFlag)
 			elif (not flagPath and dualFlagPath):
 				if not os.path.exists(dualFlag):
 					raise PluginError, "the dual flag file %s doesn't exists" %dualFlag
@@ -449,7 +449,7 @@ notify_user             = semah@iap.fr
 
 			if dualMode == '1':
 				condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s, %(img2)s -c %(config)s
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(img)s,%(img2)s %(params)s -c %(config)s
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 

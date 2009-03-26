@@ -315,7 +315,6 @@ var {{ plugin.id }} = {
 			});
 			td.update('See SEx XML file');
 			tr.insert(td);
-	
 			td = new Element('td');
 			var tn, imgpath, a;
 				
@@ -424,6 +423,32 @@ var {{ plugin.id }} = {
 		td = new Element('td').insert(resp.Weight.length > 0 ? resp.Weight : '--');
 		tr.insert(td);
 		tab2.insert(tr);
+		
+		if (resp.DualMode == '1') {
+
+			//Dual Mode
+			tr = new Element('tr');
+			td = new Element('td').insert('SExtractor is in DUAL MODE');
+			tr.insert(td);
+
+			//Flag dual
+			tr = new Element('tr');
+			td = new Element('td').insert('Flag path (Dual Mode):');
+			tr.insert(td);
+
+			td = new Element('td').insert(resp.DualFlag.length > 0 ? resp.DualFlag : '--');
+			tr.insert(td);
+			tab2.insert(tr);
+
+			// Weight dual
+			tr = new Element('tr');
+			td = new Element('td').insert('Weight path (Dual Mode):');
+			tr.insert(td);
+
+			td = new Element('td').insert(resp.DualWeight.length > 0 ? resp.DualWeight : '--');
+			tr.insert(td);
+			tab2.insert(tr);
+		}
 
 		// Psf
 		tr = new Element('tr');
