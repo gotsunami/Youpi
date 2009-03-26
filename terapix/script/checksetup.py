@@ -3,19 +3,48 @@ import sys, os
 
 YOUPI_USER = 'youpiadm'
 
+def log(group, msg):
+	"""
+	Prints a formatted log message to stdout.
+	@param group string group name
+	@param msg string message to display
+	"""
+	print "[%s] %s" % (group, msg)
+
+def sub(msg):
+	print " * %s" % msg
+
 def setup_db():
 	"""
 	Database setup.
 	"""
 
-	print "Init database with mandatoy data...",
-	# FIXME
-	print 'FIXME'
-	return
-	surveys = Survey.objects.all()
-	if surveys:
+	log('init', 'setup database with mandatoy data')
+
+	#surveys = Survey.objects.all()
+	#if surveys:
 		# Check that MEGACAM and WIRCAM instruments exist
-		instrus = Instrument.objects.filter(Q(name = 'MEGACAM') | Q(name = 'WIRCAM'))
+#		instrus = Instrument.objects.filter(Q(name = 'MEGACAM') | Q(name = 'WIRCAM'))
+
+	# Default first quality evaluation comments
+	sub('Adding default first quality evaluation comments')
+	comments = ('---', 'Poor seeing (>1.2)', 'Astrometric keyword problem: some CCDs off',
+				'D3-i rejection', 'Galaxy counts below/above expectations', 'Some CCDs or half-CCDs missing',
+				'Defocus?', 'PSF/Object image doubled', 'Diffuse light contamination', 'Unusual PSF anisotropy pattern',
+				'Elongated image', 'Unusual rh-mag. diagram', 'Unusual background image', 'Telescope lost guiding?')
+
+	for com in comments:
+		try:
+			c = FirstQComment(comment = com)
+			c.save()
+		except:
+			# Already in DB
+			pass
+
+	# Default processing kinds
+
+	print 'OK'
+
 
 def setup_users():
 	print "Check if there is at least one user...",
