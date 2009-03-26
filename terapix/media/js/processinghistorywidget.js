@@ -413,17 +413,23 @@ function ProcessingHistoryWidget(container, varName) {
 	
 				var tr, td, cls, stab, str, std, d, img, gdiv;
 	
+				/*
+				 * FIXME
+				 * reprocess_all_failed_processing is not yet implemented in any plugin...
+				 *
+
 				if (status == 'failed' && len && kind != 'all') {
 					var rdiv = document.createElement('div');
 					rdiv.setAttribute('id', 'reprocess_failed_div');
 					rdiv.setAttribute('class', 'reprocess');
 					var rimg = document.createElement('img');
-					rimg.setAttribute('onclick', kind + "_reprocess_all_failed_processings('" + resp['Stats']['TasksIds'] + "');");
+					rimg.setAttribute('onclick', kind + ".reprocess_all_failed_processings('" + resp['Stats']['TasksIds'] + "');");
 					rimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reprocess.gif');
 					rdiv.appendChild(rimg);
 					rdiv.appendChild(document.createTextNode(' that current selection of processings that never succeeded'));
 					container.appendChild(rdiv);
 				}
+				*/
 	
 				// Updates stats
 				var spans = ['success', 'failed', 'total', 'big_total'];

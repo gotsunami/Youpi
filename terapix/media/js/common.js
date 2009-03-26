@@ -332,29 +332,30 @@ function queryUrlDisplayAsTable(container_id, select_limit_id, post_url, style)
  */
 function results_showDetails(pname, id, fullpage) {
 	var fullpage = fullpage ? true : false;
-	var div = document.getElementById('infopanel');
+	var div = $('infopanel');
 	var r = new HttpRequest(
 		div.id,
 		null,
 		// Custom handler for results
 		function(resp) {
-			div.innerHTML = '';
+			div.update();
 			if (fullpage) {
-				var a = document.createElement('a');
-				a.setAttribute('href', '/youpi/results/' + pname + '/' + id + '/');
-				a.appendChild(document.createTextNode("Click here to see a full page result for '" + resp['result']['Title'] + "'"));
-				div.appendChild(document.createTextNode('[ '));
-				div.appendChild(a);
-				div.appendChild(document.createTextNode(' ]'));
+				var a = new Element('a', {href: '/youpi/results/' + pname + '/' + id + '/', target: '_blank'});
+				a.update("Click here to see a full page result for '" + resp.result.Title + "'");
+				div.insert('[ ').insert(a).insert(' ]');
 			}
 			// Global variable
-			currentReturnedData = resp['result'];
+			currentReturnedData = resp.result;
 			eval(pname + ".resultsShowEntryDetails('" + div.id + "')");
 		}
 	);
 
-	var post = 'Plugin=' + pname + '&Method=getTaskInfo&TaskId=' + id;
-	r.send('/youpi/process/plugin/', post);
+	var post = {
+		Plugin: pname,
+		Method: 'getTaskInfo',
+		TaskId: id
+	};
+	r.send('/youpi/process/plugin/', $H(post).toQueryString());
 }
 
 /*

@@ -551,24 +551,22 @@ var {{ plugin.id }} = {
 		td.appendChild(udiv);
 	
 		// Grading
-		if (resp['Success']) {
+		if (resp.Success) {
 			var gdiv = new Element('div');
-			var a = new Element('a');
-			if (resp['GradingCount'] > 0) {
-				gdiv.setAttribute('class', 'notgraded');
-				a.setAttribute('href', "/youpi/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
-				a.appendChild(document.createTextNode('Image graded ' + resp['GradingCount'] + ' time' + (resp['GradingCount'] > 1 ? 's' : '')));
-				gdiv.appendChild(a);
+			if (resp.GradingCount > 0) {
+				gdiv.writeAttribute('class', 'notgraded');
+				var a = new Element('a', {href: "/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', target: '_blank'});
+				a.insert('Image graded ' + resp.GradingCount + ' time' + (resp.GradingCount > 1 ? 's' : ''));
+				gdiv.insert(a);
 			}
 			else {
-				gdiv.setAttribute('class', 'notgraded');
-				gdiv.appendChild(document.createTextNode('Image not graded yet'));
-				gdiv.appendChild(new Element('br'));
-				a.setAttribute('href', "/youpi/grading/{{ plugin.id }}/" + resp['FitsinId'] + '/');
-				a.appendChild(document.createTextNode('Grade it now !'));
-				gdiv.appendChild(a);
+				gdiv.writeAttribute('class', 'notgraded');
+				gdiv.insert('Image not graded yet').insert(new Element('br'));
+				var a = new Element('a', {href: "/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', target: '_blank'});
+				a.insert('Grade it now !');
+				gdiv.insert(a);
 			}
-			td.appendChild(gdiv);
+			td.insert(gdiv);
 		}
 	
 		tr = new Element('tr');
