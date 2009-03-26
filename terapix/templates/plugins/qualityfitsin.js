@@ -1362,7 +1362,7 @@ var {{ plugin.id }} = {
 			if (k == 1 && reprocess_len) {
 				th.appendChild(new Element('br'));
 				var rimg = new Element('img');
-				rimg.setAttribute('onclick', resp['PluginId'] + "_reprocessAllFailedProcessings('" + stats['ReprocessTaskList'] + "');");
+				rimg.setAttribute('onclick', resp['PluginId'] + ".reprocessAllFailedProcessings('" + stats['ReprocessTaskList'] + "');");
 				rimg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 				rimg.setAttribute('style', 'cursor: pointer;');
 				th.appendChild(rimg);
