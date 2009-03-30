@@ -473,6 +473,8 @@ notify_user             = monnerville@iap.fr
 			# seconds
 			#
 			userData['StartupDelay'] = step
+			# Mandatory for WP
+			userData['JobID'] = self.getUniqueCondorJobId()
 
 			# Base64 encoding + marshal serialization
 			# Will be passed as argument 1 to the wrapper script

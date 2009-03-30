@@ -385,6 +385,8 @@ notify_user             = semah@iap.fr
 			userData['ImgID'] = str(img.id)
 			userData['Descr'] = str("%s of %s" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
 			userData['ResultsOutputDir'] = str(os.path.join(resultsOutputDir, img.name))
+			# Mandatory for WP
+			userData['JobID'] = self.getUniqueCondorJobId()
 
 			# Parameters to use for each job
 			sex_params = "-XSL_URL %s/sextractor.xsl -PARAMETERS_NAME %s -FILTER_NAME %s -WRITE_XML YES " % (os.path.join(	

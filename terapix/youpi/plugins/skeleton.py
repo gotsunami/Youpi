@@ -106,17 +106,21 @@ class Skeleton(ProcessingPlugin):
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
 
-		# Base64 encoding + marshal serialization
-		# Will be passed as argument 1 to the wrapper script
-		try:
-			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
-		except ValueError:
-			raise ValueError, userData
 
 		# Real command to perform here
 		args = ''
 		for x in range(self.jobCount):
-			args += "arguments = %s %s\nqueue\n" % (encUserData, self.command)
+			# Mandatory for WP
+			userData['JobID'] = self.getUniqueCondorJobId()
+			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+
+			args += """
+arguments 		= %(data)s %(command)s
+environment		= PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(data)s
+queue""" % ({
+	'data': encUserData, 
+	'command': self.command,
+})
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 

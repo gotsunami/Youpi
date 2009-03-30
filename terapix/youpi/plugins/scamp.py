@@ -242,6 +242,8 @@ notify_user             = monnerville@iap.fr
 		userData['ImgID'] = idList
 		userData['Descr'] = str("%s from %d SExtractor catalogs" % (self.optionLabel, len(images)))		# Mandatory for Active Monitoring Interface (AMI)
 		userData['LDACFiles'] = ldac_files
+		# Mandatory for WP
+		userData['JobID'] = self.getUniqueCondorJobId()
 
 		#
 		# Delaying job startup will prevent "Too many connections" MySQL errors

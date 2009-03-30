@@ -30,6 +30,61 @@ def getNowDateTime(lt = time.time()):
 	"""
 	return "%4d-%02d-%02d %02d:%02d:%02d" % time.localtime(lt)[:6]
 
+def getJobClusterId(userData):
+	"""
+	Gets current job Condor ID
+	@returns cluster id string
+	"""
+
+	pipe = os.popen("/opt/condor/bin/condor_q -global -xml")
+	data = pipe.readlines()
+	pipe.close()
+
+	# Removes first 3 lines (not XML)
+	doc = dom.parseString(string.join(data[3:]))
+	jNode = doc.getElementsByTagName('c')
+	currentJobFound = False
+
+	# First, try to locate the current job
+	for job in jNode:
+		jobData = {}
+		data = job.getElementsByTagName('a')
+
+		for a in data:
+			if a.getAttribute('n') == 'Env':
+				# Try to look for YOUPI_USER_DATA environment variable
+				# If this is variable is found then this is a Youpi's job so we can keep it
+				env = str(a.firstChild.firstChild.nodeValue)
+				if env.find('YOUPI_USER_DATA') >= 0:
+					m = re.search('YOUPI_USER_DATA=(.*?)$', env)
+					XMLUserData = m.groups(0)[0]	
+					c = XMLUserData.find(';')
+					if c > 0:
+						XMLUserData = XMLUserData[:c]
+
+					XMLUserData = marshal.loads(base64.decodestring(str(XMLUserData)))
+					try:
+						if userData['JobID'] == XMLUserData['JobID']:
+							# Job found
+							data = job.getElementsByTagName('a')
+							for b in data:
+								if b.getAttribute('n') == 'ClusterId':
+									jobData['ClusterId'] = str(b.firstChild.firstChild.nodeValue)
+
+								elif b.getAttribute('n') == 'ProcId':
+									jobData['ProcId'] = str(b.firstChild.firstChild.nodeValue)
+							currentJobFound = True
+					except KeyError:
+						pass
+
+			if currentJobFound:
+				break
+
+		if currentJobFound:
+			break
+
+	return "%s.%s" % (jobData['ClusterId'], jobData['ProcId'])
+
 def ingestQFitsInResults(fitsinId, g):
 	"""
 	Stores results from QFits-in outputs.
@@ -176,6 +231,7 @@ def task_start_log(userData, start, kind_id = None):
 		g.setTableName('youpi_processing_task')
 		g.insert(	user_id = int(user_id),
 					kind_id = int(kind_id),
+					clusterId = getJobClusterId(userData),
 					start_date = start,
 					end_date = getNowDateTime(),
 					title = userData['Descr'],

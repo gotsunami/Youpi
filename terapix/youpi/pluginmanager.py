@@ -3,7 +3,7 @@
 from django.contrib.sessions.models import Session
 #
 import glob, sys, types, re, os, string
-import marshal, base64
+import marshal, base64, random, time
 from types import *
 #
 from terapix.youpi.models import *
@@ -19,6 +19,7 @@ class ProcessingPlugin:
 
 	def __init__(self):
 		self.enable = True
+		self.id = 'base'
 		self.shortName = 'My short name here'
 		self.optionLabel = 'My option label'
 		# Default HTML template
@@ -30,6 +31,16 @@ class ProcessingPlugin:
 		self.__data = [] 
 		# Used to generate rather unique item ID in shopping cart
 		self.itemCounter = 0
+
+	def getUniqueCondorJobId(self):
+		"""
+		Builds a unique Condor job Id string. Can be passed to the wrapper_processing script on 
+		the cluster so that it can retreive all job information from Condor.
+		@return Condor Id string
+		"""
+
+		random.seed()
+		return "%s:%f-%d" % (self.id, time.time(), random.randint(1, 1000000))
 
 	def getConfigFileContent(self, request):
 		post = request.POST
