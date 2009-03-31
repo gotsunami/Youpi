@@ -228,6 +228,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Title' 			: str("%s - %s.fits" % (self.description, img.name)),
 					'User' 				: str(task.user.username),
 					'Hostname'			: str(task.hostname),
+					'ClusterId'			: str(task.clusterId),
 					'Success' 			: task.success,
 					'Start' 			: str(task.start_date),
 					'End' 				: str(task.end_date),
@@ -336,14 +337,14 @@ class QualityFitsIn(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "Unable to use a suitable config file: %s" % e
 
-		now = time.time()
-		customrc = os.path.join('/tmp/', "qf-%s.rc" % now)
+		# QualityFITS configuration file
+		customrc = self.getConfigurationFilePath()
 		qfrc = open(customrc, 'w')
 		qfrc.write(content)
 		qfrc.close()
 
 		# Condor submission file
-		csfPath = "/tmp/qcondor-%s.txt" % now
+		csfPath = self.getCondorSubmitFilePath()
 
 		images = Image.objects.filter(id__in = idList)
 		# Content of YOUPI_USER_DATA env variable passed to Condor
@@ -367,6 +368,9 @@ class QualityFitsIn(ProcessingPlugin):
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
+		# Get filenames for Condor log files (log, error, out)
+		logs = self.getCondorLogFilenames()
+
 	 	# Generates CSF
 		condor_submit_file = """
 #
@@ -374,28 +378,32 @@ class QualityFitsIn(ProcessingPlugin):
 # Please not that this file has been generated automatically by Youpi
 # http://clix.iap.fr/youpi/
 #
-executable              = %s/wrapper_processing.py
+executable              = %(wrapperpath)s/wrapper_processing.py
 universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s, %s/NOP
-initialdir				= %s
+transfer_input_files    = %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(settingspath)s/NOP
+initialdir				= %(initdir)s
 transfer_output_files   = NOP
-log                     = /tmp/QF.log.$(Cluster).$(Process)
-error                   = /tmp/QF.err.$(Cluster).$(Process)
-output                  = /tmp/QF.out.$(Cluster).$(Process)
+log                     = %(log)s
+error                   = %(errlog)s
+output                  = %(outlog)s
 notification            = Error
 notify_user             = monnerville@iap.fr
 # Computed Req string
-%s""" % (	os.path.join(submit_file_path, 'script'),
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			customrc,
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			req )
-
+%(requirements)s""" % {	
+	'wrapperpath'	: os.path.join(submit_file_path, 'script'),
+	'settingspath'	: submit_file_path, 
+	'scriptpath'	: os.path.join(submit_file_path, 'script'),
+	'conf'			: customrc,
+	'initdir'		: os.path.join(submit_file_path, 'script'),
+	'requirements'	: req,
+	'log'			: logs['log'],
+	'errlog'		: logs['error'],
+	'outlog'		: logs['out'],
+}
+		
 		csf.write(condor_submit_file)
 
 		# Check if already successful processings

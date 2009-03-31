@@ -91,7 +91,7 @@ class Skeleton(ProcessingPlugin):
 
 		now = time.time()
 		# Condor submission file
-		csfPath = "/tmp/skel-%s.txt" % now
+		csfPath = self.getCondorSubmitFilePath()
 		csf = open(csfPath, 'w')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
@@ -123,6 +123,8 @@ queue""" % ({
 })
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
+		# Get filenames for Condor log files (log, error, out)
+		logs = self.getCondorLogFilenames()
 
 	 	# Generates CSF
 		condor_submit_file = """
@@ -132,35 +134,39 @@ queue""" % ({
 # http://clix.iap.fr/youpi/
 #
 
-# Plugin: %s
+# Plugin: %(name)s
 
-executable              = %s/wrapper_processing.py
+executable              = %(wrapperpath)s/wrapper_processing.py
 universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
-initialdir				= %s
+transfer_input_files    = %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(settingspath)s/NOP
+initialdir				= %(initdir)s
 transfer_output_files   = NOP
-# YOUPI_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
-log                     = /tmp/SKEL.log.$(Cluster).$(Process)
-error                   = /tmp/SKEL.err.$(Cluster).$(Process)
-output                  = /tmp/SKEL.out.$(Cluster).$(Process)
+# YOUPI_USER_DATA = %(dataclear)s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(dataenc)s
+log                     = %(log)s
+error                   = %(errlog)s
+output                  = %(outlog)s
 notification            = Error
 notify_user             = monnerville@iap.fr
 # Computed Req string
-%s
-%s""" % (	self.description,
-			os.path.join(submit_file_path, 'script'),
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			submit_file_path, 
-			os.path.join(submit_file_path, 'script'),
-			userData, 
-			base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
-			req, 
-			args )
+%(requirements)s
+%(args)s""" % {	
+	'name'			: self.description,
+	'wrapperpath'	: os.path.join(submit_file_path, 'script'),
+	'settingspath'	: submit_file_path, 
+	'scriptpath'	: os.path.join(submit_file_path, 'script'),
+	'initdir'		: os.path.join(submit_file_path, 'script'),
+	'dataclear'		: userData, 
+	'dataenc'		: base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
+	'requirements'	: req, 
+	'args'			: args,
+	'log'			: logs['log'],
+	'errlog'		: logs['error'],
+	'outlog'		: logs['out'],
+}
 
 		csf.write(condor_submit_file)
 		csf.close()
@@ -201,6 +207,7 @@ notify_user             = monnerville@iap.fr
 					'Title' 	: str("%s" % self.description),
 					'User' 		: str(task.user.username),
 					'Success' 	: task.success,
+					'ClusterId'	: str(task.clusterId),
 					'Start' 	: str(task.start_date),
 					'End' 		: str(task.end_date),
 					'Duration' 	: str(task.end_date-task.start_date),

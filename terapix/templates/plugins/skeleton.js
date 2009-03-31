@@ -237,6 +237,13 @@ var {{ plugin.id }} = {
 			tr.insert(td);
 			tab2.insert(tr);
 		}
+
+		// Condor Job Logs
+		tr = new Element('tr');
+		td = new Element('td', {style: 'padding: 0px'});
+		td.update(ResultsHelpers.getCondorJobLogsEntry(resp.ClusterId, resp.TaskId));
+		tr.insert(td);
+		tab2.insert(tr);
 	
 		d.insert(tab);
 		container.insert(d);

@@ -140,16 +140,14 @@ class Swarp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "Unable to use a suitable config file: %s" % e
 
-		now = time.time()
-
 		# Swarp config file
-		customrc = os.path.join('/tmp/', "swarp-config-%s.rc" % now)
+		customrc = self.getConfigurationFilePath()
 		swrc = open(customrc, 'w')
 		swrc.write(content)
 		swrc.close()
 
 		# Condor submission file
-		csfPath = "/tmp/swarp-condor-%s.txt" % now
+		csfPath = self.getCondorSubmitFilePath()
 		csf = open(csfPath, 'w')
 
 		# Swarp file containing a list of images to process (one per line)
@@ -177,6 +175,9 @@ class Swarp(ProcessingPlugin):
 		step = 0 							# At least step seconds between two job start
 
 		submit_file_path = os.path.join(TRUNK, 'terapix')
+
+		# Get filenames for Condor log files (log, error, out)
+		logs = self.getCondorLogFilenames()
 
 		# Weight maps support
 		if useQFITSWeights:
@@ -210,25 +211,30 @@ when_to_transfer_output = ON_EXIT
 transfer_input_files    = %(heads)s, %(weights)s, %(images)s, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(nop)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
-log                     = /tmp/SWARP.log.$(Cluster).$(Process)
-error                   = /tmp/SWARP.err.$(Cluster).$(Process)
-output                  = /tmp/SWARP.out.$(Cluster).$(Process)
+log                     = %(log)s
+error                   = %(errlog)s
+output                  = %(outlog)s
 notification            = Error
 notify_user             = monnerville@iap.fr
 # Computed Req string
 %(requirements)s
-""" % {	'description'	: self.description,
-		'wrapper' 		: os.path.join(submit_file_path, 'script'),
-		'settings' 		: submit_file_path, 
-		'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
-		'config' 		: customrc,
-		'swarplist' 	: swarpImgsFile,
-		'nop' 			: submit_file_path, 
-		'heads'			: head_files,
-		'weights'		: weight_files,
-		'images'		: string.join([os.path.join(img.path, img.name + '.fits') for img in images], ', '),
-		'initdir' 		: os.path.join(submit_file_path, 'script'),
-		'requirements' 	: req }
+""" % {	
+	'description'	: self.description,
+	'wrapper' 		: os.path.join(submit_file_path, 'script'),
+	'settings' 		: submit_file_path, 
+	'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
+	'config' 		: customrc,
+	'swarplist' 	: swarpImgsFile,
+	'nop' 			: submit_file_path, 
+	'heads'			: head_files,
+	'weights'		: weight_files,
+	'images'		: string.join([os.path.join(img.path, img.name + '.fits') for img in images], ', '),
+	'initdir' 		: os.path.join(submit_file_path, 'script'),
+	'requirements' 	: req,
+	'log'			: logs['log'],
+	'errlog'		: logs['error'],
+	'outlog'		: logs['out'],
+}
 
 		csf.write(condor_submit_file)
 
@@ -455,6 +461,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'ResultsLog'		: swarplog,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
 					'Previews'			: thumbs,
+					'ClusterId'			: str(task.clusterId),
 					'HasThumbnails'		: data.thumbnails,
 					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
 					'History'			: history,

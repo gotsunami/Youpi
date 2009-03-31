@@ -342,6 +342,13 @@ var {{ plugin.id }} = {
 			tab2.insert(tr);
 		}
 
+		// Condor Job Logs
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
+		td.update(ResultsHelpers.getCondorJobLogsEntry(resp.ClusterId, resp.TaskId));
+		tr.insert(td);
+		tab2.insert(tr);
+
 		// Processing history
 		// Header title
 		var hist = resp.History;

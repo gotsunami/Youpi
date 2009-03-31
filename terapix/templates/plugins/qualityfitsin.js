@@ -613,6 +613,13 @@ var {{ plugin.id }} = {
 			tab2.appendChild(tr);
 		}
 	
+		// Condor Job Logs
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
+		td.update(ResultsHelpers.getCondorJobLogsEntry(resp.ClusterId, resp.TaskId));
+		tr.insert(td);
+		tab2.insert(tr);
+
 		// QFits-in processing history
 		// Header title
 		var hist = resp['QFitsHistory'];

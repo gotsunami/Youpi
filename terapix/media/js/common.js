@@ -891,7 +891,7 @@ Notifier = {
 	 * Default timeout in seconds
 	 *
 	 */
-	defaultTimeout: 3.0,
+	defaultTimeout: 5.0,
 	/*
 	 * Var: queue
 	 * Holds data awaiting to be processed (FIFO queue)
@@ -904,6 +904,98 @@ Notifier = {
 	 *
 	 */
 	max: 10
+};
+
+/*
+ * Namespace: ResultsHelpers
+ * Namespace for plugin helper functions (for the results page)
+ * 
+ */
+ResultsHelpers = {
+	/*
+	 * Function: getCondorJobLogsEntry
+	 * Builds and return a TABLE DOM element with info related to Condor job ID and log files, when available
+	 *
+	 * Parameters:
+	 *  clusterId - string: cluster Id
+	 *  taskId - Task DB Id
+	 *
+	 * Returns:
+	 *  TABLE DOM element
+	 * 
+	 */
+	getCondorJobLogsEntry: function(clusterId, taskId) {
+		var tab = new Element('table').setStyle({width: '100%'});
+		var tr = new Element('tr');
+		var td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
+		td.insert('Condor Job Logs');
+		tr.insert(td);
+		tab.insert(tr);
+
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2});
+		tr.insert(td);
+		tab.insert(tr);
+		var htab = new Element('table').setStyle({width: '100%'});
+		td.insert(htab);
+		tr = new Element('tr');
+		td = new Element('td');
+		td.insert('Cluster Id: ' + (clusterId == 'None' ? '--' : clusterId)).insert(new Element('br'));
+		tr.insert(td);
+		td = new Element('td');
+
+		var msg = 'Log files: ';
+		if (clusterId == 'None') {
+			msg += '--';
+		}
+		else {
+			var r = new HttpRequest(
+				td,
+				null, // Use default error handler
+				// Custom handler for results
+				function(resp) {
+					td.update();
+					var logs = $H(resp.logs);
+					var tab = new Element('table');
+					var ttr, ttd;
+					logs.each(function(pair) {
+						ttr = new Element('tr');
+						ttd = new Element('td');
+						ttd.insert('Condor ' + pair.key + ': ');
+						ttr.insert(ttd);
+						ttd = new Element('td');
+						if (logs.get(pair.key).length) {
+							var a = new Element('a', {target: '_blank'}).update(logs.get(pair.key));
+							ttd.insert(a);
+							ttr.insert(ttd);
+							ttd = new Element('td').setStyle({textAlign: 'right'});
+							ttd.insert(resp.sizes[pair.key]);
+							ttr.insert(ttd);
+						}
+						else {
+							ttd.setStyle({colspan: 2});
+							ttd.insert('--');
+							ttr.insert(ttd);
+						}
+						tab.insert(ttr);
+					});
+					td.insert(tab);
+				}
+			);
+
+			var post = {
+				Method: 'getCondorLogFilesLinks',
+				TaskId: taskId
+			};
+			r.send('/youpi/cluster/logs/', $H(post).toQueryString());
+		}
+
+		td.insert(msg);
+		tr.insert(td);
+		htab.insert(tr);
+
+		return tab;
+	}
 };
 
 // Monitors notify events

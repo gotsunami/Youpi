@@ -13,6 +13,7 @@ CONDORFILE 		= '/tmp/condor.prod'
 CONDOR_OUTPUT 	= '/tmp/condor.prod.out'
 CONDOR_ERROR 	= '/tmp/condor.prod.error'
 CONDOR_LOG 		= '/tmp/condor.prod.log'
+CONDOR_LOG_DIR	= '/tmp'
 #
 # ImageMagick support
 #

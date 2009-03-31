@@ -39,6 +39,8 @@ urlpatterns = patterns(
 	(r'^youpi/cluster/softwares/versions/refresh/$', 'query_condor_node_for_versions'),
 	(r'^youpi/cluster/softwares/versions/delete/$', 'clear_softs_versions'),
 	(r'^youpi/cluster/status/$', 'condor_status'),
+	(r'^youpi/cluster/logs/$', 'get_condor_log_files_links'),
+	(r'^youpi/cluster/log/(.*?)/(.*?)/$', 'show_condor_log_file'),
 
 	(r'^youpi/monitoring/$', 'monitoring'),
 	(r'^youpi/monitoring/live/$', 'live_monitoring'),

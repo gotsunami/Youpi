@@ -1474,6 +1474,74 @@ def stats_processing(request):
 
 	return HttpResponse(str({'info': data}), mimetype = 'text/plain')
 
+@login_required
+@profile
+def get_condor_log_files_links(request):
+	"""
+	Returns a dictionnary with entries for the log, error and output filenames 
+	that should be used by plugins generating Condor submission files.
+	@return Dictionnary with paths to Condor log files
+	"""
+
+	post = request.POST
+	try:
+		taskId = post['TaskId']
+	except Exception, e:
+		raise PluginError, "POST argument error. Unable to process data."
+
+	task = Processing_task.objects.filter(id = taskId)[0]
+	pattern = os.path.join(CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
+	logs = {
+		'log': pattern % 'log', 
+		'error': pattern % 'err', 
+		'out': pattern % 'out',
+	}
+	sizes = {'log': 0, 'error': 0, 'out': 0}
+
+	for kind, path in logs.iteritems():
+		try:
+			sizes[kind] = int(os.path.getsize(path))
+			logs[kind] = str("""<a href="/youpi/cluster/log/%s/%s/" target="_blank">%s</a>""" % (kind, taskId, logs[kind][logs[kind].rfind('/')+1:]))
+		except OSError:
+			logs[kind] = ''
+
+	return HttpResponse(str({'logs': logs, 'sizes': sizes}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def show_condor_log_file(request, kind, taskId):
+	"""
+	Display Condor log file for a given kind and taskId
+	@param kind one of 'log', 'error', 'out'
+	@param taskId task Id
+	"""
+
+	if kind not in ('log', 'error', 'out'):
+		return HttpResponseBadRequest('Bad request')
+
+	try:
+		task = Processing_task.objects.filter(id = taskId)[0]
+	except:
+		return HttpResponseBadRequest('Bad request')
+
+	pattern = os.path.join(CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
+
+	logs = {
+		'log': pattern % 'log', 
+		'error': pattern % 'err', 
+		'out': pattern % 'out',
+	}
+
+	try:
+		f = open(logs[kind], 'r')
+		data = string.join(f.readlines(), '')
+		if not data:
+			data = 'Empty file.'
+		f.close()
+	except IOError:
+		data = 'Log file not found on server (has it been deleted?)'
+
+	return HttpResponse(str(data), mimetype = 'text/plain')
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'

@@ -2,7 +2,7 @@
 
 from django.contrib.sessions.models import Session
 #
-import glob, sys, types, re, os, string
+import glob, sys, types, re, os, string, os.path
 import marshal, base64, random, time
 from types import *
 #
@@ -41,6 +41,41 @@ class ProcessingPlugin:
 
 		random.seed()
 		return "%s:%f-%d" % (self.id, time.time(), random.randint(1, 1000000))
+
+	def getCondorSubmitFilePath(self):
+		"""
+		Returns the path to Condor submit file path.
+		Each call generates a new filename so that no file gets overwritten.
+		The returned name should then be used by plugins to add some content to it.
+		@return Path to a non existing file
+		"""
+
+		return "%s/CONDOR-%s-%s.txt" % (CONDOR_LOG_DIR, self.id, time.time())
+
+	def getConfigurationFilePath(self):
+		"""
+		Returns the pathname to configuration file used for this processing
+		Each call generates a new filename so that no file gets overwritten.
+		The returned name should then be used by plugins to add some content to it.
+		@return Path to a non existing file
+		"""
+
+		return "%s/%s-%s.rc" % (CONDOR_LOG_DIR, self.id.upper(), time.time())
+
+	def getCondorLogFilenames(self):
+		"""
+		Returns a dictionnary with entries for the log, error and output filenames 
+		that should be used by plugins generating Condor submission files.
+		@return Dictionnary with paths to Condor log files
+		"""
+
+		pattern = os.path.join(CONDOR_LOG_DIR, self.id.upper() + '.%s.$(Cluster).$(Process)')
+
+		return {
+			'log'	: pattern % "log",
+			'error'	: pattern % "err",
+			'out'	: pattern % "out",
+		}
 
 	def getConfigFileContent(self, request):
 		post = request.POST
