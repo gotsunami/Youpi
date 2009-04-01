@@ -11,7 +11,7 @@
 #
 ##############################################################################
 
-import sys, os
+import sys, os, string
 os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
 if '..' not in sys.path:
 	sys.path.insert(0, '..')
@@ -21,6 +21,7 @@ try:
 	from django.db.models import Q
 	from django.db import IntegrityError
 	#
+	from terapix.settings import *
 	from terapix.youpi.models import *
 	from terapix.youpi.pluginmanager import PluginManager
 except ImportError:
@@ -95,6 +96,26 @@ def setup_db():
 			# Already existing
 			pass
 
+	# Default configuration files
+	logger.log('Adding default configuration files')
+	user = User.objects.all()[0]
+	for plugin in manager.plugins:
+		try:
+			name = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', plugin.id + '.conf.default')
+			f = open(name, 'r')
+			config = string.join(f.readlines())
+			f.close()
+		except IOError, e:
+			print "!", name
+
+		k = Processing_kind.objects.filter(name__exact = plugin.id)[0]
+		try:
+			m = ConfigFile(kind = k, name = 'default', content = config, user = user)
+			m.save()
+		except:
+			# Cannot save, already exits: do nothing
+			pass
+
 def setup_users():
 	logger.setGroup('users', 'Check if there is at least one user')
 
@@ -124,8 +145,8 @@ def setup_policies():
 		logger.log("ALL policy found")
 
 def setup():
-	setup_db()
 	setup_users()
+	setup_db()
 	setup_policies()
 	
 

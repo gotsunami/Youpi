@@ -107,11 +107,11 @@ class ProcessingPlugin:
 
 	def getConfigFileNames(self, request):
 		# Updates entry
-		configs = ConfigFile.objects.filter(kind__name__exact = self.id)
-		if not len(configs):
+		dfltconfig = ConfigFile.objects.filter(kind__name__exact = self.id, name = 'default')
+		if not dfltconfig:
 			self.__saveDefaultConfigFileToDB(request)
-			configs = ConfigFile.objects.filter(kind__name__exact = self.id)
 
+		configs = ConfigFile.objects.filter(kind__name__exact = self.id)
 		res = []
 		for config in configs:
 			res.append(str(config.name))
