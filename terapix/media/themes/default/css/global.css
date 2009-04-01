@@ -1510,3 +1510,9 @@ div.tags *, .dropzone * {
 	font-size: 9px;
 	vertical-align: center;
 }
+
+.reminder {
+	font-size: 9px;
+	color: brown;
+	width: 200px;
+}

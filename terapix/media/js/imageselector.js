@@ -2682,6 +2682,12 @@ function ImageSelector(container, options)
 		td.insert(rdiv);
 		tr.insert(td);
 
+		// Selection reminder
+		td = new Element('td');
+		rdiv = new Element('div', {id: id + '_reminder_div_' + currentTR}).addClassName('reminder');
+		td.insert(rdiv);
+		tr.insert(td);
+
 		// Finally executes appropriate handler for current line
 		eval('build' + fields[0] + 'DataWidget')(currentTR);
 	
@@ -2760,6 +2766,26 @@ function ImageSelector(container, options)
 				rdiv.setAttribute('style', 'padding: 2px; background-color: lightblue; border: 1px solid #5b80b2; text-align:center; vertical-align: middle;');
 				rdiv.update();
 				rdiv.insert(count);
+
+				// Updates selection reminder
+				var tr = rdiv.up('tr');
+				var sels = tr.select('select');
+				var reminder = '';
+				sels.each(function(sel) {
+					if (sel.multiple) {
+						var m = '';
+						$A(sel.options).each(function(option) {
+							if (option.selected)
+								m += option.value + ', ';
+						});
+						reminder += m.sub(/, $/, '');
+					}
+					else
+						reminder += sel.options[sel.selectedIndex].text + ' ';
+				});
+				if (sels.length < 3)
+					reminder += tr.select('input[type="text"]')[0].value;
+				rdiv.up().next().select('div')[0].update(reminder);
 
 				idResults.splice(xhr.idResultsIdx, 1);
 				if (idResults[xhr.idResultsIdx]) {
