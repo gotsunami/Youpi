@@ -56,14 +56,18 @@ class Sextractor(ProcessingPlugin):
 		try:
 			idList					= eval(post['IdList'])
 			itemID					= str(post['ItemId'])
+			
 			flagPath			 	= post['FlagPath']
-			dualFlagPath		 	= post['DualFlagPath']
 			weightPath 				= post['WeightPath']
-			dualWeightPath 			= post['DualWeightPath']
 			psfPath 				= post['PsfPath']
+
+			dualMode		 		= int(post['DualMode'])
+			dualImage 				= post['DualImage']
+			dualWeightPath 			= post['DualWeightPath']
+			dualFlagPath		 	= post['DualFlagPath']
+
 			config 					= post['Config']
 			resultsOutputDir 		= post['ResultsOutputDir']
-			dualMode		 		= int(post['DualMode'])
 
 		except Exception, e:
 				raise PluginError, "POST argument error. Unable to process data:  %s" %e
@@ -76,14 +80,15 @@ class Sextractor(ProcessingPlugin):
 
 		# Custom data
 		data = { 'idList' 				: idList,
-				 'flagPath' 			: flagPath,
-				 'dualflagPath' 		: dualFlagPath,
 				 'weightPath' 			: weightPath,
-				 'dualweightPath' 		: dualWeightPath,
+				 'flagPath' 			: flagPath,
 				 'psfPath' 				: psfPath,
+				 'dualMode' 			: dualMode,
+				 'dualImage' 			: dualImage,
+				 'dualweightPath' 		: dualWeightPath,
+				 'dualflagPath' 		: dualFlagPath,
 				 'resultsOutputDir'		: resultsOutputDir, 
 				 'config' 				: config,
-				 'dualMode' 			: dualMode
 				 }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
@@ -110,20 +115,20 @@ class Sextractor(ProcessingPlugin):
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
-#			raise PluginError, "%s" % data
 			res.append({
 						'date' 					: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 				: str(it.user.username),
 						'idList' 				: str(data['idList']), 
 						'weightPath' 			: str(data['weightPath']), 
-						'dualweightPath' 		: str(data['dualweightPath']), 
 						'flagPath' 				: str(data['flagPath']), 
-						'dualflagPath' 			: str(data['dualflagPath']), 
 						'psfPath' 				: str(data['psfPath']), 
+						'dualMode'				: int(data['dualMode']),
+						'dualImage'		 		: str(data['dualImage']), 
+						'dualweightPath' 		: str(data['dualweightPath']), 
+						'dualflagPath' 			: str(data['dualflagPath']), 
 						'resultsOutputDir' 		: str(data['resultsOutputDir']), 
 						'name' 					: str(it.name),
 						'config' 				: str(data['config']),
-						'dualMode'				: int(data['dualMode']),
 						})
 
 		return res 
@@ -206,16 +211,20 @@ class Sextractor(ProcessingPlugin):
 		post = request.POST
 		try:
 			itemId 					= str(post['ItemId'])
-			flagPath	 			= post['FlagPath']
-			dualFlagPath	 		= post['DualFlagPath']
+
 			weightPath 				= post['WeightPath']
-			dualWeightPath 			= post['DualWeightPath']
+			flagPath	 			= post['FlagPath']
 			psfPath 				= post['PsfPath']
+
+			dualMode 				= post['DualMode']
+			dualImage 				= post['DualImage']
+			dualFlagPath	 		= post['DualFlagPath']
+			dualWeightPath 			= post['DualWeightPath']
+
 			config 					= post['Config']
 			taskId 					= post.get('TaskId', '')
 			resultsOutputDir 		= post['ResultsOutputDir']
 			reprocessValid 			= int(post['ReprocessValid'])
-			dualMode 				= post['DualMode']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 		
@@ -260,30 +269,29 @@ class Sextractor(ProcessingPlugin):
 		csf = open(csfPath, 'w')
 		
 		images = Image.objects.filter(id__in = idList)
-				
-
-		if dualMode == '1':
-			try:
-				idList = eval(post['IdList'])	# List of lists
-			except Exception, e:
-				raise PluginError, "POST argument error. Unable to process data. %s" % e
-			dualImage = idList[0][1]
-			imgdual = Image.objects.filter(id = dualImage)
-
+			
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 				: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 				: str(request.user.id),				# Mandatory for AMI, WP
 					'ItemID' 				: itemId,
 					'SubmissionFile'		: csfPath, 
 					'ConfigFile' 			: customrc, 
-					'Weight' 				: str(weightPath), 
-					'DualWeight' 			: str(dualWeightPath), 
-					'Flag'	 				: str(flagPath), 
-					'DualFlag'	 			: str(dualFlagPath), 
-					'Psf'		 			: str(psfPath), 
 					'Descr' 				: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
+					'Weight' 				: str(weightPath), 
+					'Flag'	 				: str(flagPath), 
+					'Psf'		 			: str(psfPath), 
 					'DualMode' 				: int(dualMode),
+					'DualImage' 			: str(dualImage),
+					'DualWeight' 			: str(dualWeightPath), 
+					'DualFlag'	 			: str(dualFlagPath), 
 				} 
+	
+		#Dual Mode check
+
+		if dualMode == '1':
+			imgdual = Image.objects.filter(id = dualImage)
+			path2 = os.path.join(imgdual[0].path, imgdual[0].name + '.fits')
+			userData['DualImage'] =	str(path2)
 
 		step = 0 							# At least step seconds between two job start
 
@@ -338,11 +346,6 @@ notify_user             = semah@iap.fr
 		for img in images:
 			path = os.path.join(img.path, img.name + '.fits')
 
-			# dual mode check
-			if dualMode == '1':
-				path2 = os.path.join(imgdual[0].path, imgdual[0].name + '.fits')
-				print path2
-
 			# WEIGHT checks
 			if weightPath:
 				if os.path.isdir(weightPath):
@@ -396,7 +399,12 @@ notify_user             = semah@iap.fr
 			# They are later used by the wrapper script to get the name of error log file easily
 			#
 			userData['ImgID'] = str(img.id)
-			userData['Descr'] = str("%s of %s" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
+
+			if dualMode == '1':
+				userData['Descr'] = str("%s of %s (Dual Mode)" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
+			else:
+				userData['Descr'] = str("%s of %s (Single Mode)" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
+
 			userData['ResultsOutputDir'] = str(os.path.join(resultsOutputDir, img.name))
 			# Mandatory for WP
 			userData['JobID'] = self.getUniqueCondorJobId()
@@ -555,7 +563,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			thumbs = [ thumb for thumb in thumbs]
 
 		return {	'TaskId'				: str(taskid),
-					'Title' 				: str("%s" % self.description),
+					'Title' 				: str("%s - %s.fits" % (self.description, imgs[0].name)),
 					'User' 					: str(task.user.username),
 					'Success' 				: task.success,
 					'Start' 				: str(task.start_date),
@@ -577,6 +585,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'DualFlag'				: str(data.dualflagPath),
 					'Psf'					: str(data.psfPath),
 					'DualMode'				: str(data.dualMode),
+					'DualImage'				: str(data.dualImage),
 		}
 
 

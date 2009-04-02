@@ -328,6 +328,7 @@ class Plugin_sex(models.Model):
 	weightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
 	flagPath = models.CharField(max_length = 255, null = True, help_text = "Path to flag images")
 	dualweightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images in dual mode")
+	dualImage = models.CharField(max_length = 255, null = True, help_text = "Path to dual image in dual mode")
 	dualflagPath = models.CharField(max_length = 255, null = True, help_text = "Path to flag images in dual mode")
 	psfPath = models.CharField(max_length = 255, null = True, help_text = "Path to psf images")
 	dualMode = models.BooleanField('Dual Image Mode', default = False)

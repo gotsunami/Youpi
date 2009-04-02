@@ -35,6 +35,7 @@ var {{ plugin.id }} = {
 			if(id.checked) {
 				if(id.value == 'single') {
 					sels = {{ plugin.id }}.ims1.getListsOfSelections();
+					sels2 = null;
 				}
 				else {
 					dualMode = 1;
@@ -86,10 +87,11 @@ var {{ plugin.id }} = {
 			weightPath: optPath[1] ? optPath[1] : '',
 			flagPath: optPath[0] ? optPath[0] : '',
 			psfPath: optPath[2]  ? optPath[2] : '',
+			dualMode: dualMode,
+			dualImage: sels2 ? sels2 : '',
 			dualWeightPath: optPath[4] ? optPath[4] : '',
 			dualFlagPath: optPath[3] ? optPath[3] : '',
 			resultsOutputDir: output_data_path,
-			dualMode: dualMode,
 		});
 	},
 
@@ -277,7 +279,9 @@ var {{ plugin.id }} = {
 		var tab = new Element('table', {'class': 'fileBrowser', 'style': 'width: 100%'});
 	
 		tr = new Element('tr');
-		th = new Element('th').update(resp['Title']);
+
+		if (resp['DualMode'] == '1') th = new Element('th').update(resp['Title'] + " (Dual Mode) ");
+		else th = new Element('th').update(resp['Title'] + " (Single Mode) ");
 		tr.insert(th);
 		tab.insert(tr);
 	
@@ -443,13 +447,35 @@ var {{ plugin.id }} = {
 		td = new Element('td').insert(resp.Weight.length > 0 ? resp.Weight : '--');
 		tr.insert(td);
 		tab2.insert(tr);
+	
+		// Psf
+		tr = new Element('tr');
+		td = new Element('td').insert('Psf path:');
+		tr.insert(td);
+
+		td = new Element('td').insert(resp.Psf.length > 0 ? resp.Psf : '--');
+		tr.insert(td);
+		tab2.insert(tr);
+	
+		//Dual Mode
+		tr = new Element('tr');
+		td = new Element('td').insert('Image Mode :');
+		tr.insert(td);
 		
 		if (resp.DualMode == '1') {
 
-			//Dual Mode
-			tr = new Element('tr');
-			td = new Element('td').insert('SExtractor is in DUAL MODE');
+			td = new Element('td').insert('Dual Mode');
 			tr.insert(td);
+			tab2.insert(tr);
+			console.log(resp);
+			//Dual IMage
+			tr = new Element('tr');
+			td = new Element('td').insert('Dual Image (measurements) :');
+			tr.insert(td);
+
+			td = new Element('td').insert(resp.DualImage.length > 0 ? resp.DualImage : '--');
+			tr.insert(td);
+			tab2.insert(tr);
 
 			//Flag dual
 			tr = new Element('tr');
@@ -469,6 +495,14 @@ var {{ plugin.id }} = {
 			tr.insert(td);
 			tab2.insert(tr);
 		}
+		else {
+
+			td = new Element('td').insert('Single Mode');
+			tr.insert(td);
+			tab2.insert(tr);
+		
+		}
+
 
 		// Psf
 		tr = new Element('tr');
@@ -682,6 +716,7 @@ var {{ plugin.id }} = {
 
 						//Weight and Flag for the dual mode
 						if (res.dualMode == 1) {
+		
 							tabitr = new Element('tr');
 							tabitd = new Element('td', {'class': 'label'});
 							tabitd.update('Weight(dual): ');
@@ -707,6 +742,7 @@ var {{ plugin.id }} = {
 							tabi.insert(tabitr);					
 
 						}
+
 						
 						td.insert(tabi);
 						tr.insert(td);
@@ -728,14 +764,15 @@ var {{ plugin.id }} = {
 
 						addImg.c_data = {
 								 		'idList' 				: res.idList,
-										'flagPath'				: res.flagPath,
-										'dualFlagPath'			: res.dualflagPath,
 										'weightPath'			: res.weightPath,
-										'dualWeightPath'		: res.dualweightPath,
+										'flagPath'				: res.flagPath,
 										'psfPath'				: res.psfPath,
+										'dualMode'				: res.dualMode,
+										'dualImage'				: res.dualImage,
+										'dualFlagPath'			: res.dualflagPath,
+										'dualWeightPath'		: res.dualweightPath,
 										'resultsOutputDir'		: res.resultsOutputDir,
 										'config'				: res.config,
-										'dualMode'				: res.dualMode
 						};
 
 						addImg.observe('click', function() {

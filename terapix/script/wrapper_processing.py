@@ -372,6 +372,10 @@ def process(userData, kind_id, argv):
 		os.mkdir(imgName)
 		os.system("mv sex.default.* sex-config* %s" %(imgName))
 		os.chdir(imgName)
+		fzs = glob.glob('*.fits.fz')
+		for fz in fzs:
+			print "SEx PREPROCESSING: uncompressing", fz
+			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
 
 
 	################### END OF PRE-PROCESSING  ################################################
@@ -497,6 +501,7 @@ def process(userData, kind_id, argv):
 							flagPath = userData['Flag'],
 							psfPath = userData['Psf'],
 							dualMode = userData['DualMode'],
+							dualImage = userData['DualImage'],
 							dualweightPath = userData['DualWeight'],
 							dualflagPath = userData['DualFlag'],
 							#
