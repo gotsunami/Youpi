@@ -136,6 +136,18 @@ class QualityFitsIn(ProcessingPlugin):
 		except TypeError:
 			return None
 
+	def getProcessingHistoryExtraData(self, taskId):
+		"""
+		Returns latest grade (if any) for this processing task
+		"""
+
+		grades = FirstQEval.objects.filter(fitsin__task__id = taskId).order_by('date')
+		if grades:
+			return str("Graded <b>" + grades[0].grade + "</b>")
+
+		else:
+			return False
+
 	def getTaskInfo(self, request):
 		"""
 		Returns information about a finished processing task

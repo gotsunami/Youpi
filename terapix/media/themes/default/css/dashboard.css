@@ -162,6 +162,8 @@ table.results tr.mouseover_success td {
 }
 
 table.results tr.mouseover_success td.exit {
+	text-align: center;
+	vertical-align: middle;
 	background: lightblue url('../img/admin/icon_success.gif') no-repeat center right;
 	width: 100%;
 }
@@ -175,16 +177,22 @@ table.results tr.mouseover_failure td {
 }
 
 table.results tr.mouseover_failure td.exit {
+	text-align: center;
+	vertical-align: middle;
 	background: lightblue url('../img/admin/icon_error.gif') no-repeat center right;
 	width: 100%;
 }
 
 table.results tr.success td.exit {
+	text-align: center;
+	vertical-align: middle;
 	background: white url('../img/admin/icon_success.gif') no-repeat center right;
 	width: 100%;
 }
 
 table.results tr.failure td.exit {
+	text-align: center;
+	vertical-align: middle;
 	background: white url('../img/admin/icon_error.gif') no-repeat center right;
 	width: 100%;
 }
@@ -402,7 +410,6 @@ img.result_panel_star {
 div.result_panel_commit {
 	text-align: center; 
 	padding-top: 5px; 
-	display: none;
 	font-style: italic;
 	font-size: 10px;
 	color: green;

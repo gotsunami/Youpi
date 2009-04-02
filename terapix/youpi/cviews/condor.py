@@ -11,7 +11,6 @@
 #
 ##############################################################################
 
-
 import MySQLdb, pyfits
 import pprint, re, glob, string
 import math, md5, random
@@ -237,10 +236,12 @@ def task_filter(request):
 	else:
 		pageCount = 1
 
+	plugin = manager.getPluginByName(kindid)
+
 	tasksIds = tasksIds[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
 	for tid in tasksIds:
 		t = Processing_task.objects.filter(id = tid)[0]
-		res.append({'Success' 		: t.success,
+		tdata = {	'Success' 		: t.success,
 					'Name' 			: str(t.kind.name),
 					'Label' 		: str(t.kind.label),
 					'Id' 			: str(t.id),
@@ -249,9 +250,19 @@ def task_filter(request):
 					'End' 			: str(t.end_date),
 					'Duration' 		: str(t.end_date-t.start_date),
 					'Node' 			: str(t.hostname),
-					'Title'			: str(t.title)
-				})
+					'Title'			: str(t.title),
+		}
+		
+		# Looks for plugin extra data, if any
+		try:
+			extra = plugin.getProcessingHistoryExtraData(tid)
+			if extra:
+				tdata['Extra'] = extra
+		except AttributeError:
+			# No method for extra data
+			pass
 
+		res.append(tdata)
 
 	return HttpResponse(str({	'results' : res, 
 								'Stats' : {	'nb_success' 	: nb_suc, 

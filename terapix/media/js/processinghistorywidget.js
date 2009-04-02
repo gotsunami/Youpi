@@ -406,24 +406,22 @@ function ProcessingHistoryWidget(container, varName) {
 		var kind = kindSel.options[kindSel.selectedIndex].value;
 		var filterText = filter.value;
 	
-		var container = document.getElementById(_instance_name + '_tasks_div');
+		var container = $(_instance_name + '_tasks_div');
 		var xhr = new HttpRequest(
-			container.id,
+			container,
 			null, // Use default error handler
 			// Custom handler for results
 			function(resp) {
-				var r = resp['results'];
-				var st = resp['Stats'];
+				var r = resp.results;
+				var st = resp.Stats;
 
 				// Display pages
-				_updatePagesNavigation(st['curPage'], st['pageCount']);
+				_updatePagesNavigation(st.curPage, st.pageCount);
 
 				// Display results
-				container.innerHTML = '';
+				container.update();
 				var len = r.length;
-				var tab = document.createElement('table');
-				tab.setAttribute('class', 'results');
-	
+				var tab = new Element('table').addClassName('results');
 				var tr, td, cls, stab, str, std, d, img, gdiv;
 	
 				/*
@@ -507,9 +505,13 @@ function ProcessingHistoryWidget(container, varName) {
 					std.appendChild(gdiv);
 					str.appendChild(std);
 	
+					// td.exit could contain per-plugin additionnal data
 					std = document.createElement('td');	
 					std.setAttribute('class', 'exit');
 					str.appendChild(std);
+					if (r[k].Extra) {
+						std.update(r[k].Extra);
+					}
 
 					stab.appendChild(str);
 					d.appendChild(stab);

@@ -38,7 +38,7 @@ function GradingWidget(container_id, varName, starsCount)
 {
 	// Name of instance if global namespace
 	var instance_name = varName;
-	var container = document.getElementById(container_id);
+	var container = $(container_id);
 
 	var id = varName + '_gradw_' + Youpi.GradingWidget.currentId;
 	Youpi.GradingWidget.currentId++;
@@ -46,17 +46,17 @@ function GradingWidget(container_id, varName, starsCount)
 	var starsCount = starsCount ? starsCount : 4;
 	
 	// Commit handler function
-	var commitHandler = defaultCommitHandler;
+	var _commitHandler = _defaultCommitHandler;
 
-	// Legend caption
-	var legendEnabled = true;
+	// Display legend caption
+	var _legendEnabled = true;
 
 	/*
 	 * true: mouse events are captured. Grading is possible.
 	 * false: no way to grade. Read-only widget.
 	 *
 	 */
-	var active = true;
+	var _active = true;
 
 	// No grade
 	var E_NO_GRADE = -1;
@@ -65,24 +65,31 @@ function GradingWidget(container_id, varName, starsCount)
 	var imgs = new Array();
 
 	// Grade label div
-	var gdiv = document.createElement('div');
+	var gdiv = new Element('div');
 	gdiv.setAttribute('class', 'result_panel_grade_label');
 	var NO_GRADE = 'No grade';
 
 	// Commit div
-	var cdiv = document.createElement('div');
+	var cdiv = new Element('div').hide();
 	cdiv.setAttribute('id', id + '_commit');
 	cdiv.setAttribute('class', 'result_panel_commit');
 
-	function draw() {
-		var main = document.createElement('div');
+	/*
+	 * Function: _draw
+	 * Widget drawing
+	 *
+	 * Note:
+	 * 
+	 */
+	function _draw() {
+		var main = new Element('div');
 		gdiv.appendChild(document.createTextNode(NO_GRADE));
 
 		for (var k=0; k < starsCount; k++) {
 			grades[k] = String.fromCharCode(65 + k);
-			imgs[k] = document.createElement('img');
+			imgs[k] = new Element('img');
 			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
-			if (active) {
+			if (_active) {
 				imgs[k].setAttribute('class', 'result_panel_star');
 				imgs[k].setAttribute('onmouseover', instance_name + ".enlight(" + k + ");");
 				imgs[k].setAttribute('onclick', instance_name + ".setGrade(" + k + ");");
@@ -92,9 +99,9 @@ function GradingWidget(container_id, varName, starsCount)
 			}
 		}
 
-		var sdiv = document.createElement('div');
+		var sdiv = new Element('div');
 		sdiv.setAttribute('style', 'text-align: center;');
-		if (active) {
+		if (_active) {
 			sdiv.setAttribute('onmouseout', instance_name + ".deselectAll();");
 		}
 		for (var k=0; k < imgs.length; k++) {
@@ -107,33 +114,78 @@ function GradingWidget(container_id, varName, starsCount)
 		container.appendChild(main);
 	}
 
-	// When inactive (off), mouse events are not captured. This widget becomes a 
-	// read-only widget
+	/*
+	 * Function: setActive
+	 * Sets wether the widget is active (responds to mouse events)
+	 *
+	 * Parameters:
+	 *  on - boolean
+	 *
+	 * Note:
+	 *  When inactive (off), mouse events are not captured. This widget becomes a read-only widget
+	 * 
+	 */
 	this.setActive = function(on) {
-		active = on;		
-		container.innerHTML = '';
+		_active = typeof on == 'boolean' ? on : _active;	
+		container.update();
 		// Repaint widget
-		draw();
+		_draw();
 	}
 
+	/*
+	 * Function: isActive
+	 * Returns wether the widget is active
+	 *
+	 * Returns:
+	 *  on - boolean
+	 * 
+	 */
 	this.isActive = function() {
-		return active;
+		return _active;
 	}
 
+	/*
+	 * Function: isGraded
+	 * Returns wether a grade has been set
+	 *
+	 * Returns:
+	 *  boolean
+	 * 
+	 */
 	this.isGraded = function() {
 		return currentGrade >=0;
 	}
 
-	this.setLegendEnabled = function (on){
-		legendEnabled = on;
-		var style = legendEnabled ? 'block' : 'none';
-		gdiv.setAttribute('style', 'display: ' + style);
+	/*
+	 * Function: setLegendEnabled
+	 * Sets wether the legend is displayed
+	 *
+	 * Parameters:
+	 *  on - boolean
+	 *
+	 */
+	this.setLegendEnabled = function (on) {
+		_legendEnabled = on;
+		_legendEnabled ? gdiv.show() : gdiv.hide();
 	}
 
+	/*
+	 * Function: isLegendEnabled
+	 * Returns wether the legend is displayed
+	 *
+	 * Returns:
+	 *  on - boolean
+	 *
+	 */
 	this.isLegendEnabled = function() {
-		return legendEnabled;
+		return _legendEnabled;
 	}
 
+	/*
+	 * Function: deselectAll
+	 * Remove grading
+	 *
+	 */
 	this.deselectAll = function() {
 		if (currentGrade >= 0) {
 			this.enlight(currentGrade);
@@ -141,13 +193,20 @@ function GradingWidget(container_id, varName, starsCount)
 		}
 
 		for (var k=0; k < imgs.length; k++) {
-			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
+			imgs[k].writeAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
 		}
 
-		gdiv.innerHTML = '';
-		gdiv.appendChild(document.createTextNode(NO_GRADE));
+		gdiv.update(NO_GRADE);
 	}
 
+	/*
+	 * Function: enlight
+	 * Turn on stars
+	 *
+	 * Parameters:
+	 *  idx - integer: index of grade
+	 *
+	 */
 	this.enlight = function(idx) {
 		for (var k=0; k <= idx; k++) {
 			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-on.gif');
@@ -160,19 +219,34 @@ function GradingWidget(container_id, varName, starsCount)
 		gdiv.appendChild(document.createTextNode('Grade: ' + grades[starsCount-idx-1]));
 	}
 
-	// chr: 'A' to 'Z'
+	/*
+	 * Function: enlight
+	 * Sets grade by char
+	 *
+	 * Parameters:
+	 *  chr - string: single char grade (ranges from 'A' to 'Z')
+	 *
+	 */
 	this.setCharGrade = function(chr) {
+		if (typeof chr != 'string' || (typeof chr == 'string' && chr.length > 1))
+			throw 'chr must be a single char string';
+
 		var idx = starsCount - ((chr.charCodeAt(0) - 65 + starsCount) % starsCount) - 1;
-		if (idx > starsCount || chr.length > 1) {
-			alert("setCharGrade: invalide grade '" + chr + "'.");
-			return;
-		}
+		if (idx > starsCount || chr.length > 1)
+			throw "Invalid grade '" + chr + "'.";
 
 		currentGrade = idx;
 		this.setGrade(idx);
 	}
 
-	// idx: int >= 0
+	/*
+	 * Function: setGrade
+	 * Sets grade by index
+	 *
+	 * Parameters:
+	 *  idx - integer: index of grade (>=0)
+	 *
+	 */
 	this.setGrade = function(idx) {
 		if (idx < 0 || idx > grades.length-1) {
 			currentGrade = E_NO_GRADE;
@@ -188,32 +262,78 @@ function GradingWidget(container_id, varName, starsCount)
 		currentGrade = idx;
 	}
 
+	/*
+	 * Function: showCommitButton
+	 * Display commit button
+	 *
+	 */
 	this.showCommitButton = function() {
-		cdiv.style.display = 'block';
-		cdiv.innerHTML = '';
-		var cimg = document.createElement('img');
+		cdiv.update();
+		var cimg = new Element('img');
 		cimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/commit.gif');
 		cimg.setAttribute('onclick', instance_name + '.commit()');
-		cdiv.appendChild(cimg);
+		cdiv.insert(cimg);
+		cdiv.show();
+		console.log(cimg);
 	}
 
+	/*
+	 * Function: getGrade
+	 * Get current grade
+	 *
+	 * Returns:
+	 *  char grade
+	 *
+	 */
 	this.getGrade = function() {
 		return grades[starsCount-currentGrade-1];
 	}
 
+	/*
+	 * Function: getCommitDiv
+	 * Get commit DIV node
+	 *
+	 * Returns:
+	 *  DOM element
+	 *
+	 */
 	this.getCommitDiv = function() {
 		return cdiv;
 	}
 
+	/*
+	 * Function: setCommitHandler
+	 * Sets a custom handler function for committing action
+	 *
+	 * Parameters:
+	 *  handler - function
+	 *
+	 */
 	this.setCommitHandler = function(handler) {
-		commitHandler = handler ? handler : defaultCommitHandler;
+		_commitHandler = handler ? handler : _defaultCommitHandler;
 	}
 
+	/*
+	 * Function: getCommitHandler
+	 * Returns current handler function for committing action
+	 *
+	 * Returns:
+	 *  handler - function
+	 *
+	 */
 	this.getCommitHandler = function() {
-		return commitHandler;
+		return _commitHandler;
 	}
 
-	function defaultCommitHandler() {
+	/*
+	 * Function: _defaultCommitHandler
+	 * Internal default commit handler function
+	 *
+	 * Returns:
+	 *  true
+	 *
+	 */
+	function _defaultCommitHandler() {
 		// NOP handler
 		cdiv.innerHTML = '';
 		cdiv.appendChild(document.createTextNode('Committed, thanks !'));
@@ -224,8 +344,8 @@ function GradingWidget(container_id, varName, starsCount)
 	// Called when user clicks on 'commit' button
 	this.commit = function() {
 		// Executes handler
-		commitHandler();
+		_commitHandler();
 	}
 
-	draw();
+	_draw();
 }
