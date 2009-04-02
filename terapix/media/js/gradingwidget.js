@@ -30,17 +30,13 @@ Youpi.GradingWidget.currentId = 1;
  * Constructor Parameters:
  *
  * container_id - string: name of parent DOM block container
- * varName - string: global variable name of instance, used internally for public interface definition
  * startsCount - integer: number of stars to display
  *
  */
-function GradingWidget(container_id, varName, starsCount)
+function GradingWidget(container_id, starsCount)
 {
-	// Name of instance if global namespace
-	var instance_name = varName;
 	var container = $(container_id);
-
-	var id = varName + '_gradw_' + Youpi.GradingWidget.currentId;
+	var id = 'gradw_' + Math.floor(Math.random() * 999999);
 	Youpi.GradingWidget.currentId++;
 
 	var starsCount = starsCount ? starsCount : 4;
@@ -87,22 +83,28 @@ function GradingWidget(container_id, varName, starsCount)
 
 		for (var k=0; k < starsCount; k++) {
 			grades[k] = String.fromCharCode(65 + k);
-			imgs[k] = new Element('img');
-			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
+			imgs[k] = new Element('img', {src: '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif'});
 			if (_active) {
-				imgs[k].setAttribute('class', 'result_panel_star');
-				imgs[k].setAttribute('onmouseover', instance_name + ".enlight(" + k + ");");
-				imgs[k].setAttribute('onclick', instance_name + ".setGrade(" + k + ");");
+				imgs[k].writeAttribute('class', 'result_panel_star');
+				imgs[k].sidx = k;
+				imgs[k].observe('mouseover', function() {
+					_enlight(this.sidx);
+				});
+				imgs[k].observe('click', function() {
+					_setGrade(this.sidx);
+				});
 			}
 			else {
-				imgs[k].setAttribute('style', 'cursor: default;');
+				imgs[k].setStyle({cursor: 'default'});
 			}
 		}
 
 		var sdiv = new Element('div');
 		sdiv.setAttribute('style', 'text-align: center;');
 		if (_active) {
-			sdiv.setAttribute('onmouseout', instance_name + ".deselectAll();");
+			sdiv.observe('mouseout', function() {
+				_deselectAll();
+			});
 		}
 		for (var k=0; k < imgs.length; k++) {
 			sdiv.appendChild(imgs[k]);
@@ -187,15 +189,23 @@ function GradingWidget(container_id, varName, starsCount)
 	 *
 	 */
 	this.deselectAll = function() {
+		_deselectAll();
+	}
+
+	/*
+	 * Function: _deselectAll
+	 * Remove grading
+	 *
+	 */
+	function _deselectAll() {
 		if (currentGrade >= 0) {
-			this.enlight(currentGrade);
+			_enlight(currentGrade);
 			return;
 		}
 
 		for (var k=0; k < imgs.length; k++) {
 			imgs[k].writeAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-off.gif');
 		}
-
 		gdiv.update(NO_GRADE);
 	}
 
@@ -203,11 +213,20 @@ function GradingWidget(container_id, varName, starsCount)
 	 * Function: enlight
 	 * Turn on stars
 	 *
+	 */
+	this.enlight = function(idx) {
+		_enlight(idx);
+	}
+
+	/*
+	 * Function: _enlight
+	 * Turn on stars
+	 *
 	 * Parameters:
 	 *  idx - integer: index of grade
 	 *
 	 */
-	this.enlight = function(idx) {
+	function _enlight(idx) {
 		for (var k=0; k <= idx; k++) {
 			imgs[k].setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/grading-star-on.gif');
 		}
@@ -220,7 +239,7 @@ function GradingWidget(container_id, varName, starsCount)
 	}
 
 	/*
-	 * Function: enlight
+	 * Function: SetCharGrade
 	 * Sets grade by char
 	 *
 	 * Parameters:
@@ -243,20 +262,29 @@ function GradingWidget(container_id, varName, starsCount)
 	 * Function: setGrade
 	 * Sets grade by index
 	 *
+	 */
+	this.setGrade = function(idx) {
+		_setGrade(idx);
+	}
+
+	/*
+	 * Function: _setGrade
+	 * Sets grade by index
+	 *
 	 * Parameters:
 	 *  idx - integer: index of grade (>=0)
 	 *
 	 */
-	this.setGrade = function(idx) {
+	function _setGrade(idx) {
 		if (idx < 0 || idx > grades.length-1) {
 			currentGrade = E_NO_GRADE;
 			return;
 		}
 
-		this.enlight(idx);
+		_enlight(idx);
 
 		if (currentGrade != idx) {
-			this.showCommitButton();
+			_showCommitButton();
 		}
 
 		currentGrade = idx;
@@ -268,13 +296,23 @@ function GradingWidget(container_id, varName, starsCount)
 	 *
 	 */
 	this.showCommitButton = function() {
+		_showCommitButton();
+	}
+
+	/*
+	 * Function: _showCommitButton
+	 * Display commit button
+	 *
+	 */
+	function _showCommitButton() {
 		cdiv.update();
 		var cimg = new Element('img');
 		cimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/commit.gif');
-		cimg.setAttribute('onclick', instance_name + '.commit()');
+		cimg.observe('click', function() {
+			_commitHandler();
+		});
 		cdiv.insert(cimg);
 		cdiv.show();
-		console.log(cimg);
 	}
 
 	/*

@@ -904,7 +904,7 @@ var {{ plugin.id }} = {
 					gtab.appendChild(tr);
 					// Variable name does not matter (as 2nd argument) because the widget 
 					// is turned into a read-only widget with setActive(false)
-					gradwid = new GradingWidget('grade_div_' + g, 'gradwid');
+					gradwid = new GradingWidget('grade_div_' + g);
 					gradwid.setLegendEnabled(false);
 					gradwid.setActive(false);
 					gradwid.setCharGrade(resp['Grades'][g][1]);

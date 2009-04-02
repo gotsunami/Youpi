@@ -46,7 +46,7 @@
 										<td nowrap="nowrap">
 											<div id="grade_div_{{ forloop.counter }}"></div>
 											<script type="text/javascript">
-												var gradwid = new GradingWidget('grade_div_{{ forloop.counter }}', 'gradwid');
+												var gradwid = new GradingWidget('grade_div_{{ forloop.counter }}');
 												gradwid.setLegendEnabled(false);
 												gradwid.setActive(false);
 												gradwid.setCharGrade('{{ ev.grade }}');
@@ -69,7 +69,7 @@
 							<u>Your grade</u>{% if userGrade %} (<a href="/youpi/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a>){% endif %}:<br/>
 							<div id="current_grade_div" style="margin-top: 10px;"></div>
 							<script type="text/javascript">
-								var mygrade = new GradingWidget('current_grade_div', 'mygrade');
+								var mygrade = new GradingWidget('current_grade_div');
 								{% if userGrade %}
 								mygrade.setCharGrade('{{ userGrade }}');
 								{% endif %}
