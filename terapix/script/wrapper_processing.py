@@ -36,6 +36,7 @@ CLUSTER_OUTPUT_PATH = NULLSTRING
 
 # Custom exceptions
 class WrapperError(Exception): pass
+class ExitError(Exception): pass
 
 def getNowDateTime(lt = time.time()):
 	"""
@@ -53,48 +54,61 @@ def getJobClusterId(userData):
 	data = pipe.readlines()
 	pipe.close()
 
-	# Removes first 3 lines (not XML)
-	doc = dom.parseString(string.join(data[3:]))
-	jNode = doc.getElementsByTagName('c')
-	currentJobFound = False
+	# Condor returns several XML files as output... Output should
+	# then be filtered
+	files = []
+	k = 0
+	idxs = []
+	for line in data:
+		if line.find('-- Schedd') == 0:
+			idxs.append(k)
+		k += 1
 
-	# First, try to locate the current job
-	for job in jNode:
-		jobData = {}
-		data = job.getElementsByTagName('a')
+	k = 0
+	idxs.append(len(data))
+	while k < len(idxs)-1:
+		files.append(data[idxs[k]:idxs[k+1]-1])
+		k += 1
 
-		for a in data:
-			if a.getAttribute('n') == 'Env':
-				# Try to look for YOUPI_USER_DATA environment variable
-				# If this is variable is found then this is a Youpi's job so we can keep it
-				env = str(a.firstChild.firstChild.nodeValue)
-				if env.find('YOUPI_USER_DATA') >= 0:
-					m = re.search('YOUPI_USER_DATA=(.*?)$', env)
-					XMLUserData = m.groups(0)[0]	
-					c = XMLUserData.find(';')
-					if c > 0:
-						XMLUserData = XMLUserData[:c]
+	try:
+		for file in files:
+			doc = dom.parseString(string.join(file[1:]))
+			jNode = doc.getElementsByTagName('c')
 
-					XMLUserData = marshal.loads(base64.decodestring(str(XMLUserData)))
-					try:
-						if userData['JobID'] == XMLUserData['JobID']:
-							# Job found
-							data = job.getElementsByTagName('a')
-							for b in data:
-								if b.getAttribute('n') == 'ClusterId':
-									jobData['ClusterId'] = str(b.firstChild.firstChild.nodeValue)
+			# First, try to locate the current job
+			for job in jNode:
+				jobData = {}
+				data = job.getElementsByTagName('a')
 
-								elif b.getAttribute('n') == 'ProcId':
-									jobData['ProcId'] = str(b.firstChild.firstChild.nodeValue)
-							currentJobFound = True
-					except KeyError:
-						pass
+				for a in data:
+					if a.getAttribute('n') == 'Env':
+						# Try to look for YOUPI_USER_DATA environment variable
+						# If this is variable is found then this is a Youpi's job so we can keep it
+						env = str(a.firstChild.firstChild.nodeValue)
+						if env.find('YOUPI_USER_DATA') >= 0:
+							m = re.search('YOUPI_USER_DATA=(.*?)$', env)
+							XMLUserData = m.groups(0)[0]	
+							c = XMLUserData.find(';')
+							if c > 0:
+								XMLUserData = XMLUserData[:c]
 
-			if currentJobFound:
-				break
+							XMLUserData = marshal.loads(base64.decodestring(str(XMLUserData)))
+							try:
+								if userData['JobID'] == XMLUserData['JobID']:
+									# Job found
+									data = job.getElementsByTagName('a')
+									for b in data:
+										if b.getAttribute('n') == 'ClusterId':
+											jobData['ClusterId'] = str(b.firstChild.firstChild.nodeValue)
 
-		if currentJobFound:
-			break
+										elif b.getAttribute('n') == 'ProcId':
+											jobData['ProcId'] = str(b.firstChild.firstChild.nodeValue)
+									raise ExitError
+							except KeyError:
+								pass
+	except ExitError:
+		# Custom error to exit all nested for loops
+		pass
 
 	return "%s.%s" % (jobData['ClusterId'], jobData['ProcId'])
 
