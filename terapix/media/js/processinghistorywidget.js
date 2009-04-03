@@ -15,31 +15,25 @@
  * Class: ProcessingHistoryWidget
  * Widget displaying processing history
  *
- * Note:
- *
- * Please note that this page documents Javascript code. <CondorPanel> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
+ * External Dependancies:
+ *  common.js - <getSelect> function
+ *  prototype.js - Enhanced Javascript library
  *
  * Constructor Parameters:
- *
- * container - string or DOM node: name of parent DOM block container
- * varName - string: global variable name of instance, used internally for public interface definition
- *
- * Requires:
- *  - <getSelect> for DOM select facilities
+ *  container - string or DOM node: name of parent DOM block container
  *
  */
-function ProcessingHistoryWidget(container, varName) {
+function ProcessingHistoryWidget(container) {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 
 	/*
-	 * Var: _instance_name
-	 * Name of instance in global namespace
+	 * Var: _id
+	 * Unique instance identifier
 	 *
-	 */
-	var _instance_name = varName;
+	 */ 
+	var _id = 'PHW_' + Math.floor(Math.random() * 999999);
 	/*
 	 * Var_: headerTitle
 	 * Header box's title
@@ -107,69 +101,74 @@ function ProcessingHistoryWidget(container, varName) {
 	 *
 	 */ 
 	function _render() {
-		var tab = document.createElement('table');
+		var tab = new Element('table');
 		tab.setAttribute('class', 'fileBrowser');
 		tab.setAttribute('style', 'width: 450px;');
 
 		var th, tr, td;
 		// TR title
-		tr = document.createElement('tr');
-		th = document.createElement('th');
+		tr = new Element('tr');
+		th = new Element('th');
 		th.appendChild(document.createTextNode(_headerTitle));
 		tr.appendChild(th);
 		tab.appendChild(tr);
 
 
 		// TR input text filtering
-		tr = document.createElement('tr');
-		td = document.createElement('td');
-		var rtab = document.createElement('table');
+		tr = new Element('tr');
+		td = new Element('td');
+		var rtab = new Element('table');
 		rtab.setAttribute('class', 'results-filter');
 		var rtr, rtd;
-		rtr = document.createElement('tr');
-		rtd = document.createElement('td');
+		rtr = new Element('tr');
+		rtd = new Element('td');
 
-		var img = document.createElement('img');
+		var img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/selector-search.gif');
 		rtd.appendChild(img);
 
-		var input = document.createElement('input');
-		input.setAttribute('id', _instance_name + '_filter_text');
+		var input = new Element('input');
+		input.setAttribute('id', _id + '_filter_text');
 		input.setAttribute('type', 'text');
 		input.setAttribute('title', 'Press Enter to filter tasks');
-		input.setAttribute('onkeyup', 'return ' + _instance_name + '.filterOnKeyUp(event);');
+		input.observe('keyup', function(event) {
+			return _filterOnKeyUp(event);
+		});
+
 		input.setAttribute('size', '40');
 		rtd.appendChild(input);
 
-		img = document.createElement('img');
+		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
 		img.setAttribute('title', 'Reset field');
 		img.setAttribute('style', 'cursor: pointer;');
-		img.setAttribute('onclick', _instance_name + '.resetFilterText();');
+		img.observe('click', function() {
+			_resetFilterText();
+		});
 		rtd.appendChild(img);
 		rtr.appendChild(rtd);
 
-		rtd = document.createElement('td');
-		img = document.createElement('img');
+		rtd = new Element('td');
+		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_success.gif');
-		var span = document.createElement('span');
-		span.setAttribute('id', _instance_name + '_success_span');
+		var span = new Element('span');
+		span.setAttribute('id', _id + '_success_span');
 		rtd.appendChild(img);
 		rtd.appendChild(span);
-		img = document.createElement('img');
+		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_error.gif');
-		span = document.createElement('span');
-		span.setAttribute('id', _instance_name + '_failed_span');
+		span = new Element('span');
+		span.setAttribute('id', _id + '_failed_span');
 		rtd.appendChild(img);
 		rtd.appendChild(span);
 
 		rtd.appendChild(document.createTextNode(' ('));
-		span = document.createElement('span');
-		span.setAttribute('id', _instance_name + '_total_span');
+		span = new Element('span');
+		span.setAttribute('id', _id + '_total_span');
 		rtd.appendChild(span);
 		rtd.appendChild(document.createTextNode('/'));
-		span = document.createElement('span');
-		span.setAttribute('id', _instance_name + '_big_total_span');
+		span = new Element('span');
+		span.setAttribute('id', _id + '_big_total_span');
 		rtd.appendChild(span);
 		rtd.appendChild(document.createTextNode(')'));
 		rtr.appendChild(rtd);
@@ -181,35 +180,41 @@ function ProcessingHistoryWidget(container, varName) {
 
 
 		// TR combos filtering
-		rtr = document.createElement('tr');
-		rtd = document.createElement('td');
+		rtr = new Element('tr');
+		rtd = new Element('td');
 		rtd.setAttribute('class', 'filter');
 		rtd.setAttribute('nowrap', 'nowrap');
 		rtd.setAttribute('colspan', '2');
-		var form = document.createElement('form');
+		var form = new Element('form');
 		rtd.appendChild(form);
 
-		img = document.createElement('img');
+		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/filter.png');
-		var label = document.createElement('label');
+		var label = new Element('label');
 		label.appendChild(document.createTextNode('Show'));
 		form.appendChild(img);
 		form.appendChild(label);
 
-		var sel = getSelect(_instance_name + '_owner_select', _sel_owner_options);
-		sel.setAttribute('onchange', _instance_name + '.applyFilter();');
+		var sel = getSelect(_id + '_owner_select', _sel_owner_options);
+		sel.observe('change', function() {
+			_applyFilter();
+		});
 		form.appendChild(sel);
 
-		sel = getSelect(_instance_name + '_status_select', _sel_status_options);
-		sel.setAttribute('onchange', _instance_name + '.applyFilter();');
+		sel = getSelect(_id + '_status_select', _sel_status_options);
+		sel.observe('change', function() {
+			_applyFilter();
+		});
 		sel.options[sel.options.length-1].setAttribute('selected', 'selected');
 		form.appendChild(sel);
 
-		sel = document.createElement('select');
-		sel.setAttribute('id', _instance_name + '_kind_select');
-		sel.setAttribute('onchange', _instance_name + '.applyFilter();');
+		sel = new Element('select');
+		sel.setAttribute('id', _id + '_kind_select');
+		sel.observe('change', function() {
+			_applyFilter();
+		});
 		for (var k=0; k < _pluginInfos.length; k++) {
-			opt = document.createElement('option');
+			opt = new Element('option');
 			if (k == 0)
 				opt.setAttribute('selected', 'selected');
 			opt.setAttribute('value', _pluginInfos[k][0]);
@@ -218,31 +223,34 @@ function ProcessingHistoryWidget(container, varName) {
 		}
 		form.appendChild(sel);
 
-		img = document.createElement('img');
+		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
 		img.setAttribute('title', 'Reset filter');
 		img.setAttribute('style', 'cursor: pointer;');
-		img.setAttribute('onclick', 'this.parentNode.reset(); ' + _instance_name + ".applyFilter(); document.getElementById('" 
-			+ _instance_name + "_filter_text').focus();");
+		img.observe('click', function() {
+			this.parentNode.reset();
+			_applyFilter();
+			$(_id + '_filter_text').focus();
+		});
 		form.appendChild(img);
 
 		rtr.appendChild(rtd);
 		rtab.appendChild(rtr);
 
 		// Pages div
-		var pdiv = new Element('div', {id: _instance_name + '_pages_div'}).addClassName('pageSwitcher');
+		var pdiv = new Element('div', {id: _id + '_pages_div'}).addClassName('pageSwitcher');
 		td.insert(pdiv);
 
 		// Results div
-		var rdiv = document.createElement('div');
-		rdiv.setAttribute('id', _instance_name + '_tasks_div');
+		var rdiv = new Element('div');
+		rdiv.setAttribute('id', _id + '_tasks_div');
 		rdiv.setAttribute('style', 'border-top: 1px #5b80b2 solid; height: 400px; overflow: auto;');
 		td.appendChild(rdiv);
 
 		_container.appendChild(tab);
 
 		// Set focus
-		document.getElementById(_instance_name + '_filter_text').focus();
+		$(_id + '_filter_text').focus();
 	}
 
 	/*
@@ -260,19 +268,19 @@ function ProcessingHistoryWidget(container, varName) {
 	}
 
 	/*
-	 * Function: resetFilterText
+	 * Function: _resetFilterText
 	 * Resets (empty) filter text
 	 *
 	 */ 
-	this.resetFilterText = function() {
-		var t = document.getElementById(_instance_name + '_filter_text');
+	function _resetFilterText() {
+		var t = $(_id + '_filter_text');
 		t.value = '';
 		_applyFilter(); 
 		t.focus();
 	} 
 
 	/*
-	 * Function: filterOnLeyUp
+	 * Function: _filterOnKeyUp
 	 * KeyUp event handler for filter text line
 	 *
 	 * Used to monitor whether the return key has been pressed.
@@ -281,8 +289,8 @@ function ProcessingHistoryWidget(container, varName) {
 	 *  event - JS event
 	 *
 	 */ 
-	this.filterOnKeyUp = function(event) {
-		var filter = document.getElementById(_instance_name + '_filter_text');
+	function _filterOnKeyUp(event) {
+		var filter = $(_id + '_filter_text');
 		// Return key pressed ?
 		if (event.which == 13) {
 			_applyFilter();
@@ -296,15 +304,18 @@ function ProcessingHistoryWidget(container, varName) {
 	 *
 	 */ 
 	function _updatePagesNavigation(curPage, pageCount) {
-		var pdiv = document.getElementById(_instance_name + '_pages_div');
+		var pdiv = $(_id + '_pages_div');
 		pdiv.innerHTML = '';
 		pdiv.appendChild(document.createTextNode('Page '));
 
 		if (curPage > 1) {
-			a = document.createElement('a');
+			a = new Element('a');
 			a.setAttribute('src', '#');
 			a.setAttribute('title', 'Show page ' + (curPage-1));
-			a.setAttribute('onclick', _instance_name + ".applyFilter(" + (curPage-1) + ");");
+			a.pdata = curPage - 1;
+			a.observe('click', function() {
+				_applyFilter(this.pdata);
+			});
 			a.appendChild(document.createTextNode('<'));
 			pdiv.appendChild(a);
 		}
@@ -312,14 +323,17 @@ function ProcessingHistoryWidget(container, varName) {
 		if (pageCount < 6) {
 			for (var k=1; k <= pageCount; k++) {
 				if (curPage == k) {
-					var p = document.createElement('span');
+					var p = new Element('span');
 					p.appendChild(document.createTextNode(k));
 					pdiv.appendChild(p);
 				}
 				else {
-					var a = document.createElement('a');
+					var a = new Element('a');
 					a.setAttribute('src', '#');
-					a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
+					a.pdata = k;
+					a.observe('click', function() {
+						_applyFilter(this.pdata);
+					});
 					a.appendChild(document.createTextNode(k));
 					pdiv.appendChild(a);
 				}
@@ -330,9 +344,11 @@ function ProcessingHistoryWidget(container, varName) {
 			var step, a;
 			if (curPage > surroundPageCount+1) {
 				// Last page
-				a = document.createElement('a');
+				a = new Element('a');
 				a.setAttribute('src', '#');
-				a.setAttribute('onclick', _instance_name + ".applyFilter('1');");
+				a.observe('click', function() {
+					_applyFilter(1);
+				});
 				a.appendChild(document.createTextNode('1'));
 				pdiv.appendChild(a);
 				// ...
@@ -342,23 +358,29 @@ function ProcessingHistoryWidget(container, varName) {
 				// Before
 				step = curPage-surroundPageCount > 0 ? curPage-surroundPageCount : curPage-1;
 				for (var k=step; k < curPage; k++) {
-					a = document.createElement('a');
+					a = new Element('a');
 					a.setAttribute('src', '#');
-					a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
+					a.pdata = k;
+					a.observe('click', function() {
+						_applyFilter(this.pdata);
+					});
 					a.appendChild(document.createTextNode(k));
 					pdiv.appendChild(a);
 				}
 			}
-			var p = document.createElement('span');
+			var p = new Element('span');
 			p.appendChild(document.createTextNode(curPage));
 			pdiv.appendChild(p);
 			if (curPage < pageCount) {
 				// After
 				step = curPage <= (pageCount-surroundPageCount) ? curPage+surroundPageCount : curPage + 1;
 				for (var k=curPage+1; k <= step; k++) {
-					a = document.createElement('a');
+					a = new Element('a');
 					a.setAttribute('src', '#');
-					a.setAttribute('onclick', _instance_name + ".applyFilter(" + k + ");");
+					a.pdata = k;
+					a.observe('click', function() {
+						_applyFilter(this.pdata);
+					});
 					a.appendChild(document.createTextNode(k));
 					pdiv.appendChild(a);
 				}
@@ -367,19 +389,25 @@ function ProcessingHistoryWidget(container, varName) {
 				// ...
 				pdiv.appendChild(document.createTextNode(' ... '));
 				// Last page
-				a = document.createElement('a');
+				a = new Element('a');
 				a.setAttribute('src', '#');
-				a.setAttribute('onclick', _instance_name + ".applyFilter(" + pageCount + ");");
+				a.pdata = pageCount;
+				a.observe('click', function() {
+					_applyFilter(this.pdata);
+				});
 				a.appendChild(document.createTextNode(pageCount));
 				pdiv.appendChild(a);
 			}
 		}
 
 		if (curPage < pageCount) {
-			a = document.createElement('a');
+			a = new Element('a');
 			a.setAttribute('src', '#');
 			a.setAttribute('title', 'Show page ' + (curPage+1));
-			a.setAttribute('onclick', _instance_name + ".applyFilter(" + (curPage+1) + ");");
+			a.pdata = curPage + 1;
+			a.observe('click', function() {
+				_applyFilter(this.pdata);
+			});
 			a.appendChild(document.createTextNode('>'));
 			pdiv.appendChild(a);
 		}
@@ -392,10 +420,10 @@ function ProcessingHistoryWidget(container, varName) {
 	 */ 
 	function _applyFilter(pageNum) {
 		try {
-			var ownerSel = document.getElementById(_instance_name + '_owner_select');
-			var statusSel = document.getElementById(_instance_name + '_status_select');
-			var kindSel = document.getElementById(_instance_name + '_kind_select');
-			var filter = document.getElementById(_instance_name + '_filter_text');
+			var ownerSel = $(_id + '_owner_select');
+			var statusSel = $(_id + '_status_select');
+			var kindSel = $(_id + '_kind_select');
+			var filter = $(_id + '_filter_text');
 		} catch(e) { return false; }
 
 		if (!pageNum || typeof pageNum != 'number')
@@ -406,7 +434,7 @@ function ProcessingHistoryWidget(container, varName) {
 		var kind = kindSel.options[kindSel.selectedIndex].value;
 		var filterText = filter.value;
 	
-		var container = $(_instance_name + '_tasks_div');
+		var container = $(_id + '_tasks_div');
 		var xhr = new HttpRequest(
 			container,
 			null, // Use default error handler
@@ -430,10 +458,10 @@ function ProcessingHistoryWidget(container, varName) {
 				 *
 
 				if (status == 'failed' && len && kind != 'all') {
-					var rdiv = document.createElement('div');
+					var rdiv = new Element('div');
 					rdiv.setAttribute('id', 'reprocess_failed_div');
 					rdiv.setAttribute('class', 'reprocess');
-					var rimg = document.createElement('img');
+					var rimg = new Element('img');
 					rimg.setAttribute('onclick', kind + ".reprocess_all_failed_processings('" + resp['Stats']['TasksIds'] + "');");
 					rimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reprocess.gif');
 					rdiv.appendChild(rimg);
@@ -445,14 +473,14 @@ function ProcessingHistoryWidget(container, varName) {
 				// Updates stats
 				var spans = ['success', 'failed', 'total', 'big_total'];
 				for (var k=0; k < spans.length; k++) {
-					var node = document.getElementById(_instance_name + '_' + spans[k] + '_span');
+					var node = $(_id + '_' + spans[k] + '_span');
 					node.innerHTML = '';
 					node.appendChild(document.createTextNode(resp['Stats']['nb_' + spans[k]]));
 				}
 	
 				if (!len) {
-					tr = document.createElement('tr');	
-					td = document.createElement('td');	
+					tr = new Element('tr');	
+					td = new Element('td');	
 					td.setAttribute('style', 'color: grey; cursor: default;');
 					td.innerHTML = '<h2>No results found.</h2>';
 					tr.appendChild(td);
@@ -463,7 +491,7 @@ function ProcessingHistoryWidget(container, varName) {
 	
 				for (var k=0; k < len; k++) {
 					cls = r[k]['Success'] ?'success' : 'failure';
-					tr = document.createElement('tr');	
+					tr = new Element('tr');	
 					tr.setAttribute('id', 'res_' + r[k]['Id']);
 					tr.setAttribute('class', cls);
 					tr.setAttribute('onmouseover', "this.setAttribute('class', 'mouseover_" + cls + "');");
@@ -472,41 +500,41 @@ function ProcessingHistoryWidget(container, varName) {
 					tab.appendChild(tr);
 	
 					// Description
-					td = document.createElement('td');	
+					td = new Element('td');	
 					td.innerHTML = r[k]['Title'];
-					d = document.createElement('div');	
+					d = new Element('div');	
 					td.appendChild(d);
 					tr.appendChild(td);
 	
 					// Misc info
-					stab = document.createElement('table');
-					str = document.createElement('tr');	
+					stab = new Element('table');
+					str = new Element('tr');	
 	
-					std = document.createElement('td');	
+					std = new Element('td');	
 					std.setAttribute('nowrap', 'nowrap');
-					gdiv = document.createElement('div');	
+					gdiv = new Element('div');	
 					gdiv.setAttribute('class', 'user');
 					gdiv.appendChild(document.createTextNode(r[k]['User']));
 					std.appendChild(gdiv);
 	
-					gdiv = document.createElement('div');	
+					gdiv = new Element('div');	
 					gdiv.setAttribute('class', 'node');
 					gdiv.appendChild(document.createTextNode(r[k]['Node']));
 					std.appendChild(gdiv);
 					str.appendChild(std);
 	
-					std = document.createElement('td');	
+					std = new Element('td');	
 					std.setAttribute('nowrap', 'nowrap');
-					gdiv = document.createElement('div');	
+					gdiv = new Element('div');	
 					gdiv.setAttribute('class', 'clock');
 					gdiv.appendChild(document.createTextNode(r[k]['Start']));
-					gdiv.appendChild(document.createElement('br'));
+					gdiv.appendChild(new Element('br'));
 					gdiv.appendChild(document.createTextNode(r[k]['Duration'] + ' sec'));
 					std.appendChild(gdiv);
 					str.appendChild(std);
 	
 					// td.exit could contain per-plugin additionnal data
-					std = document.createElement('td');	
+					std = new Element('td');	
 					std.setAttribute('class', 'exit');
 					str.appendChild(std);
 					if (r[k].Extra) {
@@ -570,7 +598,7 @@ function ProcessingHistoryWidget(container, varName) {
 		}
 
 		if (typeof container == 'string') {
-			var cont = document.getElementById(container);
+			var cont = $(container);
 			if (!cont) {
 				_error('not a valid container: ' + container);
 				return;

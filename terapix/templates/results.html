@@ -137,7 +137,7 @@ function get_stats() {
 <script type="text/javascript">
 	var p, pInfo;
 	document.observe('dom:loaded', function() {
-		p = new ProcessingHistoryWidget('history_div', 'p');
+		p = new ProcessingHistoryWidget('history_div');
 		pInfo = new Array();
 		{% for plugin in plugins %}
 		pInfo[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.optionLabel }}'];
