@@ -92,7 +92,6 @@ function ProcessingHistoryWidget(container) {
 	 */ 
 	this.render = function() {
 		_render();
-		_applyFilter();
 	}
 
 	/*
@@ -109,9 +108,9 @@ function ProcessingHistoryWidget(container) {
 		// TR title
 		tr = new Element('tr');
 		th = new Element('th');
-		th.appendChild(document.createTextNode(_headerTitle));
-		tr.appendChild(th);
-		tab.appendChild(tr);
+		th.insert(_headerTitle);
+		tr.insert(th);
+		tab.insert(tr);
 
 
 		// TR input text filtering
@@ -125,18 +124,15 @@ function ProcessingHistoryWidget(container) {
 
 		var img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/selector-search.gif');
-		rtd.appendChild(img);
+		rtd.insert(img);
 
 		var input = new Element('input');
 		input.setAttribute('id', _id + '_filter_text');
 		input.setAttribute('type', 'text');
 		input.setAttribute('title', 'Press Enter to filter tasks');
-		input.observe('keyup', function(event) {
-			return _filterOnKeyUp(event);
-		});
 
 		input.setAttribute('size', '40');
-		rtd.appendChild(input);
+		rtd.insert(input);
 
 		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
@@ -145,38 +141,38 @@ function ProcessingHistoryWidget(container) {
 		img.observe('click', function() {
 			_resetFilterText();
 		});
-		rtd.appendChild(img);
-		rtr.appendChild(rtd);
+		rtd.insert(img);
+		rtr.insert(rtd);
 
 		rtd = new Element('td');
 		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_success.gif');
 		var span = new Element('span');
 		span.setAttribute('id', _id + '_success_span');
-		rtd.appendChild(img);
-		rtd.appendChild(span);
+		rtd.insert(img);
+		rtd.insert(span);
 		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_error.gif');
 		span = new Element('span');
 		span.setAttribute('id', _id + '_failed_span');
-		rtd.appendChild(img);
-		rtd.appendChild(span);
+		rtd.insert(img);
+		rtd.insert(span);
 
-		rtd.appendChild(document.createTextNode(' ('));
+		rtd.insert(' (');
 		span = new Element('span');
 		span.setAttribute('id', _id + '_total_span');
-		rtd.appendChild(span);
-		rtd.appendChild(document.createTextNode('/'));
+		rtd.insert(span);
+		rtd.insert('/');
 		span = new Element('span');
 		span.setAttribute('id', _id + '_big_total_span');
-		rtd.appendChild(span);
-		rtd.appendChild(document.createTextNode(')'));
-		rtr.appendChild(rtd);
+		rtd.insert(span);
+		rtd.insert(')');
+		rtr.insert(rtd);
 
-		rtab.appendChild(rtr);
-		td.appendChild(rtab);
-		tr.appendChild(td);
-		tab.appendChild(tr);
+		rtab.insert(rtr);
+		td.insert(rtab);
+		tr.insert(td);
+		tab.insert(tr);
 
 
 		// TR combos filtering
@@ -186,68 +182,92 @@ function ProcessingHistoryWidget(container) {
 		rtd.setAttribute('nowrap', 'nowrap');
 		rtd.setAttribute('colspan', '2');
 		var form = new Element('form');
-		rtd.appendChild(form);
+		rtd.insert(form);
 
 		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/filter.png');
 		var label = new Element('label');
-		label.appendChild(document.createTextNode('Show'));
-		form.appendChild(img);
-		form.appendChild(label);
+		label.insert('Show');
+		form.insert(img);
+		form.insert(label);
 
 		var sel = getSelect(_id + '_owner_select', _sel_owner_options);
-		sel.observe('change', function() {
-			_applyFilter();
-		});
-		form.appendChild(sel);
+		form.insert(sel);
 
 		sel = getSelect(_id + '_status_select', _sel_status_options);
-		sel.observe('change', function() {
-			_applyFilter();
-		});
 		sel.options[sel.options.length-1].setAttribute('selected', 'selected');
-		form.appendChild(sel);
+		form.insert(sel);
 
 		sel = new Element('select');
 		sel.setAttribute('id', _id + '_kind_select');
-		sel.observe('change', function() {
-			_applyFilter();
-		});
 		for (var k=0; k < _pluginInfos.length; k++) {
 			opt = new Element('option');
 			if (k == 0)
 				opt.setAttribute('selected', 'selected');
 			opt.setAttribute('value', _pluginInfos[k][0]);
-			opt.appendChild(document.createTextNode(_pluginInfos[k][1] + ' processings'));
-			sel.appendChild(opt);
+			opt.insert(_pluginInfos[k][1] + ' processings');
+			sel.insert(opt);
 		}
-		form.appendChild(sel);
+		form.insert(sel);
 
 		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
 		img.setAttribute('title', 'Reset filter');
 		img.setAttribute('style', 'cursor: pointer;');
-		img.observe('click', function() {
+		img.observe('click', function(event) {
 			this.parentNode.reset();
-			_applyFilter();
 			$(_id + '_filter_text').focus();
 		});
-		form.appendChild(img);
+		form.insert(img);
 
-		rtr.appendChild(rtd);
-		rtab.appendChild(rtr);
+		rtr.insert(rtd);
+		rtab.insert(rtr);
 
-		// Pages div
-		var pdiv = new Element('div', {id: _id + '_pages_div'}).addClassName('pageSwitcher');
+		// Plugin-specific div (might be used by plugins for custom filtering/sorting options)
+		var pdiv = new Element('div', {id: _id + '_plugin_custom_options_div'}).addClassName('plugin-filter');
 		td.insert(pdiv);
 
-		// Results div
-		var rdiv = new Element('div');
-		rdiv.setAttribute('id', _id + '_tasks_div');
-		rdiv.setAttribute('style', 'border-top: 1px #5b80b2 solid; height: 400px; overflow: auto;');
-		td.appendChild(rdiv);
+		var bdiv = new Element('div', {id: _id + '_submit_div'}).addClassName('results-submit');
+		var bmit = new Element('input', {type: 'button', value: 'Start searching!'});
+		bmit.observe('click', function(event) {
+			_applyFilter();
+		});
+		bdiv.insert(bmit);
+		td.insert(bdiv);
 
-		_container.appendChild(tab);
+		// Pages div
+		pdiv = new Element('div', {id: _id + '_pages_div'}).addClassName('pageSwitcher');
+		td.insert(pdiv);
+
+		// Custom header div
+		var hdiv = new Element('div', {id: _id + 'plugin_header_div'}).addClassName('pluginHeader').hide();
+		td.insert(hdiv);
+
+		// Results div
+		var rdiv = new Element('div', {id: _id + '_tasks_div'}).addClassName('historyResults');
+		var rt = new Element('table').setStyle({width: '100%', height: '100%'});
+		var rtr, rtd;
+		rtr = new Element('tr');
+		rtd = new Element('td').setStyle({
+			textAlign: 'center', 
+			verticalAlign: 'middle', 
+			color: 'lightgray', 
+			fontSize: '20px',
+			lineHeight: '25px'
+		});
+		rtd.insert('Select search criteria then<br/>hit the <i>Start searching!</i> button');
+		rtr.insert(rtd);
+		rt.insert(rtr);
+		rdiv.update(rt);
+		td.insert(rdiv);
+
+		_container.insert(tab);
+
+		// Display custom plugin filters, if any
+		try {
+			eval(sel.options[0].value + ".addProcessingResultsCustomOptions('" + _id + "_plugin_custom_options_div');");
+		}
+		catch(e) {}
 
 		// Set focus
 		$(_id + '_filter_text').focus();
@@ -260,7 +280,7 @@ function ProcessingHistoryWidget(container) {
 	 * Required to set up processing types (filtering options)
 	 *
 	 * See Also:
-	 *  <_pluginsInfos> for format definition
+	 *  <_pluginInfos> for format definition
 	 *
 	 */ 
 	this.setActivePlugins = function(plugInfo) {
@@ -275,28 +295,8 @@ function ProcessingHistoryWidget(container) {
 	function _resetFilterText() {
 		var t = $(_id + '_filter_text');
 		t.value = '';
-		_applyFilter(); 
 		t.focus();
 	} 
-
-	/*
-	 * Function: _filterOnKeyUp
-	 * KeyUp event handler for filter text line
-	 *
-	 * Used to monitor whether the return key has been pressed.
-	 *
-	 * Parameters:
-	 *  event - JS event
-	 *
-	 */ 
-	function _filterOnKeyUp(event) {
-		var filter = $(_id + '_filter_text');
-		// Return key pressed ?
-		if (event.which == 13) {
-			_applyFilter();
-		}
-		return true;
-	}
 
 	/*
 	 * Function: _updatePagesNavigation
@@ -306,7 +306,7 @@ function ProcessingHistoryWidget(container) {
 	function _updatePagesNavigation(curPage, pageCount) {
 		var pdiv = $(_id + '_pages_div');
 		pdiv.innerHTML = '';
-		pdiv.appendChild(document.createTextNode('Page '));
+		pdiv.insert('Page ');
 
 		if (curPage > 1) {
 			a = new Element('a');
@@ -316,16 +316,16 @@ function ProcessingHistoryWidget(container) {
 			a.observe('click', function() {
 				_applyFilter(this.pdata);
 			});
-			a.appendChild(document.createTextNode('<'));
-			pdiv.appendChild(a);
+			a.insert('<');
+			pdiv.insert(a);
 		}
 
 		if (pageCount < 6) {
 			for (var k=1; k <= pageCount; k++) {
 				if (curPage == k) {
 					var p = new Element('span');
-					p.appendChild(document.createTextNode(k));
-					pdiv.appendChild(p);
+					p.insert(k);
+					pdiv.insert(p);
 				}
 				else {
 					var a = new Element('a');
@@ -334,8 +334,8 @@ function ProcessingHistoryWidget(container) {
 					a.observe('click', function() {
 						_applyFilter(this.pdata);
 					});
-					a.appendChild(document.createTextNode(k));
-					pdiv.appendChild(a);
+					a.insert(k);
+					pdiv.insert(a);
 				}
 			}
 		}
@@ -349,10 +349,10 @@ function ProcessingHistoryWidget(container) {
 				a.observe('click', function() {
 					_applyFilter(1);
 				});
-				a.appendChild(document.createTextNode('1'));
-				pdiv.appendChild(a);
+				a.insert('1');
+				pdiv.insert(a);
 				// ...
-				pdiv.appendChild(document.createTextNode(' ... '));
+				pdiv.insert(' ... ');
 			}
 			if (curPage > 1) {
 				// Before
@@ -364,13 +364,13 @@ function ProcessingHistoryWidget(container) {
 					a.observe('click', function() {
 						_applyFilter(this.pdata);
 					});
-					a.appendChild(document.createTextNode(k));
-					pdiv.appendChild(a);
+					a.insert(k);
+					pdiv.insert(a);
 				}
 			}
 			var p = new Element('span');
-			p.appendChild(document.createTextNode(curPage));
-			pdiv.appendChild(p);
+			p.insert(curPage);
+			pdiv.insert(p);
 			if (curPage < pageCount) {
 				// After
 				step = curPage <= (pageCount-surroundPageCount) ? curPage+surroundPageCount : curPage + 1;
@@ -381,13 +381,13 @@ function ProcessingHistoryWidget(container) {
 					a.observe('click', function() {
 						_applyFilter(this.pdata);
 					});
-					a.appendChild(document.createTextNode(k));
-					pdiv.appendChild(a);
+					a.insert(k);
+					pdiv.insert(a);
 				}
 			}
 			if (curPage < pageCount-2) {
 				// ...
-				pdiv.appendChild(document.createTextNode(' ... '));
+				pdiv.insert(' ... ');
 				// Last page
 				a = new Element('a');
 				a.setAttribute('src', '#');
@@ -395,8 +395,8 @@ function ProcessingHistoryWidget(container) {
 				a.observe('click', function() {
 					_applyFilter(this.pdata);
 				});
-				a.appendChild(document.createTextNode(pageCount));
-				pdiv.appendChild(a);
+				a.insert(pageCount);
+				pdiv.insert(a);
 			}
 		}
 
@@ -408,8 +408,8 @@ function ProcessingHistoryWidget(container) {
 			a.observe('click', function() {
 				_applyFilter(this.pdata);
 			});
-			a.appendChild(document.createTextNode('>'));
-			pdiv.appendChild(a);
+			a.insert('>');
+			pdiv.insert(a);
 		}
 	}
 
@@ -464,18 +464,22 @@ function ProcessingHistoryWidget(container) {
 					var rimg = new Element('img');
 					rimg.setAttribute('onclick', kind + ".reprocess_all_failed_processings('" + resp['Stats']['TasksIds'] + "');");
 					rimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reprocess.gif');
-					rdiv.appendChild(rimg);
-					rdiv.appendChild(document.createTextNode(' that current selection of processings that never succeeded'));
-					container.appendChild(rdiv);
+					rdiv.insert(rimg);
+					rdiv.insert(' that current selection of processings that never succeeded');
+					container.insert(rdiv);
 				}
 				*/
-	
+
+				// Process custom plugin header for results, if any
+				if (resp.ExtraHeader)
+					$(_id + 'plugin_header_div').update(resp.ExtraHeader).show();
+
 				// Updates stats
 				var spans = ['success', 'failed', 'total', 'big_total'];
 				for (var k=0; k < spans.length; k++) {
 					var node = $(_id + '_' + spans[k] + '_span');
 					node.innerHTML = '';
-					node.appendChild(document.createTextNode(resp['Stats']['nb_' + spans[k]]));
+					node.insert(resp['Stats']['nb_' + spans[k]]);
 				}
 	
 				if (!len) {
@@ -483,9 +487,9 @@ function ProcessingHistoryWidget(container) {
 					td = new Element('td');	
 					td.setAttribute('style', 'color: grey; cursor: default;');
 					td.innerHTML = '<h2>No results found.</h2>';
-					tr.appendChild(td);
-					tab.appendChild(tr);
-					container.appendChild(tab);
+					tr.insert(td);
+					tab.insert(tr);
+					container.insert(tab);
 					return;
 				}
 	
@@ -497,14 +501,14 @@ function ProcessingHistoryWidget(container) {
 					tr.setAttribute('onmouseover', "this.setAttribute('class', 'mouseover_" + cls + "');");
 					tr.setAttribute('onmouseout', "this.setAttribute('class', '" + cls + "');");
 					tr.setAttribute('onclick', "results_showDetails('" + r[k]['Name'] + "'," + r[k]['Id'] + ", true);");
-					tab.appendChild(tr);
+					tab.insert(tr);
 	
 					// Description
 					td = new Element('td');	
 					td.innerHTML = r[k]['Title'];
 					d = new Element('div');	
-					td.appendChild(d);
-					tr.appendChild(td);
+					td.insert(d);
+					tr.insert(td);
 	
 					// Misc info
 					stab = new Element('table');
@@ -514,41 +518,41 @@ function ProcessingHistoryWidget(container) {
 					std.setAttribute('nowrap', 'nowrap');
 					gdiv = new Element('div');	
 					gdiv.setAttribute('class', 'user');
-					gdiv.appendChild(document.createTextNode(r[k]['User']));
-					std.appendChild(gdiv);
+					gdiv.insert(r[k]['User']);
+					std.insert(gdiv);
 	
 					gdiv = new Element('div');	
 					gdiv.setAttribute('class', 'node');
-					gdiv.appendChild(document.createTextNode(r[k]['Node']));
-					std.appendChild(gdiv);
-					str.appendChild(std);
+					gdiv.insert(r[k]['Node']);
+					std.insert(gdiv);
+					str.insert(std);
 	
 					std = new Element('td');	
 					std.setAttribute('nowrap', 'nowrap');
 					gdiv = new Element('div');	
 					gdiv.setAttribute('class', 'clock');
-					gdiv.appendChild(document.createTextNode(r[k]['Start']));
-					gdiv.appendChild(new Element('br'));
-					gdiv.appendChild(document.createTextNode(r[k]['Duration'] + ' sec'));
-					std.appendChild(gdiv);
-					str.appendChild(std);
+					gdiv.insert(r[k]['Start']);
+					gdiv.insert(new Element('br'));
+					gdiv.insert(r[k]['Duration'] + ' sec');
+					std.insert(gdiv);
+					str.insert(std);
 	
 					// td.exit could contain per-plugin additionnal data
 					std = new Element('td');	
 					std.setAttribute('class', 'exit');
-					str.appendChild(std);
+					str.insert(std);
 					if (r[k].Extra) {
 						std.update(r[k].Extra);
 					}
 
-					stab.appendChild(str);
-					d.appendChild(stab);
-					tr.appendChild(td);
+					stab.insert(str);
+					d.insert(stab);
+					tr.insert(td);
 	
-					tab.appendChild(tr);
+					tab.insert(tr);
 				}
 	
-				container.appendChild(tab);
+				container.insert(tab);
 			}
 		);
 	
@@ -561,7 +565,8 @@ function ProcessingHistoryWidget(container) {
 				'&FilterText=' + filterText;
 	
 		// Send HTTP POST request
-		xhr.setBusyMsg('Please wait while filtering processing data');
+		xhr.setBusyMsg('Please wait while filtering data...');
+		xhr.setCustomAnimatedImage('/media/themes/' + guistyle + '/img/misc/thickbox-loader.gif');
 		xhr.send('/youpi/results/filter/', post);
 	}
 

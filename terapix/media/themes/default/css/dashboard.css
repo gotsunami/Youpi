@@ -236,8 +236,31 @@ table.results-filter td {
 	font-size: 10px;
 }
 
-table.results-filter td.filter * {
+table.results-filter td.filter *, div.plugin-filter * {
 	font-size: 10px;
+}
+
+div.results-submit * {
+	font-size: 10px;
+}
+
+div.results-submit {
+	text-align: right;
+}
+
+div.historyResults {
+	border-top: 1px #5b80b2 solid; 
+	height: 400px; 
+	overflow: auto;
+}
+
+div.xhrAnim {
+	text-align: center;
+	height: -moz-fit-content;
+	top: 30%;
+	font-size: 9px;
+	color: brown;
+	position: relative;
 }
 
 table.results-filter td.filter select, label {

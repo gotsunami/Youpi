@@ -264,15 +264,29 @@ def task_filter(request):
 
 		res.append(tdata)
 
-	return HttpResponse(str({	'results' : res, 
-								'Stats' : {	'nb_success' 	: nb_suc, 
-											'nb_failed' 	: nb_failed, 
-											'nb_total' 		: nb_suc + nb_failed,
-											'pageCount'		: pageCount,
-											'curPage'		: targetPage,
-											'TasksIds' 		: tasksIds,
-											'nb_big_total' 	: int(len(allTasks)) }}), 
-											mimetype = 'text/plain')
+	resp = {
+		'results' : res, 
+		'Stats' : {	
+			'nb_success' 	: nb_suc, 
+			'nb_failed' 	: nb_failed, 
+			'nb_total' 		: nb_suc + nb_failed,
+			'pageCount'		: pageCount,
+			'curPage'		: targetPage,
+			'TasksIds' 		: tasksIds,
+			'nb_big_total' 	: int(len(allTasks)),
+		},
+	} 
+
+	# Looks for plugin extra data, if any
+	try:
+		extraHeader = plugin.getProcessingHistoryExtraHeader(request)
+		if extraHeader:
+			resp['ExtraHeader'] = extraHeader
+	except AttributeError:
+		# No method for extra header data
+		pass
+
+	return HttpResponse(str(resp), mimetype = 'text/plain')
 
 @login_required
 @profile

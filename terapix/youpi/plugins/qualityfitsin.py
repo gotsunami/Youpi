@@ -148,6 +148,24 @@ class QualityFitsIn(ProcessingPlugin):
 		else:
 			return False
 
+	def getProcessingHistoryExtraHeader(self, request):
+		"""
+		Returns extra custom header for qfitsin items
+		"""
+
+		all = Plugin_fitsin.objects.all().count()
+		grades = FirstQEval.objects.values('fitsin').distinct()
+		
+		return """
+			<table style="width: %s">
+				<tr>
+					<td>%d of %d images already graded</td>
+					<td align="right"><div id="ph_agraded_div"></div></td>
+				</tr>
+			</table>
+			<script type="text/javascript">new ProgressBar('ph_agraded_div', %.2f);</script>
+		""" % ('100%', len(grades), all, len(grades)*100./all)
+
 	def getTaskInfo(self, request):
 		"""
 		Returns information about a finished processing task

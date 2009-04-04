@@ -917,6 +917,18 @@ var {{ plugin.id }} = {
 		}
 	},
 
+	/*
+	 * Function: addProcessingResultsCustomOptions
+	 * Add custom qfitsin options to the processing results page
+	 *
+	 * Parameters:
+	 *	container - string: container ID
+	 *
+	 */ 
+	addProcessingResultsCustomOptions: function(container) {
+		var d = $(container);
+	},
+
 	getTabId: function(ul_id) {
 		// Looking for tab's id
 		//var ul = $('tabnav2');

@@ -34,11 +34,6 @@ function createXMLHttpRequest() {
  * Class: HttpRequest
  * Simple implementation for handling AJAX HTTP requests
  *
- * Note:
- *
- * Please note that this page documents Javascript code. <HttpRequest> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
- *
  * Constructor Parameters:
  *  cont - string or DOM element: name of parent DOM block container
  *  errorHandler - function code with one argument (error message)
@@ -53,6 +48,13 @@ function HttpRequest(cont, errorHandler, resultHandler) {
 	var _container = $(cont);
 	var _errorHandler;
 	var _resultHandler;
+	/*
+	 * Var: _customAnimatedImage
+	 * Custom path to (animated) image to be displayed while waiting
+	 * for Ajax response
+	 *
+	 */
+	var _customAnimatedImage = null;
 
 	function _main() {
 		_xhr = _createXMLHttpRequest();
@@ -99,6 +101,11 @@ function HttpRequest(cont, errorHandler, resultHandler) {
 		return _busy_msg;
 	}
 
+	// path can be null
+	this.setCustomAnimatedImage = function(path) {
+		_customAnimatedImage = path;
+	}
+
 	/*
 	 * Sends async HTTP request
 	 *
@@ -116,10 +123,28 @@ function HttpRequest(cont, errorHandler, resultHandler) {
 		if (async) {
 			_xhr.onreadystatechange = function() {
 				if (_xhr.readyState == 1) {
-					try {
-						_container.update(getLoadingHTML(_busy_msg));
-					} catch(e) {
-						_container.update(_busy_msg + '...');
+					if (_customAnimatedImage) {
+						var rt = new Element('table').setStyle({width: '100%', height: '100%'});
+						var rtr, rtd;
+						rtr = new Element('tr');
+						rtd = new Element('td').setStyle({
+							textAlign: 'center', 
+							verticalAlign: 'middle', 
+							color: 'brown', 
+							fontSize: '9px'
+						});
+						rtr.insert(rtd);
+						var img = new Element('img', {src: _customAnimatedImage});
+						rtd.insert(img).insert(new Element('br')).insert(_busy_msg);
+						rt.insert(rtr);
+						_container.update(rt);
+					}
+					else {
+						try {
+							_container.update(getLoadingHTML(_busy_msg));
+						} catch(e) {
+							_container.update(_busy_msg + '...');
+						}
 					}
 				}
 				else if (_xhr.readyState == 4) {

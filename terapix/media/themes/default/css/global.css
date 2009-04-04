@@ -1516,3 +1516,13 @@ div.tags *, .dropzone * {
 	color: brown;
 	width: 200px;
 }
+
+.pluginHeader * {
+	font-size: 10px;
+}
+
+.pluginHeader {
+	border-top: 1px #5b80b2 solid;
+	color: brown;
+}
+
