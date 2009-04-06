@@ -178,8 +178,7 @@ def task_filter(request):
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
-	allTasks = Processing_task.objects.all().order_by('-end_date')
-	kind = Processing_kind.objects.filter(name = kindid)[0]
+	lenAllTasks = Processing_task.objects.count()
 
 	anyStatus = False
 	if status == 'successful':
@@ -191,54 +190,52 @@ def task_filter(request):
 
 	if owner == 'all':
 		if anyStatus:
-			tasks = Processing_task.objects.filter(kind = kind).order_by('-end_date')
+			tasksIds = Processing_task.objects.filter(kind__name = kindid).order_by('-end_date').values('id')
 		else:
-			tasks = Processing_task.objects.filter(success = success, kind = kind).order_by('-end_date')
+			tasksIds = Processing_task.objects.filter(success = success, kind__name = kindid).order_by('-end_date').values('id')
 
 	elif owner == 'my':
 		if anyStatus:
-			tasks = Processing_task.objects.filter(user = request.user, kind = kind).order_by('-end_date')
+			tasksIds = Processing_task.objects.filter(user = request.user, kind__name = kindid).order_by('-end_date').values('id')
 		else:
-			tasks = Processing_task.objects.filter(user = request.user, success = success, kind = kind).order_by('-end_date')
+			tasksIds = Processing_task.objects.filter(user = request.user, success = success, kind__name = kindid).order_by('-end_date').values('id')
 
 	elif owner == 'others':
 		if anyStatus:
-			tasks = Processing_task.objects.exclude(user = request.user).filter(kind = kind).order_by('-end_date')
+			tasksIds = Processing_task.objects.exclude(user = request.user).filter(kind__name = kindid).order_by('-end_date').values('id')
 		else:
-			tasks = Processing_task.objects.exclude(user = request.user).filter(success = success, kind = kind).order_by('-end_date')
+			tasksIds = Processing_task.objects.exclude(user = request.user).filter(success = success, kind__name = kindid).order_by('-end_date').values('id')
 	else:
-		tasks = allTasks
+		tasksIds = Processing_task.objects.all().order_by('-end_date').values('id')
 
 	res = []
 	nb_suc = nb_failed = 0
-	tasksIds = []
-	for t in tasks:
-		if (t.user.username.lower().find(filterText) >= 0 or
-			t.user.first_name.lower().find(filterText) >= 0 or
-			t.user.last_name.lower().find(filterText) >= 0 or
-			t.kind.name.lower().find(filterText) >= 0 or
-			t.hostname.lower().find(filterText) >= 0 or
-			t.title.lower().find(filterText) >= 0 or
-			("%s" % t.start_date).find(filterText) >= 0 or
-			("%s" % t.end_date).find(filterText) >= 0):
+	if filterText:
+		keepIds = []
+		for t in tasksIds:
+#			if (t.user.username.lower().find(filterText) >= 0 or
+#				t.user.first_name.lower().find(filterText) >= 0 or
+#				t.user.last_name.lower().find(filterText) >= 0 or
+#				t.kind.name.lower().find(filterText) >= 0 or
+#				t.hostname.lower().find(filterText) >= 0 or
+#				t.title.lower().find(filterText) >= 0 or
+#				("%s" % t.start_date).find(filterText) >= 0 or
+#				("%s" % t.end_date).find(filterText) >= 0):
 
-			tasksIds.append(int(t.id))
-
-			if t.success:
-				nb_suc += 1
-			else:
-				nb_failed += 1
+			keepIds.append(t['id'])
+		tasksIds = keepIds
+	else:
+		tasksIds = [t['id'] for t in tasksIds]
 
 	plugin = manager.getPluginByName(kindid)
 
-	# Pass res to plugin to that it can filter/alter the result set
+	# Plugins can optionally filter/alter the result set
 	try:
 		tasksIds = plugin.filterProcessingHistoryTasks(request, tasksIds)
 	except AttributeError:
 		# Not implemented
 		pass
 
-	# Pre-filtering estimation
 	if len(tasksIds) > maxPerPage:
 		pageCount = len(tasksIds)/maxPerPage
 		if len(tasksIds) % maxPerPage > 0:
@@ -248,9 +245,13 @@ def task_filter(request):
 
 	# Tasks ids for the page
 	tasksIds = tasksIds[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
+	tasks = Processing_task.objects.filter(id__in = tasksIds).order_by('-end_date')
+	for t in tasks:
+		if t.success:
+			nb_suc += 1
+		else:
+			nb_failed += 1
 
-	for tid in tasksIds:
-		t = Processing_task.objects.filter(id = tid)[0]
 		tdata = {	'Success' 		: t.success,
 					'Name' 			: str(t.kind.name),
 					'Label' 		: str(t.kind.label),
@@ -265,7 +266,7 @@ def task_filter(request):
 		
 		# Looks for plugin extra data, if any
 		try:
-			extra = plugin.getProcessingHistoryExtraData(tid)
+			extra = plugin.getProcessingHistoryExtraData(t.id)
 			if extra:
 				tdata['Extra'] = extra
 		except AttributeError:
@@ -281,8 +282,8 @@ def task_filter(request):
 			'nb_total' 		: nb_suc + nb_failed,
 			'pageCount'		: pageCount,
 			'curPage'		: targetPage,
-			'TasksIds' 		: tasksIds,
-			'nb_big_total' 	: int(len(allTasks)),
+			'TasksIds' 		: [int (t) for t in tasksIds],
+			'nb_big_total' 	: int(lenAllTasks),
 		},
 	} 
 
