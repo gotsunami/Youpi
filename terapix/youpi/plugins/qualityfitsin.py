@@ -136,17 +136,39 @@ class QualityFitsIn(ProcessingPlugin):
 		except TypeError:
 			return None
 
+	def filterProcessingHistoryTasks(self, request, tasksIds):
+		"""
+		Filters processing history input tasks
+		"""
+		try:
+			gradingFilter = request.POST['GradingFilter']
+		except KeyError, e:
+			raise PluginError, e
+
+		keep = []
+		for id in tasksIds:
+			grades = FirstQEval.objects.filter(fitsin__task__id = id)
+			if (grades and (gradingFilter == 'all' or gradingFilter == 'graded')) or \
+				(not grades and (gradingFilter == 'all' or gradingFilter == 'not graded')):
+				keep.append(id)
+
+		return keep
+
 	def getProcessingHistoryExtraData(self, taskId):
 		"""
 		Returns latest grade (if any) for this processing task
 		"""
 
 		grades = FirstQEval.objects.filter(fitsin__task__id = taskId).order_by('date')
-		if grades:
-			return str("Graded <b>" + grades[0].grade + "</b>")
 
-		else:
-			return False
+		ret = False
+		if grades:
+			ret =  "Graded <b>" + grades[0].grade + '</b>'
+			if len(grades) > 1:
+				ret += " (%d)" % len(grades)
+			ret = str(ret)
+
+		return ret
 
 	def getProcessingHistoryExtraHeader(self, request):
 		"""

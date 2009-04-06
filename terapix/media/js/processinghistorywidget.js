@@ -121,38 +121,15 @@ function ProcessingHistoryWidget(container) {
 		var rtr, rtd;
 		rtr = new Element('tr');
 		rtd = new Element('td');
-
-		var img = new Element('img');
-		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/selector-search.gif');
-		rtd.insert(img);
-
-		var input = new Element('input');
-		input.setAttribute('id', _id + '_filter_text');
-		input.setAttribute('type', 'text');
-		input.setAttribute('title', 'Press Enter to filter tasks');
-
-		input.setAttribute('size', '40');
-		rtd.insert(input);
-
-		img = new Element('img');
-		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
-		img.setAttribute('title', 'Reset field');
-		img.setAttribute('style', 'cursor: pointer;');
-		img.observe('click', function() {
-			_resetFilterText();
-		});
-		rtd.insert(img);
 		rtr.insert(rtd);
 
 		rtd = new Element('td');
 		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_success.gif');
-		var span = new Element('span');
-		span.setAttribute('id', _id + '_success_span');
+		var span = new Element('span', {id: _id + '_success_span'}).setStyle({marginRight: '10px'});
 		rtd.insert(img);
 		rtd.insert(span);
-		img = new Element('img');
-		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_error.gif');
+		img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_error.gif'});
 		span = new Element('span');
 		span.setAttribute('id', _id + '_failed_span');
 		rtd.insert(img);
@@ -174,21 +151,33 @@ function ProcessingHistoryWidget(container) {
 		tr.insert(td);
 		tab.insert(tr);
 
-
 		// TR combos filtering
 		rtr = new Element('tr');
 		rtd = new Element('td');
 		rtd.setAttribute('class', 'filter');
 		rtd.setAttribute('nowrap', 'nowrap');
 		rtd.setAttribute('colspan', '2');
-		var form = new Element('form');
+		var form = new Element('form', {id: _id + '_search_form'});
+		form.observe('submit', function(event) {
+			console.log('toto');
+			return true;
+		});
 		rtd.insert(form);
 
 		img = new Element('img');
 		img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/filter.png');
+		form.insert(img);
+		var input = new Element('input', {
+			id: _id + '_filter_text', 
+			type: 'text', 
+			title: 'Press Enter to filter tasks', 
+			size: '40'
+		});
+		form.insert(input);
+		form.insert(new Element('br'));
+
 		var label = new Element('label');
 		label.insert('Show');
-		form.insert(img);
 		form.insert(label);
 
 		var sel = getSelect(_id + '_owner_select', _sel_owner_options);
@@ -200,6 +189,9 @@ function ProcessingHistoryWidget(container) {
 
 		sel = new Element('select');
 		sel.setAttribute('id', _id + '_kind_select');
+		sel.observe('change', function(event) {
+			_onKindChange(this);
+		});
 		for (var k=0; k < _pluginInfos.length; k++) {
 			opt = new Element('option');
 			if (k == 0)
@@ -210,24 +202,21 @@ function ProcessingHistoryWidget(container) {
 		}
 		form.insert(sel);
 
-		img = new Element('img');
-		img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reset.png');
-		img.setAttribute('title', 'Reset filter');
-		img.setAttribute('style', 'cursor: pointer;');
-		img.observe('click', function(event) {
-			this.parentNode.reset();
-			$(_id + '_filter_text').focus();
-		});
-		form.insert(img);
+		// Plugin-specific div (might be used by plugins for custom filtering/sorting options)
+		var pdiv = new Element('div', {id: _id + '_plugin_custom_options_div'}).addClassName('plugin-filter');
+		form.insert(pdiv);
 
 		rtr.insert(rtd);
 		rtab.insert(rtr);
 
-		// Plugin-specific div (might be used by plugins for custom filtering/sorting options)
-		var pdiv = new Element('div', {id: _id + '_plugin_custom_options_div'}).addClassName('plugin-filter');
-		td.insert(pdiv);
-
 		var bdiv = new Element('div', {id: _id + '_submit_div'}).addClassName('results-submit');
+		var rbut = new Element('input', {type: 'button', value: 'Reset'});
+		rbut.observe('click', function(event) {
+			$(_id + '_search_form').reset();
+			$(_id + '_filter_text').focus();
+			_onKindChange($(_id + '_kind_select'));
+		});
+		bdiv.insert(rbut);
 		var bmit = new Element('input', {type: 'button', value: 'Start searching!'});
 		bmit.observe('click', function(event) {
 			_applyFilter();
@@ -262,15 +251,21 @@ function ProcessingHistoryWidget(container) {
 		td.insert(rdiv);
 
 		_container.insert(tab);
-
-		// Display custom plugin filters, if any
-		try {
-			eval(sel.options[0].value + ".addProcessingResultsCustomOptions('" + _id + "_plugin_custom_options_div');");
-		}
-		catch(e) {}
+		_onKindChange(sel);
 
 		// Set focus
 		$(_id + '_filter_text').focus();
+	}
+
+	function _onKindChange(sel) {
+		// Display custom plugin filters, if any
+		try {
+			eval(sel.options[sel.selectedIndex].value + ".addProcessingResultsCustomOptions('" + _id + "_plugin_custom_options_div');");
+		}
+		catch(e) {
+			// Empty container
+			$(_id + '_plugin_custom_options_div').update();
+		}
 	}
 
 	/*
@@ -286,17 +281,6 @@ function ProcessingHistoryWidget(container) {
 	this.setActivePlugins = function(plugInfo) {
 		_pluginInfos = plugInfo;
 	}
-
-	/*
-	 * Function: _resetFilterText
-	 * Resets (empty) filter text
-	 *
-	 */ 
-	function _resetFilterText() {
-		var t = $(_id + '_filter_text');
-		t.value = '';
-		t.focus();
-	} 
 
 	/*
 	 * Function: _updatePagesNavigation
@@ -471,8 +455,7 @@ function ProcessingHistoryWidget(container) {
 				*/
 
 				// Process custom plugin header for results, if any
-				if (resp.ExtraHeader)
-					$(_id + 'plugin_header_div').update(resp.ExtraHeader).show();
+				resp.ExtraHeader ? $(_id + 'plugin_header_div').update(resp.ExtraHeader).show() : $(_id + 'plugin_header_div').hide();
 
 				// Updates stats
 				var spans = ['success', 'failed', 'total', 'big_total'];
@@ -495,12 +478,20 @@ function ProcessingHistoryWidget(container) {
 	
 				for (var k=0; k < len; k++) {
 					cls = r[k]['Success'] ?'success' : 'failure';
-					tr = new Element('tr');	
-					tr.setAttribute('id', 'res_' + r[k]['Id']);
-					tr.setAttribute('class', cls);
-					tr.setAttribute('onmouseover', "this.setAttribute('class', 'mouseover_" + cls + "');");
-					tr.setAttribute('onmouseout', "this.setAttribute('class', '" + cls + "');");
-					tr.setAttribute('onclick', "results_showDetails('" + r[k]['Name'] + "'," + r[k]['Id'] + ", true);");
+					tr = new Element('tr', {id: 'res_' + r[k]['Id']}).addClassName(cls);
+					tr.custdata = {name: r[k]['Name'], taskId: r[k]['Id']};
+					tr.observe('mouseover', function() { 
+						this.removeClassName('mouseout'); 
+						this.addClassName('mouseover'); 
+					});
+					tr.observe('mouseout', function() { 
+						this.removeClassName('mouseover'); 
+						this.addClassName('mouseout'); 
+					});
+					tr.observe('click', function() { 
+						results_showDetails(this.custdata.name, this.custdata.taskId); 
+						this.addClassName('clicked');
+					});
 					tab.insert(tr);
 	
 					// Description
@@ -557,17 +548,28 @@ function ProcessingHistoryWidget(container) {
 		);
 	
 		// Checks if a selection of that name already exists
-		post = 	'Owner=' + owner + 
-				'&Status=' + status + 
-				'&Kind=' + kind +
-				'&Limit=' + _maxPerPage +
-				'&Page=' + pageNum +
-				'&FilterText=' + filterText;
+		var post = $H({
+			Owner: owner, 
+			Status: status, 
+			Kind: kind,
+			Limit: _maxPerPage,
+			Page: pageNum,
+			FilterText: filterText
+		});
+
+		// Add POST data info related to custom plugin search criteria, if any
+		var cdiv = $(_id + '_plugin_custom_options_div');
+		if (!cdiv.empty()) {
+			var elems = cdiv.select('[name]');
+			elems.each(function(elem) {
+				post.set(elem.readAttribute('name'), elem.value);
+			});
+		}
 	
 		// Send HTTP POST request
 		xhr.setBusyMsg('Please wait while filtering data...');
 		xhr.setCustomAnimatedImage('/media/themes/' + guistyle + '/img/misc/thickbox-loader.gif');
-		xhr.send('/youpi/results/filter/', post);
+		xhr.send('/youpi/results/filter/', post.toQueryString());
 	}
 
 	/*

@@ -924,9 +924,16 @@ var {{ plugin.id }} = {
 	 * Parameters:
 	 *	container - string: container ID
 	 *
+	 * Note:
+	 * 	_name_ attribute is mandatory: will be used to generate POST data later
+	 *
 	 */ 
 	addProcessingResultsCustomOptions: function(container) {
 		var d = $(container);
+		var lab = new Element('label').update('Show ');
+		var gr = getSelect(uidfitsin + '_grading_select', ['all', 'graded', 'not graded']);
+		gr.writeAttribute('name', 'GradingFilter');
+		d.update(lab).insert(gr).insert(new Element('label').update(' images'));
 	},
 
 	getTabId: function(ul_id) {

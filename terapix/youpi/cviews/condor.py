@@ -229,6 +229,16 @@ def task_filter(request):
 			else:
 				nb_failed += 1
 
+	plugin = manager.getPluginByName(kindid)
+
+	# Pass res to plugin to that it can filter/alter the result set
+	try:
+		tasksIds = plugin.filterProcessingHistoryTasks(request, tasksIds)
+	except AttributeError:
+		# Not implemented
+		pass
+
+	# Pre-filtering estimation
 	if len(tasksIds) > maxPerPage:
 		pageCount = len(tasksIds)/maxPerPage
 		if len(tasksIds) % maxPerPage > 0:
@@ -236,9 +246,9 @@ def task_filter(request):
 	else:
 		pageCount = 1
 
-	plugin = manager.getPluginByName(kindid)
-
+	# Tasks ids for the page
 	tasksIds = tasksIds[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
+
 	for tid in tasksIds:
 		t = Processing_task.objects.filter(id = tid)[0]
 		tdata = {	'Success' 		: t.success,
@@ -261,7 +271,6 @@ def task_filter(request):
 		except AttributeError:
 			# No method for extra data
 			pass
-
 		res.append(tdata)
 
 	resp = {

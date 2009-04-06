@@ -145,7 +145,7 @@ table.results tr {
 	cursor: pointer;
 }
 
-table.results tr.success {
+table.results tr.success, table.results tr.failure {
 	border-bottom: 1px gray dashed;
 }
 
@@ -153,57 +153,34 @@ table.results tr.success td {
 	color: green;
 }
 
-table.results tr.mouseover_success {
+table.results tr.failure td {
+	color: red;
+}
+
+table.results tr.mouseover, table.results tr.mouseout {
 	border-bottom: 1px gray dashed;
 }
 
-table.results tr.mouseover_success td {
+table.results tr.clicked td {
+	background-color: lightyellow;
+}
+
+table.results tr.mouseover td {
 	background-color: lightblue;
 }
 
-table.results tr.mouseover_success td.exit {
+table.results td.exit {
 	text-align: center;
 	vertical-align: middle;
-	background: lightblue url('../img/admin/icon_success.gif') no-repeat center right;
-	width: 100%;
-}
-
-table.results tr.mouseover_failure {
-	border-bottom: 1px gray dashed;
-}
-
-table.results tr.mouseover_failure td {
-	background-color: lightblue;
-}
-
-table.results tr.mouseover_failure td.exit {
-	text-align: center;
-	vertical-align: middle;
-	background: lightblue url('../img/admin/icon_error.gif') no-repeat center right;
 	width: 100%;
 }
 
 table.results tr.success td.exit {
-	text-align: center;
-	vertical-align: middle;
-	background: white url('../img/admin/icon_success.gif') no-repeat center right;
-	width: 100%;
+	background: transparent url('../img/admin/icon_success.gif') no-repeat center right;
 }
 
 table.results tr.failure td.exit {
-	text-align: center;
-	vertical-align: middle;
-	background: white url('../img/admin/icon_error.gif') no-repeat center right;
-	width: 100%;
-}
-
-
-table.results tr.failure {
-	border-bottom: 1px gray dashed;
-}
-
-table.results tr.failure td{
-	color: red;
+	background: transparent url('../img/admin/icon_error.gif') no-repeat center right;
 }
 
 table.results div.user {
@@ -242,6 +219,7 @@ table.results-filter td.filter *, div.plugin-filter * {
 
 div.results-submit * {
 	font-size: 10px;
+	margin-right: 5px;
 }
 
 div.results-submit {
