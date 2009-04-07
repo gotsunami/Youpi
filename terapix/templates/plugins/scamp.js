@@ -75,8 +75,8 @@ var {{ plugin.id }} = {
 		{{ plugin.id }}_LDAC_error = 0;
 	
 		var container = emptyContainer('menuitem_sub_3');
-		var pre = document.createElement('pre');
-		container.appendChild(pre);
+		var pre = new Element('pre');
+		container.insert(pre);
 	
 		var log = new Logger(pre);
 	
@@ -94,7 +94,7 @@ var {{ plugin.id }} = {
 		log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection.');
 	
 		// CHECK 2: get config file
-		var cSel = document.getElementById('{{ plugin.id }}_config_name_select');
+		var cSel = $('{{ plugin.id }}_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 		log.msg_status("Using '" + config + "' as configuration file");
 	
@@ -108,7 +108,7 @@ var {{ plugin.id }} = {
 	},
 
 	getOutputDataPath: function() {
-		var custom_dir = document.getElementById('output_path_input').value;
+		var custom_dir = $('output_path_input').value;
 		var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
 	
 		if (custom_dir && custom_dir.replace(/\ /g, '').length) {
@@ -194,7 +194,7 @@ var {{ plugin.id }} = {
 	},
 
 	do_addSelectionToCart: function(selIds) {
-		var cSel = document.getElementById('{{ plugin.id }}_config_name_select');
+		var cSel = $('{{ plugin.id }}_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 		var output_data_path = {{ plugin.id }}.getOutputDataPath();
 	
@@ -276,26 +276,26 @@ var {{ plugin.id }} = {
 			opt.setAttribute('onclick', "{{ plugin.id }}.renderLDACSelection(" + parseInt(k) + ")");
 		}
 		
-		var ldac_tab = document.createElement('table');
+		var ldac_tab = new Element('table');
 		ldac_tab.setAttribute('style', 'width: 100%;');
 		var tr, td;
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 	
 		ldac_tab.appendChild(tr);
 		tr.appendChild(td);
 		container.appendChild(ldac_tab);
 	
-		var ldac_choice_div = document.createElement('div');
+		var ldac_choice_div = new Element('div');
 		ldac_choice_div.appendChild(selNode);
 		td.appendChild(ldac_choice_div);
 	
-		var ldac_opt_div = document.createElement('div');
+		var ldac_opt_div = new Element('div');
 		ldac_opt_div.setAttribute('style', 'vertical-align: middle;');
 		td.appendChild(ldac_opt_div);
 	
 		// Select all
-		var sub = document.createElement('input');
+		var sub = new Element('input');
 		sub.setAttribute('style', 'float: left;');
 		sub.setAttribute('type', 'button');
 		sub.setAttribute('value', 'Select all');
@@ -303,7 +303,7 @@ var {{ plugin.id }} = {
 		ldac_opt_div.appendChild(sub);
 			
 		// Unselect all
-		sub = document.createElement('input');
+		sub = new Element('input');
 		sub.setAttribute('style', 'float: left; margin-left: 10px;');
 		sub.setAttribute('type', 'button');
 		sub.setAttribute('value', 'Unselect all');
@@ -311,14 +311,14 @@ var {{ plugin.id }} = {
 		ldac_opt_div.appendChild(sub);
 	
 		// Add to cart button
-		var addc = document.createElement('img');
+		var addc = new Element('img');
 		addc.setAttribute('style', 'cursor: pointer; float: right;');
 		addc.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif');
 		addc.setAttribute('onclick', "{{ plugin.id }}.do_addSelectionToCart();");
 		ldac_opt_div.appendChild(addc);
 			
-		td = document.createElement('td');
-		var ldac_selection_div = document.createElement('div');
+		td = new Element('td');
+		var ldac_selection_div = new Element('div');
 		ldac_selection_div.setAttribute('id', 'ldac_selection_div');
 		td.appendChild(ldac_selection_div);
 		tr.appendChild(td);
@@ -436,22 +436,22 @@ var {{ plugin.id }} = {
 	},
 
 	renderOutputDirStats: function(container_id) {
-		var container = document.getElementById(container_id);
+		var container = $(container_id);
 		container.innerHTML = '';
 	
 		// global var defined in results.html
 		var resp = output_dir_stats_data;
 		var stats = resp['Stats'];
 	
-		var tab = document.createElement('table');
+		var tab = new Element('table');
 		tab.setAttribute('class', 'output_dir_stats');
 		var tr,th,td;
-		var tr = document.createElement('tr');
+		var tr = new Element('tr');
 		// Header
 		var header = ['Task success', 'Task failures', 'Total processings'];
 		var cls = ['task_success', 'task_failure', 'task_total'];
 		for (var k=0; k < header.length; k++) {
-			th = document.createElement('th');
+			th = new Element('th');
 			th.setAttribute('class', cls[k]);
 			th.setAttribute('colspan', '2');
 			th.appendChild(document.createTextNode(header[k]));
@@ -459,11 +459,11 @@ var {{ plugin.id }} = {
 		}
 		tab.appendChild(tr);
 	
-		tr = document.createElement('tr');
+		tr = new Element('tr');
 		var val, percent, cls;
 		for (var k=0; k < header.length; k++) {
-			c_td = document.createElement('td');
-			p_td = document.createElement('td');
+			c_td = new Element('td');
+			p_td = new Element('td');
 			switch (k) {
 				case 0:
 					val = stats['TaskSuccessCount'][0];
@@ -525,15 +525,15 @@ var {{ plugin.id }} = {
 		// Global variable
 		var resp = currentReturnedData;
 	
-		var container = document.getElementById(container_id);
-		var d = document.createElement('div');
+		var container = $(container_id);
+		var d = new Element('div');
 		d.setAttribute('class', 'entryResult');
-		var tab = document.createElement('table');
+		var tab = new Element('table');
 		tab.setAttribute('class', 'fileBrowser');
 		tab.setAttribute('style', 'width: 100%');
 	
-		tr = document.createElement('tr');
-		th = document.createElement('th');
+		tr = new Element('tr');
+		th = new Element('th');
 		th.appendChild(document.createTextNode(resp['Title']));
 		tr.appendChild(th);
 		tab.appendChild(tr);
@@ -541,36 +541,36 @@ var {{ plugin.id }} = {
 		container.appendChild(d);
 	
 		// Duration
-		var tdiv = document.createElement('div');
+		var tdiv = new Element('div');
 		tdiv.setAttribute('class', 'duration');
 		tdiv.appendChild(document.createTextNode(resp['Start']));
-		tdiv.appendChild(document.createElement('br'));
+		tdiv.appendChild(new Element('br'));
 		tdiv.appendChild(document.createTextNode(resp['End']));
-		tdiv.appendChild(document.createElement('br'));
+		tdiv.appendChild(new Element('br'));
 		var src;
 		resp['Success'] ? src = 'success' : src = 'error';
-		var img = document.createElement('img');
+		var img = new Element('img');
 		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
 		img.setAttribute('style', 'padding-right: 5px;');
 		tdiv.appendChild(img);
 		tdiv.appendChild(document.createTextNode(resp['Duration'] + ' on'));
-		tdiv.appendChild(document.createElement('br'));
+		tdiv.appendChild(new Element('br'));
 		tdiv.appendChild(document.createTextNode(resp['Hostname']));
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 		td.appendChild(tdiv);
 		tr.appendChild(td);
 		tab.appendChild(tr);
 	
 		// User
-		var udiv = document.createElement('div');
+		var udiv = new Element('div');
 		udiv.setAttribute('class', 'user');
 		udiv.appendChild(document.createTextNode('Job initiated by ' + resp['User']));
-		udiv.appendChild(document.createElement('br'));
+		udiv.appendChild(new Element('br'));
 		udiv.appendChild(document.createTextNode('Exit status: '));
-		udiv.appendChild(document.createElement('br'));
-		var exit_s = document.createElement('span');
+		udiv.appendChild(new Element('br'));
+		var exit_s = new Element('span');
 		var txt;
 		resp['Success'] ? txt = 'success' : txt = 'failure';
 		exit_s.setAttribute('class', 'exit_' + txt);
@@ -578,10 +578,10 @@ var {{ plugin.id }} = {
 		udiv.appendChild(exit_s);
 		td.appendChild(udiv);
 	
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('style', 'padding: 0px');
-		var tab2 = document.createElement('table');
+		var tab2 = new Element('table');
 		tab2.setAttribute('class', 'scamp-result-entry-params');
 		td.appendChild(tab2);
 		tr.appendChild(td);
@@ -589,9 +589,9 @@ var {{ plugin.id }} = {
 	
 		// Thumbnails when successful
 		if (resp['Success']) {
-			tr = document.createElement('tr');
+			tr = new Element('tr');
 			tr.setAttribute('class', 'scamp-result-entry-tn');
-			td = document.createElement('td');
+			td = new Element('td');
 			td.setAttribute('onclick', "window.open('" + resp['WWW'] + "/scamp.xml');");
 			td.setAttribute('onmouseover', "this.setAttribute('class', 'scamp-result-entry-complete-on');");
 			td.setAttribute('onmouseout', "this.setAttribute('class', 'scamp-result-entry-complete-off');");
@@ -599,7 +599,7 @@ var {{ plugin.id }} = {
 			td.appendChild(document.createTextNode('See Scamp XML file'));
 			tr.appendChild(td);
 	
-			td = document.createElement('td');
+			td = new Element('td');
 			var tns = resp['Previews'];
 			var tn, imgpath, a;
 			for (var k=0; k < tns.length; k++) {
@@ -636,18 +636,18 @@ var {{ plugin.id }} = {
 		// Scamp processing history
 		// Header title
 		var hists = resp.History;
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		td.setAttribute('class', 'qfits-result-header-title');
 		td.appendChild(document.createTextNode('Scamp processing history (' + hists.length + ')'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
-		htab = document.createElement('table');
+		htab = new Element('table');
 		htab.setAttribute('class', 'qfits-result-history');
 		td.appendChild(htab);
 		tr.appendChild(td);
@@ -700,53 +700,53 @@ var {{ plugin.id }} = {
 	
 		// Scamp run parameters
 		// Image
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		td.setAttribute('class', 'qfits-result-header-title');
 		td.appendChild(document.createTextNode('Scamp run parameters'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.appendChild(document.createTextNode('Input LDAC files (' + resp['LDACFiles'].length + '):'));
 		tr.appendChild(td);
 	
-		td = document.createElement('td');
-		var ldac_div = document.createElement('div');
+		td = new Element('td');
+		var ldac_div = new Element('div');
 		ldac_div.setAttribute('class', 'min_size');
 		td.appendChild(ldac_div);
 		for (var k=0; k < resp['LDACFiles'].length; k++) {
 			ldac_div.appendChild(document.createTextNode(resp['LDACFiles'][k]));
-			ldac_div.appendChild(document.createElement('br'));
+			ldac_div.appendChild(new Element('br'));
 		}
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		// Output directory
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('nowrap', 'nowrap');
 		td.appendChild(document.createTextNode('Results output dir:'));
 		tr.appendChild(td);
 	
-		td = document.createElement('td');
+		td = new Element('td');
 		td.appendChild(document.createTextNode(resp['ResultsOutputDir']));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
 		// Scamp Config file
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		if (resp['Success']) {
 			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 		}
-		var cdiv = document.createElement('div');
+		var cdiv = new Element('div');
 		cdiv.setAttribute('id', 'config-' + resp['TaskId']);
 		cdiv.setAttribute('class', 'config_file');
-		var pre = document.createElement('pre');
+		var pre = new Element('pre');
 		pre.appendChild(document.createTextNode(resp['Config']));
 		cdiv.appendChild(pre);
 		tr.appendChild(td);
@@ -757,19 +757,19 @@ var {{ plugin.id }} = {
 	
 		// Error log file when failure
 		if (!resp['Success']) {
-			tr = document.createElement('tr');
-			td = document.createElement('td');
+			tr = new Element('tr');
+			td = new Element('td');
 			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 			td.setAttribute('colspan', '2');
-			var but = document.createElement('input');
+			var but = new Element('input');
 			but.setAttribute('type', 'button');
 			but.setAttribute('value', 'Toggle error log file view');
 			but.setAttribute('onclick', "toggleDisplay('log-" + resp['TaskId'] + "');");
 			td.appendChild(but);
-			var cdiv = document.createElement('div');
+			var cdiv = new Element('div');
 			cdiv.setAttribute('id', 'log-' + resp['TaskId']);
 			cdiv.setAttribute('style', 'height: 200px; overflow: auto; background-color: black; padding-left: 5px; display: none')
-			var pre = document.createElement('pre');
+			var pre = new Element('pre');
 			pre.appendChild(document.createTextNode(resp['Log']));
 			cdiv.appendChild(pre);
 			td.appendChild(cdiv);
@@ -780,18 +780,18 @@ var {{ plugin.id }} = {
 		}
 	
 		// XML Filtering 
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
 		td.setAttribute('class', 'qfits-result-header-title');
 		td.appendChild(document.createTextNode('XML Filtering'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
-		tr = document.createElement('tr');
-		td = document.createElement('td');
+		tr = new Element('tr');
+		td = new Element('td');
 		td.setAttribute('colspan', '2');
-		var d = document.createElement('div');
+		var d = new Element('div');
 		d.setAttribute('style', 'padding: 10px;');
 		d.setAttribute('id', '{{ plugin.id }}_xml_div');
 		td.appendChild(d);
@@ -802,9 +802,9 @@ var {{ plugin.id }} = {
 	},
 
 	showSavedItems: function() {
-		var cdiv = document.getElementById('plugin_menuitem_sub_{{ plugin.id }}');
+		var cdiv = $('plugin_menuitem_sub_{{ plugin.id }}');
 		cdiv.innerHTML = '';
-		var div = document.createElement('div');
+		var div = new Element('div');
 		div.setAttribute('class', 'savedItems');
 		div.setAttribute('id', '{{ plugin.id }}_saved_items_div');
 		cdiv.appendChild(div);
@@ -819,7 +819,7 @@ var {{ plugin.id }} = {
 					removeAllChildrenNodes(div);
 					
 					var total = resp['result'].length;
-					var countNode = document.getElementById('plugin_{{ plugin.id }}_saved_count');
+					var countNode = $('plugin_{{ plugin.id }}_saved_count');
 					countNode.innerHTML = '';
 					var txt;
 					if (total > 0)
@@ -828,25 +828,25 @@ var {{ plugin.id }} = {
 						txt = 'No item';
 					countNode.appendChild(document.createTextNode(txt));
 	
-					var table = document.createElement('table');
+					var table = new Element('table');
 					table.setAttribute('class', 'savedItems');
 					var tr, th;
-					var icon = document.createElement('img');
+					var icon = new Element('img');
 					icon.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
 					icon.setAttribute('style', 'vertical-align:middle; margin-right: 10px;');
 	
-					tr = document.createElement('tr');
-					th = document.createElement('th');
+					tr = new Element('tr');
+					th = new Element('th');
 					th.setAttribute('colspan', '8');
 					th.appendChild(icon);
 					th.appendChild(document.createTextNode('{{ plugin.description }}: ' + resp['result'].length + ' saved item' + (resp['result'].length > 1 ? 's' : '')));
 					tr.appendChild(th);
 					table.appendChild(tr);
 	
-					tr = document.createElement('tr');
+					tr = new Element('tr');
 					var header = ['Date', 'User', 'Name', '# images', 'Config', 'Action'];
 					for (var k=0; k < header.length; k++) {
-						th = document.createElement('th');
+						th = new Element('th');
 						th.appendChild(document.createTextNode(header[k]));
 						tr.appendChild(th);
 					}
@@ -1002,12 +1002,12 @@ var {{ plugin.id }} = {
 		var c = 0;
 		var txt;
 		idList.length > 1 ? txt = 'Batch' : txt = 'Single';
-		var selDiv = document.createElement('div');
+		var selDiv = new Element('div');
 		selDiv.setAttribute('class', 'selectionModeTitle');
 		selDiv.appendChild(document.createTextNode(txt + ' selection mode:'));
 		container.appendChild(selDiv);
 	
-		selDiv = document.createElement('div');
+		selDiv = new Element('div');
 		selDiv.setAttribute('class', 'listsOfSelections');
 	
 		for (var k=0; k < idList.length; k++) {
@@ -1016,13 +1016,13 @@ var {{ plugin.id }} = {
 				selDiv.appendChild(document.createTextNode('Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '')));
 			else
 				selDiv.appendChild(document.createTextNode(c + ' image' + (c > 1 ? 's' : '')));
-			selDiv.appendChild(document.createElement('br'));
+			selDiv.appendChild(new Element('br'));
 		}
 		container.appendChild(selDiv);
 	},
 
 	reprocess_ldac_selection: function(ldac_files, taskId) {
-		var container = document.getElementById('{{ plugin.id }}_xml_fields_result_div');
+		var container = $('{{ plugin.id }}_xml_fields_result_div');
 	
 		var xhr = new HttpRequest(
 			container,
@@ -1170,16 +1170,16 @@ function ScampXMLParser(taskId, container) {
 					_fieldNames[k] = _fields[k][0];
 				}
 
-				var tab = document.createElement('table');
+				var tab = new Element('table');
 				tab.setAttribute('id', '{{ plugin.id }}_xml_fields_tab');
 				_container.appendChild(tab);
 
 				// Add first line
 				_addRow();
 
-				var div = document.createElement('div');
+				var div = new Element('div');
 				div.setAttribute('style', 'text-align: right;');
-				var but = document.createElement('input');
+				var but = new Element('input');
 				but.setAttribute('type', 'button');
 				but.setAttribute('value', 'Find Matches');
 				but.setAttribute('onclick', 'xmlParser.submitQuery()');
@@ -1187,7 +1187,7 @@ function ScampXMLParser(taskId, container) {
 				_container.appendChild(div);
 
 				// Result div
-				rdiv = document.createElement('div');
+				rdiv = new Element('div');
 				rdiv.setAttribute('id', '{{ plugin.id }}_xml_fields_result_div');
 				_container.appendChild(rdiv);
 			}
@@ -1203,9 +1203,9 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.submitQuery = function() {
-		var container = document.getElementById('{{ plugin.id }}_xml_fields_result_div');
+		var container = $('{{ plugin.id }}_xml_fields_result_div');
 		container.setAttribute('style', 'border-top: 3px solid #5b80b2; margin-top: 10px; padding-top: 5px;');
-		var tab = document.getElementById('{{ plugin.id }}_xml_fields_tab');
+		var tab = $('{{ plugin.id }}_xml_fields_tab');
 		var trs = tab.getElementsByTagName('tr');
 		var query = new Array();
 		for (var k=0; k < trs.length; k++) {
@@ -1230,7 +1230,7 @@ function ScampXMLParser(taskId, container) {
 				ldac_files = d['LDACFiles'];
 				if (!ldac_files.length) {
 					container.innerHTML = '';
-					var idiv = document.createElement('div');
+					var idiv = new Element('div');
 					idiv.setAttribute('class', 'tip');
 					idiv.setAttribute('style', 'width: 30%;');
 					idiv.appendChild(document.createTextNode('No LDAC files found matching\nthese criteria.'));
@@ -1241,18 +1241,18 @@ function ScampXMLParser(taskId, container) {
 				container.innerHTML = '';
 				log = new Logger(container);
 				log.msg_ok(ldac_files.length + ' LDAC file' + (ldac_files.length > 1 ? 's' : '') + ' matched');
-				var ldiv = document.createElement('div');
+				var ldiv = new Element('div');
 				ldiv.setAttribute('style', 'height: 100px; overflow: auto; width: 500px;');
 				for (var k=0; k < ldac_files.length; k++) {
 					ldiv.appendChild(document.createTextNode(d['DataPath'] + '/' + ldac_files[k]));
-					ldiv.appendChild(document.createElement('br'));
+					ldiv.appendChild(new Element('br'));
 				}
 				container.appendChild(ldiv);
 
 				// Button div
-				var bdiv = document.createElement('div');
+				var bdiv = new Element('div');
 				bdiv.setAttribute('style', 'text-align: right;');
-				var img = document.createElement('img');
+				var img = new Element('img');
 				img.setAttribute('style', 'cursor: pointer;');
 				img.setAttribute('onclick', "{{ plugin.id }}.reprocess_ldac_selection('" + ldac_files + "'," + d['TaskId'] + ");");
 				img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
@@ -1268,17 +1268,17 @@ function ScampXMLParser(taskId, container) {
 
 	function _addRow() {
 		var tr, td;
-		var tab = document.getElementById('{{ plugin.id }}_xml_fields_tab');
+		var tab = $('{{ plugin.id }}_xml_fields_tab');
 		var type = _fields[0][1];
 
-		tr = document.createElement('tr');
+		tr = new Element('tr');
 		tab.appendChild(tr);
 		tr.setAttribute('id', '{{ plugin.id }}_xml_fields_tr_' + _rowIdx);
 
 		// - button
-		td = document.createElement('td');
+		td = new Element('td');
 		if (_rowIdx > 0) {
-			var addb = document.createElement('input');
+			var addb = new Element('input');
 			addb.setAttribute('type', 'button');
 			addb.setAttribute('value', '-');
 			addb.setAttribute('onclick', "xmlParser.removeRow(" + _rowIdx + ");");
@@ -1288,31 +1288,31 @@ function ScampXMLParser(taskId, container) {
 		tr.appendChild(td);
 
 		// + button
-		td = document.createElement('td');
-		addb = document.createElement('input');
+		td = new Element('td');
+		addb = new Element('input');
 		addb.setAttribute('type', 'button');
 		addb.setAttribute('value', '+');
 		addb.setAttribute('onclick', "xmlParser.addRow();");
 		td.appendChild(addb);
 		tr.appendChild(td);
 
-		td = document.createElement('td');
+		td = new Element('td');
 		var sel = getSelect('{{ plugin.id }}_xml_fields_select_' + _rowIdx, _fieldNames);
 		sel.setAttribute('onchange', "xmlParser.selectionHasChanged(" + _rowIdx + ");");
 		td.appendChild(sel);
 		tr.appendChild(td);
 
 		// Condition
-		td = document.createElement('td');
+		td = new Element('td');
 		td.setAttribute('id', '{{ plugin.id }}_xml_fields_cond_td_' + _rowIdx);
 		td.appendChild(_getTypeSelect(type));
 		tr.appendChild(td);
 
 		// Text field
-		td = document.createElement('td');
+		td = new Element('td');
 		td.setAttribute('id', '{{ plugin.id }}_xml_fields_text_td_' + _rowIdx);
 		if (type != 'boolean') {
-			var txt = document.createElement('input');
+			var txt = new Element('input');
 			txt.setAttribute('type', 'text');
 			txt.setAttribute('size', '30');
 			td.appendChild(txt);
@@ -1324,7 +1324,7 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.removeRow = function(rowIdx) {
-		var tr = document.getElementById('{{ plugin.id }}_xml_fields_tr_' + rowIdx);
+		var tr = $('{{ plugin.id }}_xml_fields_tr_' + rowIdx);
 		tr.parentNode.removeChild(tr);
 	}
 
@@ -1347,18 +1347,18 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.selectionHasChanged = function(curRowIdx) {
-		var sel = document.getElementById('{{ plugin.id }}_xml_fields_select_' + curRowIdx);
+		var sel = $('{{ plugin.id }}_xml_fields_select_' + curRowIdx);
 		var idx = sel.selectedIndex;
 		var type = _fields[idx][1];
 
-		var cond = document.getElementById('{{ plugin.id }}_xml_fields_cond_td_' + curRowIdx);
+		var cond = $('{{ plugin.id }}_xml_fields_cond_td_' + curRowIdx);
 		removeAllChildrenNodes(cond);
 		cond.appendChild(_getTypeSelect(type));
 
-		var text = document.getElementById('{{ plugin.id }}_xml_fields_text_td_' + curRowIdx);
+		var text = $('{{ plugin.id }}_xml_fields_text_td_' + curRowIdx);
 		removeAllChildrenNodes(text);
 		if (type != 'boolean') {
-			var txt = document.createElement('input');
+			var txt = new Element('input');
 			txt.setAttribute('type', 'text');
 			txt.setAttribute('size', '30');
 			text.appendChild(txt);
@@ -1395,7 +1395,7 @@ function ScampXMLParser(taskId, container) {
 
 	function _main() {
 		if (typeof container == 'string') {
-			_container = document.getElementById(container);
+			_container = $(container);
 		}
 		else
 			_container = container;

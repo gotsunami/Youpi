@@ -701,6 +701,7 @@ function AdvancedTable() {
 		else {
 			// Pagination mode, we send _pageStatus to the server-side
 			// script in order to rebuild the selection
+			if (!_postData) return null;
 			var xhr = new HttpRequest(
 				null,
 				// Use default error handler
