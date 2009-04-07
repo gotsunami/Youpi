@@ -34,7 +34,7 @@ def main():
 	print "Data paths for %d images:" % len(images)
 	sys.stdout.flush()
 
-	k = 0
+	k = 1
 	for img in images:
 		print "%05d %s%s.fits" % (k, img.path, img.name)
 		sys.stdout.flush()
