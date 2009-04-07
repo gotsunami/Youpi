@@ -1940,12 +1940,11 @@ function ImageSelector(container, options)
 				// This function issues a synchonous call in pagination mode;
 				// the result of this call is then stored in _paginationImageSelection
 				var sel = _tableWidget.getSelectedColsValues();
-				if (!sel) return null;
-
 				if (_tableWidget.paginationActivated())
 					sel = _paginationImageSelection;
-				var nb = 0;
+				if (!sel) return null;
 
+				var nb = 0;
 				if (sel.length > 0)
 					nb = sel.split(',').length;
 				if (!nb) return null;
