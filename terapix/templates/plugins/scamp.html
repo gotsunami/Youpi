@@ -8,10 +8,13 @@
 		</div>
 		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0"></div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
+			<div id="selector_div"></div>
+		</div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2">
 			<div style="width: 500px" id="config_file_div"></div>
 		</div>
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2"></div>
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_3">
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_3"></div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_4">
 			<div class="tip" style="margin-top: 40px; width: 250px;">	
 				<p>Once your images selections have been made and a config file has been selected,
 				checks must be performed to <b>ensure LDAC files are available</b> before proceeding.</p>
@@ -23,15 +26,30 @@
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
-		var m = new SubMenu('submenu', ['Select images', 'Select a configuration file', 'Set output directory', 'Input data validation']);
-		m.setOnClickHandler(2, function() {
+		var m = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory', 'Input data validation']);
+		m.setOnClickHandler(3, function() {
 			$('output_path_input').focus();
 		});
 
 		{{ plugin.id }}.selectImages();
-		var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
 
 		// Enable user output custom directory
-		plugin_enableOutputDirectory('menuitem_sub_2', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+		plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+
 	});
+
+	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+
+	var fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
+	fm_file_browser.setRootTitle('Terapix Cluster');
+	fm_file_browser.setFilteringPatterns(['*.ahead']);
+	fm_file_browser.setRootDataPath('/data');
+
+	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
+	selector.addPath('.ahead data', 'ahead', { mandatory: true });
+	selector.setFileBrowser(fm_file_browser);
+	selector.render();
+
+	// Now file browser can renders itself
+	fm_file_browser.render();
 </script>
