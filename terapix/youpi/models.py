@@ -392,9 +392,6 @@ class Plugin_fitsin(models.Model):
 	class Meta:
 		verbose_name = "QualityFits-In plugin data"
 
-	def __unicode__(self):
-		return self.name
-
 class Plugin_fitsout(models.Model):
 	"""
 	 Related to QualityFITSout plugin
