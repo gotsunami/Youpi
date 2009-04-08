@@ -33,8 +33,9 @@ def appmenu(request):
 					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : AUP + '/ingestion/'},
 					{'title' : 'Tags', 				'id' : 'tags',			'href' : AUP + '/tags/'},
 					{'title' : 'Processing', 		'id' : 'processing', 	'href' : AUP + '/processing/'},
-					{'title' : 'Processing Results','id' : 'results',	 	'href' : AUP + '/results/'},
 					{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : AUP + '/monitoring/'},
+					{'title' : 'Results',			'id' : 'results',	 	'href' : AUP + '/results/'},
+					{'title' : 'Reporting',			'id' : 'reporting',	 	'href' : AUP + '/reporting/'},
 				),
 				'apart' : ( 	
 					# Display order is inverted

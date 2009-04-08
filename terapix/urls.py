@@ -60,6 +60,7 @@ urlpatterns = patterns(
 	(r'^youpi/monitoring/softwares/$', 'soft_version_monitoring'),
 	(r'^youpi/condor/cancel/$', 'job_cancel'),
 	(r'^youpi/condor/setup/$', 'condor_setup'),
+	(r'^youpi/reporting/$', 'reporting'),
 	(r'^youpi/results/$', 'results'),
 	(r'^youpi/results/filter/$', 'task_filter'),
 	(r'^youpi/results/stats/$', 'dir_stats'),

@@ -1,0 +1,39 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
+<script type="text/javascript" src="/media/js/processinghistorywidget.js"></script>
+<script type="text/javascript" src="/media/js/progressbar.js"></script>
+
+
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+	<div id="submenu">
+		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0"></div>
+		<!--
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
+			<div id="selector_div"></div>
+		</div>
+		-->
+	</div>
+</div>
+<script type="text/javascript">
+	var menu;
+	document.observe('dom:loaded', function() {
+		menu = new SubMenu('submenu', ['Reports']);
+	});
+</script>
+{% endblock %}

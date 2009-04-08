@@ -568,7 +568,7 @@ function ProcessingHistoryWidget(container) {
 	
 		// Send HTTP POST request
 		xhr.setBusyMsg('Please wait while filtering data...');
-		xhr.setCustomAnimatedImage('/media/themes/' + guistyle + '/img/misc/thickbox-loader.gif');
+		xhr.setCustomAnimatedImage('/media/themes/' + guistyle + '/img/misc/snake-loader.gif');
 		xhr.send('/youpi/results/filter/', post.toQueryString());
 	}
 

@@ -248,6 +248,18 @@ def results(request):
 
 @login_required
 @profile
+def reporting(request):
+	"""
+	Page to generate reports.
+	"""
+
+	return render_to_response('reporting.html', {	
+						'selected_entry_id'	: 'reporting', 
+					}, 
+					context_instance = RequestContext(request))
+
+@login_required
+@profile
 def tags(request):
 	"""
 	Related to tags page.
