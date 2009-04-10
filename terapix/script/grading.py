@@ -184,7 +184,7 @@ def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 
 
 def main():
-	parser = OptionParser(description = 'My prog')
+	parser = OptionParser(description = 'Tool for grading all Qualityfits-in processings')
 	parser.add_option('-d', '--delete', 
 			default = False, 
 			action = 'store_true', 
