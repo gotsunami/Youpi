@@ -141,7 +141,11 @@ def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 			line = f.readline()[:-1]
 			if not line: break
 
-			name, grade, comment = line.split(separator)
+			try: name, grade, comment = line.split(separator)
+			except ValueError, e:
+				print "\n[Parsing Error] in CSV file at line %d: %s" % (pos, e)
+				raise KeyboardInterrupt
+
 			img = Image.objects.filter(name = name)
 			if not img:
 				notfound += 1
@@ -243,7 +247,7 @@ def main():
 		elif options.delete:
 			delete_grades(options.simulate, verbose = options.verbose)
 	except KeyboardInterrupt:
-		print "Catched interrupt. Exiting..."
+		print "Exiting..."
 		sys.exit(2)
 
 
