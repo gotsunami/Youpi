@@ -65,6 +65,13 @@ class ProcessingPlugin:
 
 		return "%s/CONDOR-%s-%s.txt" % (CONDOR_LOG_DIR, self.id, time.time())
 
+	def reports(self):
+		"""
+		Reporting capabilities
+		"""
+
+		return []
+
 	def getConfigurationFilePath(self):
 		"""
 		Returns the pathname to configuration file used for this processing

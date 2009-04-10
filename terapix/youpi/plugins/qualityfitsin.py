@@ -23,6 +23,8 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.settings import *
+#
+from django.http import HttpResponse, HttpResponseNotFound
 
 class QualityFitsIn(ProcessingPlugin):
 	"""
@@ -885,3 +887,28 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		"""
 
 		return "%s of image <b>%s</b>" % (self.optionLabel, data['imgName'])
+
+	def reports(self):
+		"""
+		Reporting capabilities
+		"""
+		return [
+			{'id': 'allgrades', 'title': 'List of all QualityFITS-in grades'},
+			{'id': 'gradestats', 'title': 'Grading statistics (summary)'},
+		]
+
+	def getReport(self, reportId):
+		"""
+		Generates a report
+		"""
+		if reportId == 'allgrades':
+			from terapix.script.grading import get_grades
+			from terapix.reporting.csv import CSVReport
+			res = get_grades()
+			return HttpResponse(CSVReport(data = get_grades()), mimetype = 'text/plain')
+		elif reportId == 'gradestats':
+			from terapix.script.grading import get_stats
+			from terapix.reporting.plain import PlainTextReport
+			return HttpResponse(PlainTextReport(data = get_stats()), mimetype = 'text/plain')
+		
+		return HttpResponseNotFound('Report not found.')

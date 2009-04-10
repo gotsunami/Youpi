@@ -254,6 +254,7 @@ def reporting(request):
 	"""
 
 	return render_to_response('reporting.html', {	
+						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: 'reporting', 
 					}, 
 					context_instance = RequestContext(request))
@@ -1103,6 +1104,22 @@ def upload_file(request):
 		errMsg = str(str(e))
 
 	return HttpResponse(str({'filename' : str(filename), 'length' : len(content), 'exit_code' : exitCode, 'error_msg' : errMsg }), mimetype = 'text/html')
+
+def get_report(request, pluginId, reportId):
+	"""
+	Generate a report
+	"""
+	try:
+		plugObj = manager.getPluginByName(pluginId)
+	except PluginManagerError:
+		# Not found
+		return HttpResponseNotFound()
+
+	try:
+		return plugObj.getReport(reportId)
+	except TypeError:
+		# Bad report Id
+		return HttpResponseNotFound()
 
 def ims_get_image_list(request):
 	"""

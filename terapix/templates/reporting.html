@@ -20,9 +20,28 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 {% block bodyclass %}dashboard{% endblock %}
 
 {% block content %}
-<div style="text-align: center;">
+<div>
 	<div id="submenu">
-		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0"></div>
+		<div style="margin-left: 30px;" id="menuitem_sub_0">
+			<div class="themes">
+				<h1>Select a report</h1>
+				<form id="report_form" method="post">
+					<label>Report: </label>
+					<select id="report_select">
+						<option value="0">--</option>
+						{% for plugin in plugins %}
+						<optgroup id="{{ plugin.id }}" label="{{ plugin.optionLabel }}">
+							{% for report in plugin.reports %}
+							<option value="{{ report.id }}">{{ report.title }}</option>
+							{% endfor %}
+						</optgroup>
+						{% endfor %}
+					</select>
+					<br/>
+					<input id="report_submit" type="submit" value="Generate!"/>	
+				</form>
+			</div>
+		</div>
 		<!--
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
 			<div id="selector_div"></div>
@@ -34,6 +53,15 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	var menu;
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['Reports']);
+		$('report_form').observe('submit', function() {
+			var sel = $('report_select');
+			var selvalue = sel.options[sel.selectedIndex].value;
+			var group = sel.options[sel.selectedIndex].up().id;
+			if (selvalue == '0') {
+				return false;
+			}
+			$('report_form').action = '/youpi/report/' + group + '/' + selvalue + '/';
+		});
 	});
 </script>
 {% endblock %}
