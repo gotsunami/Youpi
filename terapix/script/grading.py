@@ -36,7 +36,7 @@ except ImportError:
 def get_stats():
 	total = Plugin_fitsin.objects.filter(task__success = True).count()
 	usergrades = FirstQEval.objects.all().values('fitsin').distinct()
-	prevrelgrades = Plugin_fitsin.objects.exclude(prevrelgrade = None).filter(task__success = True).count()
+	prevrelgrades = Plugin_fitsin.objects.exclude(prevrelgrade = '').filter(task__success = True).count()
 
 	stats = (
 		('User-defined grades', len(usergrades)),
@@ -54,8 +54,6 @@ def get_grades():
 
 	@return a list of tuples [(image name, grade, comment), ...]
 	"""
-	#fitsinIds = FirstQEval.objects.values('fitsin').distinct()
-	#fitsins = Plugin_fitsin.objects.filter(id__in = [f['fitsin'] for f in fitsinIds])
 	fitsins = Plugin_fitsin.objects.filter(task__success = True)
 	tmp = {}
 	for f in fitsins:
@@ -89,6 +87,24 @@ def get_grades():
 
 	return res 
 
+def delete_grades(simulate, verbose = False):
+	total = Plugin_fitsin.objects.filter(task__success = True).exclude(prevrelgrade = '').count()
+	print "Simulation:", simulate
+	print "Computing how many grades to delete..."
+	print "%d grades (and comments) to delete." % total
+
+	if not simulate and total:
+		r = raw_input('Continue? (y/n) ')
+		if r not in ('y', 'Y'):
+			print "Aborted."
+			sys.exit(2)
+
+		from django.db import connection
+		cur = connection.cursor()
+		cur.execute("UPDATE youpi_plugin_fitsin SET prevrelgrade = '', prevrelcomment = ''")
+		connection._commit()
+		print "Done"
+
 def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 	try:
 		f = open(filename)
@@ -106,6 +122,8 @@ def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 
 	notfound = found = imgcount = writes = 0
 	pos = 1
+	from django.db import connection
+	cur = connection.cursor()
 	try:
 		while True:
 			line = f.readline()[:-1]
@@ -119,18 +137,24 @@ def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 					print "Not Found:", name
 					sys.stdout.flush()
 			else:
+				found += 1
 				if not simulate:
 					rels = Rel_it.objects.filter(task__kind__name = 'fitsin', image = img[0])
-					fitsins = Plugin_fitsin.objects.filter(task__in = [r.task for r in rels])
-					for proc in fitsins:
-						proc.prevrelgrade, proc.prevrelcomment = grade, comment
-						proc.save()
-						writes += 1
+					fitsins = Plugin_fitsin.objects.filter(task__in = [r.task for r in rels], task__success = True).values('id')
+					if fitsins:
+						q = """
+						UPDATE youpi_plugin_fitsin 
+						SET prevrelgrade="%s", prevrelcomment="%s"
+						WHERE id IN (%s)
+						""" % (grade, comment, string.join([str(i['id']) for i in fitsins], ','))
+						cur.execute(q)
+						writes += len(fitsins)
 					
-				found += 1
 			if not verbose:
 				sys.stdout.write(term.BOL + "Found: %5d, Not Found: %5d, DB Writes: %5d, Line %5d" % (found, notfound, writes, pos))
 			pos += 1
+
+		connection._commit()
 	except KeyboardInterrupt:
 		sys.stdout.write(term.SHOW_CURSOR)
 		raise
@@ -145,20 +169,55 @@ def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 
 def main():
 	parser = OptionParser(description = 'My prog')
-	parser.add_option('-i', '--ingest', dest = 'filename', help = 'Sets the CSV file to use for grade ingestion')
-	parser.add_option('-l', '--list-only', action = 'store_true', help = 'List available grades in DB')
-	parser.add_option('-t', '--stats', action = 'store_true', help = 'Display statistics')
-	parser.add_option('-v', '--verbose', action = 'store_true', default = False, help = 'Increase verbosity')
-	parser.add_option('-s', '--simulate', action = 'store_true', default = False, help = 'Simulate action (do nothing)')
-	(options, args) = parser.parse_args()
+	parser.add_option('-d', '--delete', 
+			default = False, 
+			action = 'store_true', 
+			help = 'Delete available grades in DB (previous release only, not user-defined ones)'
+	)
+	parser.add_option('-i', '--ingest', 
+			default = False, 
+			dest = 'filename', 
+			help = 'Sets the CSV file to use for grade ingestion'
+	)
+	parser.add_option('-l', '--list-only', 
+			default = False, 
+			action = 'store_true', 
+			help = 'List available grades in DB'
+	)
+	parser.add_option('-t', '--stats', 
+			default = False, 
+			action = 'store_true', 
+			help = 'Display statistics'
+	)
+	parser.add_option('-v', '--verbose', 
+			action = 'store_true', 
+			default = False, 
+			help = 'Increase verbosity'
+	)
+	parser.add_option('-s', '--simulate', 
+			action = 'store_true', 
+			default = False, 
+			help = 'Simulate action (do nothing)'
+	)
 
-	if len(args):
-		parser.error('takes no argument at all')
+	try: opts = sys.argv[1]
+	except IndexError: parser.print_help()
+
+	(options, args) = parser.parse_args()
+	if len(args): parser.error('takes no argument at all')
 
 	if options.list_only and options.filename:
 		parser.error('options -l and -i are mutually exclusive')
 	if options.stats and options.list_only:
 		parser.error('options -t and -l are mutually exclusive')
+	if options.delete and options.filename:
+		parser.error('options -d and -i are mutually exclusive')
+	if options.delete and options.stats:
+		parser.error('options -d and -t are mutually exclusive')
+	if options.filename and options.stats:
+		parser.error('options -i and -t are mutually exclusive')
+	if options.delete and options.list_only:
+		parser.error('options -d and -l are mutually exclusive')
 
 	try:
 		if options.stats:
@@ -168,11 +227,13 @@ def main():
 			from terapix.reporting.csv import CSVReport
 			print CSVReport(data = get_grades())
 		elif options.filename:
-			print options.verbose
 			ingest_grades(options.filename, options.simulate, verbose = options.verbose)
+		elif options.delete:
+			delete_grades(options.simulate, verbose = options.verbose)
 	except KeyboardInterrupt:
 		print "Catched interrupt. Exiting..."
 		sys.exit(2)
+
 
 if __name__ == '__main__':
 	main()
