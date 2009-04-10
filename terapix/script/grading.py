@@ -54,11 +54,21 @@ def get_grades():
 
 	@return a list of tuples [(image name, grade, comment), ...]
 	"""
-	fitsins = Plugin_fitsin.objects.filter(task__success = True)
+	from django.db import connection
+	cur = connection.cursor()
+	cur.execute("""
+		SELECT f.id, f.prevrelgrade, f.prevrelcomment, i.name 
+		FROM youpi_plugin_fitsin AS f, youpi_processing_task AS t, youpi_rel_it AS r, youpi_image AS i
+		WHERE f.task_id=t.id 
+		AND r.task_id=f.task_id
+		AND r.image_id = i.id
+		AND t.success=1""")
+	res = cur.fetchall()
+
 	tmp = {}
-	for f in fitsins:
-		grades = FirstQEval.objects.filter(fitsin = f).order_by('-date')
-		imgName = Rel_it.objects.filter(task = f.task)[0].image.name
+	for r in res:
+		grades = FirstQEval.objects.filter(fitsin__id = r[0]).order_by('-date')
+		imgName = r[3]
 
 		# Looks for user-defined grades
 		if grades:
@@ -67,11 +77,11 @@ def get_grades():
 			tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].comment.comment))
 
 		# Now looks for a previous release grade
-		if f.prevrelgrade:
+		if r[1]:
 			if not tmp.has_key(imgName):
 				tmp[imgName] = []
 			# Add a fake datetime object to make sure this grade is the older one
-			tmp[imgName].append([f.prevrelgrade, datetime.datetime(datetime.MINYEAR, 1, 1), f.prevrelcomment])
+			tmp[imgName].append([r[1], datetime.datetime(datetime.MINYEAR, 1, 1), r[2]])
 
 	# Now, only keep the latest grade for each image
 	res = []
@@ -85,7 +95,9 @@ def get_grades():
 				latest = grades[k]
 		res.append((imgName, latest[0], latest[2]))
 
-	return res 
+	# Sort by image name
+	res.sort(cmp = lambda x,y: cmp(x[0], y[0])) 
+	return res
 
 def delete_grades(simulate, verbose = False):
 	total = Plugin_fitsin.objects.filter(task__success = True).exclude(prevrelgrade = '').count()
