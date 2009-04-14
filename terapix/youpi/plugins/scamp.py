@@ -304,15 +304,21 @@ queue""" %  (	encUserData,
 
 		return csfPath
 
-	def checkForSelectionLDACData(self, request, imgList = None):
+	def checkForSelectionLdacAheadData(self, request, imgList = None):
 		"""
-		Check if every image in this selection has associated LDAC data.
+		Check if every image in this selection has associated LDAC/AHEAD data.
 		Policy: only the lastest successful qfits-in of current logged-in user is looked for.
 
-		@return Dictionnary {'missingLDAC' : list of images names without LDAC data, 'tasksIds' : list of matching tasks}
+		#@return Dictionnary {'missing' : list of images names without LDAC/AHEAD data, 'tasksIds' : list of matching tasks}
+		@return Dictionnary {'missing' : [[img1, ['img1.ldac', 'img1.ahead']], [img2, ...], ...], 'tasksIds' : list of matching tasks}
 		"""
 
 		post = request.POST
+		try:
+			aheadPath = post['AheadPath']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
 		if imgList:
 			idList = imgList
 		else:
@@ -323,14 +329,15 @@ queue""" %  (	encUserData,
 
 		tasksIds = []
 		missing = []
-		imgList = Image.objects.filter(id__in = idList)
+		imgList = Image.objects.filter(id__in = idList).order_by('name')
 		curTask = None
 
 		for img in imgList:
+			ldacMissing = aheadMissing = False
 			rels = Rel_it.objects.filter(image = img)
 			if not rels:
-				missing.extend([str(img.name)])
-				continue
+				#missing.extend([str(img.name)])
+				ldacMissing = True
 
 			relTaskIds = [rel.task.id for rel in rels]
 
@@ -341,12 +348,25 @@ queue""" %  (	encUserData,
 													success = True).order_by('-end_date')
 
 			if not tasks:
-				missing.append(str(img.name))
-				continue
+				#missing.append(str(img.name))
+				ldacMissing = True
 
-			tasksIds.append(int(tasks[0].id))
+			if not os.path.exists(os.path.join(aheadPath, img.name + '.ahead')):
+				aheadMissing = True
 
-		return {'missingLDACImages' : missing, 'tasksIds' : tasksIds}
+			if ldacMissing or aheadMissing:
+				info = [str(img.name)]
+				miss = []
+				if ldacMissing: miss.append(str(img.name) + '.ldac')
+				if aheadMissing: miss.append(str(img.name) + '.ahead')
+				info.append(miss)
+				missing.append(info)
+
+
+			if not ldacMissing and not aheadMissing:
+				tasksIds.append(int(tasks[0].id))
+
+		return {'missing' : missing, 'total': int(len(imgList)), 'totalms': int(len(missing)), 'tasksIds' : tasksIds}
 
 	def getLDACPathsFromImageSelection(self, request, imgList = None):
 		"""

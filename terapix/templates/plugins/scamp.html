@@ -4,7 +4,7 @@
 <div style="text-align: center;">
 	<div id="submenu">
 		<div id="{{ plugin.id }}_add_to_cart_div" style="margin-top: 10px; margin-right: 10px; text-align: right">
-			<input type="button" onclick="swap_display('entry_3', 'menuitem_sub_3', 'menu', 'menuitem_sub_'); {{ plugin.id }}.addSelectionToCart();" value="Validate input data"/>
+			<input id="validate_button" type="button" value="Validate input data"/>
 		</div>
 		<div align="center" style="margin-left: 30px;" id="menuitem_sub_0"></div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
@@ -25,9 +25,10 @@
 </div>
 
 <script type="text/javascript">
+	var menu;
 	document.observe('dom:loaded', function() {
-		var m = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory', 'Input data validation']);
-		m.setOnClickHandler(3, function() {
+		menu = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory', 'Input data validation']);
+		menu.setOnClickHandler(3, function() {
 			$('output_path_input').focus();
 		});
 
@@ -36,6 +37,11 @@
 		// Enable user output custom directory
 		plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
 
+	});
+
+	$('validate_button').observe('click', function() {
+		menu.activate(4); 
+		{{ plugin.id }}.addSelectionToCart();
 	});
 
 	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');

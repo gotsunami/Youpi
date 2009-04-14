@@ -802,7 +802,7 @@ function Logger(container)
 	 * Display an error message
 	 *
 	 * Parameters:
-	 *  msg - string: message
+	 *  msg - string or DOM: message
 	 *  alertBox - boolean: whether to display an alert box on the screen
 	 *
 	 */ 

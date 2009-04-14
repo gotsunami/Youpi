@@ -74,7 +74,7 @@ var {{ plugin.id }} = {
 		{{ plugin.id }}_curSelectionIdx = 0;
 		{{ plugin.id }}_LDAC_error = 0;
 	
-		var container = emptyContainer('menuitem_sub_3');
+		var container = emptyContainer('menuitem_sub_4');
 		var pre = new Element('pre');
 		container.insert(pre);
 	
@@ -97,14 +97,38 @@ var {{ plugin.id }} = {
 		var cSel = $('{{ plugin.id }}_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 		log.msg_status("Using '" + config + "' as configuration file");
+
+		// CHECK 3: check for mandatory .ahead data path
+		// MANDATORY PATHS
+		var mandvars = selector.getMandatoryPrefixes();
+		var mandpaths = new Array();
+		for (var k=0; k < mandvars.length; k++) {
+			var selNode = $(uidscamp + '_' + mandvars[k] + '_select');
+			var success = true;
+			var path;
+			if (!selNode)
+				success = false;
+			else {
+				path = selNode.options[selNode.selectedIndex].text;
+				if (path == selector.getNoSelectionPattern()) {
+					success = false;
+				}
+				mandpaths.push(path);
+			}
+
+			if (!success) {
+				log.msg_error("No " + mandvars[k] + " data path selected (mandatory). Please <a href=\"#\" onclick=\"menu.activate(1);\">select a data path first</a>.");
+				return;
+			}
+		}
 	
-		// CHECK 3: custom output directory
+		// CHECK 4: custom output directory
 		var output_data_path = {{ plugin.id }}.getOutputDataPath();
 		log.msg_status("Using output data path '" + output_data_path + "'");
 	
-		// CHECK 4: do images in selection(s) have LDAC data?
-		log.msg_status("Deeper selection(s) checks for LDAC data...");
-		{{ plugin.id }}.checkForSelectionLDACData(pre);
+		// CHECK 5: checks for LDAC/AHEAD data
+		log.msg_status("Deeper selection(s) checks for LDAC/AHEAD data...");
+		{{ plugin.id }}.checkForSelectionLdacAheadData(pre, mandpaths[0]);
 	},
 
 	getOutputDataPath: function() {
@@ -122,7 +146,7 @@ var {{ plugin.id }} = {
 	},
 
 	/*
-	 * Function: checkForSelectionLDACData
+	 * Function: checkForSelectionLdacAheadData
 	 * Check if every images in that selection has associated LDAC data
 	 *
 	 * Parameters:
@@ -130,7 +154,7 @@ var {{ plugin.id }} = {
 	 * container - DOM element: DOM block container
 	 *
 	 */ 
-	checkForSelectionLDACData: function(container) {
+	checkForSelectionLdacAheadData: function(container, aheadPath) {
 		var div = new Element('div');
 		var log = new Logger(div);
 		var sels = ims.getListsOfSelections();
@@ -147,15 +171,16 @@ var {{ plugin.id }} = {
 				// Custom handler for results
 				function(resp) {
 					div.update();
-					missing = resp['result']['missingLDACImages'];
+					//missing = resp['result']['missingLDACImages'];
+					missing = resp.result.missing;
 	
 					if (missing.length > 0) {
-						log.msg_warning('Missing LDAC data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
+						log.msg_warning('Missing LDAC/AHEAD data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
 							' (' + missing.length + ' image' + (missing.length > 1 ? 's' : '') + ' failed!)');
 						{{ plugin.id }}_LDAC_error = 1;
 					}	
 					else {
-						log.msg_ok('LDAC data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
+						log.msg_ok('LDAC/AHEAD data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
 							' (' + idList.length + ' image' + (idList.length > 1 ? 's' : '') + ') is OK');
 					}
 	
@@ -166,7 +191,7 @@ var {{ plugin.id }} = {
 					}
 					else {
 						if ({{ plugin.id }}_LDAC_error) {
-							log.msg_error('Missing LDAC information. Selection(s) not added to cart!', true);
+							log.msg_error('Missing LDAC/AHEAD information. Selection(s) not added to cart!', true);
 							return;
 						}
 	
@@ -185,18 +210,25 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&' + 
-					'Method=checkForSelectionLDACData&' +
-					'IdList=' + idList;
+		var post = {
+			Plugin: uidscamp,
+			Method: 'checkForSelectionLdacAheadData',
+			IdList: idList.toString(),
+			AheadPath: aheadPath
+		}
 		// Send query
 		r.setBusyMsg('Checking selection ' + ({{ plugin.id }}_curSelectionIdx+1) + ' (' + idList.length + ' images)');
-		r.send('/youpi/process/plugin/', post);
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
 	do_addSelectionToCart: function(selIds) {
 		var cSel = $('{{ plugin.id }}_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
+		var aheads = $(uidscamp + '_ahead_select');
+		var aheadPath = aheads.options[aheads.selectedIndex].text;
 		var output_data_path = {{ plugin.id }}.getOutputDataPath();
+
+		console.log(aheadPath); return;
 	
 		if (!selIds) {
 			// Manual selections, needs to buid an appropriate selection
@@ -230,7 +262,8 @@ var {{ plugin.id }} = {
 		p_data = {	plugin_name	: 	'{{ plugin.id }}', 
 					userData 	: 	{	'config' : config,
 										'idList' : selIds,
-										'resultsOutputDir' : output_data_path
+										'resultsOutputDir' : output_data_path,
+										'aheadPath' : a
 					}
 		};
 	
