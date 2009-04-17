@@ -524,6 +524,12 @@ class Tag(models.Model):
 
 	user = models.ForeignKey(User)
 
+	class Meta:
+		permissions = (('can_edit_others', "Can edit others' tags"),)
+
+	class Meta:
+		verbose_name = "Tags"
+
 class Rel_si(models.Model):
 	"""
 	Survey-Instrument relation

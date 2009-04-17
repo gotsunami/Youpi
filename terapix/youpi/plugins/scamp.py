@@ -67,6 +67,7 @@ class Scamp(ProcessingPlugin):
 						'username' 			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
+				 		'aheadPath'			: str(data['aheadPath']),
 						'name' 				: str(it.name),
 						'taskId' 			: str(data['taskId']), 
 						'config' 			: str(data['config'])})
@@ -86,6 +87,7 @@ class Scamp(ProcessingPlugin):
 			itemID = str(post['ItemId'])
 			config = post['Config']
 			taskId = post.get('TaskId', '')
+			aheadPath = post['AheadPath']
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
@@ -100,7 +102,9 @@ class Scamp(ProcessingPlugin):
 		data = { 'idList' 			: idList, 
 				 'resultsOutputDir' : resultsOutputDir, 
 				 'taskId'			: taskId,
-				 'config' 			: config }
+				 'aheadPath'		: aheadPath,
+				 'config' 			: config,
+		}
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
 		k = Processing_kind.objects.filter(name__exact = self.id)[0]
@@ -317,7 +321,7 @@ queue""" %  (	encUserData,
 		try:
 			aheadPath = post['AheadPath']
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+			raise PluginError, "POST argument error. Unable to process data MATMAT."
 
 		if imgList:
 			idList = imgList
@@ -378,13 +382,13 @@ queue""" %  (	encUserData,
 		post = request.POST
 		try:
 			idList = request.POST['IdList'].split(',')
-			checks = self.checkForSelectionLDACData(request)
+			checks = self.checkForSelectionLdacAheadData(request)
 		except Exception, e:
 			if imgList:
 				idList = imgList
 				checks = self.checkForSelectionLDACData(request, idList)
 			else:
-				raise PluginError, "POST argument error. Unable to process data."
+				raise PluginError, "POST argument error. Unable to process data KKKK."
 
 		ldac_files = []
 		tasks = Processing_task.objects.filter(id__in = checks['tasksIds'])

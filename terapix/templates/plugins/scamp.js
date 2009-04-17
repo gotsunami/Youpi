@@ -21,10 +21,21 @@ var xmlParser;
 
 // Used in checkForSelectionLDACData()
 var {{ plugin.id }}_curSelectionIdx = 0;
-var {{ plugin.id }}_LDAC_error = 0;
 var uidscamp = '{{ plugin.id }}';
 
 var {{ plugin.id }} = {
+	/*
+	 * Variable: aheadPath
+	 * Data path to .ahead files
+	 *
+	 */
+	aheadPath: null,
+	/*
+	 * Variable: LdacError
+	 * Not null if any LDAC check error
+	 *
+	 */
+	LdacError: 0,
 	/*
 	 * Function: reprocessCalibration
 	 * Schedule a Swarp reprocessing
@@ -72,7 +83,7 @@ var {{ plugin.id }} = {
 	addSelectionToCart: function() {
 		// Global var
 		{{ plugin.id }}_curSelectionIdx = 0;
-		{{ plugin.id }}_LDAC_error = 0;
+		{{ plugin.id }}.LdacError = 0;
 	
 		var container = emptyContainer('menuitem_sub_4');
 		var pre = new Element('pre');
@@ -121,6 +132,7 @@ var {{ plugin.id }} = {
 				return;
 			}
 		}
+		{{ plugin.id }}.aheadPath = mandpaths[0];
 	
 		// CHECK 4: custom output directory
 		var output_data_path = {{ plugin.id }}.getOutputDataPath();
@@ -128,7 +140,7 @@ var {{ plugin.id }} = {
 	
 		// CHECK 5: checks for LDAC/AHEAD data
 		log.msg_status("Deeper selection(s) checks for LDAC/AHEAD data...");
-		{{ plugin.id }}.checkForSelectionLdacAheadData(pre, mandpaths[0]);
+		{{ plugin.id }}.checkForSelectionLdacAheadData(pre);
 	},
 
 	getOutputDataPath: function() {
@@ -150,11 +162,10 @@ var {{ plugin.id }} = {
 	 * Check if every images in that selection has associated LDAC data
 	 *
 	 * Parameters:
-	 *
-	 * container - DOM element: DOM block container
+	 *  container - DOM element: DOM block container
 	 *
 	 */ 
-	checkForSelectionLdacAheadData: function(container, aheadPath) {
+	checkForSelectionLdacAheadData: function(container) {
 		var div = new Element('div');
 		var log = new Logger(div);
 		var sels = ims.getListsOfSelections();
@@ -171,13 +182,27 @@ var {{ plugin.id }} = {
 				// Custom handler for results
 				function(resp) {
 					div.update();
-					//missing = resp['result']['missingLDACImages'];
 					missing = resp.result.missing;
 	
 					if (missing.length > 0) {
 						log.msg_warning('Missing LDAC/AHEAD data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
 							' (' + missing.length + ' image' + (missing.length > 1 ? 's' : '') + ' failed!)');
-						{{ plugin.id }}_LDAC_error = 1;
+						{{ plugin.id }}.LdacError = 1;
+
+						var mdiv = new Element('div').setStyle({
+							marginLeft: '20px', 
+							maxHeight: '100px', 
+							overflow: 'auto',
+							width: '50%'
+						}).addClassName('warning');
+						log.insert(mdiv);
+						missing.each(function(image) {
+							// Missing files list
+							image[1].each(function(file) {
+								var fspan = new Element('span').addClassName('file').update({{ plugin.id }}.aheadPath + file);
+								mdiv.insert('Missing file ').insert(fspan).insert(new Element('br'));
+							});
+						});
 					}	
 					else {
 						log.msg_ok('LDAC/AHEAD data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
@@ -190,7 +215,7 @@ var {{ plugin.id }} = {
 						{{ plugin.id }}.checkForSelectionLDACData(container);
 					}
 					else {
-						if ({{ plugin.id }}_LDAC_error) {
+						if ({{ plugin.id }}.LdacError) {
 							log.msg_error('Missing LDAC/AHEAD information. Selection(s) not added to cart!', true);
 							return;
 						}
@@ -214,8 +239,8 @@ var {{ plugin.id }} = {
 			Plugin: uidscamp,
 			Method: 'checkForSelectionLdacAheadData',
 			IdList: idList.toString(),
-			AheadPath: aheadPath
-		}
+			AheadPath: {{ plugin.id }}.aheadPath
+		};
 		// Send query
 		r.setBusyMsg('Checking selection ' + ({{ plugin.id }}_curSelectionIdx+1) + ' (' + idList.length + ' images)');
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
@@ -224,12 +249,8 @@ var {{ plugin.id }} = {
 	do_addSelectionToCart: function(selIds) {
 		var cSel = $('{{ plugin.id }}_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
-		var aheads = $(uidscamp + '_ahead_select');
-		var aheadPath = aheads.options[aheads.selectedIndex].text;
 		var output_data_path = {{ plugin.id }}.getOutputDataPath();
 
-		console.log(aheadPath); return;
-	
 		if (!selIds) {
 			// Manual selections, needs to buid an appropriate selection
 			var sels = ims.getListsOfSelections();
@@ -258,13 +279,16 @@ var {{ plugin.id }} = {
 		for (var k=0; k < totalSels; k++)
 			totalImgs += tmp[k].length;
 	
+		var data = 	{
+			config: config,
+			idList: selIds,
+			resultsOutputDir: output_data_path,
+			aheadPath: {{ plugin.id }}.aheadPath
+		};
+
 		// Finally, add to the shopping cart
-		p_data = {	plugin_name	: 	'{{ plugin.id }}', 
-					userData 	: 	{	'config' : config,
-										'idList' : selIds,
-										'resultsOutputDir' : output_data_path,
-										'aheadPath' : a
-					}
+		p_data = {	plugin_name	: uidscamp,
+					userData 	: data
 		};
 	
 		// Add entry into the shopping cart
@@ -413,8 +437,14 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 'Plugin={{ plugin.id }}&Method=getLDACPathsFromImageSelection&IdList=' + selArr[idx];
-		xhr.send('/youpi/process/plugin/', post);
+		var post = {
+			Plugin: uidscamp,
+			Method: 'getLDACPathsFromImageSelection',
+			IdList: selArr[idx].toString(),
+			AheadPath: {{ plugin.id }}.aheadPath
+		};
+
+		xhr.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
 	/*

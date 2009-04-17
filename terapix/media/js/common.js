@@ -761,12 +761,24 @@ function Logger(container)
 	}
 
 	/*
+	 * Function: insert
+	 * Inserts any DOM element
+	 *
+	 * Parameters:
+	 *  elem - DOM element
+	 *
+	 */ 
+	this.insert = function(elem) {
+		_log.insert(elem);
+	}
+
+	/*
 	 * Function: clear
 	 * Clear log
 	 *
 	 */ 
 	this.clear = function() {
-		_log.innerHTML = '';
+		_log.update();
 	}
 
 	/*
