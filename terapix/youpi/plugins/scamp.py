@@ -162,6 +162,7 @@ class Scamp(ProcessingPlugin):
 			itemId = str(post['ItemId'])
 			config = post['Config']
 			taskId = post.get('TaskId', '')
+			aheadPath = post['AheadPath']
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
@@ -211,6 +212,7 @@ class Scamp(ProcessingPlugin):
 					'Warnings' 			: {}, 
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
+					'AheadPath'			: str(aheadPath),
 					'Descr' 			: '',									# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
 					'Kind'	 			: self.id,								# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),					# Mandatory for AMI, WP
@@ -219,8 +221,21 @@ class Scamp(ProcessingPlugin):
 
 		step = 0 							# At least step seconds between two job start
 
-		csf = open(csfPath, 'w')
+		# Keep data path only
+		ldac_files = self.getLDACPathsFromImageSelection(request, idList)
+		ldac_files = [dat[1] for dat in ldac_files]
 
+		# .ahead files support
+		ahead_files = string.join([os.path.join(aheadPath, img.name + '.ahead') for img in images], ', ')
+
+		# Swarp file containing a list of images to process (one per line)
+		catalogFile = os.path.join('/tmp/', "scamp-cataloglist-%s.rc" % time.time())
+		catalogPaths = [img.name + '.ldac' for img in images]
+		scif = open(catalogFile, 'w')
+		scif.write(string.join(catalogPaths, '\n'))
+		scif.close()
+
+		csf = open(csfPath, 'w')
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
 	 	# Generates CSF
@@ -235,7 +250,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(settingspath)s/NOP
+transfer_input_files    = %(aheads)s, %(ldacs)s, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -251,6 +266,9 @@ notify_user             = monnerville@iap.fr
 	'conf'			: customrc,
 	'initdir'		: os.path.join(submit_file_path, 'script'),
 	'requirements'	: req ,
+	'ldacsfile'		: catalogFile,
+	'aheads'		: ahead_files,
+	'ldacs'			: string.join([f for f in ldac_files], ', '),
 	'log'			: logs['log'],
 	'errlog'		: logs['error'],
 	'outlog'		: logs['out'],
@@ -258,10 +276,6 @@ notify_user             = monnerville@iap.fr
 
 
 		csf.write(condor_submit_file)
-
-		ldac_files = self.getLDACPathsFromImageSelection(request, idList)
-		# Keep data path only
-		ldac_files = [dat[1] for dat in ldac_files]
 
 		userData['ImgID'] = idList
 		userData['Descr'] = str("%s from %d SExtractor catalogs" % (self.optionLabel, len(images)))		# Mandatory for Active Monitoring Interface (AMI)
@@ -291,17 +305,18 @@ notify_user             = monnerville@iap.fr
 																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
 
 		condor_submit_entry = """
-arguments               = %s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %s %s -c %s 2>/dev/null
-# YOUPI_USER_DATA = %s
-environment             = USERNAME=%s; TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
-queue""" %  (	encUserData, 
-				scamp_params,
-				string.join(ldac_files), 
-				os.path.basename(customrc),
-				userData, 
-				request.user.username,
-				FTP_URL + resultsOutputDir,
-				base64.encodestring(marshal.dumps(userData)).replace('\n', '') )
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %(params)s @%(ldacsfile)s -c %(config)s 2>/dev/null
+# YOUPI_USER_DATA = %(userdata)s
+environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
+queue""" %  {	
+		'encuserdata' 	: encUserData, 
+		'params'		: scamp_params,
+		'ldacsfile' 	: os.path.basename(catalogFile),
+		'config'		: os.path.basename(customrc),
+		'userdata'		: userData, 
+		'user'			: request.user.username,
+		'tpxupload'		: FTP_URL + resultsOutputDir,
+	}
 
 		csf.write(condor_submit_entry)
 		csf.close()
@@ -386,7 +401,7 @@ queue""" %  (	encUserData,
 		except Exception, e:
 			if imgList:
 				idList = imgList
-				checks = self.checkForSelectionLDACData(request, idList)
+				checks = self.checkForSelectionLdacAheadData(request, idList)
 			else:
 				raise PluginError, "POST argument error. Unable to process data KKKK."
 
@@ -474,6 +489,7 @@ queue""" %  (	encUserData,
 					'End' 				: str(task.end_date),
 					'ClusterId'			: str(task.clusterId),
 					'WWW' 				: str(data.www),
+					'AheadPath'			: str(data.aheadPath),
 					'LDACFiles'			: marshal.loads(base64.decodestring(data.ldac_files)),
 					'Duration' 			: str(task.end_date-task.start_date),
 					'ResultsOutputDir' 	: str(task.results_output_dir),

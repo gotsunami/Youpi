@@ -165,7 +165,7 @@ class Swarp(ProcessingPlugin):
 
 		# Swarp file containing a list of images to process (one per line)
 		images = Image.objects.filter(id__in = idList)
-		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % now)
+		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % time.time())
 		imgPaths = [img.name + '.fits' for img in images]
 		swif = open(swarpImgsFile, 'w')
 		swif.write(string.join(imgPaths, '\n'))

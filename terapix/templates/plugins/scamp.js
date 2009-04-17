@@ -787,6 +787,17 @@ var {{ plugin.id }} = {
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
+		// Path to .ahead files
+		tr = new Element('tr');
+		td = new Element('td', {nowrap: 'nowrap'});
+		td.insert('Ahead path:');
+		tr.appendChild(td);
+	
+		td = new Element('td');
+		td.insert(resp.AheadPath);
+		tr.insert(td);
+		tab2.insert(tr);
+
 		// Output directory
 		tr = new Element('tr');
 		td = new Element('td');

@@ -321,6 +321,24 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 			except Exception, e:
 				raise WrapperError, e
 
+		elif kind == 'scamp':
+			try:
+				g.setTableName('youpi_plugin_scamp')
+				g.insert(	task_id = int(task_id),
+							#
+							# Scamp config file serialization: base64 encoding over zlib compression
+							#
+							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							ldac_files = base64.encodestring(marshal.dumps(userData['LDACFiles'])).replace('\n', ''),
+							www = os.path.join(	WWW_SCAMP_PREFIX, 
+												username, 
+												userData['Kind'], 
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							aheadPath = userData['AheadPath']
+				)
+			except Exception, e:
+				raise WrapperError, e
+
 	try:
 		g.setTableName('youpi_processing_task')
 		g.update(	end_date = getNowDateTime(time.time()),
@@ -459,6 +477,7 @@ def process(userData, kind_id, argv):
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
 							thumbnails = convert,
+							aheadPath = userData['AheadPath']
 				)
 				scamp_id = g.con.insert_id()
 			except Exception, e:

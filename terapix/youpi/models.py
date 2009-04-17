@@ -287,6 +287,7 @@ class Plugin_scamp(models.Model):
 	ldac_files = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Scamp output HTML data")
 	thumbnails = models.BooleanField('Has image thumbnails', default = False)
+	aheadPath = models.CharField(max_length = 255, null = True, help_text = "Path to .ahead files")
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')
@@ -306,7 +307,7 @@ class Plugin_swarp(models.Model):
 	thumbnails = models.BooleanField('Has image thumbnails', default = False)
 	weightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
 	useQFITSWeights = models.BooleanField('True if QFITS weight maps have been used', default = False)
-	headPath = models.CharField(max_length = 255, null = True, help_text = "Path to .head images")
+	headPath = models.CharField(max_length = 255, null = True, help_text = "Path to .head files")
 	useHeadFiles = models.BooleanField('True if .head files have been used', default = False)
 
 	# FKs constraints
