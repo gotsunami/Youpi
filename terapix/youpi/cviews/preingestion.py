@@ -80,6 +80,25 @@ def processing_check_config_file_exists(request):
 
 	return HttpResponse(str({'result' : exists}), mimetype = 'text/plain')
 
+def processing_check_file_exists(request):
+	"""
+	Checks if a  file with that name (for a given processing plugin) already exists.
+	"""
+	try:
+		kind = request.POST['Kind']
+		name = request.POST['Name']
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	manage = ManageFile.objects.filter(kind__name__exact = kind, name = name)
+
+	if manage:
+		exists = 1
+	else:
+		exists = 0
+
+	return HttpResponse(str({'result' : exists}), mimetype = 'text/plain')
+
 def processing_get_image_selections(request):
 	"""
 	Returns image selections.

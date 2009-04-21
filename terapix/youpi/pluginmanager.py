@@ -102,15 +102,32 @@ class ProcessingPlugin:
 		try:
 			name = str(post['Name'])
 		except:
-			raise PluginError, "Invalid POST parameters"
+			raise PluginError, "invalid post parameters %s" % post
 
-		# Updates entry
+		# updates entry
 		try:
 			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
 		except:
-			raise PluginError, "No config file with that name: %s" % name
+			raise PluginError, "no config file with that name: %s" % name
 
 		return str(config.content)
+
+	def getFileContent(self, request):
+		post = request.POST
+		try:
+			name = str(post['Name'])
+		except:
+			raise PluginError, "invalid post parameters"
+
+		# updates entry
+		try:
+			manage = ManageFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+		except:
+			raise PluginError, "no config file with that name: %s" % name
+
+		return str(manage.content)
+
+
 
 	def getConfigFileNames(self, request):
 		# Updates entry
@@ -124,6 +141,19 @@ class ProcessingPlugin:
 			res.append(str(config.name))
 
 		return { 'configs' : res }
+
+	def getFileNames(self, request):
+		# Updates entry
+		dfltmanage = ManageFile.objects.filter(kind__name__exact = self.id, name = 'default')
+		if not dfltmanage:
+			self.__saveDefaultFileToDB(request)
+
+		manages = ManageFile.objects.filter(kind__name__exact = self.id)
+		res = []
+		for manage in manages:
+			res.append(str(manage.name))
+
+		return { 'manages' : res }
 
 	def __saveDefaultConfigFileToDB(self, request):
 		"""
@@ -147,6 +177,29 @@ class ProcessingPlugin:
 			pass
 
 		return config
+
+	def __saveDefaultFileToDB(self, request):
+		"""
+		Looks into DB (youpi_managefiles table) if an entry for a default  file. 
+		If not creates one with the embedded default content.
+		"""
+
+		try:
+			f = open(os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', self.id + '.default.param'))
+			manage = string.join(f.readlines())
+			f.close()
+		except IOError, e:
+			raise PluginError, "Default file for %s: %s" % (self.id, e)
+
+		k = Processing_kind.objects.filter(name__exact = self.id)[0]
+		try:
+			m = ManageFile(kind = k, name = 'default', content = manage, user = request.user)
+			m.save()
+		except:
+			# Cannot save, already exits: do nothing
+			pass
+
+		return manage
 
 	def saveConfigFile(self, request):
 		"""
@@ -172,6 +225,33 @@ class ProcessingPlugin:
 
 		return name + ' saved'
 
+	def saveFile(self, request):
+		"""
+		Save  file to DB
+		"""
+		post = request.POST
+		try:
+			name = str(post['Name'])
+			manage = str(post['Content'])
+			filetype = str(post['Type'])
+		except Exception, e:
+			raise PluginError, "Unable to save file: no name given"
+
+		try:
+			# Updates entry
+			m = ManageFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+			m.content = manage
+			m.type = filetype
+		except:
+			# ... or inserts a new one
+			k = Processing_kind.objects.filter(name__exact = self.id)[0]
+			m = ManageFile(kind = k, name = name, content = manage, user = request.user, type = filetype)
+
+		m.save()
+
+		return name + ' saved'
+
+
 	def deleteConfigFile(self, request):
 		"""
 		Deletes configuration file to DB
@@ -188,6 +268,25 @@ class ProcessingPlugin:
 			raise PluginError, "No config file with that name: %s" % name
 
 		config.delete()
+
+		return name + ' deleted'
+
+	def deleteFile(self, request):
+		"""
+		Deletes file to DB
+		"""
+		post = request.POST
+		try:
+			name = str(post['Name'])
+		except Exception, e:
+			raise PluginError, "Unable to delete file: no name given"
+
+		try:
+			manage = ManageFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+		except:
+			raise PluginError, "No file with that name: %s" % name
+
+		manage.delete()
 
 		return name + ' deleted'
 

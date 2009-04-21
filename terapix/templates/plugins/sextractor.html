@@ -29,22 +29,23 @@
 			<div id ="{{plugin.id}}_results_div2"></div>
 			<hr>
 		</div>
-		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
 				<div id="selector1_div"></div>
 				<HR>
 				<div id="selector2_div" style="display:none;">
 					<br>
 					<br>
-					<div class="tip" id="infodual" style="float:left;width:270px;margin-left:40px;"></div>
+					<div class="tip" id="infodual" style="float: left; width: 270px; margin-left: 40px;"></div>
 				</div>
-		</div>
-
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_2">
 			<div style="width: 500px" id="config_file_div"></div>
 		</div>
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_3"></div>
+
+		<div align="center" style="display: block; width: 100%" id="menuitem_sub_3">
+			<div style="width: 500px" id="parameter_file_div"></div>
+		</div>
+		<div align="center" style="display: none; width: 100%" id="menuitem_sub_4"></div>
 	</div>
 </div>
 
@@ -52,6 +53,7 @@
 	var text_single = "<b> Single Image Mode Option:</b><li>Creation a catalogue of objects from an astronomic image<br><li>support for WeightMaps<br><li>support for FlagMaps<br>";
 	var text_dual = "<b>Dual Image Mode Option:</b><li>Image1 is used for detection of sources, image2 for measurements only.<br><li>Image1 and image2 must have the same dimensions.<br><li>For most photometric parameters,image1 will use image2 pixel values, which allows one to easily measurepixel-to-pixel colours.";
 	var info_dual = "<b> SExtractor is in DUAL IMAGE MODE </b><BR><br>You can specify for each image of this mode :<BR><br><li> A <b>WEIGHT MAP</b><li> A <b>FLAG MAP</b><br><br> Use the path selector to choose:<br><br><li><b>TOP</b> selection for the first image<br><li><b>BOTTOM</b> selection for the image used for measurements"
+
 $('single','dual').each(function (id) {
 	if (id.value == 'single') {
 		id.observe('mouseover', function() {
@@ -78,7 +80,7 @@ $('single','dual').each(function (id) {
 
 	var menu;
 	document.observe('dom:loaded', function() {
-		menu = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Set output directory']);
+		menu = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 'Select a parameter file', 'Set output directory']);
 		menu.setOnClickHandler(3, function() {
 			$('output_path_input').focus();
 		});
@@ -88,6 +90,7 @@ $('single','dual').each(function (id) {
 			
 
 	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+	var cf2 = new FileWidget('parameter_file_div', '{{ plugin.id }}', 'parameter');
 
 	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
 	fm_file_browser.setRootTitle('Terapix Cluster');
@@ -97,7 +100,7 @@ $('single','dual').each(function (id) {
 	
 
 	// Enable user output custom directory
-	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+	plugin_enableOutputDirectory('menuitem_sub_4', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
 		
 	var selector1 = new PathSelectorWidget('selector1_div', '{{ plugin.id }}');
 	selector1.addPath('FLAG data', 'flags');

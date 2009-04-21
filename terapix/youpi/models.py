@@ -171,6 +171,33 @@ class ConfigFile(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class ManageFile(models.Model):
+	"""
+	Standalone table, no foreign key constraint.
+	Useful to store (serialized) data related to  files to use for processing
+	"""
+	
+	# Name of  content
+	name = models.CharField(max_length = 80)
+	# type of file
+	type = models.CharField(max_length = 80)
+	# file full content (clear text)
+	content = models.TextField()
+	# Serialized data (base64 encoding over marshal serialization)
+	data = models.TextField(null=True)
+	date = models.DateTimeField(auto_now_add = True)
+
+	# FKs constraints
+	user = models.ForeignKey(User, db_column = 'user_id')
+	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
+	
+	class Meta:
+		unique_together = ('name', 'kind')
+		verbose_name = "Management file"
+
+	def __unicode__(self):
+		return self.name
+
 class MiscData(models.Model):
 	"""
 	Standalone table, no foreign key constraint.
