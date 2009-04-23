@@ -67,6 +67,7 @@ class Sextractor(ProcessingPlugin):
 			dualFlagPath		 	= post['DualFlagPath']
 
 			config 					= post['Config']
+			param 					= post['Param']
 			resultsOutputDir 		= post['ResultsOutputDir']
 
 		except Exception, e:
@@ -89,6 +90,7 @@ class Sextractor(ProcessingPlugin):
 				 'dualflagPath' 		: dualFlagPath,
 				 'resultsOutputDir'		: resultsOutputDir, 
 				 'config' 				: config,
+				 'param' 				: param,
 				 }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
@@ -129,6 +131,7 @@ class Sextractor(ProcessingPlugin):
 						'resultsOutputDir' 		: str(data['resultsOutputDir']), 
 						'name' 					: str(it.name),
 						'config' 				: str(data['config']),
+						'param' 				: str(data['param']),
 						})
 
 		return res 
@@ -222,6 +225,7 @@ class Sextractor(ProcessingPlugin):
 			dualWeightPath 			= post['DualWeightPath']
 
 			config 					= post['Config']
+			param 					= post['Param']
 			taskId 					= post.get('TaskId', '')
 			resultsOutputDir 		= post['ResultsOutputDir']
 			reprocessValid 			= int(post['ReprocessValid'])
@@ -233,36 +237,46 @@ class Sextractor(ProcessingPlugin):
 		req = self.getCondorRequirementString(request)
 
 		#
-		# Config file selection and storage.
+		# File selection and storage.(for the configuration file and the parameter file)
 		#
-		# Rules: 	if sexId has a value, then the config file content is retreive
-		# 			from the existing Sextractor processing. Otherwise, the config file content
-		#			is fetched by name from the ConfigFile objects.
+		# Rules: 	if sexId has a value, then the  file content is retreive
+		# 			from the existing Sextractor processing. Otherwise, the  file content
+		#			is fetched by name from the File objects in database.
 		#
-		# 			Selected config file content is finally saved to a regular file.
+		# 			Selected file content is finally saved to a regular file.
 		#
 		try:
 			if len(taskId):
-				config = Plugin_sex.objects.filter(id = int(taskId))[0]
-				content = str(zlib.decompress(base64.decodestring(config.config)))
+				config, param = Plugin_sex.objects.filter(id = int(taskId))[0]
+				contconf = str(zlib.decompress(base64.decodestring(config.config)))
+				contparam = str(zlib.decompress(base64.decodestring(param.param)))
 			else:
 				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
-				content = config.content
+				param = ManageFile.objects.filter(kind__name__exact = self.id, name = param)[0]
+				contconf = config.content
+				contparam = param.content
+
 		except IndexError:
-			# Config file not found, maybe one is trying to process data from a saved item 
-			# with a delete configuration file
-			raise PluginError, "The configuration file you want to use for this processing has not been found " + \
-				"in the database... Are you trying to process data with a config file that has been deleted?"
+			# File not found, maybe one is trying to process data from a saved item 
+			# with a delete file
+			raise PluginError, "The file you want to use for this processing has not been found " + \
+				"in the database... Are you trying to process data with a file that has been deleted?"
 		except Exception, e:
-			raise PluginError, "Unable to use a suitable config file: %s" % e
+			raise PluginError, "Unable to use a suitable  file: %s" % e
 
 		now = time.time()
 
 		# Sex config file
 		customrc = os.path.join('/tmp/', "sex-config-%s.rc" % now)
 		sexrc = open(customrc, 'w')
-		sexrc.write(content)
+		sexrc.write(contconf)
 		sexrc.close()
+	
+		# Sex param file
+		custompc = os.path.join('/tmp/', "sex-param-%s.pc" % now)
+		sexpc = open(custompc, 'w')
+		sexpc.write(contparam)
+		sexpc.close()
 
 		# Condor submission file
 		csfPath = "/tmp/sex-condor-%s.txt" % now
@@ -276,6 +290,7 @@ class Sextractor(ProcessingPlugin):
 					'ItemID' 				: itemId,
 					'SubmissionFile'		: csfPath, 
 					'ConfigFile' 			: customrc, 
+					'ParamFile' 			: custompc, 
 					'Descr' 				: '',								# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
 					'Weight' 				: str(weightPath), 
 					'Flag'	 				: str(flagPath), 
@@ -311,7 +326,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    =  %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(mandpath)s/sex.default.param, %(mandpath)s/sex.default.conv
+transfer_input_files    =  %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = /tmp/SEX.log.$(Cluster).$(Process)
@@ -326,6 +341,7 @@ notify_user             = semah@iap.fr
 		'settings' 		: submit_file_path, 
 		'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
 		'config' 		: customrc,
+		'param' 		: custompc,
 		'nop' 			: submit_file_path, 
 		'initdir' 		: os.path.join(submit_file_path, 'script'),
 		'mandpath' 		: os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
@@ -410,12 +426,11 @@ notify_user             = semah@iap.fr
 			userData['JobID'] = self.getUniqueCondorJobId()
 
 			# Parameters to use for each job
-			sex_params = "-XSL_URL %s/sextractor.xsl -PARAMETERS_NAME %s -FILTER_NAME %s -WRITE_XML YES " % (os.path.join(	
+			sex_params = "-XSL_URL %s/sextractor.xsl  -FILTER_NAME %s -WRITE_XML YES " % (os.path.join(	
 																						WWW_SEX_PREFIX, 
 																						request.user.username, 
 																						userData['Kind'], 
 																						userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]),
-																						'sex.default.param',
 																						'sex.default.conv')
 			#Addding weight support 
 			if weightPath:
@@ -472,7 +487,7 @@ notify_user             = semah@iap.fr
 
 			if dualMode == '1':
 				condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(img)s,%(img2)s %(params)s -c %(config)s
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(img)s,%(img2)s %(params)s -c %(config)s -PARAMETERS_NAME %(param)s
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
@@ -480,6 +495,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 				'img'			: path,
 				'img2'			: path2,
 				'config'		: os.path.basename(customrc),
+				'param'			: os.path.basename(custompc),
 				'userdata'		: userData,
 				'user'			: request.user.username,
 				'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }
@@ -487,13 +503,14 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			else:
 
 				condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s -PARAMETERS_NAME %(param)s
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData,
 				'params'		: sex_params,
 				'img'			: path,
 				'config'		: os.path.basename(customrc),
+				'param'         : os.path.basename(custompc),
 				'userdata'		: userData,
 				'user'			: request.user.username,
 				'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }

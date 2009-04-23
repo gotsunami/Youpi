@@ -74,6 +74,10 @@ var {{ plugin.id }} = {
 		var cSel = $(uidsex + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 
+		//Get parameter file
+		var pSel = $(uidsex + '_parameter_name_select');
+		var param = pSel.options[pSel.selectedIndex].text;
+
 		//Gets custom output directory
 		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
 		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidsex + '/';
@@ -82,15 +86,16 @@ var {{ plugin.id }} = {
 			output_data_path += custom_dir + '/';
 
 		{{ plugin.id }}.do_addSelectionToCart({
-			config: config, 
-			idList: sels,
-			weightPath: optPath[1] ? optPath[1] : '',
-			flagPath: optPath[0] ? optPath[0] : '',
-			psfPath: optPath[2]  ? optPath[2] : '',
-			dualMode: dualMode,
-			dualImage: sels2 ? sels2 : '',
-			dualWeightPath: optPath[4] ? optPath[4] : '',
-			dualFlagPath: optPath[3] ? optPath[3] : '',
+			param			: param,
+			config			: config, 
+			idList			: sels,
+			weightPath		: optPath[1] ? optPath[1] : '',
+			flagPath		: optPath[0] ? optPath[0] : '',
+			psfPath			: optPath[2]  ? optPath[2] : '',
+			dualMode		: dualMode,
+			dualImage		: sels2 ? sels2 : '',
+			dualWeightPath	: optPath[4] ? optPath[4] : '',
+			dualFlagPath	: optPath[3] ? optPath[3] : '',
 			resultsOutputDir: output_data_path,
 		});
 	},
@@ -597,14 +602,14 @@ var {{ plugin.id }} = {
 					});
 	
 					tr = new Element('tr');
-					th = new Element('th', {'colspan': '8'});
+					th = new Element('th', {'colspan': '9'});
 					th.insert(icon);
 					th.insert('{{ plugin.description }}: ' + resp['result'].length + ' saved item' + (resp['result'].length > 1 ? 's' : ''));
 					tr.insert(th);
 					table.insert(tr);
 	
 					tr = new Element('tr');
-					var headers = $A(['Date', 'User', 'Name', '# images', 'Mode', 'Config', 'Paths', 'Action']);
+					var headers = $A(['Date', 'User', 'Name', '# images', 'Mode', 'Config','Parameters', 'Paths', 'Action']);
 					headers.each(function(header) {
 						tr.insert(new Element('th').update(header));
 					});
@@ -668,6 +673,10 @@ var {{ plugin.id }} = {
 
 						// Config
 						td = new Element('td', {'class': 'config'}).update(res.config);
+						tr.insert(td);
+
+						// Param 
+						td = new Element('td', {'class': 'config'}).update(res.param);
 						tr.insert(td);
 
 						// Handling paths
@@ -758,6 +767,7 @@ var {{ plugin.id }} = {
 						});
 						td.insert(delImg);
 
+						//Add to cart
 						var addImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'
 						});
 						
@@ -773,6 +783,7 @@ var {{ plugin.id }} = {
 										'dualWeightPath'		: res.dualweightPath,
 										'resultsOutputDir'		: res.resultsOutputDir,
 										'config'				: res.config,
+										'param'					: res.param,
 						};
 
 						addImg.observe('click', function() {
