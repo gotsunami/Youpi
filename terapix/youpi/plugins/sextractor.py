@@ -326,7 +326,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    =  %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv
+transfer_input_files    =  %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv, %(mandpath)s/default.nnw
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = /tmp/SEX.log.$(Cluster).$(Process)
@@ -590,6 +590,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'ResultsOutputDir' 		: str(task.results_output_dir),
 					'ResultsLog'			: sexlog,
 					'Config' 				: str(zlib.decompress(base64.decodestring(data.config))),
+					'Param' 				: str(zlib.decompress(base64.decodestring(data.param))),
 					'Previews'				: thumbs,
 					'HasThumbnails'			: data.thumbnails,
 					'FITSImages'			: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
