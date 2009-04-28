@@ -541,8 +541,23 @@ var {{ plugin.id }} = {
 		cdiv.insert(pre);
 		tr.insert(td);
 		tab2.insert(tr);
+	
+		// param file
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2});
+		if (resp.Success) {
+			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
+		}
+		var cdiv = new Element('div', {
+						id: 'param-' + resp.TaskId,
+						'class': 'config_file'
+		});
+		var pre = new Element('pre').insert(resp.Param);
+		cdiv.insert(pre);
+		tr.insert(td);
+		tab2.insert(tr);
 
-		var confbox = new DropdownBox(td, 'Toggle Sex config file view');
+		var parambox = new DropdownBox(td, 'Toggle Sex parameters file view');
 		$(confbox.getContentNode()).insert(cdiv);
 	
 		// Error log file when failure
