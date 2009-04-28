@@ -146,9 +146,21 @@ class ImageSelections(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class ConfigType(models.Model):
+	"""
+	Defines types for configuration files
+	"""
+	
+	name = models.CharField(max_length = 80, unique = True)
+	
+	class Meta:
+		verbose_name = "Configuration file type"
+
+	def __unicode__(self):
+		return self.name
+
 class ConfigFile(models.Model):
 	"""
-	Standalone table, no foreign key constraint.
 	Useful to store (serialized) data related to configuration files to use for processing
 	"""
 	
@@ -163,37 +175,11 @@ class ConfigFile(models.Model):
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
+	type = models.ForeignKey(ConfigType)
 	
 	class Meta:
 		unique_together = ('name', 'kind')
 		verbose_name = "Configuration file"
-
-	def __unicode__(self):
-		return self.name
-
-class ManageFile(models.Model):
-	"""
-	Standalone table, no foreign key constraint.
-	Useful to store (serialized) data related to  files to use for processing
-	"""
-	
-	# Name of  content
-	name = models.CharField(max_length = 80)
-	# type of file
-	type = models.CharField(max_length = 80)
-	# file full content (clear text)
-	content = models.TextField()
-	# Serialized data (base64 encoding over marshal serialization)
-	data = models.TextField(null=True)
-	date = models.DateTimeField(auto_now_add = True)
-
-	# FKs constraints
-	user = models.ForeignKey(User, db_column = 'user_id')
-	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
-	
-	class Meta:
-		unique_together = ('name', 'kind')
-		verbose_name = "Management file"
 
 	def __unicode__(self):
 		return self.name
@@ -349,6 +335,7 @@ class Plugin_swarp(models.Model):
 class Plugin_sex(models.Model):
 	# Serialized data (base64 encoding over zlib compression)
 	config = models.TextField(null = True)
+	param  = models.TextField(null = True)
 	# Results log
 	log = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Sex output HTML data")
