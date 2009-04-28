@@ -13,19 +13,23 @@
 
 /*
  * Class: ConfigFileWidget
- * Simple widget that allows to select a configuration file to use with a processing plugin
+ *  Simple widget that allows to select a configuration file to use with a processing plugin
  *
  * Constructor Parameters:
+ *  container - string or DOM node: name of parent DOM block container
+ *  pluginId - string: unique plugin id
+ *  options - object: options
  *
- * container - string or DOM node: name of parent DOM block container
- * pluginId - string: unique plugin id
+ * Available Options:
+ *  type - string: type of config file
  *
  */
-function ConfigFileWidget(container, pluginId)
+function ConfigFileWidget(container, pluginId, options)
 {
 	var _container = $(container);
 	var id = 'CFW_' + Math.floor(Math.random() * 999999);
 	var plugin_id = pluginId ? pluginId : null;
+	var _options;
 
 	function render() {
 		var tr, th, td;
@@ -34,14 +38,14 @@ function ConfigFileWidget(container, pluginId)
 
 		tr = new Element('tr');
 		th = new Element('th');
-		th.insert('Config File');
+		th.insert( _options.type + ' File');
 		tr.insert(th);
 		tab.insert(tr);
 
 		tr = new Element('tr');
 		td = new Element('td');
 		td.setAttribute('style', 'vertical-align: middle');
-		td.insert('Select a configuration file to use for processing:');
+		td.insert('Select a ' + _options.type + ' file to use for processing:');
 
 		var butd = new Element('div');
 		var bnew = new Element('input', {
@@ -59,7 +63,7 @@ function ConfigFileWidget(container, pluginId)
 		bedit.observe('click', _editSelectedConfigFile);
 
 		var ndiv = new Element('div');
-		ndiv.setAttribute('id', id + '_config_name_div');
+		ndiv.setAttribute('id', id + '_' + _options.type + '_name_div');
 		ndiv.setAttribute('style', 'float: right');
 
 		butd.insert(bnew);
@@ -72,13 +76,13 @@ function ConfigFileWidget(container, pluginId)
 
 		// Label div, reports current conf selected file
 		ndiv = new Element('div');
-		ndiv.setAttribute('id', id + '_config_current_div');
+		ndiv.setAttribute('id', id + '_' + _options.type + '_current_div');
 		ndiv.setAttribute('style', 'margin-top: 15px; color: brown; font-weight: bold');
 		_container.insert(ndiv);
 
 		// Editor div
 		ndiv = new Element('div');
-		ndiv.setAttribute('id', id + '_config_editor_div');
+		ndiv.setAttribute('id', id + '_' + _options.type + '_editor_div');
 		ndiv.setAttribute('style', 'display: none;');
 		tab = new Element('table');
 		tab.setAttribute('class', 'fileBrowser');
@@ -86,17 +90,17 @@ function ConfigFileWidget(container, pluginId)
 		tr = new Element('tr');
 		th = new Element('th');
 		th.setAttribute('colspan', '2');
-		th.insert('Config File Editor');
+		th.insert( _options.type + 'File Editor');
 		tr.insert(th);
 		tab.insert(tr);
 
 		tr = new Element('tr');
 		td = new Element('td');
-		td.setAttribute('id', id + '_config_editor_td');
+		td.setAttribute('id', id + '_' + _options.type + '_editor_td');
 		var ldiv = new Element('div');
 		ldiv.setAttribute('id', id + '_editor_loading');
 		var tarea = new Element('textarea');
-		tarea.setAttribute('id', id + '_config_textarea');
+		tarea.setAttribute('id', id + '_' + _options.type + '_textarea');
 		tarea.setAttribute('rows', '30');
 		tarea.setAttribute('cols', '100');
 		td.insert(ldiv);
@@ -106,11 +110,11 @@ function ConfigFileWidget(container, pluginId)
 		td = new Element('td');
 		td.setAttribute('style', id + 'background-color: #eaeaea; border-left: 2px solid #5b80b2; width: 30%');
 		ldiv = new Element('div');
-		var bsave = new Element('input', {type: 'button', value: 'Save config as...'});
+		var bsave = new Element('input', {type: 'button', value: 'Save ' + _options.type + ' as...'});
 		bsave.observe('click', _saveConfigFileAs);
 
 		var sdiv = new Element('div');
-		sdiv.setAttribute('id', id + '_config_save_div');
+		sdiv.setAttribute('id', id + '_' + _options.type + '_save_div');
 		sdiv.setAttribute('class', 'imageSelector');
 		ldiv.insert(bsave);
 		ldiv.insert(sdiv);
@@ -128,11 +132,11 @@ function ConfigFileWidget(container, pluginId)
 	}
 
 	function _displayCurrentConfUsed() {
-		var selNode = $(plugin_id + '_config_name_select');
+		var selNode = $(plugin_id + '_' + _options.type +'_name_select');
 		var txt = selNode.options[selNode.selectedIndex].text;
-		var curConfDiv = $(id + '_config_current_div');
+		var curConfDiv = $(id + '_' + _options.type + '_current_div');
 		removeAllChildrenNodes(curConfDiv);
-		curConfDiv.insert("The '" + txt + "' configuration file will be used for processing.");
+		curConfDiv.insert("The '" + txt + "' " + _options.type +" file will be used for processing.");
 	}
 	
 	function _displayNewConfigFile() {
@@ -140,19 +144,19 @@ function ConfigFileWidget(container, pluginId)
 	}
 
 	function _editSelectedConfigFile() {
-		var sel = $(plugin_id + '_config_name_select');
+		var sel = $(plugin_id + '_' + _options.type + '_name_select');
 		var conf = sel.options[sel.selectedIndex].text;
 		editConfigFile(conf);
 	}
 
 	function _closeEditor() {
-		var div = $(id + '_config_editor_div');
+		var div = $(id + '_' + _options.type + '_editor_div');
 		div.setAttribute('style', 'display: none');
 	}
 
 	function editConfigFile(configName) {
 		var ldiv = $(id + '_editor_loading');
-		var div = $(id + '_config_editor_div');
+		var div = $(id + '_' + _options.type + '_editor_div');
 		div.setAttribute('style', 'display: block');
 	
 		var r = new HttpRequest(
@@ -161,28 +165,34 @@ function ConfigFileWidget(container, pluginId)
 			// Custom handler for results
 			function(resp) {
 				ldiv.innerHTML = '';
-				var edit = $(id + '_config_textarea');
+				var edit = $(id + '_' + _options.type + '_textarea');
 				edit.value = resp['result'];
 				edit.focus();
 			}
 		);
 	
-		var post = 'Plugin=' + plugin_id + '&Method=getConfigFileContent&Name=' + configName;
-		r.send('/youpi/process/plugin/', post);
+		var post = {
+			Plugin: plugin_id,
+			Method: 'getConfigFileContent',
+			Name: configName,
+			Type: _options.type
+		};
+
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	}
 
 	function _saveConfigFileAs() {
-		var div = $(id + '_config_save_div');
-		var sub = $(id + '_config_save_subdiv');
-	
+		var div = $(id + '_' + _options.type + '_save_div');
+		var sub = $(id + '_' + _options.type + '_save_subdiv');
+
 		if (!sub) {
 			sub = new Element('div');
-			sub.setAttribute('id', id + '_config_save_subdiv');
+			sub.setAttribute('id', id + '_' + _options.type + '_save_subdiv');
 			sub.setAttribute('class', 'show');
 	
 			var txt = new Element('input');
 			txt.setAttribute('style', 'float: left; margin-right: 5px;');
-			txt.setAttribute('id', id + '_config_save_text');
+			txt.setAttribute('id', id + '_' +_options.type +'_save_text');
 			txt.setAttribute('type', 'text');
 			sub.insert(txt);
 	
@@ -191,7 +201,7 @@ function ConfigFileWidget(container, pluginId)
 			sub.insert(save);
 	
 			var res = new Element('div');
-			res.setAttribute('id', id + '_config_save_res_div');
+			res.setAttribute('id', id + '_' +_options.type +'_save_res_div');
 			res.setAttribute('style', 'vertical-align: middle');
 			sub.insert(res);
 	
@@ -206,7 +216,7 @@ function ConfigFileWidget(container, pluginId)
 					maxresults: 20,
 					timeout: 3000
 				};
-				var au = new _bsn.AutoSuggest(id + '_config_save_text', options);
+				var au = new _bsn.AutoSuggest(id + '_' + _options.type + '_save_text', options);
 			} catch(e) {}
 	
 			txt.focus();
@@ -217,7 +227,7 @@ function ConfigFileWidget(container, pluginId)
 			}
 			else {
 				sub.setAttribute('class', 'show');
-				var nText = $(id + '_config_save_text');
+				var nText = $(id + '_' + _options.type + '_save_text');
 				nText.select();
 				nText.focus();
 			}
@@ -225,17 +235,17 @@ function ConfigFileWidget(container, pluginId)
 	}
 
 	function _saveConfig() {
-		var textNode = $(id + '_config_save_text');
+		var textNode = $(id + '_' + _options.type + '_save_text');
 		var name = textNode.value.replace('+', '%2B');
 	
 		if (name.length == 0) {
-			alert('Cannot save a config file with an empty name!');
+			alert('Cannot save a ' + _options.type + ' file with an empty name!');
 			textNode.focus();
 			return;
 		}
 	
 		// Checks for name availability (does not exits in DB)
-		var cnode = $(id + '_config_save_res_div');
+		var cnode = $(id + '_' + _options.type + '_save_res_div');
 		var xhr = new HttpRequest(
 			cnode.id,
 			// Use default error handler
@@ -249,19 +259,15 @@ function ConfigFileWidget(container, pluginId)
 					
 					//if the configuration filename is default
 					if (name == 'default') {
-						
 						//adding this rule to not permit it
-						alert("A default config file can't be overwritten !");
+						alert("A default " + _options.type + " file can't be overwritten !");
 						return;
-
 					}
-
 					else {
 						// Name already exists, ask for overwriting
-						var r = confirm("A config file with that name already exists in the database.\nWould you like to overwrite it ?");
-
+						var r = confirm("A "+ _options.type + " file with that name already exists in the database.\nWould you like to overwrite it ?");
 						if (!r) return;
-						}
+					}
 				}
 	
 				// Saves to DB
@@ -270,16 +276,21 @@ function ConfigFileWidget(container, pluginId)
 		);
 	
 		// Checks if a selection of that name already exists
-		post = 	'Kind=' + plugin_id + '&Name=' + name;
+		//post = 	'Kind=' + plugin_id + '&Name=' + name + '&Type=' + _options.type;
+		var post = {
+			Kind: plugin_id,
+			Name: name,
+			Type: _options.type
+		};
 	
 		// Send HTTP POST request
-		xhr.send('/youpi/process/checkConfigFileExists/', post);
+		xhr.send('/youpi/process/checkConfigFileExists/', $H(post).toQueryString());
 	}
 
 	function _saveConfigToDB(name) {
-		var cnode = $(id + '_config_save_res_div');
-		var area = $(id + '_config_textarea');
-	
+		var cnode = $(id + '_' + _options.type + '_save_res_div');
+		var area = $(id + '_' +_options.type + '_textarea');
+
 		var r = new HttpRequest(
 			cnode.id,
 			// Use default error handler
@@ -290,7 +301,7 @@ function ConfigFileWidget(container, pluginId)
 				removeAllChildrenNodes(cnode);
 				var p = new Element('p');
 				p.setAttribute('class', 'done');
-				p.insert("Done. Config file saved under");
+				p.insert("Done. " + _options.type + " file saved under");
 				p.insert(new Element('br'));
 				p.insert("'" + name + "'.");
 				cnode.insert(p);
@@ -299,21 +310,20 @@ function ConfigFileWidget(container, pluginId)
 				setConfigFile();
 			}
 		);
-	
-		var post = 'Plugin=' + plugin_id + '&Method=saveConfigFile&Name=' + escape(name) + 
-			'&Content=' + escape(area.value);
+		var post = 'Plugin=' + plugin_id + '&Method=saveConfigFile&Name=' + escape(name) + '&Content=' + escape(area.value) + '&Type=' + escape(_options.type) ;
 		r.send('/youpi/process/plugin/', post);
 	}
 
 	function setConfigFile() {
-		var cdiv = $(id + '_config_name_div');
+		var cdiv = $(id + '_' + _options.type + '_name_div');
 		var r = new HttpRequest(
-			id + '_config_name_div',
+			id + '_' + _options.type + '_name_div',
 			null,
 			// Custom handler for results
 			function(resp) {
-				removeAllChildrenNodes(cdiv);
-				var selNode = getSelect(plugin_id + '_config_name_select', resp['result']['configs']);
+				cdiv.update();
+				var confs = resp.result.configs;
+				var selNode = getSelect(plugin_id + '_' + _options.type +'_name_select', confs.map(function(conf) { return conf.name; }));
 				selNode.observe('change', _displayCurrentConfUsed);
 				cdiv.insert(selNode);
 	
@@ -329,25 +339,30 @@ function ConfigFileWidget(container, pluginId)
 			}
 		);
 	
-		var post = 'Plugin=' + plugin_id + '&Method=getConfigFileNames';
-		r.send('/youpi/process/plugin/', post);
+		var post = {
+			Plugin: plugin_id,
+			Method: 'getConfigFileNames',
+			Type: _options.type
+		};
+
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	}
 
 	function _deleteConfigFile() {
-		var selNode = $(plugin_id + '_config_name_select');
+		var selNode = $(plugin_id + '_' + _options.type + '_name_select');
 		var txt = selNode.options[selNode.selectedIndex].text;
 	
 		if (txt == 'default') {
-			alert('Cannot remove default configuration file.');
+			alert('Cannot remove default ' + _options.type + ' file.');
 			return;
 		}
 		else {
-			var r = confirm("Are you sure you want to delete the configuration file '" + txt + "'?");
+			var r = confirm("Are you sure you want to delete the " + _options.type + "  file '" + txt + "'?");
 			if (!r) return;
 		}
 	
 		var r = new HttpRequest(
-			id + '_config_current_div',
+			id + '_' + _options.type + '_current_div',
 			null,
 			// Custom handler for results
 			function(resp) {
@@ -356,12 +371,22 @@ function ConfigFileWidget(container, pluginId)
 			}
 		);
 	
-		var post = 'Plugin=' + plugin_id + '&Method=deleteConfigFile&Name=' + txt;
+		var post = 'Plugin=' + plugin_id + '&Method=deleteConfigFile&Name=' + txt + '&Type=' + _options.type;
 		r.send('/youpi/process/plugin/', post);
 	}
 
 	// Constructor
 	function init() {
+		if (typeof options != 'object') {
+			throw "options must be an object"
+			return;
+		}
+		if (typeof options.type != 'string') {
+			throw "type not available"
+			return;
+		}
+
+		_options = options;
 		render();
 		setConfigFile();
 	}

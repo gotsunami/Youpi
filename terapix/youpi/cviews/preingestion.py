@@ -68,10 +68,11 @@ def processing_check_config_file_exists(request):
 	try:
 		kind = request.POST['Kind']
 		name = request.POST['Name']
+		type = request.POST['Type']
 	except Exception, e:
 		return HttpResponseForbidden()
 
-	config = ConfigFile.objects.filter(kind__name__exact = kind, name = name)
+	config = ConfigFile.objects.filter(kind__name__exact = kind, name = name, type__name = type)
 
 	if config:
 		exists = 1

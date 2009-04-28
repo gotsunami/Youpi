@@ -101,65 +101,48 @@ class ProcessingPlugin:
 		post = request.POST
 		try:
 			name = str(post['Name'])
+			type = str(post['Type'])
 		except:
 			raise PluginError, "invalid post parameters %s" % post
 
 		# updates entry
 		try:
-			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name, type__name = type)[0]
 		except:
 			raise PluginError, "no config file with that name: %s" % name
 
 		return str(config.content)
 
-	def getFileContent(self, request):
-		post = request.POST
-		try:
-			name = str(post['Name'])
-		except:
-			raise PluginError, "invalid post parameters"
-
-		# updates entry
-		try:
-			manage = ManageFile.objects.filter(kind__name__exact = self.id, name = name)[0]
-		except:
-			raise PluginError, "no config file with that name: %s" % name
-
-		return str(manage.content)
-
-
 
 	def getConfigFileNames(self, request):
+		post = request.POST
+		try:
+			type = str(post['Type'])
+		except:
+			raise PluginError, "invalid post parameters %s" % post
+
 		# Updates entry
-		dfltconfig = ConfigFile.objects.filter(kind__name__exact = self.id, name = 'default')
+		dfltconfig = ConfigFile.objects.filter(kind__name__exact = self.id, name = 'default', type__name = type)
 		if not dfltconfig:
 			self.__saveDefaultConfigFileToDB(request)
 
-		configs = ConfigFile.objects.filter(kind__name__exact = self.id)
+		configs = ConfigFile.objects.filter(kind__name__exact = self.id, type__name = type)
 		res = []
 		for config in configs:
-			res.append(str(config.name))
+			res.append({'name' : str(config.name), 'type' : str(config.type.name)})
 
 		return { 'configs' : res }
-
-	def getFileNames(self, request):
-		# Updates entry
-		dfltmanage = ManageFile.objects.filter(kind__name__exact = self.id, name = 'default')
-		if not dfltmanage:
-			self.__saveDefaultFileToDB(request)
-
-		manages = ManageFile.objects.filter(kind__name__exact = self.id)
-		res = []
-		for manage in manages:
-			res.append(str(manage.name))
-
-		return { 'manages' : res }
 
 	def __saveDefaultConfigFileToDB(self, request):
 		"""
 		Looks into DB (youpi_configfiles table) if an entry for a default configuration file. 
 		If not creates one with the embedded default content.
 		"""
+		post = request.POST
+		try:
+			type = str(post['Type'])
+		except:
+			raise PluginError, "invalid post parameters %s" % post
 
 		try:
 			f = open(os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', self.id + '.conf.default'))
@@ -170,36 +153,13 @@ class ProcessingPlugin:
 
 		k = Processing_kind.objects.filter(name__exact = self.id)[0]
 		try:
-			m = ConfigFile(kind = k, name = 'default', content = config, user = request.user)
+			m = ConfigFile(kind = k, name = 'default', content = config, user = request.user, type__name = 'config')
 			m.save()
 		except:
 			# Cannot save, already exits: do nothing
 			pass
 
 		return config
-
-	def __saveDefaultFileToDB(self, request):
-		"""
-		Looks into DB (youpi_managefiles table) if an entry for a default  file. 
-		If not creates one with the embedded default content.
-		"""
-
-		try:
-			f = open(os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', self.id + '.default.param'))
-			manage = string.join(f.readlines())
-			f.close()
-		except IOError, e:
-			raise PluginError, "Default file for %s: %s" % (self.id, e)
-
-		k = Processing_kind.objects.filter(name__exact = self.id)[0]
-		try:
-			m = ManageFile(kind = k, name = 'default', content = manage, user = request.user)
-			m.save()
-		except:
-			# Cannot save, already exits: do nothing
-			pass
-
-		return manage
 
 	def saveConfigFile(self, request):
 		"""
@@ -208,44 +168,20 @@ class ProcessingPlugin:
 		post = request.POST
 		try:
 			name = str(post['Name'])
+			type = str(post['Type'])
 			config = str(post['Content'])
 		except Exception, e:
 			raise PluginError, "Unable to save config file: no name given"
 
+		t = ConfigType.objects.filter(name = type)[0]
 		try:
 			# Updates entry
-			m = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+			m = ConfigFile.objects.filter(kind__name__exact = self.id, name = name, type = t)[0]
 			m.content = config
 		except:
 			# ... or inserts a new one
 			k = Processing_kind.objects.filter(name__exact = self.id)[0]
-			m = ConfigFile(kind = k, name = name, content = config, user = request.user)
-
-		m.save()
-
-		return name + ' saved'
-
-	def saveFile(self, request):
-		"""
-		Save  file to DB
-		"""
-		post = request.POST
-		try:
-			name = str(post['Name'])
-			manage = str(post['Content'])
-			filetype = str(post['Type'])
-		except Exception, e:
-			raise PluginError, "Unable to save file: no name given"
-
-		try:
-			# Updates entry
-			m = ManageFile.objects.filter(kind__name__exact = self.id, name = name)[0]
-			m.content = manage
-			m.type = filetype
-		except:
-			# ... or inserts a new one
-			k = Processing_kind.objects.filter(name__exact = self.id)[0]
-			m = ManageFile(kind = k, name = name, content = manage, user = request.user, type = filetype)
+			m = ConfigFile(kind = k, name = name, content = config, user = request.user, type = t)
 
 		m.save()
 
@@ -259,34 +195,16 @@ class ProcessingPlugin:
 		post = request.POST
 		try:
 			name = str(post['Name'])
+			type = str(post['Type'])
 		except Exception, e:
 			raise PluginError, "Unable to delete config file: no name given"
 
 		try:
-			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name)[0]
+			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name, type = type)[0]
 		except:
 			raise PluginError, "No config file with that name: %s" % name
 
 		config.delete()
-
-		return name + ' deleted'
-
-	def deleteFile(self, request):
-		"""
-		Deletes file to DB
-		"""
-		post = request.POST
-		try:
-			name = str(post['Name'])
-		except Exception, e:
-			raise PluginError, "Unable to delete file: no name given"
-
-		try:
-			manage = ManageFile.objects.filter(kind__name__exact = self.id, name = name)[0]
-		except:
-			raise PluginError, "No file with that name: %s" % name
-
-		manage.delete()
 
 		return name + ' deleted'
 

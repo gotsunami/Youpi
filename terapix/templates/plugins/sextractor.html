@@ -89,8 +89,8 @@ $('single','dual').each(function (id) {
 	});
 			
 
-	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
-	var cf2 = new FileWidget('parameter_file_div', '{{ plugin.id }}', 'parameter');
+	var cf1 = new ConfigFileWidget('config_file_div', '{{ plugin.id }}', {type: 'config'});
+	var cf2 = new ConfigFileWidget('parameter_file_div', '{{ plugin.id }}', {type: 'param'});
 
 	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
 	fm_file_browser.setRootTitle('Terapix Cluster');

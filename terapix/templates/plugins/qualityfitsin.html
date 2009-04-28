@@ -35,7 +35,7 @@
 		{{ plugin.id }}.doit();
 	});
 
-	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}');
+	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}', {type: 'config'});
 	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
 	fm_file_browser.setRootTitle('Terapix Cluster');
 	fm_file_browser.setFilteringPatterns(['*.fits', '*.reg']);
