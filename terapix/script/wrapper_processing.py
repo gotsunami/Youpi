@@ -388,7 +388,7 @@ def process(userData, kind_id, argv):
 
 		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
 		os.mkdir(imgName)
-		os.system("mv sex.default.* sex-config* %s" %(imgName))
+		os.system("mv sex-config* sex-param* sex.default.conv default.nnw %s" %(imgName))
 		os.chdir(imgName)
 		fzs = glob.glob('*.fits.fz')
 		for fz in fzs:
@@ -527,6 +527,7 @@ def process(userData, kind_id, argv):
 							# Sex config file serialization: base64 encoding over zlib compression
 							#
 							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							param  = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ParamFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
 							www = os.path.join(	WWW_SEX_PREFIX, 
 												username, 
 												userData['Kind'], 
