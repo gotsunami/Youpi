@@ -1,223 +1,88 @@
-NUMBER                 Running object number                                     
- EXT_NUMBER             FITS extension number                                     
- MAG_ISO                Isophotal magnitude                                        [mag]
- MAGERR_ISO             RMS error for isophotal magnitude                          [mag]
- MAG_ISOCOR             Corrected isophotal magnitude                              [mag]
- MAGERR_ISOCOR          RMS error for corrected isophotal magnitude                [mag]
- MAG_AUTO               Kron-like elliptical aperture magnitude                    [mag]
- MAGERR_AUTO            RMS error for AUTO magnitude                               [mag]
- MAG_PETRO              Petrosian-like elliptical aperture magnitude               [mag]
- MAGERR_PETRO           RMS error for PETROsian magnitude                          [mag]
- MAG_BEST               Best of MAG_AUTO and MAG_ISOCOR                            [mag]
- MAGERR_BEST            RMS error for MAG_BEST                                     [mag]
- MAG_WIN                Gaussian-weighted magnitude                                [mag]
- MAGERR_WIN             RMS error for MAG_WIN                                      [mag]
- MAG_GALFIT             Magnitude derived from galaxy fit                          [mag]
- KRON_RADIUS            Kron apertures in units of A or B                         
- PETRO_RADIUS           Petrosian apertures in units of A or B                    
- BACKGROUND             Background at centroid position                            [count]
- THRESHOLD              Detection threshold above background                       [count]
- XPEAK_WORLD            World-x coordinate of the brightest pixel                  [deg]
- YPEAK_WORLD            World-y coordinate of the brightest pixel                  [deg]
- ALPHAPEAK_SKY          Right ascension of brightest pix (native)                  [deg]
- DELTAPEAK_SKY          Declination of brightest pix (native)                      [deg]
- ALPHAPEAK_J2000        Right ascension of brightest pix (J2000)                   [deg]
- DELTAPEAK_J2000        Declination of brightest pix (J2000)                       [deg]
- ALPHAPEAK_B1950        Right ascension of brightest pix (B1950)                   [deg]
- DELTAPEAK_B1950        Declination of brightest pix (B1950)                       [deg]
- X_WORLD                Barycenter position along world x axis                     [deg]
- Y_WORLD                Barycenter position along world y axis                     [deg]
- X_MAMA                 Barycenter position along MAMA x axis                      [m**(-6)]
- Y_MAMA                 Barycenter position along MAMA y axis                      [m**(-6)]
- ALPHA_SKY              Right ascension of barycenter (native)                     [deg]
- DELTA_SKY              Declination of barycenter (native)                         [deg]
- ALPHA_J2000            Right ascension of barycenter (J2000)                      [deg]
- DELTA_J2000            Declination of barycenter (J2000)                          [deg]
- ALPHA_B1950            Right ascension of barycenter (B1950)                      [deg]
- DELTA_B1950            Declination of barycenter (B1950)                          [deg]
- X2_WORLD               Variance along X-WORLD (alpha)                             [deg**2]
- Y2_WORLD               Variance along Y-WORLD (delta)                             [deg**2]
- XY_WORLD               Covariance between X-WORLD and Y-WORLD                     [deg**2]
- CXX_WORLD              Cxx object ellipse parameter (WORLD units)                 [deg**(-2)]
- CYY_WORLD              Cyy object ellipse parameter (WORLD units)                 [deg**(-2)]
- CXY_WORLD              Cxy object ellipse parameter (WORLD units)                 [deg**(-2)]
- A_WORLD                Profile RMS along major axis (world units)                 [deg]
- B_WORLD                Profile RMS along minor axis (world units)                 [deg]
- THETA_WORLD            Position angle (CCW/world-x)                               [deg]
- THETA_SKY              Position angle (east of north) (native)                    [deg]
- THETA_J2000            Position angle (east of north) (J2000)                     [deg]
- THETA_B1950            Position angle (east of north) (B1950)                     [deg]
- ERRX2_WORLD            Variance of position along X-WORLD (alpha)                 [deg**2]
- ERRY2_WORLD            Variance of position along Y-WORLD (delta)                 [deg**2]
- ERRXY_WORLD            Covariance of position X-WORLD/Y-WORLD                     [deg**2]
- ERRCXX_WORLD           Cxx error ellipse parameter (WORLD units)                  [deg**(-2)]
- ERRCYY_WORLD           Cyy error ellipse parameter (WORLD units)                  [deg**(-2)]
- ERRCXY_WORLD           Cxy error ellipse parameter (WORLD units)                  [deg**(-2)]
- ERRA_WORLD             World RMS position error along major axis                  [deg]
- ERRB_WORLD             World RMS position error along minor axis                  [deg]
- ERRTHETA_WORLD         Error ellipse pos. angle (CCW/world-x)                     [deg]
- ERRTHETA_SKY           Native error ellipse pos. angle (east of north)            [deg]
- ERRTHETA_J2000         J2000 error ellipse pos. angle (east of north)             [deg]
- ERRTHETA_B1950         B1950 error ellipse pos. angle (east of north)             [deg]
- XWIN_WORLD             Windowed position along world x axis                       [deg]
- YWIN_WORLD             Windowed position along world y axis                       [deg]
- ALPHAWIN_SKY           Windowed right ascension  (native)                         [deg]
- DELTAWIN_SKY           Windowed declination (native)                              [deg]
- ALPHAWIN_J2000         Windowed right ascension (J2000)                           [deg]
- DELTAWIN_J2000         windowed declination (J2000)                               [deg]
- ALPHAWIN_B1950         Windowed right ascension (B1950)                           [deg]
- DELTAWIN_B1950         Windowed declination (B1950)                               [deg]
- X2WIN_WORLD            Windowed variance along X-WORLD (alpha)                    [deg**2]
- Y2WIN_WORLD            Windowed variance along Y-WORLD (delta)                    [deg**2]
- XYWIN_WORLD            Windowed covariance between X-WORLD and Y-WORLD            [deg**2]
- CXXWIN_WORLD           Windowed Cxx object ellipse parameter (WORLD units)        [deg**(-2)]
- CYYWIN_WORLD           Windowed Cyy object ellipse parameter (WORLD units)        [deg**(-2)]
- CXYWIN_WORLD           Windowed Cxy object ellipse parameter (WORLD units)        [deg**(-2)]
- AWIN_WORLD             Windowed profile RMS along major axis (world units)        [deg]
- BWIN_WORLD             Windowed profile RMS along minor axis (world units)        [deg]
- THETAWIN_WORLD         Windowed position angle (CCW/world-x)                      [deg]
- THETAWIN_SKY           Windowed position angle (east of north) (native)           [deg]
- THETAWIN_J2000         Windowed position angle (east of north) (J2000)            [deg]
- THETAWIN_B1950         Windowed position angle (east of north) (B1950)            [deg]
- ERRX2WIN_WORLD         Variance of windowed pos along X-WORLD (alpha)             [deg**2]
- ERRY2WIN_WORLD         Variance of windowed pos along Y-WORLD (delta)             [deg**2]
- ERRXYWIN_WORLD         Covariance of windowed pos X-WORLD/Y-WORLD                 [deg**2]
- ERRCXXWIN_WORLD        Cxx windowed error ellipse parameter (WORLD units)         [deg**(-2)]
- ERRCYYWIN_WORLD        Cyy windowed error ellipse parameter (WORLD units)         [deg**(-2)]
- ERRCXYWIN_WORLD        Cxy windowed error ellipse parameter (WORLD units)         [deg**(-2)]
- ERRAWIN_WORLD          World RMS windowed pos error along major axis              [deg]
- ERRBWIN_WORLD          World RMS windowed pos error along minor axis              [deg]
- ERRTHETAWIN_WORLD      Windowed error ellipse pos. angle (CCW/world-x)            [deg]
- ERRTHETAWIN_SKY        Native windowed error ellipse pos. angle (east of north)   [deg]
- ERRTHETAWIN_J2000      J2000 windowed error ellipse pos. angle (east of north)    [deg]
- ERRTHETAWIN_B1950      B1950 windowed error ellipse pos. angle (east of north)    [deg]
- NITER_WIN              Number of iterations for WIN centering                    
- MU_THRESHOLD           Detection threshold above background                       [mag * arcsec**(-2)]
- MU_MAX                 Peak surface brightness above background                   [mag * arcsec**(-2)]
- ISOAREA_WORLD          Isophotal area above Analysis threshold                    [deg**2]
- ISOAREAF_WORLD         Isophotal area (filtered) above Detection threshold        [deg**2]
- ISO0                   Isophotal area at level 0                                  [pixel**2]
- ISO1                   Isophotal area at level 1                                  [pixel**2]
- ISO2                   Isophotal area at level 2                                  [pixel**2]
- ISO3                   Isophotal area at level 3                                  [pixel**2]
- ISO4                   Isophotal area at level 4                                  [pixel**2]
- ISO5                   Isophotal area at level 5                                  [pixel**2]
- ISO6                   Isophotal area at level 6                                  [pixel**2]
- ISO7                   Isophotal area at level 7                                  [pixel**2]
- FLAGS                  Extraction flags                                          
- FLAGS_WEIGHT           Weighted extraction flags                                 
- FLAGS_WIN              Flags for WINdowed parameters                             
- #IMAFLAGS_ISO           FLAG-image flags OR'ed over the iso. profile              
- #NIMAFLAGS_ISO          Number of flagged pixels entering IMAFLAGS_ISO            
- FWHM_WORLD             FWHM assuming a gaussian core                              [deg]
- POLAR_WORLD            (A_WORLD^2 - B_WORLD^2)/(A_WORLD^2 + B_WORLD^2)           
- POLARWIN_WORLD         (AWIN^2 - BWIN^2)/(AWIN^2 + BWIN^2)                       
- CLASS_STAR             S/G classifier output                                     
- THRESHOLDMAX           Maximum threshold possible for detection                   [count]
- YPSF_WORLD             PSF position along world y axis                            [deg]
- ALPHAPSF_SKY           Right ascension of the fitted PSF (native)                 [deg]
- DELTAPSF_SKY           Declination of the fitted PSF (native)                     [deg]
- ALPHAPSF_J2000         Right ascension of the fitted PSF (J2000)                  [deg]
- DELTAPSF_J2000         Declination of the fitted PSF (J2000)                      [deg]
- ALPHAPSF_B1950         Right ascension of the fitted PSF (B1950)                  [deg]
- DELTAPSF_B1950         Declination of the fitted PSF (B1950)                      [deg]
- MAG_PSF                Magnitude from PSF-fitting                                 [mag]
- MAGERR_PSF             RMS magnitude error from PSF-fitting                       [mag]
- NITER_PSF              Number of iterations for PSF-fitting                      
- CHI2_PSF               Reduced chi2 from PSF-fitting                             
- ERRX2PSF_WORLD         Variance of PSF position along X-WORLD (alpha)             [deg**2]
- ERRY2PSF_WORLD         Variance of PSF position along Y-WORLD (delta)             [deg**2]
- ERRXYPSF_WORLD         Covariance of PSF position X-WORLD/Y-WORLD                 [deg**2]
- ERRCYYPSF_WORLD        Cyy PSF error ellipse parameter (WORLD units)              [deg**(-2)]
- ERRCXYPSF_WORLD        Cxy PSF error ellipse parameter (WORLD units)              [deg**(-2)]
- ERRAPSF_WORLD          World PSF RMS position error along major axis              [pixel]
- ERRBPSF_WORLD          World PSF RMS position error along minor axis              [pixel]
- ERRTHTPSF_WORLD        PSF error ellipse pos. angle (CCW/world-x)                 [deg]
- ERRTHTPSF_SKY          Native PSF error ellipse pos. angle (east of north)        [deg]
- ERRTHTPSF_J2000        J2000 PSF error ellipse pos. angle (east of north)         [deg]
- ERRTHTPSF_B1950        B1950 PSF error ellipse pos. angle (east of north)         [deg]
- PC                     Principal components                                      
- VECTOR_MODEL           Model-fitting coefficients                                
- VECTOR_MODELERR        Model-fitting coefficient uncertainties                   
- CHI2_MODEL             Reduced Chi2 of the fit                                   
- FLAGS_MODEL            Model-fitting flags                                       
- NITER_MODEL            Number of iterations for model-fitting                    
- MAG_MODEL              Magnitude from model-fitting                               [mag]
- MAGERR_MODEL           RMS error on model-fitting magnitude                       [mag]
- XMODEL_WORLD           Fitted position along world x axis                         [deg]
- YMODEL_WORLD           Fitted position along world y axis                         [deg]
- ALPHAMODEL_SKY         Fitted position along right ascension  (native)            [deg]
- DELTAMODEL_SKY         Fitted position along declination (native)                 [deg]
- ALPHAMODEL_J2000       Fitted position along right ascension (J2000)              [deg]
- DELTAMODEL_J2000       Fitted position along declination (J2000)                  [deg]
- ALPHAMODEL_B1950       Fitted position along right ascension (B1950)              [deg]
- DELTAMODEL_B1950       Fitted position along declination (B1950)                  [deg]
- ERRX2MODEL_WORLD       Variance of fitted position along X-WORLD (alpha)          [deg**2]
- ERRY2MODEL_WORLD       Variance of fitted position along Y-WORLD (delta)          [deg**2]
- ERRXYMODEL_WORLD       Covariance of fitted position X-WORLD/Y-WORLD              [deg**2]
- ERRCXXMODEL_WORLD      Cxx fitted error ellipse parameter (WORLD units)           [deg**(-2)]
- ERRCYYMODEL_WORLD      Cyy fitted error ellipse parameter (WORLD units)           [deg**(-2)]
- ERRCXYMODEL_WORLD      Cxy fitted error ellipse parameter (WORLD units)           [deg**(-2)]
- ERRAMODEL_WORLD        World RMS error of fitted position along major axis        [deg]
- ERRBMODEL_WORLD        World RMS error of fitted position along minor axis        [deg]
- ERRTHETAMODEL_WORLD    Error ellipse pos.angle of fitted position (CCW/world-x)   [deg]
- ERRTHETAMODEL_SKY      Native fitted error ellipse pos. angle (east of north)     [deg]
- ERRTHETAMODEL_J2000    J2000 fitted error ellipse pos. angle (east of north)      [deg]
- ERRTHETAMODEL_B1950    B1950 fitted error ellipse pos. angle (east of north)      [deg]
- MAG_SPHEROID           Spheroid total magnitude from fitting                      [mag]
- MAGERR_SPHEROID        RMS error on fitted spheroid total magnitude               [mag]
- SPHEROID_REFF_WORLD    Spheroid effective radius from fitting                     [deg]
- SPHEROID_REFFERR_WORLD RMS error on fitted spheroid effective radius              [deg]
- SPHEROID_ASPECTERR_IMA RMS error on fitted spheroid aspect ratio                 
- SPHEROID_ASPECT_WORLD  Spheroid aspect ratio from fitting                        
- SPHEROID_ASPECTERR_WOR RMS error on fitted spheroid aspect ratio                 
- SPHEROID_THETAERR_IMAG RMS error on spheroid position angle                       [deg]
- SPHEROID_THETA_WORLD   Spheroid position angle (CCW/world-x)                      [deg]
- SPHEROID_THETAERR_WORL RMS error on spheroid position angle                       [deg]
- SPHEROID_THETA_SKY     Spheroid position angle (east of north, native)            [deg]
- SPHEROID_THETA_J2000   Spheroid position angle (east of north, J2000)             [deg]
- SPHEROID_THETA_B1950   Spheroid position angle (east of north, B1950)             [deg]
- SPHEROID_SERSICN       Spheroid Sersic index from fitting                        
- SPHEROID_SERSICNERR    RMS error on fitted spheroid Sersic index                 
- MAG_DISK               Disk total magnitude from fitting                          [mag]
- MAGERR_DISK            RMS error on fitted disk total magnitude                   [mag]
- DISK_SCALE_WORLD       Disk scalelength from fitting (world coords)               [deg]
- DISK_SCALEERR_WORLD    RMS error on fitted disk scalelength (world coords)        [deg]
- DISK_ASPECT_WORLD      Disk aspect ratio from fitting                            
- DISK_ASPECTERR_WORLD   RMS error on disk aspect ratio                            
- DISK_INCLINATION       Disk inclination from fitting                              [deg]
- DISK_INCLINATIONERR    RMS error on disk inclination from fitting                 [deg]
- DISK_THETA_WORLD       Disk position angle (CCW/world-x)                          [deg]
- DISK_THETAERR_WORLD    RMS error on disk position angle                           [deg]
- DISK_THETA_SKY         Disk position angle (east of north, native)                [deg]
- DISK_THETA_J2000       Disk position angle (east of north, J2000)                 [deg]
- DISK_THETA_B1950       Disk position angle (east of north, B1950)                 [deg]
- DISK_PATTERN_VECTOR    Disk pattern fitted coefficients                          
- DISK_PATTERNMOD_VECTOR Disk pattern fitted moduli                                
- DISK_PATTERNARG_VECTOR Disk pattern fitted arguments                              [deg]
- DISK_PATTERN_SPIRAL    Disk pattern spiral index                                 
- MAG_BAR                Bar total magnitude from fitting                           [mag]
- MAGERR_BAR             RMS error on fitted total bar magnitude                    [mag]
- BAR_LENGTH_WORLD       Bar length from fitting                                    [deg]
- BAR_LENGTHERR_WORLD    RMS error on fitted bar length (world coords)              [deg]
- BAR_ASPECT_WORLD       Bar aspect ratio from fitting                             
- BAR_ASPECTERR_WORLD    RMS error on fitted bar aspect ratio                      
- BAR_POSANG             Bar true position angle (CCW/disk maj.axis) from fitting   [deg]
- BAR_POSANGERR          RMS error on fitted true bar position angle                [deg]
- BAR_THETA_WORLD        Bar projected angle (CCW/world-x) from fitting             [deg]
- BAR_THETAERR_WORLD     RMS error on fitted bar projected angle                    [deg]
- BAR_THETA_SKY          Bar projected angle (east of north, native) from fitting   [deg]
- BAR_THETA_J2000        Bar projected angle (east of north, J2000) from fitting    [deg]
- BAR_THETA_B1950        Bar projected angle (east of north, B1950) from fitting    [deg]
- MAG_ARMS               Total magnitude in spiral arms from fitting                [mag]
- MAGERR_ARMS            RMS error on fitted total magnitude in spiral arms         [mag]
- ARMS_SCALE_WORLD       Spiral arms scale length from fitting                      [deg]
- ARMS_SCALEERR_WORLD    RMS error on fitted spiral arm scale length                [deg]
- ARMS_POSANG            Pos. angle (CCW/disk maj.axis) of spiral arms from fitting [deg]
- ARMS_POSANGERR         RMS error on fitted spiral arm position angle              [deg]
- ARMS_PITCH             Pitch angle of spiral arms from fitting                    [deg]
- ARMS_PITCHERR          RMS error on fitted spiral arm pitch angle                 [deg]
- ARMS_START_WORLD       Starting radius of spiral arms from fitting                [deg]
- ARMS_STARTERR_WORLD    RMS error on spiral arm starting radius                    [deg]
- ARMS_QUADFRAC          Fraction of spiral arms in quadrature from fitting         [deg]
- ARMS_QUADFRACERR       RMS error on fitted spiral arms quadrature fraction        [deg]
+NUMBER
+
+X_IMAGE
+Y_IMAGE
+ERRA_IMAGE
+ERRB_IMAGE
+ERRTHETA_IMAGE
+A_IMAGE
+B_IMAGE
+POLAR_IMAGE
+THETA_IMAGE
+
+X_WORLD
+Y_WORLD
+ERRA_WORLD
+ERRB_WORLD
+ERRTHETA_WORLD
+A_WORLD
+B_WORLD
+POLAR_WORLD
+THETA_WORLD
+
+ALPHA_J2000
+DELTA_J2000
+ERRTHETA_J2000
+THETA_J2000
+
+XWIN_IMAGE
+YWIN_IMAGE
+ERRAWIN_IMAGE
+ERRBWIN_IMAGE
+ERRTHETAWIN_IMAGE
+AWIN_IMAGE
+BWIN_IMAGE
+POLARWIN_IMAGE
+THETAWIN_IMAGE
+
+XWIN_WORLD
+YWIN_WORLD
+ERRAWIN_WORLD
+ERRBWIN_WORLD
+ERRTHETAWIN_WORLD
+AWIN_WORLD
+BWIN_WORLD
+POLARWIN_WORLD
+THETAWIN_WORLD
+
+ALPHAWIN_J2000
+DELTAWIN_J2000
+ERRTHETAWIN_J2000
+THETAWIN_J2000
+
+FLUX_ISO
+FLUXERR_ISO
+MAG_ISO
+MAGERR_ISO
+
+FLUX_APER
+FLUXERR_APER
+MAG_APER
+MAGERR_APER
+
+FLUX_AUTO
+FLUXERR_AUTO
+MAG_AUTO
+MAGERR_AUTO
+
+FLUX_PETRO
+FLUXERR_PETRO
+MAG_PETRO
+MAGERR_PETRO
+
+FLUX_RADIUS(3)
+KRON_RADIUS
+PETRO_RADIUS
+
+BACKGROUND
+THRESHOLD
+MU_THRESHOLD
+FLUX_MAX
+MU_MAX
+ISOAREA_IMAGE
+ISOAREAF_IMAGE
+ISOAREA_WORLD
+ISOAREAF_WORLD
+
+FLAGS
+CLASS_STAR
