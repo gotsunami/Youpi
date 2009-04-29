@@ -96,7 +96,11 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Config File</varname></term>
-			<listitem><para>Config File (<emphasis>Config Id</emphasis>, Django's User Id, Processing Kind Id, Name, Content, Data, Date)</para></listitem>
+			<listitem><para>Config File (<emphasis>Config Id</emphasis>, Django's User Id, Processing Kind Id, Config Type Id, Name, Content, Data, Date)</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term><varname>Config Type</varname></term>
+			<listitem><para>Config Type (<emphasis>Config Id</emphasis>, Name)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Final Quality Comment</varname></term>

@@ -12,6 +12,7 @@ graph mcd {
 	cartitem [label="{ Cart Item | [ Cart Item Id ]\nName\nData }"];
 	channel [label="{ Channel | [ Channel Id ]\nName\nWavelength\nUrl\nWavecurve\nTranscurve\nMag offsets }"];
 	configfile [label="{ Config File | [ Config Id ]\nContent\nData }"];
+	configtype [label="{ Config Type | [ Config Id ]\nName }"];
 	fitstables [label="{ FITS Tables | [ Name ]\nInstrument\nChannel\nRun\nQSO status\nObjet\nFitstable\nAbsorption\nAbsorption_err\nIs_phot }"];
 	image [label="{ Image | [ Image Id ]\nName\nSky Footprint\nPath\nAlpha\nDelta\nEquinox\nObject\nDate Obs\nExp time\nPhotc Header\nPhotc Custom\nPhotk\nAirmass\nAbsorption\nChecksum\nGain\nIngestion date\nFlat\nMask\nReg\nQSO status }"];
 	imageselections [label="{ Image selections | [ name ]\ndata }"];
@@ -61,6 +62,7 @@ graph mcd {
 	node30 [label="processes data", style=dashed, shape=Mrecord];
 	node31 [label="is marked"];
 	node32 [label="{ defines | Date }", style=dashed, shape=Mrecord];
+	node33 [label="type"];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
@@ -131,6 +133,9 @@ graph mcd {
 	imageselections -- node22 [label="  1,1", style=dashed];
 	miscdata -- node22 [label="  1,1", style=dashed];
 	node22 -- authuser [label="  0,n", style=dashed];
+
+	configfile -- node33 [label="  1,1"];
+	configtype -- node33 [label="  0,n"];
 
 	authuser -- node32 [label="  0,n", style=dashed];
 	node32 -- tag [label="  1,1", style=dashed];

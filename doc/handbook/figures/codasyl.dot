@@ -28,6 +28,7 @@ digraph codasyl {
 	user [label="Django User", style=dashed];
 	miscdata [label="Misc Data"];
 	configfile [label="Config File"];
+	configtype [label="Config Type"];
 	ingrading [label="First Quality Evaluation"];
 	outgrading [label="Final Quality Evaluation"];
 	incomment [label="First Quality Comment"];
@@ -76,6 +77,8 @@ digraph codasyl {
 	kind -> task;
 	kind -> configfile;
 	kind -> carti;
+
+	configtype -> configfile;
 
 	task -> relit;
 	Tag -> reltagi;

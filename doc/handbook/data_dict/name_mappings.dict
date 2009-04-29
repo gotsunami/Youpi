@@ -13,6 +13,7 @@ Channel;<emphasis>youpi_channel</emphasis>;<emphasis>Channel</emphasis>
 Coaddition;<emphasis>youpi_coaddition</emphasis>;<emphasis>Coaddition</emphasis>
 Condor Node Selection;<emphasis>youpi_condornodesel</emphasis>;<emphasis>CondorNodeSel</emphasis>
 Config File;<emphasis>youpi_configfile</emphasis>;<emphasis>ConfigFile</emphasis>
+Config Type;<emphasis>youpi_configtype</emphasis>;<emphasis>ConfigType</emphasis>
 Final Quality Comment;<emphasis>youpi_finalqcomment</emphasis>;<emphasis>FinalQComment</emphasis>
 Final Quality Evaluation;<emphasis>youpi_finalqeval</emphasis>;<emphasis>FinalQEval</emphasis>
 First Quality Comment;<emphasis>youpi_firstqcomment</emphasis>;<emphasis>FirstQComment</emphasis>
