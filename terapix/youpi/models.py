@@ -227,8 +227,15 @@ class CartItem(models.Model):
 
 class Image(models.Model):
 	name = models.CharField(max_length = 255, help_text="name of image")
-	skyfootprint = models.MultiPolygonField()
-	centerfield = models.PointField()
+	#
+	# http://dev.mysql.com/doc/refman/5.0/en/innodb-restrictions.html:
+	# InnoDB tables do not support spatial data types before MySQL 5.0.16. As of 5.0.16,
+	# InnoDB supports spatial data types, but not indexes on them.
+	#
+	# ... so spatial indexes are not created (forced with spatial_index = False)
+	#
+	skyfootprint = models.MultiPolygonField(spatial_index = False)
+	centerfield = models.PointField(spatial_index = False)
 	objects = models.GeoManager()
 	path = models.CharField(max_length = 255,blank=True,null=True,help_text="path of image")
 	alpha = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text= " Right ascension of field center [deg]")
