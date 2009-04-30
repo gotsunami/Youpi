@@ -133,6 +133,26 @@ class ProcessingPlugin:
 
 		return { 'configs' : res }
 
+	def setDefaultConfigFiles(self, defaultCF):
+		"""
+		Used by plugins to alter the default config files list.
+		The base class does nothing and returns defautlCF.
+		"""
+
+		# Do nothing in base class
+		return defaultCF
+
+	def getDefaultConfigFiles(self):
+		"""
+		Returns the default config files list to use with the ConfigFileWidget JS class.
+		"""
+
+		# Default config files to use
+		return [
+			{'path': os.path.join(PLUGINS_CONF_DIR, self.id + '.conf.default'), 'type': 'config'},
+		]
+
+
 	def __saveDefaultConfigFileToDB(self, request):
 		"""
 		Looks into DB (youpi_configfiles table) if an entry for a default configuration file. 
@@ -144,22 +164,26 @@ class ProcessingPlugin:
 		except:
 			raise PluginError, "invalid post parameters %s" % post
 
-		try:
-			f = open(os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', self.id + '.conf.default'))
-			config = string.join(f.readlines())
-			f.close()
-		except IOError, e:
-			raise PluginError, "Default config file for %s: %s" % (self.id, e)
+		# Should be used by plugins to alter the default content of the list
+		defaultConfigFiles = self.setDefaultConfigFiles(self.getDefaultConfigFiles())
 
-		k = Processing_kind.objects.filter(name__exact = self.id)[0]
-		try:
-			m = ConfigFile(kind = k, name = 'default', content = config, user = request.user, type__name = 'config')
-			m.save()
-		except:
-			# Cannot save, already exits: do nothing
-			pass
-
-		return config
+		for cf in defaultConfigFiles:
+			if cf['type'] != type: continue
+			try:
+				f = open(cf['path'])
+				config = string.join(f.readlines())
+				f.close()
+			except IOError, e:
+				raise PluginError, "Default config file for %s: %s" % (self.id, e)
+		
+			k = Processing_kind.objects.filter(name__exact = self.id)[0]
+			t = ConfigType.objects.filter(name = type)[0]
+			try:
+				m = ConfigFile(kind = k, name = 'default', content = config, user = request.user, type = t)
+				m.save()
+			except:
+				# Cannot save, already exits: do nothing
+				pass
 
 	def saveConfigFile(self, request):
 		"""
@@ -200,7 +224,7 @@ class ProcessingPlugin:
 			raise PluginError, "Unable to delete config file: no name given"
 
 		try:
-			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name, type = type)[0]
+			config = ConfigFile.objects.filter(kind__name__exact = self.id, name = name, type__name = type)[0]
 		except:
 			raise PluginError, "No config file with that name: %s" % name
 

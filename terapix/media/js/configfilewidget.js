@@ -325,6 +325,9 @@ function ConfigFileWidget(container, pluginId, options)
 				var confs = resp.result.configs;
 				var selNode = getSelect(plugin_id + '_' + _options.type +'_name_select', confs.map(function(conf) { return conf.name; }));
 				selNode.observe('change', _displayCurrentConfUsed);
+				// Set as default
+				var defopt = selNode.select("option[value=\"default\"]")[0];
+				defopt.writeAttribute('selected', 'selected');
 				cdiv.insert(selNode);
 	
 				var txt = selNode.options[selNode.selectedIndex].text;

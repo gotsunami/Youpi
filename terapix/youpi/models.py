@@ -178,7 +178,7 @@ class ConfigFile(models.Model):
 	type = models.ForeignKey(ConfigType)
 	
 	class Meta:
-		unique_together = ('name', 'kind')
+		unique_together = ('name', 'kind', 'type')
 		verbose_name = "Configuration file"
 
 	def __unicode__(self):

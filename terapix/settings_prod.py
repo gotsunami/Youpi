@@ -28,6 +28,10 @@ CONDOR_ERROR 	= '/tmp/condor.prod.error'
 CONDOR_LOG 		= '/tmp/condor.prod.log'
 CONDOR_LOG_DIR	= '/tmp'
 #
+# Plugins configuration files directory
+#
+PLUGINS_CONF_DIR = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf')
+#
 # ImageMagick support
 #
 HAS_CONVERT 		= True

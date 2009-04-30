@@ -617,3 +617,12 @@ queue""" %  {	'encuserdata' 	: encUserData,
 
 		return "%s <tt>%s</tt>" % (self.optionLabel, self.command)
 
+	def setDefaultConfigFiles(self, defaultCF):
+		"""
+		Alter the default config files list with an entry for the 
+		Sextractor parameter file.
+		"""
+
+		defaultCF.append({'path': os.path.join(PLUGINS_CONF_DIR, self.id + '.param.default'), 'type': 'param'})
+		return defaultCF
+
