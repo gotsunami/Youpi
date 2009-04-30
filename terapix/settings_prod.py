@@ -109,6 +109,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_OPTIONS = {"init_command": "SET storage_engine=INNODB"}
 DATABASE_NAME = 'spica2'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'semah'             # Not used with sqlite3.
 DATABASE_PASSWORD = 's19e5m13a1h8'         # Not used with sqlite3.
