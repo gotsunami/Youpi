@@ -24,7 +24,6 @@ from django.db.models import Q
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 #
-from terapix.youpi.forms import *
 from terapix.youpi.models import *
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
