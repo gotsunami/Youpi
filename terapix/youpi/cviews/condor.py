@@ -31,7 +31,6 @@ from django.contrib.auth.models import User
 #
 from terapix.youpi.cviews import *
 from terapix.youpi.cviews.condreqstr import *
-from terapix.youpi.forms import *
 from terapix.youpi.models import *
 from terapix.youpi.pluginmanager import PluginManagerError
 #
