@@ -23,6 +23,7 @@
 	<!ENTITY csf 						"Condor submission file">
 	<!ENTITY dj	 						"Django">
 	<!ENTITY dom 						"<acronym>DOM	</acronym>">
+	<!ENTITY faq			 			"<acronym>FAQ</acronym>">
 	<!ENTITY fits			 			"<acronym>FITS</acronym>">
 	<!ENTITY forth		 			"<acronym>FORTH</acronym>">
 	<!ENTITY get			 			"<acronym>GET</acronym>">
