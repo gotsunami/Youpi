@@ -176,11 +176,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Site Profile</varname></term>
-			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, &d_uid;, GUI Style, Default Condor Setup, Default Mode)</para></listitem>
-		</varlistentry>
-		<varlistentry>
-			<term><varname>Site Profile-Group Relation</varname></term>
-			<listitem><para>Site Profile-Group Relation (<emphasis>P--G Id, Site Profile Id, &d_gid;</emphasis>)</para></listitem>
+			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, &d_uid;, &d_gid; (default group), GUI Style, Default Condor Setup, Default Mode)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>SCAMP Plugin</varname></term>
