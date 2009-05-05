@@ -1,5 +1,6 @@
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import Group
 #
 from terapix.youpi.pluginmanager import PluginManager
 from terapix.youpi.models import SiteProfile
@@ -34,13 +35,24 @@ def pref_save_default_condor_config(user):
 	p.save()
 
 def profile(fn):
+	"""
+	Decorator used to check for existing user profile
+	"""
 	def new(*args):
 		try:
 			user = args[0].user
 			prof = user.get_profile()
 		except ObjectDoesNotExist:
 			# Create a new profile
-			p = SiteProfile(user = user)
+			groups = user.groups.all()
+			if not groups:
+				# No user groups; add default one
+				grp = Group(name = user.username)
+				grp.save()
+			else:
+				grp = groups[0]
+
+			p = SiteProfile(user = user, dflt_group = grp)
 			p.save()
 			# Adds default Condor config for that profile
 			pref_save_default_condor_config(user)
