@@ -1,6 +1,7 @@
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import Group
+from django.db import IntegrityError
 #
 from terapix.youpi.pluginmanager import PluginManager
 from terapix.youpi.models import SiteProfile
@@ -48,7 +49,11 @@ def profile(fn):
 			if not groups:
 				# No user groups; add default one
 				grp = Group(name = user.username)
-				grp.save()
+				try:
+					grp.save()
+				except IntegrityError:
+					# Already exits
+					grp = Group.objects.filter(name = user.username)[0]
 			else:
 				grp = groups[0]
 
