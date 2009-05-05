@@ -80,7 +80,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Cart Item</varname></term>
-			<listitem><para>Cart Item (<emphasis>Item Id</emphasis>, Django's User Id, Processing Kind Id, Name, Data, Date)</para></listitem>
+			<listitem><para>Cart Item (<emphasis>Item Id</emphasis>, &d_uid;, &d_gid;, Mode, Processing Kind Id, Name, Data, Date)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Channel</varname></term>
@@ -96,7 +96,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Config File</varname></term>
-			<listitem><para>Config File (<emphasis>Config Id</emphasis>, Django's User Id, Processing Kind Id, Config Type Id, Name, Content, Data, Date)</para></listitem>
+			<listitem><para>Config File (<emphasis>Config Id</emphasis>, &d_uid;, &d_gid;, Mode, Processing Kind Id, Config Type Id, Name, Content, Data, Date)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Config Type</varname></term>
@@ -108,7 +108,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Final Quality Evaluation</varname></term>
-			<listitem><para>Final Quality Evaluation (<emphasis>Django's User Id, FITSout Id</emphasis>, Final Comment Id, Date, Grade, Custom Comment)</para></listitem>
+			<listitem><para>Final Quality Evaluation (<emphasis>&d_uid;, FITSout Id</emphasis>, Final Comment Id, Date, Grade, Custom Comment)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>First Quality Comment</varname></term>
@@ -116,7 +116,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>First Quality Evaluation</varname></term>
-			<listitem><para>First Quality Evaluation (<emphasis>Django's User Id, FITSin Id</emphasis>, First Comment Id, Date, Grade, Custom Comment)</para></listitem>
+			<listitem><para>First Quality Evaluation (<emphasis>&d_uid;, FITSin Id</emphasis>, First Comment Id, Date, Grade, Custom Comment)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>FIST Tables</varname></term>
@@ -144,11 +144,11 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Image Selections</varname></term>
-			<listitem><para>Image Selections (<emphasis>Selection Id</emphasis>, Django's User Id, Name, Data, Date)</para></listitem>
+			<listitem><para>Image Selections (<emphasis>Selection Id</emphasis>, &d_uid;, &d_gid;, Mode, Name, Data, Date)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Ingestion</varname></term>
-			<listitem><para>Ingestion (<emphasis>Ingestion Id</emphasis>, Django's User Id, Label, Start Ingestion Date, End Ingestion Date, Email, Path, Check Fitsverify, Check QSO Status, Check Multiple Ingestion, Exit Code, Report)</para></listitem>
+			<listitem><para>Ingestion (<emphasis>Ingestion Id</emphasis>, &d_uid;, &d_gid;, Mode, Label, Start Ingestion Date, End Ingestion Date, Email, Path, Check Fitsverify, Check QSO Status, Check Multiple Ingestion, Exit Code, Report)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Instrument</varname></term>
@@ -156,7 +156,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Misc Data</varname></term>
-			<listitem><para>Misc Data (<emphasis>Misc Id</emphasis>, Django's User Id, Key, Data, Date)</para></listitem>
+			<listitem><para>Misc Data (<emphasis>Misc Id</emphasis>, &d_uid;, &d_gid;, Mode, Key, Data, Date)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Processing Kind</varname></term>
@@ -164,7 +164,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Processing Task</varname></term>
-			<listitem><para>Processing Task (<emphasis>Processing Task Id</emphasis>, Django's User Id, Processing Kind Id, Start Date, End Date, Success, Error Log, Hostname, Results Output Directory, Title)</para></listitem>
+			<listitem><para>Processing Task (<emphasis>Processing Task Id</emphasis>, &d_uid;, &d_gid;, Mode, Processing Kind Id, Start Date, End Date, Success, Error Log, Hostname, Results Output Directory, Title)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Run</varname></term>
@@ -176,7 +176,11 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Site Profile</varname></term>
-			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, GUI Style, Default Condor Setup)</para></listitem>
+			<listitem><para>Site Profile (<emphasis>Profile Id</emphasis>, &d_uid;, GUI Style, Default Condor Setup, Default Mode)</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term><varname>Site Profile-Group Relation</varname></term>
+			<listitem><para>Site Profile-Group Relation (<emphasis>P--G Id, Site Profile Id, &d_gid;</emphasis>)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>SCAMP Plugin</varname></term>
@@ -196,11 +200,11 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Tag</varname></term>
-			<listitem><para>Tag (<emphasis>Tag Id</emphasis>, User Id, Name, Style, Date, Comment)</para></listitem>
+			<listitem><para>Tag (<emphasis>Tag Id</emphasis>, &d_uid;, &d_gid;, Mode, Name, Style, Date, Comment)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>User-Survey Relation</varname></term>
-			<listitem><para>User-Survey Relation (<emphasis>U--S Id, User Id, Survey Id</emphasis>)</para></listitem>
+			<listitem><para>User-Survey Relation (<emphasis>U--S Id, &d_uid;, Survey Id</emphasis>)</para></listitem>
 		</varlistentry>
 	</variablelist>
 	</para>

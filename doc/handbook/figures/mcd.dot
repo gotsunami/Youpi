@@ -9,20 +9,21 @@ graph mcd {
 	/* Entities */
 	node [shape=record];
 	calib [label="{ Calibration Kit | [ Calibration Kit Id ]\nName\nBad pixel mask\nFlat field }"];
-	cartitem [label="{ Cart Item | [ Cart Item Id ]\nName\nData }"];
+	cartitem [label="{ Cart Item | [ Cart Item Id ]\nName\nData\nMode }"];
 	channel [label="{ Channel | [ Channel Id ]\nName\nWavelength\nUrl\nWavecurve\nTranscurve\nMag offsets }"];
-	configfile [label="{ Config File | [ Config Id ]\nContent\nData }"];
+	configfile [label="{ Config File | [ Config Id ]\nContent\nData\nMode }"];
 	configtype [label="{ Config Type | [ Config Id ]\nName }"];
 	fitstables [label="{ FITS Tables | [ Name ]\nInstrument\nChannel\nRun\nQSO status\nObjet\nFitstable\nAbsorption\nAbsorption_err\nIs_phot }"];
 	image [label="{ Image | [ Image Id ]\nName\nSky Footprint\nPath\nAlpha\nDelta\nEquinox\nObject\nDate Obs\nExp time\nPhotc Header\nPhotc Custom\nPhotk\nAirmass\nAbsorption\nChecksum\nGain\nIngestion date\nFlat\nMask\nReg\nQSO status }"];
-	imageselections [label="{ Image selections | [ name ]\ndata }"];
-	ingestion [label="{ Ingestion | [ Ingestion Id ]\nLabel\nEmail\nPath\nCheck fitsverify\nCheck QSO status\nCheck multiple ingestion\nExit code\nReport }"];
+	imageselections [label="{ Image selections | [ name ]\nData\nMode }"];
+	ingestion [label="{ Ingestion | [ Ingestion Id ]\nLabel\nEmail\nPath\nCheck fitsverify\nCheck QSO status\nCheck multiple ingestion\nExit code\nReport\nMode }"];
 	instrument [label="{ Instrument | [ Instrument Id ]\nName\nTelescope\nUrl\nTimezone\nAltitude\nNchips\nAstrinstru key\nPhotinstru_key\nPath }"];
-	miscdata [label="{ Misc data | [ Key ]\nData }"];
+	miscdata [label="{ Misc data | [ Key ]\nData\nMode }"];
 	run [label="{ Run | [ Name ]\nPI\nUrl\nEmail\nProcess request date\nDate start\nDate end\nDate download\nRelease date }"];
 	survey [label="{ Survey | [ Name ]\nComment\nUrl}"];
 	authuser [label="{ User | (Django table auth_user) }", style=dashed];
-	task [label="{ Processing task | [ Id ]\nSuccess\nError Log\nHostname\nResults output directory\nTitle }"];
+	authgroup [label="{ Group | (Django table auth_group) }", style=dashed];
+	task [label="{ Processing task | [ Id ]\nSuccess\nError Log\nHostname\nResults output directory\nTitle\Mode }"];
 	processingkind [label="{ Processing kind | [ Internal name ]\nLabel }"];
 	pluginfitsin [label="{ FITSin plugin | [ Id ]\nAstoffra\nAstoffde\nAststdevra\nAststdevde\nAstrom accuracy\nPsfwhm min\nPsfwhm\nPsfwhm max\nPsfhld min\nPsfhld\nPsfhld max\nPsfel min\nPsfel\nPsfel max\nPsfchi2 min\nPsfchi2\nPsfchi2 max\nPsfresi min\nPsfresi\nPsfresi max\nPsfasym min\nPsfasym\nPsfasym max\nNstars min\nNstars\nNstars max\nBkg\nBkgstdev\nSatlev\nFlat Path\nMask Path\nRegion Path\nQualityFITS config\nResults Ingestion Log\nHTTP Url\nPrevious Release Grade\nPrevious Release Comment }"];
 	pluginfitsout [label="{ FITSout plugin | [ Id ] }"];
@@ -31,9 +32,9 @@ graph mcd {
 	pluginother [label="{ Other plugin | [ Id ]\n... }",style=dotted];
 	firstqcomment [label="{ First Quality Comment | [ Comment ]}"];
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
-	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style\nDefault Condor Setup}"];
+	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style\nDefault Condor Setup\nDefault Mode }"];
 	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection\nDate\nIs policy}"];
-	tag [label="{ Tag | [ Id ]\nName\nCSS Style\nComment}"];
+	tag [label="{ Tag | [ Id ]\nName\nCSS Style\nComment\nMode}"];
 
 	/* Relations */
 	node [shape=ellipse];
@@ -63,6 +64,9 @@ graph mcd {
 	node31 [label="is marked"];
 	node32 [label="{ defines | Date }", style=dashed, shape=Mrecord];
 	node33 [label="type"];
+	node34 [label="belongs to"];
+	node35 [label="is owned by"];
+	node36 [label="default group"];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
@@ -95,6 +99,15 @@ graph mcd {
 	image -- node13 [label="  0,1"];
 	node13 -- calib [label="  1,n"];
 
+	task -- node35 [label="  1,1", style=dashed];
+	tag -- node35 [label="  1,1", style=dashed];
+	cartitem -- node35 [label="  1,1", style=dashed];
+	configfile -- node35 [label="  1,1", style=dashed];
+	imageselections -- node35 [label="  1,1", style=dashed];
+	ingestion -- node35 [label="  1,1", style=dashed];
+	miscdata -- node35 [label="  1,1", style=dashed];
+	node35 -- authgroup [label="  0,n", style=dashed];
+
 	task -- node23 [label="  0,n"];
 	node23 -- pluginfitsin [label="  1,1"];
 	node23 -- pluginfitsout [label="  1,1"];
@@ -102,8 +115,13 @@ graph mcd {
 	node23 -- pluginswarp [label="  1,1"];
 	node23 -- pluginother [label="  1,1", style=dotted];
 
-	siteprofile -- node28 [label="  1, 1", style=dashed];
+	siteprofile -- node28 [label="  1,1", style=dashed];
+	siteprofile -- node36 [label="  0,1", style=dashed];
+	authgroup -- node36 [label="  0,n", style=dashed];
 	authuser -- node28 [label="  0,1", style=dashed];
+
+	authuser -- node34 [label=" 1,n", style=dashed];
+	node34 -- authgroup [label=" 0,n", style=dashed];
 
 	condornodesel -- node29 [label="  1,1", style=dashed];
 	authuser -- node29 [label="  0,n", style=dashed];

@@ -18,6 +18,8 @@ digraph codasyl {
 	relsi [label="Survey-Instrument Relation"];
 	relit [label="Image-Task Relation"];
 	relus [label="User-Survey Relation"];
+	relug [label="User-Group Relation", style=dashed];
+	relpg [label="Profile-Group Relation"];
 	reltagi [label="Tag-Image Relation"];
 	kind [label="Processing Kind"];
 	plugfitsin [label="FITSin Plugin"];
@@ -26,6 +28,7 @@ digraph codasyl {
 	plugswarp [label="SWARP Plugin"];
 	plugother [label="Other Plugin", style=dotted];
 	user [label="Django User", style=dashed];
+	group [label="Django Group", style=dashed];
 	miscdata [label="Misc Data"];
 	configfile [label="Config File"];
 	configtype [label="Config Type"];
@@ -64,9 +67,21 @@ digraph codasyl {
 	user -> siteprofile[style=dashed];
 	user -> condornodesel[style=dashed];
 	user -> relus[style=dashed];
+	user -> relug[style=dashed];
 	user -> Tag[style=dashed];
 	plugfitsin -> ingrading[style=dashed];
 	plugfitsout -> outgrading[style=dashed];
+
+	group -> task[style=dashed];
+	group -> Tag[style=dashed];
+	group -> carti[style=dashed];
+	group -> configfile[style=dashed];
+	group -> imgsel[style=dashed];
+	group -> Ingestion[style=dashed];
+	group -> miscdata[style=dashed];
+	group -> relug[style=dashed];
+	group -> relpg[style=dashed];
+	siteprofile -> relpg[style=dashed];
 	
 	Instrument -> Channel;
 	Instrument -> Run;

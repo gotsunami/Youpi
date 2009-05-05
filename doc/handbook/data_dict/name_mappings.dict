@@ -34,6 +34,7 @@ Run;<emphasis>youpi_run</emphasis>;<emphasis>Run</emphasis>
 Run-Image Relation;<emphasis>youpi_rel_ri</emphasis>;<emphasis>Rel_ri</emphasis>
 SCAMP Plugin;<emphasis>youpi_plugin_scamp</emphasis>;<emphasis>Plugin_scamp</emphasis>
 Site Profile;<emphasis>youpi_siteprofile</emphasis>;<emphasis>SiteProfile</emphasis>
+Site Profile-Group Relation;<emphasis>youpi_rel_pg</emphasis>;<emphasis>Rel_pg</emphasis>
 Survey;<emphasis>youpi_survey</emphasis>;<emphasis>Survey</emphasis>
 Survey-Instrument Relation;<emphasis>youpi_rel_si</emphasis>;<emphasis>Rel_si</emphasis>
 Tag;<emphasis>youpi_tag</emphasis>;<emphasis>Tag</emphasis>
