@@ -116,6 +116,12 @@ div.warning {
 	border: 2px solid #B0C4DE;
 }
 
+div.modal_warning {
+	background: transparent url('../img/34x34/warning.png') no-repeat top left;
+	padding: 10px;
+	padding-left: 50px;
+}
+
 div.lightTip {
 	padding: 2px;
 	color: brown;

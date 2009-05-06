@@ -867,7 +867,7 @@ function getQueryString(hash, strip) {
  * Provides some functions to notify user
  *
  */
-Notifier = {
+var Notifier = {
 	/*
 	 * Function: notify
 	 * Static popup message
@@ -936,7 +936,7 @@ Notifier = {
  * Namespace for plugin helper functions (for the results page)
  * 
  */
-ResultsHelpers = {
+var ResultsHelpers = {
 	/*
 	 * Function: getCondorJobLogsEntry
 	 * Builds and return a TABLE DOM element with info related to Condor job ID and log files, when available
@@ -1022,6 +1022,64 @@ ResultsHelpers = {
 		return tab;
 	}
 };
+
+/*
+ * Namespace: boxes
+ * Namespace for custom boxes using the Modalbox capabilities
+ * 
+ */
+var boxes = {
+	/*
+	 * Function: confirm
+	 * Display a modern JS confirm box
+	 *
+	 * Parameters:
+	 *  msg - string: message to display
+	 *  onAcceptHandler - function: callback executed when the 'Ok' button is clicked
+	 *  title - string: header title [optional]
+	 * 
+	 */
+	confirm: function(msg, onAcceptHandler, title) {
+		if (typeof msg != 'string')
+			throw "msg must be a string";
+		if (typeof onAcceptHandler != 'function')
+			throw "onAcceptHandler must be a function";
+		if (title && typeof title != 'string')
+			throw "title must be a string";
+
+		var title = title ? title : 'Confirm';
+		var d = new Element('div').addClassName('modal_warning');
+		var bd = new Element('div').setStyle({paddingTop: '10px', textAlign: 'right'});
+		var yesButton = new Element('input', {id: 'modalbox_ok_input', type: 'button', value: 'Ok'}).setStyle({marginRight: '20px'});
+		var noButton = new Element('input', {id: 'modalbox_cancel_input', type: 'button', value: 'Cancel'});
+		bd.insert(yesButton).insert(noButton);
+		d.update(msg);
+		d.insert(bd);
+
+		Modalbox.show(d, {
+			title: title, 
+			width: 300, 
+			overlayClose: false,
+			slideDownDuration: .25,
+			slideUpDuration: .25,
+			afterLoad: function() {
+				$('modalbox_ok_input').observe('click', function() { 
+					Modalbox.accept = true;
+					Modalbox.hide(); 
+				});
+				$('modalbox_cancel_input').observe('click', function() { 
+					Modalbox.accept = false;
+					Modalbox.hide(); 
+				});
+			},
+			afterHide: function() {
+				if (Modalbox.accept && onAcceptHandler)
+					onAcceptHandler();
+			}
+		});
+	}
+};
+
 
 // Monitors notify events
 document.observe('notifier:notify', function(event) {
