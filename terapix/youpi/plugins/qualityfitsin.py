@@ -95,8 +95,9 @@ class QualityFitsIn(ProcessingPlugin):
 				 'config' : config }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
+		profile = request.user.get_profile()
 		k = Processing_kind.objects.filter(name__exact = self.id)[0]
-		cItem = CartItem(kind = k, name = itemName, user = request.user)
+		cItem = CartItem(kind = k, name = itemName, user = request.user, mode = profile.dflt_mode, group = profile.dflt_group)
 		cItem.data = sdata
 		cItem.save()
 

@@ -292,6 +292,8 @@ def run_ingestion():
 		if script_args[i[0]] == 'yes':
 			i[1] = 1
 
+	res = g.execute("SELECT dflt_group_id, dflt_mode FROM youpi_siteprofile WHERE user_id=%d" % int(user_id))
+	perms = {'group_id': res[0][0], 'mode': res[0][1]}
 	try:
 		g.begin()
 		g.setTableName('youpi_ingestion')
@@ -304,6 +306,8 @@ def run_ingestion():
 					check_qso_status = vars[1][1],
 					check_multiple_ingestion = vars[2][1],
 					path = path,
+					group_id = perms['group_id'],
+					mode = perms['mode'],
 					exit_code = 0 )
 		ingestionId = g.con.insert_id()
 		g.con.commit()

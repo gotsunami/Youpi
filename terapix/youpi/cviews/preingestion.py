@@ -48,13 +48,14 @@ def processing_save_image_selection(request):
 	# Base64 encoding + marshal serialization
 	sList = base64.encodestring(marshal.dumps(idList)).replace('\n', NULLSTRING)
 
+	profile = request.user.get_profile()
 	try:
 		# Updates entry
 		imgSelEntry = ImageSelections.objects.filter(name = name)[0]
 		imgSelEntry.data = sList
 	except:
 		# ... or inserts a new one
-		imgSelEntry = ImageSelections(name = name, data = sList, user = request.user)
+		imgSelEntry = ImageSelections(name = name, data = sList, user = request.user, mode = profile.dflt_mode, group = profile.dflt_group)
 
 	imgSelEntry.save()
 
