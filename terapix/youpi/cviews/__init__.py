@@ -57,7 +57,7 @@ def profile(fn):
 			else:
 				grp = groups[0]
 
-			p = SiteProfile(user = user, dflt_group = grp)
+			p = SiteProfile(user = user, dflt_group = grp, dflt_mode = '640')
 			p.save()
 			# Adds default Condor config for that profile
 			pref_save_default_condor_config(user)
