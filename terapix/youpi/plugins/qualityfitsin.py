@@ -587,7 +587,7 @@ arguments                = %s /usr/local/bin/condor_transfert.pl /usr/local/bin/
 			# Add per-job custom environment variable
 			condor_submit_img_entries += """
 # YOUPI_USER_DATA = %s
-environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s""" %  (	userData, 
+environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%s""" %  (	userData, 
 																															FTP_URL + resultsOutputDir,
 																															base64.encodestring(marshal.dumps(userData)).replace('\n', '') ) 
 

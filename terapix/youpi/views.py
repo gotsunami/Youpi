@@ -126,6 +126,7 @@ def condor_setup(request):
 	Condor cluster setup
 	"""
 	return render_to_response('condorsetup.html', {	
+						'custom_condor_req' : request.user.get_profile().custom_condor_req,
 						'selected_entry_id'	: 'condorsetup', 
 					}, 
 					context_instance = RequestContext(request))

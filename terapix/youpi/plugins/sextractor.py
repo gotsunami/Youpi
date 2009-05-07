@@ -490,7 +490,7 @@ notify_user             = semah@iap.fr
 				condor_submit_entry = """
 arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(img)s,%(img2)s %(params)s -c %(config)s -PARAMETERS_NAME %(param)s
 # YOUPI_USER_DATA 		= %(userdata)s
-environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
+environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
 				'params'		: sex_params,
 				'img'			: path,
@@ -506,7 +506,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 				condor_submit_entry = """
 arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s -PARAMETERS_NAME %(param)s
 # YOUPI_USER_DATA 		= %(userdata)s
-environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(encuserdata)s
+environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData,
 				'params'		: sex_params,
 				'img'			: path,

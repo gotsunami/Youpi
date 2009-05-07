@@ -11,15 +11,4 @@
 #
 ##############################################################################
 
-from terapix.exceptions import FileNotFoundError
 import os.path
-
-def findPath(file):
-	for path in os.environ['PATH'].split(':'):
-		abspath = os.path.join(path, file)
-		if os.path.exists(abspath):
-			if os.path.isfile(abspath):
-				return path
-
-	raise FileNotFoundError, "File %s not found in paths: %s" % (file, os.environ['PATH'])
-

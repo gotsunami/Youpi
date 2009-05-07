@@ -128,7 +128,7 @@ class Skeleton(ProcessingPlugin):
 
 			args += """
 arguments 		= %(data)s %(command)s
-environment		= PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(data)s
+environment		= PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(data)s
 queue""" % ({
 	'data': encUserData, 
 	'command': self.command,
@@ -157,7 +157,7 @@ transfer_input_files    = %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 # YOUPI_USER_DATA = %(dataclear)s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%(dataenc)s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(dataenc)s
 log                     = %(log)s
 error                   = %(errlog)s
 output                  = %(outlog)s

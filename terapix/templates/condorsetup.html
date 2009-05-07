@@ -98,6 +98,14 @@ function show_save_current_selection() {
 						<div id="saved_sel_div" style="margin-bottom: 10px;"></div>	
 						<div id="save_sel_div">	
 						</div>						
+
+						<h1 style="margin-top: 20px; border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">
+						Custom Condor Requirements</h1>
+						<div class="tip" style="width: 80%;">You can add custom content to the Condor requirement string that will apply to all saved policies or selections.</div>
+						<textarea rows="6" style="width: 80%" id="custom_req_area">{% if custom_condor_req %}{{ custom_condor_req }}{% endif %}</textarea>
+						<div style="width: 80%; text-align: right;">
+							<input id="custom_req_save_input" type="button" value="Save!"/>
+						</div>
 					<td>
 				</tr>
 			</table>
@@ -117,5 +125,8 @@ function show_save_current_selection() {
 	condorPanel.showSavedSelections('saved_sel_div', true, function() { condorPanel.render(); });
 
 	show_save_current_selection();
+	$('custom_req_save_input').observe('click', function() {
+		console.log('toto');
+	});
 </script>
 {% endblock %}

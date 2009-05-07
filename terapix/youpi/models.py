@@ -617,8 +617,9 @@ class SiteProfile(models.Model):
 
 	# Current user GUI style
 	guistyle = models.CharField(max_length = 255, default = 'default')
-	# Serialized data (base64 encoding over marshal serialization)
 	dflt_condor_setup = models.TextField()
+	# Custom Condor requirements
+	custom_condor_req = models.TextField(null = True)
 	# Default chmod permissions (ex: 644)
 	dflt_mode = models.CharField(max_length = 3)
 

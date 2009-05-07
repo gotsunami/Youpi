@@ -13,8 +13,18 @@
 
 # Django settings for terapix project.
 
-from terapix.common import findPath
 import os, os.path
+
+# FIXME: move code
+class FileNotFoundError(Exception): pass
+def findPath(file):
+	for path in os.environ['PATH'].split(':'):
+		abspath = os.path.join(path, file)
+		if os.path.exists(abspath):
+			if os.path.isfile(abspath):
+				return path
+
+	raise FileNotFoundError, "File %s not found in paths: %s" % (file, os.environ['PATH'])
 
 #
 # Local configuration file (site specific)

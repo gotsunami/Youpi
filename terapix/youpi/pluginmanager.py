@@ -346,6 +346,10 @@ class ProcessingPlugin:
 			else:
 				req = get_requirement_string_from_selection(c_selection)
 
+		# Add any custom Condor requirements, if any
+		custom_req = request.user.get_profile().custom_condor_req
+		if custom_req: req = "%s && (%s))" % (req[:-1], custom_req)
+
 		return req
 
 	def deleteCartItem(self, request):
