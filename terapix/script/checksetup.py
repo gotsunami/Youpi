@@ -28,7 +28,6 @@ except ImportError:
 	print 'Please run this command from the terapix subdirectory.'
 	sys.exit(1)
 
-
 YOUPI_USER = 'youpiadm'
 
 class LoggerError(Exception): pass

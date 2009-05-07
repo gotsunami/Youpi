@@ -620,7 +620,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList)
-				pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
+				pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_submit %s 2>&1' % csfPath)) 
 				data = pipe.readlines()
 				pipe.close()
 				cluster_ids.append(self.getClusterId(data))
@@ -774,7 +774,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		except KeyError, e:
 			raise PluginError, 'Bad parameters'
 
-		pipe = os.popen("/opt/condor/bin/condor_q -xml")
+		pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_q -xml"))
 		data = pipe.readlines()
 		pipe.close()
 
@@ -864,7 +864,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		cluster = str(post['ClusterId'])
 		proc = str(post['ProcId'])
 
-		pipe = os.popen("/opt/condor/bin/condor_rm %s.%s" % (cluster, proc))
+		pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_rm %s.%s" % (cluster, proc)))
 		data = pipe.readlines()
 		pipe.close()
 

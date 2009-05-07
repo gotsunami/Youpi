@@ -18,6 +18,7 @@ import xml.dom.minidom as dom
 import base64, marshal
 #
 from terapix.youpi.models import *
+from terapix.settings import *
 
 def get_condor_status():
 	"""
@@ -28,7 +29,7 @@ def get_condor_status():
 	state is one of 'Idle' or 'Running'.
 	"""
 
-	pipe = os.popen("/opt/condor/bin/condor_status -xml")
+	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_status -xml'))
 	data = pipe.readlines()
 	pipe.close()
 

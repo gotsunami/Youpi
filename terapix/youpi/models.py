@@ -60,11 +60,6 @@ class Instrument(models.Model):
 	photinstru_key = models.CharField(max_length = 255,blank=True,null=True,help_text="")
 	path = models.CharField(max_length = 255,blank=True,null=True)
 
-	class Admin:
-		list_display = ('name','telescope')
-		fields = (('Technical Informations', {'fields':('name','telescope','url','timezone','altitude')}),
-			('Physical Informations',{'fields':('astrinstru_key','photinstru_key','nchips','path'),'classes': 'collapse'}),)
-
 	def __unicode__(self):
 		return self.name
 
@@ -82,12 +77,6 @@ class Run(models.Model):
 	# FKs constraints
 	instrument = models.ForeignKey(Instrument,db_column='instrument_id')
 
-	class Admin:
-		list_display = ('name','instrument')
-		list_filter = ('instrument',)
-		fields=(('Technical Informations ', {'fields':('name','instrument','pi','url','email')}),
-			('Date Informations ',{'fields':('processrequestdate','datestart','datend','datedownload','releasedate'),'classes': 'collapse'}),)
-
 	def __unicode__(self):
 		return self.name
 
@@ -102,12 +91,6 @@ class Channel(models.Model):
 	# FKs constraints
 	instrument = models.ForeignKey(Instrument)
 
-	class Admin:
-		list_display = ('name','instrument')
-		list_filter = ('instrument',)
-		fields = (('Technical Informations', {'fields':('instrument','name','url')}),
-			('Physical Informations',{'fields':('wavelength','wavecurve','transcurve','magoffsets'),'classes': 'collapse'}),)
-
 	def __unicode__(self):
 		return self.name
 
@@ -115,9 +98,6 @@ class CalibrationKit(models.Model):
 	name = models.CharField(max_length = 80,blank=True,null=True)
 	badpixelmask = models.CharField(max_length = 512,blank=True,null=True,help_text="")
 	flatfield = models.CharField(max_length = 512,blank=True,null=True,help_text="")
-
-	class Admin:
-		pass
 
 	class Meta:
 		verbose_name = "Calibration kit"
@@ -271,8 +251,6 @@ class Image(models.Model):
 		verbose_name = "Ingested image"
 		verbose_name_plural = "Ingested images"
 
-	class Admin:
-		pass
 
 	def __unicode__(self):
 		return self.name

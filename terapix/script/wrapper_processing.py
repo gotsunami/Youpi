@@ -50,7 +50,7 @@ def getJobClusterId(userData):
 	@returns cluster id string
 	"""
 
-	pipe = os.popen("/opt/condor/bin/condor_q -global -xml")
+	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_q -global -xml'))
 	data = pipe.readlines()
 	pipe.close()
 

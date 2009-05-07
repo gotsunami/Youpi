@@ -353,7 +353,7 @@ def get_live_monitoring(request, nextPage = -1):
 	then full data set is returned.
 	"""
 
-	pipe = os.popen("/opt/condor/bin/condor_q -xml")
+	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_q -xml'))
 	data = pipe.readlines()
 	pipe.close()
 
@@ -560,7 +560,7 @@ queue
 	f.write(condor_submit_file);
 	f.close();
 
-	job = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csf)
+	job = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csf))
 	job.close()
 
 	return HttpResponse(str({'Versions' : []}), mimetype = 'text/plain')
@@ -589,7 +589,7 @@ def job_cancel(request):
 		proc = str(post['ProcId'])
 		rmJobs = ["%s.%s" % (cluster, proc)]
 	
-	pipe = os.popen("/opt/condor/bin/condor_rm %s" % string.join(rmJobs, ' '))
+	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_rm %s" % string.join(rmJobs, ' ')))
 	data = pipe.readlines()
 	pipe.close()
 
@@ -675,7 +675,7 @@ queue
 
 	f.close()
 
-	job = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % (CONDORFILE + '_' + ingestionId))
+	job = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % (CONDORFILE + '_' + ingestionId)))
 	resp = job.readlines()
 	job.close()
 

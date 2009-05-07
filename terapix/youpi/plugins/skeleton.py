@@ -76,7 +76,7 @@ class Skeleton(ProcessingPlugin):
 
 		try:
 			csfPath = self.__getCondorSubmissionFile(request)
-			pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
+			pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
 			data = pipe.readlines()
 			pipe.close()
 			cluster_ids.append(self.getClusterId(data))
@@ -118,7 +118,6 @@ class Skeleton(ProcessingPlugin):
 
 		# Builds realtime Condor requirements string
 		req = self.getCondorRequirementString(request)
-
 
 		# Real command to perform here
 		args = ''

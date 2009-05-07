@@ -13,6 +13,7 @@
 
 # Django settings for terapix project.
 
+from terapix.common import findPath
 import os, os.path
 
 #
@@ -22,6 +23,9 @@ HOME 			= '/home/nis/semah/'
 TRUNK 			= os.path.join(HOME, 'youpi')
 APP_URL_PREFIX  = '/youpi'
 AUP				= APP_URL_PREFIX 	# For short
+#
+CONDOR_BIN_PATH = findPath('condor_q')
+#
 CONDORFILE 		= '/tmp/condor.greg'
 CONDOR_OUTPUT 	= '/tmp/condor.greg.out'
 CONDOR_ERROR 	= '/tmp/condor.greg.error'
@@ -47,7 +51,7 @@ IMS_MAX_PER_PAGE	= 50
 #
 # Software info (to get versioning information)
 #
-SOFTS = (	('Condor', 		'/opt/condor/bin/condor', 		# command
+SOFTS = (	('Condor', 		os.path.join(CONDOR_BIN_PATH, 'condor'), 		# command
 							'-v',							# argument to version version information 
 							'Version: (.*?) \w'),			# RegExp to retreive version number only
 			('MissFITS',	'/usr/local/bin/missfits', 

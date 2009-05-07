@@ -15,6 +15,7 @@
 class CondorSetupError(Exception): pass
 class CondorSubmitError(Exception): pass
 class PostDataError(Exception): pass
+class FileNotFoundError(Exception): pass
 #
 class PluginError(Exception): pass
 class PluginAllDataAlreadyProcessed(PluginError): pass

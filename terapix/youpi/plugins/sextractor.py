@@ -167,7 +167,7 @@ class Sextractor(ProcessingPlugin):
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList)
-				pipe = os.popen("/opt/condor/bin/condor_submit %s 2>&1" % csfPath) 
+				pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
 				data = pipe.readlines()
 				pipe.close()
 				cluster_ids.append(self.getClusterId(data))

@@ -18,6 +18,9 @@
 from django.contrib.auth.views import login
 from terapix.youpi.views import logout
 from django.conf.urls.defaults import *
+from django.contrib import admin
+
+admin.autodiscover()
 
 urlpatterns = patterns(
 	# Module that handles queries
@@ -130,7 +133,7 @@ urlpatterns = patterns(
 	(r'^youpi/autocompletion/(.*?)/(.*?)/$', 'autocomplete'),
 
     # Uncomment this for admin
-    (r'^youpi/admin/', include('django.contrib.admin.urls')),
+    (r'^youpi/admin/(.*)', admin.site.root),
 
 	# User authentication
     (r'^youpi/accounts/login/$', login),

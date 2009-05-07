@@ -14,7 +14,8 @@
 # vim: set ts=4
 
 from django.contrib import auth
-from django.contrib.auth.models import *
+from django.contrib.auth import views
+from django.contrib.auth.models import * 
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.db import models
 from django.shortcuts import render_to_response
@@ -1583,6 +1584,7 @@ def show_condor_log_file(request, kind, taskId):
 		data = 'Log file not found on server (has it been deleted?)'
 
 	return HttpResponse(str(data), mimetype = 'text/plain')
+
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'
