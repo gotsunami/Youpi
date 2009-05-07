@@ -13,7 +13,7 @@
 
 from django.db import models
 from django.contrib.gis.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 GRADE_A = 'A'
 GRADE_B = 'B'
@@ -116,9 +116,12 @@ class ImageSelections(models.Model):
 	# Serialized data (base64 encoding over marshal serialization)
 	data = models.TextField()
 	date = models.DateTimeField(auto_now_add = True)
+	# Default chmod permissions (ex: 644)
+	mode = models.CharField(max_length = 3)
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
+	group = models.ForeignKey(Group)
 	
 	class Meta:
 		verbose_name="Image selection"
@@ -151,9 +154,12 @@ class ConfigFile(models.Model):
 	# Serialized data (base64 encoding over marshal serialization)
 	data = models.TextField(null=True)
 	date = models.DateTimeField(auto_now_add = True)
+	# Default chmod permissions (ex: 644)
+	mode = models.CharField(max_length = 3)
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
+	group = models.ForeignKey(Group)
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
 	type = models.ForeignKey(ConfigType)
 	
@@ -175,10 +181,13 @@ class MiscData(models.Model):
 	# Serialized data (base64 encoding over marshal serialization)
 	data = models.TextField()
 	date = models.DateTimeField(auto_now_add = True)
+	# Default chmod permissions (ex: 644)
+	mode = models.CharField(max_length = 3)
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
-	
+	group = models.ForeignKey(Group)
+
 	class Meta:
 		unique_together = ('key', 'user')
 		verbose_name="Miscallenous data"
@@ -194,9 +203,12 @@ class CartItem(models.Model):
 	date = models.DateTimeField(auto_now_add = True)
 	# Serialized data (base64 encoding over marshal serialization)
 	data = models.TextField()
+	# Default chmod permissions (ex: 644)
+	mode = models.CharField(max_length = 3)
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
+	group = models.ForeignKey(Group)
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
 	
 	class Meta:
@@ -266,9 +278,12 @@ class Processing_task(models.Model):
 	results_output_dir = models.CharField(max_length = 255, null = False, help_text="Output directory for results")
 	title = models.CharField(max_length = 255, help_text="Processing task title")
 	clusterId = models.CharField(max_length = 255, help_text="Condor Job Cluster Id", null = True)
+	# Default chmod permissions (ex: 644)
+	mode = models.CharField(max_length = 3)
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
+	group = models.ForeignKey(Group)
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
 	
 	class Meta:
@@ -475,9 +490,12 @@ class Ingestion(models.Model):
 	exit_code = models.BooleanField('Exit code status', default=False, choices = ((False, 'Failure'), (True, 'Success')))
 	# Serialized data (base64 encoding over zlib compression)
 	report = models.TextField(blank = True, null = True)
+	# Default chmod permissions (ex: 644)
+	mode = models.CharField(max_length = 3)
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
+	group = models.ForeignKey(Group)
 
 	class Meta:
 		verbose_name="Ingestion"
@@ -521,8 +539,12 @@ class Tag(models.Model):
 	style = models.CharField(max_length = 255, help_text = 'Tag CSS style')
 	date = models.DateTimeField(auto_now_add = True)
 	comment = models.CharField(max_length = 255, help_text = 'Comment')
+	# Default chmod permissions (ex: 644)
+	mode = models.CharField(max_length = 3)
 
+	# FKs constraints
 	user = models.ForeignKey(User)
+	group = models.ForeignKey(Group)
 
 	class Meta:
 		permissions = (('can_edit_others', "Can edit others' tags"),)
@@ -597,8 +619,12 @@ class SiteProfile(models.Model):
 	guistyle = models.CharField(max_length = 255, default = 'default')
 	# Serialized data (base64 encoding over marshal serialization)
 	dflt_condor_setup = models.TextField()
+	# Default chmod permissions (ex: 644)
+	dflt_mode = models.CharField(max_length = 3)
 
+	# FKs
 	user = models.ForeignKey(User, unique = True)
+	dflt_group = models.ForeignKey(Group)
 
 class CondorNodeSel(models.Model):
 	"""

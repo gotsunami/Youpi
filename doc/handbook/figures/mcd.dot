@@ -9,20 +9,21 @@ graph mcd {
 	/* Entities */
 	node [shape=record];
 	calib [label="{ Calibration Kit | [ Calibration Kit Id ]\nName\nBad pixel mask\nFlat field }"];
-	cartitem [label="{ Cart Item | [ Cart Item Id ]\nName\nData }"];
+	cartitem [label="{ Cart Item | [ Cart Item Id ]\nName\nData\nMode }"];
 	channel [label="{ Channel | [ Channel Id ]\nName\nWavelength\nUrl\nWavecurve\nTranscurve\nMag offsets }"];
-	configfile [label="{ Config File | [ Config Id ]\nContent\nData }"];
+	configfile [label="{ Config File | [ Config Id ]\nContent\nData\nMode }"];
 	configtype [label="{ Config Type | [ Config Id ]\nName }"];
 	fitstables [label="{ FITS Tables | [ Name ]\nInstrument\nChannel\nRun\nQSO status\nObjet\nFitstable\nAbsorption\nAbsorption_err\nIs_phot }"];
 	image [label="{ Image | [ Image Id ]\nName\nSky Footprint\nPath\nAlpha\nDelta\nEquinox\nObject\nDate Obs\nExp time\nPhotc Header\nPhotc Custom\nPhotk\nAirmass\nAbsorption\nChecksum\nGain\nIngestion date\nFlat\nMask\nReg\nQSO status }"];
-	imageselections [label="{ Image selections | [ name ]\ndata }"];
-	ingestion [label="{ Ingestion | [ Ingestion Id ]\nLabel\nEmail\nPath\nCheck fitsverify\nCheck QSO status\nCheck multiple ingestion\nExit code\nReport }"];
+	imageselections [label="{ Image selections | [ name ]\nData\nMode }"];
+	ingestion [label="{ Ingestion | [ Ingestion Id ]\nLabel\nEmail\nPath\nCheck fitsverify\nCheck QSO status\nCheck multiple ingestion\nExit code\nReport\nMode }"];
 	instrument [label="{ Instrument | [ Instrument Id ]\nName\nTelescope\nUrl\nTimezone\nAltitude\nNchips\nAstrinstru key\nPhotinstru_key\nPath }"];
-	miscdata [label="{ Misc data | [ Key ]\nData }"];
+	miscdata [label="{ Misc data | [ Key ]\nData\nMode }"];
 	run [label="{ Run | [ Name ]\nPI\nUrl\nEmail\nProcess request date\nDate start\nDate end\nDate download\nRelease date }"];
 	survey [label="{ Survey | [ Name ]\nComment\nUrl}"];
-	authuser [label="{ User | (Django table auth_user) }", style=dashed];
-	task [label="{ Processing task | [ Id ]\nSuccess\nError Log\nHostname\nResults output directory\nTitle }"];
+	authuser [label="{ User | (Django table auth_user) }", style=dashed, color=green];
+	authgroup [label="{ Group | (Django table auth_group) }", style=dashed, color=brown];
+	task [label="{ Processing task | [ Id ]\nSuccess\nError Log\nHostname\nResults output directory\nTitle\nMode }"];
 	processingkind [label="{ Processing kind | [ Internal name ]\nLabel }"];
 	pluginfitsin [label="{ FITSin plugin | [ Id ]\nAstoffra\nAstoffde\nAststdevra\nAststdevde\nAstrom accuracy\nPsfwhm min\nPsfwhm\nPsfwhm max\nPsfhld min\nPsfhld\nPsfhld max\nPsfel min\nPsfel\nPsfel max\nPsfchi2 min\nPsfchi2\nPsfchi2 max\nPsfresi min\nPsfresi\nPsfresi max\nPsfasym min\nPsfasym\nPsfasym max\nNstars min\nNstars\nNstars max\nBkg\nBkgstdev\nSatlev\nFlat Path\nMask Path\nRegion Path\nQualityFITS config\nResults Ingestion Log\nHTTP Url\nPrevious Release Grade\nPrevious Release Comment }"];
 	pluginfitsout [label="{ FITSout plugin | [ Id ] }"];
@@ -31,9 +32,9 @@ graph mcd {
 	pluginother [label="{ Other plugin | [ Id ]\n... }",style=dotted];
 	firstqcomment [label="{ First Quality Comment | [ Comment ]}"];
 	finalqcomment [label="{ Final Quality Comment | [ Comment ]}"];
-	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style\nDefault Condor Setup}"];
+	siteprofile [label="{ Site profile | [ Profile Id ]\nGUI Style\nDefault Condor Setup\nDefault Mode }"];
 	condornodesel [label="{ Condor Selections | [ Sel Id ]\nLabel\nNode selection\nDate\nIs policy}"];
-	tag [label="{ Tag | [ Id ]\nName\nCSS Style\nComment}"];
+	tag [label="{ Tag | [ Id ]\nName\nCSS Style\nComment\nMode}"];
 
 	/* Relations */
 	node [shape=ellipse];
@@ -46,30 +47,33 @@ graph mcd {
 	node12 [label="observed through"];
 	node13 [label="processed with"];
 	node14 [label="is captured by"];
-	node15 [label="{ is run by | Start Time\nEnd Time}", style=dashed, shape=Mrecord];
+	node15 [label="{ is run by | Start Time\nEnd Time}", style=dashed, shape=Mrecord, color=green];
 	node17 [label="is processed by"];
-	node18 [label="{ is initiated by | Start Time\nEnd Time}", style=dashed, shape=Mrecord];
+	node18 [label="{ is initiated by | Start Time\nEnd Time}", style=dashed, shape=Mrecord, color=green];
 	node19 [label="kind"];
 	node21 [label="belongs to"];
-	node22 [label="{ belongs to | Creation Date}", style=dashed, shape=Mrecord];
+	node22 [label="{ belongs to | Creation Date}", style=dashed, shape=Mrecord, color=green];
 	node23 [label="processing results"];
-	node24 [label="{ first quality evaluation | Creation Date\nGrade\nCustom Comment }", style=dashed, shape=Mrecord];
-	node25 [label="{ final quality evaluation | Creation Date\nGrade\nCustom Comment }", style=dashed, shape=Mrecord];
+	node24 [label="{ first quality evaluation | Creation Date\nGrade\nCustom Comment }", style=dashed, shape=Mrecord, color=green];
+	node25 [label="{ final quality evaluation | Creation Date\nGrade\nCustom Comment }", style=dashed, shape=Mrecord, color=green];
 	node26 [label="predefined comments"];
 	node27 [label="predefined comments"];
-	node28 [label="has profile", style=dashed, shape=Mrecord];
-	node29 [label="defines", style=dashed, shape=Mrecord];
-	node30 [label="processes data", style=dashed, shape=Mrecord];
+	node28 [label="has profile", style=dashed, shape=Mrecord, color=green];
+	node29 [label="defines", style=dashed, shape=Mrecord, color=green];
+	node30 [label="processes data", style=dashed, shape=Mrecord, color=green];
 	node31 [label="is marked"];
-	node32 [label="{ defines | Date }", style=dashed, shape=Mrecord];
+	node32 [label="{ defines | Date }", style=dashed, shape=Mrecord, color=green];
 	node33 [label="type"];
+	node34 [label="belongs to", style=dashed, color=brown];
+	node35 [label="is owned by", style=dashed, color=brown];
+	node36 [label="has default group", style=dashed, color=brown];
 
 	/* Links */
 	run -- node4 [label="  1,n"];
 	node4 -- image [label="  1,n"]; 
 
-	authuser -- node30 [label="  0,n", style=dashed]; 
-	node30 -- survey [label="  1,n", style=dashed]; 
+	authuser -- node30 [label="  0,n", style=dashed, color=green]; 
+	node30 -- survey [label="  1,n", style=dashed, color=green]; 
 
 	instrument -- node5 [label="  0,n"]; 
 	node5 -- run [label="  1,1"]; 
@@ -95,6 +99,15 @@ graph mcd {
 	image -- node13 [label="  0,1"];
 	node13 -- calib [label="  1,n"];
 
+	task -- node35 [label="  1,1", style=dashed, color=brown];
+	tag -- node35 [label="  1,1", style=dashed, color=brown];
+	cartitem -- node35 [label="  1,1", style=dashed, color=brown];
+	configfile -- node35 [label="  1,1", style=dashed, color=brown];
+	imageselections -- node35 [label="  1,1", style=dashed, color=brown];
+	ingestion -- node35 [label="  1,1", style=dashed, color=brown];
+	miscdata -- node35 [label="  1,1", style=dashed, color=brown];
+	node35 -- authgroup [label="  0,n", style=dashed, color=brown];
+
 	task -- node23 [label="  0,n"];
 	node23 -- pluginfitsin [label="  1,1"];
 	node23 -- pluginfitsout [label="  1,1"];
@@ -102,17 +115,22 @@ graph mcd {
 	node23 -- pluginswarp [label="  1,1"];
 	node23 -- pluginother [label="  1,1", style=dotted];
 
-	siteprofile -- node28 [label="  1, 1", style=dashed];
-	authuser -- node28 [label="  0,1", style=dashed];
+	siteprofile -- node36 [label="  1,1", style=dashed, color=brown];
+	authgroup -- node36 [label="  0,n", style=dashed, color=brown];
+	authuser -- node28 [label="  0,1", style=dashed, color=green];
+	siteprofile -- node28 [label="  1,1", style=dashed, color=green];
 
-	condornodesel -- node29 [label="  1,1", style=dashed];
-	authuser -- node29 [label="  0,n", style=dashed];
+	authuser -- node34 [label=" 1,n", style=dashed, color=brown];
+	node34 -- authgroup [label=" 0,n", style=dashed, color=brown];
+
+	condornodesel -- node29 [label="  1,1", style=dashed, color=green];
+	authuser -- node29 [label="  0,n", style=dashed, color=green];
 
 	image -- node14 [label="  1,1"];
 	node14 -- instrument [label="  0,n"];
 
-	ingestion -- node15 [label="  1,1", style=dashed];
-	node15 -- authuser [label="  0,n", style=dashed];
+	ingestion -- node15 [label="  1,1", style=dashed, color=green];
+	node15 -- authuser [label="  0,n", style=dashed, color=green];
 
 	cartitem -- node22 [label="  1,1", style=dashed];
 	cartitem -- node21 [label="  1,1"];
@@ -120,8 +138,8 @@ graph mcd {
 	image -- node17 [label="  0,n"];
 	node17 -- task [label="  0,n"];
 
-	authuser -- node18 [label="  0,n", style=dashed];
-	node18 -- task [label="  1,1", style=dashed];
+	authuser -- node18 [label="  0,n", style=dashed, color=green];
+	node18 -- task [label="  1,1", style=dashed, color=green];
 
 	task -- node19 [label="  1,1"];
 	node19 -- processingkind [label="  0,n"];
@@ -129,22 +147,22 @@ graph mcd {
 	configfile -- node21 [label="  1,1"];
 	node21 -- processingkind [label="  0,n"];
 
-	configfile -- node22 [label="  1,1", style=dashed];
 	imageselections -- node22 [label="  1,1", style=dashed];
-	miscdata -- node22 [label="  1,1", style=dashed];
-	node22 -- authuser [label="  0,n", style=dashed];
+	miscdata -- node22 [label="  1,1", style=dashed, color=green];
+	node22 -- authuser [label="  0,n", style=dashed, color=green];
+	configfile -- node22 [label="  1,1", style=dashed, color=green];
 
 	configfile -- node33 [label="  1,1"];
 	configtype -- node33 [label="  0,n"];
 
-	authuser -- node32 [label="  0,n", style=dashed];
-	node32 -- tag [label="  1,1", style=dashed];
+	authuser -- node32 [label="  0,n", style=dashed, color=green];
+	node32 -- tag [label="  1,1", style=dashed, color=green];
 
-	authuser -- node24 [label="  0,n", style=dashed];
-	node24 -- pluginfitsin [label="  0,n", style=dashed];
+	authuser -- node24 [label="  0,n", style=dashed, color=green];
+	node24 -- pluginfitsin [label="  0,n", style=dashed, color=green];
 
-	authuser -- node25 [label="  0,n", style=dashed];
-	node25 -- pluginfitsout [label="  0,n", style=dashed];
+	authuser -- node25 [label="  0,n", style=dashed, color=green];
+	node25 -- pluginfitsout [label="  0,n", style=dashed, color=green];
 
 	node24 -- node26 [label="  1,1"];
 	node26 -- firstqcomment [label="  0,n"];

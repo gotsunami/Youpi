@@ -22,6 +22,8 @@
 	<!ENTITY appname_accro 	"<acronym>YOUpi is your processing PIpeline</acronym>">
 	<!ENTITY csf 						"Condor submission file">
 	<!ENTITY dj	 						"Django">
+	<!ENTITY d_uid	 				"Django User Id">
+	<!ENTITY d_gid	 				"Django Group Id">
 	<!ENTITY dom 						"<acronym>DOM	</acronym>">
 	<!ENTITY faq			 			"<acronym>FAQ</acronym>">
 	<!ENTITY fits			 			"<acronym>FITS</acronym>">

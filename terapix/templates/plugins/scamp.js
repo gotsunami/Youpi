@@ -463,11 +463,6 @@ var {{ plugin.id }} = {
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
 	
-		if (!silent) {
-			var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
-			if (!r) return;
-		}
-	
 		var r = new HttpRequest(
 				logdiv,
 				null,	
@@ -968,7 +963,11 @@ var {{ plugin.id }} = {
 						});
 						delImg.c_data = {trid: trid, name: res.name};
 						delImg.observe('click', function() {
-							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
+							var trid = this.c_data.trid;
+							var name = this.c_data.name;
+							boxes.confirm("Are you sure you want to delete saved item '" + name + "'?", function() {
+								{{ plugin.id }}.delSavedItem(trid, name);
+							});
 						});
 						td.insert(delImg);
 
@@ -998,9 +997,6 @@ var {{ plugin.id }} = {
 	},
 
 	delSavedItem: function(trid, name) {
-		var r = confirm("Are you sure you want to delete saved item '" + name + "'?");
-		if (!r) return;
-	
 		var trNode = $(trid);
 		var r = new HttpRequest(
 				uidscamp + '_result',

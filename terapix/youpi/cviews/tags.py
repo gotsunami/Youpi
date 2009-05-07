@@ -27,6 +27,8 @@ from terapix.youpi.cviews import *
 #
 from settings import *
 
+@login_required
+@profile
 def fetch_tags(request):
 	"""
 	Returns all available tags
@@ -37,6 +39,8 @@ def fetch_tags(request):
 
 	return HttpResponse(str({'tags' : data}), mimetype = 'text/plain')
 
+@login_required
+@profile
 def get_tag_info(request):
 	"""
 	Returns one tag's information or empty dictionnary if tag does not exist
@@ -63,6 +67,8 @@ def get_tag_info(request):
 
 	return HttpResponse(str({'info' : info}), mimetype = 'text/plain')
 
+@login_required
+@profile
 def get_images_from_tags(request):
 	"""
 	Returns list of matching images ids (formatted for Image Selector)
@@ -94,6 +100,8 @@ def get_images_from_tags(request):
 
 	return HttpResponse(str({'fields': ['id'], 'data': idList, 'hidden': ['']}), mimetype = 'text/plain')
 
+@login_required
+@profile
 def save_tag(request):
 	"""
 	Saves new tag to DB.
@@ -107,14 +115,17 @@ def save_tag(request):
 	except Exception, e:
 		return HttpResponseForbidden()
 
+	profile = request.user.get_profile()
 	try:
-		tag = Tag(name = name, user = request.user, comment = comment, style = style)
+		tag = Tag(name = name, user = request.user, comment = comment, style = style, mode = profile.dflt_mode, group = profile.dflt_group)
 		tag.save()
 	except Exception, e:
 		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 
 	return HttpResponse(str({'saved' : str(name)}), mimetype = 'text/plain')
 
+@login_required
+@profile
 def update_tag(request):
 	"""
 	Updates tag
@@ -139,6 +150,8 @@ def update_tag(request):
 
 	return HttpResponse(str({'updated' : str(name), 'oldname' : str(key)}), mimetype = 'text/plain')
 
+@login_required
+@profile
 def delete_tag(request):
 	"""
 	Deletes tag
@@ -159,6 +172,8 @@ def delete_tag(request):
 
 	return HttpResponse(str({'deleted' : str(name)}), mimetype = 'text/plain')
 
+@login_required
+@profile
 def tag_mark_images(request):
 	"""
 	Marks image(s) with tag(s)
@@ -194,6 +209,8 @@ def tag_mark_images(request):
 
 	return HttpResponse(str({'marked' : marked}), mimetype = 'text/plain')
 
+@login_required
+@profile
 def tag_unmark_images(request):
 	"""
 	Unmarks image(s) with tag(s)

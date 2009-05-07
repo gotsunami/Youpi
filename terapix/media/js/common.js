@@ -867,7 +867,7 @@ function getQueryString(hash, strip) {
  * Provides some functions to notify user
  *
  */
-Notifier = {
+var Notifier = {
 	/*
 	 * Function: notify
 	 * Static popup message
@@ -936,7 +936,7 @@ Notifier = {
  * Namespace for plugin helper functions (for the results page)
  * 
  */
-ResultsHelpers = {
+var ResultsHelpers = {
 	/*
 	 * Function: getCondorJobLogsEntry
 	 * Builds and return a TABLE DOM element with info related to Condor job ID and log files, when available
@@ -1022,6 +1022,167 @@ ResultsHelpers = {
 		return tab;
 	}
 };
+
+/*
+ * Namespace: boxes
+ * Namespace for custom boxes using the Modalbox capabilities
+ * 
+ */
+var boxes = {
+	/*
+	 * Function: confirm
+	 * Display a modern JS confirm box
+	 *
+	 * Parameters:
+	 *  msg - string: message to display
+	 *  onAcceptHandler - function: callback executed when the 'Ok' button is clicked
+	 *  title - string: header title [optional]
+	 * 
+	 */
+	confirm: function(msg, onAcceptHandler, title) {
+		if (typeof msg != 'string')
+			throw "msg must be a string";
+		if (typeof onAcceptHandler != 'function')
+			throw "onAcceptHandler must be a function";
+		if (title && typeof title != 'string')
+			throw "title must be a string";
+
+		var title = title ? title : 'Confirm';
+		var d = new Element('div').addClassName('modal_warning');
+		var bd = new Element('div').setStyle({paddingTop: '10px', textAlign: 'right'});
+		var yesButton = new Element('input', {id: 'modalbox_ok_input', type: 'button', value: 'Ok'}).setStyle({marginRight: '20px'});
+		var noButton = new Element('input', {id: 'modalbox_cancel_input', type: 'button', value: 'Cancel'});
+		bd.insert(yesButton).insert(noButton);
+		d.update(msg);
+		d.insert(bd);
+
+		Modalbox.show(d, {
+			title: title, 
+			width: 300, 
+			overlayClose: false,
+			slideDownDuration: .25,
+			slideUpDuration: .25,
+			afterLoad: function() {
+				$('modalbox_ok_input').observe('click', function() { 
+					Modalbox.accept = true;
+					Modalbox.hide(); 
+				});
+				$('modalbox_cancel_input').observe('click', function() { 
+					Modalbox.accept = false;
+					Modalbox.hide(); 
+				});
+			},
+			afterHide: function() {
+				if (Modalbox.accept && onAcceptHandler)
+					onAcceptHandler();
+			}
+		});
+	},
+
+	permissions: function(action) {
+		if (typeof action != 'string')
+			throw "action must be a string";
+
+		// Ajax resp
+		// FIXME
+		var groups = ['monnerville', 'Terapix', 'demo'];
+		var user = 'monnerville';
+		//
+		var title = 'User Permissions';
+		var d = new Element('div');
+		var bd = new Element('div').setStyle({paddingTop: '10px', textAlign: 'right'});
+		var yesButton = new Element('input', {id: 'modalbox_ok_input', type: 'button', value: 'Apply'}).setStyle({marginRight: '20px'});
+		var resetButton = new Element('input', {
+			id: 'modalbox_reset_input', 
+			title: 'Reset the form to your default permissions', 
+			type: 'button', 
+			value: 'Reset'
+		}).setStyle({marginRight: '20px'});
+		var noButton = new Element('input', {id: 'modalbox_cancel_input', type: 'button', value: 'Cancel'});
+		bd.insert(yesButton).insert(resetButton).insert(noButton);
+
+		var t = new Element('table').setStyle({width: '100%'});
+		var tr, td, th;
+		var r, w;
+
+		// Header
+		tr = new Element('tr').insert(new Element('th')).insert(new Element('th'));
+		th = new Element('th').update('Read');
+		tr.insert(th);
+		th = new Element('th').update('Write');
+		tr.insert(th);
+		t.insert(tr);
+
+		// User
+		tr = new Element('tr');
+		th = new Element('th').insert('User');
+		tr.insert(th);
+		td = new Element('td').insert(user);
+		tr.insert(td);
+		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked', disabled: 'disabled'}));
+		tr.insert(td);
+		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked'}));
+		tr.insert(td);
+		t.insert(tr);
+
+		// Group
+		tr = new Element('tr');
+		th = new Element('th').insert('Group');
+		tr.insert(th);
+		td = new Element('td').insert(getSelect('perm_group_select', groups));
+		tr.insert(td);
+		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked'}));
+		tr.insert(td);
+		td = new Element('td').insert(new Element('input', {type: 'checkbox'}));
+		tr.insert(td);
+		t.insert(tr);
+
+		// Others
+		tr = new Element('tr');
+		th = new Element('th').insert('Others');
+		tr.insert(th);
+		td = new Element('td').insert('All');
+		tr.insert(td);
+		td = new Element('td').insert(new Element('input', {type: 'checkbox'}));
+		tr.insert(td);
+		td = new Element('td').insert(new Element('input', {type: 'checkbox'}));
+		tr.insert(td);
+		t.insert(tr);
+
+		d.insert('You can use this form to define permissions related to data access:<br/>');
+		d.insert(t);
+		d.insert(bd);
+
+		Modalbox.validated = false;
+		Modalbox.show(d, {
+			title: title, 
+			overlayClose: false,
+			slideDownDuration: .25,
+			slideUpDuration: .25,
+			afterLoad: function() {
+				$('modalbox_ok_input').observe('click', function() { 
+					Modalbox.validated = true;
+					Modalbox.hide(); 
+				});
+				$('modalbox_reset_input').observe('click', function() { 
+					// Reset to user's default permissions
+					// FIXME
+				});
+				$('modalbox_cancel_input').observe('click', function() { 
+					Modalbox.hide(); 
+				});
+			},
+			afterHide: function() {
+				if (Modalbox.validated) {
+					// Update local permissions
+					// FIXME
+				}
+				console.log(Modalbox.validated);
+			}
+		});
+	}
+};
+
 
 // Monitors notify events
 document.observe('notifier:notify', function(event) {

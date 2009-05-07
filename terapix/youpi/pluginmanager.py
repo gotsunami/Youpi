@@ -197,6 +197,7 @@ class ProcessingPlugin:
 		except Exception, e:
 			raise PluginError, "Unable to save config file: no name given"
 
+		profile = request.user.get_profile()
 		t = ConfigType.objects.filter(name = type)[0]
 		try:
 			# Updates entry
@@ -205,12 +206,11 @@ class ProcessingPlugin:
 		except:
 			# ... or inserts a new one
 			k = Processing_kind.objects.filter(name__exact = self.id)[0]
-			m = ConfigFile(kind = k, name = name, content = config, user = request.user, type = t)
+			m = ConfigFile(kind = k, name = name, content = config, user = request.user, type = t, mode = profile.dflt_mode, group = profile.dflt_group)
 
 		m.save()
 
 		return name + ' saved'
-
 
 	def deleteConfigFile(self, request):
 		"""
@@ -414,7 +414,8 @@ class ProcessingPlugin:
 			# Inserts a new one
 			pathList = [str(path)]
 			sdata = base64.encodestring(marshal.dumps(pathList)).replace('\n', '')
-			m = MiscData(key = key, data = sdata, user = request.user)
+			profile = request.user.get_profile()
+			m = MiscData(key = key, data = sdata, user = request.user, mode = profile.dflt_mode, group = profile.dflt_group)
 
 		if canSave:
 			m.save()

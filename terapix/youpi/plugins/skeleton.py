@@ -81,9 +81,9 @@ class Skeleton(ProcessingPlugin):
 			pipe.close()
 			cluster_ids.append(self.getClusterId(data))
 		except CondorSubmitError, e:
-				condorError = str(e)
+			condorError = str(e)
 		except Exception, e:
-				error = "Error while processing item: %s" % e
+			error = "Error while processing item: %s" % e
 
 		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
@@ -259,8 +259,9 @@ notify_user             = monnerville@iap.fr
 				 'resultsOutputDir' : resultsOutputDir }
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
+		profile = request.user.get_profile()
 		k = Processing_kind.objects.filter(name__exact = self.id)[0]
-		cItem = CartItem(kind = k, name = itemName, user = request.user)
+		cItem = CartItem(kind = k, name = itemName, user = request.user, mode = profile.dflt_mode, group = profile.dflt_group)
 		cItem.data = sdata
 		cItem.save()
 

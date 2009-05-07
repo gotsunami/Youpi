@@ -253,6 +253,8 @@ def task_start_log(userData, start, kind_id = None):
 		except Exception, e:
 			raise WrapperError, e
 
+	res = g.execute("SELECT dflt_group_id, dflt_mode FROM youpi_siteprofile WHERE user_id=%d" % int(user_id))
+	perms = {'group_id': res[0][0], 'mode': res[0][1]}
 	try:
 		g.begin()
 		g.setTableName('youpi_processing_task')
@@ -264,6 +266,8 @@ def task_start_log(userData, start, kind_id = None):
 					title = userData['Descr'],
 					hostname = socket.getfqdn(),
 					results_output_dir = userData['ResultsOutputDir'],
+					group_id = perms['group_id'],
+					mode = perms['mode'],
 					success = 0 )
 		task_id = g.con.insert_id()
 	except Exception, e:
