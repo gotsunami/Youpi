@@ -104,6 +104,7 @@ function show_save_current_selection() {
 						<div class="tip" style="width: 80%;">You can add custom content to the Condor requirement string that will apply to all saved policies or selections.</div>
 						<textarea rows="6" style="width: 80%" id="custom_req_area">{% if custom_condor_req %}{{ custom_condor_req }}{% endif %}</textarea>
 						<div style="width: 80%; text-align: right;">
+							<div id="save_custom_req_log"></div>
 							<input id="custom_req_save_input" type="button" value="Save!"/>
 						</div>
 					<td>
@@ -126,7 +127,22 @@ function show_save_current_selection() {
 
 	show_save_current_selection();
 	$('custom_req_save_input').observe('click', function() {
-		console.log('toto');
+		var r = new HttpRequest(
+				'save_custom_req_log',
+				null,	
+				// Custom handler for results
+				function(resp) {
+					$('save_custom_req_log').update();
+					// Notify user
+					document.fire('notifier:notify', 'Custom condor requirement string successfully saved');
+				}
+		);
+	
+		var post = {
+			'Req': $('custom_req_area').value
+		};
+
+		r.send('/youpi/cluster/saveCustomReqStr/', $H(post).toQueryString());
 	});
 </script>
 {% endblock %}

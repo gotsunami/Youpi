@@ -48,6 +48,7 @@ urlpatterns = patterns(
 	(r'^youpi/cluster/getCondorPolicies/$', 'get_condor_policies'),
 	(r'^youpi/cluster/getPolicyData/$', 'get_policy_data'),
 	(r'^youpi/cluster/nodes/$', 'condor_hosts'),
+	(r'^youpi/cluster/saveCustomReqStr/$', 'save_condor_custom_reqstr'),
 	(r'^youpi/cluster/saveNodeSelection/$', 'save_condor_node_selection'),
 	(r'^youpi/cluster/savePolicy/$', 'save_condor_policy'),
 	(r'^youpi/cluster/softwares/$', 'condor_softs'),

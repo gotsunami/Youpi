@@ -1224,6 +1224,24 @@ def save_condor_policy(request):
 
 	return HttpResponse(str({'Label' : str(label), 'Policy' : str(serial)}), mimetype = 'text/plain')
 
+def save_condor_custom_reqstr(request):
+	"""
+	Save Condor custom requirement string
+	"""
+	try:
+		reqstr = request.POST['Req']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	try:
+		p = request.user.get_profile()
+		p.custom_condor_req = reqstr
+		p.save()
+	except Exception, e:
+		return HttpResponse(str({'Error' : "%s" % e}), mimetype = 'text/plain')
+
+	return HttpResponse(str({'Status' : str('saved')}), mimetype = 'text/plain')
+
 def del_condor_node_selection(request):
 	"""
 	Delete Condor node selection. 
