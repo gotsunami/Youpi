@@ -1113,9 +1113,9 @@ var boxes = {
 		tr.insert(th);
 		t.insert(tr);
 
-		// User
+		// Owner
 		tr = new Element('tr');
-		th = new Element('th').insert('User');
+		th = new Element('th').insert('Owner');
 		tr.insert(th);
 		td = new Element('td').insert(user);
 		tr.insert(td);

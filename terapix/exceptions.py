@@ -23,3 +23,6 @@ class PluginManagerError(PluginError): pass
 #
 # For debugging
 class DebugError(Exception): pass
+#
+class PermissionsError(Exception): pass
+class PermissionsConvertError(PermissionsError): pass

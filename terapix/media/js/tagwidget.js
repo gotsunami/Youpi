@@ -145,6 +145,8 @@ function TagWidget(container, name) {
 			owner: null, 
 			style: 'background-color: brown; color: white', 
 			comment: null,
+			mode: null,
+			isOwner: false
 		});
 
 		_update();
@@ -183,6 +185,36 @@ function TagWidget(container, name) {
 		}
 
 		_attrs.update({comment: msg});
+	}
+
+	/*
+	 * Function: setMode
+	 * Sets permissions mode
+	 *
+	 * Parameters:
+	 *  msg - string
+	 *
+	 */ 
+	this.setMode = function(msg) {
+		if (typeof msg != 'string') {
+			throw "setMode expects a string!";
+			return;
+		}
+
+		_attrs.update({mode: msg});
+	}
+
+	/*
+	 * Function: setIsOwner
+	 * Sets if user is tag's owner
+	 *
+	 * Parameters:
+	 *  own - boolean
+	 *
+	 */ 
+	this.setIsOwner = function(own) {
+		var own = (own == 1 || own == true) ? true : false;
+		_attrs.update({isOwner: own});
 	}
 
 	/*

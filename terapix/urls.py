@@ -81,6 +81,10 @@ urlpatterns = patterns(
 	(r'^youpi/tags/unmark/$', 'tag_unmark_images'),
 	(r'^youpi/tags/images/$', 'get_images_from_tags'),
 
+	# Permissions
+	(r'^youpi/permissions/get/$', 'get_permissions'),
+	(r'^youpi/permissions/set/$', 'set_permissions'),
+
 	# Prefs and docs
 	(r'^youpi/preferences/$', 'preferences'),
 	(r'^youpi/preferences/theme/set/$', 'set_current_theme'),

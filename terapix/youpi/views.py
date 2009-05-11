@@ -1604,6 +1604,50 @@ def show_condor_log_file(request, kind, taskId):
 
 	return HttpResponse(str(data), mimetype = 'text/plain')
 
+@login_required
+@profile
+def get_permissions(request):
+	"""
+	Returns permissions for a given entity.
+	The return value is a JSON object like:
+
+	{'user' : {'read': true, 'write': true},
+	 'group': {'read': true, 'write': false},
+	 'others': {'read': false, 'write': false}}
+	"""
+
+	post = request.POST
+	try:
+		# Target entity
+		target = post['Target']
+		# Unique key to identify an element in table
+		key = post['Key']
+	except Exception, e:
+		raise PluginError, "POST argument error. Unable to process data."
+
+
+	return HttpResponse(str({'logs': logs, 'sizes': sizes}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def set_permissions(request):
+	"""
+	Sets permissions for a given entity.
+	The return value is a JSON object like:
+	"""
+
+	post = request.POST
+	try:
+		# Target entity
+		target = post['Target']
+		# Unique key to identify an element in table
+		key = post['Key']
+		# New perms to apply
+		perms = post['Perms']
+	except Exception, e:
+		raise PluginError, "POST argument error. Unable to process data."
+
+	return HttpResponse(str({'logs': logs, 'sizes': sizes}), mimetype = 'text/plain')
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'

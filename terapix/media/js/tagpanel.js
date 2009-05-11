@@ -19,6 +19,7 @@
  *
  * Dependancies:
  *  <TagWidget> module, <StylePicker> module.
+ *  common.js (boxes.permissions)
  *
  * Constructor Parameters:
  *  container - string or DOM object: name of parent DOM block container
@@ -177,7 +178,7 @@ function TagPanel(container) {
 		td.insert(inp);
 		tr.insert(td);
 		tab.insert(tr);
-
+		
 		if (data.get('style')) {
 			// Owner
 			tr = new Element('tr');
@@ -187,6 +188,26 @@ function TagPanel(container) {
 			tr.insert(td);
 
 			td = new Element('td').update(data.get('owner'));
+			tr.insert(td);
+			tab.insert(tr);
+			
+			// Permissions
+			tr = new Element('tr');
+			td = new Element('td');
+			lab = new Element('label').update('Permissions:');
+			td.insert(lab);
+			tr.insert(td);
+
+			td = new Element('td');
+			td.insert(data.get('mode'));
+			if (data.get('isOwner')) {
+				td.insert(' (');
+				var a = new Element('a', {href: '#'}).update('Change');
+				a.observe('click', function() {
+					boxes.permissions('toto');
+				});
+				td.insert(a).insert(')');
+			}
 			tr.insert(td);
 			tab.insert(tr);
 
@@ -520,6 +541,8 @@ function TagPanel(container) {
 			t.setOwner(tag.username);
 			t.setCreationDate(tag.date);
 			t.setEditable(true);
+			t.setMode(tag.mode);
+			t.setIsOwner(tag.isOwner);
 			t.update();
 			// Use it _after_ update() call so that Draggable instance
 			// can overwrite CSS properties
