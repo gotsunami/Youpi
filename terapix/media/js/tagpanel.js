@@ -198,17 +198,34 @@ function TagPanel(container) {
 			td.insert(lab);
 			tr.insert(td);
 
-			td = new Element('td');
-			td.insert(data.get('mode'));
-			if (data.get('isOwner')) {
-				td.insert(' (');
-				var a = new Element('a', {href: '#'}).update('Change');
-				a.observe('click', function() {
-					boxes.permissions('toto');
-				});
-				td.insert(a).insert(')');
-			}
-			tr.insert(td);
+			var ptd = new Element('td');
+			var post = {
+				Target: 'tag',
+				Key: data.get('name')
+			};
+			var pr = new HttpRequest(
+				null,
+				null,
+				function(r) {
+					if (r.Error) {
+						return;
+					}
+					ptd.insert(r.mode);
+					if (r.isOwner) {
+						ptd.insert(' (');
+						var a = new Element('a', {href: '#'}).update('Change');
+						a.observe('click', function() {
+							boxes.permissions(post.Target, post.Key, r.perms, {username: r.username, groupname: r.groupname, groups: r.groups});
+						});
+						ptd.insert(a).insert(')');
+					}
+				}
+			);
+
+			// Get tag permissions
+			pr.send('/youpi/permissions/get/', $H(post).toQueryString());
+
+			tr.insert(ptd);
 			tab.insert(tr);
 
 			// Creation date
@@ -541,8 +558,6 @@ function TagPanel(container) {
 			t.setOwner(tag.username);
 			t.setCreationDate(tag.date);
 			t.setEditable(true);
-			t.setMode(tag.mode);
-			t.setIsOwner(tag.isOwner);
 			t.update();
 			// Use it _after_ update() call so that Draggable instance
 			// can overwrite CSS properties

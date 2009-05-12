@@ -24,7 +24,6 @@ from django.template import RequestContext
 #
 from terapix.youpi.models import *
 from terapix.youpi.cviews import *
-from terapix.youpi.auth import Permissions
 #
 from settings import *
 
@@ -40,8 +39,6 @@ def fetch_tags(request):
 				'style': str(tag.style), 
 				'comment': str(tag.comment), 
 				'username': str(tag.user.username), 
-				'isOwner': int(request.user == tag.user),
-				'mode': "%s" % Permissions(tag.mode),
 				'date': str(tag.date)} 
 			for tag in tags] 
 

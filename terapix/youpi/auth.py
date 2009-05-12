@@ -68,7 +68,11 @@ class Permissions:
 		"""
 		Permissions instance to JSON conversion
 		"""
-		print 'toto'
+		return {
+			'user' : {'read': int(self.user.read), 'write': int(self.user.write)}, 
+			'group' : {'read': int(self.group.read), 'write': int(self.group.write)}, 
+			'others' : {'read': int(self.others.read), 'write': int(self.others.write)}
+		}
 
 	def toOctal(self):
 		"""

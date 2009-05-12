@@ -1079,14 +1079,32 @@ var boxes = {
 		});
 	},
 
-	permissions: function(action) {
-		if (typeof action != 'string')
-			throw "action must be a string";
+	/*
+	 * Function: permissions
+	 * Display a permissions box
+	 *
+	 * Parameters:
+	 *  target - string: entity name
+	 *  key - string: key used to find a match
+	 *  perms - object: user permissions for this object
+	 *  userInfo - object: additional information
+	 * 
+	 * Notes:
+	 *  The following format must be used:
+	 *  
+	 *  perms format: {user: {read: bool, write: bool}, group: {read: bool, write: bool}, others: {read: bool, write: bool}}
+	 *  userInfo format: {username: <string>, groupname: <string>, groups: <array>}
+	 *
+	 */
+	permissions: function(target, key, perms, userInfo) {
+		if (typeof target != 'string' || typeof key != 'string')
+			throw "Target and key must be strings";
 
-		// Ajax resp
-		// FIXME
-		var groups = ['monnerville', 'Terapix', 'demo'];
-		var user = 'monnerville';
+		if (typeof perms != 'object' || typeof userInfo != 'object')
+			throw "perms and userInfo must be objects";
+
+		console.log($H(perms).inspect());
+
 		//
 		var title = 'User Permissions';
 		var d = new Element('div');
@@ -1117,7 +1135,7 @@ var boxes = {
 		tr = new Element('tr');
 		th = new Element('th').insert('Owner');
 		tr.insert(th);
-		td = new Element('td').insert(user);
+		td = new Element('td').insert(userInfo.username);
 		tr.insert(td);
 		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked', disabled: 'disabled'}));
 		tr.insert(td);
@@ -1129,7 +1147,7 @@ var boxes = {
 		tr = new Element('tr');
 		th = new Element('th').insert('Group');
 		tr.insert(th);
-		td = new Element('td').insert(getSelect('perm_group_select', groups));
+		td = new Element('td').insert(getSelect('perm_group_select', userInfo.groups));
 		tr.insert(td);
 		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked'}));
 		tr.insert(td);

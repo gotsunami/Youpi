@@ -26,6 +26,7 @@ from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 #
 from terapix.youpi.models import *
+from terapix.youpi.auth import Permissions
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 from terapix.script.ingestion import getNowDateTime
@@ -1625,8 +1626,24 @@ def get_permissions(request):
 	except Exception, e:
 		raise PluginError, "POST argument error. Unable to process data."
 
+	isOwner = False
+	if target == 'tag':
+		tag = Tag.objects.filter(name = key)[0]
+		perms = Permissions(tag.mode)
+		groupname = tag.group.name
+		if tag.user == request.user: isOwner = True
 
-	return HttpResponse(str({'logs': logs, 'sizes': sizes}), mimetype = 'text/plain')
+	# User groups
+	groups = [str(g.name) for g in request.user.groups.all()]
+
+	return HttpResponse(str({
+		'mode'		: str(perms), 
+		'perms'		: perms.toJSON(), 
+		'isOwner'	: int(isOwner),
+		'username'	: str(request.user.username),
+		'groupname'	: str(groupname),
+		'groups'	: groups,
+	}), mimetype = 'text/plain')
 
 @login_required
 @profile
