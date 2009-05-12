@@ -1118,81 +1118,87 @@ var boxes = {
 		var noButton = new Element('input', {id: 'modalbox_cancel_input', type: 'button', value: 'Cancel'});
 		bd.insert(yesButton).insert(resetButton).insert(noButton);
 
-		var t = new Element('table').setStyle({width: '100%'});
-		var tr, td, th;
-		var r, w;
+		function update_table(userInfo, perms) {
+			var t = new Element('table').setStyle({width: '100%'});
+			var tr, td, th;
+			var r, w;
 
-		// Header
-		tr = new Element('tr').insert(new Element('th')).insert(new Element('th'));
-		th = new Element('th').update('Read');
-		tr.insert(th);
-		th = new Element('th').update('Write');
-		tr.insert(th);
-		t.insert(tr);
+			// Header
+			tr = new Element('tr').insert(new Element('th')).insert(new Element('th'));
+			th = new Element('th').update('Read');
+			tr.insert(th);
+			th = new Element('th').update('Write');
+			tr.insert(th);
+			t.insert(tr);
 
-		var chk;
-		// Owner
-		tr = new Element('tr');
-		th = new Element('th').insert('Owner');
-		tr.insert(th);
-		td = new Element('td').insert(userInfo.username);
-		tr.insert(td);
-		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked', disabled: 'disabled'}));
-		tr.insert(td);
-		td = new Element('td');
-		chk = new Element('input', {type: 'checkbox'});
-		if (perms.user.write) chk.writeAttribute('checked', 'checked');
-		td.insert(chk);
-		tr.insert(td);
-		t.insert(tr);
+			var chk;
+			// Owner
+			tr = new Element('tr');
+			th = new Element('th').insert('Owner');
+			tr.insert(th);
+			td = new Element('td').insert(userInfo.username);
+			tr.insert(td);
+			td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked', disabled: 'disabled'}));
+			tr.insert(td);
+			td = new Element('td');
+			chk = new Element('input', {type: 'checkbox'});
+			if (perms.user.write) chk.writeAttribute('checked', 'checked');
+			td.insert(chk);
+			tr.insert(td);
+			t.insert(tr);
 
-		// Group
-		tr = new Element('tr');
-		th = new Element('th').insert('Group');
-		tr.insert(th);
-		var gsel = getSelect('perm_group_select', userInfo.groups);
-		gsel.select('option').each(function(opt) {
-			if (opt.value == userInfo.groupname)
-				opt.writeAttribute('selected', 'selected');
-		});
-		td = new Element('td').insert(gsel);
-		tr.insert(td);
+			// Group
+			tr = new Element('tr');
+			th = new Element('th').insert('Group');
+			tr.insert(th);
+			var gsel = getSelect('perm_group_select', userInfo.groups);
+			gsel.select('option').each(function(opt) {
+				if (opt.value == userInfo.groupname)
+					opt.writeAttribute('selected', 'selected');
+			});
+			td = new Element('td').insert(gsel);
+			tr.insert(td);
 
-		td = new Element('td');
-		chk = new Element('input', {type: 'checkbox'});
-		if (perms.group.read) chk.writeAttribute('checked', 'checked');
-		td.insert(chk);
-		tr.insert(td);
+			td = new Element('td');
+			chk = new Element('input', {type: 'checkbox'});
+			if (perms.group.read) chk.writeAttribute('checked', 'checked');
+			td.insert(chk);
+			tr.insert(td);
 
-		td = new Element('td');
-		chk = new Element('input', {type: 'checkbox'});
-		if (perms.group.write) chk.writeAttribute('checked', 'checked');
-		td.insert(chk);
-		tr.insert(td);
-		t.insert(tr);
+			td = new Element('td');
+			chk = new Element('input', {type: 'checkbox'});
+			if (perms.group.write) chk.writeAttribute('checked', 'checked');
+			td.insert(chk);
+			tr.insert(td);
+			t.insert(tr);
 
-		// Others
-		tr = new Element('tr');
-		th = new Element('th').insert('Others');
-		tr.insert(th);
-		td = new Element('td').insert('All');
-		tr.insert(td);
+			// Others
+			tr = new Element('tr');
+			th = new Element('th').insert('Others');
+			tr.insert(th);
+			td = new Element('td').insert('All');
+			tr.insert(td);
 
-		td = new Element('td');
-		chk = new Element('input', {type: 'checkbox'});
-		if (perms.others.read) chk.writeAttribute('checked', 'checked');
-		td.insert(chk);
-		tr.insert(td);
+			td = new Element('td');
+			chk = new Element('input', {type: 'checkbox'});
+			if (perms.others.read) chk.writeAttribute('checked', 'checked');
+			td.insert(chk);
+			tr.insert(td);
 
-		td = new Element('td');
-		chk = new Element('input', {type: 'checkbox'});
-		if (perms.others.write) chk.writeAttribute('checked', 'checked');
-		td.insert(chk);
-		tr.insert(td);
-		t.insert(tr);
+			td = new Element('td');
+			chk = new Element('input', {type: 'checkbox'});
+			if (perms.others.write) chk.writeAttribute('checked', 'checked');
+			td.insert(chk);
+			tr.insert(td);
+			t.insert(tr);
+
+			return t;
+		}
 
 		d.insert('You can use this form to define permissions related to data access:<br/>');
-		d.insert(t);
+		var tdiv = new Element('div', {id: 'modalbox_tab_div'});
+		tdiv.update(update_table(userInfo, perms));
+		d.insert(tdiv);
 		d.insert(bd);
 
 		Modalbox.validated = false;
@@ -1203,17 +1209,53 @@ var boxes = {
 			slideUpDuration: .25,
 			afterLoad: function() {
 				$('modalbox_ok_input').observe('click', function() { 
-					Modalbox.validated = true;
-					Modalbox.hide(); 
+					// Apply permissions
+					checks = $('modalbox_tab_div').select('input[type=checkbox]');
+					// Default mask fofr user/group/others r/w permissions
+					vals = [1, 0, 0, 0, 0, 0];
+					checks.each(function(chk, k) {
+						if (chk.checked) vals[k] = 1;
+					});
+					var pr = new HttpRequest(
+						null,
+						null,
+						function(r) {
+							if (r.Error) return;
+							Modalbox.hide();
+						}
+					);
+					var post = {
+						Target: target,
+						Key: key,
+						Perms: vals.join(',')
+					};
+						
+					pr.send('/youpi/permissions/set/', $H(post).toQueryString());
+					
+					//Modalbox.hide(); 
 				});
 				$('modalbox_reset_input').observe('click', function() { 
 					// Reset to user's default permissions
-					// FIXME
+					// Gets default user permissions
+					var pr = new HttpRequest(
+						null,
+						null,
+						function(r) {
+							if (r.Error) {
+								return;
+							}
+							userInfo.groupname = r.default_group;
+							$('modalbox_tab_div').update(update_table(userInfo, r.perms));
+						}
+					);
+					pr.send('/youpi/permissions/default/');
+					Modalbox.validated = true;
 				});
 				$('modalbox_cancel_input').observe('click', function() { 
 					Modalbox.hide(); 
 				});
 			},
+			/*
 			afterHide: function() {
 				if (Modalbox.validated) {
 					// Update local permissions
@@ -1221,6 +1263,7 @@ var boxes = {
 				}
 				console.log(Modalbox.validated);
 			}
+			*/
 		});
 	}
 };

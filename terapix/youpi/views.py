@@ -1651,6 +1651,7 @@ def set_permissions(request):
 	"""
 	Sets permissions for a given entity.
 	The return value is a JSON object like:
+	Perms is a string like: 1,1,1,0,0,0 specifying read/write bits for user/group/others respectively
 	"""
 
 	post = request.POST
@@ -1664,7 +1665,44 @@ def set_permissions(request):
 	except Exception, e:
 		raise PluginError, "POST argument error. Unable to process data."
 
-	return HttpResponse(str({'logs': logs, 'sizes': sizes}), mimetype = 'text/plain')
+	isOwner = False
+	error = ''
+	if target == 'tag':
+		tag = Tag.objects.filter(name = key)[0]
+		if tag.user != request.user:
+			error = 'Operation Not Allowed'
+		else:
+			perms = [int(i) for i in perms.split(',')]
+			# Owner can always read
+			u = 4
+			g = o = 0
+			if perms[1] == 1: u += 2
+			# Group
+			if perms[2] == 1: g += 4
+			if perms[3] == 1: g += 2
+			# Others
+			if perms[4] == 1: o += 4
+			if perms[5] == 1: o += 2
+			
+			tag.mode = "%d%d%d" % (u, g, o)
+			tag.save()
+
+	return HttpResponse(str({'Error': str(error), 'Mode': str(tag.mode)}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def get_user_default_permissions(request):
+	"""
+	Returns user default permissions
+	{'default_mode': <mode>, 'default_group': <group>'}
+	"""
+
+	p = request.user.get_profile()
+
+	return HttpResponse(str({
+		'perms'	: Permissions(p.dflt_mode).toJSON(),
+		'default_group'	: str(p.dflt_group),
+	}), mimetype = 'text/plain')
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'

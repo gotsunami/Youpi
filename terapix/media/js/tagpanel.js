@@ -102,6 +102,12 @@ function TagPanel(container) {
 	 *
 	 */
 	var _oldTagData = null;
+	/*
+	 * Var: _currentTagName
+	 * Current tag name being edited
+	 *
+	 */
+	var _currentTagName = null;
 
 
 	// Group: Functions
@@ -124,6 +130,7 @@ function TagPanel(container) {
 		else
 			_oldTagData = data;
 
+		_currentTagName = data.get('name');
 		_editDiv.update();
 		var f = new Element('form', {'class': 'tagform'});
 		var tab = new Element('table');
@@ -198,35 +205,8 @@ function TagPanel(container) {
 			td.insert(lab);
 			tr.insert(td);
 
-			var ptd = new Element('td');
-			var post = {
-				Target: 'tag',
-				Key: data.get('name')
-			};
-			var pr = new HttpRequest(
-				null,
-				null,
-				function(r) {
-					if (r.Error) {
-						return;
-					}
-					ptd.insert(r.mode);
-					if (r.isOwner) {
-						ptd.insert(' (');
-						var a = new Element('a', {href: '#'}).update('Change');
-						a.observe('click', function() {
-							boxes.permissions(post.Target, post.Key, 
-								r.perms, 
-								{username: r.username, groupname: r.groupname, groups: r.groups},
-								'Set your permissions for tag ' + data.get('name'));
-						});
-						ptd.insert(a).insert(')');
-					}
-				}
-			);
-
-			// Get tag permissions
-			pr.send('/youpi/permissions/get/', $H(post).toQueryString());
+			var ptd = new Element('td', {id: 'tag_edit_perms_td'});
+			_updatePermissionsArea(ptd);
 
 			tr.insert(ptd);
 			tab.insert(tr);
@@ -317,6 +297,42 @@ function TagPanel(container) {
 			};
 			var au = new _bsn.AutoSuggest(_id + 'tag_name_input', options);
 		}
+	}
+
+	/*
+	 * Function: _updatePermissionsArea
+	 * Update permissions on the screen
+	 *
+	 */ 
+	function _updatePermissionsArea(container) {
+		var post = {
+			Target: 'tag',
+			Key: _currentTagName
+		};
+		var pr = new HttpRequest(
+			null,
+			null,
+			function(r) {
+				if (r.Error) {
+					return;
+				}
+				container.update(r.mode);
+				if (r.isOwner) {
+					container.insert(' (');
+					var a = new Element('a', {href: '#'}).update('Change');
+					a.observe('click', function() {
+						boxes.permissions(post.Target, post.Key, 
+							r.perms, 
+							{username: r.username, groupname: r.groupname, groups: r.groups},
+							'Set your permissions for tag ' + _currentTagName);
+					});
+					container.insert(a).insert(')');
+				}
+			}
+		);
+
+		// Get tag permissions
+		pr.send('/youpi/permissions/get/', $H(post).toQueryString());
 	}
 
 	/*
@@ -664,6 +680,8 @@ function TagPanel(container) {
 			_showEditForm(event.memo);
 		});
 
+		document.observe('permissions:updated', function(event) {
+		});
 	}
 
 	_render();

@@ -534,7 +534,6 @@ class Fitstables(models.Model):
 		unique_together = [('name', 'run', 'fitstable')]
 
 class Tag(models.Model):
-
 	name = models.CharField(max_length = 255, blank = False, null = False, unique = True, help_text = 'Tag name')
 	style = models.CharField(max_length = 255, help_text = 'Tag CSS style')
 	date = models.DateTimeField(auto_now_add = True)

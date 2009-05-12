@@ -84,6 +84,7 @@ urlpatterns = patterns(
 	# Permissions
 	(r'^youpi/permissions/get/$', 'get_permissions'),
 	(r'^youpi/permissions/set/$', 'set_permissions'),
+	(r'^youpi/permissions/default/$', 'get_user_default_permissions'),
 
 	# Prefs and docs
 	(r'^youpi/preferences/$', 'preferences'),
