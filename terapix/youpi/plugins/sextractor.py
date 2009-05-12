@@ -252,8 +252,8 @@ class Sextractor(ProcessingPlugin):
 				contconf = str(zlib.decompress(base64.decodestring(config.config)))
 				contparam = str(zlib.decompress(base64.decodestring(param.param)))
 			else:
-				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
-				param = ManageFile.objects.filter(kind__name__exact = self.id, name = param)[0]
+				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config, type__name__exact = 'config')[0]
+				param = ConfigFile.objects.filter(kind__name__exact = self.id, name = param, type__name__exact = 'param')[0]
 				contconf = config.content
 				contparam = param.content
 
@@ -342,8 +342,8 @@ notify_user             = semah@iap.fr
 		'settings' 		: submit_file_path, 
 		'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
 		'config' 		: customrc,
-		'param' 		: custompc,
 		'nop' 			: submit_file_path, 
+		'param' 		: custompc,
 		'initdir' 		: os.path.join(submit_file_path, 'script'),
 		'mandpath' 		: os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
 		'requirements' 	: req }

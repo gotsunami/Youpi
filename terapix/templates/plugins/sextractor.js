@@ -75,7 +75,7 @@ var {{ plugin.id }} = {
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		//Get parameter file
-		var pSel = $(uidsex + '_parameter_name_select');
+		var pSel = $(uidsex + '_param_name_select');
 		var param = pSel.options[pSel.selectedIndex].text;
 
 		//Gets custom output directory
@@ -542,6 +542,9 @@ var {{ plugin.id }} = {
 		tr.insert(td);
 		tab2.insert(tr);
 	
+		var configbox = new DropdownBox(td, 'Toggle Sex configuration file view');
+		$(configbox.getContentNode()).insert(cdiv);
+
 		// param file
 		tr = new Element('tr');
 		td = new Element('td', {colspan: 2});
@@ -558,7 +561,7 @@ var {{ plugin.id }} = {
 		tab2.insert(tr);
 
 		var parambox = new DropdownBox(td, 'Toggle Sex parameters file view');
-		$(confbox.getContentNode()).insert(cdiv);
+		$(parambox.getContentNode()).insert(cdiv);
 	
 		// Error log file when failure
 		if (!resp['Success']) {
