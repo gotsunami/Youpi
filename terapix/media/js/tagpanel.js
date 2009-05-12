@@ -215,7 +215,10 @@ function TagPanel(container) {
 						ptd.insert(' (');
 						var a = new Element('a', {href: '#'}).update('Change');
 						a.observe('click', function() {
-							boxes.permissions(post.Target, post.Key, r.perms, {username: r.username, groupname: r.groupname, groups: r.groups});
+							boxes.permissions(post.Target, post.Key, 
+								r.perms, 
+								{username: r.username, groupname: r.groupname, groups: r.groups},
+								'Set your permissions for tag ' + data.get('name'));
 						});
 						ptd.insert(a).insert(')');
 					}

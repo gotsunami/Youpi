@@ -1088,6 +1088,7 @@ var boxes = {
 	 *  key - string: key used to find a match
 	 *  perms - object: user permissions for this object
 	 *  userInfo - object: additional information
+	 *  title - string: optional title message
 	 * 
 	 * Notes:
 	 *  The following format must be used:
@@ -1096,17 +1097,15 @@ var boxes = {
 	 *  userInfo format: {username: <string>, groupname: <string>, groups: <array>}
 	 *
 	 */
-	permissions: function(target, key, perms, userInfo) {
+	permissions: function(target, key, perms, userInfo, title) {
 		if (typeof target != 'string' || typeof key != 'string')
 			throw "Target and key must be strings";
 
 		if (typeof perms != 'object' || typeof userInfo != 'object')
 			throw "perms and userInfo must be objects";
 
-		console.log($H(perms).inspect());
-
 		//
-		var title = 'User Permissions';
+		var title = typeof title == 'string' ? title : 'User Permissions';
 		var d = new Element('div');
 		var bd = new Element('div').setStyle({paddingTop: '10px', textAlign: 'right'});
 		var yesButton = new Element('input', {id: 'modalbox_ok_input', type: 'button', value: 'Apply'}).setStyle({marginRight: '20px'});
@@ -1131,6 +1130,7 @@ var boxes = {
 		tr.insert(th);
 		t.insert(tr);
 
+		var chk;
 		// Owner
 		tr = new Element('tr');
 		th = new Element('th').insert('Owner');
@@ -1139,7 +1139,10 @@ var boxes = {
 		tr.insert(td);
 		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked', disabled: 'disabled'}));
 		tr.insert(td);
-		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked'}));
+		td = new Element('td');
+		chk = new Element('input', {type: 'checkbox'});
+		if (perms.user.write) chk.writeAttribute('checked', 'checked');
+		td.insert(chk);
 		tr.insert(td);
 		t.insert(tr);
 
@@ -1147,11 +1150,24 @@ var boxes = {
 		tr = new Element('tr');
 		th = new Element('th').insert('Group');
 		tr.insert(th);
-		td = new Element('td').insert(getSelect('perm_group_select', userInfo.groups));
+		var gsel = getSelect('perm_group_select', userInfo.groups);
+		gsel.select('option').each(function(opt) {
+			if (opt.value == userInfo.groupname)
+				opt.writeAttribute('selected', 'selected');
+		});
+		td = new Element('td').insert(gsel);
 		tr.insert(td);
-		td = new Element('td').insert(new Element('input', {type: 'checkbox', checked: 'checked'}));
+
+		td = new Element('td');
+		chk = new Element('input', {type: 'checkbox'});
+		if (perms.group.read) chk.writeAttribute('checked', 'checked');
+		td.insert(chk);
 		tr.insert(td);
-		td = new Element('td').insert(new Element('input', {type: 'checkbox'}));
+
+		td = new Element('td');
+		chk = new Element('input', {type: 'checkbox'});
+		if (perms.group.write) chk.writeAttribute('checked', 'checked');
+		td.insert(chk);
 		tr.insert(td);
 		t.insert(tr);
 
@@ -1161,9 +1177,17 @@ var boxes = {
 		tr.insert(th);
 		td = new Element('td').insert('All');
 		tr.insert(td);
-		td = new Element('td').insert(new Element('input', {type: 'checkbox'}));
+
+		td = new Element('td');
+		chk = new Element('input', {type: 'checkbox'});
+		if (perms.others.read) chk.writeAttribute('checked', 'checked');
+		td.insert(chk);
 		tr.insert(td);
-		td = new Element('td').insert(new Element('input', {type: 'checkbox'}));
+
+		td = new Element('td');
+		chk = new Element('input', {type: 'checkbox'});
+		if (perms.others.write) chk.writeAttribute('checked', 'checked');
+		td.insert(chk);
 		tr.insert(td);
 		t.insert(tr);
 
