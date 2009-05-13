@@ -24,7 +24,9 @@ from django.template import RequestContext
 #
 from terapix.youpi.models import *
 from terapix.youpi.cviews import *
+from terapix.youpi.auth import *
 #
+import cjson as json
 from settings import *
 
 @login_required
@@ -34,15 +36,15 @@ def fetch_tags(request):
 	Returns all available tags
 	"""
 
-	tags = Tag.objects.all().order_by('name')
-	data = [{	'name': str(tag.name), 
-				'style': str(tag.style), 
-				'comment': str(tag.comment), 
-				'username': str(tag.user.username), 
-				'date': str(tag.date)} 
+	tags, filtered = read_proxy(request, Tag.objects.all().order_by('name'))
+	data = [{	'name'		: tag.name, 
+				'style'		: tag.style, 
+				'comment'	: tag.comment, 
+				'username'	: tag.user.username, 
+				'date'		: str(tag.date)} 
 			for tag in tags] 
 
-	return HttpResponse(str({'tags' : data}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'tags' : data}), mimetype = 'text/plain')
 
 @login_required
 @profile
@@ -61,16 +63,16 @@ def get_tag_info(request):
 	if tag:
 		tag = tag[0]
 		info = {
-			'name': str(tag.name),
-			'style': str(tag.style),
-			'date': str(tag.date),
-			'comment': str(tag.comment),
-			'username': str(tag.user.username),
+			'name'		: tag.name,
+			'style'		: tag.style,
+			'date'		: str(tag.date),
+			'comment'	: tag.comment,
+			'username'	: tag.user.username,
 		}
 	else:
 		info = {}
 
-	return HttpResponse(str({'info' : info}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'info' : info}), mimetype = 'text/plain')
 
 @login_required
 @profile

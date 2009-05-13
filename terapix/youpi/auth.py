@@ -7,14 +7,18 @@
 # This program is Free Software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.  # ##############################################################################
+# of the License, or (at your option) any later version.  
+# ##############################################################################
 
 """
 Set of functions to deal with authentication within Youpi.
 """
 
+from django.db import models
+#
 import re
 from terapix.exceptions import *
+from types import *
 
 bits_range = [0, 2, 4, 6]
 
@@ -121,3 +125,51 @@ class Permissions:
 	def __repr__(self):
 		return "<Permission %s: %s>" % (self.toOctal(), self.__get_unix_mode())
 
+
+def read_proxy(request, results):
+	"""
+	Read permissions proxy.
+
+	Deals with Youpi's permissions tranparently by returning appropriate 
+	content. Use it from your views by encapsulating your Django model queries:
+
+	Instead of writing:
+	tags = Tag.objects.all()
+
+	Write instead:
+	tags, filtered = read_proxy(request, Tag.objects.all())
+
+	@param request Django request instance
+	@param results Django's query QuerySet
+	@return A tuple (subset, filtered)
+	"""
+
+	if type(results) != models.query.QuerySet:
+		raise TypeError, 'Result set must be a Django QuerySet'
+
+	if not results: return results
+	if not isinstance(results[0], models.Model):
+		raise TypeError, 'Must be a list of Django Model instances'
+
+	try:
+		m = results[0].mode
+	except AttributeError, e:
+		raise PermissionsError, 'This result set does not support permissions'
+
+	allow = []
+	filtered = False
+	for r in results:
+		p = Permissions(r.mode)
+		if not p.others.read:
+			if r.user == request.user and p.user.read: 
+				allow.append(r)
+				continue
+			if r.group in request.user.groups.all() and p.group.read: 
+				allow.append(r)
+				continue
+		else:
+			allow.append(r)
+		# Access not granted
+		filtered = True
+		
+	return allow, filtered
