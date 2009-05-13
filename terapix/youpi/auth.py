@@ -19,12 +19,9 @@ from terapix.exceptions import *
 bits_range = [0, 2, 4, 6]
 
 class Permissions:
-	class user:
-		read = write = False
-	class group:
-		read = write = False
-	class others:
-		read = write = False
+	class user: pass
+	class group: pass
+	class others: pass
 
 	def __init__(self, mode):
 		self.mode = mode
@@ -45,6 +42,10 @@ class Permissions:
 		
 		if False in [m in bits_range for m in bits]:
 			raise PermissionsConvertError, 'Mode bit must be one of 0, 2, 4, 6'
+
+		self.user.read = self.user.write = False
+		self.group.read = self.group.write = False
+		self.others.read = self.others.write = False
 
 		# User
 		if bits[0] == 4 or bits[0] == 6:

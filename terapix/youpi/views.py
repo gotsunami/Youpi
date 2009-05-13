@@ -1662,30 +1662,38 @@ def set_permissions(request):
 		key = post['Key']
 		# New perms to apply
 		perms = post['Perms']
+		group = post['Group']
 	except Exception, e:
 		raise PluginError, "POST argument error. Unable to process data."
 
+	# Deserialize perms
+	perms = [int(i) for i in perms.split(',')]
+	# Owner can always read
+	u = 4
+	g = o = 0
+	if perms[1] == 1: u += 2
+	# Group
+	if perms[2] == 1: g += 4
+	if perms[3] == 1: g += 2
+	# Others
+	if perms[4] == 1: o += 4
+	if perms[5] == 1: o += 2
+	perms = "%d%d%d" % (u, g, o)
+
+	group = Group.objects.filter(name = group)[0]
 	isOwner = False
 	error = ''
+
 	if target == 'tag':
 		tag = Tag.objects.filter(name = key)[0]
 		if tag.user != request.user:
 			error = 'Operation Not Allowed'
 		else:
-			perms = [int(i) for i in perms.split(',')]
-			# Owner can always read
-			u = 4
-			g = o = 0
-			if perms[1] == 1: u += 2
-			# Group
-			if perms[2] == 1: g += 4
-			if perms[3] == 1: g += 2
-			# Others
-			if perms[4] == 1: o += 4
-			if perms[5] == 1: o += 2
-			
-			tag.mode = "%d%d%d" % (u, g, o)
+			tag.mode = perms
+			tag.group = group
 			tag.save()
+	else:
+		error = 'Cannot set permission for this item'
 
 	return HttpResponse(str({'Error': str(error), 'Mode': str(tag.mode)}), mimetype = 'text/plain')
 

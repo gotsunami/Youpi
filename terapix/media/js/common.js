@@ -1221,13 +1221,21 @@ var boxes = {
 						null,
 						function(r) {
 							if (r.Error) return;
+							// Notify permissions changes
+							document.fire('permissions:updated');
 							Modalbox.hide();
 						}
 					);
+
+					var newgrp;
+					$('perm_group_select').select('option').each(function(opt) {
+						if (opt.selected) newgrp = opt.value;
+					});
 					var post = {
 						Target: target,
 						Key: key,
-						Perms: vals.join(',')
+						Perms: vals.join(','),
+						Group: newgrp
 					};
 						
 					pr.send('/youpi/permissions/set/', $H(post).toQueryString());
@@ -1254,16 +1262,7 @@ var boxes = {
 				$('modalbox_cancel_input').observe('click', function() { 
 					Modalbox.hide(); 
 				});
-			},
-			/*
-			afterHide: function() {
-				if (Modalbox.validated) {
-					// Update local permissions
-					// FIXME
-				}
-				console.log(Modalbox.validated);
 			}
-			*/
 		});
 	}
 };

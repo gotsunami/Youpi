@@ -187,17 +187,6 @@ function TagPanel(container) {
 		tab.insert(tr);
 		
 		if (data.get('style')) {
-			// Owner
-			tr = new Element('tr');
-			td = new Element('td');
-			lab = new Element('label').update('Owner:');
-			td.insert(lab);
-			tr.insert(td);
-
-			td = new Element('td').update(data.get('owner'));
-			tr.insert(td);
-			tab.insert(tr);
-			
 			// Permissions
 			tr = new Element('tr');
 			td = new Element('td');
@@ -316,7 +305,9 @@ function TagPanel(container) {
 				if (r.Error) {
 					return;
 				}
-				container.update(r.mode);
+
+				container.update(r.username).insert('/').insert(r.groupname).insert(new Element('br'));
+				container.insert(r.mode);
 				if (r.isOwner) {
 					container.insert(' (');
 					var a = new Element('a', {href: '#'}).update('Change');
@@ -681,6 +672,7 @@ function TagPanel(container) {
 		});
 
 		document.observe('permissions:updated', function(event) {
+			_updatePermissionsArea($('tag_edit_perms_td'));
 		});
 	}
 
