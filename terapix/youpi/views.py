@@ -31,6 +31,7 @@ from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 from terapix.script.ingestion import getNowDateTime
 #
+import cjson as json
 import MySQLdb, pyfits
 import pprint, re, glob, string
 import math, md5, random
@@ -1636,12 +1637,12 @@ def get_permissions(request):
 	# User groups
 	groups = [str(g.name) for g in request.user.groups.all()]
 
-	return HttpResponse(str({
+	return HttpResponse(json.encode({
 		'mode'		: str(perms), 
 		'perms'		: perms.toJSON(), 
-		'isOwner'	: int(isOwner),
-		'username'	: str(tag.user.username),
-		'groupname'	: str(groupname),
+		'isOwner'	: isOwner,
+		'username'	: tag.user.username,
+		'groupname'	: groupname,
 		'groups'	: groups,
 	}), mimetype = 'text/plain')
 
@@ -1695,7 +1696,7 @@ def set_permissions(request):
 	else:
 		error = 'Cannot set permission for this item'
 
-	return HttpResponse(str({'Error': str(error), 'Mode': str(tag.mode)}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'Error': error, 'Mode': tag.mode}), mimetype = 'text/plain')
 
 @login_required
 @profile
