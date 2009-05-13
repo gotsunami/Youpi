@@ -1640,7 +1640,7 @@ def get_permissions(request):
 		'mode'		: str(perms), 
 		'perms'		: perms.toJSON(), 
 		'isOwner'	: int(isOwner),
-		'username'	: str(request.user.username),
+		'username'	: str(tag.user.username),
 		'groupname'	: str(groupname),
 		'groups'	: groups,
 	}), mimetype = 'text/plain')
