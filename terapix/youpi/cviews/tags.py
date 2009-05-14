@@ -151,11 +151,11 @@ def update_tag(request):
 		tag.name = name
 		tag.comment = comment
 		tag.style = style
-		tag.save()
+		success = write_proxy(request, tag)
 	except Exception, e:
 		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 
-	return HttpResponse(str({'updated' : str(name), 'oldname' : str(key)}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'updated': name, 'oldname': key, 'success': success}), mimetype = 'text/plain')
 
 @login_required
 @profile
@@ -171,13 +171,11 @@ def delete_tag(request):
 
 	try:
 		tag = Tag.objects.filter(name__exact = name)[0]
-		tag.delete()
-		# FIXME
-		# Delete associations in youpi_rel_tagi
+		success = write_proxy(request, tag, delete = True)
 	except Exception, e:
 		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 
-	return HttpResponse(str({'deleted' : str(name)}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'success': success, 'deleted' : name}), mimetype = 'text/plain')
 
 @login_required
 @profile
