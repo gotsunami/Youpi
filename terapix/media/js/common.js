@@ -1301,12 +1301,14 @@ var boxes = {
  * Parameters:
  *  target - string: entity
  *  key - string
+ *  handler - function: callback function [optional]
  *
  * Returns:
  *  container DOM element
  *
  */ 
-function get_permissions(target, key) {
+function get_permissions(target, key, handler) {
+	var handler = typeof(handler) == 'function' ? handler : null;
 	var post = {
 		Target: target,
 		Key: key
@@ -1336,6 +1338,7 @@ function get_permissions(target, key) {
 				});
 				container.insert(a).insert(')');
 			}
+			if (handler) handler(r);
 		}
 	);
 
