@@ -185,6 +185,7 @@ function TagPanel(container) {
 		td.insert(inp);
 		tr.insert(td);
 		tab.insert(tr);
+		var buttd = new Element('td', {colspan: 2}).setStyle({textAlign: 'right'});
 		
 		if (data.get('style')) {
 			// Permissions
@@ -195,7 +196,16 @@ function TagPanel(container) {
 			tr.insert(td);
 
 			var ptd = new Element('td');
-			ptd.insert(get_permissions('tag', _currentTagName));
+			ptd.insert(get_permissions('tag', _currentTagName, function(resp) {
+				if (resp.currentUser.write) {
+					// Display appropriate buttons
+					var delb = new Element('input', {type: 'button', value: 'Delete', style: 'margin-right: 10px'});
+					delb.observe('click', _deleteTag);
+					var upb = new Element('input', {type: 'button', value: 'Update'});
+					upb.observe('click', _updateTag);
+					buttd.insert(delb).insert(upb);
+				}
+			}));
 
 			tr.insert(ptd);
 			tab.insert(tr);
@@ -225,29 +235,20 @@ function TagPanel(container) {
 
 		// Buttons
 		tr = new Element('tr');
-		td = new Element('td', {colspan: 2}).setStyle({textAlign: 'right'});
-		var addb = new Element('input', {type: 'button', value: data.get('style') ? 'Update' : 'Add'});
-		addb.observe('click', function() {
-			data.get('style') ? _updateTag() : _saveTag();
-		});
-
 		var cancelb = new Element('input', {type: 'button', value: 'Cancel', style: 'margin-right: 10px'});
 		cancelb.observe('click', function() {
 			_editDiv.slideUp();
 			$(_id + 'add_new_span').appear();
 		});
-		td.insert(cancelb);
+		buttd.insert(cancelb);
 
-		if (data.get('style')) {
-			var delb = new Element('input', {type: 'button', value: 'Delete', style: 'margin-right: 10px'});
-			delb.observe('click', function() {
-				_deleteTag();
-			});
-			td.insert(delb);
+		if (!data.get('style')) {
+			var addb = new Element('input', {type: 'button', value: 'Add'});
+			addb.observe('click', _saveTag);
+			buttd.insert(addb);
 		}
 
-		td.insert(addb);
-		tr.insert(td);
+		tr.insert(buttd);
 		tab.insert(tr);
 
 		f.insert(tab);
