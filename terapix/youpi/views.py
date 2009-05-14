@@ -1638,14 +1638,28 @@ def get_permissions(request):
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
 	perms = Permissions(ent.mode)
+	isOwner = ent.user == request.user
+	groups = [g.name for g in request.user.groups.all()]
+
+	# Current user permissions
+	cuser_read = cuser_write = False
+	if (isOwner and perms.user.read) or \
+		(ent.group.name in groups and perms.group.read) or \
+		perms.others.read:
+		cuser_read = True
+	if (isOwner and perms.user.write) or \
+		(ent.group.name in groups and perms.group.write) or \
+		perms.others.write:
+		cuser_write = True
 
 	return HttpResponse(json.encode({
-		'mode'		: str(perms), 
-		'perms'		: perms.toJSON(), 
-		'isOwner'	: ent.user == request.user,
-		'username'	: ent.user.username,
-		'groupname'	: ent.group.name,
-		'groups'	: [g.name for g in request.user.groups.all()]
+		'mode'			: str(perms), 
+		'perms'			: perms.toJSON(), 
+		'isOwner'		: isOwner,
+		'username'		: ent.user.username,
+		'groupname'		: ent.group.name,
+		'groups'		: groups,
+		'currentUser' 	: {'read': cuser_read, 'write': cuser_write},
 	}), mimetype = 'text/plain')
 
 @login_required
