@@ -454,6 +454,15 @@ function ProcessingHistoryWidget(container) {
 				}
 				*/
 
+				// Notify user that results are filtered
+				if (resp.filtered) {
+					var msg = 'Please note that some of the results are filtered! (no read permission)';
+					document.fire('notifier:notify', msg);
+					var rdiv = new Element('div').addClassName('reprocess');
+					rdiv.update(msg);
+					container.insert(rdiv);
+				}
+
 				// Process custom plugin header for results, if any
 				resp.ExtraHeader ? $(_id + 'plugin_header_div').update(resp.ExtraHeader).show() : $(_id + 'plugin_header_div').hide();
 

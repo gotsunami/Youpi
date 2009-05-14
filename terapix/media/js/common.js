@@ -1314,7 +1314,7 @@ function get_permissions(target, key) {
 
 	var container = new Element('div', {id: 'user_permissions_div'});
 	var pr = new HttpRequest(
-		null,
+		container,
 		null,
 		function(r) {
 			if (r.Error) {

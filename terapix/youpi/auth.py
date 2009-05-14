@@ -147,7 +147,7 @@ def read_proxy(request, results):
 	if type(results) != models.query.QuerySet:
 		raise TypeError, 'Result set must be a Django QuerySet'
 
-	if not results: return results
+	if not results: return results, False
 	if not isinstance(results[0], models.Model):
 		raise TypeError, 'Must be a list of Django Model instances'
 
@@ -169,7 +169,9 @@ def read_proxy(request, results):
 				continue
 		else:
 			allow.append(r)
+			continue
 		# Access not granted
 		filtered = True
 		
 	return allow, filtered
+

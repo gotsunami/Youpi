@@ -22,9 +22,9 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbi
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 #
-from terapix.youpi.models import *
-from terapix.youpi.cviews import *
 from terapix.youpi.auth import *
+from terapix.youpi.cviews import *
+from terapix.youpi.models import *
 #
 import cjson as json
 from settings import *

@@ -11,6 +11,7 @@
 #
 ##############################################################################
 
+import cjson as json
 import MySQLdb, pyfits
 import pprint, re, glob, string
 import math, md5, random
@@ -29,6 +30,7 @@ from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 from django.contrib.auth.models import User
 #
+from terapix.youpi.auth import *
 from terapix.youpi.cviews import *
 from terapix.youpi.cviews.condreqstr import *
 from terapix.youpi.models import *
@@ -180,33 +182,25 @@ def task_filter(request):
 	lenAllTasks = Processing_task.objects.count()
 
 	anyStatus = False
-	if status == 'successful':
-		success = 1
-	elif status == 'failed':
-		success = 0
-	else:
-		anyStatus = True
+	if status == 'successful': success = 1
+	elif status == 'failed': success = 0
+	else: anyStatus = True
 
 	if owner == 'all':
-		if anyStatus:
-			tasksIds = Processing_task.objects.filter(kind__name = kindid).order_by('-end_date').values('id')
-		else:
-			tasksIds = Processing_task.objects.filter(success = success, kind__name = kindid).order_by('-end_date').values('id')
+		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.filter(kind__name = kindid).order_by('-end_date'))
+		else: tasks, filtered = read_proxy(request, Processing_task.objects.filter(success = success, kind__name = kindid).order_by('-end_date'))
 
 	elif owner == 'my':
-		if anyStatus:
-			tasksIds = Processing_task.objects.filter(user = request.user, kind__name = kindid).order_by('-end_date').values('id')
-		else:
-			tasksIds = Processing_task.objects.filter(user = request.user, success = success, kind__name = kindid).order_by('-end_date').values('id')
+		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.filter(user = request.user, kind__name = kindid).order_by('-end_date'))
+		else: tasks, filtered = read_proxy(request, Processing_task.objects.filter(user = request.user, success = success, kind__name = kindid).order_by('-end_date'))
 
 	elif owner == 'others':
-		if anyStatus:
-			tasksIds = Processing_task.objects.exclude(user = request.user).filter(kind__name = kindid).order_by('-end_date').values('id')
-		else:
-			tasksIds = Processing_task.objects.exclude(user = request.user).filter(success = success, kind__name = kindid).order_by('-end_date').values('id')
+		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.exclude(user = request.user).filter(kind__name = kindid).order_by('-end_date'))
+		else: tasks, filtered = read_proxy(request, Processing_task.objects.exclude(user = request.user).filter(success = success, kind__name = kindid).order_by('-end_date'))
 	else:
-		tasksIds = Processing_task.objects.all().order_by('-end_date').values('id')
-
+		tasks, filtered = read_proxy(request, Processing_task.objects.all().order_by('-end_date'))
+			
+	tasksIds = [{'id': t.id} for t in tasks]
 	res = []
 	nb_suc = nb_failed = 0
 	if filterText:
@@ -274,6 +268,7 @@ def task_filter(request):
 		res.append(tdata)
 
 	resp = {
+		'filtered' : filtered,
 		'results' : res, 
 		'Stats' : {	
 			'nb_success' 	: nb_suc, 
@@ -281,8 +276,9 @@ def task_filter(request):
 			'nb_total' 		: nb_suc + nb_failed,
 			'pageCount'		: pageCount,
 			'curPage'		: targetPage,
-			'TasksIds' 		: [int (t) for t in tasksIds],
-			'nb_big_total' 	: int(lenAllTasks),
+			#'TasksIds' 		: [int (t) for t in tasksIds],
+			'TasksIds' 		: tasksIds,
+			'nb_big_total' 	: lenAllTasks,
 		},
 	} 
 
@@ -295,7 +291,7 @@ def task_filter(request):
 		# No method for extra header data
 		pass
 
-	return HttpResponse(str(resp), mimetype = 'text/plain')
+	return HttpResponse(json.encode(resp), mimetype = 'text/plain')
 
 @login_required
 @profile
