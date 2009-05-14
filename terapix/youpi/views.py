@@ -1627,23 +1627,25 @@ def get_permissions(request):
 	except Exception, e:
 		raise PluginError, "POST argument error. Unable to process data."
 
-	isOwner = False
+	ent = None
 	if target == 'tag':
 		tag = Tag.objects.filter(name = key)[0]
-		perms = Permissions(tag.mode)
-		groupname = tag.group.name
-		if tag.user == request.user: isOwner = True
+		ent = tag
+	elif target == 'task':
+		task = Processing_task.objects.filter(id = key)[0]
+		ent = task
+	else:
+		raise PermissionsError, "Permissions for target %s not supported" % target
 
-	# User groups
-	groups = [str(g.name) for g in request.user.groups.all()]
+	perms = Permissions(ent.mode)
 
 	return HttpResponse(json.encode({
 		'mode'		: str(perms), 
 		'perms'		: perms.toJSON(), 
-		'isOwner'	: isOwner,
-		'username'	: tag.user.username,
-		'groupname'	: groupname,
-		'groups'	: groups,
+		'isOwner'	: ent.user == request.user,
+		'username'	: ent.user.username,
+		'groupname'	: ent.group.name,
+		'groups'	: [g.name for g in request.user.groups.all()]
 	}), mimetype = 'text/plain')
 
 @login_required
@@ -1687,16 +1689,21 @@ def set_permissions(request):
 
 	if target == 'tag':
 		tag = Tag.objects.filter(name = key)[0]
-		if tag.user != request.user:
-			error = 'Operation Not Allowed'
-		else:
-			tag.mode = perms
-			tag.group = group
-			tag.save()
+		ent = tag
+	elif target == 'task':
+		task = Processing_task.objects.filter(id = key)[0]
+		ent = task
 	else:
-		error = 'Cannot set permission for this item'
+		raise PermissionsError, "Permissions for target %s not supported" % target
 
-	return HttpResponse(json.encode({'Error': error, 'Mode': tag.mode}), mimetype = 'text/plain')
+	if ent.user != request.user:
+		error = 'Operation Not Allowed'
+	else:
+		ent.mode = perms
+		ent.group = group
+		ent.save()
+
+	return HttpResponse(json.encode({'Error': error, 'Mode': ent.mode}), mimetype = 'text/plain')
 
 @login_required
 @profile

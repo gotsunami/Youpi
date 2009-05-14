@@ -250,6 +250,13 @@ var {{ plugin.id }} = {
 			tr.insert(td);
 			tab2.insert(tr);
 		}
+		
+		// Permissions
+		tr = new Element('tr');
+		td = new Element('td', {style: 'padding: 0px'});
+		td.update(ResultsHelpers.getPermissionsEntry(resp.TaskId));
+		tr.insert(td);
+		tab2.insert(tr);
 
 		// Condor Job Logs
 		tr = new Element('tr');

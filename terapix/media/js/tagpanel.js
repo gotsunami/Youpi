@@ -19,7 +19,7 @@
  *
  * Dependancies:
  *  <TagWidget> module, <StylePicker> module.
- *  common.js (boxes.permissions)
+ *  common.js (boxes.permissions, <get_permissions> function)
  *
  * Constructor Parameters:
  *  container - string or DOM object: name of parent DOM block container
@@ -194,8 +194,8 @@ function TagPanel(container) {
 			td.insert(lab);
 			tr.insert(td);
 
-			var ptd = new Element('td', {id: 'tag_edit_perms_td'});
-			_updatePermissionsArea(ptd);
+			var ptd = new Element('td');
+			ptd.insert(get_permissions('tag', _currentTagName));
 
 			tr.insert(ptd);
 			tab.insert(tr);
@@ -286,44 +286,6 @@ function TagPanel(container) {
 			};
 			var au = new _bsn.AutoSuggest(_id + 'tag_name_input', options);
 		}
-	}
-
-	/*
-	 * Function: _updatePermissionsArea
-	 * Update permissions on the screen
-	 *
-	 */ 
-	function _updatePermissionsArea(container) {
-		var post = {
-			Target: 'tag',
-			Key: _currentTagName
-		};
-		var pr = new HttpRequest(
-			null,
-			null,
-			function(r) {
-				if (r.Error) {
-					return;
-				}
-
-				container.update(r.username).insert('/').insert(r.groupname).insert(new Element('br'));
-				container.insert(r.mode);
-				if (r.isOwner) {
-					container.insert(' (');
-					var a = new Element('a', {href: '#'}).update('Change');
-					a.observe('click', function() {
-						boxes.permissions(post.Target, post.Key, 
-							r.perms, 
-							{username: r.username, groupname: r.groupname, groups: r.groups},
-							'Set your permissions for tag ' + _currentTagName);
-					});
-					container.insert(a).insert(')');
-				}
-			}
-		);
-
-		// Get tag permissions
-		pr.send('/youpi/permissions/get/', $H(post).toQueryString());
 	}
 
 	/*
@@ -669,10 +631,6 @@ function TagPanel(container) {
 		document.observe('tagWidget:edit', function(event) {
 			// User wants tag edition panel
 			_showEditForm(event.memo);
-		});
-
-		document.observe('permissions:updated', function(event) {
-			_updatePermissionsArea($('tag_edit_perms_td'));
 		});
 	}
 

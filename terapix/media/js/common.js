@@ -1020,6 +1020,33 @@ var ResultsHelpers = {
 		htab.insert(tr);
 
 		return tab;
+	},
+	/*
+	 * Function: getPermissionsEntry
+	 * Builds and return a TABLE DOM element with info related to user permissions
+	 *
+	 * Parameters:
+	 *  taskId - Task DB Id
+	 *
+	 * Returns:
+	 *  TABLE DOM element
+	 * 
+	 */
+	getPermissionsEntry: function(taskId) {
+		var tab = new Element('table').setStyle({width: '100%'});
+		var tr = new Element('tr');
+		var td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
+		td.insert('User Permissions');
+		tr.insert(td);
+		tab.insert(tr);
+
+		tr = new Element('tr');
+		td = new Element('td');
+		td.update(get_permissions('task', taskId));
+		tr.insert(td);
+		tab.insert(tr);
+
+		return tab;
 	}
 };
 
@@ -1222,7 +1249,7 @@ var boxes = {
 						function(r) {
 							if (r.Error) return;
 							// Notify permissions changes
-							document.fire('permissions:updated');
+							document.fire('permissions:updated', {target: target, key: key});
 							Modalbox.hide();
 						}
 					);
@@ -1267,8 +1294,61 @@ var boxes = {
 	}
 };
 
+/*
+ * Function: get_permissions
+ * Returns information about user permissions
+ *
+ * Parameters:
+ *  target - string: entity
+ *  key - string
+ *
+ * Returns:
+ *  container DOM element
+ *
+ */ 
+function get_permissions(target, key) {
+	var post = {
+		Target: target,
+		Key: key
+	};
+
+	var container = new Element('div', {id: 'user_permissions_div'});
+	var pr = new HttpRequest(
+		null,
+		null,
+		function(r) {
+			if (r.Error) {
+				return;
+			}
+
+			container.update(r.username).insert('/').insert(r.groupname);
+			container.insert('  ').insert(r.mode);
+			if (r.isOwner) {
+				container.insert(' (');
+				var a = new Element('a', {href: '#'}).update('Change');
+				a.observe('click', function() {
+					boxes.permissions(
+						post.Target, 
+						post.Key, 
+						r.perms, 
+						{username: r.username, groupname: r.groupname, groups: r.groups}
+					);
+				});
+				container.insert(a).insert(')');
+			}
+		}
+	);
+
+	// Get tag permissions
+	pr.send('/youpi/permissions/get/', $H(post).toQueryString());
+	return container;
+}
 
 // Monitors notify events
 document.observe('notifier:notify', function(event) {
 	Notifier.notify(event.memo);
+});
+
+document.observe('permissions:updated', function(event) {
+	$('user_permissions_div').update(get_permissions(event.memo.target, event.memo.key));
 });
