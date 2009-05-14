@@ -175,3 +175,44 @@ def read_proxy(request, results):
 		
 	return allow, filtered
 
+def write_proxy(request, model, delete = False):
+	"""
+	Write permissions proxy.
+
+	Deals with Youpi's permissions tranparently by returning appropriate 
+	content. Use it from your views by encapsulating your Django model queries:
+
+	Instead of writing:
+	tag.save() or tag.delete()
+
+	Write instead:
+	write_proxy(request, tag) or write_proxy(request, tag, delete = True)
+
+	@param request Django request instance
+	@param model Django model
+	@param delete Delete action (instead of save/update) when true [default: False]
+	@return boolean: True if data successfully written
+	"""
+
+	if not isinstance(model, models.Model):
+		raise TypeError, 'model parameter must a Django Model'
+
+	try:
+		m = model.mode
+	except AttributeError, e:
+		raise PermissionsError, 'This result set does not support permissions'
+
+	p = Permissions(model.mode)
+
+	write = False
+	if (model.user == request.user and p.user.write) or \
+		(model.group in request.user.groups.all() and p.group.write) or \
+		p.others.write:
+		write = True
+
+	if write:
+		if delete: model.delete()
+		else: model.save()
+
+	return write
+
