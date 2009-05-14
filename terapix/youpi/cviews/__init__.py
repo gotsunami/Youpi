@@ -54,6 +54,7 @@ def profile(fn):
 				except IntegrityError:
 					# Already exits
 					grp = Group.objects.filter(name = user.username)[0]
+				user.groups.add(grp)
 			else:
 				grp = groups[0]
 
