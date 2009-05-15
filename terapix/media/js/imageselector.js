@@ -1240,11 +1240,6 @@ function ImageSelector(container, options)
 	 *
 	 */ 
 	function _showEditSelectionBox(container) {
-		if (!_getListsOfSelections()) {
-			container.update(imgSelRequiredMsg);
-			return;
-		}
-
 		container.update();
 		var sub = $(id + '_edit_selection_subdiv');
 
@@ -2483,8 +2478,12 @@ function ImageSelector(container, options)
 			null,
 			// Custom handler for results
 			function(resp) {
-				removeAllChildrenNodes(div);
-				removeAllChildrenNodes(div);
+				div.update();
+				if (!resp.success) {
+					var log = new Logger(div);
+					log.msg_error("You have no write permission on this item. Selection not deleted.");
+					return;
+				}
 				var p = new Element('p');
 				p.setAttribute('class', 'done');
 				p.insert("Done. Selection '" + name + "'");
@@ -2631,6 +2630,12 @@ function ImageSelector(container, options)
 			function(resp) {
 				// Selection saved
 				cnode.update();
+				if (!resp.success) {
+					var log = new Logger(cnode);
+					log.msg_error("You have no write permission on this item. Please choose another name. Selection not saved.");
+					return;
+				}
+
 				var p = new Element('p', {'class': 'done'}).insert("Done. Selection saved under<br/>");
 				p.insert("'" + name.replace('%2B', '+') + "'.");
 				cnode.insert(p);

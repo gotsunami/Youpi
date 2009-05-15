@@ -55,13 +55,14 @@ def processing_save_image_selection(request):
 		# Updates entry
 		imgSelEntry = ImageSelections.objects.filter(name = name)[0]
 		imgSelEntry.data = sList
+		success = write_proxy(request, imgSelEntry)
 	except:
 		# ... or inserts a new one
 		imgSelEntry = ImageSelections(name = name, data = sList, user = request.user, mode = profile.dflt_mode, group = profile.dflt_group)
+		imgSelEntry.save()
+		success = True
 
-	imgSelEntry.save()
-
-	return HttpResponse(str({'name' : str(name), 'id' : int(imgSelEntry.id)}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'name': name, 'id': imgSelEntry.id, 'success': success}), mimetype = 'text/plain')
 
 def processing_check_config_file_exists(request):
 	"""
@@ -98,8 +99,6 @@ def processing_get_image_selections(request):
 
 	if not all:
 		try:
-			# FIXME
-			#sel = ImageSelections.objects.filter(name = name)[0]
 			sels, filtered = read_proxy(request, ImageSelections.objects.filter(name = name))
 			if sels:
 				sel = sels[0]
@@ -111,8 +110,6 @@ def processing_get_image_selections(request):
 			# Not found
 			pass
 	else:
-		# FIXME
-		#sel = ImageSelections.objects.all().order_by('name')
 		sels, filtered = read_proxy(request, ImageSelections.objects.all().order_by('name'))
 		for s in sels:
 			sList = marshal.loads(base64.decodestring(s.data))
@@ -136,12 +133,11 @@ def processing_delete_image_selection(request):
 
 	try:
 		sel = ImageSelections.objects.filter(name = name)[0]
-		sel.delete();
-	except:
-		# FIXME: do something if not sel !
-		pass
+		success = write_proxy(request, sel, delete = True)
+	except Exception, e:
+		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 
-	return HttpResponse(str({'data' : str(name)}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'success': success, 'data' : name}), mimetype = 'text/plain')
 
 def getSQLSignComparator(condTxt):
 	c = '='
