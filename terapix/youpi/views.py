@@ -1634,6 +1634,10 @@ def get_permissions(request):
 	elif target == 'task':
 		task = Processing_task.objects.filter(id = key)[0]
 		ent = task
+	elif target == 'imgsel':
+		# Image selections
+		sel = ImageSelections.objects.filter(name = key)[0]
+		ent = sel
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
@@ -1707,6 +1711,10 @@ def set_permissions(request):
 	elif target == 'task':
 		task = Processing_task.objects.filter(id = key)[0]
 		ent = task
+	elif target == 'imgsel':
+		# Image selections
+		sel = ImageSelections.objects.filter(name = key)[0]
+		ent = sel
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 

@@ -12,6 +12,7 @@
 ##############################################################################
 
 
+import cjson as json
 import MySQLdb, pyfits
 import pprint, re, glob, string
 import math, md5, random
@@ -27,6 +28,7 @@ from django.db.models import get_models
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 #
+from terapix.youpi.auth import *
 from terapix.youpi.models import *
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
@@ -92,30 +94,36 @@ def processing_get_image_selections(request):
 		all = True
 
 	mode = request.POST.get('Mode', 'Single') # Single or Batch
+	idList = []
 
 	if not all:
 		try:
-			sel = ImageSelections.objects.filter(name = name)[0]
-			# marshal de-serialization + base64 decoding
-			idList = marshal.loads(base64.decodestring(str(sel.data)))
+			# FIXME
+			#sel = ImageSelections.objects.filter(name = name)[0]
+			sels, filtered = read_proxy(request, ImageSelections.objects.filter(name = name))
+			if sels:
+				sel = sels[0]
+				# marshal de-serialization + base64 decoding
+				idList = marshal.loads(base64.decodestring(str(sel.data)))
 			if mode == 'Single' and len(idList) > 1:
 				idList = []
 		except:
 			# Not found
-			idList = []
+			pass
 	else:
-		sel = ImageSelections.objects.all().order_by('name')
-		idList = []
-		for s in sel:
-			sList = marshal.loads(base64.decodestring(str(s.data)))
+		# FIXME
+		#sel = ImageSelections.objects.all().order_by('name')
+		sels, filtered = read_proxy(request, ImageSelections.objects.all().order_by('name'))
+		for s in sels:
+			sList = marshal.loads(base64.decodestring(s.data))
 			if mode == 'Single' and len(sList) == 1:
-				idList.append([str(s.name), sList])
+				idList.append([s.name, sList])
 			elif mode == 'Batch' and len(sList) > 1:
-				idList.append([str(s.name), sList])
+				idList.append([s.name, sList])
 
 	count = len(idList)
 
-	return HttpResponse(str({'data' : idList, 'count' : count}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'data' : idList, 'count' : count, 'filtered': filtered}), mimetype = 'text/plain')
 
 def processing_delete_image_selection(request):
 	"""

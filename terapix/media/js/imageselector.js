@@ -976,6 +976,12 @@ function ImageSelector(container, options)
 		var sub = new DropdownBox(div, 'Save selection');
 		sub.setOnClickHandler(_handlerSaveSelectionAs.bind(sub));
 		bdiv.insert(div);
+		
+		// Edit selection
+		div = new Element('div', {'id': id + '_edit_selection_div'});
+		var sub = new DropdownBox(div, 'Edit selection');
+		sub.setOnClickHandler(_handlerEditSelection.bind(sub));
+		bdiv.insert(div);
 
 		// Delete existing selection
 		div = new Element('div', {'id': id + '_delete_selection_div'});
@@ -992,7 +998,16 @@ function ImageSelector(container, options)
 	 *
 	 */ 
 	function _handlerSaveSelectionAs() {
-		_showSaveSelectionBox(this.getContentNode());
+		if (this.isOpen()) _showSaveSelectionBox(this.getContentNode());
+	}
+
+	/*
+	 * Function: _handlerEditSelection
+	 * 'Edit selection' Dropdown box custom handler
+	 *
+	 */ 
+	function _handlerEditSelection() {
+		if (this.isOpen()) _showEditSelectionBox(this.getContentNode());
 	}
 
 	/*
@@ -1001,7 +1016,7 @@ function ImageSelector(container, options)
 	 *
 	 */ 
 	function _handlerDeleteExistingSelection() {
-		_showDeleteSelectionBox(this.getContentNode());
+		if (this.isOpen()) _showDeleteSelectionBox(this.getContentNode());
 	}
 
 	/*
@@ -1048,16 +1063,7 @@ function ImageSelector(container, options)
 			sub.setAttribute('class', 'show');
 			container.insert(sub);
 		}
-		else {
-			if (sub.getAttribute('class') == 'show') {
-				sub.setAttribute('class', 'hide');
-				return;
-			}
-			else {
-				sub.setAttribute('class', 'show');
-			}
-		}
-
+		
 		// Retrieves all image selections stored into DB
 		getImageSelections(sub, function(resp) {
 			removeAllChildrenNodes(sub);
@@ -1223,6 +1229,57 @@ function ImageSelector(container, options)
 				nText.focus();
 			}
 		}
+	}
+
+	/*
+	 * Function: _showEditSelectionBox
+	 * Displays selection box used for editing selection (permissions)
+	 *
+	 * Parameters:
+	 *  container - string or DOM node: parent container
+	 *
+	 */ 
+	function _showEditSelectionBox(container) {
+		if (!_getListsOfSelections()) {
+			container.update(imgSelRequiredMsg);
+			return;
+		}
+
+		container.update();
+		var sub = $(id + '_edit_selection_subdiv');
+
+		if (!sub) {
+			sub = new Element('div', {'id': id + '_edit__selection_subdiv'}).addClassName('show');
+			container.insert(sub);
+		}
+
+		// Retrieves all image selections stored into DB
+		getImageSelections(sub, function(resp) {
+			sub.update();
+
+			if (resp.data.length == 0) {
+				var p = new Element('p').addClassName('error');
+				p.insert('No saved selections found.');
+				p.insert(new Element('br'));
+				p.insert('Nothing to edit.');
+				sub.insert(p);
+				return;
+			}
+
+			var options = new Array();
+			resp.data.each(function(sel) {
+				options.push(sel[0]);
+			});
+
+			var sel = getSelect(id + '_del_selection_combo', options);
+			sel.observe('change', function() {
+				$(id + '_sel_perm_div').update(get_permissions('imgsel', this.options[this.selectedIndex].value));
+			});
+			sub.insert(sel).insert(new Element('br'));
+			var pdiv = new Element('div', {id: id + '_sel_perm_div'});
+			pdiv.update(get_permissions('imgsel', sel.select('option')[0].value));
+			sub.insert(pdiv);
+		});
 	}
 
 

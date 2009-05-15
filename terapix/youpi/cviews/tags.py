@@ -44,7 +44,7 @@ def fetch_tags(request):
 				'date'		: str(tag.date)} 
 			for tag in tags] 
 
-	return HttpResponse(json.encode({'tags' : data}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'tags': data, 'filtered': filtered}), mimetype = 'text/plain')
 
 @login_required
 @profile
