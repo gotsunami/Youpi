@@ -11,7 +11,6 @@
 #
 ##############################################################################
 
-import cjson as json
 import MySQLdb, pyfits
 import pprint, re, glob, string
 import math, md5, random
@@ -30,7 +29,6 @@ from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 from django.contrib.auth.models import User
 #
-from terapix.youpi.auth import *
 from terapix.youpi.cviews import *
 from terapix.youpi.cviews.condreqstr import *
 from terapix.youpi.models import *
@@ -182,25 +180,33 @@ def task_filter(request):
 	lenAllTasks = Processing_task.objects.count()
 
 	anyStatus = False
-	if status == 'successful': success = 1
-	elif status == 'failed': success = 0
-	else: anyStatus = True
+	if status == 'successful':
+		success = 1
+	elif status == 'failed':
+		success = 0
+	else:
+		anyStatus = True
 
 	if owner == 'all':
-		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.filter(kind__name = kindid).order_by('-end_date'))
-		else: tasks, filtered = read_proxy(request, Processing_task.objects.filter(success = success, kind__name = kindid).order_by('-end_date'))
+		if anyStatus:
+			tasksIds = Processing_task.objects.filter(kind__name = kindid).order_by('-end_date').values('id')
+		else:
+			tasksIds = Processing_task.objects.filter(success = success, kind__name = kindid).order_by('-end_date').values('id')
 
 	elif owner == 'my':
-		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.filter(user = request.user, kind__name = kindid).order_by('-end_date'))
-		else: tasks, filtered = read_proxy(request, Processing_task.objects.filter(user = request.user, success = success, kind__name = kindid).order_by('-end_date'))
+		if anyStatus:
+			tasksIds = Processing_task.objects.filter(user = request.user, kind__name = kindid).order_by('-end_date').values('id')
+		else:
+			tasksIds = Processing_task.objects.filter(user = request.user, success = success, kind__name = kindid).order_by('-end_date').values('id')
 
 	elif owner == 'others':
-		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.exclude(user = request.user).filter(kind__name = kindid).order_by('-end_date'))
-		else: tasks, filtered = read_proxy(request, Processing_task.objects.exclude(user = request.user).filter(success = success, kind__name = kindid).order_by('-end_date'))
+		if anyStatus:
+			tasksIds = Processing_task.objects.exclude(user = request.user).filter(kind__name = kindid).order_by('-end_date').values('id')
+		else:
+			tasksIds = Processing_task.objects.exclude(user = request.user).filter(success = success, kind__name = kindid).order_by('-end_date').values('id')
 	else:
-		tasks, filtered = read_proxy(request, Processing_task.objects.all().order_by('-end_date'))
-			
-	tasksIds = [{'id': t.id} for t in tasks]
+		tasksIds = Processing_task.objects.all().order_by('-end_date').values('id')
+
 	res = []
 	nb_suc = nb_failed = 0
 	if filterText:
@@ -268,7 +274,6 @@ def task_filter(request):
 		res.append(tdata)
 
 	resp = {
-		'filtered' : filtered,
 		'results' : res, 
 		'Stats' : {	
 			'nb_success' 	: nb_suc, 
@@ -276,9 +281,8 @@ def task_filter(request):
 			'nb_total' 		: nb_suc + nb_failed,
 			'pageCount'		: pageCount,
 			'curPage'		: targetPage,
-			#'TasksIds' 		: [int (t) for t in tasksIds],
-			'TasksIds' 		: tasksIds,
-			'nb_big_total' 	: lenAllTasks,
+			'TasksIds' 		: [int (t) for t in tasksIds],
+			'nb_big_total' 	: int(lenAllTasks),
 		},
 	} 
 
@@ -291,7 +295,7 @@ def task_filter(request):
 		# No method for extra header data
 		pass
 
-	return HttpResponse(json.encode(resp), mimetype = 'text/plain')
+	return HttpResponse(str(resp), mimetype = 'text/plain')
 
 @login_required
 @profile
@@ -630,13 +634,28 @@ def condor_ingestion(request):
 				'UserID' 		: str(request.user.id)}
 
 	submit_file_path = os.path.join(TRUNK, 'terapix')
+    
+	
+	node = "Machine == \"%s\"" % machine
+
+	# Add any custom Condor requirements, if any
+	custom_req = request.user.get_profile().custom_condor_req
+	
+	# if custom_rep exists machine is composed by node and custom condor requirements from the condor setup panel
+	if custom_req:
+		machine = "((%s) && (%s))" % (node, custom_req)
+	
+	# if not machine only compose the requirements
+	else:
+		machine = node
+
 
 	f = open(CONDORFILE + '_' + ingestionId, 'w')
 	f.write("""
 executable = %s/ingestion.py
 universe                = vanilla
 transfer_executable     = True
-requirements            = Machine == "%s"
+requirements            = %s
 
 # Arguments (base64 encoded + python serialization with marshal)
 # Args equal to: %s
@@ -649,7 +668,7 @@ initialdir				= %s
 transfer_output_files   = NOP
 # Logs
 # YOUPI_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%s
 output                  = %s
 error                   = %s
 log                     = %s
