@@ -19,6 +19,7 @@ import glob, sys, types, re, os, string, os.path
 import marshal, base64, random, time
 from types import *
 #
+from terapix.youpi.auth import *
 from terapix.youpi.models import *
 from terapix.exceptions import *
 from terapix.settings import *
@@ -126,12 +127,16 @@ class ProcessingPlugin:
 		if not dfltconfig:
 			self.__saveDefaultConfigFileToDB(request)
 
-		configs = ConfigFile.objects.filter(kind__name__exact = self.id, type__name = type)
-		res = []
-		for config in configs:
-			res.append({'name' : str(config.name), 'type' : str(config.type.name)})
+		# Always append 'default' config file
+		dfltconfig = ConfigFile.objects.filter(kind__name__exact = self.id, name = 'default', type__name = type)
+		res = [{'name': 'default', 'type': str(type)}]
 
-		return { 'configs' : res }
+		configs, filtered = read_proxy(request, ConfigFile.objects.filter(kind__name__exact = self.id, type__name = type))
+		for config in configs:
+			if config.name != 'default':
+				res.append({'name': str(config.name), 'type': str(config.type.name)})
+
+		return {'configs': res}
 
 	def setDefaultConfigFiles(self, defaultCF):
 		"""
