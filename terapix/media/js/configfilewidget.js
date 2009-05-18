@@ -97,28 +97,6 @@ function ConfigFileWidget(container, pluginId, options)
 		tr = new Element('tr');
 
 		// Menu options
-		/*
-		 * FIXME
-		td = new Element('td');
-		td.setAttribute('style', id + 'background-color: #eaeaea; border-left: 2px solid #5b80b2; width: 30%');
-		ldiv = new Element('div');
-		var bsave = new Element('input', {type: 'button', value: 'Save ' + _options.type + ' as...'});
-		bsave.observe('click', _saveConfigFileAs);
-
-		var sdiv = new Element('div');
-		sdiv.setAttribute('id', id + '_' + _options.type + '_save_div');
-		sdiv.setAttribute('class', 'imageSelector');
-		ldiv.insert(bsave);
-		ldiv.insert(sdiv);
-		sdiv = new Element('div');
-		var bclose = new Element('input', {type: 'button', value: 'Close editor'});
-		bclose.observe('click', _closeEditor);
-		sdiv.insert(bclose);
-		td.insert(ldiv);
-		td.insert(sdiv);
-		tr.insert(td);
-		*/
-
 		// Text editor related
 		td = new Element('td', {id: id + '_' + _options.type + '_editor_td'});
 		var ldiv = new Element('div', {id: id + '_editor_loading'});
@@ -131,6 +109,12 @@ function ConfigFileWidget(container, pluginId, options)
 				value: 'Save ' + _options.type + ' as...'
 		}).setStyle({marginRight: '10px'});
 		bsave.observe('click', _saveConfigFileAs);
+		var bdel = new Element('input', {
+				id: id + '_del_input', 
+				type: 'button', 
+				value: 'Delete ' + _options.type
+		}).setStyle({marginRight: '10px'});
+		bdel.observe('click', _deleteConfigFile);
 		var sdiv = new Element('div');
 		sdiv.setAttribute('id', id + '_' + _options.type + '_save_div');
 		sdiv.setAttribute('class', 'imageSelector');
@@ -138,6 +122,7 @@ function ConfigFileWidget(container, pluginId, options)
 		var bclose = new Element('input', {type: 'button', value: 'Close editor'});
 		bclose.observe('click', _closeEditor);
 		mdiv.insert(bsave);
+		mdiv.insert(bdel);
 		mdiv.insert(bclose);
 		mdiv.insert(sdiv);
 
@@ -155,8 +140,8 @@ function ConfigFileWidget(container, pluginId, options)
 		var selNode = $(plugin_id + '_' + _options.type +'_name_select');
 		var txt = selNode.options[selNode.selectedIndex].text;
 		var curConfDiv = $(id + '_' + _options.type + '_current_div');
-		removeAllChildrenNodes(curConfDiv);
-		curConfDiv.insert("The '" + txt + "' " + _options.type +" file will be used for processing.");
+		curConfDiv.update("The '" + txt + "' " + _options.type +" file will be used for processing.");
+		if ($(id + '_' + _options.type + '_editor_div').visible()) _editSelectedConfigFile();
 	}
 	
 	function _displayNewConfigFile() {
@@ -170,8 +155,7 @@ function ConfigFileWidget(container, pluginId, options)
 	}
 
 	function _closeEditor() {
-		var div = $(id + '_' + _options.type + '_editor_div');
-		div.setAttribute('style', 'display: none');
+		$(id + '_' + _options.type + '_editor_div').hide();
 	}
 
 	function editConfigFile(configName) {
@@ -179,6 +163,7 @@ function ConfigFileWidget(container, pluginId, options)
 		var div = $(id + '_' + _options.type + '_editor_div');
 		div.setAttribute('style', 'display: block');
 		$(id + '_save_as_input').hide();
+		$(id + '_del_input').hide();
 	
 		var post = {
 			Plugin: plugin_id,
@@ -196,7 +181,10 @@ function ConfigFileWidget(container, pluginId, options)
 
 				if (configName != 'default') {
 					var d = get_permissions('config', resp.result.id, function(r) {
-						if (r.currentUser.write) $(id + '_save_as_input').show();
+						if (r.currentUser.write)
+							$(id + '_del_input').show();
+						if (r.currentUser.read)
+							$(id + '_save_as_input').show();
 					});
 					ldiv.update(d);
 				}
@@ -372,14 +360,6 @@ function ConfigFileWidget(container, pluginId, options)
 				cdiv.insert(selNode);
 	
 				var txt = selNode.options[selNode.selectedIndex].text;
-				var img = new Element('img', {
-								title: 'Delete this entry',
-								style: 'cursor: pointer; margin-left: 5px;',
-								src: '/media/themes/' + guistyle + '/img/16x16/cancel.png'
-				});
-				img.observe('click', _deleteConfigFile);
-				cdiv.insert(img);
-				
 				_displayCurrentConfUsed();
 			}
 		);
@@ -408,7 +388,7 @@ function ConfigFileWidget(container, pluginId, options)
 				null,
 				// Custom handler for results
 				function(resp) {
-					if (resp.success) {
+					if (resp.result.success) {
 						document.fire('notifier:notify', "Config file '" + txt + "' deleted");
 						selNode.remove(selNode.selectedIndex);
 					}
