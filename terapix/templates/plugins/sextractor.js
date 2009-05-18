@@ -540,35 +540,31 @@ var {{ plugin.id }} = {
 		if (resp.Success) {
 			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 		}
-		var cdiv = new Element('div', {
+		var cdiv1 = new Element('div', {
 						id: 'config-' + resp.TaskId,
 						'class': 'config_file'
 		});
-		var pre = new Element('pre').insert(resp.Config);
-		cdiv.insert(pre);
+		var pre1 = new Element('pre').insert(resp.Config);
+		cdiv1.insert(pre1);
 		tr.insert(td);
 		tab2.insert(tr);
 	
 		var configbox = new DropdownBox(td, 'Toggle Sex configuration file view');
-		$(configbox.getContentNode()).insert(cdiv);
+		$(configbox.getContentNode()).insert(cdiv1);
 
-		// param file
-		tr = new Element('tr');
-		td = new Element('td', {colspan: 2});
-		if (resp.Success) {
-			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
-		}
-		var cdiv = new Element('div', {
-						id: 'param-' + resp.TaskId,
+		var cdiv2 = new Element('div', {
+						id: 'config-' + resp.TaskId,
 						'class': 'config_file'
 		});
-		var pre = new Element('pre').insert(resp.Param);
-		cdiv.insert(pre);
+
+		// param file
+		var pre2 = new Element('pre').insert(resp.Param);
+		cdiv2.insert(pre2);
 		tr.insert(td);
 		tab2.insert(tr);
-
+	
 		var parambox = new DropdownBox(td, 'Toggle Sex parameters file view');
-		$(parambox.getContentNode()).insert(cdiv);
+		$(parambox.getContentNode()).insert(cdiv2);
 	
 		// Error log file when failure
 		if (!resp['Success']) {
