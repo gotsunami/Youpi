@@ -84,8 +84,7 @@ function ConfigFileWidget(container, pluginId, options)
 		ndiv = new Element('div');
 		ndiv.setAttribute('id', id + '_' + _options.type + '_editor_div');
 		ndiv.setAttribute('style', 'display: none;');
-		tab = new Element('table');
-		tab.setAttribute('class', 'fileBrowser');
+		tab = new Element('table').addClassName('fileBrowser').setStyle({width: '-moz-fit-content'});
 
 		tr = new Element('tr');
 		th = new Element('th');
@@ -102,7 +101,7 @@ function ConfigFileWidget(container, pluginId, options)
 		var ldiv = new Element('div', {id: id + '_editor_loading'});
 		var tarea = new Element('textarea', {id: id + '_' + _options.type + '_textarea', rows: 30, cols: 100});
 		// Buttons
-		var mdiv = new Element('div');
+		var mdiv = new Element('div').addClassName('toolbar');
 		var bsave = new Element('input', {
 				id: id + '_save_as_input', 
 				type: 'button', 
