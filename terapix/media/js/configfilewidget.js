@@ -33,7 +33,7 @@ function ConfigFileWidget(container, pluginId, options)
 
 	function render() {
 		var tr, th, td;
-		var tab = new Element('table');
+		var tab = new Element('table').setStyle({width: '50%'});
 		tab.setAttribute('class', 'fileBrowser');
 
 		tr = new Element('tr');
@@ -95,18 +95,10 @@ function ConfigFileWidget(container, pluginId, options)
 		tab.insert(tr);
 
 		tr = new Element('tr');
-		td = new Element('td');
-		td.setAttribute('id', id + '_' + _options.type + '_editor_td');
-		var ldiv = new Element('div');
-		ldiv.setAttribute('id', id + '_editor_loading');
-		var tarea = new Element('textarea');
-		tarea.setAttribute('id', id + '_' + _options.type + '_textarea');
-		tarea.setAttribute('rows', '30');
-		tarea.setAttribute('cols', '100');
-		td.insert(ldiv);
-		td.insert(tarea);
-		tr.insert(td);
 
+		// Menu options
+		/*
+		 * FIXME
 		td = new Element('td');
 		td.setAttribute('style', id + 'background-color: #eaeaea; border-left: 2px solid #5b80b2; width: 30%');
 		ldiv = new Element('div');
@@ -124,6 +116,34 @@ function ConfigFileWidget(container, pluginId, options)
 		sdiv.insert(bclose);
 		td.insert(ldiv);
 		td.insert(sdiv);
+		tr.insert(td);
+		*/
+
+		// Text editor related
+		td = new Element('td', {id: id + '_' + _options.type + '_editor_td'});
+		var ldiv = new Element('div', {id: id + '_editor_loading'});
+		var tarea = new Element('textarea', {id: id + '_' + _options.type + '_textarea', rows: 30, cols: 100});
+		// Buttons
+		var mdiv = new Element('div');
+		var bsave = new Element('input', {
+				id: id + '_save_as_input', 
+				type: 'button', 
+				value: 'Save ' + _options.type + ' as...'
+		}).setStyle({marginRight: '10px'});
+		bsave.observe('click', _saveConfigFileAs);
+		var sdiv = new Element('div');
+		sdiv.setAttribute('id', id + '_' + _options.type + '_save_div');
+		sdiv.setAttribute('class', 'imageSelector');
+
+		var bclose = new Element('input', {type: 'button', value: 'Close editor'});
+		bclose.observe('click', _closeEditor);
+		mdiv.insert(bsave);
+		mdiv.insert(bclose);
+		mdiv.insert(sdiv);
+
+		td.insert(mdiv);
+		td.insert(ldiv);
+		td.insert(tarea);
 		tr.insert(td);
 
 		tab.insert(tr);
@@ -158,18 +178,7 @@ function ConfigFileWidget(container, pluginId, options)
 		var ldiv = $(id + '_editor_loading');
 		var div = $(id + '_' + _options.type + '_editor_div');
 		div.setAttribute('style', 'display: block');
-	
-		var r = new HttpRequest(
-			ldiv.id,
-			null,
-			// Custom handler for results
-			function(resp) {
-				ldiv.innerHTML = '';
-				var edit = $(id + '_' + _options.type + '_textarea');
-				edit.value = resp['result'];
-				edit.focus();
-			}
-		);
+		$(id + '_save_as_input').hide();
 	
 		var post = {
 			Plugin: plugin_id,
@@ -177,6 +186,30 @@ function ConfigFileWidget(container, pluginId, options)
 			Name: configName,
 			Type: _options.type
 		};
+
+		var r = new HttpRequest(
+			ldiv.id,
+			null,
+			// Custom handler for results
+			function(resp) {
+				ldiv.update();
+
+				if (configName != 'default') {
+					var d = get_permissions('config', resp.result.id, function(r) {
+						if (r.currentUser.write) $(id + '_save_as_input').show();
+					});
+					ldiv.update(d);
+				}
+				else {
+					var log = new Logger(ldiv);
+					log.msg_warning('Default configuration file is always readable by everyone');
+					$(id + '_save_as_input').show();
+				}
+				var edit = $(id + '_' + _options.type + '_textarea');
+				edit.value = resp.result.data;
+				edit.focus();
+			}
+		);
 
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	}
@@ -310,8 +343,16 @@ function ConfigFileWidget(container, pluginId, options)
 				setConfigFile();
 			}
 		);
-		var post = 'Plugin=' + plugin_id + '&Method=saveConfigFile&Name=' + escape(name) + '&Content=' + escape(area.value) + '&Type=' + escape(_options.type) ;
-		r.send('/youpi/process/plugin/', post);
+
+		var post = {
+			Plugin: plugin_id,
+			Method: 'saveConfigFile',
+			Name: name,
+			Content: area.value.unescapeHTML(),
+			Type: _options.type
+		}
+
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	}
 
 	function setConfigFile() {
@@ -332,6 +373,7 @@ function ConfigFileWidget(container, pluginId, options)
 	
 				var txt = selNode.options[selNode.selectedIndex].text;
 				var img = new Element('img', {
+								title: 'Delete this entry',
 								style: 'cursor: pointer; margin-left: 5px;',
 								src: '/media/themes/' + guistyle + '/img/16x16/cancel.png'
 				});
@@ -359,23 +401,26 @@ function ConfigFileWidget(container, pluginId, options)
 			alert('Cannot remove default ' + _options.type + ' file.');
 			return;
 		}
-		else {
-			var r = confirm("Are you sure you want to delete the " + _options.type + "  file '" + txt + "'?");
-			if (!r) return;
-		}
-	
-		var r = new HttpRequest(
-			id + '_' + _options.type + '_current_div',
-			null,
-			// Custom handler for results
-			function(resp) {
-				selNode.remove(selNode.selectedIndex);
-				_displayCurrentConfUsed();
-			}
-		);
-	
-		var post = 'Plugin=' + plugin_id + '&Method=deleteConfigFile&Name=' + txt + '&Type=' + _options.type;
-		r.send('/youpi/process/plugin/', post);
+
+		boxes.confirm("Are you sure you want to delete the " + _options.type + "  file '" + txt + "'?", function() {
+			var r = new HttpRequest(
+				id + '_' + _options.type + '_current_div',
+				null,
+				// Custom handler for results
+				function(resp) {
+					if (resp.success) {
+						document.fire('notifier:notify', "Config file '" + txt + "' deleted");
+						selNode.remove(selNode.selectedIndex);
+					}
+					else
+						boxes.perms_discard();
+					_displayCurrentConfUsed();
+				}
+			);
+		
+			var post = 'Plugin=' + plugin_id + '&Method=deleteConfigFile&Name=' + txt + '&Type=' + _options.type;
+			r.send('/youpi/process/plugin/', post);
+		});
 	}
 
 	// Constructor

@@ -112,7 +112,7 @@ class ProcessingPlugin:
 		except:
 			raise PluginError, "no config file with that name: %s" % name
 
-		return str(config.content)
+		return {'id': str(config.id), 'data': str(config.content)}
 
 
 	def getConfigFileNames(self, request):
@@ -213,9 +213,9 @@ class ProcessingPlugin:
 			k = Processing_kind.objects.filter(name__exact = self.id)[0]
 			m = ConfigFile(kind = k, name = name, content = config, user = request.user, type = t, mode = profile.dflt_mode, group = profile.dflt_group)
 
-		m.save()
+		success = write_proxy(request, m)
 
-		return name + ' saved'
+		return {'name': name, 'success': int(success)}
 
 	def deleteConfigFile(self, request):
 		"""
@@ -233,9 +233,10 @@ class ProcessingPlugin:
 		except:
 			raise PluginError, "No config file with that name: %s" % name
 
-		config.delete()
+		#config.delete()
+		success = write_proxy(request, config, delete = True)
 
-		return name + ' deleted'
+		return {'name': name, 'success': int(success)}
 
 	def getOutputDirStats(self, outputDir):
 		"""

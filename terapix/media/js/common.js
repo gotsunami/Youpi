@@ -1105,7 +1105,55 @@ var boxes = {
 			}
 		});
 	},
+	/*
+	 * Function: alert
+	 * Display a modern JS aler box
+	 *
+	 * Parameters:
+	 *  msg - string: message to display
+	 *  title - string: header title [optional]
+	 * 
+	 */
+	alert: function(msg, title) {
+		if (typeof msg != 'string')
+			throw "msg must be a string";
+		if (title && typeof title != 'string')
+			throw "title must be a string";
 
+		var title = title ? title : 'Notification';
+		var d = new Element('div').addClassName('modal_warning');
+		var bd = new Element('div').setStyle({paddingTop: '10px', textAlign: 'right'});
+		var okButton = new Element('input', {id: 'modalbox_ok_input', type: 'button', value: 'Ok'});
+		bd.insert(okButton);
+		d.update(msg);
+		d.insert(bd);
+
+		Modalbox.show(d, {
+			title: title, 
+			width: 300, 
+			overlayClose: false,
+			slideDownDuration: .25,
+			slideUpDuration: .25,
+			afterLoad: function() {
+				$('modalbox_ok_input').observe('click', function() { 
+					Modalbox.accept = true;
+					Modalbox.hide(); 
+				});
+			}
+		});
+	},
+	/*
+	 * Function: perms_discard
+	 * Alert box for users with bad permissions
+	 *
+	 * Parameters:
+	 *  msg - string: message to display
+	 *  title - string: header title [optional]
+	 * 
+	 */
+	perms_discard: function(msg, title) {
+		boxes.alert("Sorry, you don't have enough permissions to do it.");
+	},
 	/*
 	 * Function: permissions
 	 * Display a permissions box
