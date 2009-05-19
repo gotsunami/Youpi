@@ -226,7 +226,7 @@ var {{ plugin.id }} = {
 					table.appendChild(tr);
 	
 					tr = new Element('tr');
-					var header = ['Date', 'User', 'Name', '# images', 'Config', 'Paths', 'Action'];
+					var header = ['Date', 'Permissions', 'Name', '# images', 'Config', 'Paths', 'Action'];
 					for (var k=0; k < header.length; k++) {
 						th = new Element('th');
 						th.appendChild(document.createTextNode(header[k]));
@@ -234,7 +234,7 @@ var {{ plugin.id }} = {
 					}
 					table.appendChild(tr);
 	
-					var delImg, trid;
+					var delImg, addImg, trid;
 					var tabi, tabitr, tabitd;
 					var idList, txt;
 					for (var k=0; k < resp['result'].length; k++) {
@@ -242,17 +242,20 @@ var {{ plugin.id }} = {
 						tr = new Element('tr');
 						trid = '{{ plugin.id }}_saved_item_' + k + '_tr';
 						tr.setAttribute('id', trid);
+						delImg = new Element('img', {id: uidfitsin + '_del_saved_item_' + k}).hide();
 	
 						// Date
 						td = new Element('td');
-						td.appendChild(document.createTextNode(resp['result'][k]['date']));
+						td.insert(resp['result'][k]['date']);
 						tr.appendChild(td);
 	
-						// User
-						td = new Element('td');
-						td.setAttribute('class', 'config');
-						td.appendChild(document.createTextNode(resp['result'][k]['username']));
-						tr.appendChild(td);
+						// Permissions
+						td = new Element('td', {'class': 'config'}).update(get_permissions('cartitem', resp['result'][k]['itemId'], function(r, imgId) {
+							// imgId is the misc parameter passed to get_permissions()
+							var img = $(imgId);
+							r.currentUser.write ? img.show() : img.hide();
+						}, delImg.readAttribute('id') /* Misc data */));
+						tr.insert(td);
 	
 						// Name
 						td = new Element('td');
@@ -330,14 +333,13 @@ var {{ plugin.id }} = {
 	
 						// Delete
 						td = new Element('td');
-						delImg = new Element('img');
 						delImg.setAttribute('style', 'margin-right: 5px');
 						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
 						delImg.setAttribute('onclick', "{{ plugin.id }}.delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
-						td.appendChild(delImg);
-						delImg = new Element('img');
-						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
-						delImg.setAttribute('onclick', "{{ plugin.id }}.addToCart('" + 
+						td.insert(delImg.hide());
+						addImg = new Element('img');
+						addImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
+						addImg.setAttribute('onclick', "{{ plugin.id }}.addToCart('" + 
 								resp['result'][k]['idList'] + "','" + 
 								resp['result'][k]['config'] + "','" + 
 								resp['result'][k]['flatPath'] + "','" +
@@ -345,8 +347,8 @@ var {{ plugin.id }} = {
 								resp['result'][k]['regPath'] + "','" +
 								resp['result'][k]['resultsOutputDir'] + "','" +
 								resp['result'][k]['taskId'] + "')");
-						td.appendChild(delImg);
-						tr.appendChild(td);
+						td.insert(addImg);
+						tr.insert(td);
 		
 						table.appendChild(tr);
 					}
