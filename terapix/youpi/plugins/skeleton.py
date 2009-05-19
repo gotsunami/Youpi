@@ -33,6 +33,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.settings import *
+from terapix.youpi.auth import read_proxy
 
 class Skeleton(ProcessingPlugin):
 	"""
@@ -277,16 +278,14 @@ notify_user             = monnerville@iap.fr
 		"""
 		Returns a user's saved items for this plugin 
 		"""
-		# TODO: Only items related to user's groups are returned.
-
-		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
+		items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username'			: str(it.user.username),
 						'descr' 			: str(data['Descr']),
+						'itemId' 			: str(it.id), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
 						'name' 				: str(it.name) })
-
 		return res

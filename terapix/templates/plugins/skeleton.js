@@ -304,7 +304,7 @@ var {{ plugin.id }} = {
 					table.insert(tr);
 	
 					tr = new Element('tr');
-					var header = $A(['Date', 'User', 'Name', 'Description', 'Action']);
+					var header = $A(['Date', 'Permissions', 'Name', 'Description', 'Action']);
 					header.each(function(elem) {
 						tr.insert(new Element('th').update(elem));
 					});
@@ -315,13 +315,23 @@ var {{ plugin.id }} = {
 					for (var k=0; k < resp['result'].length; k++) {
 						trid = '{{ plugin.id }}_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
+						delImg = new Element('img', {	id: uidskel + '_del_saved_item_' + k,	
+														style: 'margin-right: 5px',
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif',
+														onclick: "{{ plugin.id }}.delSavedItem('" + trid + "', '" + 
+															resp['result'][k]['name'] + "')"
+						}).hide();
 	
 						// Date
 						td = new Element('td').update(resp['result'][k]['date']);
 						tr.insert(td);
 	
-						// User
-						td = new Element('td', {'class': 'config'}).update(resp['result'][k]['username']);
+						// Permissions
+						td = new Element('td', {'class': 'config'}).update(get_permissions('cartitem', resp['result'][k]['itemId'], function(r, imgId) {
+							// imgId is the misc parameter passed to get_permissions()
+							var img = $(imgId);
+							r.currentUser.write ? img.show() : img.hide();
+						}, delImg.readAttribute('id') /* Misc data */));
 						tr.insert(td);
 	
 						// Name
@@ -334,11 +344,6 @@ var {{ plugin.id }} = {
 						
 						// Delete
 						td = new Element('td');
-						delImg = new Element('img', {	style: 'margin-right: 5px',
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif',
-														onclick: "{{ plugin.id }}.delSavedItem('" + trid + "', '" + 
-															resp['result'][k]['name'] + "')"
-						});
 						td.insert(delImg);
 
 						delImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif',
