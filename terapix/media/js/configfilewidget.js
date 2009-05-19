@@ -180,10 +180,9 @@ function ConfigFileWidget(container, pluginId, options)
 
 				if (configName != 'default') {
 					var d = get_permissions('config', resp.result.id, function(r) {
-						if (r.currentUser.write)
-							$(id + '_del_input').show();
-						if (r.currentUser.read)
-							$(id + '_save_as_input').show();
+						var delb = $(id + '_del_input');
+						r.currentUser.write ? delb.show() : delb.hide();
+						if (r.currentUser.read) $(id + '_save_as_input').show();
 					});
 					ldiv.update(d);
 				}
