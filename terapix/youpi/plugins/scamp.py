@@ -19,9 +19,10 @@ import marshal, base64, zlib
 from types import *
 #
 from terapix.youpi.pluginmanager import ProcessingPlugin
-from terapix.exceptions import *
 from terapix.youpi.models import *
+from terapix.exceptions import *
 from terapix.settings import *
+from terapix.youpi.auth import read_proxy
 
 class Scamp(ProcessingPlugin):
 	"""	
@@ -59,7 +60,7 @@ class Scamp(ProcessingPlugin):
 		"""
 
 		# per-user items
-		items = CartItem.objects.filter(kind__name__exact = self.id, user = request.user).order_by('-date')
+		items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
@@ -70,6 +71,7 @@ class Scamp(ProcessingPlugin):
 				 		'aheadPath'			: str(data['aheadPath']),
 						'name' 				: str(it.name),
 						'taskId' 			: str(data['taskId']), 
+						'itemId' 			: str(it.id), 
 						'config' 			: str(data['config'])})
 
 		return res

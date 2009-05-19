@@ -21,6 +21,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.settings import *
+from terapix.youpi.auth import read_proxy
 
 class Sextractor(ProcessingPlugin):
 	"""
@@ -112,9 +113,8 @@ class Sextractor(ProcessingPlugin):
 		"""
 		Returns a user's saved items. 
 		"""
-		# TODO: Only items related to user's groups are returned.
-
-		items = CartItem.objects.filter(kind__name__exact = self.id, user = request.user).order_by('-date')
+		# per-user items
+		items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
@@ -126,6 +126,7 @@ class Sextractor(ProcessingPlugin):
 						'flagPath' 				: str(data['flagPath']), 
 						'psfPath' 				: str(data['psfPath']), 
 						'dualMode'				: int(data['dualMode']),
+						'itemId' 				: str(it.id), 
 						'dualImage'		 		: str(data['dualImage']), 
 						'dualweightPath' 		: str(data['dualweightPath']), 
 						'dualflagPath' 			: str(data['dualflagPath']), 

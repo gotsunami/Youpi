@@ -834,7 +834,7 @@ var {{ plugin.id }} = {
 					table.insert(tr);
 	
 					tr = new Element('tr');
-					var headers = $A(['Date', 'User', 'Name', '# images', 'Config', 'Paths', 'Action']);
+					var headers = $A(['Date', 'Permissions', 'Name', '# images', 'Config', 'Paths', 'Action']);
 					headers.each(function(header) {
 						tr.insert(new Element('th').update(header));
 					});
@@ -846,13 +846,22 @@ var {{ plugin.id }} = {
 						idLists = res.idList.evalJSON();
 						trid = uidswarp + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
+						delImg = new Element('img', {	id: uidswarp + '_del_saved_item_' + k,
+														style: 'margin-right: 5px',
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
+						}).hide();
 
 						// Date
 						td = new Element('td').update(res.date);
 						tr.insert(td);
 	
 						// User
-						td = new Element('td', {'class': 'config'}).update(res.username);
+						// Permissions
+						td = new Element('td', {'class': 'config'}).update(get_permissions('cartitem', res.itemId, function(r, imgId) {
+							// imgId is the misc parameter passed to get_permissions()
+							var img = $(imgId);
+							r.currentUser.write ? img.show() : img.hide();
+						}, delImg.readAttribute('id') /* Misc data */));
 						tr.insert(td);
 	
 						// Name
@@ -894,9 +903,6 @@ var {{ plugin.id }} = {
 	
 						// Delete
 						td = new Element('td');
-						delImg = new Element('img', {	style: 'margin-right: 5px',
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
-						});
 						delImg.c_data = {trid: trid, name: res.name};
 						delImg.observe('click', function() {
 							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);

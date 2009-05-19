@@ -367,11 +367,11 @@ class ProcessingPlugin:
 
 		try:
 			item = CartItem.objects.filter(kind__name__exact = self.id, name = name)[0]
-			item.delete()
+			success = write_proxy(request, item, delete = True)
 		except Exception, e:
 			raise PluginError, "No item named '%s' found." % name
 
-		return "Item %s deleted" % name
+		return {'name': name, 'success': int(success)}
 
 	def getMiscDataPaths(self, request):
 		"""

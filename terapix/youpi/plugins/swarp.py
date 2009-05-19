@@ -20,6 +20,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.settings import *
+from terapix.youpi.auth import read_proxy
 
 class Swarp(ProcessingPlugin):
 	"""
@@ -570,9 +571,8 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		"""
 		Returns a user's saved items for this plugin 
 		"""
-
 		# per-user items
-		items = CartItem.objects.filter(kind__name__exact = self.id, user = request.user).order_by('-date')
+		items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
@@ -580,6 +580,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 						'username'			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
 						'taskId' 			: str(data['taskId']), 
+						'itemId' 			: str(it.id), 
 						'weightPath' 		: str(data['weightPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
 				 		'useQFITSWeights' 	: str(data['useQFITSWeights']),

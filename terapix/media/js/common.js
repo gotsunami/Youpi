@@ -1159,11 +1159,14 @@ var boxes = {
 	 * Display a permissions box
 	 *
 	 * Parameters:
+	 *  container_id - string: DOM container id
+	 *  handler - function: custom handler function (can be null)
 	 *  target - string: entity name
 	 *  key - string: key used to find a match
 	 *  perms - object: user permissions for this object
 	 *  userInfo - object: additional information
-	 *  title - string: optional title message
+	 *  misc - any: any data (passed to handler, if any) [optional]
+	 *  title - string: title message [optional]
 	 * 
 	 * Notes:
 	 *  The following format must be used:
@@ -1172,7 +1175,9 @@ var boxes = {
 	 *  userInfo format: {username: <string>, groupname: <string>, groups: <array>}
 	 *
 	 */
-	permissions: function(target, key, perms, userInfo, title) {
+	permissions: function(container_id, handler, target, key, perms, userInfo, misc, title) {
+		if (typeof container_id != 'string')
+			throw "container_id must be a string";
 		if (typeof target != 'string' || typeof key != 'string')
 			throw "Target and key must be strings";
 
@@ -1297,7 +1302,13 @@ var boxes = {
 						function(r) {
 							if (r.Error) return;
 							// Notify permissions changes
-							document.fire('permissions:updated', {target: target, key: key});
+							document.fire('permissions:updated', {
+								container_id: container_id, // DOM container
+								target: target, 
+								key: key, 
+								handler: handler,
+								misc: misc
+							});
 							Modalbox.hide();
 						}
 					);
@@ -1350,19 +1361,21 @@ var boxes = {
  *  target - string: entity
  *  key - string
  *  handler - function: callback function [optional]
+ *  misc - any: misc data passed to handler [optional]
  *
  * Returns:
  *  container DOM element
  *
  */ 
-function get_permissions(target, key, handler) {
+function get_permissions(target, key, handler, misc) {
 	var handler = typeof(handler) == 'function' ? handler : null;
 	var post = {
 		Target: target,
 		Key: key
 	};
 
-	var container = new Element('div', {id: 'user_permissions_div'});
+	var uid = 'user_permissions_div_' + Math.floor(Math.random() * 999999);
+	var container = new Element('div', {id: uid});
 	var pr = new HttpRequest(
 		container,
 		null,
@@ -1378,15 +1391,18 @@ function get_permissions(target, key, handler) {
 				var a = new Element('a', {href: '#'}).update('Change');
 				a.observe('click', function() {
 					boxes.permissions(
+						uid,
+						handler,
 						post.Target, 
 						post.Key, 
 						r.perms, 
-						{username: r.username, groupname: r.groupname, groups: r.groups}
+						{username: r.username, groupname: r.groupname, groups: r.groups},
+						misc
 					);
 				});
 				container.insert(a).insert(')');
 			}
-			if (handler) handler(r);
+			if (handler) handler(r, misc);
 		}
 	);
 
@@ -1401,5 +1417,7 @@ document.observe('notifier:notify', function(event) {
 });
 
 document.observe('permissions:updated', function(event) {
-	$('user_permissions_div').update(get_permissions(event.memo.target, event.memo.key));
+	var c = $(event.memo.container_id);
+	if (!c) throw 'Permissions container not found';
+	c.update(get_permissions(event.memo.target, event.memo.key, event.memo.handler, event.memo.misc /* misc data parameter */));
 });

@@ -23,6 +23,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.settings import *
+from terapix.youpi.auth import read_proxy
 #
 from django.http import HttpResponse, HttpResponseNotFound
 
@@ -109,7 +110,7 @@ class QualityFitsIn(ProcessingPlugin):
 		"""
 
 		# per-user items
-		items = CartItem.objects.filter(kind__name__exact = self.id, user = request.user).order_by('-date')
+		items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
@@ -118,6 +119,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'idList' 			: str(data['idList']), 
 						'flatPath' 			: str(data['flatPath']), 
 						'taskId' 			: str(data['taskId']), 
+						'itemId' 			: str(it.id), 
 						'maskPath' 			: str(data['maskPath']), 
 						'regPath' 			: str(data['regPath']), 
 						'resultsOutputDir' 	: str(data['resultsOutputDir']), 

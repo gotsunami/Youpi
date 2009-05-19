@@ -1641,6 +1641,9 @@ def get_permissions(request):
 	elif target == 'config':
 		config = ConfigFile.objects.filter(id = key)[0]
 		ent = config
+	elif target == 'cartitem':
+		carti = CartItem.objects.filter(id = key)[0]
+		ent = carti
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
@@ -1721,6 +1724,9 @@ def set_permissions(request):
 	elif target == 'config':
 		config = ConfigFile.objects.filter(id = key)[0]
 		ent = config
+	elif target == 'cartitem':
+		carti = CartItem.objects.filter(id = key)[0]
+		ent = carti
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
