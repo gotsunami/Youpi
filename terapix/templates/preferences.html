@@ -12,6 +12,8 @@
 <script type="text/javascript" src="/media/js/xhr.js"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript" src="/media/js/condorpanel.js"></script>
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
+<script type="text/javascript" src="/media/js/3rdParty/modalbox/modalbox.js"></script>
 
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -236,15 +238,32 @@ function load_config() {
 		</div>
 		<div id="bottom_save_div" class="prefs_condor"></div>
 	</div>
+	<div style="width: 100%; display: none;" id="menuitem_sub_2">
+		<div class="prefs_condor">
+			<h1>Default Permissions to apply</h1>
+			You can change your default permissions for accessing data. Theses values are used everytime you work within Youpi and allow you to 
+			control your data access.
+			<div style="margin-top: 10px;">
+				<table class="defaultCondorSetup">
+					<tr>
+						<td>Default Mode</td>
+						<td id="perms_mode_td"/>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
-		var m = new SubMenu('submenu', ['Themes', 'Default Condor Setup']);
+			var m = new SubMenu('submenu', ['Themes', 'Default Condor Setup', 'Default Permissions']);
 
 		show_available_themes();
 		show_current_config_button();
 		load_config();
+
+		$('perms_mode_td').update(get_permissions('profile', 'any'));
 	});
 </script>
 {% endblock %}
