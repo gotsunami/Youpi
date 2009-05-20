@@ -67,7 +67,7 @@ class Scamp(ProcessingPlugin):
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
-						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
+						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request)),
 				 		'aheadPath'			: str(data['aheadPath']),
 						'name' 				: str(it.name),
 						'taskId' 			: str(data['taskId']), 

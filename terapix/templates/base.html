@@ -43,8 +43,9 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			<div class="user">
 			Logged in as <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>
 			{% block userlinks %}
-				[ <a href="/youpi/admin/password_change/">{% trans 'Change password' %}</a>
-				- <a href="/youpi/accounts/logout/">{% trans 'Log out' %}</a> ]
+				| <a href="/youpi/admin/password_change/">{% trans 'Change password' %}</a>
+				{% if user.is_staff %} | <a href="/youpi/admin/">Admin</a>{% endif %}
+				| <a href="/youpi/accounts/logout/">{% trans 'Log out' %}</a>
 			{% endblock %}
 	        </div>
 			<div id="youpi_cart_id" style="float: right"></div>

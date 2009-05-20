@@ -1658,7 +1658,6 @@ function ImageSelector(container, options)
 	 */ 
 	function buildTagDataWidget(tr_idx) {
 		var output = $(id + '_custom_div_' + tr_idx);
-
 		var xhr = new HttpRequest(
 			output.id,
 			// Use default error handler
@@ -1666,17 +1665,26 @@ function ImageSelector(container, options)
 			// Custom handler for results
 			function(resp) {
 				// Rendering
-				output.update();
-				var selNode = getSelect(id + '_tag_select_' + tr_idx, resp['data'], 6);
+				removeAllChildrenNodes(output);
+				var selid = id + '_tag_select_' + tr_idx;
+				if (resp.tags.length > 0) {
+					var sels = new Array();
+					resp.tags.each(function(tag) {
+						sels.push(tag.name);
+					});
+					var selNode = getSelect(selid, sels, 6);
+				}
+				else {
+					var selNode = new Element('select', {id: selid});
+					option = new Element('option', {value: 0});
+					option.update('-- No saved selection in database --');
+					selNode.insert(option);
+				}
 				output.insert(selNode);
 			}
 		);
 
-		// Build custom query
-		var data = 'Distinct=&Table=youpi_tag&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
-
-		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/tags/fetchtags/');
 	}
 
 	/*

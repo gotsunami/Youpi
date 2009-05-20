@@ -1644,15 +1644,24 @@ def get_permissions(request):
 	elif target == 'cartitem':
 		carti = CartItem.objects.filter(id = key)[0]
 		ent = carti
+	elif target == 'profile':
+		prof = SiteProfile.objects.filter(user = request.user)[0]
+		ent = prof
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
-	perms = Permissions(ent.mode)
 	isOwner = ent.user == request.user
 	groups = [g.name for g in request.user.groups.all()]
 
 	# Current user permissions
-	cuser_read = cuser_write = False
+	if target == 'profile':
+		cuser_read = cuser_write = True
+		ent.group = ent.dflt_group
+		perms = Permissions(ent.dflt_mode)
+	else:
+		cuser_read = cuser_write = False
+		perms = Permissions(ent.mode)
+
 	if (isOwner and perms.user.read) or \
 		(ent.group.name in groups and perms.group.read) or \
 		perms.others.read:
@@ -1727,17 +1736,24 @@ def set_permissions(request):
 	elif target == 'cartitem':
 		carti = CartItem.objects.filter(id = key)[0]
 		ent = carti
+	elif target == 'profile':
+		prof = SiteProfile.objects.filter(user = request.user)[0]
+		ent = prof
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
 	if ent.user != request.user:
 		error = 'Operation Not Allowed'
 	else:
-		ent.mode = perms
-		ent.group = group
+		if target == 'profile': 
+			ent.dflt_group = group
+			ent.dflt_mode = perms
+		else:
+			ent.mode = perms
+			ent.group = group
 		ent.save()
 
-	return HttpResponse(json.encode({'Error': error, 'Mode': ent.mode}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'Error': error, 'Mode': perms}), mimetype = 'text/plain')
 
 @login_required
 @profile

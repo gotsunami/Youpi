@@ -186,6 +186,10 @@ function TagPanel(container) {
 		tr.insert(td);
 		tab.insert(tr);
 		var buttd = new Element('td', {colspan: 2}).setStyle({textAlign: 'right'});
+		var delb = new Element('input', {type: 'button', value: 'Delete', style: 'margin-right: 10px'});
+		delb.observe('click', _deleteTag);
+		var upb = new Element('input', {type: 'button', value: 'Update'});
+		upb.observe('click', _updateTag);
 		
 		if (data.get('style')) {
 			// Permissions
@@ -198,12 +202,10 @@ function TagPanel(container) {
 			var ptd = new Element('td');
 			ptd.insert(get_permissions('tag', _currentTagName, function(resp) {
 				if (resp.currentUser.write) {
-					// Display appropriate buttons
-					var delb = new Element('input', {type: 'button', value: 'Delete', style: 'margin-right: 10px'});
-					delb.observe('click', _deleteTag);
-					var upb = new Element('input', {type: 'button', value: 'Update'});
-					upb.observe('click', _updateTag);
-					buttd.insert(delb).insert(upb);
+					delb.show(); upb.show();
+				}
+				else {
+					delb.hide(); upb.hide();
 				}
 			}));
 
@@ -241,6 +243,7 @@ function TagPanel(container) {
 			$(_id + 'add_new_span').appear();
 		});
 		buttd.insert(cancelb);
+		buttd.insert(delb).insert(upb);
 
 		if (!data.get('style')) {
 			var addb = new Element('input', {type: 'button', value: 'Add'});

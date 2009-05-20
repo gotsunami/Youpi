@@ -130,7 +130,7 @@ class Sextractor(ProcessingPlugin):
 						'dualImage'		 		: str(data['dualImage']), 
 						'dualweightPath' 		: str(data['dualweightPath']), 
 						'dualflagPath' 			: str(data['dualflagPath']), 
-						'resultsOutputDir' 		: str(data['resultsOutputDir']), 
+						'resultsOutputDir' 		: str(self.getUserResultsOutputDir(request)),
 						'name' 					: str(it.name),
 						'config' 				: str(data['config']),
 						'param' 				: str(data['param']),
