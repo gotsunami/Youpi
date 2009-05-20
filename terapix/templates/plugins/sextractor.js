@@ -28,11 +28,12 @@ var {{ plugin.id }} = {
 
 
 	addSelectionToCart: function() {
-		
 		var dualMode = 0;
+		var sels, sels1, sels2;
 		//Checks for images
 		$('single','dual').each( function(id) {
-			if(id.checked) {
+			var chk = id.select('input')[0];
+			if(chk.checked) {
 				if(id.value == 'single') {
 					sels = {{ plugin.id }}.ims1.getListsOfSelections();
 					sels2 = null;
@@ -42,11 +43,10 @@ var {{ plugin.id }} = {
 					sels1 = {{ plugin.id }}.ims1.getListsOfSelections().evalJSON();
 					sels2 = {{ plugin.id }}.ims2.getListsOfSelections().evalJSON();
 					sels = '[[' + sels1 + ', ' + sels2 + ']]';
-					}
 				}
 			}
-		)
-		
+		});
+
 		if (!sels) {
 			alert('No images selected. Nothing to add to cart !');
 			return;
@@ -892,38 +892,5 @@ var {{ plugin.id }} = {
 				}
 		);
 	},
-
-	selectImages: function() {
-		var root1 = $('{{plugin.id}}_results_div');
-		var root2 = $('{{plugin.id}}_results_div2');
-		{{ plugin.id }}.ims1 = new ImageSelector(root1);
-		{{ plugin.id }}.ims1.setTableWidget(new AdvancedTable());
-
-		$('single','dual').each( function(id) {
-			id.observe('click', function() {
-				if (id.value == 'dual') {
-					if (!{{ plugin.id }}.ims2) {
-						{{ plugin.id }}.ims1.getTableWidget().setExclusiveSelectionMode(true);
-						{{ plugin.id }}.ims2 = new ImageSelector(root2);
-						var at = new AdvancedTable();
-						at.setExclusiveSelectionMode(true);
-						{{ plugin.id }}.ims2.setTableWidget(at);
-					}
-					else {
-					root2.show();
-					}
-				}
-				else if (id.value == 'single') {
-					if ({{ plugin.id }}.ims2) {
-						root2.hide();
-						{{ plugin.id }}.ims1.getTableWidget().setExclusiveSelectionMode(false);
-					
-					}
-				}
-			}
-		);
-		}
-	);
-	}
 };
 	

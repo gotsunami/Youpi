@@ -6,34 +6,26 @@
 			<img style="cursor: pointer" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif" onclick="{{ plugin.id }}.addSelectionToCart();"/>
 		</div>
 		<div style="margin-left: 30px;" id="menuitem_sub_0">
-			<hr>	
-			<div style="float:left">
-				<tr>
-					<table class="sex_mode">
-							<tr>
-								<td style="text-align: center;vertical-align:middle;">
-									<table>
-										<tr><td><input id = "single" type="radio" name="mode" value="single" checked="checked"> Single Image Mode</input></td></tr>
-										<tr><td><input id = "dual" type="radio" name="mode" value="dual"> Dual Image Mode</input></td></tr>
-									</table>
-								</td>
-							</tr>
-					</table>
-				</tr>
+			<div>
+				<table class="sex_mode">
+					<tr>
+						<td style="text-align: center;vertical-align:middle;">
+							<table>
+								<tr><td><div id="single"><input type="radio" name="mode" value="single" checked="checked"> Single Image Mode</input></div></td></tr>
+								<tr id="dual"><td id="dual"><input type="radio" name="mode" value="dual"> Dual Image Mode</input></td></tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<div id="help_mode" class="tip" style="display:none;width:40%;"></div>
 			</div>
-			<div id="help_mode" class="tip" style="display:none;float:left;width:40%;"></div>
-			<br>
-			<hr>
 			<div id ="{{plugin.id}}_results_div"></div>
 			<div id ="{{plugin.id}}_results_div2"></div>
-			<hr>
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
 				<div id="selector1_div"></div>
-				<HR>
-				<div id="selector2_div" style="display:none;">
-					<br>
-					<br>
+				<div id="selector2_div">
+					<br/> <br/>
 					<div class="tip" id="infodual" style="float: left; width: 270px; margin-left: 40px;"></div>
 				</div>
 		</div>
@@ -53,29 +45,40 @@
 	var text_dual = "<b>Dual Image Mode Option:</b><li>Image1 is used for detection of sources, image2 for measurements only.<br><li>Image1 and image2 must have the same dimensions.<br><li>For most photometric parameters,image1 will use image2 pixel values, which allows one to easily measurepixel-to-pixel colours.";
 	var info_dual = "<b> SExtractor is in DUAL IMAGE MODE </b><BR><br>You can specify for each image of this mode :<BR><br><li> A <b>WEIGHT MAP</b><li> A <b>FLAG MAP</b><br><br> Use the path selector to choose:<br><br><li><b>TOP</b> selection for the first image<br><li><b>BOTTOM</b> selection for the image used for measurements"
 
-$('single','dual').each(function (id) {
-	if (id.value == 'single') {
-		id.observe('mouseover', function() {
-			$('help_mode').update(text_single);
-			$('help_mode').appear();
-			});
+	var root1 = $('{{plugin.id}}_results_div');
+	var root2 = $('{{plugin.id}}_results_div2');
+	{{ plugin.id }}.ims1 = new ImageSelector(root1);
+	{{ plugin.id }}.ims1.setTableWidget(new AdvancedTable());
 
-		id.observe('mouseout', function() {
-			$('help_mode').fade();
-			});
-		}
-	else if (id.value == 'dual') { 
+	$('selector2_div').hide();
+	$('single','dual').each(function (id) {
 		id.observe('mouseover', function() {
-			$('help_mode').update(text_dual);
-			$('help_mode').appear();
-			});
-		
-		id.observe('mouseout', function() {
-			$('help_mode').fade();
-			});
-		}	
-	}
-);
+			$('help_mode').show();
+			$('help_mode').update(eval('text_' + this.id));
+		});
+		id.observe('click', function() {
+			$('help_mode').show();
+			$('help_mode').update(eval('text_' + this.id));
+			if (this.id == 'dual') {
+				$('selector2_div').show();
+				if (!{{ plugin.id }}.ims2) {
+					{{ plugin.id }}.ims1.getTableWidget().setExclusiveSelectionMode(true);
+					{{ plugin.id }}.ims2 = new ImageSelector(root2);
+					var at = new AdvancedTable();
+					at.setExclusiveSelectionMode(true);
+					{{ plugin.id }}.ims2.setTableWidget(at);
+					}
+				else root2.show();
+			}
+			else if (this.id == 'single') {
+				$('selector2_div').hide();
+				if ({{ plugin.id }}.ims2) {
+					root2.hide();
+					{{ plugin.id }}.ims1.getTableWidget().setExclusiveSelectionMode(false);
+					}
+			}
+		});
+	});
 
 	var menu;
 	document.observe('dom:loaded', function() {
@@ -84,9 +87,8 @@ $('single','dual').each(function (id) {
 			$('output_path_input').focus();
 		});
 
-		{{ plugin.id }}.selectImages();
+	//	{{ plugin.id }}.selectImages();
 	});
-			
 
 	var cf1 = new ConfigFileWidget('config_file_div', '{{ plugin.id }}', {type: 'config'});
 	var cf2 = new ConfigFileWidget('parameter_file_div', '{{ plugin.id }}', {type: 'param'});
@@ -95,8 +97,6 @@ $('single','dual').each(function (id) {
 	fm_file_browser.setRootTitle('Terapix Cluster');
 	fm_file_browser.setFilteringPatterns(['*_flag.fits', '*_weight.fits', '*_psf.fits']);
 	fm_file_browser.setRootDataPath('/data');
-
-	
 
 	// Enable user output custom directory
 	plugin_enableOutputDirectory('menuitem_sub_4', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
@@ -113,19 +113,5 @@ $('single','dual').each(function (id) {
 	selector2.setFileBrowser(fm_file_browser);
 	selector2.render();
 			
-	$('single','dual').each(function (id) {
-		if (id.value == 'dual') {
-			id.observe('click',function() {
-				$('selector2_div').style.display = 'block';
-				$('infodual').update(info_dual);
-			});
-		}
-		else {
-			id.observe('click', function () {
-				$('selector2_div').style.display = 'none';
-				$('infodual').update('');
-			});
-		}
-	});
-fm_file_browser.render();
+	fm_file_browser.render();
 </script>
