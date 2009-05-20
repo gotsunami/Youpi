@@ -286,6 +286,6 @@ notify_user             = monnerville@iap.fr
 						'username'			: str(it.user.username),
 						'descr' 			: str(data['Descr']),
 						'itemId' 			: str(it.id), 
-						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
+						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request)),
 						'name' 				: str(it.name) })
 		return res

@@ -98,6 +98,13 @@ class ProcessingPlugin:
 			'out'	: pattern % "out",
 		}
 
+	def getUserResultsOutputDir(self, request):
+		"""
+		Returns generated result output dir. Useful for reprocessing saved items.
+		"""
+
+		return os.path.join(PROCESSING_OUTPUT, request.user.username, self.id)
+
 	def getConfigFileContent(self, request):
 		post = request.POST
 		try:

@@ -122,7 +122,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'itemId' 			: str(it.id), 
 						'maskPath' 			: str(data['maskPath']), 
 						'regPath' 			: str(data['regPath']), 
-						'resultsOutputDir' 	: str(data['resultsOutputDir']), 
+						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request)),
 						'name' 				: str(it.name),
 						'config' 			: str(data['config'])})
 
