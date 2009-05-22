@@ -29,7 +29,7 @@ def findPath(file):
 #
 # Local configuration file (site specific)
 #
-HOME 			= '/var/www/localhost/htdocs'
+HOME 			= '/usr/local/www/data'
 TRUNK 			= os.path.join(HOME, 'youpi')
 APP_URL_PREFIX  = '/youpi'
 AUP				= APP_URL_PREFIX 	# For short
@@ -87,8 +87,9 @@ SOFTS = (	('Condor', 		os.path.join(CONDOR_BIN_PATH, 'condor'), 		# command
 							'version (.*?) \(')
 		)
 
-PROCESSING_OUTPUT = '/data/mix4/raid1/spica-PROD/'
-FTP_URL = 'ftp://mix4/'
+PROCESSING_OUTPUT = '/data/mix21/raid1/spica-PROD/';
+FTP_URL = 'ftp://mix21/'
+
 #
 # TPX_CONDOR_UPLOAD_URL
 #
@@ -104,7 +105,7 @@ TPX_CONDOR_UPLOAD_URL = FTP_URL + PROCESSING_OUTPUT
 # Ex: http://clix.iap.fr:9000/893265p_04/qualityFITS/ will be used 
 # for image '893265p_04.fits'.
 #
-WWW_FITSIN_PREFIX = 'http://clix.iap.fr:9900/'
+WWW_FITSIN_PREFIX = 'http://youpix.iap.fr:9900/'
 WWW_SCAMP_PREFIX = WWW_FITSIN_PREFIX
 WWW_SWARP_PREFIX = WWW_FITSIN_PREFIX
 WWW_SEX_PREFIX = WWW_FITSIN_PREFIX
@@ -113,11 +114,11 @@ WWW_SEX_PREFIX = WWW_FITSIN_PREFIX
 #
 PROCESSING_SKELETON_ENABLE = False
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+	('Mathias Monnerville', 'monnerville@iap.fr'),
 )
 
 MANAGERS = ADMINS
