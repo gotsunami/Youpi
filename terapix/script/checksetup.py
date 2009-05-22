@@ -95,6 +95,17 @@ def setup_db():
 			# Already existing
 			pass
 
+	# Default config types
+	logger.log('Adding default configuration file types')
+	for type in ('config', 'param'):
+		try:
+			t = ConfigType(name = type)
+			t.save()
+			logger.log('Added type ' + type)
+		except IntegrityError:
+			# Already existing
+			pass
+
 	# Default configuration files
 	logger.log('Adding default configuration files')
 	user = User.objects.all()[0]
