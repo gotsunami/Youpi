@@ -363,11 +363,11 @@ queue""" %  {
 
 			relTaskIds = [rel.task.id for rel in rels]
 
-			# Valid task is only the lastest successful qfits-in of current logged-in user
-			tasks = Processing_task.objects.filter(	id__in = relTaskIds, 
-													user = request.user, 
-													kind__name__exact = 'fitsin',
-													success = True).order_by('-end_date')
+			tasks, filtered = read_proxy(request, Processing_task.objects.filter(
+				id__in = relTaskIds, 
+				kind__name__exact = 'fitsin',
+				success = True).order_by('-end_date'),
+			)
 
 			if not tasks:
 				#missing.append(str(img.name))
