@@ -40,6 +40,12 @@ function FileBrowser(container_id, varName) {
 	 */
 	var _instance_name = varName;
 	/*
+	 * Var: _container_id
+	 * DOM container ID
+	 *
+	 */
+	var _container_id = container_id;
+	/*
 	 * Var: _MODES
 	 * Selection modes available
 	 *
@@ -391,9 +397,9 @@ function FileBrowser(container_id, varName) {
 	function _renderBase() {
 		var tr, th, td;
 		var tab = document.createElement('table');
-		tab.setAttribute('id', container_id + '_fb_tab');
+		tab.setAttribute('id', _container_id + '_fb_tab');
 		tab.setAttribute('class', 'fileBrowser');
-		var container = document.getElementById(container_id);
+		var container = document.getElementById(_container_id);
 		container.appendChild(tab);
 
 		tr = document.createElement('tr');
@@ -404,7 +410,7 @@ function FileBrowser(container_id, varName) {
 
 		tr = document.createElement('tr');
 		td = document.createElement('td');
-		td.setAttribute('id', container_id + '_tree');
+		td.setAttribute('id', _container_id + '_tree');
 		tr.appendChild(td);
 		tab.appendChild(tr);
 
@@ -412,20 +418,20 @@ function FileBrowser(container_id, varName) {
 		if (_selectionMode == _MODES.MULTI) {
 			tr = document.createElement('tr');
 			th = document.createElement('th');
-			th.setAttribute('id', container_id + '_sel_path_th');
+			th.setAttribute('id', _container_id + '_sel_path_th');
 			th.appendChild(document.createTextNode(_selectedPathTitle));
 			tr.appendChild(th);
 			tab.appendChild(tr);
 	
 			tr = document.createElement('tr');
-			tr.setAttribute('id', container_id + '_sel_mode_tr');
+			tr.setAttribute('id', _container_id + '_sel_mode_tr');
 			td = document.createElement('td');
 			td.setAttribute('style', 'width: 320px; margin: 0px; padding: 0px;');
 	
 			var d = document.createElement('div');
-			d.setAttribute('id', container_id + '_sel_mode_div');
+			d.setAttribute('id', _container_id + '_sel_mode_div');
 			d.setAttribute('style', 'overflow: auto; height: 80px; vertical-align: center;'); 
-			td.setAttribute('id', container_id + '_tree');
+			td.setAttribute('id', _container_id + '_tree');
 			td.appendChild(d);
 			tr.appendChild(td);
 			tab.appendChild(tr);
@@ -449,7 +455,7 @@ function FileBrowser(container_id, varName) {
 		} ];
 
 		if (_tree) delete _tree;
-		_tree = new TafelTree(container_id + '_tree', _root, {
+		_tree = new TafelTree(td, _root, {
 			'generate'			: true,
 			'imgBase'			: '/media/js/3rdParty/tafelTree/imgs/',
 			'height'			: _treeviewHeight,
@@ -482,14 +488,14 @@ function FileBrowser(container_id, varName) {
 	 *
 	 */ 
 	function _renderSelectionMode() {
-		var tr = document.getElementById(container_id + '_sel_mode_tr');
+		var tr = document.getElementById(_container_id + '_sel_mode_tr');
 		if (_selectionMode == _MODES.SINGLE) {
 			return;
 		}
 
 		tr.style.display = 'block';
 		tr.firstChild.style.width = '*';
-		var d = document.getElementById(container_id + '_sel_mode_div');
+		var d = document.getElementById(_container_id + '_sel_mode_div');
 		
 		var tab = document.createElement('table');
 		tab.setAttribute('class', 'selModeMulti');
@@ -620,7 +626,7 @@ function FileBrowser(container_id, varName) {
 		if (id == 'root' || !branch.hasChildren() || nb == 0)
 			return;
 
-		var d = document.getElementById(container_id + '_sel_mode_div');
+		var d = document.getElementById(_container_id + '_sel_mode_div');
 		var tab = d.firstChild;
 
 		if (_selectedDataPaths.length == 0 && tab.childNodes.length)
@@ -637,7 +643,7 @@ function FileBrowser(container_id, varName) {
 		var tr, td;
 		// Delete action
 		tr = document.createElement('tr');
-		var trid =  container_id + '_added_path_tr_' + (_selectedDataPaths.length-1);
+		var trid =  _container_id + '_added_path_tr_' + (_selectedDataPaths.length-1);
 		tr.setAttribute('id', trid);
 
 		td = document.createElement('td');
@@ -685,7 +691,7 @@ function FileBrowser(container_id, varName) {
 	 *
 	 */ 
 	function _updateSelectedPathsHeaderTitle() {
-		var th = document.getElementById(container_id + '_sel_path_th');
+		var th = document.getElementById(_container_id + '_sel_path_th');
 		var total = 0;
 		for (var k=0; k < _selectedDataPaths.length; k++) {
 			total += _selectedDataPaths[k][1];
@@ -716,7 +722,7 @@ function FileBrowser(container_id, varName) {
 	 *
 	 */ 
 	this.removeDataPath = function(num) {
-		var trid = container_id + '_added_path_tr_' + num;
+		var trid = _container_id + '_added_path_tr_' + num;
 		var tr =  document.getElementById(trid);
 		var tab = tr.parentNode;
 
