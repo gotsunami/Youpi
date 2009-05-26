@@ -1531,3 +1531,13 @@ div.tags *, .dropzone * {
 	padding: 0px;
 	background-color: lightyellow;
 }
+
+.datapath {
+	cursor: pointer;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.all_mini * {
+	font-size: 10px;
+}

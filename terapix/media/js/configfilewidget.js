@@ -74,17 +74,9 @@ function ConfigFileWidget(container, pluginId, options)
 		tab.insert(tr);
 
 		// Options
-		var opta = new Element('a', {href: '#'}).update('import config files');
-		opta.observe('click', function() {
-			boxes.browsePath(['*.*'], function(path) {
-				console.log(path);
-			});
-		});
-		var optd = new Element('div');
-		optd.update('(Or ').insert(opta).insert(' from a directory)');
 		tr = new Element('tr');
 		td = new Element('td');
-		td.insert(optd);
+		_showImportOption(td);
 		tr.insert(td);
 		tab.insert(tr);
 
@@ -149,6 +141,49 @@ function ConfigFileWidget(container, pluginId, options)
 		tab.insert(tr);
 		ndiv.insert(tab);
 		_container.insert(ndiv);
+	}
+
+	/*
+	 * Function: _showImportOption
+	 * Shows config file import option
+	 *
+	 * Parameters:
+	 *  container: DOM or string: container
+	 *
+	 */ 
+	function _showImportOption(container) {
+		var opta = new Element('a', {href: '#'}).update('import config files');
+		var optd = new Element('div').addClassName('all_mini');
+		opta.observe('click', function() {
+			var pathi = new Element('input', {id: plugin_id + '_config_data_path_input', 
+				readonly: 'readonly',
+				type: 'text', 
+				size: 50, 
+				title: 'Click to open the path selector'}).addClassName('datapath');
+			var importb = new Element('input', {type: 'button', value: 'Import!'});
+			importb.observe('click', function() { 
+				_batchImport(pathi.value);
+			}).hide();
+			pathi.observe('click', function() {
+				boxes.browsePath(['*.*'], function(path) {
+					if (path) {
+						pathi.writeAttribute('value', path);
+						importb.show();
+					}
+				});
+			});
+			var backa = new Element('a', {href: '#'}).update('Back');
+			backa.observe('click', function() { _showImportOption(container); });
+			optd.update('(').insert(backa).insert(')').insert(pathi).insert(importb).appear({
+				afterFinish: function() {pathi.focus();}
+			});
+		});
+		optd.update('(Or ').insert(opta).insert(' from a directory)');
+		container.update(optd);
+	}
+
+	function _batchImport(path) {
+		console.log(path);
 	}
 
 	function _displayCurrentConfUsed() {
