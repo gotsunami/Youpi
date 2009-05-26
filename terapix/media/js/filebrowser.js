@@ -455,7 +455,7 @@ function FileBrowser(container_id, varName) {
 		} ];
 
 		if (_tree) delete _tree;
-		_tree = new TafelTree(td, _root, {
+		_tree = new TafelTree(container_id + '_tree', _root, {
 			'generate'			: true,
 			'imgBase'			: '/media/js/3rdParty/tafelTree/imgs/',
 			'height'			: _treeviewHeight,

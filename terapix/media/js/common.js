@@ -1106,6 +1106,73 @@ var boxes = {
 		});
 	},
 	/*
+	 * Function: browsePath
+	 * File/Path selector box
+	 *
+	 * Parameters:
+	 *  onAcceptHandler - function: callback executed when the 'Ok' button is clicked
+	 *  fileTypes - array: array of string patterns
+	 *  title - string: header title [optional]
+	 * 
+	 */
+	browsePath: function(fileTypes, onAcceptHandler, title) {
+		if (typeof onAcceptHandler != 'function')
+			throw "onAcceptHandler must be a function";
+		if (typeof fileTypes != 'object')
+			throw "fileTyeps must be an array of strings";
+		if (title && typeof title != 'string')
+			throw "title must be a string";
+
+		var title = title ? title : 'Select a data path';
+		var label = new Element('div').setStyle({marginTop: '5px', marginBottom: '10px'}).update('Please select a path:');
+		var d = new Element('div').update(label);
+		var bd = new Element('div').setStyle({paddingTop: '10px', textAlign: 'right'});
+		var yesButton = new Element('input', {id: 'modalbox_ok_input', type: 'button', value: 'Ok'}).setStyle({marginRight: '20px'});
+		var noButton = new Element('input', {id: 'modalbox_cancel_input', type: 'button', value: 'Cancel'});
+		bd.insert(yesButton).insert(noButton);
+
+		var selectedPath = null;
+		box_file_browser = new LightFileBrowser('box_file_browser');
+		box_file_browser.setRootTitle('Terapix Cluster');
+		box_file_browser.setFilteringPatterns(fileTypes);
+		box_file_browser.setRootDataPath('/data');
+		box_file_browser.setTreeviewHeight('300px');
+		box_file_browser.setBranchClickedHandler(function(path) {
+			selectedPath = path;
+		});
+
+		d.insert(box_file_browser.render());
+		d.insert(bd);
+
+		Window._accept = false;
+		var win = new Window({
+			className: 'alphacube',
+			width: 400, 
+			height: 370, 
+			minimizable: false, 
+			maximizable: false, 
+			resizable: false, 
+			draggable: false,
+			title: title
+		});
+		win.getContent().update(d);
+		win.setCloseCallback(function() {
+			if (Window._accept && onAcceptHandler)
+				onAcceptHandler(selectedPath);
+			return true;
+		});
+		win.showCenter(true);
+
+		$('modalbox_ok_input').observe('click', function() { 
+			Window._accept = true;
+			win.close(); 
+		});
+
+		$('modalbox_cancel_input').observe('click', function() { 
+			win.close(); 
+		});
+	},
+	/*
 	 * Function: alert
 	 * Display a modern JS aler box
 	 *
@@ -1421,3 +1488,5 @@ document.observe('permissions:updated', function(event) {
 	if (!c) throw 'Permissions container not found';
 	c.update(get_permissions(event.memo.target, event.memo.key, event.memo.handler, event.memo.misc /* misc data parameter */));
 });
+
+var box_file_browser;

@@ -72,6 +72,22 @@ function ConfigFileWidget(container, pluginId, options)
 		td.insert(butd);
 		tr.insert(td);
 		tab.insert(tr);
+
+		// Options
+		var opta = new Element('a', {href: '#'}).update('import config files');
+		opta.observe('click', function() {
+			boxes.browsePath(['*.*'], function(path) {
+				console.log(path);
+			});
+		});
+		var optd = new Element('div');
+		optd.update('(Or ').insert(opta).insert(' from a directory)');
+		tr = new Element('tr');
+		td = new Element('td');
+		td.insert(optd);
+		tr.insert(td);
+		tab.insert(tr);
+
 		_container.insert(tab);
 
 		// Label div, reports current conf selected file
