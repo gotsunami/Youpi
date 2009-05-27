@@ -595,18 +595,13 @@ function ImageSelector(container, options)
 		// Upload text file to make a single selection
 		tea = new Element('a', {href: '#'}).update('upload a text file');
 		tea.observe('click', function() {
-		//	$(id + '_results_div').fade();
-			critdiv.fade({ 
-				delay: 0.2,
-				afterFinish: function() {
-					_showSingleSelFormUpload(updiv);
-					updiv.appear();
-					// Cleaning up
-					$(id + '_image_info_div').fade();
-					$(id + '_result_count_div').update();
-					_tableWidget.empty();
-				}
-			});
+			critdiv.hide();
+			_showSingleSelFormUpload(updiv);
+			updiv.show();
+			// Cleaning up
+			$(id + '_image_info_div').fade();
+			$(id + '_result_count_div').update();
+			_tableWidget.empty();
 		});
 		tediv = new Element('div').setStyle({fontSize: '9px'}).update('(or ').insert(tea).insert(' describing a selection)');
 		critdiv.insert(tediv);
@@ -733,14 +728,10 @@ function ImageSelector(container, options)
 		var bdiv = new Element('div').setStyle({fontSize: '9px'});
 		ba = new Element('a', {href: '#'}).update('go back');
 		ba.observe('click', function() {
-			div.fade({ 
-				delay: 0.2,
-				afterFinish: function() {
-					_tableWidget.empty();
-					$(id + '_result_count_div').update();
-					$(id + '_crit_div').appear();
-				}
-			});
+			div.hide();
+			_tableWidget.empty();
+			$(id + '_result_count_div').update();
+			$(id + '_crit_div').show();
 		});
 		bdiv.insert('(Or ').insert(ba).insert(' to criteria-based selection page)');
 		div.insert(bdiv);
