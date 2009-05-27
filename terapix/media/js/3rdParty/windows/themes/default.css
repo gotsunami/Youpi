@@ -147,6 +147,7 @@
 
 .dialog table.table_window td , .dialog table.table_window th { 
   padding: 0; 
+  border: none;
 }
 
 .dialog .title_window {
