@@ -692,12 +692,14 @@ queue
 		error = resp
 		jobid = 'null'
 
-	return HttpResponse(str({	'Path' 			: str(path), 
-								'IngestionId' 	: str(ingestionId), 
-								'Host' 			: str(machine),
-								'JobId' 		: str(jobid),
-								'Error'			: str(error)
-							}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({
+		'Path' 			: path, 
+		'IngestionId' 	: ingestionId, 
+		'Host' 			: node,
+		'JobId' 		: jobid,
+		'Error'			: error,
+	}), mimetype = 'text/plain')
+
 @login_required
 @profile
 def get_condor_requirement_string(request):
