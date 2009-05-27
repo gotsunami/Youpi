@@ -1090,12 +1090,12 @@ def upload_file(request):
 
 		if len(keys):
 			k = keys[0]
-			content = files[k]['content']
+			content = files[k].read()
 		else:
 			raise Exception, "Could not get file content"
 
 		# Valid XML file, save it to disk
-		filename = files[k]['filename']
+		filename = files[k].name
 		f = open('/tmp/' + request.user.username + '_' + filename, 'w')
 		f.write(content)
 		f.close()
