@@ -520,7 +520,7 @@ def run_ingestion():
 			continue
 
 		try:
-			res = g.execute("""select name from youpi_image where name = "%s";""" % fitsNoExt);
+			res = g.execute("""select name, checksum from youpi_image where name = "%s";""" % fitsNoExt);
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			sendmail(1, email, duration_stime, time.time(), runame)
@@ -539,7 +539,16 @@ def run_ingestion():
 		#
 		
 		old = fitsNoExt
+		# Image name found
 		if res:
+			# Compare checksums
+			dbchecksum = res[0][1]
+			if checksum == dbchecksum:
+				# Do nothing because the same physical image is already ingested
+				debug("\tImage with same name and checksum already ingested. Skipping...")
+				continue
+
+			# Different checksums, so go ahead
 			fitsNoExt = freshImageName(fitsNoExt, g)
 			if allowSeveralIngestions != 'yes':
 				if old != fitsNoExt:
@@ -680,7 +689,10 @@ def run_ingestion():
 			sendmail(1, email, duration_stime, time.time(), runame)
 			sys.exit(1)
 
+		#
 		# Computing image sky footprint
+		#
+		footprint_start = time.time()
 		poly = []
 		for i in range(1,len(r)):
 			pix1,pix2 = r[i].header['CRPIX1'],r[i].header['CRPIX2']
@@ -693,7 +705,6 @@ def run_ingestion():
 			x3,y3 = nax1 - pix1, nax2 - pix2
 			x4,y4 = 1 - pix1, nax2 - pix2
 
-
 			# Manu's Method
 			ra1, dec1, ra2, dec2, ra3, dec3, ra4, dec4 = (	val1+cd11*x1+cd12*y1,
 			val2+cd21*x1+cd22*y1,
@@ -705,14 +716,11 @@ def run_ingestion():
 			val2+cd21*x4+cd22*y4 )
 
 			poly.append("(%.20f %.20f, %.20f %.20f, %.20f %.20f, %.20f %.20f, %.20f %.20f)" % (ra1, dec1, ra2, dec2, ra3, dec3, ra4, dec4, ra1, dec1))
-			print i
 
 		q = "GeomFromText(\"MULTIPOLYGON(("
-		print 'LEN:', len(poly)
 		for p in poly:
 				q += "%s, " % p
 		q = q[:-2] + "))\")"
-		print q
 		
 		try:
 			g.begin()
@@ -723,9 +731,10 @@ def run_ingestion():
 			g.con.rollback()
 			runame = 'ERROR'
 
-#preparing data to insert centerfield point
+		#
+		# Preparing data to insert centerfield point
+		#
 		cf = "GeomFromText('POINT(%s %s)')" % (ra, de)
-
 		qu = """UPDATE youpi_image SET centerfield=%s WHERE name="%s";""" % (cf, fitsNoExt)
 		try:
 			g.begin()
@@ -735,13 +744,13 @@ def run_ingestion():
 			debug(e, FATAL)
 			g.con.rollback()
 			runame = 'ERROR'
-		
+
+		debug("\tSky footprint/centerfield took: (%.2f)" % (time.time()-footprint_start))
 		# Done
 		debug("\tIngested in database as '%s'" % fitsNoExt)
 	
 		# Commits for that image
 		g.con.commit()
-		
 			
 	duration_etime = time.time()
 
@@ -783,4 +792,3 @@ if __name__ == '__main__':
 		debug("Incorrect arguments passed to the script: %s" % e, FATAL)
 		sendmail(1, 'monnerville@iap.fr', time.time(), time.time(), 'UNKNOWN')
 		sys.exit(1)
-
