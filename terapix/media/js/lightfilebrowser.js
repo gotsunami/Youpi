@@ -53,6 +53,7 @@ function LightFileBrowser(varName) {
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 
+	var _container;
 	/*
 	 * Var: _selectedDataPaths
 	 * Array of arrays of selected data paths
@@ -305,6 +306,7 @@ function LightFileBrowser(varName) {
 	 */ 
 	this.setFilteringPatterns = function(patternList) {
 		_filteringPatterns = patternList;
+		if (_container) _updateTreeRoot();
 	}
 
 	/*
@@ -341,8 +343,13 @@ function LightFileBrowser(varName) {
 	 *
 	 */ 
 	function _renderBase() {
-		var container = new Element('div').addClassName('home');
-
+		_container = new Element('div').addClassName('home');
+		_updateTreeRoot();
+		return _container;
+	}
+	
+	function _updateTreeRoot() {
+		if (_container) _container.update();
 		// root's JSON branch
 		_root = [ {
 			'id'				: 'root',
@@ -361,7 +368,7 @@ function LightFileBrowser(varName) {
 		} ];
 
 		if (_tree) delete _tree;
-		_tree = new TafelTree(container, _root, {
+		_tree = new TafelTree(_container, _root, {
 			'generate'			: true,
 			'imgBase'			: '/media/js/3rdParty/tafelTree/imgs/',
 			'height'			: _treeviewHeight,
@@ -372,7 +379,6 @@ function LightFileBrowser(varName) {
 			'cookies'			: false } 
 		);
 
-		return container;
 	}
 
 	/*

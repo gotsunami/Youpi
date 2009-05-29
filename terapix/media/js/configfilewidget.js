@@ -30,6 +30,8 @@ function ConfigFileWidget(container, pluginId, options)
 	var id = 'CFW_' + Math.floor(Math.random() * 999999);
 	var plugin_id = pluginId ? pluginId : null;
 	var _options;
+	var _uploadPB;
+	var _cancelImport = false;
 
 	function render() {
 		var tr, th, td;
@@ -75,12 +77,12 @@ function ConfigFileWidget(container, pluginId, options)
 
 		// Options
 		tr = new Element('tr');
-		td = new Element('td');
-		_showImportOption(td);
+		td = new Element('td', {id: id + '_' + options.type + '_import_files_td'});
 		tr.insert(td);
 		tab.insert(tr);
 
 		_container.insert(tab);
+		_showImportOption();
 
 		// Label div, reports current conf selected file
 		ndiv = new Element('div');
@@ -147,13 +149,13 @@ function ConfigFileWidget(container, pluginId, options)
 	 * Function: _showImportOption
 	 * Shows config file import option
 	 *
-	 * Parameters:
-	 *  container: DOM or string: container
-	 *
 	 */ 
-	function _showImportOption(container) {
+	function _showImportOption() {
+		var container = $(id + '_' + options.type + '_import_files_td');
 		var opta = new Element('a', {href: '#'}).update('import config files');
 		var optd = new Element('div').addClassName('all_mini');
+		var patterns;
+
 		opta.observe('click', function() {
 			var pathi = new Element('input', {id: plugin_id + '_config_data_path_input', 
 				readonly: 'readonly',
@@ -162,18 +164,20 @@ function ConfigFileWidget(container, pluginId, options)
 				title: 'Click to open the path selector'}).addClassName('datapath');
 			var importb = new Element('input', {type: 'button', value: 'Import!'});
 			importb.observe('click', function() { 
-				_batchImport(pathi.value);
+				_cancelImport = false;
+				_batchImport(pathi.value, patterns);
 			}).hide();
 			pathi.observe('click', function() {
-				boxes.browsePath(['*.*'], function(path) {
+				boxes.browsePath(['*.*'], function(path, filePatterns) {
 					if (path) {
 						pathi.writeAttribute('value', path);
+						patterns = filePatterns;
 						importb.show();
 					}
 				});
 			});
 			var backa = new Element('a', {href: '#'}).update('Back');
-			backa.observe('click', function() { _showImportOption(container); });
+			backa.observe('click', function() { _showImportOption(); });
 			optd.update('(').insert(backa).insert(')').insert(pathi).insert(importb).appear({
 				afterFinish: function() {pathi.focus();}
 			});
@@ -182,8 +186,110 @@ function ConfigFileWidget(container, pluginId, options)
 		container.update(optd);
 	}
 
-	function _batchImport(path) {
-		console.log(path);
+	/*
+	 * Function: _batchImport
+	 * Sets things up for batch import
+	 *
+	 * Parameters:
+	 *  path - string: path for searching files
+	 *  patterns - array: array of regexp patterns
+	 *
+	 */ 
+	function _batchImport(path, patterns) {
+		var container = $(id + '_' + options.type + '_import_files_td');
+		container.update();
+		var cancelb = new Element('input', {id: id + _options.type + '_cancel_button', type: 'button', value: 'Cancel'});
+		cancelb.observe('click', function() {
+			boxes.confirm('Are you sure you want to cancel the import?', function() {
+				_cancelImport = true;
+			});
+		});
+
+		var tab = new Element('table').setStyle({width: '100%'});
+		var tr, td;
+		tr = new Element('tr');
+		td = new Element('td').setStyle({width: '100%', verticalAlign: 'middle'});
+		var p = new Element('div');
+		_uploadPB = new ProgressBar(p, 0, {
+			borderColor: 'grey', 
+			color: 'lightblue',
+			animate: false
+		});
+		var log = new Element('span', {id: id +  '_' + _options.type + '_upload_log'});
+		td.insert(p).insert(log);
+		tr.insert(td);
+
+		td = new Element('td').insert(cancelb);
+		tr.insert(td);
+		tab.insert(tr);
+		container.update(tab);
+
+		_do_Import(0, path, patterns);
+	}
+
+	/*
+	 * Function: _batchImport
+	 * Import files recursively from a directory
+	 *
+	 * Parameters:
+	 *  pos - integer: file number (seek)
+	 *  path - string: path for searching files
+	 *  patterns - array: array of regexp patterns
+	 *  total - integer: total file count [optional]
+	 *
+	 */ 
+	function _do_Import(pos, path, patterns, total) {
+		var container = $(id +  '_' + _options.type + '_upload_log');
+		var r = new HttpRequest(
+			container,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				var r = resp.result;
+				var log = new Logger(container);
+				if (r.error) {
+					container.update();
+					log.msg_error(r.error);
+					return;
+				}
+				if (!_cancelImport && r.pos < r.total) {
+					_uploadPB.setPourcentage(r.percent);			
+					_do_Import(r.pos, path, patterns, r.total);
+				}
+				else {
+					container.update();
+					if (_cancelImport)
+						log.msg_warning('Aborted. ' + r.pos + ' files imported');
+					else {
+						_uploadPB.setPourcentage(100);			
+						log.msg_ok('Done. ' + r.total + ' files imported' + (r.total == 0 ? ' (<b>maybe not the right directory?</b>)' : ''));
+					}
+					var but = $(id + _options.type + '_cancel_button');
+					but.writeAttribute('value', 'Close');
+					but.stopObserving('click');
+					but.observe('click', function() {
+						_showImportOption();
+					});
+				}
+			}
+		);
+
+		var post = {
+			Plugin: plugin_id,
+			Method: 'importConfigFiles',
+			Path: path,
+			Patterns: patterns.join(';'),
+			Type: _options.type
+		}
+
+		if (pos) {
+			post.Pos = pos;
+			post.Total = total;
+		}
+
+		r.setBusyMsg('Please wait while processing');
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	}
 
 	function _displayCurrentConfUsed() {

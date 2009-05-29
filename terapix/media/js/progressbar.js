@@ -91,10 +91,8 @@ function ProgressBar(container, percent, options) {
 	 *
 	 */ 
 	this.setPourcentage = function(pourcent) {
-		_pourcent = pourcent;
-
-		// Update
-		_render();
+		_percent = pourcent;
+		_render(); // Update
 	}
 
 	/*
@@ -134,7 +132,7 @@ function ProgressBar(container, percent, options) {
 	 *
 	 */ 
 	this.getPourcentage = function() {
-		return _pourcent;
+		return _percent;
 	}
 
 	/*

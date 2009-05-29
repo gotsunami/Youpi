@@ -1115,17 +1115,17 @@ var boxes = {
 	 *  title - string: header title [optional]
 	 * 
 	 */
-	browsePath: function(fileTypes, onAcceptHandler, title) {
+	browsePath: function(filePatterns, onAcceptHandler, title) {
 		if (typeof onAcceptHandler != 'function')
 			throw "onAcceptHandler must be a function";
-		if (typeof fileTypes != 'object')
+		if (typeof filePatterns != 'object')
 			throw "fileTyeps must be an array of strings";
 		if (title && typeof title != 'string')
 			throw "title must be a string";
 
 		var title = title ? title : 'Select a data path';
-		var label = new Element('div').setStyle({marginTop: '5px', marginBottom: '10px'}).update('Please select a path:');
-		var d = new Element('div').update(label);
+		var patd = new Element('div').setStyle({marginTop: '5px', marginBottom: '10px'}).update('File pattern:');
+		var d = new Element('div').update(patd);
 		var bd = new Element('div').setStyle({paddingTop: '10px', textAlign: 'right'});
 		var yesButton = new Element('input', {id: 'modalbox_ok_input', type: 'button', value: 'Ok'}).setStyle({marginRight: '20px'});
 		var noButton = new Element('input', {id: 'modalbox_cancel_input', type: 'button', value: 'Cancel'});
@@ -1134,12 +1134,18 @@ var boxes = {
 		var selectedPath = null;
 		box_file_browser = new LightFileBrowser('box_file_browser');
 		box_file_browser.setRootTitle('Terapix Cluster');
-		box_file_browser.setFilteringPatterns(fileTypes);
+		box_file_browser.setFilteringPatterns(filePatterns);
 		box_file_browser.setRootDataPath('/data');
 		box_file_browser.setTreeviewHeight('300px');
 		box_file_browser.setBranchClickedHandler(function(path) {
 			selectedPath = path;
 		});
+
+		var pati = new Element('input', {value: filePatterns.join(';'), title: 'Set file patterns separated by semi-colons'});
+		pati.observe('change', function() {
+			box_file_browser.setFilteringPatterns(this.value.split(';'));
+		});
+		patd.insert(pati);
 
 		d.insert(box_file_browser.render());
 		d.insert(bd);
@@ -1158,7 +1164,7 @@ var boxes = {
 		win.getContent().update(d);
 		win.setCloseCallback(function() {
 			if (Window._accept && onAcceptHandler)
-				onAcceptHandler(selectedPath);
+				onAcceptHandler(selectedPath, pati.value.split(';'));
 			return true;
 		});
 		win.showCenter(true);

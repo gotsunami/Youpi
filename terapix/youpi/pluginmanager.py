@@ -145,6 +145,46 @@ class ProcessingPlugin:
 
 		return {'configs': res}
 
+	def importConfigFiles(self, request):
+		"""
+		Import all configuration files in a directory. File names are matched against 
+		a pattern.
+		"""
+
+		post = request.POST
+		try:
+			path = post['Path']
+			patterns = post['Patterns'].split(';')
+			type = post['Type']
+		except:
+			raise PluginError, "invalid post parameters %s" % post
+
+		res = {}
+		MAX_FILE_SIZE = 1024 # In Kb
+		files = []
+		try:
+			for pat in patterns:
+				pfiles = glob.glob(os.path.join(path, pat))
+				files.extend(pfiles)
+		except:
+			res['error'] = 'An error occured when looking for files in the provided path. Please check your path and try again'
+
+		try: 
+			pos = int(post['Pos'])
+			total = int(post['Total'])
+			if pos < total - 5: pos += 5
+			else: pos = total
+		except:
+			# Compute total
+			total = len(files);
+			pos = 5
+
+		res['total'] = total
+		res['pos'] = pos
+		if total == 0: res['percent'] = 0
+		else: res['percent'] = pos*100./total
+		return res
+
 	def setDefaultConfigFiles(self, defaultCF):
 		"""
 		Used by plugins to alter the default config files list.
@@ -163,7 +203,6 @@ class ProcessingPlugin:
 		return [
 			{'path': os.path.join(PLUGINS_CONF_DIR, self.id + '.conf.default'), 'type': 'config'},
 		]
-
 
 	def __saveDefaultConfigFileToDB(self, request):
 		"""
