@@ -271,6 +271,8 @@ function ConfigFileWidget(container, pluginId, options)
 					but.observe('click', function() {
 						_showImportOption();
 					});
+					// Refresh content
+					setConfigFile();
 				}
 			}
 		);
@@ -294,7 +296,7 @@ function ConfigFileWidget(container, pluginId, options)
 
 	function _displayCurrentConfUsed() {
 		var selNode = $(plugin_id + '_' + _options.type +'_name_select');
-		var txt = selNode.options[selNode.selectedIndex].text;
+		var txt = selNode.options[selNode.selectedIndex].value;
 		var curConfDiv = $(id + '_' + _options.type + '_current_div');
 		curConfDiv.update("The '" + txt + "' " + _options.type +" file will be used for processing.");
 		if ($(id + '_' + _options.type + '_editor_div').visible()) _editSelectedConfigFile();
@@ -306,7 +308,7 @@ function ConfigFileWidget(container, pluginId, options)
 
 	function _editSelectedConfigFile() {
 		var sel = $(plugin_id + '_' + _options.type + '_name_select');
-		var conf = sel.options[sel.selectedIndex].text;
+		var conf = sel.options[sel.selectedIndex].value;
 		editConfigFile(conf);
 	}
 
@@ -514,7 +516,7 @@ function ConfigFileWidget(container, pluginId, options)
 				defopt.writeAttribute('selected', 'selected');
 				cdiv.insert(selNode);
 	
-				var txt = selNode.options[selNode.selectedIndex].text;
+				var txt = selNode.options[selNode.selectedIndex].value;
 				_displayCurrentConfUsed();
 			}
 		);
@@ -530,7 +532,7 @@ function ConfigFileWidget(container, pluginId, options)
 
 	function _deleteConfigFile() {
 		var selNode = $(plugin_id + '_' + _options.type + '_name_select');
-		var txt = selNode.options[selNode.selectedIndex].text;
+		var txt = selNode.options[selNode.selectedIndex].value;
 	
 		if (txt == 'default') {
 			alert('Cannot remove default ' + _options.type + ' file.');
@@ -553,8 +555,13 @@ function ConfigFileWidget(container, pluginId, options)
 				}
 			);
 		
-			var post = 'Plugin=' + plugin_id + '&Method=deleteConfigFile&Name=' + txt + '&Type=' + _options.type;
-			r.send('/youpi/process/plugin/', post);
+			var post = {
+				Plugin: plugin_id,
+				Method: 'deleteConfigFile',
+				Name: txt.escapeHTML(),
+				Type: _options.type
+			};
+			r.send('/youpi/process/plugin/', $H(post).toQueryString());
 		});
 	}
 

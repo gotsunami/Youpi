@@ -161,6 +161,8 @@ class ProcessingPlugin:
 
 		res = {}
 		MAX_FILE_SIZE = 1024 # In Kb
+		STEP = 10
+
 		files = []
 		try:
 			for pat in patterns:
@@ -172,15 +174,47 @@ class ProcessingPlugin:
 		try: 
 			pos = int(post['Pos'])
 			total = int(post['Total'])
-			if pos < total - 5: pos += 5
-			else: pos = total
 		except:
+			# First call to this function
 			# Compute total
 			total = len(files);
-			pos = 5
+			pos = 0
+
+		profile = request.user.get_profile()
+		ctype = ConfigType.objects.filter(name = type)[0]
+		kind = Processing_kind.objects.filter(name__exact = self.id)[0]
+		frame = range(len(files))[pos:]
+		z = 0
+		for k in frame:
+			if pos == total: break
+			pos += 1
+			z += 1
+			try:
+				# TODO: check magic number
+				f = open(files[k])
+				content = string.join(f.readlines(), '\n')
+				base = os.path.basename(files[k])
+				name = base[:base.rfind('.')]
+				res['config'] = str(name)
+				f.close()
+			except Exception, e:
+				# Problem reading the file
+				# TODO: deal with error
+				continue
+
+			try:
+				# Updates entry
+				m = ConfigFile.objects.filter(kind = kind, name = name, type = ctype)[0]
+				m.content = content
+			except:
+				# ... or inserts a new one
+				m = ConfigFile(kind = kind, name = name, content = content, user = request.user, type = ctype, mode = profile.dflt_mode, group = profile.dflt_group)
+
+			success = write_proxy(request, m)
+			if z > STEP: break
 
 		res['total'] = total
-		res['pos'] = pos
+		res['pos'] = pos 
 		if total == 0: res['percent'] = 0
 		else: res['percent'] = pos*100./total
 		return res
