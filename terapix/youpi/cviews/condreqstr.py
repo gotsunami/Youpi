@@ -69,6 +69,8 @@ def get_requirement_string(params, vms):
 		'T'	: 1024 * 1024
 	}
 
+	# Sanitize
+	params = params.replace('*', '.*')
 	params = params.split('#')
 	nodes = [vm[0] for vm in vms]
 
