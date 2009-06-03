@@ -1268,7 +1268,7 @@ def del_condor_node_selection(request):
 
 		if data:
 			for plugin in data.keys():
-				if data[plugin]['DS'].find(label) >= 0:
+				if data[plugin]['DS'] == label:
 					return HttpResponse(str({'Error' : str("Cannot delete selection '%s'. User '%s' references it in his/her default selection preferences menu." 
 								% (label, p.user.username))}), mimetype = 'text/plain')
 
