@@ -109,14 +109,16 @@ function reduceString(msg, max) {
  * Parameters:
  *  id - string: unique element id
  *  options - array of strings
- *  size - integer: > 1 for multiple select (defaults to 1)
+ *  size - integer: > 1 for multiple select [default: 1]
+ *  linenumber - boolean: activates line numbering [default: false]
  *
  * Returns:
  *  DOM select node
  *
  */
-function getSelect(id, options, size) {
+function getSelect(id, options, size, linenumber) {
 	size = size ? size : 1;
+	linenumber = typeof linenumber == 'boolean' ? linenumber : false;
 	var select = new Element('select', {'id': id});
 	if (size > 1) {
 		select.setAttribute('size', size);
@@ -124,9 +126,9 @@ function getSelect(id, options, size) {
 	}
 
 	var opt = null;
-	options.each(function(option) {
+	options.each(function(option, k) {
 		opt = new Element('option', {value: option});
-		opt.update(option);
+		linenumber ? opt.update("<span class=\"option_num\">" + (k+1) + '</span> ' + option) : opt.update(option);
 		select.insert(opt);
 	});
 

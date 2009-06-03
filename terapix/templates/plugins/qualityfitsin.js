@@ -1278,6 +1278,8 @@ var {{ plugin.id }} = {
 			}
 		}
 
+		console.log(output_data_path); return;
+
 		// Finally, add to the shopping cart
 		var total = {{ plugin.id }}_ims.getImagesCount();
 
