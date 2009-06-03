@@ -1364,6 +1364,7 @@ var {{ plugin.id }} = {
 											flatPath		: proc[k]['Flat'],
 											maskPath		: proc[k]['Mask'],
 											regPath 		: proc[k]['Reg'],
+											taskId			: proc[k]['TaskId'],
 											resultsOutputDir: proc[k]['ResultsOutputDir']
 								}
 					};

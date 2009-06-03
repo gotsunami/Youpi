@@ -753,6 +753,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		fitsin = Plugin_fitsin.objects.filter(task__in = tasks)[0]
 
 		processings = {	'ResultsOutputDir' 	: str(tasks[0].results_output_dir), 
+						'TaskId'			: int(tasks[0].id), # Used to retrieve config file content
 						'ImgList' 			: str(imgList),
 						'Count'				: len(imgList),
 						'Flat' 				: str(fitsin.flat),
