@@ -152,7 +152,7 @@ function ConfigFileWidget(container, pluginId, options)
 	 */ 
 	function _showImportOption() {
 		var container = $(id + '_' + options.type + '_import_files_td');
-		var opta = new Element('a', {href: '#'}).update('import config files');
+		var opta = new Element('a', {href: '#'}).update('import ' + options.type + ' files');
 		var optd = new Element('div').addClassName('all_mini');
 		var patterns;
 
