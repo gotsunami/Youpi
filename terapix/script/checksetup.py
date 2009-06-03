@@ -106,9 +106,30 @@ def setup_db():
 			# Already existing
 			pass
 
+	# Check user profile
+	user = User.objects.all()[0]
+	p = user.get_profile()
+	if not p:
+		# Create a new profile
+		groups = user.groups.all()
+		if not groups:
+			# No user groups; add default one
+			grp = Group(name = user.username)
+			try:
+				grp.save()
+			except IntegrityError:
+				# Already exits
+				grp = Group.objects.filter(name = user.username)[0]
+			user.groups.add(grp)
+		else:
+			grp = groups[0]
+
+		p = SiteProfile(user = user, dflt_group = grp, dflt_mode = '640')
+		p.save()
+
 	# Default configuration files
 	logger.log('Adding default configuration files')
-	user = User.objects.all()[0]
+	t = ConfigType.objects.filter(name = 'config')[0]
 	for plugin in manager.plugins:
 		try:
 			name = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', plugin.id + '.conf.default')
@@ -120,11 +141,22 @@ def setup_db():
 
 		k = Processing_kind.objects.filter(name__exact = plugin.id)[0]
 		try:
-			m = ConfigFile(kind = k, name = 'default', content = config, user = user)
+			m = ConfigFile(kind = k, name = 'default', content = config, group = p.dflt_group, mode = p.dflt_mode, type = t, user = user)
 			m.save()
 		except:
 			# Cannot save, already exits: do nothing
 			pass
+
+	# Add default parameter file for Sextractor (sex.param.default)
+	try:
+		t = ConfigType.objects.filter(name = 'param')[0]
+		k = Processing_kind.objects.filter(name__exact = 'sex')[0]
+		m = ConfigFile(kind = k, name = 'default', content = config, type = t, user = user, group = p.dflt_group, mode = p.dflt_mode)
+		m.save()
+	except:
+		# Cannot save, already exits: do nothing
+		pass
+
 
 def setup_users():
 	logger.setGroup('users', 'Check if there is at least one user')
