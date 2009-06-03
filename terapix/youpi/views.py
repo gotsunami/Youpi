@@ -1526,7 +1526,8 @@ def stats_processing(request):
 	tasks_per_kind = []
 	for k in kinds:
 		taskcount = Processing_task.objects.filter(kind = k).count()
-		percent = taskcount*100./total_tasks
+		if total_tasks: percent = taskcount*100./total_tasks
+		else: percent = 0
 		tasks_per_kind.append({'kind': str(k.name), 'count': int(taskcount), 'percent': percent})
 
 	failed_tasks = Processing_task.objects.filter(success = 0).count()
