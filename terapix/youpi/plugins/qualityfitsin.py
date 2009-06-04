@@ -904,10 +904,14 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		nongopts = """Select output directory: <select name="output_dir_select">%s</select>""" % \
 				string.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs), '\n')
 
+		oneopts = """Select a grade: <select name="grade_select">%s</select>""" % \
+				string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[0]), GRADE_SET), '\n')
+
 		return [
 			{'id': 'allgrades', 'title': 'List of all QualityFITS-in grades'},
 			{'id': 'gradestats', 'title': 'Grading statistics (summary)'},
 			{'id': 'nongraded', 'title': 'List of all non graded images', 'options': nongopts},
+			{'id': 'onegrade', 'title': 'List of all images with a selected grade', 'options': oneopts},
 		]
 
 	def __getReportName(self, reportId):
@@ -923,6 +927,8 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		Generates a report.
 		@param reportId report Id as returned by the reports() function
 		"""
+		post = request.POST
+
 		if reportId == 'allgrades':
 			from terapix.script.grading import get_grades
 			from terapix.reporting.csv import CSVReport
@@ -932,8 +938,20 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			from terapix.script.grading import get_stats
 			from terapix.reporting.plain import PlainTextReport
 			return HttpResponse(PlainTextReport(data = get_stats()), mimetype = 'text/plain')
+		elif reportId == 'onegrade':
+			from terapix.reporting.csv import CSVReport
+			try:
+				grade = post['grade_select']
+			except Exception, e:
+				raise PluginError, ("POST argument error. Unable to process data: %s" % e)
+			usergrades = FirstQEval.objects.filter(grade = grade)
+			content = []
+			for g in usergrades:
+				rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
+				content.append((rel.image.name, g.grade, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
+			if not usergrades: return HttpResponse('No images are graded ' + grade, mimetype = 'text/plain')
+			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
 		elif reportId == 'nongraded':
-			post = request.POST
 			try:
 				outdir = post['output_dir_select']
 			except Exception, e:
