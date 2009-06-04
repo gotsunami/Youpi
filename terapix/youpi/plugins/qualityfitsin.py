@@ -944,11 +944,11 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				grade = post['grade_select']
 			except Exception, e:
 				raise PluginError, ("POST argument error. Unable to process data: %s" % e)
-			usergrades = FirstQEval.objects.filter(grade = grade)
+			usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
 			content = []
 			for g in usergrades:
 				rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
-				content.append((rel.image.name, g.grade, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
+				content.append((rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
 			if not usergrades: return HttpResponse('No images are graded ' + grade, mimetype = 'text/plain')
 			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
 		elif reportId == 'nongraded':
@@ -975,7 +975,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			for t in tasks[:50]:
 				rel = Rel_it.objects.filter(task = t)[0]
 				f = Plugin_fitsin.objects.filter(task = t)[0]
-				trs.append(("""<tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');"><td><a target="blank" href="/youpi/grading/fitsin/%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
+				trs.append(("""<tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');"><td><a target="_blank" href="/youpi/grading/fitsin/%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
 
 			if not tasks:
 				trs.append(("""<tr><td>All images in this directory have already been graded</td></tr>"""))
