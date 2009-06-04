@@ -1119,7 +1119,7 @@ def get_report(request, pluginId, reportId):
 		return HttpResponseNotFound()
 
 	try:
-		return plugObj.getReport(reportId)
+		return plugObj.getReport(request, reportId)
 	except TypeError:
 		# Bad report Id
 		return HttpResponseNotFound()

@@ -26,6 +26,8 @@ from terapix.settings import *
 from terapix.youpi.auth import read_proxy
 #
 from django.http import HttpResponse, HttpResponseNotFound
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 class QualityFitsIn(ProcessingPlugin):
 	"""
@@ -894,16 +896,26 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 
 	def reports(self):
 		"""
-		Reporting capabilities
+		Adds reporting capabilities to QFITSin plugin
 		"""
 		return [
 			{'id': 'allgrades', 'title': 'List of all QualityFITS-in grades'},
 			{'id': 'gradestats', 'title': 'Grading statistics (summary)'},
+			{'id': 'nongraded', 'title': 'List of all non graded images'},
 		]
 
-	def getReport(self, reportId):
+	def __getReportName(self, reportId):
 		"""
-		Generates a report
+		Returns report name
+		"""
+		for r in self.reports():
+			if r['id'] == reportId:
+				return r['title']
+
+	def getReport(self, request, reportId):
+		"""
+		Generates a report.
+		@param reportId report Id as returned by the reports() function
 		"""
 		if reportId == 'allgrades':
 			from terapix.script.grading import get_grades
@@ -914,5 +926,46 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			from terapix.script.grading import get_stats
 			from terapix.reporting.plain import PlainTextReport
 			return HttpResponse(PlainTextReport(data = get_stats()), mimetype = 'text/plain')
+		elif reportId == 'nongraded':
+			from django.db import connection
+			cur = connection.cursor()
+
+			usergrades = FirstQEval.objects.all().values('fitsin').distinct()
+			usergrades = [g['fitsin'] for g in usergrades]
+			fitsins = Plugin_fitsin.objects.filter(task__success = True).values('id')
+			fitsinsIds = [g['id'] for g in fitsins]
+			nongraded = []
+			for ug in usergrades:
+				fitsinsIds.remove(ug)
+
+			trs = []
+			fitsins = Plugin_fitsin.objects.filter(id__in = fitsinsIds)[:50]
+			tasks = Plugin_fitsin.objects.filter(id__in = fitsinsIds).values('task')
+			tasksIds = [g['task'] for g in tasks]
+
+			cur.execute("""SELECT DISTINCT(t.results_output_dir) FROM youpi_processing_task AS t, youpi_processing_kind AS k WHERE t.kind_id=k.id AND k.name='fitsin'""")
+			odirs = cur.fetchall()
+			for od in odirs:
+				trs.append("<tr><th>%s</th></tr>" % od[0])
+				tasks = Processing_task.objects.filter(id__in = tasksIds, results_output_dir = od[0]).order_by('-start_date')
+				for t in tasks[:10]:
+					rel = Rel_it.objects.filter(task = t)[0]
+					f = Plugin_fitsin.objects.filter(task = t)[0]
+					trs.append(("""<tr><td><a target="blank" href="/youpi/grading/fitsin/%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
+
+			content = """
+<div style="margin-bottom: 10px">Not graded: %(remaining)d images</div>
+<table>
+	%(rows)s
+</table>
+""" % {
+	'remaining': len(fitsinsIds),
+	'rows': string.join(trs, '\n'),
+}
+
+			return render_to_response('report.html', {	
+								'report_title' 		: self.__getReportName(reportId),
+								'report_content' 	: content, 
+			}, context_instance = RequestContext(request))
 		
 		return HttpResponseNotFound('Report not found.')
