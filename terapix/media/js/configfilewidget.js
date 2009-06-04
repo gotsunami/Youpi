@@ -228,7 +228,7 @@ function ConfigFileWidget(container, pluginId, options)
 	}
 
 	/*
-	 * Function: _batchImport
+	 * Function: _do_Import
 	 * Import files recursively from a directory
 	 *
 	 * Parameters:
@@ -236,9 +236,10 @@ function ConfigFileWidget(container, pluginId, options)
 	 *  path - string: path for searching files
 	 *  patterns - array: array of regexp patterns
 	 *  total - integer: total file count [optional]
+	 *  skipped - integer: total files skipped [optional]
 	 *
 	 */ 
-	function _do_Import(pos, path, patterns, total) {
+	function _do_Import(pos, path, patterns, total, skipped) {
 		var container = $(id +  '_' + _options.type + '_upload_log');
 		var r = new HttpRequest(
 			container,
@@ -255,7 +256,7 @@ function ConfigFileWidget(container, pluginId, options)
 				}
 				if (!_cancelImport && r.pos < r.total) {
 					_uploadPB.setPourcentage(r.percent);			
-					_do_Import(r.pos, path, patterns, r.total);
+					_do_Import(r.pos, path, patterns, r.total, r.skipped);
 				}
 				else {
 					container.update();
@@ -288,6 +289,7 @@ function ConfigFileWidget(container, pluginId, options)
 		if (pos) {
 			post.Pos = pos;
 			post.Total = total;
+			post.Skipped = skipped;
 		}
 
 		r.setBusyMsg('Please wait while processing');

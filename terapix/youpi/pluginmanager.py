@@ -17,6 +17,7 @@ from django.contrib.sessions.models import Session
 #
 import glob, sys, types, re, os, string, os.path
 import marshal, base64, random, time
+import magic
 from types import *
 #
 from terapix.youpi.auth import *
@@ -174,12 +175,18 @@ class ProcessingPlugin:
 		try: 
 			pos = int(post['Pos'])
 			total = int(post['Total'])
+			skipped = int(post.get('Skipped', 0))
 		except:
 			# First call to this function
 			# Compute total
 			total = len(files);
+			skipped = 0
 			pos = 0
 
+		mag = magic.open(magic.MAGIC_NONE)
+		mag.load()
+
+		res['skipped'] = skipped
 		profile = request.user.get_profile()
 		ctype = ConfigType.objects.filter(name = type)[0]
 		kind = Processing_kind.objects.filter(name__exact = self.id)[0]
@@ -190,7 +197,10 @@ class ProcessingPlugin:
 			pos += 1
 			z += 1
 			try:
-				# TODO: check magic number
+				# Check magic number. Must be equal to 'ASCII text'
+				if mag.file(files[k]).find('ASCII') == -1:
+					res['skipped'] += 1
+					continue
 				f = open(files[k])
 				content = string.join(f.readlines(), '\n')
 				base = os.path.basename(files[k])
@@ -198,9 +208,8 @@ class ProcessingPlugin:
 				res['config'] = str(name)
 				f.close()
 			except Exception, e:
-				# Problem reading the file
-				# TODO: deal with error
-				continue
+				res['error'] = str(e)
+				break
 
 			try:
 				# Updates entry
