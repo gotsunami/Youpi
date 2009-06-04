@@ -41,7 +41,10 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				{% for plugin in plugins %}
 					{% for report in plugin.reports %}
 						{% if report.options %}
-						<div id="{{ report.id }}_options">{{ report.options|safe }}</div> 
+						<div id="{{ report.id }}_options" style="margin-top: 20px">
+							<div style="color: brown; font-weight: bold; margin-bottom: 10px;">This report has the following options:</div>
+							<div class="report_options">{{ report.options|safe }}</div>
+						</div>
 						{% endif %}
 					{% endfor %}
 				{% endfor %}
@@ -51,11 +54,6 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				</form>
 			</div>
 		</div>
-		<!--
-		<div align="center" style="display: none; width: 100%" id="menuitem_sub_1">
-			<div id="selector_div"></div>
-		</div>
-		-->
 	</div>
 </div>
 <script type="text/javascript">
@@ -73,15 +71,15 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		});
 
 		// Hide options div
-		$('reports_options').select('div').each(function(div) { div.hide(); });
+		$('reports_options').select('div[id]').each(function(div) { div.hide(); });
 
 		$('report_select').observe('change', function() {
 			var sel = $('report_select');
 			var id = sel.options[sel.selectedIndex].value;
 			// Hide options div
-			$('reports_options').select('div').each(function(div) { div.hide(); });
+			$('reports_options').select('div[id]').each(function(div) { div.hide(); });
 			var divopt = $(id + '_options');
-			if (divopt) divopt.show();
+			if (divopt) divopt.slideDown({duration: 0.2});
 		});
 	});
 </script>

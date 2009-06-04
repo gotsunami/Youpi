@@ -1541,3 +1541,11 @@ div.tags *, .dropzone * {
 .all_mini * {
 	font-size: 10px;
 }
+
+.report_options {
+	background-color: #eee;
+	-moz-border-radius: 5px;
+	width: -moz-fit-content;	
+	padding: 10px;
+}
+
