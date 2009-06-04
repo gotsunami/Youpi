@@ -898,10 +898,16 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		"""
 		Adds reporting capabilities to QFITSin plugin
 		"""
+
+		outdirs = Processing_task.objects.filter(kind__name = self.id).values('results_output_dir').order_by('results_output_dir').distinct()
+		outdirs = [g['results_output_dir'] for g in outdirs]
+		nongopts = """Select output directory: <select name="output_dir_select">%s</select>""" % \
+				string.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs), '\n')
+
 		return [
 			{'id': 'allgrades', 'title': 'List of all QualityFITS-in grades'},
 			{'id': 'gradestats', 'title': 'Grading statistics (summary)'},
-			{'id': 'nongraded', 'title': 'List of all non graded images'},
+			{'id': 'nongraded', 'title': 'List of all non graded images', 'options': nongopts},
 		]
 
 	def __getReportName(self, reportId):
@@ -927,8 +933,11 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			from terapix.reporting.plain import PlainTextReport
 			return HttpResponse(PlainTextReport(data = get_stats()), mimetype = 'text/plain')
 		elif reportId == 'nongraded':
-			from django.db import connection
-			cur = connection.cursor()
+			post = request.POST
+			try:
+				outdir = post['output_dir_select']
+			except Exception, e:
+				raise PluginError, ("POST argument error. Unable to process data: %s" % e)
 
 			usergrades = FirstQEval.objects.all().values('fitsin').distinct()
 			usergrades = [g['fitsin'] for g in usergrades]
@@ -943,15 +952,15 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			tasks = Plugin_fitsin.objects.filter(id__in = fitsinsIds).values('task')
 			tasksIds = [g['task'] for g in tasks]
 
-			cur.execute("""SELECT DISTINCT(t.results_output_dir) FROM youpi_processing_task AS t, youpi_processing_kind AS k WHERE t.kind_id=k.id AND k.name='fitsin'""")
-			odirs = cur.fetchall()
-			for od in odirs:
-				trs.append("<tr><th>%s</th></tr>" % od[0])
-				tasks = Processing_task.objects.filter(id__in = tasksIds, results_output_dir = od[0]).order_by('-start_date')
-				for t in tasks[:10]:
-					rel = Rel_it.objects.filter(task = t)[0]
-					f = Plugin_fitsin.objects.filter(task = t)[0]
-					trs.append(("""<tr><td><a target="blank" href="/youpi/grading/fitsin/%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
+			trs.append("<tr><th>%s</th></tr>" % outdir)
+			tasks = Processing_task.objects.filter(id__in = tasksIds, results_output_dir = outdir).order_by('-start_date')
+			for t in tasks[:50]:
+				rel = Rel_it.objects.filter(task = t)[0]
+				f = Plugin_fitsin.objects.filter(task = t)[0]
+				trs.append(("""<tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');"><td><a target="blank" href="/youpi/grading/fitsin/%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
+
+			if not tasks:
+				trs.append(("""<tr><td>All images in this directory have already been graded</td></tr>"""))
 
 			content = """
 <div style="margin-bottom: 10px">Not graded: %(remaining)d images</div>

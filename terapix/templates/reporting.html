@@ -37,6 +37,15 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 						</optgroup>
 						{% endfor %}
 					</select>
+					<div id="reports_options">
+				{% for plugin in plugins %}
+					{% for report in plugin.reports %}
+						{% if report.options %}
+						<div id="{{ report.id }}_options">{{ report.options|safe }}</div> 
+						{% endif %}
+					{% endfor %}
+				{% endfor %}
+					</div>
 					<br/>
 					<input id="report_submit" type="submit" value="Generate!"/>	
 				</form>
@@ -61,6 +70,18 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				return false;
 			}
 			$('report_form').action = '/youpi/report/' + group + '/' + selvalue + '/';
+		});
+
+		// Hide options div
+		$('reports_options').select('div').each(function(div) { div.hide(); });
+
+		$('report_select').observe('change', function() {
+			var sel = $('report_select');
+			var id = sel.options[sel.selectedIndex].value;
+			// Hide options div
+			$('reports_options').select('div').each(function(div) { div.hide(); });
+			var divopt = $(id + '_options');
+			if (divopt) divopt.show();
 		});
 	});
 </script>
