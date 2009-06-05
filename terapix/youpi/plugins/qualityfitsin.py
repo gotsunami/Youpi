@@ -950,12 +950,17 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				grade = post['grade_select']
 			except Exception, e:
 				return HttpResponseRedirect('/youpi/reporting/')
+
+			prevrelgrades = Plugin_fitsin.objects.exclude(prevrelgrade = '').filter(prevrelgrade = grade, task__success = True)
 			usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
 			content = []
 			for g in usergrades:
 				rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
 				content.append((rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
-			if not usergrades: return HttpResponse('No images are graded ' + grade, mimetype = 'text/plain')
+			for g in prevrelgrades:
+				rel = Rel_it.objects.filter(task = g.task)[0]
+				content.append((rel.image.name, g.prevrelgrade, rel.image.path, rel.image.checksum, '', g.task.user, g.prevrelcomment, ''))
+			if not (usergrades or prevrelgrades): return HttpResponse('No images are graded ' + grade, mimetype = 'text/plain')
 			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
 
 		elif reportId == 'nongraded':
