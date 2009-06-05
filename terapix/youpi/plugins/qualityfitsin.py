@@ -907,12 +907,15 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		oneopts = """Select a grade: <select name="grade_select">%s</select>""" % \
 				string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[0]), GRADE_SET), '\n')
 
-		return [
+		rdata = [
 			{'id': 'allgrades', 'title': 'List of all QualityFITS-in grades'},
 			{'id': 'gradestats', 'title': 'Grading statistics (summary)'},
 			{'id': 'nongraded', 'title': 'List of all non graded images', 'options': nongopts},
 			{'id': 'onegrade', 'title': 'List of all images with a selected grade', 'options': oneopts},
 		]
+		rdata.sort(cmp=lambda x,y: cmp(x['title'],y['title']))
+
+		return rdata
 
 	def __getReportName(self, reportId):
 		"""
@@ -975,7 +978,13 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			for t in tasks[:50]:
 				rel = Rel_it.objects.filter(task = t)[0]
 				f = Plugin_fitsin.objects.filter(task = t)[0]
-				trs.append(("""<tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');"><td><a target="_blank" href="/youpi/grading/fitsin/%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
+				trs.append(("""
+<tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');">
+	<td><a target="_blank" href="/youpi/grading/fitsin/%s">%s</a></td>
+	<td>%s</td>
+	<td>%s</td>
+	<td>%s</td>
+</tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
 
 			if not tasks:
 				trs.append(("""<tr><td>All images in this directory have already been graded</td></tr>"""))
