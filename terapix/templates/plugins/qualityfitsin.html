@@ -14,24 +14,16 @@
 			<div style="width: 80%" id="config_file_div"></div>
 		</div>
 		<div align="center" style="display: none; width: 100%" id="menuitem_sub_3"></div>
-		<div align="center" style="display: none; width: 100%; margin-top: 10px;" id="menuitem_sub_4"></div>
 	</div>
 </div>
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
 		var m = new SubMenu('submenu', ['Select images', 'Select data paths', 'Select a configuration file', 
-			'Set output directory', 'QualityFITS job monitoring']);
+			'Set output directory']);
 		m.setOnClickHandler(3, function() {
 			$('output_path_input').focus();
 		});
-		m.setOnClickHandler(4, function() {
-			// _this_ is a LI DOM object
-			var div = m.getContentNodeForEntry(this);
-			div.update(getLoadingHTML('Loading cluster data, please wait'));
-			{{ plugin.id }}.monitorJobs(div);
-		});
-
 		{{ plugin.id }}.doit();
 	});
 
