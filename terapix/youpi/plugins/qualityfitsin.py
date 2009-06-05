@@ -25,8 +25,8 @@ from terapix.youpi.models import *
 from terapix.settings import *
 from terapix.youpi.auth import read_proxy
 #
-from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import render_to_response
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.shortcuts import render_to_response 
 from django.template import RequestContext
 
 class QualityFitsIn(ProcessingPlugin):
@@ -908,10 +908,11 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[0]), GRADE_SET), '\n')
 
 		rdata = [
-			{'id': 'allgrades', 'title': 'List of all QualityFITS-in grades'},
-			{'id': 'gradestats', 'title': 'Grading statistics (summary)'},
-			{'id': 'nongraded', 'title': 'List of all non graded images', 'options': nongopts},
-			{'id': 'onegrade', 'title': 'List of all images with a selected grade', 'options': oneopts},
+			{'id': 'allgrades',		'title': 'List of all QualityFITS-in grades'},
+			{'id': 'gradestats', 	'title': 'Grading statistics (summary)'},
+			{'id': 'nongraded', 	'title': 'List of all non graded images', 'options': nongopts},
+			{'id': 'onegrade', 		'title': 'List of all images with a selected grade', 'options': oneopts},
+			{'id': 'piegrades', 	'title': 'Pie Chart of grades'},
 		]
 		rdata.sort(cmp=lambda x,y: cmp(x['title'],y['title']))
 
@@ -937,16 +938,18 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			from terapix.reporting.csv import CSVReport
 			res = get_grades()
 			return HttpResponse(CSVReport(data = get_grades()), mimetype = 'text/plain')
+
 		elif reportId == 'gradestats':
 			from terapix.script.grading import get_stats
 			from terapix.reporting.plain import PlainTextReport
 			return HttpResponse(PlainTextReport(data = get_stats()), mimetype = 'text/plain')
+
 		elif reportId == 'onegrade':
 			from terapix.reporting.csv import CSVReport
 			try:
 				grade = post['grade_select']
 			except Exception, e:
-				raise PluginError, ("POST argument error. Unable to process data: %s" % e)
+				return HttpResponseRedirect('/youpi/reporting/')
 			usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
 			content = []
 			for g in usergrades:
@@ -954,11 +957,12 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				content.append((rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
 			if not usergrades: return HttpResponse('No images are graded ' + grade, mimetype = 'text/plain')
 			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
+
 		elif reportId == 'nongraded':
 			try:
 				outdir = post['output_dir_select']
 			except Exception, e:
-				raise PluginError, ("POST argument error. Unable to process data: %s" % e)
+				return HttpResponseRedirect('/youpi/reporting/')
 
 			usergrades = FirstQEval.objects.all().values('fitsin').distinct()
 			usergrades = [g['fitsin'] for g in usergrades]
@@ -1003,5 +1007,58 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 								'report_title' 		: self.__getReportName(reportId),
 								'report_content' 	: content, 
 			}, context_instance = RequestContext(request))
+
+		elif reportId == 'piegrades':
+			from terapix.script.grading import get_proportions
+			data = get_proportions()
+			# Get grading statistics
+			js = """
+<div id="imgcontainer" style="width:600px;height:300px;"></div>
+<script type="text/javascript">
+function draw_pie(){
+	// Fill series.
+	var grade_a = [[0, %(ga)d]];
+	var grade_b = [[0, %(gb)d]];
+	var grade_c = [[0, %(gc)d]];
+	var grade_d = [[0, %(gd)d]];
+
+	//Draw the graph.
+	var f = Flotr.draw($('imgcontainer'), [
+			{data: grade_a, label: 'Graded A (%(ga)d)'}, 
+			{data: grade_b, label: 'Graded B (%(gb)d)'}, 
+			{data: grade_c, label: 'Graded C (%(gc)d)'},
+			{data: grade_d, label: 'Graded D (%(gd)d)'}
+		], {
+			HtmlText: false, 
+			grid: {
+				verticalLines: false, 
+				horizontalLines: false
+			},
+			xaxis: {showLabels: false},
+			yaxis: {showLabels: false}, 
+			pie: {
+				show: true, 
+				explode: 6
+			},
+			legend:{
+				position: 'se',
+				backgroundColor: '#D2E8FF'
+			}
+		}
+	);
+}
+draw_pie();
+</script>
+""" % {
+	'ga': data[0][1], 
+	'gb': data[1][1], 
+	'gc': data[2][1], 
+	'gd': data[3][1], 
+}
+			return render_to_response('report.html', {	
+								'report_title' 		: self.__getReportName(reportId),
+								'report_content' 	: js, 
+			}, context_instance = RequestContext(request))
+
 		
 		return HttpResponseNotFound('Report not found.')

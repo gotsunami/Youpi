@@ -117,6 +117,23 @@ def delete_grades(simulate, verbose = False):
 		connection._commit()
 		print "Done"
 
+def get_proportions():
+	from django.db import connection
+	cur = connection.cursor()
+	q1 = "select grade, count(grade) from youpi_firstqeval group by grade"
+	q2 = "select prevrelgrade, count(prevrelgrade) from youpi_plugin_fitsin where prevrelgrade != '' group by prevrelgrade"
+
+	grades = {'A': 0, 'B': 0, 'C': 0, 'D': 0}
+	for q in (q1, q2):
+		cur.execute(q)
+		res = cur.fetchall()
+		for g in res:
+			grades[g[0]] += int(g[1])
+
+	grades = [(k,v) for k,v in grades.iteritems()]
+	grades.sort(cmp = lambda x,y: cmp(x[0], y[0]))
+	return grades
+
 def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 	try:
 		f = open(filename)
@@ -200,6 +217,11 @@ def main():
 			action = 'store_true', 
 			help = 'List available grades in DB'
 	)
+	parser.add_option('-p', '--props', 
+			default = False, 
+			action = 'store_true', 
+			help = 'List grades relative proportions'
+	)
 	parser.add_option('-t', '--stats', 
 			default = False, 
 			action = 'store_true', 
@@ -246,6 +268,9 @@ def main():
 			ingest_grades(options.filename, options.simulate, verbose = options.verbose)
 		elif options.delete:
 			delete_grades(options.simulate, verbose = options.verbose)
+		elif options.props:
+			from terapix.reporting.csv import CSVReport
+			print CSVReport(data = get_proportions())
 	except KeyboardInterrupt:
 		print "Exiting..."
 		sys.exit(2)

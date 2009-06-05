@@ -2,9 +2,13 @@
 {% load i18n %}
 
 {% block extrahead %}
-<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
-<script type="text/javascript" src="/media/js/processinghistorywidget.js"></script>
-<script type="text/javascript" src="/media/js/progressbar.js"></script>
+<!--[if IE]>
+<script type="text/javascript" src="/media/js/3rdParty/flotr/lib/excanvas.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/flotr/lib/base64.js"></script>
+<![endif]-->
+<script type="text/javascript" src="/media/js/3rdParty/flotr/lib/canvas2image.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/flotr/lib/canvastext.js"></script>
+<script type="text/javascript" src="/media/js/3rdParty/flotr/flotr-0.2.0-alpha.js"></script>
 
 
 <!-- Menu handling -->
