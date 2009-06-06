@@ -253,7 +253,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(aheads)s, %(ldacs)s, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(settingspath)s/NOP
+transfer_input_files    = %(aheads)s, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -270,11 +270,10 @@ notify_user             = monnerville@iap.fr
 	'initdir'		: os.path.join(submit_file_path, 'script'),
 	'requirements'	: req ,
 	'ldacsfile'		: catalogFile,
-	'aheads'		: ahead_files,
-	'ldacs'			: string.join([f for f in ldac_files], ', '),
 	'log'			: logs['log'],
 	'errlog'		: logs['error'],
 	'outlog'		: logs['out'],
+	'aheads'		: ahead_files,
 }
 
 
@@ -308,8 +307,8 @@ notify_user             = monnerville@iap.fr
 																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %(params)s @%(ldacsfile)s -c %(config)s 2>/dev/null
 # YOUPI_USER_DATA = %(userdata)s
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %(params)s @%(ldacsfile)s -c %(config)s %(ldacs)s 2>/dev/null
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
 		'encuserdata' 	: encUserData, 
@@ -319,6 +318,7 @@ queue""" %  {
 		'userdata'		: userData, 
 		'user'			: request.user.username,
 		'tpxupload'		: FTP_URL + resultsOutputDir,
+		'ldacs'			: string.join([f for f in ldac_files], ' '),
 	}
 
 		csf.write(condor_submit_entry)
