@@ -387,11 +387,6 @@ var {{ plugin.id }} = {
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
 
-		if (!silent) {
-			var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
-			if (!r) return;
-		}
-	
 		var r = new HttpRequest(
 				logdiv,
 				null,	
@@ -597,7 +592,7 @@ var {{ plugin.id }} = {
 		if (resp.Success) {
 			tr = new Element('tr', {'class': 'scamp-result-entry-tn'});
 			td = new Element('td', {
-					onclick: "window.open('" + resp['WWW'] + "swarp.xml');",
+					onclick: "window.open('" + resp.WWW + resp.Index + "');",
 					onmouseover: "this.setAttribute('class', 'scamp-result-entry-complete-on');",
 					onmouseout: "this.setAttribute('class', 'scamp-result-entry-complete-off');",
 					'class': 'scamp-result-entry-complete-off'

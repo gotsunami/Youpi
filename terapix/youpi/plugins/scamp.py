@@ -48,9 +48,6 @@ class Scamp(ProcessingPlugin):
 		self.itemCartTemplate = 'plugins/scamp_item_cart.html' 		# Template for custom rendering into the shopping cart
 		self.jsSource = 'plugins/scamp.js' 							# Custom javascript
 
-		# Scamp's output XML filename
-		self.XMLFile = 'scamp.xml'
-
 		# Decomment to disable the plugin
 		#self.enable = False
 
@@ -253,7 +250,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(aheads)s, %(ldacs)s, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(settingspath)s/NOP
+transfer_input_files    = %(aheads)s, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -270,11 +267,10 @@ notify_user             = monnerville@iap.fr
 	'initdir'		: os.path.join(submit_file_path, 'script'),
 	'requirements'	: req ,
 	'ldacsfile'		: catalogFile,
-	'aheads'		: ahead_files,
-	'ldacs'			: string.join([f for f in ldac_files], ', '),
 	'log'			: logs['log'],
 	'errlog'		: logs['error'],
 	'outlog'		: logs['out'],
+	'aheads'		: ahead_files,
 }
 
 
@@ -308,17 +304,18 @@ notify_user             = monnerville@iap.fr
 																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %(params)s @%(ldacsfile)s -c %(config)s 2>/dev/null
 # YOUPI_USER_DATA = %(userdata)s
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl %(scamp)s %(params)s -c %(config)s %(ldacs)s 2>/dev/null
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
+		'scamp'			: CMD_SCAMP,
 		'encuserdata' 	: encUserData, 
 		'params'		: scamp_params,
-		'ldacsfile' 	: os.path.basename(catalogFile),
 		'config'		: os.path.basename(customrc),
 		'userdata'		: userData, 
 		'user'			: request.user.username,
 		'tpxupload'		: FTP_URL + resultsOutputDir,
+		'ldacs'			: string.join([f for f in ldac_files], ' '),
 	}
 
 		csf.write(condor_submit_entry)
@@ -483,6 +480,8 @@ queue""" %  {
 		if data.thumbnails:
 			thumbs = ['tn_' + thumb for thumb in thumbs]
 
+		config = zlib.decompress(base64.decodestring(data.config))
+
 		return {	'TaskId'			: str(taskid),
 					'Title' 			: str("%s processing" % self.description),
 					'User' 				: str(task.user.username),
@@ -492,13 +491,14 @@ queue""" %  {
 					'End' 				: str(task.end_date),
 					'ClusterId'			: str(task.clusterId),
 					'WWW' 				: str(data.www),
+					'Index'				: str(self.getConfigValue(config.split('\n'), 'XML_NAME')),
 					'AheadPath'			: str(data.aheadPath),
 					'LDACFiles'			: marshal.loads(base64.decodestring(data.ldac_files)),
 					'Duration' 			: str(task.end_date-task.start_date),
 					'ResultsOutputDir' 	: str(task.results_output_dir),
 					'Log' 				: log,
 					'ResultsLog'		: scamplog,
-					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
+					'Config' 			: str(config),
 					'Previews'			: thumbs,
 					'HasThumbnails'		: data.thumbnails,
 					'History'			: history,
@@ -518,11 +518,13 @@ queue""" %  {
 			raise PluginError, "POST argument error. Unable to process data."
 
 		task = Processing_task.objects.filter(id = taskId)[0]
-
-		# FIXME: may not be self.XMLFile with custom conf file
-		filePath = str(os.path.join(task.results_output_dir, self.XMLFile))
-
-		if not os.path.exists(filePath):
+		scamp = Plugin_scamp.objects.filter(task__id = taskId)[0]
+		XMLFile = self.getConfigValue(zlib.decompress(base64.decodestring(scamp.config)).split('\n'), 'XML_NAME')
+		if XMLFile:
+			filePath = str(os.path.join(task.results_output_dir, XMLFile))
+			if not os.path.exists(filePath):
+				filePath = -1
+		else:
 			filePath = -1
 
 		return { 'FilePath' : filePath }
@@ -538,7 +540,9 @@ queue""" %  {
 			raise PluginError, "POST argument error. Unable to process data."
 
 		task = Processing_task.objects.filter(id = taskId)[0]
-		file = str(os.path.join(task.results_output_dir, self.XMLFile))
+		scamp = Plugin_scamp.objects.filter(task__id = taskId)[0]
+		XMLFile = self.getConfigValue(zlib.decompress(base64.decodestring(scamp.config)).split('\n'), 'XML_NAME')
+		file = str(os.path.join(task.results_output_dir, XMLFile))
 
 		doc = dom.parse(file)
 		fields = []
@@ -572,7 +576,8 @@ queue""" %  {
 
 		task = Processing_task.objects.filter(id = taskId)[0]
 		data = Plugin_scamp.objects.filter(task__id = taskId)[0]
-		file = str(os.path.join(task.results_output_dir, self.XMLFile))
+		XMLFile = self.getConfigValue(zlib.decompress(base64.decodestring(data.config)).split('\n'), 'XML_NAME')
+		file = str(os.path.join(task.results_output_dir, XMLFile))
 
 		doc = dom.parse(file)
 		tabledata = doc.getElementsByTagName('TABLEDATA')[0]

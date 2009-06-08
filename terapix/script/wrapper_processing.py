@@ -489,7 +489,7 @@ def process(userData, kind_id, argv):
 
 			# Copy XSL stylesheet
 			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen("/usr/local/bin/scamp -dd|grep XSL_URL 2>&1") 
+			pipe = os.popen(CMD_SCAMP + " -dd|grep XSL_URL 2>&1") 
 			data = pipe.readlines()
 			pipe.close()
 
@@ -544,7 +544,7 @@ def process(userData, kind_id, argv):
 
 			# Copy XSL stylesheet
 			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen("/usr/bin/sex -dd|grep XSL_URL 2>&1") 
+			pipe = os.popen(CMD_SEX + " -dd|grep XSL_URL 2>&1") 
 			data = pipe.readlines()
 			pipe.close()
 
@@ -570,7 +570,7 @@ def process(userData, kind_id, argv):
 
 				if (os.path.exists(cur +'.fits')):
 
-					os.system("/usr/bin/swarp %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (cur + '.fits', os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
+					os.system(CMD_SWARP + " %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (cur + '.fits', os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
 					# Converts produced FITS image into PNG format
 					tiff = os.path.join(userData['ResultsOutputDir'], cur + '.tif')
 					os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'temp.fits'), tiff))
@@ -615,7 +615,7 @@ def process(userData, kind_id, argv):
 
 			# Copy XSL stylesheet
 			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen("/usr/bin/swarp -dd|grep XSL_URL 2>&1") 
+			pipe = os.popen(CMD_SWARP + " -dd|grep XSL_URL 2>&1") 
 			data = pipe.readlines()
 			pipe.close()
 
@@ -623,7 +623,7 @@ def process(userData, kind_id, argv):
 			shutil.copy(xslPath, userData['ResultsOutputDir'])
 
 			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen("/usr/bin/swarp -dd|grep IMAGEOUT_NAME 2>&1") 
+			pipe = os.popen(CMD_SWARP + " -dd|grep IMAGEOUT_NAME 2>&1") 
 			data = pipe.readlines()
 			pipe.close()
 

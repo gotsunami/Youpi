@@ -650,7 +650,7 @@ var {{ plugin.id }} = {
 			tr = new Element('tr');
 			tr.setAttribute('class', 'scamp-result-entry-tn');
 			td = new Element('td');
-			td.setAttribute('onclick', "window.open('" + resp['WWW'] + "/scamp.xml');");
+			td.setAttribute('onclick', "window.open('" + resp.WWW + resp.Index + "');");
 			td.setAttribute('onmouseover', "this.setAttribute('class', 'scamp-result-entry-complete-on');");
 			td.setAttribute('onmouseout', "this.setAttribute('class', 'scamp-result-entry-complete-off');");
 			td.setAttribute('class', 'scamp-result-entry-complete-off');

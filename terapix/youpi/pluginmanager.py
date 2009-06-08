@@ -67,6 +67,24 @@ class ProcessingPlugin:
 
 		return "%s/CONDOR-%s-%s.txt" % (CONDOR_LOG_DIR, self.id, time.time())
 
+	def getConfigValue(self, content, keyword):
+		"""
+		Parses all lines of content looking for a keyword.
+		Blank lines are skipped. Comments starting by # are ignored
+		Keyword search is case-sensitive.
+		@param content list of strings
+		@param keyword word search in content
+		@returns keyword's value of False
+		"""
+		for line in content:
+			if line.find(keyword) != -1:
+				line = re.sub(r'#.*$', '', line[:-1])
+				res = [k for k in re.split(r'[ \t]', line) if len(k)]
+				try: return res[1]
+				except: return False
+
+		return False
+
 	def reports(self):
 		"""
 		Reporting capabilities

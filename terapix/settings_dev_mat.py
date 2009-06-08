@@ -45,6 +45,10 @@ CONDOR_LOG_DIR	= '/tmp'
 # Plugins configuration files directory
 #
 PLUGINS_CONF_DIR = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf')
+# 
+CMD_SCAMP			= 'scamp'
+CMD_SWARP			= 'swarp'
+CMD_SEX				= 'sex'
 #
 # ImageMagick support
 #
@@ -73,13 +77,13 @@ SOFTS = (	('Condor', 		os.path.join(CONDOR_BIN_PATH, 'condor'), 		# command
 			('QualityFITS', '/usr/local/bin/qualityFITS', 
 							'-V', 
 							'version (.*?) conf'),
-			('Sextractor', 	'/usr/local/bin/sex', 
+			('Sextractor', 	CMD_SEX,
 							'-v', 
 							'version (.*?) \('),
-			('Scamp', 		'/usr/local/bin/scamp', 
+			('Scamp', 		CMD_SCAMP,
 							'-v', 
 							'version (.*?) \('),
-			('Swarp', 		'/usr/bin/swarp', 
+			('Swarp', 		CMD_SWARP,
 							'-v', 
 							'version (.*?) \('),
 			('WeightWatcher',	'/usr/local/bin/ww', 

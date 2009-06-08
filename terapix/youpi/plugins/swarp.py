@@ -280,10 +280,11 @@ notify_user             = monnerville@iap.fr
 
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/swarp %(params)s @%(imgsfile)s -c %(config)s 2>/dev/null
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl %(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>/dev/null
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
+				'swarp'			: CMD_SWARP,
 				'params'		: swarp_params,
 				'config'		: os.path.basename(customrc),
 				'userdata'		: userData, 
@@ -462,6 +463,8 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		if data.thumbnails:
 			thumbs = ['tn_' + thumb for thumb in thumbs]
 
+		config = zlib.decompress(base64.decodestring(data.config))
+
 		return {	'TaskId'			: str(taskid),
 					'Title' 			: str("%s" % self.description),
 					'User' 				: str(task.user.username),
@@ -471,9 +474,10 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'TotalExposureTime'	: str(round(totalExpTime, 2)),
 					'Duration' 			: str(task.end_date-task.start_date),
 					'WWW' 				: str(data.www),
+					'Index' 			: str(self.getConfigValue(config.split('\n'), 'XML_NAME')),
 					'ResultsOutputDir' 	: str(task.results_output_dir),
 					'ResultsLog'		: swarplog,
-					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
+					'Config' 			: str(config),
 					'Previews'			: thumbs,
 					'ClusterId'			: str(task.clusterId),
 					'HasThumbnails'		: data.thumbnails,

@@ -489,10 +489,11 @@ notify_user             = semah@iap.fr
 
 			if dualMode == '1':
 				condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(img)s,%(img2)s %(params)s -c %(config)s -PARAMETERS_NAME %(param)s
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl %(sextractor)s %(img)s,%(img2)s %(params)s -c %(config)s -PARAMETERS_NAME %(param)s
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
+				'sextractor'	: CMD_SEX,
 				'params'		: sex_params,
 				'img'			: path,
 				'img2'			: path2,
@@ -503,12 +504,12 @@ queue""" %  {	'encuserdata' 	: encUserData,
 				'tpxupload'		: FTP_URL + userData['ResultsOutputDir'] +'/' }
 
 			else:
-
 				condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/bin/sex %(params)s %(img)s -c %(config)s -PARAMETERS_NAME %(param)s
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl %(sextractor)s %(params)s %(img)s -c %(config)s -PARAMETERS_NAME %(param)s
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData,
+				'sextractor'	: CMD_SEX,
 				'params'		: sex_params,
 				'img'			: path,
 				'config'		: os.path.basename(customrc),
