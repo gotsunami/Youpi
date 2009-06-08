@@ -305,9 +305,10 @@ notify_user             = monnerville@iap.fr
 
 		condor_submit_entry = """
 # YOUPI_USER_DATA = %(userdata)s
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl /usr/local/bin/scamp %(params)s -c %(config)s %(ldacs)s 2>/dev/null
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl %(scamp)s %(params)s -c %(config)s %(ldacs)s 2>/dev/null
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
+		'scamp'			: CMD_SCAMP,
 		'encuserdata' 	: encUserData, 
 		'params'		: scamp_params,
 		'config'		: os.path.basename(customrc),
