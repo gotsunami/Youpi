@@ -46,7 +46,9 @@
 		$('{{ plugin.id }}_{{ forloop.counter0 }}_run').observe('click', function() {
 			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
 			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
-			{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter }}', capitalizeHashKeys(userData));
+			boxes.confirm('Are you sure you want to submit this item to the cluster?', function() {
+				{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
+			});
 		});
 
 		$('{{ plugin.id }}_{{ forloop.counter0 }}_save').observe('click', function() {

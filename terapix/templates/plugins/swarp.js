@@ -387,11 +387,6 @@ var {{ plugin.id }} = {
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
 
-		if (!silent) {
-			var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
-			if (!r) return;
-		}
-	
 		var r = new HttpRequest(
 				logdiv,
 				null,	
