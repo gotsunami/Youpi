@@ -462,6 +462,8 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		if data.thumbnails:
 			thumbs = ['tn_' + thumb for thumb in thumbs]
 
+		config = zlib.decompress(base64.decodestring(data.config))
+
 		return {	'TaskId'			: str(taskid),
 					'Title' 			: str("%s" % self.description),
 					'User' 				: str(task.user.username),
@@ -471,9 +473,10 @@ queue""" %  {	'encuserdata' 	: encUserData,
 					'TotalExposureTime'	: str(round(totalExpTime, 2)),
 					'Duration' 			: str(task.end_date-task.start_date),
 					'WWW' 				: str(data.www),
+					'Index' 			: str(self.getConfigValue(config.split('\n'), 'XML_NAME')),
 					'ResultsOutputDir' 	: str(task.results_output_dir),
 					'ResultsLog'		: swarplog,
-					'Config' 			: str(zlib.decompress(base64.decodestring(data.config))),
+					'Config' 			: str(config),
 					'Previews'			: thumbs,
 					'ClusterId'			: str(task.clusterId),
 					'HasThumbnails'		: data.thumbnails,

@@ -597,7 +597,7 @@ var {{ plugin.id }} = {
 		if (resp.Success) {
 			tr = new Element('tr', {'class': 'scamp-result-entry-tn'});
 			td = new Element('td', {
-					onclick: "window.open('" + resp['WWW'] + "swarp.xml');",
+					onclick: "window.open('" + resp.WWW + resp.Index + "');",
 					onmouseover: "this.setAttribute('class', 'scamp-result-entry-complete-on');",
 					onmouseout: "this.setAttribute('class', 'scamp-result-entry-complete-off');",
 					'class': 'scamp-result-entry-complete-off'
