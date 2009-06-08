@@ -206,6 +206,11 @@ def task_filter(request):
 	if filterText:
 		keepIds = []
 		for t in tasksIds:
+			rels = Rel_it.objects.filter(task__id = t['id'])
+			for r in rels:
+				if r.image.name.find(filterText) >= 0:
+					keepIds.append(t['id'])
+
 #			if (t.user.username.lower().find(filterText) >= 0 or
 #				t.user.first_name.lower().find(filterText) >= 0 or
 #				t.user.last_name.lower().find(filterText) >= 0 or
@@ -215,7 +220,6 @@ def task_filter(request):
 #				("%s" % t.start_date).find(filterText) >= 0 or
 #				("%s" % t.end_date).find(filterText) >= 0):
 
-			keepIds.append(t['id'])
 		tasksIds = keepIds
 	else:
 		tasksIds = [t['id'] for t in tasksIds]
