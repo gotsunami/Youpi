@@ -46,9 +46,9 @@ CONDOR_LOG_DIR	= '/tmp'
 #
 PLUGINS_CONF_DIR = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf')
 # 
-CMD_SCAMP			= '/usr/bin/scamp'
-CMD_SWARP			= '/usr/bin/swarp'
-CMD_SEX				= '/usr/bin/sex'
+CMD_SCAMP			= 'scamp'
+CMD_SWARP			= 'swarp'
+CMD_SEX				= 'sex'
 #
 # ImageMagick support
 #
