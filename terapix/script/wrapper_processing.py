@@ -544,7 +544,7 @@ def process(userData, kind_id, argv):
 
 			# Copy XSL stylesheet
 			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen("/usr/bin/sex -dd|grep XSL_URL 2>&1") 
+			pipe = os.popen(CMD_SEX + " -dd|grep XSL_URL 2>&1") 
 			data = pipe.readlines()
 			pipe.close()
 
