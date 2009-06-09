@@ -134,7 +134,7 @@ def get_proportions():
 	grades.sort(cmp = lambda x,y: cmp(x[0], y[0]))
 	return grades
 
-def ingest_grades(filename, simulate, verbose = False, separator = ';'):
+def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 	try:
 		f = open(filename)
 	except IOError, e:
@@ -143,6 +143,17 @@ def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 
 	print "Looking for fields separated by '%s'" % separator
 	print "Each line should match: '%s'" % string.join(('Image name', 'Grade', 'Comment'), separator)
+	if user:
+		print "Will ingest grades in the youpi_firstqeval table"
+		try:
+			user = User.objects.filter(username__exact = user)[0]
+		except:
+			# User not found; exiting
+			print "Abort: user '%s' not found in database." % user
+			sys.exit(1)
+
+	else:
+		print "Will ingest grades in the youpi_plugin_fitsin table"
 	print "Simulation:", simulate
 
 	start = time.time()
@@ -173,22 +184,43 @@ def ingest_grades(filename, simulate, verbose = False, separator = ';'):
 				found += 1
 				if not simulate:
 					rels = Rel_it.objects.filter(task__kind__name = 'fitsin', image = img[0])
-					fitsins = Plugin_fitsin.objects.filter(task__in = [r.task for r in rels], task__success = True).values('id')
-					if fitsins:
+					if not rels: continue
+					fitsins = Plugin_fitsin.objects.filter(task__in = [r.task for r in rels], task__success = True)
+					if not user:
 						q = """
 						UPDATE youpi_plugin_fitsin 
 						SET prevrelgrade="%s", prevrelcomment="%s"
 						WHERE id IN (%s)
-						""" % (grade, comment, string.join([str(i['id']) for i in fitsins], ','))
+						""" % (grade, comment, string.join([i.id for i in fitsins], ','))
 						cur.execute(q)
 						writes += len(fitsins)
+					else:
+						# Check for existing grade for this processing by this user
+						matchg = FirstQEval.objects.filter(user = user, fitsin__in = fitsins).order_by('-date')
+						if matchg:
+							# Update the grade for the latest evaluation only
+							m = matchg[0]
+							m.grade = grade
+							m.custom_comment = comment
+							m.save()
+							writes += 1
+						else:
+							# No user-grade for this image, create a new one
+							com = FirstQComment.objects.all()[0]
+							for fit in fitsins:
+								m = FirstQEval(user = user, fitsin = fit)
+								m.grade = grade
+								m.comment = com
+								m.custom_comment = comment
+								m.save()
+							writes += len(fitsins)
 					
 			if not verbose:
 				sys.stdout.write(term.BOL + "Found: %5d, Not Found: %5d, DB Writes: %5d, Line %5d" % (found, notfound, writes, pos))
 			pos += 1
 
 		connection._commit()
-	except KeyboardInterrupt:
+	except:
 		sys.stdout.write(term.SHOW_CURSOR)
 		raise
 
@@ -232,6 +264,10 @@ def main():
 			default = False, 
 			help = 'Increase verbosity'
 	)
+	parser.add_option('-u', '--user', 
+			default = False, 
+			help = 'Grades as user'
+	)
 	parser.add_option('-s', '--simulate', 
 			action = 'store_true', 
 			default = False, 
@@ -265,7 +301,7 @@ def main():
 			from terapix.reporting.csv import CSVReport
 			print CSVReport(data = get_grades())
 		elif options.filename:
-			ingest_grades(options.filename, options.simulate, verbose = options.verbose)
+			ingest_grades(options.filename, options.simulate, options.user, verbose = options.verbose)
 		elif options.delete:
 			delete_grades(options.simulate, verbose = options.verbose)
 		elif options.props:
