@@ -984,7 +984,14 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 
 			content = """
 <table class="report_grading_stats">
-	<tr><th></th><th>Results Output Directory</th><th># Graded</th><th># Non graded</th><th>%%</th><th>Total</th></tr>
+	<tr>
+		<th></th>
+		<th>Results Output Directory</th>
+		<th># Graded</th>
+		<th># Non graded</th>
+		<th>%%</th>
+		<th>Total of Processings</th>
+	</tr>
 	%(rows)s
 </table>
 """ % {
