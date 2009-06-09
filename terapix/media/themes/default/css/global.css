@@ -1549,3 +1549,10 @@ div.tags *, .dropzone * {
 	padding: 10px;
 }
 
+table.report_grading_stats tr.complete td {
+	color: green;
+}
+
+table.report_grading_stats tr.complete td.gradecomplete {
+	background: white url(../img/admin/icon_success.gif) no-repeat left center;
+}

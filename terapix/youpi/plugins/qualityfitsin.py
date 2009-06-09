@@ -909,12 +909,12 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 
 		rdata = [
 			{'id': 'allgrades',		'title': 'List of all QualityFITS-in grades'},
-			{'id': 'gradestats', 	'title': 'Grading statistics (summary)'},
+			{'id': 'gradestats', 	'title': 'Grading statistics'},
 			{'id': 'nongraded', 	'title': 'List of all non graded images', 'options': nongopts},
 			{'id': 'onegrade', 		'title': 'List of all images with a selected grade', 'options': oneopts},
 			{'id': 'piegrades', 	'title': 'Pie Chart of grades'},
 		]
-		rdata.sort(cmp=lambda x,y: cmp(x['title'],y['title']))
+		rdata.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
 		return rdata
 
@@ -940,9 +940,60 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			return HttpResponse(CSVReport(data = get_grades()), mimetype = 'text/plain')
 
 		elif reportId == 'gradestats':
-			from terapix.script.grading import get_stats
-			from terapix.reporting.plain import PlainTextReport
-			return HttpResponse(PlainTextReport(data = get_stats()), mimetype = 'text/plain')
+			paths = Processing_task.objects.filter(success = True, kind__name = self.id).distinct().values('results_output_dir').order_by('results_output_dir')
+			
+			paths = [p['results_output_dir'] for p in paths]
+			trs = []
+			k = 0
+			for path in paths:
+				k += 1
+				fitsins = Plugin_fitsin.objects.filter(task__success = True, task__results_output_dir = path)
+				ugrades = FirstQEval.objects.filter(fitsin__in = fitsins)
+				graded = len(ugrades)
+				nongraded = len(fitsins) - graded
+				total = graded + nongraded
+				style = 'text-align: right;'
+				gstyle = trstyle = gradecls = ''
+				if graded == 0: gstyle = 'color: red;'
+				elif graded < total: gstyle = 'color: orange; font-weight: bold;'
+				else: 
+					gstyle = 'color: green;'
+					trstyle = 'complete'
+					gradecls = 'gradecomplete'
+
+				trs.append(("""
+<tr class="%(trstyle)s">
+	<td>%(idx)s</td>
+	<td class="file">%(path)s</td>
+	<td class="%(gradecls)s" style="%(style)s%(gstyle)s">%(graded)d</td>
+	<td style="%(style)s">%(nongraded)d</td>
+	<td style="%(style)s">%(percent).2f</td>
+	<td style="%(style)s">%(total)d</td>
+</tr>""" % {
+	'idx': k,
+	'path' : path,
+	'graded' : graded,
+	'nongraded' : nongraded,
+	'total' : total,
+	'style' : style,
+	'gstyle' : gstyle,
+	'trstyle' : trstyle,
+	'gradecls' : gradecls,
+	'percent' : graded*100./total,
+}))
+
+			content = """
+<table class="report_grading_stats">
+	<tr><th></th><th>Results Output Directory</th><th># Graded</th><th># Non graded</th><th>%%</th><th>Total</th></tr>
+	%(rows)s
+</table>
+""" % {
+	'rows': string.join(trs, '\n'),
+}
+			return render_to_response('report.html', {	
+								'report_title' 		: self.__getReportName(reportId),
+								'report_content' 	: content, 
+			}, context_instance = RequestContext(request))
 
 		elif reportId == 'onegrade':
 			from terapix.reporting.csv import CSVReport
