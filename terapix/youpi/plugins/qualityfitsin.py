@@ -189,7 +189,7 @@ class QualityFitsIn(ProcessingPlugin):
 			<table style="width: %s">
 				<tr>
 					<td>%d of %d images already graded</td>
-					<td align="right"><div id="ph_agraded_div"></div></td>
+					<td><div id="ph_agraded_div"></div></td>
 				</tr>
 			</table>
 			<script type="text/javascript">new ProgressBar('ph_agraded_div', %.2f);</script>
