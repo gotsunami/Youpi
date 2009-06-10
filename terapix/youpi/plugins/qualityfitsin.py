@@ -945,6 +945,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			paths = Processing_task.objects.filter(success = True, kind__name = self.id).distinct().values_list('results_output_dir', flat = True).order_by('results_output_dir')
 			trs = []
 			k = 0
+			totalgraded = totalnongraded = totalprocessings = 0
 			for path in paths:
 				k += 1
 				fitsins = Plugin_fitsin.objects.filter(task__success = True, task__results_output_dir = path).values_list('id', flat = True)
@@ -953,9 +954,14 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				cur.execute(q)
 				res = cur.fetchall()
 				ugrades = len(res)
+
 				graded = ugrades
 				nongraded = len(fitsins) - graded
 				total = graded + nongraded
+				totalgraded += graded
+				totalnongraded += nongraded
+				totalprocessings += total
+
 				style = 'text-align: right;'
 				gstyle = trstyle = gradecls = ''
 				if graded == 0: gstyle = 'color: red;'
@@ -974,16 +980,16 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 	<td style="%(style)s">%(percent).2f</td>
 	<td style="%(style)s">%(total)d</td>
 </tr>""" % {
-	'idx': k,
-	'path' : path,
-	'graded' : graded,
+	'idx'		: k,
+	'path' 		: path,
+	'graded' 	: graded,
 	'nongraded' : nongraded,
-	'total' : total,
-	'style' : style,
-	'gstyle' : gstyle,
-	'trstyle' : trstyle,
-	'gradecls' : gradecls,
-	'percent' : graded*100./total,
+	'total' 	: total,
+	'style' 	: style,
+	'gstyle' 	: gstyle,
+	'trstyle' 	: trstyle,
+	'gradecls' 	: gradecls,
+	'percent' 	: graded*100./total,
 }))
 
 			content = """
@@ -996,10 +1002,30 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		<th>%%</th>
 		<th>Total of Processings</th>
 	</tr>
+	<tr style="background-color: lightyellow">
+		<th></th>
+		<th style="text-align: right">Total</th>
+		<th style="text-align: right">%(totalgraded)d</th>
+		<th style="text-align: right">%(totalnongraded)d</th>
+		<th style="text-align: right">%(totalpercent).2f</th>
+		<th style="text-align: right">%(totalprocessings)d</th>
+	</tr>
 	%(rows)s
+	<tr style="background-color: lightyellow">
+		<th></th>
+		<th style="text-align: right">Total</th>
+		<th style="text-align: right">%(totalgraded)d</th>
+		<th style="text-align: right">%(totalnongraded)d</th>
+		<th style="text-align: right">%(totalpercent).2f</th>
+		<th style="text-align: right">%(totalprocessings)d</th>
+	</tr>
 </table>
 """ % {
-	'rows': string.join(trs, '\n'),
+	'rows'				: string.join(trs, '\n'),
+	'totalgraded'		: totalgraded,
+	'totalpercent'		: totalgraded*100./totalprocessings,
+	'totalnongraded'	: totalnongraded,
+	'totalprocessings'	: totalprocessings,
 }
 			return render_to_response('report.html', {	
 								'report_title' 		: self.__getReportName(reportId),
