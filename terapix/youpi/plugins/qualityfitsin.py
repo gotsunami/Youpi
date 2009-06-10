@@ -940,16 +940,20 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			return HttpResponse(CSVReport(data = get_grades()), mimetype = 'text/plain')
 
 		elif reportId == 'gradestats':
-			paths = Processing_task.objects.filter(success = True, kind__name = self.id).distinct().values('results_output_dir').order_by('results_output_dir')
-			
-			paths = [p['results_output_dir'] for p in paths]
+			from django.db import connection
+			cur = connection.cursor()
+			paths = Processing_task.objects.filter(success = True, kind__name = self.id).distinct().values_list('results_output_dir', flat = True).order_by('results_output_dir')
 			trs = []
 			k = 0
 			for path in paths:
 				k += 1
-				fitsins = Plugin_fitsin.objects.filter(task__success = True, task__results_output_dir = path)
-				ugrades = FirstQEval.objects.filter(fitsin__in = fitsins)
-				graded = len(ugrades)
+				fitsins = Plugin_fitsin.objects.filter(task__success = True, task__results_output_dir = path).values_list('id', flat = True)
+				# Only one grade even for processings graded multiple times by different users 
+				q = """SELECT COUNT(*) FROM youpi_firstqeval WHERE fitsin_id IN (%s) GROUP BY fitsin_id""" % string.join([str(f) for f in fitsins], ',')
+				cur.execute(q)
+				res = cur.fetchall()
+				ugrades = len(res)
+				graded = ugrades
 				nongraded = len(fitsins) - graded
 				total = graded + nongraded
 				style = 'text-align: right;'
