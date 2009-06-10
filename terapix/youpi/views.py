@@ -1118,11 +1118,7 @@ def get_report(request, pluginId, reportId):
 		# Not found
 		return HttpResponseNotFound()
 
-	try:
-		return plugObj.getReport(request, reportId)
-	except TypeError:
-		# Bad report Id
-		return HttpResponseNotFound()
+	return plugObj.getReport(request, reportId)
 
 def ims_get_image_list(request):
 	"""
