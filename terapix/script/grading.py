@@ -121,14 +121,14 @@ def get_proportions():
 	from django.db import connection
 	cur = connection.cursor()
 	q1 = "select grade, count(grade) from youpi_firstqeval group by grade"
-	q2 = "select prevrelgrade, count(prevrelgrade) from youpi_plugin_fitsin where prevrelgrade != '' group by prevrelgrade"
 
 	grades = {'A': 0, 'B': 0, 'C': 0, 'D': 0}
-	for q in (q1, q2):
+	for q in (q1,):
 		cur.execute(q)
 		res = cur.fetchall()
 		for g in res:
-			grades[g[0]] += int(g[1])
+			if g[0] in ('A','B','C','D'):
+				grades[g[0]] += int(g[1])
 
 	grades = [(k,v) for k,v in grades.iteritems()]
 	grades.sort(cmp = lambda x,y: cmp(x[0], y[0]))
