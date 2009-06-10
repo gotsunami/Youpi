@@ -134,6 +134,46 @@ def get_proportions():
 	grades.sort(cmp = lambda x,y: cmp(x[0], y[0]))
 	return grades
 
+def copy_grades(simulate, user, verbose):
+	print "Will copy prevrel grades into the the youpi_firstqeval table, graded by user %s" % user
+	print "This copy is non-destructive. You can run this command multiple times."
+	try:
+		user = User.objects.filter(username__exact = user)[0]
+	except:
+		# User not found; exiting
+		print "Abort: user '%s' not found in database." % user
+		sys.exit(1)
+
+	term = TerminalController()
+	sys.stdout.write(term.HIDE_CURSOR)
+
+	fitsins = Plugin_fitsin.objects.exclude(prevrelgrade = '').filter(task__success = True)
+	com = FirstQComment.objects.all()[0]
+	writes = k = matches = 0
+	print "Preparing data..."
+
+	try:
+		for f in fitsins:
+			k += 1
+			mg = FirstQEval.objects.filter(user = user, fitsin = f)
+			if not mg:
+				matches += 1
+				if not simulate:
+					e = FirstQEval(user = user, fitsin = f)
+					e.grade = f.prevrelgrade
+					e.comment = com
+					if f.prevrelcomment: e.custom_comment = f.prevrelcomment
+					else: e.custom_comment = ''
+					e.save()
+					writes += 1
+			sys.stdout.write(term.BOL + "QFits-in: %5d, Matches: %5d, User grades added: %5d" % (k, matches, writes))
+	except:
+		sys.stdout.write(term.SHOW_CURSOR)
+		raise
+
+	sys.stdout.write(term.SHOW_CURSOR + '\n')
+	print "New grades added: %d" % writes
+
 def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 	try:
 		f = open(filename)
@@ -143,6 +183,7 @@ def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 
 	print "Looking for fields separated by '%s'" % separator
 	print "Each line should match: '%s'" % string.join(('Image name', 'Grade', 'Comment'), separator)
+
 	if user:
 		print "Will ingest grades in the youpi_firstqeval table"
 		try:
@@ -234,6 +275,11 @@ def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 
 def main():
 	parser = OptionParser(description = 'Tool for grading all Qualityfits-in processings')
+	parser.add_option('-c', '--copy', 
+			action = 'store_true', 
+			default = False, 
+			help = 'Copy a prevrelgrade to a user grade if no user grade available. Must be used with option -u'
+	)
 	parser.add_option('-d', '--delete', 
 			default = False, 
 			action = 'store_true', 
@@ -292,8 +338,15 @@ def main():
 		parser.error('options -i and -t are mutually exclusive')
 	if options.delete and options.list_only:
 		parser.error('options -d and -l are mutually exclusive')
+	if options.copy and options.filename:
+		parser.error('options -c and -i are mutually exclusive')
+	if options.copy and options.list_only:
+		parser.error('options -c and -l are mutually exclusive')
+	if options.copy and options.delete:
+		parser.error('options -c and -d are mutually exclusive')
 
 	try:
+		start = time.time()
 		if options.stats:
 			from terapix.reporting.plain import PlainTextReport
 			print PlainTextReport(data = get_stats())
@@ -307,6 +360,13 @@ def main():
 		elif options.props:
 			from terapix.reporting.csv import CSVReport
 			print CSVReport(data = get_proportions())
+		elif options.copy:
+			if not options.user:
+				parser.error('option -c must be used with option -u')
+			copy_grades(options.simulate, options.user, verbose = options.verbose)
+
+		end = time.time()
+		print "Took: %.2fs" % (end-start)
 	except KeyboardInterrupt:
 		print "Exiting..."
 		sys.exit(2)
