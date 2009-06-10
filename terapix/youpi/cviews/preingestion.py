@@ -523,6 +523,185 @@ def preingestion_custom_query(request):
 
 	return HttpResponse(str({'query' : str(query), 'fields' : tableFields, 'data' : data, 'hidden' : str(hide).split(',')}), mimetype = 'text/plain')
 
+def ims_get_collection(request, name):
+	"""
+	Returns a collection for the image selector
+	"""
+	if name == 'object':
+		data = Image.objects.all().distinct().values_list('object', flat = True).order_by('object')
+	elif name == 'ingestionid':
+		data = Ingestion.objects.all().distinct().values_list('label', flat = True).order_by('label')
+	elif name == 'channel':
+		data = Channel.objects.all().distinct().values_list('name', flat = True).order_by('name')
+	elif name == 'instrument':
+		data = Instrument.objects.all().distinct().values_list('name', flat = True).order_by('name')
+	elif name == 'run':
+		data = Run.objects.all().distinct().values_list('name', flat = True).order_by('name')
+	elif name == 'tag':
+		data = Tag.objects.all().distinct().values_list('name', flat = True).order_by('name')
+	elif name == 'savedselections':
+		sels, filtered = read_proxy(request, ImageSelections.objects.all().order_by('name'))
+		data = []
+		for s in sels:
+			sList = marshal.loads(base64.decodestring(s.data))
+			if len(sList) == 1: data.append(s.name)
+	else:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	return HttpResponse(json.encode({'name': name, 'data': [str(d) for d in data]}), mimetype = 'text/plain')
+
+def ims_get_images(request, name):
+	"""
+	Returns a list of images
+	(r'^youpi/ims/images/(.*?)/$', 'ims_get_images'),
+	"""
+	try:
+		cond = request.POST['Condition']
+		value = request.POST['Value']
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	from django.db import connection
+	cur = connection.cursor()
+
+	idList = request.POST.get('IdList', False)
+	if idList: idList = [int(id) for id in idList.split(',')]
+
+	if name not in ('Ra', 'Dec', 'Name'):
+		if value.find(',') > 0:
+			value = value.split(',')
+		else:
+			value = (value,)
+
+	EQ = 'is equal to'
+	NEQ = 'is different from'
+	GT = 'is greater than'
+	LT = 'is lower than'
+
+	if name == 'Run':
+		if idList:
+			if cond == EQ:
+				data = Image.objects.filter(run__name__in = value, id__in = idList).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(run__name__in = value).filter(id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			if cond == EQ:
+				data = Image.objects.filter(run__name__in = value).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(run__name__in = value).values_list('id', flat = True).order_by('name')
+
+	elif name == 'Tag':
+		if idList:
+			if cond == EQ:
+				data = Rel_tagi.objects.filter(tag__name__in = value, image__id__in = idList).values_list('image__id', flat = True)
+			else:
+				q = """
+				SELECT DISTINCT(i.id) 
+				FROM youpi_image AS i, youpi_rel_tagi AS r, youpi_tag AS t 
+				WHERE r.image_id=i.id AND r.tag_id=t.id AND t.name NOT IN (%s) AND i.id IN (%s)""" \
+					% (string.join(map(lambda x: "'%s'" % x, value), ','), string.join(map(lambda x: str(x), idList), ',')) 
+				cur.execute(q)
+				res = cur.fetchall()
+				data = [r[0] for r in res]
+		else:
+			if cond == EQ:
+				data = Rel_tagi.objects.filter(tag__name__in = value).values_list('image__id', flat = True)
+			else:
+				q = """
+				SELECT DISTINCT(i.id) 
+				FROM youpi_image AS i, youpi_rel_tagi AS r, youpi_tag AS t 
+				WHERE r.image_id=i.id AND r.tag_id=t.id AND t.name NOT IN (%s)""" % string.join(map(lambda x: "'%s'" % x, value), ',')
+				cur.execute(q)
+				res = cur.fetchall()
+				data = [r[0] for r in res]
+
+	elif name == 'Object':
+		if idList:
+			if cond == EQ:
+				data = Image.objects.filter(object__in = value, id__in = idList).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(object__in = value).filter(id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			if cond == EQ:
+				data = Image.objects.filter(object__in = value).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(object__in = value).values_list('id', flat = True).order_by('name')
+
+	elif name == 'Instrument':
+		if idList:
+			if cond == EQ:
+				data = Image.objects.filter(instrument__name__in = value, id__in = idList).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(instrument__name__in = value).filter(id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			if cond == EQ:
+				data = Image.objects.filter(instrument__name__in = value).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(instrument__name__in = value).values_list('id', flat = True).order_by('name')
+
+	elif name == 'Channel':
+		if idList:
+			if cond == EQ:
+				data = Image.objects.filter(channel__name__in = value, id__in = idList).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(channel__name__in = value).filter(id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			if cond == EQ:
+				data = Image.objects.filter(channel__name__in = value).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(channel__name__in = value).values_list('id', flat = True).order_by('name')
+
+	elif name == 'Name':
+		# Image name
+		if idList:
+			data = Image.objects.filter(name__icontains = value, id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			data = Image.objects.filter(name__icontains = value).values_list('id', flat = True).order_by('name')
+
+	elif name == 'Ra':
+		# FIXME: LT, GT
+		if idList:
+			data = Image.objects.filter(alpha = value, id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			data = Image.objects.filter(alpha = value).values_list('id', flat = True).order_by('name')
+
+	elif name == 'Dec':
+		# FIXME: LT, GT
+		if idList:
+			data = Image.objects.filter(delta = value, id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			data = Image.objects.filter(delta = value).values_list('id', flat = True).order_by('name')
+
+	elif name == 'Saved':
+		sel = ImageSelections.objects.filter(name__in = value)[0]
+		sdata = marshal.loads(base64.decodestring(sel.data))
+		selIdList = sdata[0]
+		if idList:
+			# Find the intersections
+			realIdList = []
+			for id in idList:
+				if id in selIdList: realIdList.append(id)
+			data = Image.objects.filter(id__in = realIdList).values_list('id', flat = True).order_by('name')
+		else:
+			data = Image.objects.filter(id__in = selIdList).values_list('id', flat = True).order_by('name')
+
+	elif name == 'IngestionId':
+		if idList:
+			if cond == EQ:
+				data = Image.objects.filter(ingestion__label__in = value, id__in = idList).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(ingestion__label__in = value).filter(id__in = idList).values_list('id', flat = True).order_by('name')
+		else:
+			if cond == EQ:
+				data = Image.objects.filter(ingestion__label__in = value).values_list('id', flat = True).order_by('name')
+			else:
+				data = Image.objects.exclude(ingestion__label__in = value).values_list('id', flat = True).order_by('name')
+
+	data = [[str(id)] for id in data]
+
+	return HttpResponse(json.encode({'name': name, 'data': data}), mimetype = 'text/plain')
+
+
 def processing_get_imgs_ids_from_release(request):
 	"""
 	Returns a dictionnary with images Ids that belong to a release

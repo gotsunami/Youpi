@@ -138,7 +138,7 @@ urlpatterns = patterns(
 	# Auto-completion
 	(r'^youpi/autocompletion/(.*?)/(.*?)/$', 'autocomplete'),
 
-    # Uncomment this for admin
+    # Admin site
     (r'^youpi/admin/(.*)', admin.site.root),
 
 	# User authentication
@@ -150,6 +150,10 @@ urlpatterns = patterns(
 	(r'^youpi/uploadFile/batch/parseContent/$', 'batch_parse_content'),
 	(r'^youpi/uploadFile/batch/viewContent/(.*)/$', 'batch_view_content'),
 	(r'^youpi/uploadFile/batch/viewSelection/$', 'batch_view_selection'),
+
+	# Image selector
+	(r'^youpi/ims/collection/(.*?)/$', 'ims_get_collection'),
+	(r'^youpi/ims/images/(.*?)/$', 'ims_get_images'),
 
 	# Stats
 	(r'^youpi/stats/ingestion/$', 'stats_ingestion'),

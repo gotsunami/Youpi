@@ -74,7 +74,6 @@ function ImageSelector(container, options)
 	 * whose name match:
 	 *   - get[E]CondSelect()
 	 *   - build[E]DataWidget()
-	 *   - get[E]SQLParams()
 	 *
 	 * Supported search criteria are Run, Object, Instrument, Channel, Name, Ra, Dec, Saved selection and IngestionId.
 	 *
@@ -1301,11 +1300,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-
-		// Build custom query
-		var data = 'Distinct=&Table=youpi_image&DisplayField=object&Lines=0&Line0Field=object&Line0Cond=contains&Line0Text=&Hide=&OrderBy=object';
-		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/ims/collection/object/');
 	}
 
 	/*
@@ -1324,23 +1319,6 @@ function ImageSelector(container, options)
 	function getObjectCondSelect(tr_idx) {
 		var conds = ['is equal to', 'is different from'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getObjectSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Object' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getObjectSQLParams() {
-		// ftable: foreign SQL table
-		return {'ftable' 	: null,
-				'field': 'object'};
 	}
 
 
@@ -1372,11 +1350,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-
-		// Build custom query
-		var data = 'Distinct=&Table=youpi_ingestion&DisplayField=label&Lines=0&Line0Field=label&Line0Cond=contains&Line0Text=&Hide=&OrderBy=label';
-		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/ims/collection/ingestionid/');
 	}
 
 	/*
@@ -1395,25 +1369,6 @@ function ImageSelector(container, options)
 	function getIngestionIdCondSelect(tr_idx) {
 		var conds = ['is equal to', 'is different from'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getIngestionIdSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'IngestionId' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getIngestionIdSQLParams() {
-		// ftable: foreign SQL table
-		return {'ftable' 		: 'youpi_ingestion',
-				'ftable_field' 	: 'label',
-				'fkid'			: 'ingestion_id',
-				'ftable_id' 	: 'id' };
 	}
 
 
@@ -1445,11 +1400,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-
-		// Build custom query
-		var data = 'Distinct=&Table=youpi_channel&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
-		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/ims/collection/channel/');
 	}
 
 	/*
@@ -1468,24 +1419,6 @@ function ImageSelector(container, options)
 	function getChannelCondSelect(tr_idx) {
 		var conds = ['is equal to', 'is different from'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getChannelSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Channel' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getChannelSQLParams() {
-		return {'ftable' 		: 'youpi_channel',
-				'ftable_field' 	: 'name',
-				'fkid'			: 'channel_id',
-				'ftable_id' 	: 'id' };
 	}
 
 
@@ -1517,12 +1450,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-
-		// Build custom query
-		var data = 'Distinct=&Table=youpi_instrument&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
-
-		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/ims/collection/instrument/');
 	}
 
 	/*
@@ -1541,24 +1469,6 @@ function ImageSelector(container, options)
 	function getInstrumentCondSelect(tr_idx) {
 		var conds = ['is equal to', 'is different from'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getInstrumentSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Instrument' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getInstrumentSQLParams() {
-		return {'ftable' 		: 'youpi_instrument',
-				'ftable_field' 	: 'name',
-				'fkid'			: 'instrument_id',
-				'ftable_id' 	: 'id' };
 	}
 
 
@@ -1590,12 +1500,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-
-		// Build custom query
-		var data = 'Distinct=&Table=youpi_run&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=contains&Line0Text=&Hide=&OrderBy=name';
-
-		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', data);
+		xhr.send('/youpi/ims/collection/run/');
 	}
 
 	/*
@@ -1614,24 +1519,6 @@ function ImageSelector(container, options)
 	function getRunCondSelect(tr_idx) {
 		var conds = ['is equal to', 'is different from'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getRunSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Run' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getRunSQLParams() {
-		return {'ftable' 		: 'youpi_run',
-				'ftable_field' 	: 'name',
-				'fkid'			: 'run_id',
-				'ftable_id' 	: 'id' };
 	}
 
 
@@ -1656,26 +1543,25 @@ function ImageSelector(container, options)
 			// Custom handler for results
 			function(resp) {
 				// Rendering
-				removeAllChildrenNodes(output);
+				output.update();
 				var selid = id + '_tag_select_' + tr_idx;
-				if (resp.tags.length > 0) {
+				if (resp.data.length > 0) {
 					var sels = new Array();
-					resp.tags.each(function(tag) {
-						sels.push(tag.name);
+					resp.data.each(function(tag) {
+						sels.push(tag);
 					});
 					var selNode = getSelect(selid, sels, 6);
 				}
 				else {
 					var selNode = new Element('select', {id: selid});
 					option = new Element('option', {value: 0});
-					option.update('-- No saved selection in database --');
+					option.update('-- No tags found in database --');
 					selNode.insert(option);
 				}
 				output.insert(selNode);
 			}
 		);
-
-		xhr.send('/youpi/tags/fetchtags/');
+		xhr.send('/youpi/ims/collection/tag/');
 	}
 
 	/*
@@ -1693,26 +1579,6 @@ function ImageSelector(container, options)
 	function getTagCondSelect(tr_idx) {
 		var conds = ['is equal to', 'is different from'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getTagSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Tag' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *  JSON element
-	 *
-	 */ 
-	function getTagSQLParams() {
-		return null;
-		/*
-		return {'ftable' 		: 'youpi_tag',
-				'ftable_field' 	: 'name',
-				'fkid'			: 'tag_id',
-				'ftable_id' 	: 'id' };
-				*/
 	}
 
 
@@ -1741,27 +1607,18 @@ function ImageSelector(container, options)
 				// Rendering
 				removeAllChildrenNodes(output);
 				var selid = id + '_saved_select_' + tr_idx;
-				if (resp['data'].length > 0) {
-					var sels = new Array();
-					for (var k=0; k < resp['data'].length; k++) {
-						sels[k] = resp['data'][k][0];
-					}
-					var selNode = getSelect(selid, sels);
-				}
+				if (resp.data.length > 0)
+					var selNode = getSelect(selid, resp.data);
 				else {
-					var selNode = new Element('select');
-					selNode.setAttribute('id', selid);
-					option = new Element('option');
-					option.setAttribute('value', 0);
+					var selNode = new Element('select', {'id': selid});
+					option = new Element('option', {'value': 0});
 					option.insert('-- No saved selection in database --');
 					selNode.insert(option);
 				}
 				output.insert(selNode);
 			}
 		);
-
-		var post = 'Mode=Single';
-		xhr.send('/youpi/process/db/getSelections/', post);
+		xhr.send('/youpi/ims/collection/savedselections/');
 	}
 
 	/*
@@ -1780,25 +1637,6 @@ function ImageSelector(container, options)
 	function getSavedCondSelect(tr_idx) {
 		var conds = ['is equal to'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getSavedSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Saved' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getSavedSQLParams() {
-		/*
-		 * Only this special string to instruct send_q() to make a non-standard (different url) call
-		 *
-		 */
-		return {'special' : true};
 	}
 
 
@@ -1842,22 +1680,6 @@ function ImageSelector(container, options)
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
 	}
 
-	/*
-	 * Function: getNameSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Name' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getNameSQLParams() {
-		return {'ftable' 	: null,
-				'field'		: 'name'};
-	}
-
 
 	// Group: Ra Field
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -1899,22 +1721,6 @@ function ImageSelector(container, options)
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
 	}
 
-	/*
-	 * Function: getRaSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Ra' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getRaSQLParams() {
-		return {'ftable' 	: null,
-				'field': 'alpha'};
-	}
-
 
 	// Group: Dec Field
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -1954,22 +1760,6 @@ function ImageSelector(container, options)
 	function getDecCondSelect(tr_idx) {
 		var conds = ['is equal to', 'is greater than', 'is lower than'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
-	}
-
-	/*
-	 * Function: getDecSQLParams
-	 * Returns a JSON object with custom SQL parameters for the 'Dec' search criteria
-	 *
-	 * These parameters will be used by <sendq> when sending POST request to the server.
-	 *
-	 * Returns:
-	 *
-	 *  JSON element
-	 *
-	 */ 
-	function getDecSQLParams() {
-		return {'ftable' 	: null,
-				'field': 'delta'};
 	}
 
 
@@ -2794,23 +2584,6 @@ function ImageSelector(container, options)
 			null,
 			// Custom handler for results
 			function(resp) {
-				/*
-				 * Since saved selections now handle a batch selection mode, data format returned has 
-				 * changed and looks like [[id1,id2,...],...]. 
-				 * Saved selection-related response misses a 'fields' key.
-				 * To keep working with single selection mode, it needs to be converted to [[id1],[id2]...] 
-				 * format first.
-				 *
-				 */
-				if (typeof resp['fields'] == 'undefined') {
-					var ids = new Array();
-					for (var j=0; j < resp['data'][0].length; j++) {
-						ids[j] = new Array();
-						ids[j][0] = resp['data'][0][j];
-					}
-					resp['data'] = ids;
-				}
-
 				output.update();
 				var count = resp['data'].length;
 				var d = new Element('div');
@@ -3002,7 +2775,7 @@ function ImageSelector(container, options)
 	 *
 	 * <_executeQuery>
 	 *
-	 */ 
+	 */
 	function sendq(k, xhr) {
 		var row, rowNode, critText, valueText, params, rid;
 
@@ -3016,18 +2789,6 @@ function ImageSelector(container, options)
 		valueNode = $(id + '_custom_div_' + row).firstChild;
 		critText = critNode.options[critNode.selectedIndex].text;
 
-		// Ugly hack for tags
-		if (critText == 'Tag') {
-			var tags = $A();
-			$A(valueNode.options).each(function(opt) {
-				if (opt.selected) tags.push(opt.text);
-			});
-			var post = {Tags: tags.toJSON()};
-			xhr.send('/youpi/tags/images/', $H(post).toQueryString());
-			return;
-		}
-
-		// Gets internal prefix for later get + prefix + SQLParams() method call
 		for (var k=0; k < labelFields.length; k++) {
 			if (labelFields[k] == critText) {
 				critText = fields[k];
@@ -3036,70 +2797,44 @@ function ImageSelector(container, options)
 		}
 
 		var multiSel = new Array();
-
 		try {
 			// Multi-selection in selects elements will be OR'ed when building SQL query (server-side)
 			if (valueNode.hasAttribute('size') && valueNode.hasAttribute('multiple')) {
 				var numSelected = 0, opt;
 				for (var j=0; j < valueNode.options.length; j++) {
 					opt = valueNode.options[j];
-					if (opt.selected) {
-						multiSel[numSelected++] = opt.text.replace('+', '%2B');
-					}
+					if (opt.selected)
+						multiSel.push(opt.text);
 				}
-				valueText = 'MULTI';
+				valueText = multiSel.join(',');
 			}
-			else {
+			else
 				valueText = valueNode.options[valueNode.selectedIndex].text.replace('+', '%2B');
-			}
 		}
 		catch(err) {
 			// Not a combobox, condiders it's a textbox
 			valueText = valueNode.value.replace('+', '%2B');
 		}
 
-		params = eval('get' + critText + 'SQLParams')();
-
-		/** SPECIAL CASE **/
-		if (params['special']) {
-			post = 'Name=' + valueText + '&Mode=Single';
-			xhr.send('/youpi/process/db/getSelections/', post);
-			return;
-		}
-
 		// Replace any '*' wildcard by '%'
 		valueText = valueText.replace(/%/g, '%25').replace(/\*/g, '%25');
 
-		post = 'Table=youpi_image&DisplayField=id&Lines=0&Line0Field=' + params['field'] + 
-			'&Line0Cond=' + getCondText(row) + '&Line0Text=' + valueText + '&Hide=&OrderBy=id';
-
-		if (multiSel.length > 0) {
-			// This is a multi-selection capable combobox
-			post += '&MultiSelection=' + multiSel;
-		}
-
-		if (params['ftable']) {
-			// Complex query
-			post += '&Ftable=' + params['ftable'] +
-					'&FtableField=' + params['ftable_field'] +
-					'&FtableFieldValue=' + valueText +
-					'&FtableId=' + params['ftable_id'] +
-					'&FkId=' + params['fkid'];
-		}
-
+		var post = $H({
+			Condition: condNode.options[condNode.selectedIndex].value,
+			Value: valueText
+		});
 		if (xhr.idResultsIdx > 0) {
-			post += '&IdList=';
 			if (idResults[xhr.idResultsIdx-1].length > 0) {
-				post += idResults[xhr.idResultsIdx-1];
+				var idList = new Array();
+				idResults[xhr.idResultsIdx-1].each(function(imgid) {
+					idList.push(imgid[0]);
+				});
+				post.set('IdList', idList.join(','));
 			}
-			else {
-				post += '-1';
-			}
-			post += '&IdField=id';
 		}
 	
 		// Send POST HTTP query
-		xhr.send('/youpi/process/preingestion/query/', post);
+		xhr.send('/youpi/ims/images/' + critText + '/', post.toQueryString());
 	}
 
 	/*
