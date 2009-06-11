@@ -1044,7 +1044,15 @@ var ResultsHelpers = {
 
 		tr = new Element('tr');
 		td = new Element('td');
-		td.update(get_permissions('task', taskId));
+		td.update(get_permissions('task', taskId, function(resp, misc) {
+			if (resp.currentUser.write) {
+				var delb = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/delete.gif'});
+				delb.observe('click', function() {
+					console.log('DELETE');
+				});
+				td.insert('You can ').insert(delb).insert(' this processing');
+			}
+		}));
 		tr.insert(td);
 		tab.insert(tr);
 

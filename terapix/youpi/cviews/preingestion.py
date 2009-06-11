@@ -323,6 +323,12 @@ def preingestion_table_fields(request):
 
 	return HttpResponse(str({'fields' : [r[0] for r in res]}), mimetype = 'text/plain')
 
+#
+# FIXME
+# DEPRECATED
+# This function should be removed. Not used anymore by the image selector.
+# However some JS code still call it...
+#
 def preingestion_custom_query(request):
 	"""
 	Builds an SQL query based on POST data, executes it and returns a JSON object containing results.
@@ -539,6 +545,8 @@ def ims_get_collection(request, name):
 		data = Run.objects.all().distinct().values_list('name', flat = True).order_by('name')
 	elif name == 'tag':
 		data = Tag.objects.all().distinct().values_list('name', flat = True).order_by('name')
+	elif name == 'grade':
+		data = [g[0] for g in GRADE_SET]
 	elif name == 'savedselections':
 		sels, filtered = read_proxy(request, ImageSelections.objects.all().order_by('name'))
 		data = []
@@ -593,16 +601,20 @@ def ims_get_images(request, name):
 	elif name == 'Tag':
 		if idList:
 			if cond == EQ:
-				data = Rel_tagi.objects.filter(tag__name__in = value, image__id__in = idList).values_list('image__id', flat = True)
+				q = """
+				SELECT DISTINCT(i.id) 
+				FROM youpi_image AS i, youpi_rel_tagi AS r, youpi_tag AS t 
+				WHERE r.image_id=i.id AND r.tag_id=t.id AND t.name IN (%s) AND i.id IN (%s)""" \
+					% (string.join(map(lambda x: "'%s'" % x, value), ','), string.join(map(lambda x: str(x), idList), ',')) 
 			else:
 				q = """
 				SELECT DISTINCT(i.id) 
 				FROM youpi_image AS i, youpi_rel_tagi AS r, youpi_tag AS t 
 				WHERE r.image_id=i.id AND r.tag_id=t.id AND t.name NOT IN (%s) AND i.id IN (%s)""" \
 					% (string.join(map(lambda x: "'%s'" % x, value), ','), string.join(map(lambda x: str(x), idList), ',')) 
-				cur.execute(q)
-				res = cur.fetchall()
-				data = [r[0] for r in res]
+			cur.execute(q)
+			res = cur.fetchall()
+			data = [r[0] for r in res]
 		else:
 			if cond == EQ:
 				data = Rel_tagi.objects.filter(tag__name__in = value).values_list('image__id', flat = True)
@@ -697,6 +709,27 @@ def ims_get_images(request, name):
 			else:
 				data = Image.objects.exclude(ingestion__label__in = value).values_list('id', flat = True).order_by('name')
 
+	elif name == 'Grade':
+		if cond == EQ:
+			fitsinIds = FirstQEval.objects.filter(grade__in = value).values_list('fitsin', flat = True).distinct()
+		else:
+			cur.execute("SELECT DISTINCT(fitsin_id) FROM youpi_firstqeval WHERE grade NOT IN (%s)" \
+				% string.join(map(lambda x: "'%s'" % x, value), ','))
+			res = cur.fetchall()
+			fitsinIds = [r[0] for r in res]
+
+		taskIds = Plugin_fitsin.objects.filter(id__in = fitsinIds).values_list('task', flat = True)
+		imgIds = Rel_it.objects.filter(task__id__in = taskIds).values_list('image', flat = True)
+		if idList:
+			# Find the intersections
+			realIdList = []
+			for id in idList:
+				if id in imgIds: realIdList.append(id)
+			data = Image.objects.filter(id__in = realIdList).values_list('id', flat = True).order_by('name')
+		else:
+			data = Image.objects.filter(id__in = imgIds).values_list('id', flat = True).order_by('name')
+
+	# Format data
 	data = [[str(id)] for id in data]
 
 	return HttpResponse(json.encode({'name': name, 'data': data}), mimetype = 'text/plain')

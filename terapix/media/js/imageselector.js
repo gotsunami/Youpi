@@ -78,16 +78,19 @@ function ImageSelector(container, options)
 	 * Supported search criteria are Run, Object, Instrument, Channel, Name, Ra, Dec, Saved selection and IngestionId.
 	 *
 	 */
-	var fields = 		[	'Run', 'Object', 'Instrument', 'Channel', 'Name', 'Ra', 'Dec', 'Saved', 'IngestionId', 'Tag' ];
+	var fields = 		[	'Run', 'Object', 'Instrument', 'Channel', 'Name', 'Ra', 'Dec', 'Saved', 'IngestionId', 'Tag', 'Grade' ];
 	/*
 	 * Var: labelFields
 	 * Array of labels to use with <fields> entries.
 	 *
 	 */
-	var labelFields = 	[	'Run', 'Object', 'Instrument', 'Channel', 'Image name', 'Ra (deg)', 'Dec (deg)', 'Saved selection', 'Ingestion ID', 'Tag' ];
-
-	var actions = [	'Create a new image selection',
-					'Merge saved selections' ];
+	var labelFields = 	[	'Run', 'Object', 'Instrument', 'Channel', 'Image name', 'Ra (deg)', 'Dec (deg)', 'Saved selection', 'Ingestion ID', 'Tag', 'Grade' ];
+	/*
+	 * Var: actions
+	 * Default IMS actions
+	 *
+	 */
+	var actions = [	'Create a new image selection', 'Merge saved selections' ];
 	/*
 	 * Var: _singleMode
 	 * Constant for single mode
@@ -1580,6 +1583,65 @@ function ImageSelector(container, options)
 		var conds = ['is equal to', 'is different from'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
 	}
+	
+
+	// Group: Grade Field
+	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Function: buildGradeDataWidget
+	 * Dynamically builds DOM content for the 'Grade' search criteria
+	 *
+	 * Parameters:
+	 *  tr_idx - string: id of DOM container element
+	 *
+	 */ 
+	function buildGradeDataWidget(tr_idx) {
+		var output = $(id + '_custom_div_' + tr_idx);
+		var xhr = new HttpRequest(
+			output.id,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				// Rendering
+				output.update();
+				var selid = id + '_grade_select_' + tr_idx;
+				if (resp.data.length > 0) {
+					var sels = new Array();
+					resp.data.each(function(tag) {
+						sels.push(tag);
+					});
+					var selNode = getSelect(selid, sels, 4);
+				}
+				else {
+					var selNode = new Element('select', {id: selid});
+					option = new Element('option', {value: 0});
+					option.update('-- No grades found in database --');
+					selNode.insert(option);
+				}
+				output.insert(selNode);
+			}
+		);
+		xhr.send('/youpi/ims/collection/grade/');
+	}
+
+	/*
+	 * Function: getGradeCondSelect
+	 * Returns DOM select object for the 'Grade' search criteria
+	 *
+	 * Parameters:
+	 *  tr_idx - string: id of DOM container element
+	 *
+	 * Returns:
+	 *  DOM select element
+	 *
+	 */ 
+	function getGradeCondSelect(tr_idx) {
+		var conds = ['is equal to', 'is different from'];
+		return getSelect(id + '_condition_select_' + tr_idx, conds);
+	}
 
 
 	// Group: Saved Selection Field
@@ -2789,6 +2851,7 @@ function ImageSelector(container, options)
 		valueNode = $(id + '_custom_div_' + row).firstChild;
 		critText = critNode.options[critNode.selectedIndex].text;
 
+		// Used for Ra and Dec
 		for (var k=0; k < labelFields.length; k++) {
 			if (labelFields[k] == critText) {
 				critText = fields[k];
