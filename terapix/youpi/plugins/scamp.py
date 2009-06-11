@@ -435,7 +435,12 @@ queue""" %  {
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
-		task = Processing_task.objects.filter(id = taskid)[0]
+		try:
+			task = Processing_task.objects.filter(id = taskid)[0]
+		except:
+			# Out of range
+			return {'Error': 1}
+
 		data = Plugin_scamp.objects.filter(task__id = taskid)[0]
 
 		if task.error_log:
@@ -459,11 +464,11 @@ queue""" %  {
 		old_task = scampHistory[0].task
 		gtasks= [old_task]
 		for h in scampHistory:
-			task = h.task
-			if old_task != task:
+			ztask = h.task
+			if old_task != ztask:
 				# Other scamp
-				gtasks.append(task)
-				old_task = task
+				gtasks.append(ztask)
+				old_task = ztask
 
 		history = []
 		for st in gtasks:

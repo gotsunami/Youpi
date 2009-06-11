@@ -706,6 +706,51 @@ queue
 
 @login_required
 @profile
+def delete_processing_task(request):
+	"""
+	Delete a processing task
+	"""
+	try:
+		taskId = request.POST['TaskId']
+	except KeyError, e:
+		raise HttpResponseServerError('Bad parameters')
+
+	success = False
+	try:
+		task = Processing_task.objects.filter(id = taskId)[0]
+		rels = Rel_it.objects.filter(task = task)
+		if task.kind.name == 'fitsin':
+			data =  Plugin_fitsin.objects.filter(task = task)[0]
+			grades = FirstQEval.objects.filter(fitsin = data)
+			for g in grades:
+				g.delete()
+		elif task.kind.name == 'fitsout':
+			data =  Plugin_fitsout.objects.filter(task = task)[0]
+		elif task.kind.name == 'scamp':
+			data =  Plugin_scamp.objects.filter(task = task)[0]
+		elif task.kind.name == 'swarp':
+			data =  Plugin_swarp.objects.filter(task = task)[0]
+		elif task.kind.name == 'skel':
+			data = None
+		else:
+			raise TypeError, 'Unknown data type to delete:' + task.kind.name
+
+		for r in rels: r.delete()
+		if data: data.delete()
+		task.delete()
+		success = True
+	except Exception, e:
+		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
+
+	resp = {
+		'success' 	: success,
+		'pluginId'  : task.kind.name,
+		'results_output_dir' : task.results_output_dir,
+	} 
+	return HttpResponse(json.encode(resp), mimetype = 'text/plain')
+
+@login_required
+@profile
 def get_condor_requirement_string(request):
 	"""
 	Get requirement string from saved policy

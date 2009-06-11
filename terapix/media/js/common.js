@@ -354,6 +354,12 @@ function results_showDetails(pname, id, fullpage) {
 		// Custom handler for results
 		function(resp) {
 			div.update();
+			if (resp.Error) {
+				var log = new Logger(div);
+				log.msg_error('Processing results not available. An error occured.');
+				currentReturnedData = false;
+				return;
+			}
 			if (fullpage) {
 				var a = new Element('a', {href: '/youpi/results/' + pname + '/' + id + '/', target: '_blank'});
 				a.update("Click here to see a full page result for '" + resp.result.Title + "'");
@@ -1046,11 +1052,48 @@ var ResultsHelpers = {
 		td = new Element('td');
 		td.update(get_permissions('task', taskId, function(resp, misc) {
 			if (resp.currentUser.write) {
-				var delb = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/delete.gif'});
+				var delb = new Element('img', {
+					title: 'Click here to delete this processing',
+					src: '/media/themes/' + guistyle + '/img/misc/delete.gif'}
+				).addClassName('clickable');
 				delb.observe('click', function() {
-					console.log('DELETE');
+					boxes.confirm('Are you sure you want to delete this processing from the database?<br/><br/>' + 
+						"Please note that output data <b>will NOT be deleted</b> by the application. It's up to you to delete the " +
+						"data in the output directory.", function() {
+						var dr = new HttpRequest(
+							null,
+							null,
+							function(r) {
+								var log = new Logger(td);
+								if (r.Error) {
+									log.msg_error('Error: ' + r.Error + '. Data not deleted.');
+									return;
+								}
+								if (r.success) {
+									var row = $$('table.results')[0].select('tr[id=res_' + taskId + ']')[0].hide();
+									$('infopanel').update();
+									var log = new Logger($('infopanel'));
+									log.msg_ok("Processing successfully deleted.");
+								}
+								else {
+									log.msg_warning('Not enough permissions. Data not deleted.');
+									boxes.perms_discard();
+								}
+							}
+						);
+						dr.send('/youpi/results/delete/', $H({TaskId: taskId}).toQueryString());
+					});
 				});
-				td.insert('You can ').insert(delb).insert(' this processing');
+				if (!$('task_perms_del_div')) {
+					var ddiv = new Element('div', {id: 'task_perms_del_div'});
+					ddiv.insert('You can ').insert(delb).insert(' this processing');
+					td.insert(ddiv);
+				}
+				$('task_perms_del_div').show();
+			}
+			else {
+				// No user write permission
+				if ($('task_perms_del_div')) $('task_perms_del_div').hide();
 			}
 		}));
 		tr.insert(td);
@@ -1228,13 +1271,9 @@ var boxes = {
 	/*
 	 * Function: perms_discard
 	 * Alert box for users with bad permissions
-	 *
-	 * Parameters:
-	 *  msg - string: message to display
-	 *  title - string: header title [optional]
 	 * 
 	 */
-	perms_discard: function(msg, title) {
+	perms_discard: function() {
 		boxes.alert("Sorry, you don't have enough permissions to do it.");
 	},
 	/*

@@ -582,6 +582,7 @@ var {{ plugin.id }} = {
 		// See templates/results.html, function showDetails(...)
 		// Global variable
 		var resp = currentReturnedData;
+		if (!resp) return;
 	
 		var container = $(container_id);
 		var d = new Element('div');

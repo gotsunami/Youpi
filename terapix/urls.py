@@ -67,6 +67,7 @@ urlpatterns = patterns(
 	(r'^youpi/report/(.*?)/(.*?)/$', 'get_report'),
 	(r'^youpi/reporting/$', 'reporting'),
 	(r'^youpi/results/$', 'results'),
+	(r'^youpi/results/delete/$', 'delete_processing_task'),
 	(r'^youpi/results/filter/$', 'task_filter'),
 	(r'^youpi/results/stats/$', 'dir_stats'),
 	(r'^youpi/results/(.*?)/(.*?)/$', 'single_result'),
