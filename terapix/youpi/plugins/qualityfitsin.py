@@ -170,10 +170,13 @@ class QualityFitsIn(ProcessingPlugin):
 
 		ret = False
 		if grades:
-			ret =  "Graded <b>" + grades[0].grade + '</b>'
-			if len(grades) > 1:
-				ret += " (%d)" % len(grades)
-			ret = str(ret)
+			try:
+				ret =  "Graded <b>" + grades[0].grade + '</b>'
+				if len(grades) > 1:
+					ret += " (%d)" % len(grades)
+				ret = str(ret)
+			except:
+				pass
 
 		return ret
 
