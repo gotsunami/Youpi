@@ -66,7 +66,7 @@ function ImageSelector(container, options)
 	 */
 	var _imageInfoWidget = null;
 	/*
-	 * Var: fields 
+	 * Var: _fields 
 	 * List of criteria to choose from to build a query. Each entry will be 
 	 * displayed in the first combobox of every added line.
 	 *
@@ -75,16 +75,19 @@ function ImageSelector(container, options)
 	 *   - get[E]CondSelect()
 	 *   - build[E]DataWidget()
 	 *
-	 * Supported search criteria are Run, Object, Instrument, Channel, Name, Ra, Dec, Saved selection and IngestionId.
-	 *
 	 */
-	var fields = 		[	'Run', 'Object', 'Instrument', 'Channel', 'Name', 'Ra', 'Dec', 'Saved', 'IngestionId', 'Tag', 'Grade' ];
-	/*
-	 * Var: labelFields
-	 * Array of labels to use with <fields> entries.
-	 *
-	 */
-	var labelFields = 	[	'Run', 'Object', 'Instrument', 'Channel', 'Image name', 'Ra (deg)', 'Dec (deg)', 'Saved selection', 'Ingestion ID', 'Tag', 'Grade' ];
+	var _fields = [
+		['Channel', 'Channel'], 
+		['Dec', 'Dec (deg)'], 
+		['Grade', 'Grade'],
+		['IngestionId', 'Ingestion ID'], 
+		['Instrument', 'Instrument'], 
+		['Object', 'Object'], 
+		['Ra', 'Ra (deg)'], 
+		['Run', 'Run'], 
+		['Saved', 'Saved selection'], 
+		['Tag', 'Tag']
+	];
 	/*
 	 * Var: actions
 	 * Default IMS actions
@@ -299,12 +302,13 @@ function ImageSelector(container, options)
 
 		// Loads matching conditional combo box
 		var condDiv = $(id + '_cond_div_' + tr_idx);
-		var selNode = eval('get' + fields[selOption.value] + 'CondSelect')(tr_idx);
+		var crit = _fields[selOption.value][0];
+		var selNode = eval('get' + crit + 'CondSelect')(tr_idx);
 		removeAllChildrenNodes(condDiv);
 		condDiv.insert(selNode);
 
 		// Now call matching handler
-		eval('build' + fields[selOption.value] + 'DataWidget')(tr_idx);
+		eval('build' + crit + 'DataWidget')(tr_idx);
 	}
 
 	/*
@@ -2569,7 +2573,7 @@ function ImageSelector(container, options)
 		td = new Element('td');
 		var cdiv = new Element('div');
 		cdiv.setAttribute('id', id + '_cond_div_' + currentTR);
-		selNode = eval('get' + fields[0] + 'CondSelect')(currentTR);
+		selNode = eval('get' + _fields[0][0] + 'CondSelect')(currentTR);
 		cdiv.insert(selNode);
 		td.insert(cdiv);
 		tr.insert(td);
@@ -2603,7 +2607,7 @@ function ImageSelector(container, options)
 		tr.insert(td);
 
 		// Finally executes appropriate handler for current line
-		eval('build' + fields[0] + 'DataWidget')(currentTR);
+		eval('build' + _fields[0][0] + 'DataWidget')(currentTR);
 	
 		currentTR++;
 	}
@@ -2852,9 +2856,9 @@ function ImageSelector(container, options)
 		critText = critNode.options[critNode.selectedIndex].text;
 
 		// Used for Ra and Dec
-		for (var k=0; k < labelFields.length; k++) {
-			if (labelFields[k] == critText) {
-				critText = fields[k];
+		for (var k=0; k < _fields.length; k++) {
+			if (_fields[k][1] == critText) {
+				critText = _fields[k][0];
 				break;
 			}
 		}
@@ -2912,10 +2916,6 @@ function ImageSelector(container, options)
 	 *
 	 *  DOM select element
 	 *
-	 * See Also:
-	 *
-	 * <fields>, <addTRLine>
-	 *
 	 */ 
 	function getMainCriteriaDOM(tr_idx) {
 		var select = new Element('select', {'id': id + '_mainCriteria_select_' + tr_idx});
@@ -2925,10 +2925,8 @@ function ImageSelector(container, options)
 		});
 
 		var option;
-		for (var j=0; j < fields.length; j++) {
-			option = new Element('option');
-			option.setAttribute('value', j);
-			option.insert(labelFields[j]);
+		for (var j=0; j < _fields.length; j++) {
+			option = new Element('option', {value: j}).update(_fields[j][1]);
 			select.insert(option);
 		}
 
