@@ -42,14 +42,17 @@
 	<!ENTITY xml 						"<acronym>XML</acronym>">
 	<!ENTITY youpiwww 			"http://youpi.terapix.org">
 ]>
-<book land="en">
+<book lang="en" xmlns:xlink="http://www.w3.org/1999/xlink">
 	<!-- vim: set ts=2 -->
 	<title>Youpi Handbook</title>
 	<bookinfo>
 		<abstract>
-			<para>Welcome to &appname;! This handbook covers the installation and day to day use of &appname;. 
+			<para>&appname; stands for <quote>Youpi is your processing Pipeline</quote>. It is a web application providing high level 
+					functionnalities to perform data reduction on scientific <link xlink:href="http://en.wikipedia.org/wiki/FITS">FITS</link> images. 
+			</para>
+			<para>This handbook covers the installation and day to day use of &appname;. 
 					Please note that this manual is a work in progress. As such, some sections may be incomplete. 
-				</para>
+			</para>
 		</abstract>
 		<legalnotice>
 			<para>
@@ -72,8 +75,7 @@
 	</bookinfo>
 	<preface>
 		<title>Preface</title>
-		<para>&appname; (stands for &appname_accro;) is a web application providing high level 
-		functionnalities to perform data reduction on scientific <emphasis role="strong">FITS</emphasis> images. 
+		<para>TODO
 		</para>
 		<sect1>
 			<title>Organization of This Book</title>

@@ -9,21 +9,24 @@
 		<title>&fits; Data Ingestion</title>
 	</sect1>
 	<sect1>
+		<title>Deal With Condor Setup</title>
+	</sect1>
+	<sect1>
+		<title>Set up Your Preferences</title>
+	</sect1>
+	<sect1>
 		<title>Processing Your Data</title>
-	</sect1>
-	<sect1>
-		<title>Processing Results</title>
-	</sect1>
-	<sect1>
-		<title>Live Monitoring of Processings</title>
 	</sect1>
 	<sect1>
 		<title>The Shopping Cart</title>
 	</sect1>
 	<sect1>
-		<title>Deal With Condor Setup</title>
+		<title>Live Monitoring of Processings</title>
 	</sect1>
 	<sect1>
-		<title>Customizing &appname;</title>
+		<title>Processing Results</title>
+	</sect1>
+	<sect1>
+		<title>Generating Reports</title>
 	</sect1>
 </chapter>
