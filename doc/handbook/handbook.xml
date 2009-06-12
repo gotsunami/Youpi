@@ -50,10 +50,11 @@
 			<para>&appname; stands for <quote>Youpi is your processing Pipeline</quote>. It is a modern, easy to use yet powerful web application 
 					providing high level functionalities to perform data reduction on scientific <link xlink:href="http://en.wikipedia.org/wiki/FITS">FITS</link> 
 					images. Built on top of various open source reduction tools released to the community by 
-					<link xlink:href="http://terapix.iap.fr"><acronym>TERAPIX</acronym></link>, &appname; can help organize your data, manage your processing jobs 
-					on a computer cluster in real time and facilitate teamwork by allowing fine-grain sharing of your results or data. Whether you are dealing with 
-					small to medium-sized data reduction projects, &appname; can be definitely a powerful alternative to other pipeline data reduction software products 
-					available on the market. Even better, &appname; is free software and published under the 
+					<link xlink:href="http://terapix.iap.fr"><acronym>TERAPIX</acronym></link> and  <link xlink:href="http://astromatic.iap.fr">Astromatic</link>, 
+					&appname; can help organize your data, manage your processing jobs on a computer cluster in real time and facilitate teamwork by allowing 
+					fine-grain sharing of your results or data. Whether you are dealing with small to medium-sized data reduction projects, &appname; can be 
+					definitely a powerful alternative to other pipeline data reduction software products available on the market. Even better, &appname; is 
+					free software and published under the 
 					<link xlink:href="http://www.gnu.org/licenses/gpl-3.0.txt"><acronym>GNU</acronym> General Public License</link>. 
 			</para>
 			<para>This handbook covers the installation and day to day use of &appname;. 
