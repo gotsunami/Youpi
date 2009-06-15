@@ -448,7 +448,7 @@ class FirstQEval(models.Model):
 
 	custom_comment = models.CharField(max_length = 255)
 	date = models.DateTimeField(auto_now_add = True)
-	grade = models.CharField(max_length = 1, blank = True, null = True, choices = GRADE_SET, help_text = "QualityFITS in grade")
+	grade = models.CharField(max_length = 1, choices = GRADE_SET, help_text = "QualityFITS in grade")
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
@@ -466,7 +466,7 @@ class FinalQEval(models.Model):
 
 	custom_comment = models.CharField(max_length = 255)
 	date = models.DateTimeField(auto_now_add = True)
-	grade = models.CharField(max_length = 1, blank = True, null = True, choices = GRADE_SET, help_text = "QualityFITS out grade")
+	grade = models.CharField(max_length = 1, choices = GRADE_SET, help_text = "QualityFITS out grade")
 
 	# FKs constraints
 	user = models.ForeignKey(User, db_column = 'user_id')
