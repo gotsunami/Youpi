@@ -1103,11 +1103,17 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		elif reportId == 'piegrades':
 			from terapix.script.grading import get_proportions
 			data = get_proportions()
-			# Get grading statistics
-			js = """
+			sum = 0
+			for d in data:
+				sum += d[1]
+			if not sum:
+				js = "No grades at all."
+			else:
+				# Get grading statistics
+				js = """
 <div id="imgcontainer" style="width:600px;height:300px;"></div>
 <script type="text/javascript">
-function draw_pie(){
+function draw_pie() {
 	// Fill series.
 	var grade_a = [[0, %(ga)d]];
 	var grade_b = [[0, %(gb)d]];
