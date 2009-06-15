@@ -16,7 +16,7 @@ Grades all Qualityfits-in processings. Can output a list of all grades in the
 database.
 """
 
-import sys, os, string, curses
+import sys, os, string, curses, os.path
 import datetime, time
 from optparse import OptionParser
 from terminal import *
@@ -113,7 +113,7 @@ def delete_grades(simulate, verbose = False):
 
 		from django.db import connection
 		cur = connection.cursor()
-		cur.execute("UPDATE youpi_plugin_fitsin SET prevrelgrade = '', prevrelcomment = ''")
+		cur.execute("UPDATE youpi_plugin_fitsin SET prevrelgrade = NULL, prevrelcomment = ''")
 		connection._commit()
 		print "Done"
 
@@ -147,7 +147,7 @@ def copy_grades(simulate, user, verbose):
 	term = TerminalController()
 	sys.stdout.write(term.HIDE_CURSOR)
 
-	fitsins = Plugin_fitsin.objects.exclude(prevrelgrade = '').filter(task__success = True)
+	fitsins = Plugin_fitsin.objects.exclude(prevrelgrade = None).filter(task__success = True)
 	com = FirstQComment.objects.all()[0]
 	writes = k = matches = 0
 	print "Preparing data..."
@@ -158,6 +158,7 @@ def copy_grades(simulate, user, verbose):
 			mg = FirstQEval.objects.filter(user = user, fitsin = f)
 			if not mg:
 				matches += 1
+				if not f.prevrelgrade: print "WARNING: No grade('%s')" % f.prevrelgrade
 				if not simulate:
 					e = FirstQEval(user = user, fitsin = f)
 					e.grade = f.prevrelgrade
@@ -174,6 +175,79 @@ def copy_grades(simulate, user, verbose):
 	sys.stdout.write(term.SHOW_CURSOR + '\n')
 	print "New grades added: %d" % writes
 
+def export_grades(output_dir, verbose):
+	"""
+	Export all grades from the DB. Generated 2 CSV files: one containing all user-defined grades, the other containing 
+	all previous release grades.
+	"""
+	prgname = 'previous-release-grades.csv'
+	if output_dir: prgname = os.path.join(output_dir, prgname)
+	try:
+		prgfile = open(prgname, 'w')
+	except Exception, e:
+		print "Error: %s" %e
+		sys.exit(1)
+
+	from django.db import connection
+	cur = connection.cursor()
+
+	# Previous release grades
+	q = """
+	SELECT i.name, f.prevrelgrade, f.prevrelcomment
+	FROM youpi_image AS i, youpi_plugin_fitsin AS f, youpi_rel_it AS r, youpi_processing_task AS t
+	WHERE f.prevrelgrade is not NULL
+	AND r.image_id = i.id
+	AND r.task_id = t.id
+	AND f.task_id = t.id
+	ORDER BY 1
+	"""
+	cur.execute(q)
+	res = cur.fetchall()
+	prgcount = 0
+	for r in res:
+		prgfile.write(string.join(r, ';') + '\n')
+		prgcount += 1
+	prgfile.close()
+	print "%-10s %-50s %10d" % ('PRELGRADE', prgname, prgcount)
+
+	# User-defined grades
+	q = """
+	SELECT count(e.grade), u.username, u.id
+	FROM youpi_firstqeval AS e, auth_user AS u
+	WHERE e.user_id = u.id
+	GROUP BY 2
+	ORDER BY 2
+	"""
+	cur.execute(q)
+	res = cur.fetchall()
+	for u in res:
+		ugname = "%s-user-grades.csv" % u[1]
+		if output_dir: ugname = os.path.join(output_dir, ugname)
+		try:
+			ugfile = open(ugname, 'w')
+		except Exception, e:
+			print "Error: %s" %e
+			sys.exit(1)
+		q = """
+		SELECT i.name, e.grade, c.comment, e.custom_comment
+		FROM youpi_image AS i, youpi_firstqeval AS e, youpi_firstqcomment AS c, youpi_plugin_fitsin AS f, youpi_rel_it AS r, youpi_processing_task AS t
+		WHERE e.fitsin_id = f.id
+		AND f.task_id = t.id
+		AND r.task_id = t.id
+		AND r.image_id = i.id
+		AND e.comment_id = c.id
+		AND e.user_id = %d
+		ORDER BY 1
+		""" % u[2]
+		cur.execute(q)
+		data = cur.fetchall()
+		ugcount = 0
+		for r in data:
+			ugfile.write(string.join(r, ';') + '\n')
+			ugcount += 1
+		ugfile.close()
+		print "%-10s %-50s %10d %-10s" % ('USERGRADES', ugname, ugcount, u[1])
+
 def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 	try:
 		f = open(filename)
@@ -183,6 +257,7 @@ def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 
 	print "Looking for fields separated by '%s'" % separator
 	print "Each line should match: '%s'" % string.join(('Image name', 'Grade', 'Comment'), separator)
+	print "(Also accepted: '%s' with the -u option)" % string.join(('Image name', 'Grade', 'Custom comment', 'Comment'), separator)
 
 	if user:
 		print "Will ingest grades in the youpi_firstqeval table"
@@ -210,10 +285,15 @@ def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 			line = f.readline()[:-1]
 			if not line: break
 
-			try: name, grade, comment = line.split(separator)
+			try: 
+				name, grade, comment = line.split(separator)
+				custom_comment = comment
 			except ValueError, e:
-				print "\n[Parsing Error] in CSV file at line %d: %s" % (pos, e)
-				raise KeyboardInterrupt
+				try:
+					name, grade, custom_comment, comment = line.split(separator)
+				except ValueError, e:
+					print "\n[Parsing Error] in CSV file at line %d: %s" % (pos, e)
+					raise KeyboardInterrupt
 
 			img = Image.objects.filter(name = name)
 			if not img:
@@ -242,17 +322,21 @@ def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 							# Update the grade for the latest evaluation only
 							m = matchg[0]
 							m.grade = grade
-							m.custom_comment = comment
+							m.custom_comment = custom_comment
 							m.save()
 							writes += 1
 						else:
 							# No user-grade for this image, create a new one
-							com = FirstQComment.objects.all()[0]
+							com = FirstQComment.objects.filter(comment = custom_comment)
+							if not com:
+								com = FirstQComment.objects.all()[0]
+								print "Custom comment not found: %s" % custom_comment
+								
 							for fit in fitsins:
 								m = FirstQEval(user = user, fitsin = fit)
 								m.grade = grade
 								m.comment = com
-								m.custom_comment = comment
+								m.custom_comment = custom_comment
 								m.save()
 							writes += len(fitsins)
 					
@@ -285,6 +369,11 @@ def main():
 			action = 'store_true', 
 			help = 'Delete available grades in DB (previous release only, not user-defined ones)'
 	)
+	parser.add_option('-e', '--export', 
+			default = False, 
+			action = 'store_true', 
+			help = 'Export all grades in 2 CSV files: one for user-defined grades, one for previous release grades'
+	)
 	parser.add_option('-i', '--ingest', 
 			default = False, 
 			dest = 'filename', 
@@ -294,6 +383,10 @@ def main():
 			default = False, 
 			action = 'store_true', 
 			help = 'List available grades in DB'
+	)
+	parser.add_option('-o', '--output', 
+			default = False, 
+			help = 'Ouput directory'
 	)
 	parser.add_option('-p', '--props', 
 			default = False, 
@@ -344,6 +437,16 @@ def main():
 		parser.error('options -c and -l are mutually exclusive')
 	if options.copy and options.delete:
 		parser.error('options -c and -d are mutually exclusive')
+	if options.export and options.delete:
+		parser.error('options -e and -d are mutually exclusive')
+	if options.export and options.copy:
+		parser.error('options -e and -c are mutually exclusive')
+	if options.export and options.list_only:
+		parser.error('options -e and -l are mutually exclusive')
+	if options.export and options.stats:
+		parser.error('options -e and -t are mutually exclusive')
+	if options.export and options.filename:
+		parser.error('options -e and -i are mutually exclusive')
 
 	try:
 		start = time.time()
@@ -364,9 +467,10 @@ def main():
 			if not options.user:
 				parser.error('option -c must be used with option -u')
 			copy_grades(options.simulate, options.user, verbose = options.verbose)
+		elif options.export:
+			export_grades(options.output, verbose = options.verbose)
 
-		end = time.time()
-		print "Took: %.2fs" % (end-start)
+		print "Took: %.2fs" % (time.time()-start)
 	except KeyboardInterrupt:
 		print "Exiting..."
 		sys.exit(2)
