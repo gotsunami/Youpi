@@ -312,7 +312,7 @@ def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 						UPDATE youpi_plugin_fitsin 
 						SET prevrelgrade="%s", prevrelcomment="%s"
 						WHERE id IN (%s)
-						""" % (grade, comment, string.join([i.id for i in fitsins], ','))
+						""" % (grade, comment, string.join([str(i.id) for i in fitsins], ','))
 						cur.execute(q)
 						writes += len(fitsins)
 					else:
@@ -327,11 +327,10 @@ def ingest_grades(filename, simulate, user, verbose = False, separator = ';'):
 							writes += 1
 						else:
 							# No user-grade for this image, create a new one
-							com = FirstQComment.objects.filter(comment = custom_comment)
-							if not com:
+							try:
+								com = FirstQComment.objects.filter(comment = custom_comment)[0]
+							except:
 								com = FirstQComment.objects.all()[0]
-								print "Custom comment not found: %s" % custom_comment
-								
 							for fit in fitsins:
 								m = FirstQEval(user = user, fitsin = fit)
 								m.grade = grade
