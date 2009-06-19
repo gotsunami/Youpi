@@ -1120,13 +1120,14 @@ def get_report(request, pluginId, reportId):
 
 	return plugObj.getReport(request, reportId)
 
-def ims_get_image_list(request):
+def ims_get_image_list_from_file(request):
 	"""
 	Parse content of fileName and returns an image selection
 	"""
 
 	try:
 		fileName = request.POST['Filename']
+		onTheFly = json.decode(request.POST['OnTheFly'])
 	except Exception, e:
 		return HttpResponseBadRequest('Incorrect POST data')
 
@@ -1138,6 +1139,8 @@ def ims_get_image_list(request):
 	except Exception, e:
 		errMsg = "%s" % e
 
+
+	basename = fileName[:fileName.rfind('.')]
 	lines = [li[:-1] for li in lines]
 	warnings = []
 	# Separate lines with image name only (to issue only one SQL query)
@@ -1172,7 +1175,17 @@ def ims_get_image_list(request):
 			break
 		j += 1
 
-	return HttpResponse(json.encode({'warnings': warnings, 'error' : errMsg, 'foundCount' : len(idList), 'total' : len(lines), 'idList' : idList}), mimetype = 'text/plain')
+	# Tag images on-the-fly
+	if onTheFly: tag_mark_images(request, True, idList, [basename])
+
+	return HttpResponse(json.encode({
+		'tagged': onTheFly, 
+		'tagname': basename, 
+		'warnings': warnings, 
+		'error': errMsg, 
+		'foundCount': len(idList), 
+		'total' : len(lines), 
+		'idList' : idList}), mimetype = 'text/plain')
 
 def save_condor_node_selection(request):
 	"""

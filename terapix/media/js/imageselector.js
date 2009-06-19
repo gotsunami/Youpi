@@ -585,22 +585,23 @@ function ImageSelector(container, options)
 
 		addTRLine(tr);
 
-		// Execute query
 		div = new Element('div', {style: 'text-align: left'});
+		// Execute query
 		var sub = new Element('input', {
 				type: 'button',
 				value: 'Find images!'
-		});
+		}).setStyle({fontWeight: 'bold', marginRight: '8px'});
 		sub.observe('click', function() {
 			_paginationImageSelection = null;
 			_executeQuery();
 		});
-		div.insert(sub);
-		critdiv.insert(div);
-
-		// Upload text file to make a single selection
-		tea = new Element('a', {href: '#'}).update('upload a text file');
-		tea.observe('click', function() {
+		// Upload a text file
+		var utb = new Element('input', {
+				type: 'button',
+				value: 'Select from text file',
+				title: 'Upload a text file describing a selection'
+		});
+		utb.observe('click', function() {
 			critdiv.hide();
 			_showSingleSelFormUpload(updiv);
 			updiv.show();
@@ -608,10 +609,25 @@ function ImageSelector(container, options)
 			$(id + '_image_info_div').fade();
 			$(id + '_result_count_div').update();
 			_tableWidget.empty();
+		}).setStyle({marginRight: '8px'});
+		// Batch import images lists
+		var bib = new Element('input', {
+				type: 'button',
+				value: 'Batch Import',
+				title: 'Batch import images lists'
 		});
-		tediv = new Element('div').setStyle({fontSize: '9px'}).update('(or ').insert(tea).insert(' describing a selection)');
-		critdiv.insert(tediv);
+		bib.observe('click', function() {
+			critdiv.hide();
+			_batchListImportForSavedSelections(updiv);
+			updiv.show();
+			// Cleaning up
+			$(id + '_image_info_div').fade();
+			$(id + '_result_count_div').update();
+			_tableWidget.empty();
+		}).setStyle({marginRight: '8px'});
 
+		div.insert(sub).insert(utb).insert(bib);
+		critdiv.insert(div);
 		_buildResultsDiv(single_div);
 	}
 
@@ -702,6 +718,31 @@ function ImageSelector(container, options)
 	}
 
 	/*
+	 * Function: _batchListImportForSavedSelections
+	 * Show form for batch import of selection files
+	 *
+	 * Parameters:
+	 *  div - DOM container
+	 *
+	 */ 
+	function _batchListImportForSavedSelections(div) {
+		div.update();
+		var bdiv = new Element('div').setStyle({fontSize: '9px'});
+		ba = new Element('a', {href: '#'}).update('go back');
+		ba.observe('click', function() {
+			div.hide();
+			_tableWidget.empty();
+			$(id + '_result_count_div').update();
+			$(id + '_crit_div').show();
+		});
+		bdiv.insert('(Or ').insert(ba).insert(' to criteria-based selection page)');
+		div.insert(bdiv);
+
+		// Log div
+		div.insert(new Element('div', {id: id + '_single_upload_log_div'}));
+	}
+
+	/*
 	 * Function: _showSingleSelFormUpload
 	 * Show form for file upload in single sel mode
 	 *
@@ -731,7 +772,11 @@ function ImageSelector(container, options)
 		form.insert(l).insert(subi);
 		div.update(form);
 
-		var bdiv = new Element('div').setStyle({fontSize: '9px'});
+		var tagc = new Element('input', {id: id + '_on_the_fly_check', type: 'checkbox', checked: 'checked'});
+		var tagl = new Element('label').update('Tag images on-the-fly (with a tag name based on the uploaded filename prefix)');
+		div.insert(tagc).insert(tagl);
+
+		var bdiv = new Element('div').setStyle({fontSize: '9px', marginTop: '20px'});
 		ba = new Element('a', {href: '#'}).update('go back');
 		ba.observe('click', function() {
 			div.hide();
@@ -811,6 +856,7 @@ function ImageSelector(container, options)
 					});
 				}
 
+				if (resp.tagged) logger.msg_ok("The image selection has been tagged '" + resp.tagname + "'");
 				logger.msg_ok('Found <b>' + resp.foundCount + '</b> images out of ' + resp.total);
 
 				// All queries are done, we can display information about images, if any
@@ -822,7 +868,8 @@ function ImageSelector(container, options)
 		);
 
 		var post = {
-			Filename: fileName
+			Filename: fileName,
+			OnTheFly: $(id + '_on_the_fly_check').checked
 		};
 
 		// Send HTTP POST request

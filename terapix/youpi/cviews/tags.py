@@ -179,21 +179,32 @@ def delete_tag(request):
 
 @login_required
 @profile
-def tag_mark_images(request):
+def tag_mark_images(request, createTag = False, idList = None, tagnames = None):
 	"""
-	Marks image(s) with tag(s)
+	Marks image(s) with tag(s).
+	@param idList list of images to tag (optional)
+	@param tags list of tag names (optional)
 	"""
 
 	try:
-		tags = eval(request.POST['Tags'])
+		tagnames = eval(request.POST['Tags'])
 		idList = eval(request.POST['IdList'])[0]
 	except Exception, e:
-		return HttpResponseForbidden()
+		# Check function parameters
+		if not (idList and tagnames):
+			return HttpResponseForbidden()
 
+	profile = request.user.get_profile()
 	# Marked image count
 	marked = 0
 	images = Image.objects.filter(id__in = idList)
-	tags = Tag.objects.filter(name__in = tags)
+	tags = Tag.objects.filter(name__in = tagnames)
+	if not tags and createTag:
+		for t in tagnames:
+			z = Tag(name = t, user = request.user, comment = '', style = 'background-color: brown; color:white; border:medium none -moz-use-text-color;', mode = profile.dflt_mode, group = profile.dflt_group)
+			z.save()
+		tags = Tag.objects.filter(name__in = tagnames)
+
 	imgtags = Rel_tagi.objects.filter(image__in = images)
 
 	try:
