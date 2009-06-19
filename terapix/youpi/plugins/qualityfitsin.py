@@ -152,11 +152,23 @@ class QualityFitsIn(ProcessingPlugin):
 		except KeyError, e:
 			raise PluginError, e
 
+		from django.db import connection
+		cur = connection.cursor()
+		q = """
+		SELECT COUNT(g.id) FROM youpi_firstqeval AS g, youpi_plugin_fitsin AS f, youpi_processing_task AS t
+		WHERE g.fitsin_id=f.id
+		AND f.task_id=t.id
+		AND t.id=%d
+		"""
+
+		if gradingFilter == 'all': return tasksIds
 		keep = []
 		for id in tasksIds:
-			grades = FirstQEval.objects.filter(fitsin__task__id = id)
-			if (grades and (gradingFilter == 'all' or gradingFilter == 'graded')) or \
-				(not grades and (gradingFilter == 'all' or gradingFilter == 'not graded')):
+			cur.execute(q % id)
+			hasgrades = cur.fetchall()[0][0]
+			if gradingFilter == 'graded' and hasgrades:
+				keep.append(id)
+			elif hasgrades == 0:
 				keep.append(id)
 
 		return keep

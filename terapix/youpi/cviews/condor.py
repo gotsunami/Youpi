@@ -186,21 +186,34 @@ def task_filter(request):
 	elif status == 'failed': success = 0
 	else: anyStatus = True
 
+	from django.db import connection
+	cur = connection.cursor()
+	q = """
+	SELECT t.id FROM youpi_processing_task AS t, youpi_processing_kind AS k
+	WHERE t.kind_id=k.id
+	AND k.name = '%s'
+	%s
+	ORDER BY end_date DESC
+	"""
+	filtered = False
+	user_id = request.user.id
+
 	if owner == 'all':
-		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.filter(kind__name = kindid).order_by('-end_date'))
-		else: tasks, filtered = read_proxy(request, Processing_task.objects.filter(success = success, kind__name = kindid).order_by('-end_date'))
+		if anyStatus: cur.execute(q % (kindid, ''))
+		else: cur.execute(q % (kindid, "AND t.success = %d" % success))
 
 	elif owner == 'my':
-		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.filter(user = request.user, kind__name = kindid).order_by('-end_date'))
-		else: tasks, filtered = read_proxy(request, Processing_task.objects.filter(user = request.user, success = success, kind__name = kindid).order_by('-end_date'))
+		if anyStatus: cur.execute(q % (kindid, "AND t.user_id=%d" % user_id))
+		else: cur.execute(q % (kindid, "AND t.user_id=%d AND t.success = %d" % (user_id, success)))
 
 	elif owner == 'others':
-		if anyStatus: tasks, filtered = read_proxy(request, Processing_task.objects.exclude(user = request.user).filter(kind__name = kindid).order_by('-end_date'))
-		else: tasks, filtered = read_proxy(request, Processing_task.objects.exclude(user = request.user).filter(success = success, kind__name = kindid).order_by('-end_date'))
+		if anyStatus: cur.execute(q % (kindid, "AND t.user_id != %d" % user_id))
+		else: cur.execute(q % (kindid, "AND t.user_id != %d AND t.success = %d" % (user_id, success)))
 	else:
-		tasks, filtered = read_proxy(request, Processing_task.objects.all().order_by('-end_date'))
+		cur.execute(q % (kindid, ''))
 			
-	tasksIds = [{'id': t.id} for t in tasks]
+	res = cur.fetchall()
+	tasksIds = [{'id': r[0]} for r in res]
 	res = []
 	nb_suc = nb_failed = 0
 	if filterText:
@@ -288,8 +301,7 @@ def task_filter(request):
 	# Looks for plugin extra data, if any
 	try:
 		extraHeader = plugin.getProcessingHistoryExtraHeader(request)
-		if extraHeader:
-			resp['ExtraHeader'] = extraHeader
+		if extraHeader: resp['ExtraHeader'] = extraHeader
 	except AttributeError:
 		# No method for extra header data
 		pass
