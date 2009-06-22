@@ -338,6 +338,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							thumbnails = 0,
 							aheadPath = userData['AheadPath']
 				)
 			except Exception, e:
