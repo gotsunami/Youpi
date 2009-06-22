@@ -228,12 +228,19 @@ class Scamp(ProcessingPlugin):
 		# .ahead files support
 		ahead_files = string.join([os.path.join(aheadPath, img.name + '.ahead') for img in images], ', ')
 
-		# Swarp file containing a list of images to process (one per line)
-		catalogFile = os.path.join('/tmp/', "scamp-cataloglist-%s.rc" % time.time())
+		# Scamp file containing a list of images to process (one per line)
+		catalogFile = "scamp-cataloglist-%s.rc" % time.time()
 		catalogPaths = [img.name + '.ldac' for img in images]
-		scif = open(catalogFile, 'w')
+		scif = open(os.path.join('/tmp/', catalogFile), 'w')
 		scif.write(string.join(catalogPaths, '\n'))
 		scif.close()
+
+		# List of all input files to be transferred (for -l option of condor_transfer.pl)
+		transferFile = "scamp-transfer-%s.rc" % time.time()
+		tf = open(os.path.join('/tmp/', transferFile), 'w')
+		tf.write(string.join(ldac_files, '\n'))
+		tf.write('\n' + ahead_files.replace(', ', '\n'))
+		tf.close()
 
 		csf = open(csfPath, 'w')
 		submit_file_path = os.path.join(TRUNK, 'terapix')
@@ -250,7 +257,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(aheads)s, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(settingspath)s/NOP
+transfer_input_files    = %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(transferfile)s, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -266,11 +273,11 @@ notify_user             = monnerville@iap.fr
 	'conf'			: customrc,
 	'initdir'		: os.path.join(submit_file_path, 'script'),
 	'requirements'	: req ,
-	'ldacsfile'		: catalogFile,
+	'ldacsfile'		: os.path.join('/tmp/', catalogFile),
 	'log'			: logs['log'],
 	'errlog'		: logs['error'],
 	'outlog'		: logs['out'],
-	'aheads'		: ahead_files,
+	'transferfile'	: os.path.join('/tmp/', transferFile),
 }
 
 
@@ -305,7 +312,7 @@ notify_user             = monnerville@iap.fr
 
 		condor_submit_entry = """
 # YOUPI_USER_DATA = %(userdata)s
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl %(scamp)s %(params)s -c %(config)s %(ldacs)s 2>/dev/null
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
 		'scamp'			: CMD_SCAMP,
@@ -315,7 +322,8 @@ queue""" %  {
 		'userdata'		: userData, 
 		'user'			: request.user.username,
 		'tpxupload'		: FTP_URL + resultsOutputDir,
-		'ldacs'			: string.join([f for f in ldac_files], ' '),
+		'transferfile'	: transferFile,
+		'ldacsfile'		: catalogFile,
 	}
 
 		csf.write(condor_submit_entry)
