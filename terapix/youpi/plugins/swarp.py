@@ -207,6 +207,14 @@ class Swarp(ProcessingPlugin):
 			userData['HeadPath'] =  str(headDataPath)
 			userData['UseHeadFiles'] =  1
 
+		# List of all input files to be transferred (for -l option of condor_transfer.pl)
+		transferFile = "swarp-transfer-%s.rc" % time.time()
+		tf = open(os.path.join('/tmp/', transferFile), 'w')
+		tf.write(weight_files.replace(', ', '\n'))			# Weights	
+		tf.write('\n' + head_files.replace(', ', '\n'))		# Heads
+		tf.write('\n' + string.join([os.path.join(img.path, img.name + '.fits') for img in images], '\n')) # Images
+		tf.close()
+		
 	 	# Generates CSF
 		condor_submit_file = """
 #
@@ -222,7 +230,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(heads)s, %(weights)s, %(images)s, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(nop)s/NOP
+transfer_input_files    = %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(swarplist)s, %(transferfile)s, %(nop)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -240,14 +248,12 @@ notify_user             = monnerville@iap.fr
 	'config' 		: customrc,
 	'swarplist' 	: swarpImgsFile,
 	'nop' 			: submit_file_path, 
-	'heads'			: head_files,
-	'weights'		: weight_files,
-	'images'		: string.join([os.path.join(img.path, img.name + '.fits') for img in images], ', '),
 	'initdir' 		: os.path.join(submit_file_path, 'script'),
 	'requirements' 	: req,
 	'log'			: logs['log'],
 	'errlog'		: logs['error'],
 	'outlog'		: logs['out'],
+	'transferfile'  : os.path.join('/tmp/', transferFile),
 }
 
 		csf.write(condor_submit_file)
@@ -280,7 +286,7 @@ notify_user             = monnerville@iap.fr
 
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl %(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>/dev/null
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- %(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>/dev/null
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
@@ -288,6 +294,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 				'params'		: swarp_params,
 				'config'		: os.path.basename(customrc),
 				'userdata'		: userData, 
+				'transferfile'  : transferFile,
 				'user'			: request.user.username,
 				'imgsfile'		: os.path.basename(swarpImgsFile),
 				'tpxupload'		: FTP_URL + resultsOutputDir }
