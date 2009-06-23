@@ -329,7 +329,6 @@ queue""" %  {	'encuserdata' 	: encUserData,
 
 			# Valid task is only the lastest successful qfits-in of current logged-in user
 			tasks = Processing_task.objects.filter(	id__in = relTaskIds, 
-													user = request.user, 
 													kind__name__exact = 'fitsin',
 													success = True).order_by('-end_date')
 
@@ -359,10 +358,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		tasksIds = []
 		missing = []
 		imgList = Image.objects.filter(id__in = idList)
-
-		tasks = Processing_task.objects.filter(	user = request.user, 
-												kind__name__exact = 'scamp',
-												success = True).order_by('-end_date')
+		tasks = Processing_task.objects.filter(kind__name__exact = 'scamp', success = True).order_by('-end_date')
 		mTasks = []
 		for t in tasks:
 			rels = Rel_it.objects.filter(task = t, image__in = imgList)
