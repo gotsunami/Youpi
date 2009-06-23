@@ -329,9 +329,6 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 			try:
 				g.setTableName('youpi_plugin_scamp')
 				g.insert(	task_id = int(task_id),
-							#
-							# Scamp config file serialization: base64 encoding over zlib compression
-							#
 							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
 							ldac_files = base64.encodestring(marshal.dumps(userData['LDACFiles'])).replace('\n', ''),
 							www = os.path.join(	WWW_SCAMP_PREFIX, 
@@ -340,6 +337,37 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
 							thumbnails = 0,
 							aheadPath = userData['AheadPath']
+				)
+			except Exception, e:
+				raise WrapperError, e
+
+		elif kind == 'swarp':
+			try:
+				g.setTableName('youpi_plugin_swarp')
+				g.insert(	task_id = int(task_id),
+							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							useQFITSWeights = userData['UseQFITSWeights'],
+							www = os.path.join(	WWW_SWARP_PREFIX, 
+												username, 
+												userData['Kind'], 
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							thumbnails = 0,
+							headPath = userData['HeadPath'],
+							useHeadFiles = userData['UseHeadFiles']
+				)
+			except Exception, e:
+				raise WrapperError, e
+
+		elif kind == 'sex':
+			try:
+				g.setTableName('youpi_plugin_sex')
+				g.insert(	task_id = int(task_id),
+							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							www = os.path.join(	WWW_SEX_PREFIX, 
+												username, 
+												userData['Kind'], 
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							thumbnails = 0,
 				)
 			except Exception, e:
 				raise WrapperError, e
