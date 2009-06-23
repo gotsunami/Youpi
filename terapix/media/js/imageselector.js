@@ -80,6 +80,7 @@ function ImageSelector(container, options)
 		['Channel', 'Channel'], 
 		['Dec', 'Dec (deg)'], 
 		['Grade', 'Grade'],
+		['Name', 'Image Name'],
 		['IngestionId', 'Ingestion ID'], 
 		['Instrument', 'Instrument'], 
 		['Object', 'Object'], 
@@ -1770,9 +1771,7 @@ function ImageSelector(container, options)
 		var output = $(id + '_custom_div_' + tr_idx);
 		var txtNode = new Element('input');
 		txtNode.setAttribute('type', 'text');
-
-		removeAllChildrenNodes(output);
-		output.insert(txtNode);
+		output.update(txtNode);
 	}
 
 	/*
@@ -1792,8 +1791,8 @@ function ImageSelector(container, options)
 		var conds = ['matches'];
 		return getSelect(id + '_condition_select_' + tr_idx, conds);
 	}
-
-
+	
+	
 	// Group: Ra Field
 	// -----------------------------------------------------------------------------------------------------------------------------
 
