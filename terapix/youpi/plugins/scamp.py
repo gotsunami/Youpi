@@ -248,7 +248,7 @@ class Scamp(ProcessingPlugin):
 
 		#
 		# Write userdata.conf which olds the remaining information needed by the wrapper processing script
-		# This file must only holds a serialized Python dictionay which will be merged by the WP script with 
+		# This file must only holds a serialized Python dictionary which will be merged by the WP script with 
 		# the userData dictionary passed as its first argument
 		#
 		bigUserData = {'ImgID': idList, 'LDACFiles': ldac_files}
