@@ -750,6 +750,19 @@ if __name__ == '__main__':
 	# De-serialize data passed as a string into arg 1
 	#
 	userData = marshal.loads(base64.decodestring(sys.argv[1]))
+	# Now, open the userdata file when available to merge its content with userData
+	try:
+		userdataFile = userData['BigUserData']
+		try:
+			f = open(userdataFile, 'r')
+			data = f.readlines()[0]
+		except Exception, e:
+			raise WrapperError, "Could not access biguserdata: %s" % e
+		userData.update(marshal.loads(base64.decodestring(data)))
+	except KeyError:
+		print "No userdata file passed"
+		pass
+
 	# Connection object to MySQL database 
 	try:
 		init_job(userData)

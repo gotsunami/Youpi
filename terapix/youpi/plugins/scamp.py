@@ -194,6 +194,9 @@ class Scamp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "Unable to use a suitable config file: %s" % e
 
+		# At least step seconds between two job start
+		step = 0 							
+
 		# Scamp configuration file
 		customrc = self.getConfigurationFilePath()
 		scamprc = open(customrc, 'w')
@@ -213,13 +216,14 @@ class Scamp(ProcessingPlugin):
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
 					'AheadPath'			: str(aheadPath),
-					'Descr' 			: '',									# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
 					'Kind'	 			: self.id,								# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),					# Mandatory for AMI, WP
 					'ResultsOutputDir'	: str(resultsOutputDir),				# Mandatory for WP
-					'Config' 			: str(post['Config'])} 
-
-		step = 0 							# At least step seconds between two job start
+					'Descr'				: "%s from %d SExtractor catalogs" % (self.optionLabel, len(images)),		# Mandatory for AMI
+					'Config' 			: str(post['Config']),
+					'JobID'				: self.getUniqueCondorJobId(),			# Mandatory for WP
+					'StartupDelay'		: step,
+		} 
 
 		# Keep data path only
 		ldac_files = self.getLDACPathsFromImageSelection(request, idList)
@@ -242,6 +246,18 @@ class Scamp(ProcessingPlugin):
 		tf.write('\n' + ahead_files.replace(', ', '\n'))
 		tf.close()
 
+		#
+		# Write userdata.conf which olds the remaining information needed by the wrapper processing script
+		# This file must only holds a serialized Python dictionay which will be merged by the WP script with 
+		# the userData dictionary passed as its first argument
+		#
+		bigUserData = {'ImgID': idList, 'LDACFiles': ldac_files}
+		userdataFile = "%s-userdata-%s.conf" % (self.id, time.time())
+		userData['BigUserData'] = userdataFile # Pass the name to the WP script
+		udf = open(os.path.join('/tmp/', userdataFile), 'w')
+		udf.write(base64.encodestring(marshal.dumps(bigUserData)).replace('\n', ''))
+		udf.close()
+
 		csf = open(csfPath, 'w')
 		submit_file_path = os.path.join(TRUNK, 'terapix')
 
@@ -257,7 +273,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(ldacsfile)s, %(transferfile)s, %(settingspath)s/NOP
+transfer_input_files    = %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(userdata)s, %(ldacsfile)s, %(transferfile)s, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -278,25 +294,10 @@ notify_user             = monnerville@iap.fr
 	'errlog'		: logs['error'],
 	'outlog'		: logs['out'],
 	'transferfile'	: os.path.join('/tmp/', transferFile),
+	'userdata'		: os.path.join('/tmp/', userdataFile),
 }
 
-
 		csf.write(condor_submit_file)
-
-		userData['ImgID'] = idList
-		userData['Descr'] = str("%s from %d SExtractor catalogs" % (self.optionLabel, len(images)))		# Mandatory for Active Monitoring Interface (AMI)
-		userData['LDACFiles'] = ldac_files
-		# Mandatory for WP
-		userData['JobID'] = self.getUniqueCondorJobId()
-
-		#
-		# Delaying job startup will prevent "Too many connections" MySQL errors
-		# and will decrease the load of the node that will receive all qualityFITS data
-		# results (PROCESSING_OUTPUT) back. Every job queued will be put to sleep StartupDelay 
-		# seconds
-		#
-		userData['StartupDelay'] = step
-		userData['Warnings'] = {}
 
 		# Base64 encoding + marshal serialization
 		# Will be passed as argument 1 to the wrapper script
