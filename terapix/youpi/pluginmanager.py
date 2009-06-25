@@ -117,12 +117,18 @@ class ProcessingPlugin:
 			'out'	: pattern % "out",
 		}
 
-	def getUserResultsOutputDir(self, request):
+	def getUserResultsOutputDir(self, request, oldPath = None, oldUserName = None):
 		"""
-		Returns generated result output dir. Useful for reprocessing saved items.
+		Builds a default output path for the user if oldPath is None.
+		If oldPath (a path to a previously processed item) is a string, then attempts to 
+		replace the old login name with the name of the current request owner.
+		@param oldPath Old output path used for process an item
+		@param oldUserName Old owner of the processing
+		@return The full output directory path
 		"""
 
-		return os.path.join(PROCESSING_OUTPUT, request.user.username, self.id)
+		if not oldPath: return os.path.join(PROCESSING_OUTPUT, request.user.username, self.id)
+		return oldPath.replace(oldUserName, request.user.username)
 
 	def getConfigFileContent(self, request):
 		post = request.POST

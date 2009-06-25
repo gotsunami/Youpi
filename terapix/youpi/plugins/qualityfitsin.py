@@ -124,7 +124,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'itemId' 			: str(it.id), 
 						'maskPath' 			: str(data['maskPath']), 
 						'regPath' 			: str(data['regPath']), 
-						'resultsOutputDir' 	: str(data['resultsOutputDir']),
+						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
 						'name' 				: str(it.name),
 						'config' 			: str(data['config'])})
 
@@ -676,7 +676,8 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				'Flat' 				: str(data.flat),
 				'Mask' 				: str(data.mask),
 				'Reg' 				: str(data.reg),
-				'ResultsOutputDir' 	: str(data.task.results_output_dir) }
+				'ResultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data.task.results_output_dir, data.task.user.username)),
+		}
 
 	def getTaskLog(self, request):
 		"""

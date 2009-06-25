@@ -119,21 +119,21 @@ class Sextractor(ProcessingPlugin):
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
 			res.append({
-						'date' 					: "%s %s" % (it.date.date(), it.date.time()), 
-						'username' 				: str(it.user.username),
-						'idList' 				: str(data['idList']), 
-						'weightPath' 			: str(data['weightPath']), 
-						'flagPath' 				: str(data['flagPath']), 
-						'psfPath' 				: str(data['psfPath']), 
-						'dualMode'				: int(data['dualMode']),
-						'itemId' 				: str(it.id), 
-						'dualImage'		 		: str(data['dualImage']), 
-						'dualweightPath' 		: str(data['dualweightPath']), 
-						'dualflagPath' 			: str(data['dualflagPath']), 
-						'resultsOutputDir' 		: str(data['resultsOutputDir']),
-						'name' 					: str(it.name),
-						'config' 				: str(data['config']),
-						'param' 				: str(data['param']),
+						'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
+						'username' 			: str(it.user.username),
+						'idList' 			: str(data['idList']), 
+						'weightPath' 		: str(data['weightPath']), 
+						'flagPath' 			: str(data['flagPath']), 
+						'psfPath' 			: str(data['psfPath']), 
+						'dualMode'			: int(data['dualMode']),
+						'itemId' 			: str(it.id), 
+						'dualImage'		 	: str(data['dualImage']), 
+						'dualweightPath' 	: str(data['dualweightPath']), 
+						'dualflagPath' 		: str(data['dualflagPath']), 
+						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
+						'name' 				: str(it.name),
+						'config' 			: str(data['config']),
+						'param' 			: str(data['param']),
 						})
 
 		return res 

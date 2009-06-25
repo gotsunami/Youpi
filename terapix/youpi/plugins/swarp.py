@@ -511,7 +511,8 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		# Must be a list of list
 		idList = [[int(r.image.id) for r in rels]]
 
-		return {'resultsOutputDir' 	: str(data.task.results_output_dir),
+		return {
+				'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data.task.results_output_dir, data.task.user.username)),
 				'useQFITSWeights'	: str(data.useQFITSWeights),
 				'idList'			: str(idList), 
 				'weightPath'		: str(data.weightPath), 
@@ -592,7 +593,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 						'taskId' 			: str(data['taskId']), 
 						'itemId' 			: str(it.id), 
 						'weightPath' 		: str(data['weightPath']), 
-						'resultsOutputDir' 	: str(data['resultsOutputDir']),
+						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
 				 		'useQFITSWeights' 	: str(data['useQFITSWeights']),
 						'name' 				: str(it.name),
 						'headDataPaths'		: string.join([str(p) for p in data['headDataPaths']], ','),
