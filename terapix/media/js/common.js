@@ -1535,15 +1535,13 @@ function get_permissions(target, key, handler, misc) {
 
 /*
  * Class: InputPathSelector
- * Returns information about user permissions
+ * An extended read-only input text filed allowing to select a directory path
  *
  * Parameters:
  *  container - DOM node: parent DOM container
  *  startValue - string: title caption of the 'start' button
  *  onStartHandler - function: callback function to call when the 'start' button is clicked
- *
- * Returns:
- *  container DOM element
+ *  backHandler - function: callback function to call when the 'back' link is clicked [optional]
  *
  */ 
 var InputPathSelector = Class.create({
@@ -1603,6 +1601,164 @@ var InputPathSelector = Class.create({
 		container.insert(pathi).insert(importb).appear({
 			afterFinish: function() {pathi.focus();}
 		});
+	}
+});
+
+/*
+ * Class: BatchUploadWidget
+ * A widget that allows to select a data path and to batch import all files
+ * in this directory
+ *
+ * Parameters:
+ *  container - DOM node: parent DOM container
+ *  backHandler - function: callback function to call when the 'back' link is clicked [optional]
+ *  onFinishHandler - function: callback function to call when the batch processing is over [optional]
+ *
+ */ 
+var BatchUploadWidget = Class.create({
+	/*
+	 * Var: _id
+	 * Unique Id string
+	 *
+	 */
+	_id: 'upload_widget_' + Math.floor(Math.random() * 999999),
+	_cancelImport: false,
+	/*
+	 * Function: initialize
+	 * Constructor
+	 *
+	 */
+	initialize: function(container, postData, backHandler, onFinishHandler) {
+		if (typeof backHandler != 'function')
+			throw "Handler must be a function";
+		if (typeof onFinishHandler != 'function')
+			throw "Handler must be a function";
+		if (typeof postData != 'object')
+			throw "postData must be an object";
+		if (!postData.ServerPath)
+			throw "postData must have a ServerPath member!";
+
+		this._container = container;
+		this._backHandler = backHandler;
+		this._onFinishHandler = onFinishHandler;
+		this._postData = postData;
+
+		container.update();
+		new InputPathSelector(container, 'Import!', 
+			// Start handler
+			function(path, patterns) {
+				this._cancelImport = false;
+				this._batchImport(path, patterns);
+			}.bind(this), 
+			// Go back handler
+			function() { backHandler(); }
+		);
+	},
+	/*
+	 * Function: _batchImport
+	 * Sets things up for batch import
+	 *
+	 * Parameters:
+	 *  path - string: path for searching files
+	 *  patterns - array: array of regexp patterns
+	 *
+	 */ 
+	_batchImport: function(path, patterns) {
+		var cancelb = new Element('input', {id: this._id + '_cancel_button', type: 'button', value: 'Cancel'});
+		cancelb._this = this;
+		cancelb.observe('click', function() {
+			boxes.confirm('Are you sure you want to cancel the import?', function() {
+				console.log(this);
+				this._cancelImport = true;
+			}.bind(this._this));
+		});
+
+		var tab = new Element('table').setStyle({width: '100%'});
+		var tr, td;
+		tr = new Element('tr');
+		td = new Element('td').setStyle({width: '100%', verticalAlign: 'middle'});
+		var p = new Element('div');
+		this._uploadPB = new ProgressBar(p, 0, {
+			borderColor: 'grey', 
+			color: 'lightblue',
+			animate: false
+		});
+		var log = new Element('span', {id: this._id + '_upload_log'});
+		td.insert(p).insert(log);
+		tr.insert(td);
+
+		td = new Element('td').insert(cancelb);
+		tr.insert(td);
+		tab.insert(tr);
+		this._container.update(tab);
+		// Start import
+		this._do_Import(0, path, patterns);
+	},
+	/*
+	 * Function: _do_Import
+	 * Import files recursively from a directory
+	 *
+	 * Parameters:
+	 *  pos - integer: file number (seek)
+	 *  path - string: path for searching files
+	 *  patterns - array: array of regexp patterns
+	 *  total - integer: total file count [optional]
+	 *  skipped - integer: total files skipped [optional]
+	 *
+	 */ 
+	_do_Import: function(pos, path, patterns, total, skipped) {
+		var container = $(this._id + '_upload_log');
+		var r = new HttpRequest(
+			container,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				var r = resp.result;
+				var log = new Logger(container);
+				if (r.error) {
+					container.update();
+					log.msg_error(r.error);
+					return;
+				}
+				if (!this._cancelImport && r.pos < r.total) {
+					this._uploadPB.setPourcentage(r.percent);			
+					this._do_Import(r.pos, path, patterns, r.total, r.skipped);
+				}
+				else {
+					container.update();
+					if (this._cancelImport)
+						log.msg_warning('Aborted. ' + r.pos + ' files imported');
+					else {
+						this._uploadPB.setPourcentage(100);			
+						log.msg_ok('Done. ' + r.total + ' files imported' + (r.total == 0 ? ' (<b>maybe not the right directory?</b>)' : ''));
+					}
+					var but = $(this._id + '_cancel_button');
+					but.writeAttribute('value', 'Close');
+					but.stopObserving('click');
+					but._this = this;
+					but.observe('click', function() {
+						//_showImportOption();
+						this._this._backHandler();
+					});
+					// Refresh content
+					if(this._onFinishHandler()) this._onFinishHandler();
+				}
+			}.bind(this)
+		);
+
+		var post = $H(this._postData);
+		post.set('Path', path);
+		post.set('Patterns', patterns.join(';'));
+
+		if (pos) {
+			post.set('Pos', pos);
+			post.set('Total', total);
+			post.set('Skipped', skipped);
+		}
+
+		r.setBusyMsg('Please wait while processing');
+		r.send(post.get('ServerPath'), post.toQueryString());
 	}
 });
 
