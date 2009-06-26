@@ -1533,6 +1533,79 @@ function get_permissions(target, key, handler, misc) {
 	return container;
 }
 
+/*
+ * Class: InputPathSelector
+ * Returns information about user permissions
+ *
+ * Parameters:
+ *  container - DOM node: parent DOM container
+ *  startValue - string: title caption of the 'start' button
+ *  onStartHandler - function: callback function to call when the 'start' button is clicked
+ *
+ * Returns:
+ *  container DOM element
+ *
+ */ 
+var InputPathSelector = Class.create({
+	/*
+	 * Var: _id
+	 * Unique Id string
+	 *
+	 */
+	_id: 'input_selector_' + Math.floor(Math.random() * 999999),
+	/*
+	 * Var: path
+	 * Selected path
+	 *
+	 */
+	path: null,
+	/*
+	 * Function: initialize
+	 * Constructor
+	 *
+	 */
+	initialize: function(container, startValue,  onStartHandler, backHandler) {
+		if (typeof startValue != 'string')
+			throw "Must be a string";
+		if (typeof onStartHandler != 'function')
+			throw "Handler must be a function";
+		if (backHandler && typeof backHandler != 'function')
+			throw "Handler must be a function";
+
+		this.startValue = startValue;
+		this.startHandler = onStartHandler;
+		var patterns;
+
+		var pathi = new Element('input', {id: this._id + '_data_path_input', 
+			readonly: 'readonly',
+			type: 'text', 
+			size: 50, 
+			title: 'Click to open the path selector'}).addClassName('datapath');
+		var importb = new Element('input', {type: 'button', value: startValue});
+		importb._handler = this.startHandler;
+		importb.observe('click', function() { 
+			this._handler(pathi.value, patterns);
+		}).hide();
+		pathi.observe('click', function() {
+			boxes.browsePath(['*.*'], function(path, filePatterns) {
+				if (path) {
+					pathi.writeAttribute('value', path);
+					patterns = filePatterns;
+					importb.show();
+				}
+			});
+		});
+		if (backHandler) {
+			var backa = new Element('a', {href: '#'}).update('Back');
+			backa.observe('click', function() { backHandler(); });
+			container.update('(').insert(backa).insert(')');
+		}
+		container.insert(pathi).insert(importb).appear({
+			afterFinish: function() {pathi.focus();}
+		});
+	}
+});
+
 // Monitors notify events
 document.observe('notifier:notify', function(event) {
 	Notifier.notify(event.memo);

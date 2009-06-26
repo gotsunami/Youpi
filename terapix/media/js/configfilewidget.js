@@ -157,30 +157,16 @@ function ConfigFileWidget(container, pluginId, options)
 		var patterns;
 
 		opta.observe('click', function() {
-			var pathi = new Element('input', {id: plugin_id + '_config_data_path_input', 
-				readonly: 'readonly',
-				type: 'text', 
-				size: 50, 
-				title: 'Click to open the path selector'}).addClassName('datapath');
-			var importb = new Element('input', {type: 'button', value: 'Import!'});
-			importb.observe('click', function() { 
-				_cancelImport = false;
-				_batchImport(pathi.value, patterns);
-			}).hide();
-			pathi.observe('click', function() {
-				boxes.browsePath(['*.*'], function(path, filePatterns) {
-					if (path) {
-						pathi.writeAttribute('value', path);
-						patterns = filePatterns;
-						importb.show();
-					}
-				});
-			});
-			var backa = new Element('a', {href: '#'}).update('Back');
-			backa.observe('click', function() { _showImportOption(); });
-			optd.update('(').insert(backa).insert(')').insert(pathi).insert(importb).appear({
-				afterFinish: function() {pathi.focus();}
-			});
+			optd.update();
+			new InputPathSelector(optd, 'Import!', 
+				// Start handler
+				function(path, patterns) {
+					_cancelImport = false;
+					_batchImport(path, patterns);
+				}, 
+				// Go back handler
+				function() { _showImportOption(); }
+			);
 		});
 		optd.update('(Or ').insert(opta).insert(' from a directory)');
 		container.update(optd);
