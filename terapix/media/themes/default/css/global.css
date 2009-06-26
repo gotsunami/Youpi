@@ -1538,6 +1538,17 @@ div.tags *, .dropzone * {
 	margin-right: 10px;
 }
 
+.text_disabled {
+	color: gray;
+	font-style: italic;
+}
+
+.text_enabled {
+	color: black;
+	font-style: normal;
+	font-family: typewriter;
+}
+
 .all_mini * {
 	font-size: 10px;
 }

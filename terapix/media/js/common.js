@@ -1574,11 +1574,13 @@ var InputPathSelector = Class.create({
 		this.startHandler = onStartHandler;
 		var patterns;
 
+		var msg = 'Click to open the path selector';
 		var pathi = new Element('input', {id: this._id + '_data_path_input', 
 			readonly: 'readonly',
 			type: 'text', 
 			size: 50, 
-			title: 'Click to open the path selector'}).addClassName('datapath');
+			value: msg,
+			title: msg}).addClassName('datapath').addClassName('text_disabled');
 		var importb = new Element('input', {type: 'button', value: startValue});
 		importb._handler = this.startHandler;
 		importb.observe('click', function() { 
@@ -1590,17 +1592,16 @@ var InputPathSelector = Class.create({
 					pathi.writeAttribute('value', path);
 					patterns = filePatterns;
 					importb.show();
+					this.addClassName('text_enabled');
 				}
-			});
+			}.bind(this));
 		});
 		if (backHandler) {
 			var backa = new Element('a', {href: '#'}).update('Back');
 			backa.observe('click', function() { backHandler(); });
 			container.update('(').insert(backa).insert(')');
 		}
-		container.insert(pathi).insert(importb).appear({
-			afterFinish: function() {pathi.focus();}
-		});
+		container.insert(pathi).insert(importb).appear();
 	}
 });
 
@@ -1623,15 +1624,17 @@ var BatchUploadWidget = Class.create({
 	 */
 	_id: 'upload_widget_' + Math.floor(Math.random() * 999999),
 	_cancelImport: false,
+	_backHandler: false,
+	_onFinishHandler: false,
 	/*
 	 * Function: initialize
 	 * Constructor
 	 *
 	 */
 	initialize: function(container, postData, backHandler, onFinishHandler) {
-		if (typeof backHandler != 'function')
+		if (backHandler && typeof backHandler != 'function')
 			throw "Handler must be a function";
-		if (typeof onFinishHandler != 'function')
+		if (onFinishHandler && typeof onFinishHandler != 'function')
 			throw "Handler must be a function";
 		if (typeof postData != 'object')
 			throw "postData must be an object";
@@ -1649,9 +1652,8 @@ var BatchUploadWidget = Class.create({
 			function(path, patterns) {
 				this._cancelImport = false;
 				this._batchImport(path, patterns);
-			}.bind(this), 
-			// Go back handler
-			function() { backHandler(); }
+			}.bind(this),
+			backHandler ? backHandler : null
 		);
 	},
 	/*
@@ -1734,13 +1736,11 @@ var BatchUploadWidget = Class.create({
 						log.msg_ok('Done. ' + r.total + ' files imported' + (r.total == 0 ? ' (<b>maybe not the right directory?</b>)' : ''));
 					}
 					var but = $(this._id + '_cancel_button');
-					but.writeAttribute('value', 'Close');
-					but.stopObserving('click');
-					but._this = this;
-					but.observe('click', function() {
-						//_showImportOption();
-						this._this._backHandler();
-					});
+					if (this._backHandler) {
+						but.writeAttribute('value', 'Close');
+						but.stopObserving('click');
+						but.observe('click', this._backHandler);
+					}
 					// Refresh content
 					if(this._onFinishHandler()) this._onFinishHandler();
 				}

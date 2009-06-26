@@ -737,8 +737,16 @@ function ImageSelector(container, options)
 			$(id + '_crit_div').show();
 		});
 		bdiv.insert('(Or ').insert(ba).insert(' to criteria-based selection page)');
-		div.insert(bdiv);
-
+		var updiv = new Element('div');
+		var post = {
+			ServerPath: '/youpi/process/plugin/'	// Mandatory
+		};
+		new BatchUploadWidget(
+			updiv, 				// container
+			post 				// POST data
+		);
+		var lab = new Element('label').setStyle({'float': 'left'}).update('Path to file files: ');
+		div.insert(bdiv).insert(lab).insert(updiv);
 		// Log div
 		div.insert(new Element('div', {id: id + '_single_upload_log_div'}));
 	}
