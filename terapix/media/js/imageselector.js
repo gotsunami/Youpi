@@ -728,7 +728,7 @@ function ImageSelector(container, options)
 	 */ 
 	function _batchListImportForSavedSelections(div) {
 		div.update();
-		var bdiv = new Element('div').setStyle({fontSize: '9px'});
+		var bdiv = new Element('div').setStyle({fontSize: '9px', marginTop: '20px'});
 		ba = new Element('a', {href: '#'}).update('go back');
 		ba.observe('click', function() {
 			div.hide();
@@ -739,14 +739,18 @@ function ImageSelector(container, options)
 		bdiv.insert('(Or ').insert(ba).insert(' to criteria-based selection page)');
 		var updiv = new Element('div');
 		var post = {
+			// FIXME
 			ServerPath: '/youpi/process/plugin/'	// Mandatory
 		};
 		new BatchUploadWidget(
 			updiv, 				// container
 			post 				// POST data
 		);
-		var lab = new Element('label').setStyle({'float': 'left'}).update('Path to file files: ');
-		div.insert(bdiv).insert(lab).insert(updiv);
+		var lab = new Element('div').update('Path to files: ');
+		div.insert(lab).insert(updiv);
+		var tagc = new Element('input', {id: id + '_on_the_fly_check', type: 'checkbox', checked: 'checked'}).setStyle({marginRight: '8px'});
+		var tagl = new Element('label').update('Tag images on-the-fly (with a tag name based on the uploaded filename prefix)');
+		div.insert(tagc).insert(tagl).insert(bdiv);
 		// Log div
 		div.insert(new Element('div', {id: id + '_single_upload_log_div'}));
 	}
@@ -781,7 +785,7 @@ function ImageSelector(container, options)
 		form.insert(l).insert(subi);
 		div.update(form);
 
-		var tagc = new Element('input', {id: id + '_on_the_fly_check', type: 'checkbox', checked: 'checked'});
+		var tagc = new Element('input', {id: id + '_on_the_fly_check', type: 'checkbox', checked: 'checked'}).setStyle({marginRight: '8px'});
 		var tagl = new Element('label').update('Tag images on-the-fly (with a tag name based on the uploaded filename prefix)');
 		div.insert(tagc).insert(tagl);
 
