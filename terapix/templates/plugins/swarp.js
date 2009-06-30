@@ -289,7 +289,7 @@ var {{ plugin.id }} = {
 
 						var at = new AdvancedTable();
 						at.setContainer(dat);
-						at.setExclusiveSelectioMode(true);
+						at.setExclusiveSelectionMode(true);
 						at.setRowIdsFromColumn(0);
 						// Fill table
 						res.Tasks.each(function(task) {

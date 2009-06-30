@@ -365,17 +365,27 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			except Exception, e:
 				raise PluginError, "POST argument error. Unable to process data."
 
-		tasksIds = []
-		missing = []
-		imgList = Image.objects.filter(id__in = idList)
-		tasks = Processing_task.objects.filter(kind__name__exact = 'scamp', success = True).order_by('-end_date')
+		from django.db import connection
+		cur = connection.cursor()
+
+		idList = string.join(idList, ',')
 		mTasks = []
-		for t in tasks:
-			rels = Rel_it.objects.filter(task = t, image__in = imgList)
-			if not rels or len(rels) != len(imgList):
-				return {'Warning': 'no scamp processing found matching that image selection. Will not use .head files for that selection.'}
-			else:
-				mTasks.append(t)
+		cur.execute("""
+		SELECT r.task_id, COUNT(r.image_id) FROM youpi_rel_it AS r, youpi_processing_task AS t, youpi_processing_kind AS k 
+		WHERE r.task_id=t.id 
+		AND t.kind_id=k.id
+		AND k.name='scamp'
+		AND r.image_id IN (%s)
+		GROUP BY r.task_id 
+		ORDER BY t.start_date desc
+		""" % idList)
+		res = cur.fetchall()
+
+		if res:
+			for r in res:
+				mTasks.append(Processing_task.objects.filter(id = r[0])[0])
+		else:
+			return {'Warning': 'no scamp processing found matching that image selection. Will not use .head files for that selection.'}
 
 		return {'Tasks' : [[str(t.id), str(t.start_date), str(t.end_date), str(t.hostname), str(t.results_output_dir)] for t in mTasks]}
 
