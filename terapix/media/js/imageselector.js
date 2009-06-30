@@ -739,18 +739,22 @@ function ImageSelector(container, options)
 		bdiv.insert('(Or ').insert(ba).insert(' to criteria-based selection page)');
 		var updiv = new Element('div');
 		var post = {
-			// FIXME
-			ServerPath: '/youpi/process/plugin/'	// Mandatory
+		//	OnTheFly: $(id + '_on_the_fly_check').checked,
+			ServerPath: '/youpi/ims/importSelections/'	// Mandatory
 		};
 		new BatchUploadWidget(
 			updiv, 				// container
-			post 				// POST data
+			post, 				// POST data
+			function() { _batchListImportForSavedSelections(div) } // back handler
 		);
 		var lab = new Element('div').update('Path to files: ');
 		div.insert(lab).insert(updiv);
+		/* FIXME
 		var tagc = new Element('input', {id: id + '_on_the_fly_check', type: 'checkbox', checked: 'checked'}).setStyle({marginRight: '8px'});
 		var tagl = new Element('label').update('Tag images on-the-fly (with a tag name based on the uploaded filename prefix)');
 		div.insert(tagc).insert(tagl).insert(bdiv);
+		*/
+		div.insert(bdiv);
 		// Log div
 		div.insert(new Element('div', {id: id + '_single_upload_log_div'}));
 	}

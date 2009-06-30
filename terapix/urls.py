@@ -155,6 +155,7 @@ urlpatterns = patterns(
 	# Image selector
 	(r'^youpi/ims/collection/(.*?)/$', 'ims_get_collection'),
 	(r'^youpi/ims/images/(.*?)/$', 'ims_get_images'),
+	(r'^youpi/ims/importSelections/$', 'ims_import_selections'),
 
 	# Stats
 	(r'^youpi/stats/ingestion/$', 'stats_ingestion'),

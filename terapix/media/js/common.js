@@ -1686,7 +1686,8 @@ var BatchUploadWidget = Class.create({
 			animate: false
 		});
 		var log = new Element('span', {id: this._id + '_upload_log'});
-		td.insert(p).insert(log);
+		var wlog = new Element('div', {id: this._id + '_warn_upload_log'}).setStyle({maxHeight: '100px', overflow: 'auto'});
+		td.insert(p).insert(wlog).insert(log);
 		tr.insert(td);
 
 		td = new Element('td').insert(cancelb);
@@ -1710,6 +1711,7 @@ var BatchUploadWidget = Class.create({
 	 */ 
 	_do_Import: function(pos, path, patterns, total, skipped) {
 		var container = $(this._id + '_upload_log');
+		var wlog = $(this._id + '_warn_upload_log');
 		var r = new HttpRequest(
 			container,
 			// Use default error handler
@@ -1723,6 +1725,12 @@ var BatchUploadWidget = Class.create({
 					log.msg_error(r.error);
 					return;
 				}
+				if (r.warnings.length) {
+					var wl = new Logger(wlog);
+					r.warnings.each(function(warn) {
+						wl.msg_warning(warn);
+					});
+				}
 				if (!this._cancelImport && r.pos < r.total) {
 					this._uploadPB.setPourcentage(r.percent);			
 					this._do_Import(r.pos, path, patterns, r.total, r.skipped);
@@ -1732,8 +1740,8 @@ var BatchUploadWidget = Class.create({
 					if (this._cancelImport)
 						log.msg_warning('Aborted. ' + r.pos + ' files imported');
 					else {
-						this._uploadPB.setPourcentage(100);			
-						log.msg_ok('Done. ' + r.total + ' files imported' + (r.total == 0 ? ' (<b>maybe not the right directory?</b>)' : ''));
+						this._uploadPB.setPourcentage(100);
+						log.msg_ok('Done. ' + r.total + ' files processed' + (r.total == 0 ? ' (<b>maybe not the right directory?</b>).' : '.'));
 					}
 					var but = $(this._id + '_cancel_button');
 					if (this._backHandler) {
@@ -1742,7 +1750,7 @@ var BatchUploadWidget = Class.create({
 						but.observe('click', this._backHandler);
 					}
 					// Refresh content
-					if(this._onFinishHandler()) this._onFinishHandler();
+					if(this._onFinishHandler) this._onFinishHandler();
 				}
 			}.bind(this)
 		);

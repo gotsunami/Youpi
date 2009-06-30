@@ -38,6 +38,7 @@ import math, md5, random
 import marshal, base64
 import os, os.path, sys, pprint
 import socket, time
+import magic
 from types import *
 from copy import deepcopy
 #
@@ -1781,6 +1782,139 @@ def get_user_default_permissions(request):
 		'perms'	: Permissions(p.dflt_mode).toJSON(),
 		'default_group'	: str(p.dflt_group),
 	}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def ims_import_selections(request):
+	"""
+	Batch import selections of images.
+	Import all selection files in a directory. File names are matched against a pattern.
+	For each file the selection is matched. If ok creates a new saved selection. If at least one image is missing from 
+	a selection description, no saved selection is created at all, instead reports a warning.
+	"""
+	post = request.POST
+	try:
+		path = post['Path']
+		patterns = post['Patterns'].split(';')
+		# FIXME
+		#onTheFly = json.decode(request.POST['OnTheFly'])
+	except:
+		raise PluginError, "invalid post parameters %s" % post
+
+	res = {}
+	MAX_FILE_SIZE = 1024 # In Kb
+	STEP = 10
+
+	files = []
+	try:
+		for pat in patterns:
+			pfiles = glob.glob(os.path.join(path, pat))
+			files.extend(pfiles)
+	except:
+		res['error'] = 'An error occured when looking for files in the provided path. Please check your path and try again'
+
+	try: 
+		pos = int(post['Pos'])
+		total = int(post['Total'])
+		skipped = int(post.get('Skipped', 0))
+	except:
+		# First call to this function
+		# Compute total
+		total = len(files);
+		skipped = 0
+		pos = 0
+
+	profile = request.user.get_profile()
+	mag = magic.open(magic.MAGIC_NONE)
+	mag.load()
+
+	res['skipped'] = skipped
+	profile = request.user.get_profile()
+	frame = range(len(files))[pos:]
+	z = 0
+	warnings = []
+	for k in frame:
+		if pos == total: break
+		pos += 1
+		z += 1
+		try:
+			# Check magic number. Must be equal to 'ASCII text'
+			if mag.file(files[k]).find('ASCII') == -1:
+				res['skipped'] += 1
+				continue
+			f = open(files[k])
+			lines = f.readlines()
+			f.close()
+		except Exception, e:
+			res['error'] = str(e)
+			break
+
+		fileName = files[k]
+		basename = fileName[:fileName.rfind('.')]
+		lines = [li[:-1] for li in lines]
+		namemd5 = []
+		idList = []
+		j = 0
+		for line in lines:
+			sp = line.split(',')
+			if len(sp) == 1:
+				sp[0] = sp[0].strip()
+				imgs = Image.objects.filter(name__startswith = sp[0])
+				if not imgs:
+					warnings.append("In %s (Line %d): image '%s' not found, will not make a selection from this file" % (os.path.basename(fileName), j+1, sp[0]))
+					break
+				else:
+					img = imgs[len(imgs)-1]
+					idList.append(img.id)
+			elif len(sp) == 2:
+				sp[0] = sp[0].strip()
+				sp[1] = sp[1].strip()
+				namemd5.append(sp)
+				imgs = Image.objects.filter(name__startswith = sp[0], checksum = sp[1])
+				if not imgs:
+					warnings.append("In %s (Line %d): image '%s' (%s) not found, will not make a selection from this file" % (os.path.basename(fileName), j+1, sp[0], sp[1]))
+					break
+				else:
+					img = imgs[len(imgs)-1]
+					idList.append(img.id)
+			else:
+				# Line not well-formatted
+				res['error'] = "Line %d is not well-formatted: should be image_name[, md5sum]" % j+1
+				break
+			j += 1
+
+		# Do not save the selection if at least one file is missing, continue to next file
+		if warnings: continue
+
+		# Tag images on-the-fly
+		# FIXME
+		#if onTheFly: tag_mark_images(request, True, idList, [basename])
+
+		sList = base64.encodestring(marshal.dumps([idList])).replace('\n', NULLSTRING)
+		selname = os.path.basename(basename)
+		try:
+			# Updates entry
+			imgSelEntry = ImageSelections.objects.filter(name = selname)[0]
+			imgSelEntry.data = sList
+			success = write_proxy(request, imgSelEntry)
+			if not success:
+				warnings.append("In %s: could not save the selection" % os.path.basename(fileName))
+		except:
+			# ... or inserts a new one
+			imgSelEntry = ImageSelections(name = selname, data = sList, user = request.user, mode = profile.dflt_mode, group = profile.dflt_group)
+			imgSelEntry.save()
+			success = True
+		res['success'] = success
+
+		if z > STEP: break
+
+	res['warnings'] = warnings
+	res['total'] = total
+	res['pos'] = pos 
+	if total == 0: res['percent'] = 0
+	else: res['percent'] = pos*100./total
+
+	return HttpResponse(json.encode({'result': res}))
 
 if __name__ == '__main__':
 	print 'Cannot be run from the command line.'
