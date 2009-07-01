@@ -79,6 +79,12 @@ function ProcessingHistoryWidget(container) {
 	 *
 	 */
 	var _maxPerPage = 20;
+	/*
+	 * Var: _pageSwitcher
+	 * PageSwitcher widget
+	 *
+	 */
+	var _pageSwitcher = null;
 
 
 	// Group: Functions
@@ -225,7 +231,7 @@ function ProcessingHistoryWidget(container) {
 		td.insert(bdiv);
 
 		// Pages div
-		pdiv = new Element('div', {id: _id + '_pages_div'}).addClassName('pageSwitcher');
+		pdiv = new Element('div', {id: _id + '_pages_div'}).addClassName('pagination');
 		td.insert(pdiv);
 
 		// Custom header div
@@ -283,121 +289,6 @@ function ProcessingHistoryWidget(container) {
 	}
 
 	/*
-	 * Function: _updatePagesNavigation
-	 * Updates page navigator
-	 *
-	 */ 
-	function _updatePagesNavigation(curPage, pageCount) {
-		var pdiv = $(_id + '_pages_div');
-		pdiv.innerHTML = '';
-		pdiv.insert('Page ');
-
-		if (curPage > 1) {
-			a = new Element('a');
-			a.setAttribute('src', '#');
-			a.setAttribute('title', 'Show page ' + (curPage-1));
-			a.pdata = curPage - 1;
-			a.observe('click', function() {
-				_applyFilter(this.pdata);
-			});
-			a.insert('<');
-			pdiv.insert(a);
-		}
-
-		if (pageCount < 6) {
-			for (var k=1; k <= pageCount; k++) {
-				if (curPage == k) {
-					var p = new Element('span');
-					p.insert(k);
-					pdiv.insert(p);
-				}
-				else {
-					var a = new Element('a');
-					a.setAttribute('src', '#');
-					a.pdata = k;
-					a.observe('click', function() {
-						_applyFilter(this.pdata);
-					});
-					a.insert(k);
-					pdiv.insert(a);
-				}
-			}
-		}
-		else {
-			var surroundPageCount = 2;
-			var step, a;
-			if (curPage > surroundPageCount+1) {
-				// Last page
-				a = new Element('a');
-				a.setAttribute('src', '#');
-				a.observe('click', function() {
-					_applyFilter(1);
-				});
-				a.insert('1');
-				pdiv.insert(a);
-				// ...
-				pdiv.insert(' ... ');
-			}
-			if (curPage > 1) {
-				// Before
-				step = curPage-surroundPageCount > 0 ? curPage-surroundPageCount : curPage-1;
-				for (var k=step; k < curPage; k++) {
-					a = new Element('a');
-					a.setAttribute('src', '#');
-					a.pdata = k;
-					a.observe('click', function() {
-						_applyFilter(this.pdata);
-					});
-					a.insert(k);
-					pdiv.insert(a);
-				}
-			}
-			var p = new Element('span');
-			p.insert(curPage);
-			pdiv.insert(p);
-			if (curPage < pageCount) {
-				// After
-				step = curPage <= (pageCount-surroundPageCount) ? curPage+surroundPageCount : curPage + 1;
-				for (var k=curPage+1; k <= step; k++) {
-					a = new Element('a');
-					a.setAttribute('src', '#');
-					a.pdata = k;
-					a.observe('click', function() {
-						_applyFilter(this.pdata);
-					});
-					a.insert(k);
-					pdiv.insert(a);
-				}
-			}
-			if (curPage < pageCount-2) {
-				// ...
-				pdiv.insert(' ... ');
-				// Last page
-				a = new Element('a');
-				a.setAttribute('src', '#');
-				a.pdata = pageCount;
-				a.observe('click', function() {
-					_applyFilter(this.pdata);
-				});
-				a.insert(pageCount);
-				pdiv.insert(a);
-			}
-		}
-
-		if (curPage < pageCount) {
-			a = new Element('a');
-			a.setAttribute('src', '#');
-			a.setAttribute('title', 'Show page ' + (curPage+1));
-			a.pdata = curPage + 1;
-			a.observe('click', function() {
-				_applyFilter(this.pdata);
-			});
-			a.insert('>');
-			pdiv.insert(a);
-		}
-	}
-
-	/*
 	 * Function: _applyFilter
 	 * Sends AJAX query along with search criterias; show results
 	 *
@@ -428,7 +319,17 @@ function ProcessingHistoryWidget(container) {
 				var st = resp.Stats;
 
 				// Display pages
-				_updatePagesNavigation(st.curPage, st.pageCount);
+				var pdiv = $(_id + '_pages_div');
+				// Page switcher widget
+				if (!_pageSwitcher) {
+					_pageSwitcher = new PageSwitcher(pdiv, function(page) {
+						_applyFilter(page);
+					});
+					_pageSwitcher.setMarginsWidth(6);
+				}
+				else
+					_pageSwitcher.setContainer(pdiv);
+				_pageSwitcher.render(st.curPage, st.pageCount);
 
 				// Display results
 				container.update();

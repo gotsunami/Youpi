@@ -842,7 +842,7 @@ div.advancedTable .pagination {
 	padding-right: 10px;
 }
 
-div.advancedTable .pagination * {
+.pagination * {
 	font-size: 9px;
 }
 
