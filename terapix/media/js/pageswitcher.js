@@ -20,7 +20,9 @@
  *  handler - function: custom handler called each time a page is selected
  *
  */
-function PageSwitcher(container, handler) {
+var  PageSwitcher = Class.create({
+		
+		
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
 
@@ -30,13 +32,13 @@ function PageSwitcher(container, handler) {
 	 * Parent DOM container
 	 *
 	 */ 
-	var _container;
+	_container: null,
 	/*
 	 * Var: _handler
 	 * Handler function called when a page is selected
 	 *
 	 */ 
-	var _handler;
+	_handler: null,
 
 
 	// Group: Variables
@@ -48,23 +50,39 @@ function PageSwitcher(container, handler) {
 	 * Number of pages displayed before and after current page (when possible)
 	 *
 	 */
-	var _margins = 5;
+	_margins: 5,
 	/*
 	 * Var: _curPage
 	 * Current page number
 	 *
 	 */
-	var _curPage;
+	_curPage: 0,
 	/*
 	 * Var: _totalPages
 	 * Pages count
 	 *
 	 */
-	var _totalPages;
+	_totalPages: 0,
 
 
 	// Group: Functions
 	// -----------------------------------------------------------------------------------------------------------------------------
+
+
+	/*
+	 * Function: initialize
+	 * Constructor
+	 *
+	 */ 
+	initialize: function(container, handler) {
+		this._container = $(container);
+		if (!container)
+			throw 'container must be a valid DOM container';
+		if (typeof handler != 'function') 
+			throw 'handler must be a valid handler function';
+
+		this._handler = handler;
+	},
 
 	/*
 	 * Function: setContainer
@@ -74,11 +92,11 @@ function PageSwitcher(container, handler) {
 	 *  container - string or DOM node container
 	 *
 	 */ 
-	this.setContainer = function(container) {
-		_container = $(container);
+	setContainer: function(container) {
 		if (!container)
 			throw 'container must be a valid DOM container';
-	}
+		this._container = $(container);
+	},
 
 	/*
 	 * Function: getContainer
@@ -88,9 +106,9 @@ function PageSwitcher(container, handler) {
 	 *  DOM container
 	 *
 	 */ 
-	this.getContainer = function() {
-		return _container;
-	}
+	getContainer: function() {
+		return this._container;
+	},
 
 	/*
 	 * Function: setMarginsWidth
@@ -100,12 +118,12 @@ function PageSwitcher(container, handler) {
 	 *  width - integer: margin width
 	 *
 	 */ 
-	this.setMarginsWidth = function(width) {
+	setMarginsWidth: function(width) {
 		if (typeof width != 'number')
 			throw 'width must be an integer';
 
-		_margins = width;
-	}
+		this._margins = width;
+	},
 
 	/*
 	 * Function: getMarginsWidth
@@ -115,9 +133,9 @@ function PageSwitcher(container, handler) {
 	 *  Margins width
 	 *
 	 */ 
-	this.getMarginsWidth = function() {
-		return _margins;
-	}
+	getMarginsWidth: function() {
+		return this._margins;
+	},
 
 	/*
 	 * Function: getCurrentPage
@@ -127,9 +145,9 @@ function PageSwitcher(container, handler) {
 	 *  page int
 	 *
 	 */ 
-	this.getCurrentPage = function() {
-		return _curPage;
-	}
+	getCurrentPage: function() {
+		return this._curPage;
+	},
 
 	/*
 	 * Function: getTotalPages
@@ -139,9 +157,9 @@ function PageSwitcher(container, handler) {
 	 *  Total page count
 	 *
 	 */ 
-	this.getTotalPages = function() {
-		return _totalPages;
-	}
+	getTotalPages: function() {
+		return this._totalPages;
+	},
 
 	/*
 	 * Function: render
@@ -152,114 +170,112 @@ function PageSwitcher(container, handler) {
 	 *  pageCount - integer: total page count
 	 *
 	 */ 
-	this.render = function(curPage, pageCount) {
+	render: function(curPage, pageCount) {
 		if (typeof curPage != 'number' || typeof pageCount != 'number') {
 			throw 'render: curPage and pageCount must be integers';
 			return;
 		}
-		_curPage = curPage;
-		_totalPages = pageCount;
-		_container.update();
-		_container.addClassName('pageSwitcher');
-		_container.insert('Page ');
+		this._curPage = curPage;
+		this._totalPages = pageCount;
+		this._container.update();
+		this._container.addClassName('pageSwitcher');
+		this._container.insert('Page ');
 
 		if (curPage > 1) {
 			var a = new Element('a', {src: '#', title: 'Show page ' + (curPage-1)}).update('<');
 			a.observe('click', function() {
-				_handler(curPage-1);
-			});
-			_container.insert(a);
+				this._handler(curPage-1);
+			}.bind(this));
+			this._container.insert(a);
 		}
 
 		if (pageCount < 6) {
 			for (var k=1; k <= pageCount; k++) {
 				if (curPage == k)
-					_container.insert(new Element('span').update(k));
+					this._container.insert(new Element('span').update(k));
 				else {
-					var a = new Element('a', {src: '#'}).update(k);
-					a.switch_to_page = k;
+					var a = new Element('a', {src: '#', title: 'Show page ' + k}).update(k);
+					a._switchToPage = k;
+					a._this = this;
 					a.observe('click', function() {
-						_handler(this.switch_to_page);
+						this._this._handler(this._switchToPage);
 					});
-					_container.insert(a);
+					this._container.insert(a);
 				}
 			}
 		}
 		else {
 			var step, a;
-			if (curPage > _margins+1) {
+			if (curPage > this._margins+1) {
 				// Last page
 				a = new Element('a', {src: '#'}).update(1);
 				a.observe('click', function() {
-					_handler(1);
-				});
-				_container.insert(a);
+					this._handler(1);
+				}.bind(this));
+				this._container.insert(a);
 				// ...
-				_container.insert(' ... ');
+				this._container.insert(' ... ');
 			}
 			if (curPage > 1) {
 				// Before
-				step = curPage-_margins > 0 ? curPage-_margins : curPage-1;
+				step = curPage-this._margins > 0 ? curPage-this._margins : curPage-1;
 				for (var k=step; k < curPage; k++) {
-					var a = new Element('a', {src: '#'}).update(k);
-					a.switch_to_page = k;
+					var a = new Element('a', {src: '#', title: 'Show page ' + k}).update(k);
+					a._switchToPage = k;
+					a._this = this;
 					a.observe('click', function() {
-						_handler(this.switch_to_page);
+						this._this._handler(this._switchToPage);
 					});
-					_container.insert(a);
+					this._container.insert(a);
 				}
 			}
 
 			// Current non-linked page
-			_container.insert(new Element('span').update(curPage));
+			this._container.insert(new Element('span').update(curPage));
 
 			if (curPage < pageCount) {
 				// After
-				step = curPage <= (pageCount-_margins) ? curPage+_margins : curPage + 1;
+				step = curPage <= (pageCount-this._margins) ? curPage+this._margins : curPage + 1;
 				for (var k=curPage+1; k <= step; k++) {
-					var a = new Element('a', {src: '#'}).update(k);
-					a.switch_to_page = k;
+					var a = new Element('a', {src: '#', title: 'Show page ' + k}).update(k);
+					a._switchToPage = k;
+					a._this = this;
 					a.observe('click', function() {
-						_handler(this.switch_to_page);
+						this._this._handler(this._switchToPage);
 					});
-					_container.insert(a);
+					this._container.insert(a);
 				}
 			}
 			if (curPage < pageCount-2) {
 				// ...
-				_container.insert(' ... ');
+				this._container.insert(' ... ');
 				// Last page
-				a = new Element('a', {src: '#'}).update(pageCount);
+				a = new Element('a', {src: '#', title: 'Show page ' + pageCount}).update(pageCount);
 				a.observe('click', function() {
-					_handler(pageCount);
-				});
-				_container.insert(a);
+					this._handler(pageCount);
+				}.bind(this));
+				this._container.insert(a);
 			}
 		}
 
 		if (curPage < pageCount) {
 			var a = new Element('a', {src: '#', title: 'Show page ' + (curPage+1)}).update('>');
 			a.observe('click', function() {
-				_handler(curPage+1);
-			});
-			_container.insert(a);
+				this._handler(curPage+1);
+			}.bind(this));
+			this._container.insert(a);
 		}
+
+		// Goto page facility
+		var gt = new Element('select');
+		gt._this = this;
+		gt.observe('change', function() {
+			this._this._handler(this.selectedIndex + 1);
+		});
+		for (var k=1; k<=pageCount; k++)
+			gt.insert(new Element('option', {value: k}).update('page ' + k));
+		var curopt = gt.options[curPage - 1];
+		curopt.writeAttribute('selected', 'selected');
+		this._container.insert(gt);
 	}
-
-	/*
-	 * Function: _main
-	 * MEP
-	 *
-	 */ 
-	function _main() {
-		_container = $(container);
-		if (!container)
-			throw 'container must be a valid DOM container';
-		if (typeof handler != 'function') 
-			throw 'handler must be a valid handler function';
-
-		_handler = handler;
-	}
-
-	_main();
-}
+});
