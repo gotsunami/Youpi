@@ -33,6 +33,7 @@
  * Signals:
  *  imageSelector:loaded - signal emitted when the image selector is fully loaded (i.e after AJAX initial queries have returned)
  *  imageSelector:tagsCommitted - signal emitted when tags are committed successfuly
+ *  imageSelector:currentSelIsSavedSelection - signal emitted when the list of images is a saved selection and the IMS has only one row of search criteria
  *
  */
 function ImageSelector(container, options)
@@ -595,6 +596,19 @@ function ImageSelector(container, options)
 		sub.observe('click', function() {
 			_paginationImageSelection = null;
 			_executeQuery();
+			/*
+			 * If there is only one row for the search and the criterium is related to 
+			 * a saved selection then look for a config file with the same name
+			 *
+			 */
+			if (currentTR > 1) return;
+			var critNode = $(id + '_mainCriteria_select_0');
+			var critText = critNode.options[critNode.selectedIndex].text;
+			if (critText == 'Saved selection') {
+				var sel = $(id + '_saved_select_0');
+				var selection = sel.options[sel.selectedIndex].value;
+ 				document.fire('imageSelector:currentSelIsSavedSelection', selection); 
+			}
 		});
 		// Upload a text file
 		var utb = new Element('input', {
@@ -2873,7 +2887,6 @@ function ImageSelector(container, options)
 	 * (Un)selects all table rows by checking checkboxes
 	 *
 	 * Parameters:
-	 *
 	 *  on - boolean: (de)selecting table's rows
 	 *
 	 */ 
@@ -2895,13 +2908,11 @@ function ImageSelector(container, options)
 	 * This function can be called many times by the <_executeQuery> function (iterative step).
 	 *
 	 * Parameters:
-	 *
 	 *  k - integer: index to determine row DOM node in table 
 	 *  xhr - <HttpRequest> instance used to send query
 	 *
 	 * See Also:
-	 *
-	 * <_executeQuery>
+	 * 	<_executeQuery>
 	 *
 	 */
 	function sendq(k, xhr) {

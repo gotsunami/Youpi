@@ -460,7 +460,14 @@ function ConfigFileWidget(container, pluginId, options)
 		_options = options;
 		render();
 		setConfigFile();
+		
+		// Slot
+		document.observe('imageSelector:currentSelIsSavedSelection', function(event) {
+			var sel = $(plugin_id + '_' + _options.type +'_name_select');
+			sel.select('option').each(function(opt) {
+				if (opt.value == event.memo) opt.writeAttribute('selected', 'selected');
+			});
+		});
 	}
-
 	init();
 }
