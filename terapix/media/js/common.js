@@ -908,10 +908,9 @@ var Notifier = {
 			return;
 		}
 		d.update(new Element('div').update(msg));
-		d.setStyle({left: (document.body.clientWidth - 190) + 'px'});
-		d.appear({to: 0.9});
+		d.appear({to: 0.8});
 		d.fade({
-			from: 0.9, 
+			from: 0.8, 
 			delay: timeout,
 			afterFinish: function() {
 				if (Notifier.queue.length)
@@ -924,7 +923,7 @@ var Notifier = {
 	 * Default timeout in seconds
 	 *
 	 */
-	defaultTimeout: 5.0,
+	defaultTimeout: 10.0,
 	/*
 	 * Var: queue
 	 * Holds data awaiting to be processed (FIFO queue)

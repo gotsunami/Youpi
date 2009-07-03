@@ -465,7 +465,10 @@ function ConfigFileWidget(container, pluginId, options)
 		document.observe('imageSelector:currentSelIsSavedSelection', function(event) {
 			var sel = $(plugin_id + '_' + _options.type +'_name_select');
 			sel.select('option').each(function(opt) {
-				if (opt.value == event.memo) opt.writeAttribute('selected', 'selected');
+				if (opt.value == event.memo) {
+					opt.writeAttribute('selected', 'selected');
+					document.fire('notifier:notify', 'Config file <b>' + event.memo + '</b> selected');
+				}
 			});
 		});
 	}

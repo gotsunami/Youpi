@@ -75,7 +75,7 @@ p.number_ingested {
 	font-weight: bold;
 }
 
-div.note, div.notify, div.tip, div.important, div.caution, div.warning {
+div.note, div.tip, div.important, div.caution, div.warning {
 	width: 95%;
 	border: 2px solid #B0C4DE;
 	background-color: #F0F8FF;
@@ -91,18 +91,18 @@ div.note, div.notify, div.tip, div.important, div.caution, div.warning {
 div.notify {
 	position: fixed;
 	z-index: 100;
-	top: 95px;
-	width: 130px;
-	padding: 20px;
-	background: #F0F8FF url('../img/34x34/tip.png') no-repeat top left;
-	border: 1px solid #B0C4DE;
+	top: 5px;
+	left: 300px;
+	padding: 5px;
+	background-color: #EF5A00;
+	border-right: 1px solid gray;
+	border-bottom: 1px solid gray;
+	-moz-border-radius: 5px;
 }
 
 div.notify div {
-	color: brown;
-	font-weight: bold;
-	font-size: 9px;
-	padding-left: 20px;
+	color: white;
+	font-size: 10px;
 }
 
 div.tip {
