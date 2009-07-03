@@ -2938,11 +2938,11 @@ function ImageSelector(container, options)
 				valueText = multiSel.join(',');
 			}
 			else
-				valueText = valueNode.options[valueNode.selectedIndex].text.replace('+', '%2B');
+				valueText = valueNode.options[valueNode.selectedIndex].text;
 		}
 		catch(err) {
 			// Not a combobox, condiders it's a textbox
-			valueText = valueNode.value.replace('+', '%2B');
+			valueText = valueNode.value;
 		}
 
 		// Replace any '*' wildcard by '%'
