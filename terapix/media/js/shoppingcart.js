@@ -133,10 +133,12 @@ function ShoppingCart(container)
 					}
 				);
 
-				var post = 	'plugin=' + obj.plugin_name + 
-							'&userData=' + escape(Object.toJSON(obj.userData));
+				var post = {
+					plugin: obj.plugin_name,
+					userData: Object.toJSON(obj.userData)
+				};					
 				// Check for cookie
-				r.send('/youpi/cart/additem/', post);
+				r.send('/youpi/cart/additem/', $H(post).toQueryString());
 			}
 		);
 

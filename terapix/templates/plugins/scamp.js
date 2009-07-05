@@ -482,11 +482,9 @@ var {{ plugin.id }} = {
 		opts.set('Plugin', uidscamp);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
-
-		var post = getQueryString(opts) +
-			'&' + runopts.clusterPolicy;
+		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
 	
-		r.send('/youpi/process/plugin/', post);
+		r.send('/youpi/process/plugin/', opts.toQueryString());
 	},
 
 	reprocessAllFailedProcessings: function(tasksList) {
@@ -568,8 +566,7 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = getQueryString(opts);
-		r.send('/youpi/process/plugin/', post);
+		r.send('/youpi/process/plugin/', opts.toQueryString());
 	},
 
 	/*
