@@ -1807,7 +1807,7 @@ def ims_import_selections(request):
 		raise PluginError, "invalid post parameters %s" % post
 
 	res = {}
-	MAX_FILE_SIZE = 1024 # In Kb
+	MAX_FILE_SIZE = 256 * 1024 # In Kb
 	STEP = 10
 
 	files = []
@@ -1844,7 +1844,7 @@ def ims_import_selections(request):
 		z += 1
 		try:
 			# Check magic number. Must be equal to 'ASCII text'
-			if mag.file(files[k]).find('ASCII') == -1:
+			if mag.file(files[k]).find('ASCII') == -1 and os.path.getsize(files[k]) > MAX_FILE_SIZE:
 				res['skipped'] += 1
 				continue
 			f = open(files[k])
