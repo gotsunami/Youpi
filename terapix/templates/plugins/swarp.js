@@ -783,8 +783,6 @@ var {{ plugin.id }} = {
 			td.insert(cdiv);
 			tr.insert(td);
 			tab2.insert(tr);
-
-			return;
 		}
 	
 		d.insert(tab);
