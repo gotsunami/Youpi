@@ -1149,8 +1149,13 @@ def ims_get_image_list_from_file(request):
 	# ...from lines with image name and checksum (one SQL query per line)
 	namemd5 = []
 	idList = []
-	j = 0
+	j = comments = 0
 	for line in lines:
+		# Skip comments
+		if line.find('#') == 0: 
+			j += 1
+			comments += 1
+			continue
 		sp = line.split(',')
 		if len(sp) == 1:
 			sp[0] = sp[0].strip()
@@ -1185,7 +1190,7 @@ def ims_get_image_list_from_file(request):
 		'warnings': warnings, 
 		'error': errMsg, 
 		'foundCount': len(idList), 
-		'total' : len(lines), 
+		'total' : len(lines)-comments, 
 		'idList' : idList}), mimetype = 'text/plain')
 
 def save_condor_node_selection(request):
@@ -1856,6 +1861,10 @@ def ims_import_selections(request):
 		idList = []
 		j = 0
 		for line in lines:
+			# Skip comments
+			if line.find('#') == 0: 
+				j += 1
+				continue
 			sp = line.split(',')
 			if len(sp) == 1:
 				sp[0] = sp[0].strip()
