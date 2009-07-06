@@ -1430,8 +1430,8 @@ function ImageSelector(container, options)
 			// Custom handler for results
 			function(resp) {
 				// Rendering
-				removeAllChildrenNodes(output);
-				var selNode = getSelect(id + '_ingestionId_select_' + tr_idx, resp['data']);
+				output.update();
+				var selNode = getSelect(id + '_ingestionId_select_' + tr_idx, resp.data, 1, true);
 				output.insert(selNode);
 			}
 		);
@@ -1749,10 +1749,10 @@ function ImageSelector(container, options)
 			// Custom handler for results
 			function(resp) {
 				// Rendering
-				removeAllChildrenNodes(output);
+				output.update();
 				var selid = id + '_saved_select_' + tr_idx;
 				if (resp.data.length > 0)
-					var selNode = getSelect(selid, resp.data);
+					var selNode = getSelect(selid, resp.data, 1, true);
 				else {
 					var selNode = new Element('select', {'id': selid});
 					option = new Element('option', {'value': 0});
