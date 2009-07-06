@@ -1724,7 +1724,7 @@ var BatchUploadWidget = Class.create({
 					log.msg_error(r.error);
 					return;
 				}
-				if (r.warnings.length) {
+				if (r.warnings) {
 					var wl = new Logger(wlog);
 					r.warnings.each(function(warn) {
 						wl.msg_warning(warn);
