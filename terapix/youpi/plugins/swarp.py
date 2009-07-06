@@ -289,7 +289,7 @@ notify_user             = monnerville@iap.fr
 
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- %(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>/dev/null
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- %(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>&1
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
