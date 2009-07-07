@@ -409,13 +409,6 @@ def process(userData, kind_id, argv):
 	################### PRE-PROCESSING STUFF GOES HERE ########################################
 
 
-	# Swarp preprocessing: uncompress .fz weight maps
-	if kind == 'swarp':
-		fzs = glob.glob('*.fits.fz')
-		for fz in fzs:
-			print "SWARP PREPROCESSING: uncompressing", fz
-			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
-	
 	if kind == 'sex':
 		img_id = userData['ImgID']
 
@@ -423,6 +416,9 @@ def process(userData, kind_id, argv):
 		os.mkdir(imgName)
 		os.system("mv sex-config* sex-param* sex.default.conv default.nnw %s" %(imgName))
 		os.chdir(imgName)
+
+		# FIXME: remove this code that won't get executed  at all since the files are not yet
+		# transferred... (see Swarp plugin code for a fix)
 		fzs = glob.glob('*.fits.fz')
 		for fz in fzs:
 			print "SEx PREPROCESSING: uncompressing", fz

@@ -13,8 +13,9 @@
 
 # vim: set ts=4
 
-import sys, os.path, re, time, string
+import os, sys, os.path, re, time, string
 import marshal, base64, zlib
+from stat import *
 #
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
@@ -51,9 +52,6 @@ class Swarp(ProcessingPlugin):
 		2. Executes condor_submit on that file
 		3. Returns info related to ClusterId and number of jobs submitted
 		"""
-
-		# FIXME
-		#return {'Error': 'Plugin not yet implemented.'}
 
 		try:
 			idList = eval(request.POST['IdList'])	# List of lists
@@ -230,6 +228,13 @@ class Swarp(ProcessingPlugin):
 		tf.write('\n' + head_files.replace(', ', '\n'))		# Heads
 		tf.write('\n' + string.join([os.path.join(img.path, img.name + '.fits') for img in images], '\n')) # Images
 		tf.close()
+
+		#
+		# Pre-processing script runned by condor_transfert.pl
+		# This is mandatory in order to be able to uncompress the weight maps
+		# preProcFile is filled later
+		#
+		preProcFile = os.path.join('/tmp/', "swarp-preprocessing-%s.py" % time.time())
 		
 	 	# Generates CSF
 		condor_submit_file = """
@@ -246,7 +251,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(userdata)s, %(swarplist)s, %(transferfile)s, %(nop)s/NOP
+transfer_input_files    = %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(userdata)s, %(swarplist)s, %(transferfile)s, %(preprocfile)s, %(nop)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -271,6 +276,7 @@ notify_user             = monnerville@iap.fr
 	'outlog'		: logs['out'],
 	'transferfile'  : os.path.join('/tmp/', transferFile),
 	'userdata'		: os.path.join('/tmp/', userdataFile),
+	'preprocfile'	: preProcFile,
 }
 
 		csf.write(condor_submit_file)
@@ -287,9 +293,39 @@ notify_user             = monnerville@iap.fr
 																userData['Kind'], 
 																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
 
+		# Now generates the preprocessing Python script needed to be able 
+		# to uncompress all .fz weight maps
+		pf = open(preProcFile, 'w')
+		pcontent = """#!/usr/bin/env python
+
+# AUTOMATICALLY GENERATED SCRIPT. DO NOT EDIT
+
+import os, glob, sys
+
+# PRE-PROCESSING stuff go there
+fzs = glob.glob('*.fits.fz')
+for fz in fzs:
+	print "SWARP PREPROCESSING: uncompressing", fz
+	os.system(" """[:-1] + CMD_IMCOPY + """ %s %s" % (fz, fz[:-3]))
+
+# Finally run swarp
+"""
+		pcontent += """
+exit_code = os.system("%(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>&1")
+sys.exit(exit_code)
+""" % {
+	'swarp'			: CMD_SWARP,
+	'params'		: swarp_params,
+	'imgsfile'		: os.path.basename(swarpImgsFile),
+	'config'		: os.path.basename(customrc),
+}
+		pf.write(pcontent)
+		pf.close()
+		RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO 
+		os.chmod(preProcFile, RWX_ALL)
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- %(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>&1
+arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- ./%(preprocscript)s
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	'encuserdata' 	: encUserData, 
@@ -300,6 +336,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 				'transferfile'  : transferFile,
 				'user'			: request.user.username,
 				'imgsfile'		: os.path.basename(swarpImgsFile),
+				'preprocscript'	: os.path.basename(preProcFile),
 				'tpxupload'		: FTP_URL + resultsOutputDir }
 
 		csf.write(condor_submit_entry)
