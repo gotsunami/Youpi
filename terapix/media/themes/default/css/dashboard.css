@@ -278,6 +278,7 @@ tr.scamp-result-entry-tn td.scamp-result-entry-complete-off {
 	vertical-align: bottom; 
 	cursor: pointer; 
 	margin: 2px;
+	padding: 2px;
 }
 tr.scamp-result-entry-tn td.scamp-result-entry-complete-on {
 	background: white url('../img/misc/scamp-preview-on.png') no-repeat top center;
@@ -288,6 +289,7 @@ tr.scamp-result-entry-tn td.scamp-result-entry-complete-on {
 	cursor: pointer; 
 	text-decoration: underline;
 	margin: 2px;
+	padding: 2px;
 }
 
 tr.scamp-result-entry-tn td {
@@ -297,6 +299,11 @@ tr.scamp-result-entry-tn td {
 	vertical-align: middle; 
 	color: green; 
 	text-align: left;
+	height: 96px;
+}
+
+tr.scamp-result-entry-tn td:last-child {
+	vertical-align: top;
 }
 
 img.scamp-result-entry-tn {
