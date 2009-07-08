@@ -79,13 +79,13 @@ function ImageSelector(container, options)
 	 */
 	var _fields = [
 		['Channel', 'Channel'], 
-		['Dec', 'Dec (deg)'], 
+		['Dec', 'Dec (Deg / HH:MN:SS.XXX)'], 
 		['Grade', 'Grade'],
 		['Name', 'Image Name'],
 		['IngestionId', 'Ingestion ID'], 
 		['Instrument', 'Instrument'], 
 		['Object', 'Object'], 
-		['Ra', 'Ra (deg)'], 
+		['Ra', 'Ra (deg / HH:MN:SS.XXX)'], 
 		['Run', 'Run'], 
 		['Saved', 'Saved selection'], 
 		['Tag', 'Tag']
@@ -2955,14 +2955,52 @@ function ImageSelector(container, options)
 			// Not a combobox, condiders it's a textbox
 			valueText = valueNode.value;
 		}
-
+		
 		// Replace any '*' wildcard by '%'
 		valueText = valueText.replace(/%/g, '%25').replace(/\*/g, '%25');
+
+		/*
+		 * hms to deg conversion
+		 *
+		 */
+		var expRa = new RegExp("^[0-9]{1,2}:[0-9]{2}:[0-9]{2}\.?[0-9]*$","g");
+		var expDec = new RegExp("^[\+\-]?[0-9]{1,2}:[0-9]{2}:[0-9]{2}\.?[0-9]*$","g");
+		var expDecimal = new RegExp("^[\+\-]?[0-9]*$","g");
+
+		var checkConvert = false;
+		var msg, re;
+		switch(critText) {
+			case 'Ra':
+				comp = "parseFloat(time[0])*15 + (parseFloat(time[1])/60)*15 + (parseFloat(time[2])/3600)*15";
+				msg = "<B>HH:MN:SS.XXX</B> or Degre between <b>0 and 360</b>";
+				re = expRa;
+				checkConvert = true;
+				break;
+			case 'Dec':
+				comp = "Math.abs(parseFloat(time[0])) + parseFloat(time[1])/60 + parseFloat(time[2])/3600";
+				msg = "<B>(+/-)HH:MN:SS.XXX</B> or Degre between <b>-90 and 90</b>";
+				re = expDec;
+				checkConvert = true;
+				break;
+			default:
+				break;
+		}
+		if (checkConvert) {
+			if(valueText.match(re)) {
+				var time = valueText.split(':');
+				valueText = eval(comp);
+				if (parseFloat(time[0]) < 0) valueText = -valueText;
+			}
+			else
+				if(!valueText.match(expDecimal))
+					boxes.alert("<b>" + critText + "</b> format is wrong: <b>\"" +valueText + "\"</b><br>This must be either " + msg);
+		}
 
 		var post = $H({
 			Condition: condNode.options[condNode.selectedIndex].value,
 			Value: valueText
 		});
+		
 		if (xhr.idResultsIdx > 0) {
 			if (idResults[xhr.idResultsIdx-1].length > 0) {
 				var idList = new Array();
