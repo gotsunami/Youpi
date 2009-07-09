@@ -193,15 +193,17 @@ function ProcessingHistoryWidget(container) {
 		sel.options[sel.options.length-1].setAttribute('selected', 'selected');
 		form.insert(sel);
 
-		sel = new Element('select');
-		sel.setAttribute('id', _id + '_kind_select');
+		sel = new Element('select', {id: _id + '_kind_select'});
 		sel.observe('change', function(event) {
 			_onKindChange(this);
 		});
 		for (var k=0; k < _pluginInfos.length; k++) {
-			opt = new Element('option');
-			if (k == 0)
-				opt.setAttribute('selected', 'selected');
+			opt = new Element('option').setStyle({
+					background: "white url('/media/themes/" + guistyle + "/img/16x16/" + _pluginInfos[k][0] + ".png') no-repeat center left", 
+					padding: '3px', 
+					paddingLeft: '20px'
+			});
+			if (k == 0) opt.setAttribute('selected', 'selected');
 			opt.setAttribute('value', _pluginInfos[k][0]);
 			opt.insert(_pluginInfos[k][1] + ' processings');
 			sel.insert(opt);
