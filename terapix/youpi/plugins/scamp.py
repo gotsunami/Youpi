@@ -208,8 +208,11 @@ class Scamp(ProcessingPlugin):
 
 		# Get filenames for Condor log files (log, error, out)
 		logs = self.getCondorLogFilenames()
-
 		images = Image.objects.filter(id__in = idList)
+
+		xmlName = self.getConfigValue(content.split('\n'), 'XML_NAME')
+		xmlRootName = xmlName[:xmlName.rfind('.')]
+
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'ItemID' 			: itemId, 
 					'Warnings' 			: {}, 
@@ -219,7 +222,7 @@ class Scamp(ProcessingPlugin):
 					'Kind'	 			: self.id,								# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),					# Mandatory for AMI, WP
 					'ResultsOutputDir'	: str(resultsOutputDir),				# Mandatory for WP
-					'Descr'				: "%s from %d SExtractor catalogs" % (self.optionLabel, len(images)),		# Mandatory for AMI
+					'Descr'				: "%s from %d SExtractor catalogs, %s" % (self.optionLabel, len(images), str(xmlRootName)),	# Mandatory for AMI
 					'Config' 			: str(post['Config']),
 					'JobID'				: self.getUniqueCondorJobId(),			# Mandatory for WP
 					'StartupDelay'		: step,
@@ -497,7 +500,7 @@ queue""" %  {
 		config = zlib.decompress(base64.decodestring(data.config))
 
 		return {	'TaskId'			: str(taskid),
-					'Title' 			: str("%s processing" % self.description),
+					'Title' 			: str("%s" % task.title),
 					'User' 				: str(task.user.username),
 					'Hostname'			: str(task.hostname),
 					'Success' 			: task.success,

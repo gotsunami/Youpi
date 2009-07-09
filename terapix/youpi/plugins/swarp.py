@@ -179,7 +179,6 @@ class Swarp(ProcessingPlugin):
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 			: self.id,						# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),			# Mandatory for AMI, WP
-					'Descr' 			: '',							# Mandatory for Active Monitoring Interface (AMI) - Will be filled later
 					'ResultsOutputDir'	: str(resultsOutputDir),		# Mandatory for WP
 					'ItemID' 			: itemId,
 					'SubmissionFile'	: csfPath, 

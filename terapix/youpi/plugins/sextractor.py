@@ -283,8 +283,10 @@ class Sextractor(ProcessingPlugin):
 		# Condor submission file
 		csfPath = "/tmp/sex-condor-%s.txt" % now
 		csf = open(csfPath, 'w')
-		
 		images = Image.objects.filter(id__in = idList)
+
+		xmlName = self.getConfigValue(content.split('\n'), 'XML_NAME')
+		xmlRootName = xmlName[:xmlName.rfind('.')]
 			
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 				: self.id,							# Mandatory for AMI, Wrapper Processing (WP)
@@ -419,9 +421,9 @@ notify_user             = semah@iap.fr
 			userData['ImgID'] = str(img.id)
 
 			if dualMode == '1':
-				userData['Descr'] = str("%s of %s (Dual Mode)" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
+				userData['Descr'] = str("%s of %s (Dual Mode), %s" % (self.optionLabel, img.name, xmlRootName))		# Mandatory for Active Monitoring Interface (AMI)
 			else:
-				userData['Descr'] = str("%s of %s (Single Mode)" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
+				userData['Descr'] = str("%s of %s (Single Mode), %s" % (self.optionLabel, img.name, xmlRootName))		# Mandatory for Active Monitoring Interface (AMI)
 
 			userData['ResultsOutputDir'] = str(os.path.join(resultsOutputDir, img.name))
 			# Mandatory for WP
@@ -583,7 +585,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 			thumbs = [ thumb for thumb in thumbs]
 
 		return {	'TaskId'				: str(taskid),
-					'Title' 				: str("%s - %s.fits" % (self.description, imgs[0].name)),
+					'Title' 				: str("%s" % task.title),
 					'User' 					: str(task.user.username),
 					'Success' 				: task.success,
 					'Start' 				: str(task.start_date),
