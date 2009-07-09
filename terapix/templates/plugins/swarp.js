@@ -406,7 +406,6 @@ var {{ plugin.id }} = {
 						otherImgs.invoke('show');
 						return;
 					}
-	
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
 				}
