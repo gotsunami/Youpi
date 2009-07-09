@@ -67,6 +67,12 @@ function ImageSelector(container, options)
 	 */
 	var _imageInfoWidget = null;
 	/*
+	 * Var: _savedSelectionUsed;
+	 * Name of saved selection used if the current image selection is only based on a saved selection criteria
+	 *
+	 */
+	var _savedSelectionUsed = null;
+	/*
 	 * Var: _fields 
 	 * List of criteria to choose from to build a query. Each entry will be 
 	 * displayed in the first combobox of every added line.
@@ -608,7 +614,10 @@ function ImageSelector(container, options)
 				var sel = $(id + '_saved_select_0');
 				var selection = sel.options[sel.selectedIndex].value;
  				document.fire('imageSelector:currentSelIsSavedSelection', selection); 
+				_savedSelectionUsed = selection;
 			}
+			else
+				_savedSelectionUsed = null;
 		});
 		// Upload a text file
 		var utb = new Element('input', {
@@ -644,6 +653,15 @@ function ImageSelector(container, options)
 		div.insert(sub).insert(utb).insert(bib);
 		critdiv.insert(div);
 		_buildResultsDiv(single_div);
+	}
+
+	/*
+	 * Function: _getSavedSelectionUsed
+	 * Returns <_getSavedSelectionUsed>
+	 *
+	 */ 
+	this.getSavedSelectionUsed = function() {
+		return _savedSelectionUsed;
 	}
 
 	/*
