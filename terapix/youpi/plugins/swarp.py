@@ -41,6 +41,7 @@ class Swarp(ProcessingPlugin):
 		self.template = 'plugins/swarp.html' 						# Main template, rendered in the processing page
 		self.itemCartTemplate = 'plugins/swarp_item_cart.html' 		# Template for custom rendering into the shopping cart
 		self.jsSource = 'plugins/swarp.js' 							# Custom javascript
+		self.isAstromatic = True									# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
 		# Decomment to disable the plugin
 		#self.enable = False

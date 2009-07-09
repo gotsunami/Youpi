@@ -47,6 +47,7 @@ class Sextractor(ProcessingPlugin):
 		self.template 			= 'plugins/sextractor.html' 							# Main template, rendered in the processing page
 		self.itemCartTemplate 	= 'plugins/sextractor_item_cart.html' 					# Template for custom rendering into the shopping cart
 		self.jsSource 			= 'plugins/sextractor.js' 								# Custom javascript
+		self.isAstromatic 		= True													# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
 		self.enable = True 
 		self.jobCount = 10

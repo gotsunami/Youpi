@@ -41,6 +41,7 @@ class ProcessingPlugin:
 		self.template = 'plugin_default.html'
 		# Default plugin version
 		self.version = '0.1'
+		self.isAstromatic = False	# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
 		# Plugin data (to be processed)
 		self.__data = [] 
@@ -74,7 +75,7 @@ class ProcessingPlugin:
 		Keyword search is case-sensitive.
 		@param content list of strings
 		@param keyword word search in content
-		@returns keyword's value of False
+		@returns keyword's value or False
 		"""
 		for line in content:
 			if line.find(keyword) != -1:
