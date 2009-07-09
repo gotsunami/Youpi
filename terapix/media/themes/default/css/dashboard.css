@@ -631,3 +631,10 @@ div.ims_batch_log_div pre {
 	font-weight: bold;
 	color: green;
 }
+
+.sc_item_numbering {
+	margin: 15px;
+	font-size: 20px;
+	color: lightgray;
+	font-weight: bold;
+}
