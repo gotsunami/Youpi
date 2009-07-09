@@ -97,10 +97,12 @@ var {{ plugin.id }} = {
 		var log = new Logger(pre);
 
 		if (path == selector.getExtra().title) {
+			
 			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
-			log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection');
+			var sName = {{ plugin.id }}.ims.getSavedSelectionUsed() ? " <span class=saved_selection_used>" + {{ plugin.id }}.ims.getSavedSelectionUsed() + "</span>" : "";
+			log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection' + sName);
 			log.msg_status("Using output data path '" + output_data_path + "'");
-			log.msg_status("Using '" + config + "' as configuration file");
+			log.msg_status("Using '<span class=saved_selection_used>" + config + "</span>' as configuration file");
 			log.msg_status('Checking <b>weight maps</b> availability (from QualityFITS)...');
 			{{ plugin.id }}.checkForQFITSData(pre, function() {
 				// Reset
