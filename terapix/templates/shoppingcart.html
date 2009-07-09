@@ -84,7 +84,6 @@ function removeItemFromCart(trid, force) {
 			var n = left == 1 ? table : trNode;
 
 			n.fade({ 
-				delay: 1.0,
 				afterFinish: function() { 
 					n.remove(); 
 					document.fire('shoppingCart:itemRemoved');
