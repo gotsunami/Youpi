@@ -12,3 +12,13 @@
 ##############################################################################
 
 import os.path
+
+def get_title_from_menu_id(menuId):
+	from youpi.context_processors import appmenu
+	parts = appmenu(None)['menu'].values()
+	for p in parts:
+		for m in p:
+			if m['id'] == menuId:
+				return m['title']
+
+	return None

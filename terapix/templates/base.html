@@ -78,10 +78,9 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		<ul class="messagelist">{% for message in messages %}<li>{{ message|escape }}</li>{% endfor %}</ul>
 	{% endif %}
 
-    <!-- Content -->
+	<!-- Content -->
 	<div id="content" class="{% block coltype %}colM{% endblock %}">
 		{% block pretitle %}{% endblock %}
-		{% block content_title %}{% if title %}<h1>{{ title|escape }}</h1>{% endif %}{% endblock %}
 		{% block content %}
 			{% block object-tools %}{% endblock %}
 			{{ content }}

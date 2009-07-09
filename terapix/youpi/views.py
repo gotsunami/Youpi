@@ -43,6 +43,7 @@ from types import *
 from copy import deepcopy
 #
 from settings import *
+from common import *
 
 # Custom views
 from terapix.exceptions import *
@@ -62,8 +63,10 @@ def index(request):
 	This is a callback function (as defined in django's urls.py file).
 	"""
 
+	menu_id = 'home'
 	return render_to_response('index.html', {	
-							'selected_entry_id'			: 'home',
+							'selected_entry_id'	: menu_id,
+							'title' 			: get_title_from_menu_id(menu_id),
 						},
 						context_instance = RequestContext(request))
 
@@ -111,6 +114,7 @@ def preferences(request):
 	except EOFError:
 		config = None
 
+	menu_id = 'preferences'
 	return render_to_response('preferences.html', {	
 						'themes'			: themes,
 						'plugins' 			: manager.plugins, 
@@ -118,7 +122,8 @@ def preferences(request):
 						'policies'			: policies,
 						'selections'		: selections,
 						'config'			: config,
-						'selected_entry_id'	: 'preferences', 
+						'selected_entry_id'	: menu_id, 
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -128,9 +133,11 @@ def condor_setup(request):
 	"""
 	Condor cluster setup
 	"""
+	menu_id = 'condorsetup'
 	return render_to_response('condorsetup.html', {	
 						'custom_condor_req' : request.user.get_profile().custom_condor_req,
-						'selected_entry_id'	: 'condorsetup', 
+						'selected_entry_id'	: menu_id, 
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -140,8 +147,10 @@ def documentation(request):
 	"""
 	Documentation template
 	"""
+	menu_id = 'documentation'
 	return render_to_response('documentation.html', {	
-						'selected_entry_id'	: 'documentation',
+						'selected_entry_id'	: menu_id,
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -167,24 +176,28 @@ def cart_view(request):
 	policies = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
 	selections = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
 
+	menu_id = 'shoppingcart'
 	return render_to_response('shoppingcart.html', {	
 					'plugins' 			: manager.plugins, 
 					'cartHasData' 		: cartHasData, 
 					# Cluster node available policies + selections
 					'policies'			: policies,
 					'selections'		: selections,
-					'selected_entry_id'	: 'shoppingcart', 
+					'selected_entry_id'	: menu_id, 
 					'misc' 				: manager,
+					'title' 			: get_title_from_menu_id(menu_id),
 				},
 				context_instance = RequestContext(request))
 
 @login_required
 @profile
 def processing(request):
+	menu_id = 'processing'
 	return render_to_response('processing.html', { 	
 						'plugins' 			: manager.plugins,
 						'processing_output' : PROCESSING_OUTPUT,
-						'selected_entry_id'	: 'processing',
+						'selected_entry_id'	: menu_id,
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -195,9 +208,11 @@ def preingestion(request):
 	Related to preIngestion step
 	"""
 	
+	menu_id = 'preingestion'
 	return render_to_response('preingestion.html', {	
 						'hostname'			: socket.gethostname(), 
-						'selected_entry_id'	: 'preingestion', 
+						'selected_entry_id'	: menu_id, 
+						'title' 			: get_title_from_menu_id(menu_id),
 					},
 					context_instance = RequestContext(request))
 
@@ -210,9 +225,11 @@ def ing(request):
 	"""
 
 	q = Image.objects.all().count()
+	menu_id = 'ing'
 	return render_to_response('ingestion.html', {	
 						'ingested' 			: q, 
-						'selected_entry_id'	: 'ing', 
+						'selected_entry_id'	: menu_id, 
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -224,8 +241,10 @@ def monitoring(request):
 	This is a callback function (as defined in django's urls.py file).
 	"""
 
+	menu_id = 'monitoring'
 	return render_to_response('monitoring.html', {	
-						'selected_entry_id'	: 'monitoring',
+						'selected_entry_id'	: menu_id,
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -243,10 +262,12 @@ def results(request):
 		if t.results_output_dir not in dirs:
 			dirs.append(t.results_output_dir)
 
+	menu_id = 'results'
 	return render_to_response('results.html', {	
 						'plugins' 			: manager.plugins, 
-						'selected_entry_id'	: 'results', 
+						'selected_entry_id'	: menu_id, 
 						'outputDirs' 		: dirs,
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -257,9 +278,11 @@ def reporting(request):
 	Page to generate reports.
 	"""
 
+	menu_id = 'reporting'
 	return render_to_response('reporting.html', {	
 						'plugins' 			: manager.plugins, 
-						'selected_entry_id'	: 'reporting', 
+						'selected_entry_id'	: menu_id, 
+						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -271,7 +294,11 @@ def tags(request):
 	This is a callback function (as defined in django's urls.py file).
 	"""
 
-	return render_to_response('tags.html', { 'selected_entry_id': 'tags' }, 
+	menu_id = 'tags'
+	return render_to_response('tags.html', { 
+					'selected_entry_id'	: menu_id,
+					'title' 			: get_title_from_menu_id(menu_id),
+				}, 
 			context_instance = RequestContext(request))
 
 @login_required
@@ -282,19 +309,23 @@ def render_plugin(request, pluginId):
 	except PluginManagerError, msg:
 		return HttpResponseNotFound("Error: %s" % msg)
 
+	menu_id = 'processing'
 	return render_to_response('processing_plugin.html', { 	
 						'plugin' 			: plugin,
-						'selected_entry_id'	: 'processing', 
+						'selected_entry_id'	: menu_id, 
 						'processing_output' : PROCESSING_OUTPUT,
+						'title' 			: plugin.id.capitalize(),
 					}, 
 					context_instance = RequestContext(request))
 
 @login_required
 @profile
 def soft_version_monitoring(request):
+	menu_id = 'monitoring'
 	return render_to_response( 'softs_versions.html', {	
 				'report' 			: len(SOFTS), 
-				'selected_entry_id'	: 'monitoring', 
+				'selected_entry_id'	: menu_id, 
+				'title' 			: get_title_from_menu_id(menu_id),
 			},
 			context_instance = RequestContext(request))
 
@@ -308,9 +339,11 @@ def show_ingestion_report(request, ingestionId):
 	else:
 		report = 'No report found... maybe the processing is not finished yet?'
 
+	menu_id = 'ing'
 	return render_to_response( 'ingestion_report.html', {	
 				'report' 			: report, 
-				'selected_entry_id'	: 'ing', 
+				'selected_entry_id'	: menu_id, 
+				'title' 			: get_title_from_menu_id(menu_id),
 			},
 			context_instance = RequestContext(request))
 
@@ -331,11 +364,13 @@ def single_result(request, pluginId, taskId):
 		# TODO: set a better page for that
 		return HttpResponseNotFound("""<h1><span style="color: red;">Result not found.</h1></span>""")
 
+	menu_id = 'results'
 	return render_to_response( 'single_result.html', {	
 					'pid' 				: pluginId, 
 					'tid'	 			: taskId,
-					'selected_entry_id'	: 'results', 
+					'selected_entry_id'	: menu_id, 
 					'plugin' 			: plugin,
+					'title' 			: get_title_from_menu_id(menu_id),
 				}, 
 				context_instance = RequestContext(request))
 
