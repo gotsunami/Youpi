@@ -97,13 +97,13 @@ var {{ plugin.id }} = {
 		var log = new Logger(pre);
 
 		if (path == selector.getExtra().title) {
-			
 			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
 			var sName = {{ plugin.id }}.ims.getSavedSelectionUsed() ? " <span class=saved_selection_used>" + {{ plugin.id }}.ims.getSavedSelectionUsed() + "</span>" : "";
 			log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection' + sName);
 			log.msg_status("Using output data path '" + output_data_path + "'");
 			log.msg_status("Using '<span class=saved_selection_used>" + config + "</span>' as configuration file");
 			log.msg_status('Checking <b>weight maps</b> availability (from QualityFITS)...');
+
 			{{ plugin.id }}.checkForQFITSData(pre, function() {
 				// Reset
 				{{ plugin.id }}.curSelectionIdx = 0;
@@ -388,6 +388,13 @@ var {{ plugin.id }} = {
 		var silent = typeof silent == 'boolean' ? silent : false;
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
+	
+		// Hide action controls
+		var tds = $(trid).select('td');
+		delImg = tds[0].select('img')[0].hide();
+		runDiv = tds[1].select('div.submitItem')[0].hide();
+		otherImgs = tds[1].select('img');
+		otherImgs.invoke('hide');
 
 		var r = new HttpRequest(
 				logdiv,
@@ -396,8 +403,11 @@ var {{ plugin.id }} = {
 				function(resp) {
 					r = resp['result'];
 					var success = update_condor_submission_log(resp, silent);
-					if (!success) return;
-	
+					if (!success) {
+						[delImg, runDiv].invoke('show');
+						otherImgs.invoke('show');
+						return;
+					}
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
 				}
