@@ -462,6 +462,13 @@ var {{ plugin.id }} = {
 		var txt = '';
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
+		
+		// Hide action controls
+		var tds = $(trid).select('td');
+		delImg = tds[0].select('img')[0].hide();
+		runDiv = tds[1].select('div.submitItem')[0].hide();
+		otherImgs = tds[1].select('img');
+		otherImgs.invoke('hide');
 	
 		var r = new HttpRequest(
 				logdiv,
@@ -470,8 +477,11 @@ var {{ plugin.id }} = {
 				function(resp) {
 					r = resp['result'];
 					var success = update_condor_submission_log(resp, silent);
-					if (!success) return;
-	
+					if (!success) {
+						[delImg, runDiv].invoke('show');
+						otherImgs.invoke('show');
+						return;
+					}
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
 				}

@@ -386,11 +386,11 @@ var {{ plugin.id }} = {
 		var silent = typeof silent == 'boolean' ? silent : false;
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
+	
+		// Hide action controls
 		var tds = $(trid).select('td');
-		delImg = tds[0].select('img')[0];
-		delImg.hide();
-		runDiv = tds[1].select('div.submitItem')[0];
-		runDiv.hide();
+		delImg = tds[0].select('img')[0].hide();
+		runDiv = tds[1].select('div.submitItem')[0].hide();
 		otherImgs = tds[1].select('img');
 		otherImgs.invoke('hide');
 
