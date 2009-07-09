@@ -173,6 +173,9 @@ class Swarp(ProcessingPlugin):
 		swif.write(string.join(imgPaths, '\n'))
 		swif.close()
 
+		xmlName = self.getConfigValue(content.split('\n'), 'XML_NAME')
+		xmlRootName = xmlName[:xmlName.rfind('.')]
+
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		userData = {'Kind'	 			: self.id,						# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),			# Mandatory for AMI, WP
@@ -185,7 +188,7 @@ class Swarp(ProcessingPlugin):
 					'UseQFITSWeights'	: int(useQFITSWeights),
 					'HeadPath'			: 'No .head files used',		# Default value
 					'UseHeadFiles'		: 0,							# Default value
-					'Descr'				: "%s of %d FITS images" % (self.optionLabel, len(images)),		# Mandatory for AMI
+					'Descr'				: "%s of %d FITS images, %s" % (self.optionLabel, len(images), str(xmlRootName)),	# Mandatory for AMI
 					'JobID' 			: self.getUniqueCondorJobId(),
 					'StartupDelay'		: step,
 		} 
@@ -519,7 +522,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		config = zlib.decompress(base64.decodestring(data.config))
 
 		return {	'TaskId'			: str(taskid),
-					'Title' 			: str("%s" % self.description),
+					'Title' 			: str("%s" % task.title),
 					'User' 				: str(task.user.username),
 					'Success' 			: task.success,
 					'Start' 			: str(task.start_date),
