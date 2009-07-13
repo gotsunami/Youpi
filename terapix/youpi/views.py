@@ -278,8 +278,15 @@ def reporting(request):
 	Page to generate reports.
 	"""
 
+	# Standard (non-plugin related) reports definition
+	reports = [
+		{'id': 'imssavedselections',	'title': 'List of saved selections from image selector'},
+	]
+	reports.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
+
 	menu_id = 'reporting'
 	return render_to_response('reporting.html', {	
+						'reports'			: reports,
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
 						'title' 			: get_title_from_menu_id(menu_id),
@@ -1144,6 +1151,25 @@ def upload_file(request):
 
 	return HttpResponse(str({'filename' : str(filename), 'length' : len(content), 'exit_code' : exitCode, 'error_msg' : errMsg }), mimetype = 'text/html')
 
+def get_global_report(request, reportId):
+	"""
+	Generates a global report.
+	@param reportId report Id
+	"""
+	post = request.POST
+	if reportId == 'imssavedselections':
+		from terapix.reporting.csv import CSVReport
+		sels = ImageSelections.objects.all().order_by('date')
+		content = []
+		k = 1
+		for s in sels:
+			content.append((k, s.name))
+			k += 1
+		if not content: return HttpResponse('No saved selections found', mimetype = 'text/plain')
+		return HttpResponse(CSVReport(data = content, separator = '\t'), mimetype = 'text/plain')
+
+	return HttpResponseNotFound('Report not found.')
+
 def get_report(request, pluginId, reportId):
 	"""
 	Generate a report
@@ -1151,8 +1177,12 @@ def get_report(request, pluginId, reportId):
 	try:
 		plugObj = manager.getPluginByName(pluginId)
 	except PluginManagerError:
-		# Not found
-		return HttpResponseNotFound()
+		# May be a global report (not plugin related)
+		if pluginId == 'global':
+			return get_global_report(request, reportId)
+		else:
+			# Not found
+			return HttpResponseNotFound()
 
 	return plugObj.getReport(request, reportId)
 

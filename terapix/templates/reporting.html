@@ -29,6 +29,9 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					<label>Report: </label>
 					<select id="report_select">
 						<option value="0">--</option>
+						{% for report in reports %}
+							<option value="{{ report.id }}">{{ report.title }}</option>
+						{% endfor %}
 						{% for plugin in plugins %}
 						<optgroup id="{{ plugin.id }}" label="{{ plugin.optionLabel }}">
 							{% for report in plugin.reports %}
@@ -65,12 +68,12 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		$('report_form').observe('submit', function() {
 			$('loading_div').update(getLoadingHTML('Please wait while generating report')).show();
 			var sel = $('report_select');
-			var selvalue = sel.options[sel.selectedIndex].value;
-			var group = sel.options[sel.selectedIndex].up().id;
-			if (selvalue == '0') {
-				return false;
-			}
-			$('report_form').action = '/youpi/report/' + group + '/' + selvalue + '/';
+			var opt = sel.options[sel.selectedIndex];
+			var selvalue = opt.value;
+			if (selvalue == '0') return false;
+			var grp = opt.up();
+			var type = grp != sel ? grp.id : 'global';
+			$('report_form').action = '/youpi/report/' + type + '/' + selvalue + '/';
 		});
 
 		// Hide options div
