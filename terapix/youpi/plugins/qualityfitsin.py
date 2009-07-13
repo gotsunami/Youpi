@@ -965,7 +965,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			SELECT t.success, t.title, t.start_date, u.username, t.hostname, t.clusterId, t.results_output_dir
 			FROM youpi_processing_task AS t, auth_user AS u, youpi_processing_kind AS k
 			WHERE t.user_id = u.id
-			AND kind_id = k.id
+			AND t.kind_id = k.id
 			AND k.name = '%s'
 			ORDER BY t.start_date
 			""" % self.id
@@ -978,6 +978,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				row = [status]
 				row.extend(r[1:])
 				content.append(row)
+			if not content: return HttpResponse('No results found', mimetype = 'text/plain')
 			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
 
 		elif reportId == 'gradestats':
