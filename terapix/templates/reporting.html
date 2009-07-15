@@ -33,11 +33,14 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 							<option value="{{ greport.id }}">{{ greport.title }}</option>
 						{% endfor %}
 						{% for plugin in plugins %}
-						<optgroup id="{{ plugin.id }}" label="{{ plugin.optionLabel }}">
+							{% if plugin.reports %}
+							<optgroup style="background: white url('/media/themes/{{ user.get_profile.guistyle }}/img/16x16/{{ plugin.id }}.png') no-repeat top left; padding: 3px; padding-left: 20px" 
+								id="{{ plugin.id }}" label="{{ plugin.optionLabel }}">
 							{% for report in plugin.reports %}
 							<option value="{{ report.id }}">{{ report.title }}</option>
 							{% endfor %}
 						</optgroup>
+							{% endif %}
 						{% endfor %}
 					</select>
 					<div id="reports_options">
