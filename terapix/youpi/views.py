@@ -277,15 +277,18 @@ def reporting(request):
 	"""
 	Page to generate reports.
 	"""
-
 	# Standard (non-plugin related) reports definition
+	selopts = """Select a processing type: <select name="kind_select">%s</select>""" % \
+			string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[1]), [(p.id, p.optionLabel) for p in manager.plugins]), '\n')
 	reports = [
-		{'id': 'imssavedselections',	'title': 'List of saved selections from image selector'},
+			{'id': 'imssavedselections',	'title': 'List of saved selections from image selector'},
+			{'id': 'procresults', 			'title': 'List of processing results', 'options': selopts},
 	]
 	reports.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
 	menu_id = 'reporting'
 	return render_to_response('reporting.html', {	
+						# Global reports
 						'reports'			: reports,
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
@@ -1167,6 +1170,34 @@ def get_global_report(request, reportId):
 			k += 1
 		if not content: return HttpResponse('No saved selections found', mimetype = 'text/plain')
 		return HttpResponse(CSVReport(data = content, separator = '\t'), mimetype = 'text/plain')
+
+	elif reportId == 'procresults':
+		try: kind = post['kind_select']
+		except Exception, e:
+			return HttpResponseRedirect('/youpi/reporting/')
+		from terapix.reporting.csv import CSVReport
+		from django.db import connection
+		cur = connection.cursor()
+		s = time.time()
+		q = """
+		SELECT t.success, t.title, t.start_date, u.username, t.hostname, t.clusterId, t.results_output_dir
+		FROM youpi_processing_task AS t, auth_user AS u, youpi_processing_kind AS k
+		WHERE t.user_id = u.id
+		AND t.kind_id = k.id
+		AND k.name = '%s'
+		ORDER BY t.start_date
+		""" % kind
+		cur.execute(q)
+		res = cur.fetchall()
+		content = []
+		for r in res:
+			status = 'F' # Failed
+			if r[0]: status = 'S'
+			row = [status]
+			row.extend(r[1:])
+			content.append(row)
+		if not content: return HttpResponse('No results found', mimetype = 'text/plain')
+		return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
 
 	return HttpResponseNotFound('Report not found.')
 

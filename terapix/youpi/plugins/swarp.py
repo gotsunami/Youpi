@@ -660,11 +660,7 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		Adds reporting capabilities to Swarp plugin
 		"""
 
-		rdata = [
-			{'id': 'procresults', 		'title': 'List of processing results'},
-		]
-		rdata.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
-
+		rdata = None
 		return rdata
 
 	def getReport(self, request, reportId):
@@ -673,30 +669,4 @@ queue""" %  {	'encuserdata' 	: encUserData,
 		@param reportId report Id as returned by the reports() function
 		"""
 		post = request.POST
-
-		if reportId == 'procresults':
-			from terapix.reporting.csv import CSVReport
-			from django.db import connection
-			cur = connection.cursor()
-			s = time.time()
-			q = """
-			SELECT t.success, t.title, t.start_date, u.username, t.hostname, t.clusterId, t.results_output_dir
-			FROM youpi_processing_task AS t, auth_user AS u, youpi_processing_kind AS k
-			WHERE t.user_id = u.id
-			AND t.kind_id = k.id
-			AND k.name = '%s'
-			ORDER BY t.start_date
-			""" % self.id
-			cur.execute(q)
-			res = cur.fetchall()
-			content = []
-			for r in res:
-				status = 'F' # Failed
-				if r[0]: status = 'S'
-				row = [status]
-				row.extend(r[1:])
-				content.append(row)
-			if not content: return HttpResponse('No results found', mimetype = 'text/plain')
-			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
-
 		return HttpResponseNotFound('Report not found.')
