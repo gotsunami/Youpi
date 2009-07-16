@@ -549,8 +549,12 @@ def process(userData, kind_id, argv):
 				raise WrapperError, e
 
 			# Copy XSL stylesheet
-			xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
-			copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
+			try:
+				xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+				copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
+			except TypeError, e:
+				# No custom XSL_URL value
+				pass
 
 			# Create thumbnails for group #1, if convert cmd available
 			if HAS_CONVERT:
@@ -600,8 +604,12 @@ def process(userData, kind_id, argv):
 				raise WrapperError, e
 
 			# Copy XSL stylesheet
-			xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
-			copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
+			try:
+				xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+				copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
+			except TypeError, e:
+				# No custom XSL_URL value
+				pass
 
 			# Gets image name
 			motif = "CHECKIMAGE_NAME"
@@ -667,19 +675,22 @@ def process(userData, kind_id, argv):
 				raise WrapperError, e
 
 			# Copy XSL stylesheet
-			xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
-			copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
+			try:
+				xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+				copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
+			except TypeError, e:
+				# No custom XSL_URL value
+				pass
 
 			# Gets image name
 			imgout = getConfigValue(configContent, 'IMAGEOUT_NAME')
-
-			# Converts produced FITS image into PNG format
-			tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
-			os.system("%s %s -OUTFILE_NAME %s -BINNING 40 2>/dev/null" % (CMD_STIFF, imgout, tiff))
-
-			os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'swarp.png')))
-			if HAS_CONVERT:
-				os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
+			if imgout:
+				# Converts produced FITS image into PNG format
+				tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
+				os.system("%s %s -OUTFILE_NAME %s -BINNING 40 2>/dev/null" % (CMD_STIFF, imgout, tiff))
+				os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'swarp.png')))
+				if HAS_CONVERT:
+					os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
 	else:
 		# Put other processing stuff here
 		pass

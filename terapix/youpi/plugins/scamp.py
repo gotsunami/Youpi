@@ -314,13 +314,17 @@ notify_user             = monnerville@iap.fr
 		except ValueError:
 			raise ValueError, userData
 
-		xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
-		scamp_params = "-XSL_URL %s" % os.path.join(WWW_SCAMP_PREFIX, 
-													request.user.username, 
-													userData['Kind'], 
-													userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
-													os.path.basename(xslPath)
-										)
+		try:
+			xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
+			scamp_params = "-XSL_URL %s" % os.path.join(WWW_SCAMP_PREFIX, 
+														request.user.username, 
+														userData['Kind'], 
+														userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+														os.path.basename(xslPath)
+											)
+		except TypeError, e:
+			# No custom XSL_URL value
+			scamp_params = ''
 
 		condor_submit_entry = """
 # YOUPI_USER_DATA = %(userdata)s

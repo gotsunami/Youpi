@@ -295,13 +295,17 @@ notify_user             = monnerville@iap.fr
 		except ValueError:
 			raise ValueError, userData
 
-		xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
-		swarp_params = "-XSL_URL %s" % os.path.join(WWW_SWARP_PREFIX, 
-													request.user.username, 
-													userData['Kind'], 
-													userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
-													os.path.basename(xslPath)
-										)
+		try:
+			xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
+			swarp_params = "-XSL_URL %s" % os.path.join(WWW_SWARP_PREFIX, 
+														request.user.username, 
+														userData['Kind'], 
+														userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+														os.path.basename(xslPath)
+											)
+		except TypeError, e:
+			# No custom XSL_URL value
+			swarp_params = ''
 
 		# Now generates the preprocessing Python script needed to be able 
 		# to uncompress all .fz weight maps
