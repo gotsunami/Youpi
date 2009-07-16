@@ -435,12 +435,13 @@ notify_user             = semah@iap.fr
 			userData['JobID'] = self.getUniqueCondorJobId()
 
 			# Parameters to use for each job
-			sex_params = "-XSL_URL %s/sextractor.xsl  -FILTER_NAME %s -WRITE_XML YES " % (os.path.join(	
-																						WWW_SEX_PREFIX, 
+			xslPath = re.search(r'file://(.*)$', self.getConfigValue(contconf.split('\n'), 'XSL_URL')).group(1)
+			sex_params = "-XSL_URL %s  -FILTER_NAME %s -WRITE_XML YES " % (os.path.join(WWW_SEX_PREFIX, 
 																						request.user.username, 
 																						userData['Kind'], 
-																						userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]),
-																						'sex.default.conv')
+																						userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+																						os.path.basename(xslPath)
+																					), 'sex.default.conv')
 			#Addding weight support 
 			if weightPath:
 				if not os.path.exists(weight):

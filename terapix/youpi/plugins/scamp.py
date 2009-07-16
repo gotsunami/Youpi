@@ -314,10 +314,13 @@ notify_user             = monnerville@iap.fr
 		except ValueError:
 			raise ValueError, userData
 
-		scamp_params = "-XSL_URL %s/scamp.xsl" % os.path.join(	WWW_SCAMP_PREFIX, 
-																request.user.username, 
-																userData['Kind'], 
-																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+		xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
+		scamp_params = "-XSL_URL %s" % os.path.join(WWW_SCAMP_PREFIX, 
+													request.user.username, 
+													userData['Kind'], 
+													userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+													os.path.basename(xslPath)
+										)
 
 		condor_submit_entry = """
 # YOUPI_USER_DATA = %(userdata)s
