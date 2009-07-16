@@ -625,7 +625,7 @@ def process(userData, kind_id, argv):
 					os.system(CMD_SWARP + " %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (cur + '.fits', os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
 					# Converts produced FITS image into PNG format
 					tiff = os.path.join(userData['ResultsOutputDir'], cur + '.tif')
-					os.system("%s %s -OUTFILE_NAME %s  2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'temp.fits'), tiff))
+					os.system("%s %s -OUTFILE_NAME %s 2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'temp.fits'), tiff))
 					os.remove(os.path.join(userData['ResultsOutputDir'], 'temp.fits'))
 
 					os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], cur + '.png')))
@@ -671,7 +671,7 @@ def process(userData, kind_id, argv):
 			copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
 
 			# Gets image name
-			imgout = getConfigValue(userData['ConfigFile'].split('\n'), 'IMAGEOUT_NAME')
+			imgout = getConfigValue(configContent, 'IMAGEOUT_NAME')
 
 			# Converts produced FITS image into PNG format
 			tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
