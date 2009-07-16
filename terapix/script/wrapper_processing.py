@@ -519,7 +519,9 @@ def process(userData, kind_id, argv):
 			pipe.close()
 
 			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
-			shutil.copy(xslPath, userData['ResultsOutputDir'])
+			try: shutil.copy(xslPath, userData['ResultsOutputDir'])
+			except IOError, e:
+				print "[WARNING] Unable to copy XSL file to output directory: %s" %e
 
 			# Create thumbnails for group #1, if convert cmd available
 			if HAS_CONVERT:
@@ -574,7 +576,9 @@ def process(userData, kind_id, argv):
 			pipe.close()
 
 			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
-			shutil.copy(xslPath, userData['ResultsOutputDir'] +'/')
+			try: shutil.copy(xslPath, userData['ResultsOutputDir'] +'/')
+			except IOError, e:
+				print "[WARNING] Unable to copy XSL file to output directory: %s" %e
 
 			# Gets image name
 			motif = "CHECKIMAGE_NAME"
@@ -645,7 +649,9 @@ def process(userData, kind_id, argv):
 			pipe.close()
 
 			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
-			shutil.copy(xslPath, userData['ResultsOutputDir'])
+			try: shutil.copy(xslPath, userData['ResultsOutputDir'])
+			except IOError, e:
+				print "[WARNING] Unable to copy XSL file to output directory: %s" %e
 
 			# FIXME: use custom ConfigFile instead of default one
 			pipe = os.popen(CMD_SWARP + " -dd|grep IMAGEOUT_NAME 2>&1") 
