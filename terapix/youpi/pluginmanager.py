@@ -71,6 +71,7 @@ class ProcessingPlugin:
 	def getConfigValue(self, content, keyword):
 		"""
 		Parses all lines of content looking for a keyword.
+		Content must be a list of strings.
 		Blank lines are skipped. Comments starting by # are ignored
 		Keyword search is case-sensitive.
 		@param content list of strings

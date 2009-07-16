@@ -33,6 +33,7 @@ username = NULLSTRING
 
 # Hold per-user output directory
 CLUSTER_OUTPUT_PATH = NULLSTRING
+RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO 
 
 # Custom exceptions
 class WrapperError(Exception): pass
@@ -43,6 +44,40 @@ def getNowDateTime(lt = time.time()):
 	Returns local date time
 	"""
 	return "%4d-%02d-%02d %02d:%02d:%02d" % time.localtime(lt)[:6]
+
+def copyFileChmodAll(fileName, targetDir):
+	"""
+	Copy the file fileName to target directory targetDir and 
+	chmod the file with the 666 permissions
+	@param fileName full path to file
+	@param targetDir destination directory
+	"""
+
+	try: 
+		shutil.copy(fileName, targetDir)
+		os.chmod(os.path.join(targetDir, os.path.basename(fileName)), RWX_ALL)
+	except Exception, e:
+		print "[WARNING] Unable to copy file %s to output directory %s: %s" % (fileName, targetDir, e)
+
+# FIXME: duplicated in PluginManager class...
+def getConfigValue(content, keyword):
+	"""
+	Parses all lines of content looking for a keyword.
+	Content must be a list of strings.
+	Blank lines are skipped. Comments starting by # are ignored
+	Keyword search is case-sensitive.
+	@param content list of strings
+	@param keyword word search in content
+	@returns keyword's value or False
+	"""
+	for line in content:
+		if line.find(keyword) != -1:
+			line = re.sub(r'#.*$', '', line[:-1])
+			res = [k for k in re.split(r'[ \t]', line) if len(k)]
+			try: return res[1]
+			except: return False
+
+	return False
 
 def getJobClusterId(userData):
 	"""
@@ -489,6 +524,7 @@ def process(userData, kind_id, argv):
 			# FIXME: look for scamp.xml; parse it and look for errors in it
 			success = 1
 
+			configContent = open(os.path.basename(userData['ConfigFile']), 'r').readlines()
 			try:
 				if HAS_CONVERT:
 					convert = 1
@@ -499,7 +535,7 @@ def process(userData, kind_id, argv):
 							#
 							# Scamp config file serialization: base64 encoding over zlib compression
 							#
-							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							config = base64.encodestring(zlib.compress(string.join(configContent, ''), 9)).replace('\n', ''),
 							ldac_files = base64.encodestring(marshal.dumps(userData['LDACFiles'])).replace('\n', ''),
 							www = os.path.join(	WWW_SCAMP_PREFIX, 
 												username, 
@@ -513,15 +549,8 @@ def process(userData, kind_id, argv):
 				raise WrapperError, e
 
 			# Copy XSL stylesheet
-			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen(CMD_SCAMP + " -dd|grep XSL_URL 2>&1") 
-			data = pipe.readlines()
-			pipe.close()
-
-			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
-			try: shutil.copy(xslPath, userData['ResultsOutputDir'])
-			except IOError, e:
-				print "[WARNING] Unable to copy XSL file to output directory: %s" %e
+			xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+			copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
 
 			# Create thumbnails for group #1, if convert cmd available
 			if HAS_CONVERT:
@@ -540,6 +569,7 @@ def process(userData, kind_id, argv):
 		if exit_code == 0:
 			success = 1
 
+			configContent = open(os.path.basename(userData['ConfigFile']), 'r').readlines()
 			try:
 				if HAS_CONVERT:
 					convert = 1
@@ -557,7 +587,7 @@ def process(userData, kind_id, argv):
 							#
 							# Sex config file serialization: base64 encoding over zlib compression
 							#
-							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							config = base64.encodestring(zlib.compress(string.join(configContent, ''), 9)).replace('\n', ''),
 							param  = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ParamFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
 							www = os.path.join(	WWW_SEX_PREFIX, 
 												username, 
@@ -570,15 +600,8 @@ def process(userData, kind_id, argv):
 				raise WrapperError, e
 
 			# Copy XSL stylesheet
-			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen(CMD_SEX + " -dd|grep XSL_URL 2>&1") 
-			data = pipe.readlines()
-			pipe.close()
-
-			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
-			try: shutil.copy(xslPath, userData['ResultsOutputDir'] +'/')
-			except IOError, e:
-				print "[WARNING] Unable to copy XSL file to output directory: %s" %e
+			xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+			copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
 
 			# Gets image name
 			motif = "CHECKIMAGE_NAME"
@@ -617,6 +640,7 @@ def process(userData, kind_id, argv):
 			# FIXME: look for swarp.xml; parse it and look for errors in it
 			success = 1
 
+			configContent = open(os.path.basename(userData['ConfigFile']), 'r').readlines()
 			try:
 				if HAS_CONVERT:
 					convert = 1
@@ -627,7 +651,7 @@ def process(userData, kind_id, argv):
 							#
 							# Swarp config file serialization: base64 encoding over zlib compression
 							#
-							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							config = base64.encodestring(zlib.compress(string.join(configContent, ''), 9)).replace('\n', ''),
 							www = os.path.join(	WWW_SWARP_PREFIX, 
 												username, 
 												userData['Kind'], 
@@ -643,23 +667,11 @@ def process(userData, kind_id, argv):
 				raise WrapperError, e
 
 			# Copy XSL stylesheet
-			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen(CMD_SWARP + " -dd|grep XSL_URL 2>&1") 
-			data = pipe.readlines()
-			pipe.close()
-
-			xslPath = re.search(r'file://(.*)$', data[0]).group(1)
-			try: shutil.copy(xslPath, userData['ResultsOutputDir'])
-			except IOError, e:
-				print "[WARNING] Unable to copy XSL file to output directory: %s" %e
-
-			# FIXME: use custom ConfigFile instead of default one
-			pipe = os.popen(CMD_SWARP + " -dd|grep IMAGEOUT_NAME 2>&1") 
-			data = pipe.readlines()
-			pipe.close()
+			xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+			copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
 
 			# Gets image name
-			imgout = re.search(r'(\w+.fits)', data[0]).group(1)
+			imgout = getConfigValue(userData['ConfigFile'].split('\n'), 'IMAGEOUT_NAME')
 
 			# Converts produced FITS image into PNG format
 			tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
@@ -716,7 +728,6 @@ def init_job(userData):
 	custom_dir = userData['ResultsOutputDir']
 
 	try:
-		RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO 
 		if not os.path.isdir(CLUSTER_OUTPUT_PATH):
 			if not os.path.isdir(user_path):
 				os.mkdir(user_path)

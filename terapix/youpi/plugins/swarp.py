@@ -295,10 +295,13 @@ notify_user             = monnerville@iap.fr
 		except ValueError:
 			raise ValueError, userData
 
-		swarp_params = "-XSL_URL %sswarp.xsl" % os.path.join(	WWW_SWARP_PREFIX, 
-																request.user.username, 
-																userData['Kind'], 
-																userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] )
+		xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
+		swarp_params = "-XSL_URL %s" % os.path.join(WWW_SWARP_PREFIX, 
+													request.user.username, 
+													userData['Kind'], 
+													userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+													os.path.basename(xslPath)
+										)
 
 		# Now generates the preprocessing Python script needed to be able 
 		# to uncompress all .fz weight maps
