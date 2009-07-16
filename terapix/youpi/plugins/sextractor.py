@@ -290,7 +290,7 @@ class Sextractor(ProcessingPlugin):
 		csf = open(csfPath, 'w')
 		images = Image.objects.filter(id__in = idList)
 
-		xmlName = self.getConfigValue(content.split('\n'), 'XML_NAME')
+		xmlName = self.getConfigValue(contconf.split('\n'), 'XML_NAME')
 		xmlRootName = xmlName[:xmlName.rfind('.')]
 			
 		# Content of YOUPI_USER_DATA env variable passed to Condor

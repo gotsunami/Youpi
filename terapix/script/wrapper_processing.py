@@ -398,6 +398,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 				g.setTableName('youpi_plugin_sex')
 				g.insert(	task_id = int(task_id),
 							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+							param  = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ParamFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
 							www = os.path.join(	WWW_SEX_PREFIX, 
 												username, 
 												userData['Kind'], 

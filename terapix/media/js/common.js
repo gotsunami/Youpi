@@ -1083,12 +1083,13 @@ var ResultsHelpers = {
 						dr.send('/youpi/results/delete/', $H({TaskId: taskId}).toQueryString());
 					});
 				});
-				if (!$('task_perms_del_div')) {
-					var ddiv = new Element('div', {id: 'task_perms_del_div'});
+				var ddiv = $('task_perms_del_div');
+				if (!ddiv) {
+					ddiv = new Element('div', {id: 'task_perms_del_div'});
 					ddiv.insert('You can ').insert(delb).insert(' this processing');
 					td.insert(ddiv);
 				}
-				$('task_perms_del_div').show();
+				ddiv.show();
 			}
 			else {
 				// No user write permission
