@@ -72,7 +72,7 @@ def getConfigValue(content, keyword):
 	"""
 	for line in content:
 		if line.find(keyword) != -1:
-			line = re.sub(r'#.*$', '', line[:-1])
+			line = re.sub(r'#.*$', '', line)
 			res = [k for k in re.split(r'[ \t]', line) if len(k)]
 			try: return res[1]
 			except: return False
