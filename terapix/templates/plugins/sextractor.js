@@ -34,7 +34,7 @@ var {{ plugin.id }} = {
 		$('single','dual').each( function(id) {
 			var chk = id.select('input')[0];
 			if(chk.checked) {
-				if(id.value == 'single') {
+				if(chk.value == 'single') {
 					sels = {{ plugin.id }}.ims1.getListsOfSelections();
 					sels2 = null;
 				}
@@ -209,7 +209,6 @@ var {{ plugin.id }} = {
 		// global var defined in results.html
 		var resp = output_dir_stats_data;
 		var stats = resp['Stats'];
-	
 		var tab = new Element('table', {'class': 'output_dir_stats'});
 		var tr,th,td;
 		var tr = new Element('tr');
@@ -592,8 +591,6 @@ var {{ plugin.id }} = {
 			td.insert(cdiv);
 			tr.insert(td);
 			tab2.insert(tr);
-
-			return;
 		}
 	
 		d.insert(tab);
