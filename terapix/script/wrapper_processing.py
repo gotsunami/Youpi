@@ -39,10 +39,19 @@ RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO
 class WrapperError(Exception): pass
 class ExitError(Exception): pass
 
-def getNowDateTime(lt = time.time()):
+def debug(msg):
+	"""
+	Prints message to stdout
+	"""
+	print "[YWP@%s] %s" % (getNowDateTime()[-8:], msg)
+	sys.stdout.flush()
+
+def getNowDateTime(lt = None):
 	"""
 	Returns local date time
 	"""
+	if not lt:
+		lt = time.time()
 	return "%4d-%02d-%02d %02d:%02d:%02d" % time.localtime(lt)[:6]
 
 def copyFileChmodAll(fileName, targetDir):
@@ -52,12 +61,15 @@ def copyFileChmodAll(fileName, targetDir):
 	@param fileName full path to file
 	@param targetDir destination directory
 	"""
-
 	try: 
 		shutil.copy(fileName, targetDir)
-		os.chmod(os.path.join(targetDir, os.path.basename(fileName)), RWX_ALL)
 	except Exception, e:
-		print "[WARNING] Unable to copy file %s to output directory %s: %s" % (fileName, targetDir, e)
+		debug("[Warning] Unable to copy file %s to output directory %s (%s)" % (fileName, targetDir, e))
+		return
+	
+	try: os.chmod(os.path.join(targetDir, os.path.basename(fileName)), RWX_ALL)
+	except Exception, e:
+		pass
 
 # FIXME: duplicated in PluginManager class...
 def getConfigValue(content, keyword):
@@ -250,7 +262,7 @@ AND r.image_id=i.id;
 		raise WrapperError, e
 
 	if not fxdata:
-		print log
+		debug(log)
 		return
 
 	try:
@@ -267,7 +279,7 @@ AND r.image_id=i.id;
 		raise WrapperError, e
 
 	# For debugging purpose
-	print log
+	debug(log)
 
 def task_start_log(userData, start, kind_id = None):
 	
@@ -457,7 +469,7 @@ def process(userData, kind_id, argv):
 		# transferred... (see Swarp plugin code for a fix)
 		fzs = glob.glob('*.fits.fz')
 		for fz in fzs:
-			print "SEx PREPROCESSING: uncompressing", fz
+			debug("Sextractor Preprocessing: uncompressing %s" % fz)
 			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
 
 
@@ -465,10 +477,13 @@ def process(userData, kind_id, argv):
 
 
 	# Execute process, waiting for completion
+	cmd_line = string.join(argv, ' ')
+	debug("Executing command line: %s\n" % cmd_line)
 	try:
-		exit_code = os.system(string.join(argv, ' '))
+		exit_code = os.system(cmd_line)
 	except:
 		pass
+	debug("\nCommand line execution terminated (code %d)" % exit_code)
 
 	(imgName, task_id, g) = task_start_log(userData, start, kind_id)
 
@@ -476,6 +491,7 @@ def process(userData, kind_id, argv):
 	################### POST-PROCESSING STUFF GOES HERE ########################################
 
 
+	debug("Beginning post-processing operations")
 	# QualityFITS-In processing
 	if kind == 'fitsin':
 		if exit_code == 0:
@@ -531,6 +547,7 @@ def process(userData, kind_id, argv):
 					convert = 1
 				else:
 					convert = 0
+					debug("[Warning] convert utility not found. No thumbnails will be generated")
 				g.setTableName('youpi_plugin_scamp')
 				g.insert(	task_id = int(task_id),
 							#
@@ -559,6 +576,7 @@ def process(userData, kind_id, argv):
 
 			# Create thumbnails for group #1, if convert cmd available
 			if HAS_CONVERT:
+				debug("Creating image thumbnails for group #1")
 				olds = 	glob.glob(os.path.join(userData['ResultsOutputDir'], 'tn_*.png'))
 				for old in olds:
 					os.remove(old)
@@ -580,6 +598,7 @@ def process(userData, kind_id, argv):
 					convert = 1
 				else:
 					convert = 0
+					debug("[Warning] convert utility not found. No thumbnails will be generated")
 				g.setTableName('youpi_plugin_sex')
 				g.insert(	task_id = int(task_id),
 							weightPath = userData['Weight'],
@@ -639,6 +658,7 @@ def process(userData, kind_id, argv):
 
 					os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], cur + '.png')))
 					if HAS_CONVERT:
+						debug("Creating image thumbnails")
 						os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_' + cur + '.png')))
 				
 					os.remove(tiff)
@@ -655,6 +675,7 @@ def process(userData, kind_id, argv):
 					convert = 1
 				else:
 					convert = 0
+					debug("[Warning] convert utility not found. No thumbnails will be generated")
 				g.setTableName('youpi_plugin_swarp')
 				g.insert(	task_id = int(task_id),
 							#
@@ -691,7 +712,10 @@ def process(userData, kind_id, argv):
 				os.system("%s %s -OUTFILE_NAME %s -BINNING 40 2>/dev/null" % (CMD_STIFF, imgout, tiff))
 				os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'swarp.png')))
 				if HAS_CONVERT:
+					debug("Creating image thumbnails")
 					os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
+			else:
+				debug("[Warning] IMAGEOUT_NAME keyword not found in configuration file")
 	else:
 		# Put other processing stuff here
 		pass
@@ -702,12 +726,14 @@ def process(userData, kind_id, argv):
 
 	task_end_log(userData, g, storeLog, task_id, success, kind)
 
-	print "WRAPPER PROCESSING: Exiting"
-	sys.exit(0)
+	debug("Post-processing operations terminated");
+	debug("Exited (code %d)" % exit_code)
+	sys.exit(exit_code)
 
 
 def init_job(userData):
 	global username
+	debug("Checking/setting environment before running job")
 
 	db = DB(host = DATABASE_HOST,
 			user = DATABASE_USER,
@@ -761,12 +787,14 @@ def init_job(userData):
 	except Exception, e:
 		error_msg = "Could not create CLUSTER_OUTPUT_PATH directory (%s): %s\n\n*** Maybe check for a NFS issue (automount)?" % (CLUSTER_OUTPUT_PATH, e)
 		error_msg += "\nResultsOutputDir=" + custom_dir
+		debug("[Error] " + error_msg)
 		start = getNowDateTime(time.time())
 		imgName, task_id, g = task_start_log(userData, start)
 		task_end_log(userData, g, error_msg, task_id, 0, userData['Kind'])
 		sys.exit(1)
 
 	# Run processing
+	debug("Checks complete, processing data...")
 	process(userData, res[0][0], sys.argv[2:])
 
 
@@ -785,7 +813,7 @@ if __name__ == '__main__':
 			raise WrapperError, "Could not access biguserdata: %s" % e
 		userData.update(marshal.loads(base64.decodestring(data)))
 	except KeyError:
-		print "No userdata file passed"
+		debug('No userdata file passed')
 		pass
 
 	# Connection object to MySQL database 
@@ -804,9 +832,9 @@ if __name__ == '__main__':
 				task_end_log(userData, g, error_msg, task_id, 0, userData['Kind'])
 				sys.exit(1)
 		else:
-			print "Error %s: %s" % (code, msg)
+			debug("[Error] %s: %s" % (code, msg))
 			sys.exit(1)
 
 	except IndexError, e:
-		print "Error:", e
+		debug("[Error] %s" % e)
 		sys.exit(1)
