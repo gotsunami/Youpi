@@ -574,7 +574,7 @@ var {{ plugin.id }} = {
 										style: 'padding-right: 5px;'
 		});
 		tdiv.insert(img);
-		tdiv.insert(resp['Duration']);
+		tdiv.insert(resp.Duration + ' on').insert(new Element('br')).insert(resp.Hostname);
 		tr = new Element('tr');
 		td = new Element('td', {style: 'border-bottom: 2px #5b80b2 solid'});
 		td.insert(tdiv);
