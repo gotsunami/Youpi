@@ -799,6 +799,23 @@ var {{ plugin.id }} = {
 			tr.insert(td);
 			tab2.insert(tr);
 		}
+		else {
+			// Stack image
+			tr = new Element('tr');
+			td = new Element('td', {colspan: '2'}).addClassName('qfits-result-header-title');
+			td.insert('Stack Image');
+			tr.insert(td);
+			tab2.insert(tr);
+
+			tr = new Element('tr');
+			td = new Element('td');
+			td.insert('Final stack name:');
+			tr.insert(td);
+			td = new Element('td');
+			td.insert(resp.ResultsOutputDir + resp.StackName);
+			tr.insert(td);
+			tab2.insert(tr);
+		}
 	
 		d.insert(tab);
 		container.insert(d);
