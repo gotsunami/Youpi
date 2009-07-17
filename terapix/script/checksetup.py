@@ -148,10 +148,19 @@ def setup_db():
 			pass
 
 	# Add default parameter file for Sextractor (sex.param.default)
+
+	try:
+		name = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.param.default')
+		f = open(name, 'r')
+		param = string.join(f.readlines())
+		f.close()
+	except IOError, e:
+		print "!", name
+
 	try:
 		t = ConfigType.objects.filter(name = 'param')[0]
 		k = Processing_kind.objects.filter(name__exact = 'sex')[0]
-		m = ConfigFile(kind = k, name = 'default', content = config, type = t, user = user, group = p.dflt_group, mode = p.dflt_mode)
+		m = ConfigFile(kind = k, name = 'default', content = param, type = t, user = user, group = p.dflt_group, mode = p.dflt_mode)
 		m.save()
 	except:
 		# Cannot save, already exits: do nothing
