@@ -385,6 +385,7 @@ table.qfits-result-history td.reprocess img {
 
 table.qfits-result-history tr.history-current td {
 	font-weight: bold;
+	background-color: #fff3bb;
 }
 
 div.reprocess {
