@@ -314,13 +314,21 @@ notify_user             = monnerville@iap.fr
 
 # AUTOMATICALLY GENERATED SCRIPT. DO NOT EDIT
 
-import os, glob, sys
+import os, glob, sys, time
+
+def debug(msg):
+	print "[YWP@%s] %s" % ("%02d:%02d:%02d" % time.localtime(time.time())[3:6], msg)
+	sys.stdout.flush()
 
 # PRE-PROCESSING stuff go there
 fzs = glob.glob('*.fits.fz')
 for fz in fzs:
-	print "SWARP PREPROCESSING: uncompressing", fz
-	os.system(" """[:-1] + CMD_IMCOPY + """ %s %s" % (fz, fz[:-3]))
+	msg = "Swarp Preprocessing: uncompressing %s - " % fz
+	exit_code = os.system(" """[:-1] + CMD_IMCOPY + """ %s %s" % (fz, fz[:-3]))
+	if exit_code == 0:
+		debug(msg + "OK")
+	else:
+		debug(msg + "ERROR code %s" % exit_code)
 
 # Finally run swarp
 """
