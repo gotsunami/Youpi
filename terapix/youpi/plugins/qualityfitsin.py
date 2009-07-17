@@ -929,7 +929,6 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			{'id': 'nongraded', 	'title': 'List of all non graded images', 'options': nongopts},
 			{'id': 'onegrade', 		'title': 'List of all images with a selected grade', 'options': oneopts},
 			{'id': 'piegrades', 	'title': 'Pie Chart of grades'},
-			{'id': 'procresults', 		'title': 'List of processing results'},
 		]
 		rdata.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
@@ -954,32 +953,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 			from terapix.script.grading import get_grades
 			from terapix.reporting.csv import CSVReport
 			res = get_grades()
-			return HttpResponse(CSVReport(data = get_grades()), mimetype = 'text/plain')
-
-		elif reportId == 'procresults':
-			from terapix.reporting.csv import CSVReport
-			from django.db import connection
-			cur = connection.cursor()
-			s = time.time()
-			q = """
-			SELECT t.success, t.title, t.start_date, u.username, t.hostname, t.clusterId, t.results_output_dir
-			FROM youpi_processing_task AS t, auth_user AS u, youpi_processing_kind AS k
-			WHERE t.user_id = u.id
-			AND t.kind_id = k.id
-			AND k.name = '%s'
-			ORDER BY t.start_date
-			""" % self.id
-			cur.execute(q)
-			res = cur.fetchall()
-			content = []
-			for r in res:
-				status = 'F' # Failed
-				if r[0]: status = 'S'
-				row = [status]
-				row.extend(r[1:])
-				content.append(row)
-			if not content: return HttpResponse('No results found', mimetype = 'text/plain')
-			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
+			return HttpResponse(str(CSVReport(data = get_grades())), mimetype = 'text/plain')
 
 		elif reportId == 'gradestats':
 			from django.db import connection
@@ -1087,7 +1061,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
 				content.append((rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
 			if not usergrades: return HttpResponse('No images are graded ' + grade, mimetype = 'text/plain')
-			return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
+			return HttpResponse(str(CSVReport(data = content)), mimetype = 'text/plain')
 
 		elif reportId == 'nongraded':
 			try:

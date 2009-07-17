@@ -1169,7 +1169,7 @@ def get_global_report(request, reportId):
 			content.append((k, s.name))
 			k += 1
 		if not content: return HttpResponse('No saved selections found', mimetype = 'text/plain')
-		return HttpResponse(CSVReport(data = content, separator = '\t'), mimetype = 'text/plain')
+		return HttpResponse(str(CSVReport(data = content, separator = '\t')), mimetype = 'text/plain')
 
 	elif reportId == 'procresults':
 		try: kind = post['kind_select']
@@ -1197,7 +1197,7 @@ def get_global_report(request, reportId):
 			row.extend(r[1:])
 			content.append(row)
 		if not content: return HttpResponse('No results found', mimetype = 'text/plain')
-		return HttpResponse(CSVReport(data = content), mimetype = 'text/plain')
+		return HttpResponse(str(CSVReport(data = content)), mimetype = 'text/plain')
 
 	return HttpResponseNotFound('Report not found.')
 
