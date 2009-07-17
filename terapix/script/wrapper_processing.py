@@ -483,7 +483,7 @@ def process(userData, kind_id, argv):
 		exit_code = os.system(cmd_line)
 	except:
 		pass
-	debug("\nCommand line execution terminated (code %d)" % exit_code)
+	debug("Command line execution terminated (code %d)" % exit_code)
 
 	(imgName, task_id, g) = task_start_log(userData, start, kind_id)
 
@@ -799,6 +799,7 @@ def init_job(userData):
 
 
 if __name__ == '__main__':
+	debug("Wrapper processing script started")
 	#
 	# De-serialize data passed as a string into arg 1
 	#
