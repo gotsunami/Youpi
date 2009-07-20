@@ -8,7 +8,6 @@ graph mcd {
 
 	/* Entities */
 	node [shape=record];
-	calib [label="{ Calibration Kit | [ Calibration Kit Id ]\nName\nBad pixel mask\nFlat field }"];
 	cartitem [label="{ Cart Item | [ Cart Item Id ]\nName\nData\nMode }"];
 	channel [label="{ Channel | [ Channel Id ]\nName\nWavelength\nUrl\nWavecurve\nTranscurve\nMag offsets }"];
 	configfile [label="{ Config File | [ Config Id ]\nContent\nData\nMode }"];
@@ -45,7 +44,6 @@ graph mcd {
 	node8 [label="belongs to"];
 	node10 [label="coaddition"];
 	node12 [label="observed through"];
-	node13 [label="processed with"];
 	node14 [label="is captured by"];
 	node15 [label="{ is run by | Start Time\nEnd Time}", style=dashed, shape=Mrecord, color=green];
 	node17 [label="is processed by"];
@@ -95,9 +93,6 @@ graph mcd {
 
 	image -- node31 [label="  0,n"];
 	node31 -- tag [label="  0,n"];
-
-	image -- node13 [label="  0,1"];
-	node13 -- calib [label="  1,n"];
 
 	task -- node35 [label="  1,1", style=dashed, color=brown];
 	tag -- node35 [label="  1,1", style=dashed, color=brown];

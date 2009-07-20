@@ -10,7 +10,6 @@ digraph codasyl {
 	"FITS Tables";
 
 	/* Linked records */
-	calib [label="Calibration Kit"];
 	imgsel [label="Image Selections"];
 	task [label="Processing Task"];
 	relri [label="Run-Image Relation"];
@@ -39,7 +38,6 @@ digraph codasyl {
 	condornodesel [label="Condor Node Selections"];
 
 	/* Sets */
-	calib -> Image;
 	Channel -> Image;
 	Ingestion -> Image;
 	Instrument -> Image;

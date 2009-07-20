@@ -600,12 +600,9 @@ def run_ingestion():
 		
 		if detector == 'MegaCam' or  i == 'MegaPrime':
 			iname = 'Megacam'
-			idCalibrationKit = 1
 	
 		elif detector == 'WIRCam' or i == 'WIRCam':
 			iname = 'Wircam'
-			idCalibrationKit = 2
-	
 		else:
 			# TODO: other type of detector ?
 			debug("Could not detect image's instrument type. Skipping...", WARNING)
@@ -649,7 +646,6 @@ def run_ingestion():
 				alpha = ra,
 				delta = de,
 				channel_id = res[0][1],
-				calibrationkit_id = idCalibrationKit,
 				ingestion_id = ingestionId,
 				instrument_id = res[0][2]
 			)

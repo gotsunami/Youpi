@@ -7,7 +7,6 @@
 Record-Table name mappings
 CODASYL Record name;DB table name;Django's class(model) name
 
-Calibration Kit;<emphasis>youpi_calibrationkit</emphasis>;<emphasis>CalibrationKit</emphasis>
 Cart Item;<emphasis>youpi_cartitem</emphasis>;<emphasis>CartItem</emphasis>
 Channel;<emphasis>youpi_channel</emphasis>;<emphasis>Channel</emphasis>
 Coaddition;<emphasis>youpi_coaddition</emphasis>;<emphasis>Coaddition</emphasis>

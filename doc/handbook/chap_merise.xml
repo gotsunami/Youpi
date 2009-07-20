@@ -21,9 +21,6 @@
 		&dict_swarp;
 	</sect2>
 	<sect2>
-		<title>Calibration Kit Entity</title>
-	</sect2>
-	<sect2>
 		<title>Instrument Entity</title>
 	</sect2>
 	<sect2>
@@ -74,10 +71,6 @@
 	<para>Here is the relational logical model of data used to design the database:
 	<variablelist>
 		<title>Models are:</title>
-		<varlistentry>
-			<term><varname>CalibrationKit</varname></term>
-			<listitem><para>Calibration Kit (<emphasis>Calibration Kit Id</emphasis>, Name, Bad Pix Mask, Flat Field)</para></listitem>
-		</varlistentry>
 		<varlistentry>
 			<term><varname>Cart Item</varname></term>
 			<listitem><para>Cart Item (<emphasis>Item Id</emphasis>, &d_uid;, &d_gid;, Mode, Processing Kind Id, Name, Data, Date)</para></listitem>
@@ -132,7 +125,7 @@
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Image</varname></term>
-			<listitem><para>Image (<emphasis>Image Id</emphasis>, Calibration Kit Id, Ingestion Id, Channel Id, Instrument Id, Name, Sky Footprint, Path, Alpha, Delta, Equinox, Object, Date Obs, Exp time, Photc Header, Photc Custom, Photk, Airmass, Absorption, Checksum, Gain, Ingestion Date, Flat, Mask, Reg, QSO Status)</para></listitem>
+			<listitem><para>Image (<emphasis>Image Id</emphasis>, Ingestion Id, Channel Id, Instrument Id, Name, Sky Footprint, Path, Alpha, Delta, Equinox, Object, Date Obs, Exp time, Photc Header, Photc Custom, Photk, Airmass, Absorption, Checksum, Gain, Ingestion Date, Flat, Mask, Reg, QSO Status)</para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term><varname>Image-Task Relation</varname></term>

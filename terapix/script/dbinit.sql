@@ -11,9 +11,6 @@ INSERT INTO youpi_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID
 INSERT INTO youpi_instrument(name) VALUES('WIRCAM');
 INSERT INTO youpi_rel_si(survey_id, instrument_id) VALUES(@surid, LAST_INSERT_ID());
 
-INSERT INTO youpi_calibrationkit(name) VALUES('cal1');
-INSERT INTO youpi_calibrationkit(name) VALUES('cal2');
-
 INSERT INTO youpi_processing_kind(name) VALUES('fitsin');
 
 INSERT INTO youpi_firstqcomment(comment) VALUES ('---'),

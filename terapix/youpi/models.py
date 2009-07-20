@@ -94,18 +94,6 @@ class Channel(models.Model):
 	def __unicode__(self):
 		return self.name
 
-class CalibrationKit(models.Model):
-	name = models.CharField(max_length = 80,blank=True,null=True)
-	badpixelmask = models.CharField(max_length = 512,blank=True,null=True,help_text="")
-	flatfield = models.CharField(max_length = 512,blank=True,null=True,help_text="")
-
-	class Meta:
-		verbose_name = "Calibration kit"
-		verbose_name_plural = "Calibration kits"
-
-	def __unicode__(self):
-		return self.name
-
 class ImageSelections(models.Model):
 	"""
 	Standalone table, no foreign key constraint.
@@ -254,7 +242,6 @@ class Image(models.Model):
 	# FKs constraints
 	channel = models.ForeignKey(Channel, db_column='channel_id')
 	run = models.ForeignKey('Run', db_column='run_id')
-	calibrationkit = models.ForeignKey(CalibrationKit,db_column='calibrationkit_id')
 	ingestion = models.ForeignKey('Ingestion',db_column='ingestion_id')
 	instrument = models.ForeignKey(Instrument, db_column = 'instrument_id')
 	
