@@ -29,7 +29,6 @@ urlpatterns = patterns(
 	# Callback functions depending on urls matches
 	(r'^youpi/$', 'index'),
 	(r'^youpi/ingestion/$', 'ing'),
-	(r'^youpi/ingestion/ingestion1/$', 'local_ingestion'),
 	(r'^youpi/ingestion/ingestion2/$', 'condor_ingestion'),
 	(r'^youpi/ingestion/imgCount/$', 'ingestion_img_count'),
 	(r'^youpi/image/info/$', 'get_image_info'),
