@@ -264,8 +264,13 @@ class QualityFitsIn(ProcessingPlugin):
 							'Reg' 			: str(h_fits.reg)
 							})
 
+		try:
+			runName = Rel_ri.objects.filter(image = img)[0].run.name
+		except:
+			runName = None
+
 		ImgInfo = [	('Object', img.object),
-					('RunId', img.run.name),
+					('RunId', runName),
 					('Filter', img.channel.name),
 					('ExpTime', self.format(img.exptime, "%.1f")),
 					('Ingestion Date', img.ingestion_date),
@@ -653,10 +658,6 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				error = "Error while processing list #%d: %s" % (k, e)
 
 		return {'ClusterIds': cluster_ids, 'NoData': info, 'Error': error, 'CondorError': condorError}
-
-	def getRuns(self, request):
-		# Return a list of lists [run name, image count]
-		return [[str(r.name), int(Image.objects.filter(run__name = r.name).count())] for r in Run.objects.all()]
 
 	def getReprocessingParams(self, request):
 		"""

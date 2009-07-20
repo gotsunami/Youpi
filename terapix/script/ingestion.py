@@ -630,7 +630,7 @@ def run_ingestion():
 		# Then insert image into db
 		try:
 			g.setTableName('youpi_image')
-			g.insert(	run_id = res[0][0],
+			g.insert(
 				name = fitsNoExt,
 				object = o,
 				airmass = a,

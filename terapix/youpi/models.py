@@ -241,7 +241,6 @@ class Image(models.Model):
 
 	# FKs constraints
 	channel = models.ForeignKey(Channel, db_column='channel_id')
-	run = models.ForeignKey('Run', db_column='run_id')
 	ingestion = models.ForeignKey('Ingestion',db_column='ingestion_id')
 	instrument = models.ForeignKey(Instrument, db_column = 'instrument_id')
 	

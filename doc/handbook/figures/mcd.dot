@@ -67,8 +67,8 @@ graph mcd {
 	node36 [label="has default group", style=dashed, color=brown];
 
 	/* Links */
-	run -- node4 [label="  1,n"];
-	node4 -- image [label="  1,n"]; 
+	run -- node4 [label="  0,n"];
+	node4 -- image [label="  0,1"]; 
 
 	authuser -- node30 [label="  0,n", style=dashed, color=green]; 
 	node30 -- survey [label="  1,n", style=dashed, color=green]; 

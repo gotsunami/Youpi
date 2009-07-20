@@ -114,7 +114,7 @@ function ImageInfoWidget(container, dbid) {
 						td.update(key.capitalize());
 						tr.insert(td);
 						td = new Element('td');
-						td.update(info.get(key));
+						td.update(info.get(key) ? info.get(key) : '-');
 						tr.insert(td);
 					}
 					tab.insert(tr);

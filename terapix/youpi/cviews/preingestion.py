@@ -587,16 +587,25 @@ def ims_get_images(request, name):
 	LT = 'is lower than'
 
 	if name == 'Run':
+		q = """
+		SELECT rel.image_id FROM youpi_rel_ri AS rel, youpi_run AS r
+		WHERE r.id = rel.run_id
+		AND r.name %s IN (%s)
+		""" % ('%s', string.join(map(lambda x: "'%s'" % x, value), ','))
 		if idList:
+			q += "AND rel.image_id IN (%s)"
 			if cond == EQ:
-				data = Image.objects.filter(run__name__in = value, id__in = idList).values_list('id', flat = True).order_by('name')
+				q = q % ('', string.join([str(id) for id in idList], ','))
 			else:
-				data = Image.objects.exclude(run__name__in = value).filter(id__in = idList).values_list('id', flat = True).order_by('name')
+				q = q % ('NOT', string.join([str(id) for id in idList], ','))
 		else:
 			if cond == EQ:
-				data = Image.objects.filter(run__name__in = value).values_list('id', flat = True).order_by('name')
+				q = q % ''
 			else:
-				data = Image.objects.exclude(run__name__in = value).values_list('id', flat = True).order_by('name')
+				q = q % 'NOT'
+		cur.execute(q)
+		res = cur.fetchall()
+		data = [r[0] for r in res]
 
 	elif name == 'Tag':
 		if idList:

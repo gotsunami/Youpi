@@ -677,57 +677,6 @@ def processing_imgs_remap_ids(request):
 
 	return HttpResponse(str({'mapList' : remap(idList)}), mimetype = 'text/plain')
 
-def processing_imgs_from_idlist(request, ids):
-	"""
-	Builds an SQL query based on POST data, executes it and returns a JSON object containing results.
-	"""
-
-	# Build integer list from ranges
-	ids = unremap(ids)
-
-	# Now executes query
-	db = DB(host = DATABASE_HOST,
-			user = DATABASE_USER,
-			passwd = DATABASE_PASSWORD,
-			db = DATABASE_NAME)
-
-	g = DBGeneric(db.con)
-	query = """
-SELECT a.id, a.name, b.name, a.object, c.name, a.alpha, a.delta 
-FROM youpi_image AS a, youpi_run AS b, youpi_channel AS c
-WHERE a.id IN (%s)
-AND a.run_id = b.id
-AND a.channel_id = c.id
-ORDER BY a.name
-""" % ids
-
-	try:
-		res = g.execute(query);
-	except MySQLdb.DatabaseError, e:
-		return HttpResponseServerError("Error: %s [Query: \"%s\"]" % (e, query))
-
-	xml = """<?xml version="1.0" encoding="utf-8"?>
-<rows>
-	<head>
-        <column width="50" type="ch" align="center" color="lightblue" sort="str">Select</column>
-        <column width="100" type="ro" align="center" sort="str">Name</column>
-        <column width="100" type="ro" align="center" sort="str">Run ID</column>
-        <column width="100" type="ro" align="center" sort="str">Object</column>
-        <column width="100" type="ro" align="center" sort="str">Channel</column>
-        <column width="120" type="ro" align="center" sort="int">Ra</column>
-        <column width="120" type="ro" align="center" sort="int">Dec</column>
-		<settings>
-			<colwidth>px</colwidth>
-		</settings>
-	</head>"""
-
-	for img in res:
-		xml += "<row id=\"%s\"><cell>1</cell><cell>%s</cell><cell>%s</cell><cell>%s</cell><cell>%s</cell><cell>%s</cell><cell>%s</cell></row>" % img
-	
-	xml += '</rows>'
-
-	return HttpResponse(xml, mimetype = 'text/xml')
-
 def processing_imgs_from_idlist_post(request):
 	"""
 	Builds an SQL query based on POST data, executes it and returns a JSON object containing results.
@@ -1409,27 +1358,29 @@ def get_image_info(request):
 	except Exception, e:
 		return HttpResponse(str({'Error': "%s" % e}), mimetype = 'text/plain')
 
+	try: runName = Rel_ri.objects.filter(image = img)[0].run.name
+	except: runName = None
 	data = {
-		'name': 		str(img.name + '.fits'),
-		'path': 		str(img.path),
-		'alpha': 		str(img.alpha),
-		'delta': 		str(img.delta),
-		'exptime': 		str(img.exptime),
-		'checksum': 	str(img.checksum),
-		'flat': 		str(img.flat),
-		'mask': 		str(img.mask),
-		'reg': 			str(img.reg),
-		'qsostatus': 	str(img.QSOstatus),
-		'instrument': 	str(img.instrument.name),
-		'run': 			str(img.run.name),
-		'channel': 		str(img.channel.name),
-		'ingestion':		str(img.ingestion.label),
-		'ing start':	str(img.ingestion.start_ingestion_date),
-		'ing end':	str(img.ingestion.end_ingestion_date),
-		'ing by':	str(img.ingestion.user.username),
+		'name'		: img.name + '.fits',
+		'path'		: img.path,
+		'alpha'		: str(img.alpha),
+		'delta'		: str(img.delta),
+		'exptime'	: str(img.exptime),
+		'checksum'	: img.checksum,
+		'flat'		: img.flat,
+		'mask'		: img.mask,
+		'reg'		: img.reg,
+		'qsostatus'	: img.QSOstatus,
+		'instrument': img.instrument.name,
+		'run'		: runName,
+		'channel'	: img.channel.name,
+		'ingestion'	: img.ingestion.label,
+		'ing start'	: str(img.ingestion.start_ingestion_date),
+		'ing end'	: str(img.ingestion.end_ingestion_date),
+		'ing by'	: img.ingestion.user.username,
 	}
 
-	return HttpResponse(str({'info': data}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'info': data}), mimetype = 'text/plain')
 
 @login_required
 @profile
