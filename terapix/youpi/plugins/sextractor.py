@@ -335,7 +335,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    =  %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv, %(mandpath)s/default.nnw
+transfer_input_files    =  %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv, %(mandpath)s/sex.default.nnw
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = /tmp/SEX.log.$(Cluster).$(Process)
@@ -446,7 +446,7 @@ notify_user             = semah@iap.fr
 				# No custom XSL_URL value
 				sex_params = ''
 
-			sex_params += " -FILTER_NAME %s -WRITE_XML YES " % 'sex.default.conv'
+			sex_params += " -WRITE_XML YES "
 
 			#Addding weight support 
 			if weightPath:
