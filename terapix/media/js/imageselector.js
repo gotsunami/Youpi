@@ -2366,9 +2366,8 @@ function ImageSelector(container, options)
 	 * Get image selections
 	 *
 	 * Parameters:
-	 *
-	 *   cNode - DOM node parent container
-	 *   resHandler - function: result function handler
+	 *  cNode - DOM node parent container
+	 *  resHandler - function: result function handler
 	 *
 	 */ 
 	function getImageSelections(cnode, resHandler) {
@@ -2489,14 +2488,17 @@ function ImageSelector(container, options)
 						}
 					}
 				}
+				gIdList = _tableWidget.getSelectedColsValues(function(sel) {
+					var gIdList = sel.split(',');
+					// Rebuild grid
+					resultHandler(gIdList.concat(selIdList), $(id + '_result_grid_div'));
+				});
 
-				gIdList = _tableWidget.getSelectedColsValues().split(',');
-
-				// Rebuild grid
-				resultHandler(gIdList.concat(selIdList), $(id + '_result_grid_div'));
-
-				removeAllChildrenNodes(div);
-				removeAllChildrenNodes(div);
+				if (gIdList) {
+					// Rebuild grid
+					resultHandler(gIdList.concat(selIdList), $(id + '_result_grid_div'));
+				}
+				div.update();
 				var p = new Element('p');
 				p.setAttribute('class', 'done');
 				p.insert("Done. Selection(s) merged");

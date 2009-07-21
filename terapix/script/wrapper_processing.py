@@ -462,7 +462,7 @@ def process(userData, kind_id, argv):
 
 		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
 		os.mkdir(imgName)
-		os.system("mv sex-config* sex-param* sex.default.conv default.nnw %s" %(imgName))
+		os.system("mv sex-config* sex-param* *.conv *.nnw %s" %(imgName))
 		os.chdir(imgName)
 
 		# FIXME: remove this code that won't get executed  at all since the files are not yet

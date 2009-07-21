@@ -675,15 +675,17 @@ function AdvancedTable() {
 	/*
 	 * Function: getSelectedColsValues
 	 * Returns a string of comma-separated columns' values
-	 *
 	 * Looks for selected rows and builds a selection string with the content 
 	 * of the column used to define unique rows ids.
+	 *
+	 * Parameters:
+	 *  handler - handler function (for pagination mode), ignored in non-pagination mode
 	 *
 	 * Returns:
 	 *  String of comma-separated selected rows' column's value
 	 *
 	 */ 
-	this.getSelectedColsValues = function() {
+	this.getSelectedColsValues = function(handler) {
 		if (!_pagination) {
 			var rowId, r, cls, colIdx;
 			var selection = '';
@@ -712,14 +714,16 @@ function AdvancedTable() {
 						throw 'AdvancedTable::getSelectedColValues' + resp.Error;
 						return;
 					}
-
 					document.fire('advancedTable:selectedImages', resp.idList);
+					// Call handler function
+					if (typeof handler == 'function') handler(resp.idList);
 				}	
 			);
 
 			// Send HTTP _synchronous_ request
 			var post = _postData + '&PageStatus=' + _pageStatus.join('_');
 			xhr.send('/youpi/process/query/idListPagination/', post, false);
+			return null;
 		}
 	}
 
