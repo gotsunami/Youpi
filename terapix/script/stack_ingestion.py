@@ -26,10 +26,13 @@ from DBGeneric import *
 
 NULLSTRING = ''
 FITSEXT = '.fits'
+TAG_STACK = 'STACK'
 
 g = None
 (INFO, WARNING, FATAL) = ('INFO', 'WARNING', 'FATAL')
 DEBUG_LEVELS = (INFO, WARNING, FATAL)
+# Ingestion log
+log = ''
 
 # Custom exceptions
 class DebugError(Exception): pass
@@ -46,14 +49,17 @@ def debug(msg, level = INFO):
 	"""
 	Prints msg (of severity level) to stdout. Usefull for debugging.
 	"""
-
+	global log
 	if type(level) is not StringType:
 		raise TypeError, "level param must be a string not type " + type(level)
 
 	if level not in DEBUG_LEVELS:
 		raise DebugError, "No debugging level named: " + level
 
-	print "%s [%s] %s" % (getNowDateTime(time.time()), level, msg)
+	msg = "%s [%s] %s" % (getNowDateTime(time.time()), level, msg)
+	log += msg + '\n'
+	print msg
+
 
 def getFITSheader(fitsObj, fitsfile):
 	"""
@@ -104,13 +110,13 @@ def getFITSField(fitsheader, fieldname, default = NULLSTRING):
 	else:
 		return data
 
-def run_ingestion(stackFile):
+def run_ingestion(stackFile, user_id):
 	"""
 	Ingestion of Stack image
 	@param stackFile full path to file
 	"""
 
-	global g, user_id
+	global g, log
 	duration_stime = time.time()
 	path = os.path.dirname(stackFile)
 
@@ -118,27 +124,25 @@ def run_ingestion(stackFile):
 
 	res = g.execute("SELECT dflt_group_id, dflt_mode FROM youpi_siteprofile WHERE user_id=%d" % int(user_id))
 	perms = {'group_id': res[0][0], 'mode': res[0][1]}
+
+	# Transaction begins here
 	g.begin()
-	try:
-		g.setTableName('youpi_ingestion')
-		g.insert(	start_ingestion_date = getNowDateTime(duration_stime),
-					end_ingestion_date = getNowDateTime(duration_stime),
-					# FIXME
-					email = '',
-					user_id = user_id,
-					label = "Stack %s" % os.path.basename(stackFile),
-					check_fitsverify  = 0,
-					check_qso_status = 0,
-					check_multiple_ingestion =0,
-					path = path,
-					group_id = perms['group_id'],
-					mode = perms['mode'],
-					exit_code = 0 )
-		ingestionId = g.con.insert_id()
-	except Exception, e:
-		debug(e, FATAL)
-		g.con.rollback()
-		sys.exit(1)
+
+	g.setTableName('youpi_ingestion')
+	g.insert(	start_ingestion_date = getNowDateTime(duration_stime),
+				end_ingestion_date = getNowDateTime(duration_stime),
+				# FIXME
+				email = '',
+				user_id = user_id,
+				label = "Stack %s" % os.path.basename(stackFile),
+				check_fitsverify  = 0,
+				check_qso_status = 0,
+				check_multiple_ingestion =0,
+				path = path,
+				group_id = perms['group_id'],
+				mode = perms['mode'],
+				exit_code = 0 )
+	ingestionId = g.con.insert_id()
 
 	# Get instruments
 	res = g.execute("""select id, name from youpi_instrument;""")
@@ -156,15 +160,15 @@ def run_ingestion(stackFile):
 	stime = time.time()
 	checksum = md5.md5(open(stackFile,'rb').read()).hexdigest()
 	etime = time.time()
-	debug("MD5: %s (%.2f)" % (checksum, etime-stime))
+	debug("MD5 is %s (in %.2fs)" % (checksum, etime-stime))
 
 	r = pyfits.open(stackFile)
 	try:
 		header = getFITSheader(r, stackFile)
 	except IngestionError, e:
 		# Do not process this image
-		debug("Skipping ingestion of %s" % stackFile, WARNING)
-		return
+		debug("No header found, skipping ingestion of %s" % stackFile, WARNING)
+		raise
 		
 	# Keywords checks
 	t = getFITSField(header, 'telescop')
@@ -191,14 +195,9 @@ def run_ingestion(stackFile):
 	# CHANNEL DATABASE INGESTION
 	res = g.execute("""select name from youpi_channel where name="%s";""" % channel)
 	if not res:
-		try:
-			g.setTableName('youpi_channel')
-			g.insert(	name = channel,
-						instrument_id = instrument_id )
-		except MySQLdb.DatabaseError, e:
-			debug(e, FATAL)
-			g.con.rollback()
-			sys.exit(1)
+		g.setTableName('youpi_channel')
+		g.insert(	name = channel,
+					instrument_id = instrument_id )
 	else:
 		debug("Channel %s already existing in DB" % channel)
 	
@@ -230,30 +229,20 @@ def run_ingestion(stackFile):
 	res = g.execute(q)
 
 	# Then insert image into db
-	try:
-		g.setTableName('youpi_image')
-		g.insert(
-			name = fitsNoExt,
-			object = o,
-			exptime = e,
-			equinox = eq,
-			ingestion_date = getNowDateTime(),
-			checksum = checksum,
-			path = path,
-			channel_id = res[0][0],
-			ingestion_id = ingestionId,
-			instrument_id = res[0][1]
-		)
-	except MySQLdb.DatabaseError, e:
-		debug(e, FATAL)
-		g.con.rollback()
-		sys.exit(1)
-	except Exception, e:
-		debug(e, FATAL)
-		g.con.rollback()
-		debug("SQL Query: %s" % q)
-		debug("Python error: %s" % e, FATAL)
-		sys.exit(1)
+	g.setTableName('youpi_image')
+	g.insert(
+		name = fitsNoExt,
+		object = o,
+		exptime = e,
+		equinox = eq,
+		ingestion_date = getNowDateTime(),
+		checksum = checksum,
+		path = path,
+		channel_id = res[0][0],
+		ingestion_id = ingestionId,
+		instrument_id = res[0][1]
+	)
+	imageId = g.con.insert_id()
 
 	# Computing image sky footprint
 	footprint_start = time.time()
@@ -287,28 +276,48 @@ def run_ingestion(stackFile):
 	for p in poly: q += "%s, " % p
 	q = q[:-2] + "))\")"
 	
-	try: g.execute("""UPDATE youpi_image SET skyfootprint=%s WHERE name="%s";""" % (q, fitsNoExt))
-	except Exception, e:
-		debug(e, FATAL)
-		g.con.rollback()
-		sys.exit(1)
+	g.execute("""UPDATE youpi_image SET skyfootprint=%s WHERE name="%s";""" % (q, fitsNoExt))
 
 	# Preparing data to insert centerfield point
 	# FIXME
 	ra = de = 0
 	cf = "GeomFromText('POINT(%s %s)')" % (ra, de)
 	qu = """UPDATE youpi_image SET centerfield=%s WHERE name="%s";""" % (cf, fitsNoExt)
-	try: g.execute(qu)
-	except Exception, e:
-		debug(e, FATAL)
-		g.con.rollback()
+	g.execute(qu)
 
-	debug("Sky footprint/centerfield took: (%.3f)" % (time.time()-footprint_start))
+	debug("Sky footprint/centerfield computation took %.3fs" % (time.time()-footprint_start))
 	debug("Ingested in database as '%s'" % fitsNoExt)
+
+	# Image tagging: tag the image with a 'Stack' tag
+	debug("Tagging image with the %s keyword" % TAG_STACK)
+	res = g.execute("SELECT id FROM youpi_tag WHERE name='%s'" % TAG_STACK)
+	if not res:
+		# Add new 'STACK' tag
+		g.setTableName('youpi_tag')
+		g.insert(name = TAG_STACK,
+				style = 'background-color: rgb(53, 106, 160); color:white; border:medium none -moz-use-text-color;',
+				date = getNowDateTime(),
+				comment = 'Used to mark stack images',
+				user_id = user_id,
+				group_id = perms['group_id'],
+				mode = perms['mode']
+		)
+	g.setTableName('youpi_rel_tagi')
+	g.insert(image_id = imageId, tag_id = res[0][0])
+
+	# Ingestion log
+	duration_etime = time.time()
+	msg = "Stack ingestion done; took %.2fs" % (duration_etime - duration_stime)
+	debug(msg)
+
+	# Close ingestion
+	g.setTableName('youpi_ingestion')
+	g.update(	report = base64.encodestring(zlib.compress(log, 9)).replace('\n', ''),
+				end_ingestion_date = getNowDateTime(duration_etime),
+				wheres = {'id' : ingestionId} )
 
 	# Commits for that image
 	g.con.commit()
-	debug("Stack ingestion done. Took %.2fs." % (time.time() - duration_stime))
 	sys.exit(0)
 	
 
@@ -327,12 +336,8 @@ if __name__ == '__main__':
 		res = g.execute("SELECT id, username FROM auth_user LIMIT 1")
 		debug("Proceeding as user '%s'" % res[0][1])
 		user_id = res[0][0]
-		run_ingestion(sys.argv[1])
-
-	except MySQLdb.DatabaseError, e:
+		run_ingestion(sys.argv[1], user_id)
+	except Exception, e:
 		debug(e, FATAL)
-		sys.exit(1)
-
-	except IndexError, e:
-		debug("Incorrect arguments passed to the script: %s" % e, FATAL)
+		g.con.rollback()
 		sys.exit(1)
