@@ -744,6 +744,8 @@ def delete_processing_task(request):
 			data =  Plugin_swarp.objects.filter(task = task)[0]
 		elif task.kind.name == 'skel':
 			data = None
+		elif task.kind.name == 'sex':
+			data =  Plugin_sex.objects.filter(task = task)[0]
 		else:
 			raise TypeError, 'Unknown data type to delete:' + task.kind.name
 
