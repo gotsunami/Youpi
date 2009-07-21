@@ -110,7 +110,7 @@ def getFITSField(fitsheader, fieldname, default = NULLSTRING):
 	else:
 		return data
 
-def run_ingestion(stackFile, user_id):
+def run_stack_ingestion(stackFile, user_id):
 	"""
 	Ingestion of Stack image
 	@param stackFile full path to file
@@ -336,7 +336,7 @@ if __name__ == '__main__':
 		res = g.execute("SELECT id, username FROM auth_user LIMIT 1")
 		debug("Proceeding as user '%s'" % res[0][1])
 		user_id = res[0][0]
-		run_ingestion(sys.argv[1], user_id)
+		run_stack_ingestion(sys.argv[1], user_id)
 	except Exception, e:
 		debug(e, FATAL)
 		g.con.rollback()
