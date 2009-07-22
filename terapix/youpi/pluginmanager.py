@@ -80,6 +80,7 @@ class ProcessingPlugin:
 		"""
 		for line in content:
 			if line.find(keyword) != -1:
+				if line[-1] == '\n': line = line[:-1]
 				line = re.sub(r'#.*$', '', line)
 				res = [k for k in re.split(r'[ \t]', line) if len(k)]
 				try: return res[1]

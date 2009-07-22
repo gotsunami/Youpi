@@ -84,6 +84,7 @@ def getConfigValue(content, keyword):
 	"""
 	for line in content:
 		if line.find(keyword) != -1:
+			if line[-1] == '\n': line = line[:-1]
 			line = re.sub(r'#.*$', '', line)
 			res = [k for k in re.split(r'[ \t]', line) if len(k)]
 			try: return res[1]
@@ -716,6 +717,17 @@ def process(userData, kind_id, argv):
 					os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
 			else:
 				debug("[Warning] IMAGEOUT_NAME keyword not found in configuration file")
+
+			# Ingest final stack image
+			debug("Starting ingestion of final stack image...")
+			try:
+				from stack_ingestion import run_stack_ingestion
+				run_stack_ingestion(g, getConfigValue(configContent, 'IMAGEOUT_NAME'), user_id)
+			except Exception, e:
+				debug("Could not ingest final stack image. Error: %s" % e)
+				success = 0
+				exit_code = 1
+
 	else:
 		# Put other processing stuff here
 		pass
@@ -729,7 +741,6 @@ def process(userData, kind_id, argv):
 	debug("Post-processing operations terminated");
 	debug("Exited (code %d)" % exit_code)
 	sys.exit(exit_code)
-
 
 def init_job(userData):
 	global username
