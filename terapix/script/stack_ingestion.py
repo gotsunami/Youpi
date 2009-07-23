@@ -299,8 +299,11 @@ def run_stack_ingestion(g, stackFile, user_id):
 				group_id = perms['group_id'],
 				mode = perms['mode']
 		)
+		tagid = g.con.insert_id()
+	else:
+		tagid = res[0][0]
 	g.setTableName('youpi_rel_tagi')
-	g.insert(image_id = imageId, tag_id = res[0][0])
+	g.insert(image_id = imageId, tag_id = tagid)
 
 	# Ingestion log
 	duration_etime = time.time()
