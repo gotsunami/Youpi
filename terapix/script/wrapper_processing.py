@@ -671,6 +671,43 @@ def process(userData, kind_id, argv):
 			success = 1
 
 			configContent = open(os.path.basename(userData['ConfigFile']), 'r').readlines()
+
+			# Final stack image ingestion
+			debug("Starting ingestion of final stack image...")
+			try:
+				from stack_ingestion import run_stack_ingestion
+				imgout = getConfigValue(configContent, 'IMAGEOUT_NAME')
+				finalStackName = run_stack_ingestion(g, os.path.join(userData['ResultsOutputDir'], imgout), user_id)
+				debug("Final stack ingestion complete")
+				if finalStackName != imgout:
+					# Stack name has changed! 
+					# The config file IMAGEOUT_NAME must be modified
+					j = 0
+					for line in configContent:
+						if line.find('IMAGEOUT_NAME') != -1:
+							line = re.sub(r'#.*$', '', line)
+							res = [k for k in re.split(r'[ \t]', line) if len(k)]
+							try: res[1] = finalStackName
+							except:
+								debug("IMAGEOUT_NAME parameter: could not set value")
+								raise
+							configContent[j] = string.join(res, '\t')
+							break
+						j += 1
+					if j == len(configContent):
+						debug("Could not find IMAGEOUT_NAME parameter in the config file")
+						raise WrapperError, "IMAGEOUT_NAME param not found"
+					debug("IMAGEOUT_NAME parameter value set to %s" % finalStackName)
+
+					# The stack file has to be renamed on disk
+					os.rename(os.path.join(userData['ResultsOutputDir'], imgout), os.path.join(userData['ResultsOutputDir'], finalStackName))
+					debug("Renamed %s to %s in %s" % (imgout, finalStackName, userData['ResultsOutputDir']))
+
+			except Exception, e:
+				debug("Could not ingest final stack image. Error: %s" % e)
+				success = 0
+				exit_code = 1
+
 			try:
 				if HAS_CONVERT:
 					convert = 1
@@ -717,16 +754,6 @@ def process(userData, kind_id, argv):
 					os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
 			else:
 				debug("[Warning] IMAGEOUT_NAME keyword not found in configuration file")
-
-			# Ingest final stack image
-			debug("Starting ingestion of final stack image...")
-			try:
-				from stack_ingestion import run_stack_ingestion
-				run_stack_ingestion(g, getConfigValue(configContent, 'IMAGEOUT_NAME'), user_id)
-			except Exception, e:
-				debug("Could not ingest final stack image. Error: %s" % e)
-				success = 0
-				exit_code = 1
 
 	else:
 		# Put other processing stuff here

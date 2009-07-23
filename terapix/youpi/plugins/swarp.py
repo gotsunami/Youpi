@@ -248,18 +248,16 @@ class Swarp(ProcessingPlugin):
 #
 # Condor submission file
 # Please not that this file has been generated automatically by Youpi
-# http://clix.iap.fr/youpi/
 #
-
 # Plugin: %(description)s
 
-executable              = %(wrapper)s/wrapper_processing.py
+executable              = %(script)s/wrapper_processing.py
 universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(userdata)s, %(swarplist)s, %(transferfile)s, %(preprocfile)s, %(nop)s/NOP
-initialdir				= %(initdir)s
+transfer_input_files    = %(settings)s/settings.py, %(script)s/stack_ingestion.py, %(script)s/DBGeneric.py, %(config)s, %(userdata)s, %(swarplist)s, %(transferfile)s, %(preprocfile)s, %(nop)s/NOP
+initialdir				= %(script)s
 transfer_output_files   = NOP
 log                     = %(log)s
 error                   = %(errlog)s
@@ -270,13 +268,11 @@ notify_user             = monnerville@iap.fr
 %(requirements)s
 """ % {	
 	'description'	: self.description,
-	'wrapper' 		: os.path.join(submit_file_path, 'script'),
+	'script' 		: os.path.join(submit_file_path, 'script'),
 	'settings' 		: submit_file_path, 
-	'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
 	'config' 		: customrc,
 	'swarplist' 	: swarpImgsFile,
 	'nop' 			: submit_file_path, 
-	'initdir' 		: os.path.join(submit_file_path, 'script'),
 	'requirements' 	: req,
 	'log'			: logs['log'],
 	'errlog'		: logs['error'],

@@ -56,9 +56,10 @@ def debug(msg, level = INFO):
 	if level not in DEBUG_LEVELS:
 		raise DebugError, "No debugging level named: " + level
 
-	msg = "%s [%s] %s" % (getNowDateTime(time.time()), level, msg)
+	msg = "[STACK@%s] [%s] %s" % (getNowDateTime()[-8:], level, msg)
 	log += msg + '\n'
 	print msg
+	sys.stdout.flush()
 
 
 def getFITSheader(fitsObj, fitsfile):
@@ -110,23 +111,43 @@ def getFITSField(fitsheader, fieldname, default = NULLSTRING):
 	else:
 		return data
 
-def run_stack_ingestion(stackFile, user_id):
+def freshImageName(nameWithoutExt, g):
 	"""
-	Ingestion of Stack image
-	@param stackFile full path to file
+	Generates a new image name based on nameWithoutExt. Current implementation only append an 
+	underscore and a digit to the name and returns it.
 	"""
 
-	global g, log
+	newName = nameWithoutExt
+	res = g.execute("select name from youpi_image where name like '" + nameWithoutExt + '%\';')
+	newName += '_' + str(len(res))
+	return newName
+
+def run_stack_ingestion(g, stackFile, user_id):
+	"""
+	Ingestion of Stack image
+	@param g DBGeneric instance
+	@param stackFile full path to file
+	@param user_id current user DB id
+	"""
+
+	global log
 	duration_stime = time.time()
-	path = os.path.dirname(stackFile)
+	ipath = os.path.dirname(stackFile)
+	fitsNoExt = os.path.basename(stackFile.replace(FITSEXT, NULLSTRING))
 
 	debug("Starting ingestion of stack image: %s" % stackFile)
 
 	res = g.execute("SELECT dflt_group_id, dflt_mode FROM youpi_siteprofile WHERE user_id=%d" % int(user_id))
 	perms = {'group_id': res[0][0], 'mode': res[0][1]}
 
-	# Transaction begins here
-	g.begin()
+	# First, do some cleanups...
+	res = g.execute("""select name, checksum, id, ingestion_id from youpi_image where name = "%s";""" % fitsNoExt)
+	# Image name found
+	if res:
+		# Do nothing because the same physical image is already ingested
+		fitsNoExt = freshImageName(fitsNoExt, g)
+		debug("[Warning] A stack image with the same name is already ingested. The stack image will be ingested as '%s'" % fitsNoExt)
+		debug("[Warning] The IMAGEOUT_NAME value will be updated to match '%s' and the stack image will be renamed on disk" % fitsNoExt)
 
 	g.setTableName('youpi_ingestion')
 	g.insert(	start_ingestion_date = getNowDateTime(duration_stime),
@@ -134,11 +155,11 @@ def run_stack_ingestion(stackFile, user_id):
 				# FIXME
 				email = '',
 				user_id = user_id,
-				label = "Stack %s" % os.path.basename(stackFile),
+				label = "Stack %s" % os.path.basename(fitsNoExt),
 				check_fitsverify  = 0,
 				check_qso_status = 0,
 				check_multiple_ingestion =0,
-				path = path,
+				path = ipath,
 				group_id = perms['group_id'],
 				mode = perms['mode'],
 				exit_code = 0 )
@@ -150,11 +171,6 @@ def run_stack_ingestion(stackFile, user_id):
 	for inst in res:
 		instruments[inst[1]] = (inst[0], re.compile(inst[1], re.I))
 	
-	#
-	# OK, seems like this file can be ingested
-	#
-	fitsNoExt = os.path.basename(stackFile.replace(FITSEXT, NULLSTRING))
-
 	# MD5 sum computation
 	debug("Computing MD5 checksum...")
 	stime = time.time()
@@ -201,25 +217,6 @@ def run_stack_ingestion(stackFile, user_id):
 	else:
 		debug("Channel %s already existing in DB" % channel)
 	
-	res = g.execute("""select name, checksum from youpi_image where name = "%s";""" % fitsNoExt)
-	old = fitsNoExt
-	# Image name found
-	if res:
-		# Compare checksums
-		dbchecksum = res[0][1]
-		if checksum == dbchecksum:
-			# Do nothing because the same physical image is already ingested
-			debug("Image with same name and checksum already ingested. Skipping...")
-			return
-
-		# FIXME
-		# Different checksums, so go ahead
-		#fitsNoExt = freshImageName(fitsNoExt, g)
-		#if allowSeveralIngestions != 'yes':
-		#	if old != fitsNoExt:
-		#		debug("Already ingested. Skipping...")
-		#		continue
-
 	# First gets run and channel IDs
 	q = """
 	SELECT chan.id, i.id
@@ -237,7 +234,7 @@ def run_stack_ingestion(stackFile, user_id):
 		equinox = eq,
 		ingestion_date = getNowDateTime(),
 		checksum = checksum,
-		path = path,
+		path = ipath,
 		channel_id = res[0][0],
 		ingestion_id = ingestionId,
 		instrument_id = res[0][1]
@@ -316,10 +313,7 @@ def run_stack_ingestion(stackFile, user_id):
 				end_ingestion_date = getNowDateTime(duration_etime),
 				wheres = {'id' : ingestionId} )
 
-	# Commits for that image
-	g.con.commit()
-	sys.exit(0)
-	
+	return fitsNoExt + FITSEXT
 
 if __name__ == '__main__':
 	print "Running from the CLI"
@@ -336,8 +330,15 @@ if __name__ == '__main__':
 		res = g.execute("SELECT id, username FROM auth_user LIMIT 1")
 		debug("Proceeding as user '%s'" % res[0][1])
 		user_id = res[0][0]
-		run_stack_ingestion(sys.argv[1], user_id)
+
+		# Transaction begins here
+		g.begin()
+		run_stack_ingestion(g, sys.argv[1], user_id)
+		# Commits for that image
+		g.con.commit()
+	
 	except Exception, e:
 		debug(e, FATAL)
 		g.con.rollback()
 		sys.exit(1)
+	sys.exit(0)
