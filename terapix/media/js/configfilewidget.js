@@ -466,6 +466,9 @@ function ConfigFileWidget(container, pluginId, options)
 			var sel = $(plugin_id + '_' + _options.type +'_name_select');
 			sel.select('option').each(function(opt) {
 				if (opt.value == event.memo) {
+					opt.up().select('option').each(function(opt) { 
+						if (opt.readAttribute('selected')) opt.removeAttribute('selected'); 
+					});
 					opt.writeAttribute('selected', 'selected');
 					document.fire('notifier:notify', 'Config file <b>' + event.memo + '</b> selected');
 				}
