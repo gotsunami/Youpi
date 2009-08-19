@@ -257,7 +257,7 @@ class Processing_task(models.Model):
 	bools = ((False, 'No'), (True, 'Yes'))
 	start_date = models.DateTimeField(auto_now_add = True, help_text = 'Beginning of processing')
 	end_date = models.DateTimeField(help_text = 'End of processing')
-	success = models.BooleanField('QSO status', null = True, default = False, choices = bools)
+	success = models.NullBooleanField('QSO status', null = True, default = False, choices = bools)
 	hostname = models.CharField(max_length = 255, null = True, help_text="Processing host (local or cluster node)")
 	# Serialized data (base64 encoding over zlib compression)
 	error_log = models.TextField(null=True)
@@ -285,7 +285,7 @@ class Plugin_scamp(models.Model):
 	log = models.TextField(null = True)
 	ldac_files = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Scamp output HTML data")
-	thumbnails = models.BooleanField('Has image thumbnails', default = False)
+	thumbnails = models.NullBooleanField('Has image thumbnails', default = False)
 	aheadPath = models.CharField(max_length = 255, null = True, help_text = "Path to .ahead files")
 
 	# FKs constraints
@@ -303,11 +303,11 @@ class Plugin_swarp(models.Model):
 	# Results log
 	log = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Swarp output HTML data")
-	thumbnails = models.BooleanField('Has image thumbnails', default = False)
+	thumbnails = models.NullBooleanField('Has image thumbnails', default = False)
 	weightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
-	useQFITSWeights = models.BooleanField('True if QFITS weight maps have been used', default = False)
+	useQFITSWeights = models.NullBooleanField('True if QFITS weight maps have been used', default = False)
 	headPath = models.CharField(max_length = 255, null = True, help_text = "Path to .head files")
-	useHeadFiles = models.BooleanField('True if .head files have been used', default = False)
+	useHeadFiles = models.NullBooleanField('True if .head files have been used', default = False)
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')
@@ -325,14 +325,14 @@ class Plugin_sex(models.Model):
 	# Results log
 	log = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Sex output HTML data")
-	thumbnails = models.BooleanField('Has image thumbnails', default = False)
+	thumbnails = models.NullBooleanField('Has image thumbnails', default = False)
 	weightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
 	flagPath = models.CharField(max_length = 255, null = True, help_text = "Path to flag images")
 	dualweightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images in dual mode")
 	dualImage = models.CharField(max_length = 255, null = True, help_text = "Path to dual image in dual mode")
 	dualflagPath = models.CharField(max_length = 255, null = True, help_text = "Path to flag images in dual mode")
 	psfPath = models.CharField(max_length = 255, null = True, help_text = "Path to psf images")
-	dualMode = models.BooleanField('Dual Image Mode', default = False)
+	dualMode = models.NullBooleanField('Dual Image Mode', default = False)
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')
@@ -470,10 +470,10 @@ class Ingestion(models.Model):
 	path = models.CharField(max_length = 250,blank=True,null=True,help_text="path where are stored images data")
 	label = models.CharField(unique = True, max_length = 80, help_text="Unique ingestion identifier")
 	check_states = ((False, 'No'), (True, 'Yes'))
-	check_fitsverify = models.BooleanField('Fitsverify status', default=False, choices = check_states)
-	check_QSO_status = models.BooleanField('QSO status', default=False, choices = check_states)
-	check_multiple_ingestion = models.BooleanField('Multiple ingestion status', default=False, choices = check_states)
-	exit_code = models.BooleanField('Exit code status', default=False, choices = ((False, 'Failure'), (True, 'Success')))
+	check_fitsverify = models.NullBooleanField('Fitsverify status', default=False, choices = check_states)
+	check_QSO_status = models.NullBooleanField('QSO status', default=False, choices = check_states)
+	check_multiple_ingestion = models.NullBooleanField('Multiple ingestion status', default=False, choices = check_states)
+	exit_code = models.NullBooleanField('Exit code status', default=False, choices = ((False, 'Failure'), (True, 'Success')))
 	# Serialized data (base64 encoding over zlib compression)
 	report = models.TextField(blank = True, null = True)
 	# Default chmod permissions (ex: 644)
@@ -514,7 +514,7 @@ class Fitstables(models.Model):
 	# Other information
 	absorption = models.DecimalField(max_digits = 32,decimal_places = 16,null=True,blank=True,help_text="")
 	absorption_err = models.DecimalField(max_digits = 32,decimal_places = 16,null=True,blank=True,help_text="")
-	is_phot = models.BooleanField('is_phot', default=False,help_text="")
+	is_phot = models.NullBooleanField('is_phot', default=False,help_text="")
 
 	class Meta:
 		unique_together = [('name', 'run', 'fitstable')]
@@ -625,7 +625,7 @@ class CondorNodeSel(models.Model):
 	label = models.CharField(max_length = 255)
 	nodeselection = models.TextField()
 	date = models.DateTimeField(auto_now_add = True)
-	is_policy = models.BooleanField('Selection is a custom policy', default = False)
+	is_policy = models.NullBooleanField('Selection is a custom policy', default = False)
 
 	class Meta:
 		unique_together = ('label', 'is_policy')

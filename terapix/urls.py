@@ -139,7 +139,7 @@ urlpatterns = patterns(
 	(r'^youpi/autocompletion/(.*?)/(.*?)/$', 'autocomplete'),
 
     # Admin site
-    (r'^youpi/admin/(.*)', admin.site.root),
+    (r'^youpi/admin/', include(admin.site.urls)),
 
 	# User authentication
     (r'^youpi/accounts/login/$', login),
