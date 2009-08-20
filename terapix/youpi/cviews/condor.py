@@ -543,7 +543,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
+transfer_input_files    = %s/settings_base.py, %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
 # YOUPI_USER_DATA = %s
@@ -670,7 +670,7 @@ arguments               = "%s"
 
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
-transfer_input_files    = %s/settings.py, %s/DBGeneric.py, %s/NOP
+transfer_input_files    = %s/settings_base.py, %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
 # Logs
