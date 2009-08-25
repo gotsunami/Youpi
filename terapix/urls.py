@@ -129,6 +129,7 @@ urlpatterns = patterns(
 	(r'^youpi/cart/additem/$', 'cart_add_item'),
 	(r'^youpi/cart/delitem/$', 'cart_delete_item'),
 	(r'^youpi/cart/itemsCount/$', 'cart_items_count'),
+	(r'^youpi/cart/savedItemsStats/$', 'cart_saved_items_stats'),
 
 	# Grading
 	(r'^youpi/grading/panel/(.*?)/(.*?)/$', 'grading_panel'),

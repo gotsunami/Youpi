@@ -14,6 +14,7 @@
 
 import time
 from types import *
+import cjson as json
 #
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -23,6 +24,7 @@ from django.template import RequestContext
 #
 from terapix.youpi.models import *
 from terapix.youpi.cviews import *
+from terapix.youpi.auth import read_proxy
 #
 from settings import *
 
@@ -113,3 +115,16 @@ def cart_items_count(request):
 		count += len(dataList)
 
 	return HttpResponse(str({'count' : count}), mimetype = 'text/plain')
+
+def cart_saved_items_stats(request):
+	"""
+	Return some statistic on per-plugin saved items
+	"""
+
+	stats = {}
+	for plugin in manager.plugins:
+		items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = plugin.id).order_by('-date'))
+		stats[plugin.id] = len(items)
+
+	return HttpResponse(json.encode({'stats' : stats}), mimetype = 'text/plain')
+

@@ -93,22 +93,25 @@ function removeItemFromCart(trid, force) {
 	);
 }
 
-function showSavedItems() {
-{% for plugin in plugins %}
-	var z = null;
-	try {
-		z = {{ plugin.id }}.showSavedItems; 
-	} catch(e) {
-		// Not implemented in plugin
-		var countNode = document.getElementById('plugin_{{ plugin.id }}_saved_count');
-		countNode.innerHTML = '';
-		countNode.appendChild(document.createTextNode('No item'));
-		var content = document.getElementById('plugin_menuitem_sub_{{ plugin.id }}');
-		content.innerHTML = 'Not implemented yet.';
-	}
+function getSavedItemsStats() {
+	var r = new HttpRequest(
+			null,
+			null,	
+			// Custom handler for results
+			function(resp) {
+				var st = $H(resp.stats);
+				st.keys().each(function(uid) {
+					var total = st.get(uid);
+					$('plugin_' + uid + '_saved_count').update(total > 0 ? total : 'No item');
+				});
 
-	if (z) z();
-{% endfor %}
+				var pattern = 'plugin_menuitem_sub_';
+				var pid = $$('div[id^=' + pattern + ']')[0].readAttribute('id').sub(pattern, '');
+				eval(pid + '.showSavedItems()');	
+			}
+	);
+
+	r.send('/youpi/cart/savedItemsStats/');
 }
 
 /*
@@ -255,9 +258,7 @@ function proceed_cart() {
 var menu;
 document.observe('dom:loaded', function() {
 	menu = new SubMenu('submenu', ['Cart items', 'Saved items']);
-	menu.setOnClickHandler(1, function() {
-		showSavedItems();
-	});
+	menu.setOnClickHandler(1, getSavedItemsStats);
 });
 
 // A shopping cart item has just been removed
@@ -347,7 +348,7 @@ document.observe('shoppingCart:itemRemoved', function() {
 					<li class="disabled">
 				{% endif %}
 						<a 	href="#" id="plugin_entry_{{ forloop.counter0 }}" 
-							onclick="swap_display(this.id, 'plugin_menuitem_sub_{{ plugin.id }}', 'saved_menu', 'plugin_menuitem_sub_');">
+							onclick="{{ plugin.id }}.showSavedItems(); swap_display(this.id, 'plugin_menuitem_sub_{{ plugin.id }}', 'saved_menu', 'plugin_menuitem_sub_');">
 							<div style="background: transparent url(/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}.png) center left no-repeat; padding-left: 30px;">
 								{{ plugin.description }}
 								<div id="plugin_{{ plugin.id }}_saved_count" class="count"></div>
