@@ -88,6 +88,17 @@
 		</para>
 		<sect1>
 			<title>&appname; Application Features</title>
+			<para>Handy features are available out of the box. With &appname; you can:
+				<itemizedlist>
+					<listitem>Easily keep track of your data</listitem>
+					<listitem>Tag FITS images with labels</listitem>
+					<listitem>Prepare your tasks then save them for later processing by adding them to a shopping cart</listitem>
+					<listitem>Define sophisticated rules to match only subsets of your Condor cluster on which you can run your processing jobs</listitem>
+					<listitem>Monitor and kill your jobs running on the cluster in realtime from the interface</listitem>
+					<listitem>Easily access all your output results</listitem>
+					<listitem>Get statistics and generate reports</listitem>
+				</itemizedlist>
+			</para>
 		</sect1>
 		<sect1>
 			<title>Organization of This Book</title>
