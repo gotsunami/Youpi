@@ -13,3 +13,159 @@ The Codasyl Logical Model
 
 The Relational Logical Model of Data
 ====================================
+
+Models
+------
+
+Here is the relational logical model of data used to design the database:
+
+Cart Item
+	Cart Item (*Item Id*, Django User Id, Django Group Id, Mode, Processing Kind Id, Name, Data, Date)
+
+Channel
+	Channel (*Channel Id*, Instrument Id, Name, Wave Length, Url, Wave Curve, Trans Curve, Mag Offsets)
+
+Coaddition
+	Coaddition (*Coaddition Id*, ...)
+
+Condor Node Selection
+	Condor Node Selection (*Selection Id*, Label, Node selection, Date, Is Policy)
+
+Config File
+	Config File (*Config Id*, Django User Id, Django Group Id, Mode, Processing Kind Id, Config Type Id, Name, Content, Data, Date)
+
+Config Type
+	Config Type (*Config Id*, Name)
+
+Final Quality Comment
+	Final Quality Comment (*Final Comment Id*, Comment)
+
+Final Quality Evaluation
+	Final Quality Evaluation (*Django User Id, FITSout Id*, Final Comment Id, Date, Grade, Custom Comment)
+
+First Quality Comment
+	First Quality Comment (*First Comment Id*, Comment)
+
+FIST Tables
+	FITS Tables (*Table Id*, Name, Instrument, Channel, Run, QSO Status, Object, FITS Table, Absorption, Absorption Err, Is Phot)
+
+FITSIn Plugin
+	FITSIn Plugin (*FITSIn Id*, Processing Task Id, RA offset, Dec offset, RA std dev, 
+	Dec std dev, Minimum PSF FWHM, Average PSF FWHM, Maximum PSF FWHM, Minimum PSF 
+	half-light diameter, Average PSF half-light diameter, Maximum PSF half-light diameter, 
+	Minimum PSF elongation, Average PSF elongation, Maximum PSF elongation, Minimum PSF 
+	chi2/d.o.f., Average PSF chi2/d.o.f., Maximum PSF chi2/d.o.f., Minimum PSF residuals, 
+	Average PSF residuals, Maximum PSF residuals, Minimum PSF asymmetry, Average PSF asymmetry, 
+	Maximum PSF asymmetry, Minimum number of PSF stars, Average number of PSF stars, Maximum 
+	number of PSF stars, Median background, Background RMS, Saturation level, Flat Path, Mask 
+	Path, Region Path, QualityFITS Config, Results Ingestion Log, HTTP Url, Previous Release 
+	Grade, Previous Release Comment)
+
+FITSOut Plugin
+	FITSOut Plugin (*FITSOut Id*, Processing Task Id)
+
+Image
+	Image (*Image Id*, Ingestion Id, Channel Id, Instrument Id, Name, Sky Footprint, Path, 
+	Alpha, Delta, Equinox, Object, Date Obs, Exp time, Photc Header, Photc Custom, Photk, 
+	Airmass, Absorption, Checksum, Gain, Ingestion Date, Flat, Mask, Reg, QSO Status)
+
+Image-Task Relation
+	Image-Task Relation (*I--T Id, Image Id, Processing Task Id*)
+
+Image-Tag Relation
+	Image-Tag Relation (*I--T Id, Image Id, Tag Id*)
+
+Image Selections
+	Image Selections (*Selection Id*, Django User Id, Django Group Id, Mode, Name, Data, Date)
+
+Ingestion
+	Ingestion (*Ingestion Id*, Django User Id, Django Group Id, Mode, Label, Start Ingestion 
+	Date, End Ingestion Date, Email, Path, Check Fitsverify, Check QSO Status, Check Multiple 
+	Ingestion, Exit Code, Report)
+
+Instrument
+	Instrument (*Instrument Id*, Name, Telescope, Url, Timezone, Altitude, Nchips, 
+	Astrinstru_key, Photinstru_key, Path)
+
+Misc Data
+	Misc Data (*Misc Id*, Django User Id, Group User Id, Mode, Key, Data, Date)
+
+Processing Kind
+	Processing Kind (*Processing Kind Id*, Internal Name, Label)
+
+Processing Task
+	Processing Task (*Processing Task Id*, Django User Id, Django Group Id, Mode, 
+	Processing Kind Id, Start Date, End Date, Success, Error Log, Hostname, Results 
+	Output Directory, Title)
+
+Run
+	Run (*Run Id*, Instrument Id, Name, PI, Url, Email, Process Request Date, 
+	Date Start, Date End, Date Download, Release Date)
+
+Run-Image Relation
+	Run-Image Relation (*R--I Id, Image Id, Run Id*)
+
+Site Profile
+	Site Profile (*Profile Id*, Django User Id, Django Group Id; (default group), 
+	GUI Style, Default Condor Setup, Default Mode)
+
+SCAMP Plugin
+	SCAMP Plugin (*SCAMP Id*, Processing Task Id, Config, Results Ingestion Log, 
+	HTTP Url, LDAC Files, Thumbnails)
+
+Survey
+	Survey (*Survey Id*, Name, Comment, Url)
+
+Survey-Instrument Relation
+	Survey-Instrument Relation (*S--I Id, Survey Id, Instrument Id*)
+
+SWARP Plugin
+	SWARP Plugin (*SWARP Id*, Processing Task Id, Config, Results Ingestion Log, 
+	HTTP Url, Thumbnails, Weight Path, Use QFITS Weights, Head Path, Use Head 
+	Files)
+
+Tag
+	Tag (*Tag Id*, Django User Id, Django Group Id, Mode, Name, Style, Date, 
+	Comment)
+
+User-Survey Relation
+ 	User-Survey Relation (*U--S Id, Django User Id, Survey Id*)
+ 
+Record-Table Name Mappings
+--------------------------
+
+========================== ========================== ==========================
+CODASYL Record name        DB table name              Django's class(model) name
+========================== ========================== ==========================
+Cart Item                  ``youpi_cartitem``         ``CartItem``
+Channel                    ``youpi_channel``          ``Channel``
+Coaddition                 ``youpi_coaddition``       ``Coaddition``
+Condor Node Selection      ``youpi_condornodesel``    ``CondorNodeSel``
+Config File                ``youpi_configfile``       ``ConfigFile``
+Config Type                ``youpi_configtype``       ``ConfigType``
+Final Quality Comment      ``youpi_finalqcomment``    ``FinalQComment``
+Final Quality Evaluation   ``youpi_finalqeval``       ``FinalQEval``
+First Quality Comment      ``youpi_firstqcomment``    ``FirstQComment``
+First Quality Evaluation   ``youpi_firstqeval``       ``FirstQEval``
+FITS Tables                ``youpi_fitstables``       ``Fitstables``
+FITSIn Plugin              ``youpi_plugin_fitsin``    ``Plugin_fitsin``
+FITSOut Plugin             ``youpi_plugin_fitsout``   ``Plugin_fitsout``
+Image                      ``youpi_image``            ``Image``
+Image-Task Relation        ``youpi_rel_it``           ``Rel_it``
+Image-Tag Relation         ``youpi_rel_tagi``         ``Rel_tagi``
+Image Selections           ``youpi_imageselections``  ``ImageSelections``
+Ingestion                  ``youpi_ingestion``        ``Ingestion``
+Instrument                 ``youpi_instrument``       ``Instrument``
+Misc Data                  ``youpi_miscdata``         ``MiscData``
+Processing Kind            ``youpi_processing_kind``  ``Processing_kind``
+Processing Task            ``youpi_processing_task``  ``Processing_task``
+Run                        ``youpi_run``              ``Run``
+Run-Image Relation         ``youpi_rel_ri``           ``Rel_ri``
+SCAMP Plugin               ``youpi_plugin_scamp``     ``Plugin_scamp``
+Site Profile               ``youpi_siteprofile``      ``SiteProfile``
+Survey                     ``youpi_survey``           ``Survey``
+Survey-Instrument Relation ``youpi_rel_si``           ``Rel_si``
+Tag                        ``youpi_tag``              ``Tag``
+User-Survey Relation       ``youpi_rel_us``           ``Rel_us``
+========================== ========================== ==========================
+
