@@ -5,11 +5,40 @@ Merise Analysis
 Data Dictionnaries
 ==================
 
+Image Entity
+------------
+
+FITSin Entity
+-------------
+
+Scamp Entity
+------------
+
+Swarp Entity
+------------
+
+
 The Conceptual Model of Data
 ============================
 
+Here is the MCD used to design the database:
+
+.. figure:: figures/mcd.svg
+   :width: 800pt
+
+   Properties surrounded with brackets are entities identifiers. The User entity 
+   (and its relations) is displayed with a dashed style because it is part of 
+   the standard Django's database model. 
+
 The Codasyl Logical Model
 =========================
+
+The codasyl logical model resulting of transformation rules applied to the 
+previous MCD model. The Django User record is displayed with a dashed style 
+because it is part of the standard Django's database model. 
+
+.. figure:: figures/codasyl.svg
+   :width: 600pt
 
 The Relational Logical Model of Data
 ====================================
