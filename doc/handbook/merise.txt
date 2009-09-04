@@ -1,0 +1,15 @@
+***************
+Merise Analysis
+***************
+
+Data Dictionnaries
+==================
+
+The Conceptual Model of Data
+============================
+
+The Codasyl Logical Model
+=========================
+
+The Relational Logical Model of Data
+====================================

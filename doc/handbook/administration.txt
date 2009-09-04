@@ -1,0 +1,8 @@
+###################
+Youpi Adminstration
+###################
+
+.. toctree::
+
+   commontasks
+

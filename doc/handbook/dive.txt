@@ -1,0 +1,8 @@
+###############
+Dive Into Youpi
+###############
+
+.. toctree::
+
+   merise
+   writingplugins

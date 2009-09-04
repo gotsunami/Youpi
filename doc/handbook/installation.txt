@@ -1,0 +1,48 @@
+****************
+Installing Youpi
+****************
+
+
+Getting Youpi
+=============
+
+
+Software Dependencies
+=====================
+
+This section will guide through the Youpi installation process. As you will 
+see, running Youpi involves installing many software packages. Optional 
+packages will enhance Youpi's functionalities and will improve the final 
+user experience.
+
+Mandatory Packages
+------------------
+
+- QualityFITS
+- Scamp
+- Swarp
+- Sextractor
+- Python
+- Mathplotlib
+- Django
+- MySQL
+- Condor
+
+Optional Packages
+-----------------
+
+
+Installation
+============
+
+
+Configuration
+=============
+
+
+Testing Your Installation
+=========================
+
+
+Upgrading to New Releases
+=========================

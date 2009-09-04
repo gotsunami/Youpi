@@ -1,0 +1,26 @@
+*************************
+Writing Plugins for Youpi
+*************************
+
+Plugin Concept Overview
+=======================
+
+Hello, world!
+=============
+
+Naming Conventions
+==================
+
+About Ajax Calls
+================
+
+Active Monitoring Interface Integration
+=======================================
+
+Wrap Your Cluster Code!
+=======================
+
+Mandatory Data Members
+======================
+
+

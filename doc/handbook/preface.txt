@@ -1,0 +1,33 @@
+=======
+Preface
+=======
+
+Todo
+
+Youpi Application Features
+==========================
+
+Handy features are available out of the box. With Youpi, you can:
+
+- Easily keep track of your data
+- Tag FITS images with labels
+- Prepare your tasks then save them for later processing by adding them to a shopping cart
+- Define sophisticated rules to match only subsets of your Condor cluster on which you can 
+  run your processing jobs
+- Monitor and kill your jobs running on the cluster in realtime from the interface
+- Easily access all your output results
+- Get statistics and generate reports
+
+Organization of This Book
+=========================
+
+Getting This Book
+=================
+
+Feel free to get a copy of this book from `Youpi's website`_. Both PDF, HTML and plain text 
+file formats are available.
+
+.. _Youpi's website: http://youpi.terapix.fr
+
+Request For Comments
+====================
