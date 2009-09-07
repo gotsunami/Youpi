@@ -188,3 +188,9 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+# Will be included at the end of every source file
+rst_epilog = """
+.. |django| replace:: Django
+.. _django: http://www.djangoproject.com/
+"""

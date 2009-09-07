@@ -2,25 +2,220 @@
 Writing Plugins for Youpi
 *************************
 
+This section is focusing on the processing capabilities of Youpi and aims to be 
+a short guideline - by providing useful background information - to the software 
+developper that needs to understand, improve and write processing plugins for Youpi.
+
 Plugin Concept Overview
 =======================
+
+Plugins are computer programs that interact with a host application to provide 
+specific on-demand new features. In order to be a rather generic pipeline for 
+processing astronomical data, Youpi - which is powered by |django|_, an open source 
+web application framework that uses the Python programming language - has been 
+designed to allow custom programs to operate a wide range of processings on data. 
+
+For this purpose, Youpi comes with an easy and convenient API allowing third-party 
+developpers to extend its standard functionalities.
+
+Basically, a Youpi processing plugin is made of four distinct files. One of them is a 
+Python script used for all server-side actions, such as (but not limited to) database 
+interactions, variables or constants you would like |django|_ to substitute in your HTML 
+templates, and class member methods you would like to be available to the public 
+interface of your plugin (so you can call them using AJAX calls from your Javascript 
+files). The remaining three files are client-side related: a Javascript file holding 
+all your client-side routines and two HTML templates files for rendering the plugin on 
+the processing page and rendering the plugin related items in the shopping cart 
+respectively.
+
+Finally, when you are done writting your new plugin, the plugin manager will find, 
+register and load your code into Youpi's processing part. Let's begin with a simple 
+example.
 
 Hello, world!
 =============
 
+*TBW*
+
 Naming Conventions
 ==================
+
+Before we continue with a concrete example in the next section, let us have a brief 
+discussion about naming policy related to Youpi plugin development. All your 
+plugins related files should live in two places (only those paths will be searched 
+for file inclusion), in a ``templates`` or ``youpi/plugins/`` directory.
+
+The ``templates`` directory, which should hold all your HTML and JavaScript 
+client-side template files. Let ``myplugin`` be your new plugin's name. In order 
+to respect Youpi naming policy, you should prepend file names with the ``plugin`` 
+keyword (note the underscore). So, you should create and use the following files::
+
+	templates/plugin_myplugin_item_cart.html
+	templates/plugin_myplugin.html
+	templates/plugin_myplugin.js
+
+Files in this directory get substituted by |django| before client-side rendering. 
+One might wonder why every plugin's JavaScript file is in there and why it needs 
+to be substituted. The reason for this rather unexpected location (it should 
+preferably belong to the ``media/js`` directory, defined to be the location 
+holding all JavaScript-related files) is that server-side |django| substitution 
+may help with the lack of robust namespacing support in JavaScript. Let us consider 
+the rendering of the HTML processing page, as defined in the ``templates/processing.html`` 
+file. Two parts are of interest::
+
+	<script type="text/javascript">
+	  {# Load custom plugin's javascript code if available #}
+	  {% for plugin in plugins %}
+	  {% include plugin.jsSource %} <co id="co-jsplugin"/>
+	  {% endfor %}
+	</script>
+	...
+	{% for plugin in plugins %}
+	{% if forloop.first %}
+	<div id="menuitem_{{ plugin.id }}">
+	  {% else %}
+	<div id="menuitem_{{ plugin.id }}" style="display: none">
+	  {% endif %}
+	  <table width="100%">
+		<tr>
+		  <td>
+			<p>Plugin description: {{ plugin.description }}, version {{ plugin.version }}</p>
+			<div align="center">{% include plugin.template %}</div> <co id="co-ptemplate"/>
+		  </td>
+		</tr>
+	  </table>
+	</div>
+	{% endfor %}
+
+``{% include plugin.jsSource %}`` includes each registered plugin's javascript code. 
+The ``include`` statement is a |django|'s built-in template tag which loads a template 
+file and renders it *with the current context*, thus making the ``plugin`` variable 
+available into your JavaScript ``jsSource`` file too.
+
+{% include plugin.template %} shows how plugin HTML template data is included into 
+the final HTML document.
+
+Since the ``plugin`` variable is a Python object (which inherits the ``Spica2Plugin`` 
+class), |django|'s template system is able to access all its data members. Context 
+variable lookup can get around this namespacing issue by, for example, prefixing 
+function and variable names with the plugin's unique identifier. Therefore, instead 
+of writing this::
+
+	function my_plugin_function() {}
+	var my_global_var;
+	<div id="my_unique_id"></div>
+
+do write instead::
+
+	function {{ plugin.id }}_my_plugin_function() {}
+	var {{ plugin.id }}_my_global_var;
+	<div id="{{ plugin.id }}_my_unique_id"></div>
+
+Let ``myid`` be your plugin's unique identifier. After rendering, final HTML data 
+will look like this::
+
+	function <emphasis role="strong">myid</emphasis>_my_plugin_function() {}
+	var <emphasis role="strong">myid</emphasis>_my_global_var;
+	<div id="<emphasis role="strong">myid</emphasis>_my_unique_id"></div>
+
+The ``youpi/plugins/`` directory, which should hold your server-side Python ascript. 
+There is no particular naming policy since all Python files that belongs to this 
+directory are parsed by the *plugin manager* at registration time. For example, 
+default plugin Python filenames are among the following::
+
+	youpi/plugins/qualityfitsin.py
+	youpi/plugins/qualityfitsout.py
+	youpi/plugins/sextractor.py
+	youpi/plugins/scamp.py
+	youpi/plugins/swarp.py
+
 
 About Ajax Calls
 ================
 
+For enhanced client-server interactions, you will certainly want to use the usefull 
+XHR facility provided by JavaScript. Sending asynchronous queries to a server allows 
+to do powerful things inside your client scripts, such as manipulating the DOM [#DOM]_ 
+according to the response received by the XHR query.
+
+If you are dealing with AJAX calls in Youpi, your are advised to use the simple 
+XHR object defined in file ``media/js/xhr.js`` that works as a wrapper with 
+convenient methods. It provides a very simple API with some useful callback mechanisms 
+for error and result handling. As you can see, its use is rather straightforward::
+
+	<script type="text/javascript" src="/media/js/xhr.js"></script>
+	<div id="container"></div>
+
+	<script type="text/javascript">
+	  var r = new HttpRequest(
+		'container',
+		null,
+		function(resp) { 
+		  var data = resp['result'];
+		}
+	  );
+
+	  var post = 'Key1=' + value1 + '&amp;Key2=' + value2;
+	  r.send('/url/to/server/script/', post); <co id="co-post_send"/>
+	</script>
+
+First, you have to set an HTML ``div`` element which acts like a block container. 
+It is only used to display some kind of "Data loading, please wait..." message
+while waiting for incoming data.  Set this parameter to ``null`` if you want no 
+"loading..." message to be displayed. The ``div``'s ``id`` must be unique in the 
+document.
+
+The ``null`` parameter indicates that no custom error handler is defined, so the 
+default one (displaying an error message embedded into the ``div`` container) will 
+be used instead.
+
+The last argument is about handling results. You should define a callback function 
+with only one argument. This function prototype has to be used every time you want 
+to access your results.  Once the XHR object gets a successful response from the 
+server, it passes an evaluation of the returned data to your custom handler code. 
+Your data, if any, will always be accessible through the content of ``resp.result`` 
+and can be of any supported JavaScript type.
+
+Handle your response here.
+
+Defines some parameters to be sent as POST data.
+
+Finally, call the ``send()`` method to send the POST HTTP query.
+
+Youpi's XHR object only supports POST HTTP requests; the ``Content-type`` 
+request header is always set to ``application/x-www-form-urlencoded``. Thus, 
+you can submit optional &post; data as a second parameter to its ``send()`` 
+function, the only one that effectively issues the query.
+
+When you are writing a processing plugin for Youpi, you have to write both 
+client-side - your HTML template file(s) and your JavaScript ``jsSource`` file 
+- and server-side code (your Python class that inherits ``YoupiPlugin``). Because 
+all your plugin's server-side code have to be a part of your Python class, Youpi 
+provides a way to call a specific member method from your plugin's JavaScript code. 
+A dedicated |django|'s URL has been defined and serves as a unique entry point, 
+so that you can use it to access any member method of any available plugin. 
+Have a look at its definition in ``urls.py``::
+
+	(r'^spica2/process/plugin/$', 'processing_plugin')
+
+.. rubric:: Footnotes
+
+.. [#DOM] The Document Object Model is fully implemented in recent versions of 
+          JavaScript and is supported in almost all today's web browsers 
+
 Active Monitoring Interface Integration
 =======================================
+
+*TBW*
 
 Wrap Your Cluster Code!
 =======================
 
+*TBW*
+
 Mandatory Data Members
 ======================
+
+*TBW*
 
 

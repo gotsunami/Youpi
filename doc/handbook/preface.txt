@@ -24,8 +24,8 @@ Organization of This Book
 Getting This Book
 =================
 
-Feel free to get a copy of this book from `Youpi's website`_. Both PDF, HTML and plain text 
-file formats are available.
+Feel free to get a copy of this book from `Youpi's website`_. Both PDF and HTML file 
+formats are available.
 
 .. _Youpi's website: http://youpi.terapix.fr
 

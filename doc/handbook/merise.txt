@@ -36,11 +36,76 @@ Validation flag        QSOstatus      Image validation status                   
 FITSin Entity
 -------------
 
+=============================== ============== ================================================================================ ========== ============ ==============
+Full name                       DB field name  Description                                                                      Unit       Type         Display Format
+=============================== ============== ================================================================================ ========== ============ ==============
+RA offset                       astoffra       Offset wrt astrometric reference catalogue in RA                                 arcsec (") ``float``    ``%8.3g``
+Dec offset                      astoffde       Offset wrt astrometric reference catalogue in Dec                                arcsec (") ``float``    ``%8.3g``
+                                astromaccuracy                                                                                                      
+RA std dev                      aststdevra     Dispersion wrt astrometric reference catalogue in RA                             arcsec(")  ``float``    ``%8.3g``
+Dec std dev                     aststdevde     Dispersion wrt astrometric reference catalogue in Dec                            arcsec(")  ``float``    ``%8.3g``
+Minimum PSF FWHM                psffwhmmin     Minimum Full-Width at Half-Maximum of the PSF                                    arcsec(")  ``float``    ``%8.3g``
+Average PSF FWHM                psffwhm        Central/average Full-Width at Half-Maximum of the PSF                            arcsec(")  ``float``    ``%8.3g``
+Maximum PSF FWHM                psffwhmmax     Maximum Full-Width at Half-Maximum of the PSF                                    arcsec(")  ``float``    ``%8.3g``
+Minimum PSF half-light diameter psfhldmin      Minimum half-light diameter of the PSF                                           arcsec(")  ``float``    ``%8.3g``
+Average PSF half-light diameter psfhldm        Average half-light diameter of the PSF                                           arcsec(")  ``float``    ``%8.3g``
+Maximum PSF half-light diameter psfhldmax      Maximum half-light diameter of the PSF                                           arcsec(")  ``float``    ``%8.3g``
+Minimum PSF elongation          psfelmin       Minimum elongation of the PSF                                                               ``float``    ``%5.2f``
+Average PSF elongation          psfel          Central/average elongation of the PSF                                                       ``float``    ``%5.2f``
+Maximum PSF elongation          psfelmax       Maximum elongation of the PSF                                                               ``float``    ``%5.2f``
+Minimum PSF chi2/d.o.f.         psfchi2min     Minimum chi2/d.o.f. of the PSF fit                                                          ``float``    ``%7.2g``
+Average PSF chi2/d.o.f.         psfchi2        Central/average chi2/d.o.f. of the PSF fit                                                  ``float``    ``%7.2g``
+Maximum PSF chi2/d.o.f.         psfchi2max     Maximum chi2/d.o.f. of the PSF fit                                                          ``float``    ``%7.2g``
+Minimum PSF residuals           psfresimin     Minimum residuals from the PSF fit                                                          ``float``    ``%7.2g``
+Average PSF residuals           psfresi        Central/average residuals from the PSF fit                                                  ``float``    ``%7.2g``
+Maximum PSF residuals           psfresimax     Maximum residuals from the PSF fit                                                          ``float``    ``%7.2g``
+Minimum PSF asymmetry           psfasymmin     Minimum asymmetry from the PSF fit                                                          ``float``    ``%7.2g``
+Average PSF asymmetry           psfasym        Central/average asymmetry from the PSF fit                                                  ``float``    ``%7.2g``
+Maximum PSF asymmetry           psfasymmax     Maximum asymmetry from the PSF fit                                                          ``float``    ``%7.2g``
+Minimum number of PSF stars     nstarsmin      Minimum number of point sources per detector used for PSF modeling                          ``long int`` ``%d``
+Average number of PSF stars     nstars         Average number of point sources per detector used for PSF modeling                          ``long int`` ``%d``
+Maximum number of PSF stars     nstarsmax      Maximum number of point sources per detector used for PSF modeling                          ``long int``   %d``
+Median background               bkg            Median background level                                                          ADU        ``float``    ``%9.4g``
+Background RMS                  bkgstdev       Dispersion RMS of the background level                                           ADU        ``float``    ``%8.3g``
+Saturation level                satlev         Detector saturation level                                                        ADU        ``float``    ``%9.4g``
+Path to mask                    mask           Absolute path to mask data                                                                  ``string``   ``%s``
+Path to flat                    flat           Absolute path to flat data                                                                  ``string``   ``%s``
+Path to region                  reg            Absolute path to region data                                                                ``string``   ``%s``
+QualityFITS configuration       qfconfig       QF configuration file serialized content (base64 encoding over zlib compression)            ``string``   ``%s``
+HTTP url                        www            URL to QF output HTML data                                                                  ``string``   ``%s``
+Results ingestion log           qflog          Results ingestion log                                                                       ``string``   ``%s``
+Previous quality evaluation     prevrelgrade   Previous QualityFITS in grading                                                             ``string``   ``%s``
+Previous quality comment        prevrelcomment Previous QualityFITS in comment                                                             ``string``   ``%s``
+=============================== ============== ================================================================================ ========== ============ ==============
+
 Scamp Entity
 ------------
 
+===================== ============= =================================================================================================================== =========== ==============
+Full name             DB field name Description                                                                                                         Type        Display Format
+===================== ============= =================================================================================================================== =========== ==============
+Results ingestion log log           Results ingestion log                                                                                               ``string``  ``%s``
+Scamp configuration   config        Scamp configuration file serialized content (base64 encoding over zlib compression)                                 ``string``  ``%s``
+HTTP url              www           URL to Scamp output data                                                                                            ``string``  ``%s``
+LDAC Files            ldac_files    List of LDAC files used during processing (serialized data)                                                         ``list``    ``%s``
+Thumbnails            thumbnails    True if thumbnails of output images (only group #1) have been created during processing (with convert utility)      ``boolean`` ``%s``
+===================== ============= =================================================================================================================== =========== ==============
+
 Swarp Entity
 ------------
+
+===================== =============== ======================================================================================== =========== ==============
+Full name             DB field name   Description                                                                              Type        Display Format
+===================== =============== ======================================================================================== =========== ==============
+Results ingestion log log             Results ingestion log                                                                    ``string``  ``%s``
+Swarp configuration   config          Swarp configuration file serialized content (base64 encoding over zlib compression)      ``string``  ``%s``
+HTTP url              www             URL to Swarp output data                                                                 ``string``  ``%s``
+Thumbnails            thumbnails      True if thumbnails of output images have been created during processing                  ``boolean`` ``%d``
+Weight Path           weightPath      Path to WEIGHT data used for this processing                                             ``string``  ``%s``
+Use QFITS Weights     useQFITSWeights True if QFits weight maps have been used                                                 ``boolean`` ``%d``
+Head Path             headPath        Path to .head files used for this processing                                             ``string``  ``%s``
+Use Head Files        useHeadFiles    True if .head files from Scamp processings have been used                                ``boolean`` ``%d``
+===================== =============== ======================================================================================== =========== ==============
 
 
 The Conceptual Model of Data
