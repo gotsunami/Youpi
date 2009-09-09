@@ -194,6 +194,10 @@ rst_epilog = """
 .. |django| replace:: Django
 .. |pm| replace:: *plugin manager*
 .. _django: http://www.djangoproject.com/
+.. |python| replace:: Python
+.. _python: http://www.python.org/
+.. |terapix| replace:: TERAPIX
+.. _terapix: http://www.terapix.fr/
 """
 
 #html_theme_path = ['themes']
