@@ -1,8 +1,8 @@
-=======
+*******
 Preface
-=======
+*******
 
-Todo
+*TBW*
 
 Youpi Application Features
 ==========================
@@ -18,8 +18,12 @@ Handy features are available out of the box. With Youpi, you can:
 - Easily access all your output results
 - Get statistics and generate reports
 
+
 Organization of This Book
 =========================
+
+*TBW*
+
 
 Getting This Book
 =================
@@ -29,5 +33,8 @@ formats are available.
 
 .. _Youpi's website: http://youpi.terapix.fr
 
+
 Request For Comments
 ====================
+
+*TBW*

@@ -2,10 +2,77 @@
 Frequently Asked Questions (FAQ)
 ################################
 
+
+This is the Frequently Asked Questions section is split into two parts: user-related 
+questions and developer-related ones.
+
+
 ********
 User FAQ
 ********
 
+.. contents::
+   :local:
+
+*TBW*
+
+
 *************
 Developer FAQ
 *************
+
+.. contents::
+   :local:
+
+I'm facing issues with foreign keys and integrity. How do I restart from scratch with a clean DB, keeping all my data?
+----------------------------------------------------------------------------------------------------------------------
+
+1. First, let's set up some environment variables::
+
+	$ export _DBUSER=yulia _HOST=dbterapix _DB=youpi_yulia
+
+2. Do a **full backup** of your data::
+
+	$ mysqldump -u${_DBUSER} -h${_HOST} -p ${_DB} \
+	--hex-blob --complete-insert \
+	> backup-full.sql
+
+3. Backup only the data from your database (not the SQL create statements)::
+
+	$ mysqldump -u${_DBUSER} -h${_HOST} -p -t ${_DB} \
+	--hex-blob --complete-insert \
+	--ignore-table=${_DB}.auth_permission \
+	--ignore-table=${_DB}.django_content_type \
+	--ignore-table=${_DB}.django_site \
+	> backup-dataonly.sql
+
+  - The ``-t`` parameter instructs ``mysqldump`` to only dump the data, not the 
+    instructions for creating the tables. 
+
+  - The ``--complete-insert`` parameter allows to write full INSERT statements to the 
+    backup file, so we can guarranty future imports will behave as expected, with MySQL 
+    not trying to insert bad data types into fields.
+
+  - Finally, the ``--ignore-table`` parameters are used to disable backup of Django's 
+    tables ``auth_permission``, ``django_content_type`` and ``django_site``. Those 
+    tables (and content) will be automatically created by Django's ``syncdb`` command 
+    later.
+
+4. Empty the database. Connect to your MySQL server then issue the following statements::
+
+	> drop database ${_DB};
+	> create database ${_DB};
+
+5. Reset the DB, reverting to a clean DB structure::
+
+	$ cd $YOUPISRC/terapix
+	$ python manage.py syncdb
+
+  This will create all the tables and indexes. Answer ``no`` to the question about 
+  adding at least one admin user. This is not required since every ``auth_*`` table 
+  information has been backed up at step 3 and will be reused.
+
+6. Finally, import your previously saved data::
+
+	$ mysql -u${_DBUSER} -h${_HOST} -p ${_DB} &lt; backup-dataonly.sql
+

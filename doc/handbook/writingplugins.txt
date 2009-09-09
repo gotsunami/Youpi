@@ -6,6 +6,7 @@ This section is focusing on the processing capabilities of Youpi and aims to be
 a short guideline - by providing useful background information - to the software 
 developper that needs to understand, improve and write processing plugins for Youpi.
 
+
 Plugin Concept Overview
 =======================
 
@@ -28,7 +29,7 @@ all your client-side routines and two HTML templates files for rendering the plu
 the processing page and rendering the plugin related items in the shopping cart 
 respectively.
 
-Finally, when you are done writting your new plugin, the plugin manager will find, 
+Finally, when you are done writting your new plugin, the |pm| will find, 
 register and load your code into Youpi's processing part. Let's begin with a simple 
 example.
 
@@ -120,7 +121,7 @@ will look like this::
 
 The ``youpi/plugins/`` directory, which should hold your server-side Python ascript. 
 There is no particular naming policy since all Python files that belongs to this 
-directory are parsed by the *plugin manager* at registration time. For example, 
+directory are parsed by the |pm| at registration time. For example, 
 default plugin Python filenames are among the following::
 
 	youpi/plugins/qualityfitsin.py
@@ -198,24 +199,292 @@ Have a look at its definition in ``urls.py``::
 
 	(r'^spica2/process/plugin/$', 'processing_plugin')
 
+This line explicitely maps the ``/spica2/process/plugin/`` URL to the server-side 
+|django|'s callback function ``processing_plugin()`` defined in ``views.py``::
+
+	def processing_plugin(request):
+		try:
+			pluginName = request.POST['Plugin']
+			method = request.POST['Method']
+		except Exception, e:
+			return HttpResponseBadRequest('Incorrect POST data')
+
+		plugin = manager.getPluginByName(pluginName)
+		try:
+			res = eval('plugin.' + method + '(request)')
+		except AttributeError:
+			raise PluginError, "Plugin '%s' has no method '%s'" % (plugin.id, method)
+
+		# Response must be a JSON-like object
+		return HttpResponse(str({'result' : res}), mimetype = 'text/plain')
+
+``Plugin`` and ``Method`` are required POST parameters. The former is the plugin's 
+identifier, the latter your plugin's method member that is to be executed. 
+
+Asks the |pm| which plugin matches this ``pluginName`` string identifier; it raises 
+a ``PluginManagerError`` Python exception if no plugin with this name has been found.
+
+Executes the requested method. As you can see, the ``request`` variable is passed to 
+every plugin method so that you can access easily request parameters from your plugin
+code. 
+
+Finally, the function returns a Python dictionary that matches the JSON [#JSON]_ format.
+
+The ``processing_plugin()`` function is defined as a |django| *view function* which 
+is a Python function that takes a web request - an ``HttpRequest`` object - as argument 
+and returns a web response. The ``request`` variable is an ``HttpRequest`` instance 
+that holds really useful information such as the HTTP method used in the request, GET 
+or POST data parameters, all HTTP headers, session and currently logged-in user data. 
+
+The JSON response is well suited for transmitting structured data over a network 
+connection and can be natively processed by JavaScript within your callback response 
+handler::
+
+	function myHandler(resp) {
+		var data = resp.result;
+		// Now data is (have to be) a JSON object ready for processing
+		...
+	}
+
+Thus, in order for your response to be parsed and processed successfully at client-side 
+level, every plugin's method have to return a JSON-aware Python dictionary.
+
 .. rubric:: Footnotes
 
 .. [#DOM] The Document Object Model is fully implemented in recent versions of 
           JavaScript and is supported in almost all today's web browsers 
+.. [#JSON] JavaScript Object Notation data-interchange format
+
 
 Active Monitoring Interface Integration
 =======================================
 
-*TBW*
+Youpi comes with a built-in job monitoring web interface, the *Active Monitoring Interface*
+(AMI for short), that allows realtime monitoring of all Youpi-related jobs running 
+on the Condor cluster. Each entry (one entry per job) gives information about:
+
+- the *Condor job's ID* which identifies a job uniquely on the cluster
+- the *Youpi's job owner* which is the username of the Youpi's account that initiated 
+  the job. 
+
+  .. note:: this is *not* the same as the UNIX user that executes Condor jobs on the cluster. 
+            Youpi's job owner is the login name - stored in the database - of the registered 
+            account that submitted the job through the web interface.
+
+- the kind of processing being made with a *short one-line description*
+- the *remote cluster host* where the job is running
+- the *elapsed time* since job submission
+- the *Condor job's status* on the cluster. A job can be marked as ``Idle`` if it is 
+  part of the queue, waiting for available resources (that matches its execution requirements) 
+  in order to run, or marked as ``Running`` if it is effectively executing on a node, or 
+  marked as ``Hold`` if Condor caught some exception while trying to terminate and release 
+  the job. A job that terminates with errors will not be part of Condor's queue anymore 
+  and will disappear from Youpi's *AMI* too.  There will be *no error reporting* through 
+  the *AMI*. In such cases, the user will have to check Condor's error log files manually, 
+  which is not very user-friendly. Therefore, suitable error handling should be added to 
+  your code to catch exceptions and avoid this situation.
+
+The *AMI* periodically monitors the XML output of the ``condor_q`` command. Almost all 
+previously mentionned information is retreived while parsing the XML data except for the 
+*Youpi's job owner* and the *short one-line description* fields, which are not Condor-related 
+information but instead Youpi-related user data. Thus, in order to make your plugin support 
+the AMI, special care must be taken when dealing with CSF generation within your scripts.
+
+Passing extra user data to Condor is achieve by defining the ``SPICA_USER_DATA`` environment 
+variable in the CSF. Its content has to be a base64-encoded serialized Python dictionary 
+with at least the two mandatory keys ``Descr`` that stands for ``description`` and 
+``UserID``, which is the Django unique user identifier (in fact, there is a third mandatory 
+key, ``Kind``, that we will discuss shortly)::
+
+	userData = {
+	  'Descr' : "%s of" % self.optionLabel,
+	  'UserId': request.user.id,
+	  # This dictionary can contain any kind of Python data
+	  'OtherData' : [] 
+	}
+
+	# CSF generation
+	csf = """
+	executable  = mybin
+	universe    = vanilla
+	environment = SPICA_USER_DATA=%s
+	...
+	""" % base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+
+	# Submit the job on Condor
+	pipe = os.popen("%s/condor_submit %s 2>&amp;1" % (CONDOR_PATH, csf))
+	data = pipe.readlines()
+	pipe.close()
+
+
+Also, note that the presence of the ``YOUPI_USER_DATA`` environment variable ensures 
+that only Youpi related jobs are filtered and monitored. Other Condor jobs will not 
+be monitored by the *AMI*.
+
 
 Wrap Your Cluster Code!
 =======================
 
-*TBW*
+Every built-in Youpi plugin that initiates jobs on the Condor cluster keeps track of 
+various processing information by storing it into the database. The ``youpi_processing_task``
+MySQL table holds information about a job exit status, the user that initiated the job, 
+the kind of processing performed, start and end times, the cluster node used for processing 
+data and the complete error log content if ``success`` is null.
+
+If your plugin is designed to send jobs to the Condor cluster, you may find useful to 
+use the ``wrapper_processing.py`` wrapper script provided with the distribution. Without 
+it, it would be rather difficult to get accurate information about a processing task 
+executing on a cluster's node. Moreover, getting the task's exit code would not be easy 
+either as you would have to parse Condor log files. 
+
+The ``wrapper_processing.py`` script will help you by encapsulating your processing 
+task. It is the one that will be executed on the target node, taking control over your 
+processing task execution, performing the following actions:
+
+- The wrapper script first performs some sanity checks. It looks for the ``Kind`` dictionary 
+  key into its first argument, which must be a *base64-encoded serialized Python dictionary* 
+  (remember the ``YOUPI_USER_DATA`` variable in the previous section?). If not found, a 
+  ``WrapperError`` Python exception is raised, thus terminating the processing. This keyword 
+  is mandatory because it allows the wrapper script to take special action depending on 
+  ``Kind``'s associated value. Youpi's built-in plugins use the ``Plugin.id`` data member for 
+  the ``Kind`` keyword.
+
+  In order to know if a *processing kind* is available, Youpi maintains a ``youpi_processing_kind`` 
+  table with some information about registered plugins. Again, if ``Kind``'s associated value 
+  does not match any of that table's entries, a ``WrapperError`` Python Exception is raised; 
+  the wrapper script is aborted.
+
+- The wrapper script then call its ``process()`` function, passing it the ``userData`` 
+  Python dictionary and the remaining command line arguments. This function
+
+  1. inserts an entry in the ``youpi_processing_task`` table, filling the information 
+     related to the node's hostname, the Django's user ID, the processing kind and 
+     starting date.
+
+  2. executes the command line arguments - your real processing stuff - in a subshell 
+     and waits for the shell to finish executing the command. It then saves the exit 
+     status of the shell.
+
+  3. performs some custom actions depending on your ``Kind``'s keyword value. This is 
+     where you can enhance the wrapper script to ``add support for your plugin``.
+
+  4. updates the ``youpi_processing_task`` table with the error log content if the 
+     processing was not successful (content is compressed and base64-encoded), fills 
+     the ``end_date`` and ``success`` data fields.
+
+Once your processing is over, the wrapper script exits, the job terminates and is removed 
+from Condor's queue.
+
+.. figure:: figures/function_calls.svg
+   :width: 800pt
+
 
 Mandatory Data Members
 ======================
 
-*TBW*
+Before you can start writing your brand new plugin, you must be aware that some variables - 
+your class' data members - are needed in order to make Youpi behave the way you expected. 
 
+For example, to prevent registration of non plugin-related code, some sanity checks are 
+performed to ensure that imported modules are conforming to the expected plugin infrastructure. 
+Those sanity checks need to access specific data members in every plugin's code, thus 
+making some data members mandatory at plugin's registration time. 
+
+Other mandatory data members are accessed by core - mainly HTML templates - files. 
+The following figure provides some information about those dependencies. Core Youpi
+files (with rounded diamond shape) need some Python data members, thus making their 
+definition at plugin level mandatory.
+
+.. figure:: figures/mandatory_vars.svg
+   :width: 800pt
+
+Mandatory Python data members are:
+
+enable
+	Boolean that states whether a plugin should be registered by the |pm| making it 
+	available for the entire application. Set ``enable`` to ``False`` if you want to 
+	disable a plugin, making it unavailable for the entire site.
+
+	Every plugin inherits the ``YoupiPlugin`` class (defined in ``pluginmanager.py``) 
+	which defines an ``enable`` data member with a value that defaults to ``True``.
+
+id
+	String that identifies a plugin uniquely. Two plugins can't have the same id. If some 
+	internal names collide, the |pm| aborts plugins loading and raises a ``PluginManagerError``
+	Python exception. If you dive into some parts of the code of existing plugins, you may 
+	see that this ``id`` string is used quite intensively in templates - files whose content is 
+	dynamically substituted at runtime by Django -  for prefixing variable or function names. 
+	This is useful when dealing with Javascript code since this technique allows to easily deal 
+	with the lack of robust native namespace support. The only file referencing the ``id`` 
+	variable is ``pluginmanager.py``.
+
+index
+	Integer used by the |pm| at loadtime to visually sort submenus (one submenu per plugin) 
+	on the processing web page. The plugin that comes with the smaller index gets displayed 
+	first (from left to right) on the screen. Note that two plugins may have the same index 
+	but this will have no effect on the resulting order (the sort algorithm is fairly simple 
+	and does not do anything special in that case). Again, the only file referencing the 
+	``index`` variable is ``pluginmanager.py``.
+
+optionLabel
+	String used by the |pm| to set a plugin's menu item title on the processing page. Note 
+	that no particular checks are performed so that plugins with the same ``optionLabel``
+	value will have the same menu title, which is not what you might want. This variable 
+	is referenced by three template files: ``processing.html``, ``plugin_default.html``
+	and ``shoppingcart.html``.
+
+description
+	Short inline string used to display some plugin's general action. Youpi uses this 
+	variable to name the low-level program that really does the job. While the ``optionLabel`` 
+	variable should hold a rather general option name, the ``description`` data member should 
+	be used to define more accurate, lower level kind of information. This variable is 
+	referenced by the templates files ``processing.html`` and ``shoppingcart.html``.
+
+itemPrefix
+	String used at the shopping cart level to add a custom prefix to items' names in the 
+	cart. The only file referencing this variable is the ``shoppingcart.html`` template.
+
+template
+	String used to specify the Django template file to use for custom HTML rendering on 
+	the processing page.  This file is the critical part of any plugin's client-side code. 
+	Since its content is processed by the Django's template rendering engine, any template 
+	tags and filters can be used within the file and, of course, server-side context 
+	variables are substituted before rendering. The only file referencing this variable is 
+	the ``processing.html`` template.
+
+	Please note that, technically speaking, the ``template`` data member is not mandatory. 
+	When Django renders the ``processing.html`` template, it tries to include - for every 
+	registered plugin - the HTML template referenced by the ``template`` plugin's data 
+	member. In ``processing.html``, the (simplified) substitution code looks like the 
+	following::
+
+		{% for plugin in plugins %}
+		<div>{% include plugin.template %}</div>
+		{% endfor %}
+
+	The ``YoupiPlugin`` class defines a generic ``template`` data member with a value 
+	that defaults to the file ``plugin_default.html``. So if you forget to provide a 
+	``template`` data member to your custom plugin, this default HTML template will be 
+	used instead, reminding you that you certainly missed something. 
+
+itemCartTemplate
+	String defining a Django HTML template that will be included into the shopping cart 
+	template for custom rendering. This is where you decide what your plugin's related 
+	items will look like and behave on the shopping cart page. The only file referencing 
+	this variable is the ``shoppingcart.html`` template.
+
+jsSource
+	String used to specify a filename containing some custom JavaScript source code for 
+	your plugin. Even if you don't have any JavaScript code to put into this file right 
+	now, it is a good practice to create an empty file and set up your ``jsSource`` data 
+	member accordingly. Indeed, core templates files such as ``shoppingcart.html`` *will* 
+	try to include every plugin's external JavaScript code::
+
+		{# Load custom plugin's javascript code when needed #}
+		{% for plugin in plugins %}
+		{% include plugin.jsSource %}
+		{% endfor %}
+
+	The ``jsSource`` variable is referenced by three template files: ``shoppingcart.html``, 
+	``results.html`` and ``single_results.html``.
 

@@ -6,6 +6,10 @@ Welcome to Youpi documentation!
 :Authors: Mathias Monnerville <monnerville@iap.fr>, Gregory Semah <semah@iap.fr>
 :Organization: Terapix, IAP
 :Copyright: 2008, 2009 Terapix, Institut d'Astrophysique de Paris
+
+:Release: |version|
+:Date: |today|
+
 :Abstract: 
 
 Youpi stands for "YOUpi is your processing PIpeline". It is a modern, easy 
