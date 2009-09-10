@@ -105,7 +105,7 @@ html_style = 'default.css'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = '../../terapix/media/themes/default/img/misc/youpi_logo_small.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -174,7 +174,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = '../../terapix/media/themes/default/img/misc/youpi_logo_small.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -188,3 +188,29 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+# Will be included at the end of every source file
+rst_epilog = """
+.. |django| replace:: Django
+.. |pm| replace:: *plugin manager*
+.. _django: http://www.djangoproject.com/
+.. |python| replace:: Python
+.. _python: http://www.python.org/
+.. |terapix| replace:: TERAPIX
+.. _terapix: http://www.terapix.fr/
+"""
+
+#html_theme_path = ['themes']
+html_theme = "default"
+html_theme_options = {
+	#'relbarbgcolor': '#4780b5',
+	'footerbgcolor': '#270b2e',
+	'relbarbgcolor': '#515185',
+	#'codebgcolor': '#fee0c6',
+	'sidebarbgcolor': '#d1d7de',
+	'sidebartextcolor': '#000000',
+	'headtextcolor': '#111111',
+	#'sidebarlinkcolor': '#256193',
+	'sidebarlinkcolor': '#515185',
+}
+

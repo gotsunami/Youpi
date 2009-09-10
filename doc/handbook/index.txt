@@ -6,12 +6,16 @@ Welcome to Youpi documentation!
 :Authors: Mathias Monnerville <monnerville@iap.fr>, Gregory Semah <semah@iap.fr>
 :Organization: Terapix, IAP
 :Copyright: 2008, 2009 Terapix, Institut d'Astrophysique de Paris
+
+:Release: |version|
+:Date: |today|
+
 :Abstract: 
 
 Youpi stands for "YOUpi is your processing PIpeline". It is a modern, easy 
 to use yet powerful web application providing high level functionalities to 
 perform data reduction on scientific `FITS`_ images. Built on top of various 
-open source reduction tools released to the community by `TERAPIX`_, Youpi can 
+open source reduction tools released to the community by |terapix|_, Youpi can 
 help organize your data, manage your processing jobs on a computer cluster 
 in real time (using `Condor`_) and facilitate teamwork by allowing fine-grain 
 sharing of results and data. Built from the ground up with modularity in mind, 
@@ -29,7 +33,6 @@ This handbook covers the installation and day to day use of Youpi. Please note
 that this manual is a work in progress. As such, some sections may be incomplete. 
 
 .. _FITS: http://en.wikipedia.org/wiki/FITS
-.. _TERAPIX: http://terapix.iap.fr
 .. _Condor: http://www.cs.wisc.edu/condor/
 .. _GNU General Public License: http://www.gnu.org/licences/gpl-3.0.txt
 

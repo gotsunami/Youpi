@@ -2,18 +2,45 @@
 Installing Youpi
 ****************
 
+This chapter is about installing Youpi in a *GNU/Linux* environment. Actually, it should 
+work on most UNIX-like systems that support |python|_ (quite a lot). For example, Youpi 
+is currently hosted on a `FreeBSD`_ server at |terapix|_. 
+
+For the moment, two configurations can be considered while setting up a Youpi environment: 
+
+.. _standalone_installation:
+
+- you can decide to perform a **standalone installation** in order to install everything, 
+  i.e. Youpi and all its `dependencies`_, on the same Linux host. This way it is possible 
+  to reduce data with tools installed locally (while accessing your images remotely, for 
+  example over `NFS`_), which can be useful if you just want to give Youpi a try or if you 
+  don't plan to setup a more complex installation involving several cluster nodes for 
+  processing your data.
+
+  .. note:: We provide a *standalone installation* on a `Live DVD`_ , available from `Youpi's 
+            website`_. This is the quickest and easiest way to give Youpi a try. All software 
+            packages are installed and are already configured for immediate use. Everything is 
+            loaded at runtime into your computer's memory, so be sure to have a rather powerful
+            machine (with tons of memory!).
+
+.. _FreeBSD: http://www.freebsd.org
+.. _Youpi's website: http://youpi.terapix.fr/demo/
+.. _Live DVD: http://en.wikipedia.org/wiki/Live_cd
+.. _NFS: http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29
+
 
 Getting Youpi
 =============
 
 
+.. _dependencies:
+
 Software Dependencies
 =====================
 
-This section will guide through the Youpi installation process. As you will 
-see, running Youpi involves installing many software packages. Optional 
-packages will enhance Youpi's functionalities and will improve the final 
-user experience.
+As of today, running Youpi involves installing many software packages. Optional 
+packages will enhance Youpi's functionalities and will improve the final user 
+experience.
 
 Mandatory Packages
 ------------------
@@ -35,14 +62,22 @@ Optional Packages
 Installation
 ============
 
+This section will guide through the Youpi installation process. As you will see, 
+
 
 Configuration
 =============
+
+*TBW*
 
 
 Testing Your Installation
 =========================
 
+*TBW*
+
 
 Upgrading to New Releases
 =========================
+
+*TBW*
