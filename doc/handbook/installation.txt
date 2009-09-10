@@ -17,11 +17,22 @@ For the moment, two configurations can be considered while setting up a Youpi en
   don't plan to setup a more complex installation involving several cluster nodes for 
   processing your data.
 
-  .. note:: We provide a *standalone installation* on a `Live DVD`_ , available from `Youpi's 
-            website`_. This is the quickest and easiest way to give Youpi a try. All software 
-            packages are installed and are already configured for immediate use. Everything is 
-            loaded at runtime into your computer's memory, so be sure to have a rather powerful
-            machine (with tons of memory!).
+  .. note:: We provide a *standalone installation* on a `Live DVD`_ , available from 
+            `Youpi's website`_. This is the quickest and easiest way to give Youpi a try. All 
+            software packages are installed and are already configured for immediate use. 
+            Everything is loaded at runtime into your computer's memory, so be sure to have 
+            a rather powerful machine (with tons of memory!).
+
+- Most often, you will want to perform a **network or cluster installation** if you want to 
+  be able to process your images on a computer cluster. The *cluster installation* steps are 
+  lighter than those required for a fully operational *standalone installation* because there 
+  are much less software requirements. Most of the packages have only to be installated on the 
+  cluster nodes, while the computer running Youpi only needs *Condor* and some Python software 
+  packages.
+
+  .. note:: In both cases, you always need to have a running Condor installation on the host 
+            running Youpi. Indeed, Youpi needs to be able to submit jobs on the cluster (the 
+            ``condor_submit`` command is used internally to submit jobs).
 
 .. _FreeBSD: http://www.freebsd.org
 .. _Youpi's website: http://youpi.terapix.fr/demo/
@@ -32,15 +43,28 @@ For the moment, two configurations can be considered while setting up a Youpi en
 Getting Youpi
 =============
 
+The latest version of Youpi is available in the `download section`_ of Youpi's website.
+
+.. _download section: http://youpi.terapix.fr/download/
+
 
 .. _dependencies:
 
 Software Dependencies
 =====================
 
-As of today, running Youpi involves installing many software packages. Optional 
-packages will enhance Youpi's functionalities and will improve the final user 
-experience.
+As of today, running Youpi involves installing many software packages. Optional packages 
+will enhance Youpi's functionalities and will improve the final user experience. As 
+explained at the beginning of this chapter, the list of packages you need to install 
+depends on the type of installation - *standalone* or *cluster* - you want to perform.
+
+Dependency Tree
+---------------
+
+Here is a partial dependency tree to better visualize Youpi's packages dependencies::
+
+	.. figure:: figures/dependencies_tree.svg
+	   :width: 800pt
 
 Mandatory Packages
 ------------------
@@ -55,8 +79,53 @@ Mandatory Packages
 - MySQL
 - Condor
 
+- Apache
+- mod_python
+- MySQL Python
+- Pyfits
+- Numpy
+
+apache2-2.2.10.lzm                                                                                                                                                  
+deps[condor]-classadds-1.0.1.lzm                                                                                                                                    
+deps[condor]-glibc-2.8.lzm                                                                                                                                          
+deps[condor]-gsoap-2.7.12.lzm                                                                                                                                       
+deps[condor]-keyutils-libs-1.2.3.lzm                                                                                                                                
+deps[condor]-krb5-libs-1.6.3.lzm                                                                                                                                    
+deps[condor]-libselinux-2.0.73.lzm                                                                                                                                  
+deps[condor]-openldap-2.4.12.lzm                                                                                                                                    
+deps[condor]-openssl-0.9.8.lzm                                                                                                                                      
+deps[condor]-postgresql-libs-8.3.7.lzm                                                                                                                              
+deps[mysql-python]-mysql-5.0.51b.lzm                                                                                                                                
+deps[pyfits]-numpy-1.3.0.lzm                                                                                                                                        
+deps[scamp]-libtool-ltdl-2.2.6.lzm                                                                                                                                  
+deps[scamp]-plplot-5.9.2.lzm                                                                                                                                        
+deps[scamp]-plplot-libs-5.9.2.lzm                                                                                                                                   
+deps[scamp]-qhull-1.7-el5.lzm                                                                                                                                       
+deps[xfce4]-vte.0.17.4.lzm                                                                                                                                          
+deps[youpi]-cfitsio-3.140.lzm                                                                                                                                       
+deps[youpi]-condor-7.3.2.lzm                                                                                                                                        
+deps[youpi]-django-1.1.lzm                                                                                                                                          
+deps[youpi]-imagemagick-6.5.2.lzm                                                                                                                                   
+deps[youpi]-mod_python-3.3.1.lzm                                                                                                                                    
+deps[youpi]-mysql-python-1.2.2.lzm                                                                                                                                  
+deps[youpi]-pyfits-2.1.1.lzm                                                                                                                                        
+deps[youpi]-python-2.5.2.lzm                                                                                                                                        
+deps[youpi]-python-cjson-1.0.5.lzm                                                                                                                                  
+deps[youpi]-python-magic-0.1.lzm                                                                                                                                    
+deps[youpi]-python-matplotlib-0.98.5.2.lzm                                                                                                                          
+fr.terapix.youpi-svn.lzm                                                                                                                                            
+mercurial-1.3.1.lzm
+net.astromatic.scamp-1.5.5.lzm                                                                                                                                      
+net.astromatic.sextractor-2.8.6.lzm                                                                                                                                 
+net.astromatic.stiff-1.12.lzm                                                                                                                                       
+net.astromatic.swarp-2.17.6.lzm                                                                                                                                     
+vim-7.1.lzm                                                                                                                                                         
+xfce-4.4.3.lzm
+
 Optional Packages
 -----------------
+
+*TBW*
 
 
 Installation
