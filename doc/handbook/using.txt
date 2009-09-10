@@ -118,8 +118,8 @@ Adding a special policy to a kind of processing will be treated in the Processin
 
 Manual custom by setting custom selections:
 	If the characteristics of your cluster have no secrets for you, and you decide to make selections
-of nodes manually, you have to use the "Available Cluster Nodes" box and save them as custom selections.
-
+	of nodes manually, you have to use the "Available Cluster Nodes" box and save them as custom 
+	selections.
 
 
 Set up Your Preferences
