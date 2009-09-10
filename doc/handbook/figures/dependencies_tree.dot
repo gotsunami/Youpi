@@ -1,28 +1,30 @@
 digraph G {
 	size="5,5";
-	youpi 	[label="Youpi software"];
-	cfitsio 	[label="CFITSIO tools"];
-	condor 	[label="Condor"];
-	django		[label="Django"];
-	magic 	[label="Image Magick"];
-	modpython		[label="Apache mod_python"];
+	rankdir = LR;
+
+	youpi [label="Youpi software"];
+	cfitsio	[label="CFITSIO tools"];
+	condor [label="Condor"];
+	django [label="Django"];
+	magic [label="Image Magick"];
+	modpython [label="Apache mod_python"];
 	mysqlpython [label="MySQL-Python"];
-	pyfits	[label="PyFITS"];
-	python	[label="Python"];
+	pyfits [label="PyFITS"];
+	python [label="Python"];
 	pythoncjson	[label="Python cjson"];
 	pythonmagic	[label="Python magic"];
 	pythonmplib	[label="Python Matplotlib"];
-	apache	[label="Apache"];
-	mysql	[label="MySQL"];
+	pythonnumpy	[label="Python Numpy"];
+	apache [label="Apache"];
+	mysql [label="MySQL"];
 
-	scamp	[label="Scamp"];
-	sextractor	[label="Sextractor"];
-	stiff	[label="Stiff"];
-	Swarp	[label="Swarp"];
-	qfits	[label="QualityFITS"];
+	scamp [label="Scamp"];
+	sextractor [label="Sextractor"];
+	stiff [label="Stiff"];
+	swarp [label="Swarp"];
+	qfits [label="QualityFITS"];
 
 	youpi -> apache;
-	youpi -> mysql;
 	youpi -> cfitsio;
 	youpi -> condor;
 	youpi -> django;
@@ -32,8 +34,25 @@ digraph G {
 	youpi -> pythoncjson;
 	youpi -> pythonmagic;
 	youpi -> pythonmplib;
+	youpi -> pythonnumpy;
 	youpi -> mysqlpython;
-	mysqlpython -> mysql;
 
+	youpi -> scamp;
+	youpi -> sextractor;
+	youpi -> stiff;
+	youpi -> swarp;
+	youpi -> qfits;
+
+	qfits -> cfitsio;
+	mysqlpython -> mysql;
 	django -> python;
+	modpython -> apache;
+	modpython -> python;
+	pythonmagic -> python;
+	pythonmplib -> python;
+	pythoncjson -> python;
+	pythonnumpy -> python;
+	mysqlpython -> python;
+	pyfits -> python;
+	pyfits -> pythonnumpy;
 }

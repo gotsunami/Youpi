@@ -58,13 +58,13 @@ will enhance Youpi's functionalities and will improve the final user experience.
 explained at the beginning of this chapter, the list of packages you need to install 
 depends on the type of installation - *standalone* or *cluster* - you want to perform.
 
-Dependency Tree
----------------
+Dependencies Tree
+-----------------
 
-Here is a partial dependency tree to better visualize Youpi's packages dependencies::
+Here is a partial dependency tree to better visualize Youpi's packages dependencies:
 
 	.. figure:: figures/dependencies_tree.svg
-	   :width: 800pt
+	   :width: 600pt
 
 Mandatory Packages
 ------------------
