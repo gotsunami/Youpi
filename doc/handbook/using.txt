@@ -2,6 +2,9 @@
 Using Youpi
 ***********
 
+Befor diving into Youpi, let's first introduce to the basic functionnalitites of
+the pipeline.
+
 Pre-ingestion of FITS Tables
 ============================
 
@@ -22,8 +25,9 @@ difficult task.
 
 For example, CFHT provides FITS tables, and CFHTLS provides log files.
 
-The goal of this step is to pre-ingest meta-data from futures ingested images in 
-order to verify the existence of those images during the ingestion.
+.. note:: The goal of this step is to pre-ingest meta-data from futures ingested 
+		  images in order to verify the existence of those images during the 
+		  ingestion.
 
 
 FITS Data Ingestion
@@ -48,48 +52,47 @@ click on the red cross button ahead of the path.
 Before clicking on the "run ingestion" button, let's see some others features of the 
 ingestion tab process:
 
-#.	You can give an ID text field for your ingestion in order to distinguish it 
-	from others. 
-#.	A log file is generated each time an ingestion has run and finished. 
-	This log file can be sent as email at the end of the ingestion, by quoting the 
-	check box before running ingestions.
-#.	You can also see previous ingestions in the history tab of the ingestion page, and
-	their relative options.
+- You can give an ID text field for your ingestion in order to distinguish it 
+  from others. 
+- A log file is generated each time an ingestion has run and finished. 
+  This log file can be sent as email at the end of the ingestion, by quoting the check 
+  box before running ingestions.
+- You can also see previous ingestions in the history tab of the ingestion page, and
+  their relative options.
 
 
 A set of options is proposed to add a fine-grain control during ingestion:
 
 Data integrity control
-	Fitsverify is integrated to the ingestion at its low level checking, it will 
-	verify that the structure of the FITS image is not corrupted and will not affect 
-	the futur processing of it.
+Fitsverify is integrated to the ingestion at its low level checking, it will 
+verify that the structure of the FITS image is not corrupted and will not affect 
+the futur processing of it.
 
-Meta-data control (CFHT case,  with pre-ingestion)
-	This option is related to the pre-ingestion step. If no pre-ingestion have been done 
-	before, uncheck it to pass the control successfully. Otherwise, it is based on the 
-	check of the QSO status value filled during pre-ingestion. Checking this option means 
-	that you will ingest only images that have been preingested and with the QSO status 
-	value as validated (i.e certified and usable for science issues).
+Meta-data control (CFHT case, with pre-ingestion)
+This option is related to the pre-ingestion step. If no pre-ingestion have been done 
+before, uncheck it to pass the control successfully. Otherwise, it is based on the 
+check of the QSO status value filled during pre-ingestion. Checking this option means 
+that you will ingest only images that have been preingested and with the QSO status 
+value as validated (i.e certified and usable for science issues).
 
 Meta-data control (Normal case, without pre-ingestion)
-	Uncheck this option if no pre-ingestion step has been done.
+Uncheck this option if no pre-ingestion step has been done.
 
 Youpi allows the possibility to ingest the same image many times
-	The image will have the same name but the generated checksum, computed and linked 
-	to the image in the youpi database, will be different.
-
-
+The image will have the same name but the generated checksum, computed and linked 
+to the image in the youpi database, will be different.
 Youpi allows to keep data integrity, uniqueness, and tracks of the ingestion process.
 
 
-Behind the wall
 
-Server side, for each image a database entry is created and filled with relevant informations
-contained in the FITS header (run, instrument, Ra, Dec, observation date, channel...) and
-others computed on the fly of the ingestion (center of the field, sky footprint, checksum).
+.. note:: Server side, for each image a database entry is created and filled with relevant 
+		  informations contained in the FITS header (run, instrument, Ra, Dec, observation
+		  date, channel...) and others computed on the fly of the ingestion (center of the
+		  field, sky footprint, checksum).
+
 
 It adds more flexibility for searching, classifying, sorting operations which are needed 
-during the image lifetime through the pipeline.
+during the image lifetime and  through the pipeline.
 
 
 Deal With Condor Setup
@@ -105,20 +108,22 @@ Youpi also provides high level condor controls on its condor set up interface.
 
 There are 2 different ways to dispatch resources from this interface:
 
-Automatic custom by setting policies:
-	Policies are automatic selections based on the characteristics of each machine of your cluster.
+- Automatic custom by setting policies:
 
-It may be interesting to select automatically all machines with available memory greater than
-8 GB of RAM (for a scamp processing), or to exclude from the pool, machines with a specified name.
-So you can divide your cluster and save those sub nodes selection as policies in order to use 
-predefined sub pool for a specific processing.
+ Policies are automatic selections based on the characteristics of each machine of your cluster.
+ It may be interesting to select automatically all machines with available memory greater than
+ 8 GB of RAM (for a scamp processing), or to exclude from the pool, machines with a specified name.
+ So you can divide your cluster and save those sub nodes selection as policies in order to use 
+ predefined sub pool for a specific processing.
 
-Adding a default policy to a kind of processing will be treated in the Set up Your Preferences part.
-Adding a special policy to a kind of processing will be treated in the Processing Your Data part.
+- Manual custom by setting custom selections:
 
-Manual custom by setting custom selections:
-	If the characteristics of your cluster have no secrets for you, and you decide to make selections
-of nodes manually, you have to use the "Available Cluster Nodes" box and save them as custom selections.
+ If the characteristics of your cluster have no secrets for you, and you decide to make selections
+ of nodes manually, you have to use the "Available Cluster Nodes" box and save them as custom selections.
+
+
+ .. note:: Adding a default policy to a kind of processing will be treated in the Set up Your Preferences part.
+	       Adding a special policy to a kind of processing will be treated in the Processing Your Data part.
 
 
 
@@ -126,8 +131,27 @@ Set up Your Preferences
 =======================
 
 The preference tab in the Youpi interface is as important as the condor setup tab.
-It handles global options for youpi and it is user dependant. Each user can set his own preferences 
-for processing data, manage your style themes and define user permissions.
+It handles global options for youpi and it is user dependant. Each user can set his preferences 
+for processing data, manage his style themes and define his own permissions.
+
+- Default shopping cart item behaviour
+
+ You can define a **default shopping cart item behaviour**, means if you intend to use policies or
+ selections for each processing plugin of youpi. Once this done, you can opt for the selections and policies 
+ you have created in the **Condor setup**, and affect to plugins.
+
+- Default permissions
+
+ Youpi authorize to fully custom your data permissions as a user/group UNIX like permissions.
+ You can change the default one (set to 640) or change the visibility for a group or anyone.
+ 
+- Themes
+
+ To improve readability, Youpi provides themes that can be changed anytime, during your navigation.
+ It makes Youpi interface more accessible, for example concerning visually impaired users.
+
+Organize your data with tags
+============================
 
 
 Processing Your Data
