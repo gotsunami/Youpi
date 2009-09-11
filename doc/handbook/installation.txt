@@ -188,6 +188,19 @@ This section will guide through the Youpi installation process. As you will see,
 Configuration
 =============
 
+MySQL
+-----
+
+*TBW*
+
+Apache
+------
+
+*TBW*
+
+Condor
+------
+
 *TBW*
 
 
