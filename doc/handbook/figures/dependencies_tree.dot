@@ -46,6 +46,7 @@ digraph G {
 	qfits -> cfitsio;
 	mysqlpython -> mysql;
 	django -> python;
+	django -> mysqlpython;
 	modpython -> apache;
 	modpython -> python;
 	pythonmagic -> python;
@@ -55,4 +56,5 @@ digraph G {
 	mysqlpython -> python;
 	pyfits -> python;
 	pyfits -> pythonnumpy;
+	pythonmplib -> pythonnumpy;
 }

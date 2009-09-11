@@ -58,72 +58,123 @@ will enhance Youpi's functionalities and will improve the final user experience.
 explained at the beginning of this chapter, the list of packages you need to install 
 depends on the type of installation - *standalone* or *cluster* - you want to perform.
 
-Dependencies Tree
------------------
+Standalone Installation
+-----------------------
 
-Here is a partial dependency tree to better visualize Youpi's packages dependencies:
+Here is a dependency tree to better visualize Youpi's software dependencies. All those 
+packages are required and must be installed on a computer host for a *standalone 
+installation*:
 
-	.. figure:: figures/dependencies_tree.svg
-	   :width: 600pt
+.. figure:: figures/dependencies_tree.svg
+   :width: 500pt
 
-Mandatory Packages
-------------------
 
-- QualityFITS
-- Scamp
-- Swarp
-- Sextractor
-- Python
-- Mathplotlib
-- Django
-- MySQL
-- Condor
+.. apache2-2.2.10.lzm                                                                                                                                                  
+	deps[condor]-classadds-1.0.1.lzm                                                                                                                                    
+	deps[condor]-glibc-2.8.lzm                                                                                                                                          
+	deps[condor]-gsoap-2.7.12.lzm                                                                                                                                       
+	deps[condor]-keyutils-libs-1.2.3.lzm                                                                                                                                
+	deps[condor]-krb5-libs-1.6.3.lzm                                                                                                                                    
+	deps[condor]-libselinux-2.0.73.lzm                                                                                                                                  
+	deps[condor]-openldap-2.4.12.lzm                                                                                                                                    
+	deps[condor]-openssl-0.9.8.lzm                                                                                                                                      
+	deps[condor]-postgresql-libs-8.3.7.lzm                                                                                                                              
+	deps[mysql-python]-mysql-5.0.51b.lzm                                                                                                                                
+	deps[pyfits]-numpy-1.3.0.lzm                                                                                                                                        
+	deps[scamp]-libtool-ltdl-2.2.6.lzm                                                                                                                                  
+	deps[scamp]-plplot-5.9.2.lzm                                                                                                                                        
+	deps[scamp]-plplot-libs-5.9.2.lzm                                                                                                                                   
+	deps[scamp]-qhull-1.7-el5.lzm                                                                                                                                       
+	deps[xfce4]-vte.0.17.4.lzm                                                                                                                                          
+	deps[youpi]-cfitsio-3.140.lzm                                                                                                                                       
+	deps[youpi]-condor-7.3.2.lzm                                                                                                                                        
+	deps[youpi]-django-1.1.lzm                                                                                                                                          
+	deps[youpi]-imagemagick-6.5.2.lzm                                                                                                                                   
+	deps[youpi]-mod_python-3.3.1.lzm                                                                                                                                    
+	deps[youpi]-mysql-python-1.2.2.lzm                                                                                                                                  
+	deps[youpi]-pyfits-2.1.1.lzm                                                                                                                                        
+	deps[youpi]-python-2.5.2.lzm                                                                                                                                        
+	deps[youpi]-python-cjson-1.0.5.lzm                                                                                                                                  
+	deps[youpi]-python-magic-0.1.lzm                                                                                                                                    
+	deps[youpi]-python-matplotlib-0.98.5.2.lzm                                                                                                                          
+	fr.terapix.youpi-svn.lzm                                                                                                                                            
+	mercurial-1.3.1.lzm
+	net.astromatic.scamp-1.5.5.lzm                                                                                                                                      
+	net.astromatic.sextractor-2.8.6.lzm                                                                                                                                 
+	net.astromatic.stiff-1.12.lzm                                                                                                                                       
+	net.astromatic.swarp-2.17.6.lzm                                                                                                                                     
+	vim-7.1.lzm                                                                                                                                                         
+	xfce-4.4.3.lzm
 
-- Apache
-- mod_python
-- MySQL Python
-- Pyfits
-- Numpy
+.. warning:: Since Youpi mainly depends on Python, we highly recommand to install 
+             Python first. This way, all required packages using Python will depend 
+             on a Python version *supported by Youpi*.
 
-apache2-2.2.10.lzm                                                                                                                                                  
-deps[condor]-classadds-1.0.1.lzm                                                                                                                                    
-deps[condor]-glibc-2.8.lzm                                                                                                                                          
-deps[condor]-gsoap-2.7.12.lzm                                                                                                                                       
-deps[condor]-keyutils-libs-1.2.3.lzm                                                                                                                                
-deps[condor]-krb5-libs-1.6.3.lzm                                                                                                                                    
-deps[condor]-libselinux-2.0.73.lzm                                                                                                                                  
-deps[condor]-openldap-2.4.12.lzm                                                                                                                                    
-deps[condor]-openssl-0.9.8.lzm                                                                                                                                      
-deps[condor]-postgresql-libs-8.3.7.lzm                                                                                                                              
-deps[mysql-python]-mysql-5.0.51b.lzm                                                                                                                                
-deps[pyfits]-numpy-1.3.0.lzm                                                                                                                                        
-deps[scamp]-libtool-ltdl-2.2.6.lzm                                                                                                                                  
-deps[scamp]-plplot-5.9.2.lzm                                                                                                                                        
-deps[scamp]-plplot-libs-5.9.2.lzm                                                                                                                                   
-deps[scamp]-qhull-1.7-el5.lzm                                                                                                                                       
-deps[xfce4]-vte.0.17.4.lzm                                                                                                                                          
-deps[youpi]-cfitsio-3.140.lzm                                                                                                                                       
-deps[youpi]-condor-7.3.2.lzm                                                                                                                                        
-deps[youpi]-django-1.1.lzm                                                                                                                                          
-deps[youpi]-imagemagick-6.5.2.lzm                                                                                                                                   
-deps[youpi]-mod_python-3.3.1.lzm                                                                                                                                    
-deps[youpi]-mysql-python-1.2.2.lzm                                                                                                                                  
-deps[youpi]-pyfits-2.1.1.lzm                                                                                                                                        
-deps[youpi]-python-2.5.2.lzm                                                                                                                                        
-deps[youpi]-python-cjson-1.0.5.lzm                                                                                                                                  
-deps[youpi]-python-magic-0.1.lzm                                                                                                                                    
-deps[youpi]-python-matplotlib-0.98.5.2.lzm                                                                                                                          
-fr.terapix.youpi-svn.lzm                                                                                                                                            
-mercurial-1.3.1.lzm
-net.astromatic.scamp-1.5.5.lzm                                                                                                                                      
-net.astromatic.sextractor-2.8.6.lzm                                                                                                                                 
-net.astromatic.stiff-1.12.lzm                                                                                                                                       
-net.astromatic.swarp-2.17.6.lzm                                                                                                                                     
-vim-7.1.lzm                                                                                                                                                         
-xfce-4.4.3.lzm
+The following table:
 
-Optional Packages
------------------
+==================== ========================================== ===========
+Software package     Supported version                          Description
+==================== ========================================== ===========
+|python|_            **2.5.x**; 2.6 and later **not supported** General-purpose high-level programming 
+                                                                Language
+`Apache`_            **2.x**                                    Apache HTTP server project
+`Apache mod_python`_ **3.3.x** and later                        Apache module that embeds the Python 
+                                                                interpreter within the server
+`MySQL`_             **5.x** and later                          Relational database management system 
+                                                                (RDBMS)
+|django|_            **1.1.x**                                  Python web framework
+`Condor`_            **7.2.x** and later                        High Throughput Computing (HTC) on large 
+                                                                collections of distributively owned 
+                                                                computing resources
+`Python cjson`_      **1.0.5**                                  Implements a very fast `JSON`_ 
+                                                                encoder/decoder for Python.
+`PyFITS`_            **1.3** and later                          Provides an interface to FITS formatted 
+                                                                files under the Python scripting language
+`Python matplotlib`_ **0.98** and later                         Python 2D plotting library
+`Python magic`_      **5.03** and later                         Python module for determing file type
+`MySQL Python`_      **1.2.x** and later                        Python interface to MySQL
+`NumPy`_             **1.3.x** and later                        Fundamental package needed for scientific 
+                                                                computing with Python
+`ImageMagick`_       **6.x** and later                          Software suite to create, edit, and compose 
+                                                                bitmap images
+`CFITSIO`_           **3.x** and later                          Youpi uses the ``imcopy`` tool internally 
+                                                                (part of the `FITS utility programs`_ bundled 
+                                                                with CFITSIO)
+`QualityFITS`_
+`Scamp`_             **1.4.x** and later                        Reads SExtractor catalogs and computes 
+                                                                astrometric and photometric solutions for any 
+                                                                arbitrary sequence of FITS images in a 
+                                                                completely automatic way
+`Swarp`_             **2.17.x** and later                       Resamples and co-adds together FITS images 
+                                                                using any arbitrary astrometric projection
+`Sextractor`_        **2.8.6** and later                        Builds a catalogue of objects from an astronomical 
+                                                                image
+`Stiff`_             **1.12** and later                         Converts scientific FITS images to the more popular 
+                                                                TIFF format for illustration purposes
+==================== ========================================== ===========
+
+.. _Apache: http://httpd.apache.org/
+.. _Apache mod_python: http://www.modpython.org/
+.. _MySQL: http://www.mysql.com/
+.. _Condor: http://www.cs.wisc.edu/condor/
+.. _Python cjson: http://pypi.python.org/pypi/python-cjson/
+.. _PyFITS: http://www.stsci.edu/resources/software_hardware/pyfits
+.. _JSON: http://json.org/
+.. _Python matplotlib: http://matplotlib.sourceforge.net/
+.. _Python magic: http://www.darwinsys.com/file/
+.. _MySQL Python: http://sourceforge.net/projects/mysql-python/
+.. _NumPy: http://numpy.scipy.org/
+.. _ImageMagick: http://www.imagemagick.org
+.. _CFITSIO: http://heasarc.gsfc.nasa.gov/fitsio/
+.. _FITS utility programs: http://heasarc.gsfc.nasa.gov/docs/software/fitsio/cexamples.html
+.. _Scamp: http://astromatic.iap.fr/software/scamp
+.. _Swarp: http://astromatic.iap.fr/software/swarp
+.. _Sextractor: http://astromatic.iap.fr/software/sextractor
+.. _Stiff: http://astromatic.iap.fr/software/stiff
+
+
+Cluster Installation
+--------------------
 
 *TBW*
 
