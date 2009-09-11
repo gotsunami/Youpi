@@ -52,8 +52,8 @@ click on the red cross button ahead of the path.
 Before clicking on the "run ingestion" button, let's see some others features of the 
 ingestion tab process:
 
-- You can give an ID text field for your ingestion in order to distinguish it 
-  from others. 
+- You can give an identification text field for your ingestion in order to distinguish it 
+  from others, or to find easily your set of ingested images.
 - A log file is generated each time an ingestion has run and finished. 
   This log file can be sent as email at the end of the ingestion, by quoting the check 
   box before running ingestions.
@@ -110,48 +110,59 @@ There are 2 different ways to dispatch resources from this interface:
 
 - Automatic custom by setting policies:
 
- Policies are automatic selections based on the characteristics of each machine of your cluster.
- It may be interesting to select automatically all machines with available memory greater than
- 8 GB of RAM (for a scamp processing), or to exclude from the pool, machines with a specified name.
- So you can divide your cluster and save those sub nodes selection as policies in order to use 
- predefined sub pool for a specific processing.
+ Policies are automatic selections based on the characteristics of each machine of your 
+ cluster. It may be interesting to select automatically all machines with available 
+ memory greater than 8 GB of RAM (for a scamp processing), or to exclude from the pool,
+ machines with a specified name. So you can divide your cluster and save those sub nodes
+ selection as policies in order to use predefined sub pool for a specific processing.
 
 - Manual custom by setting custom selections:
 
- If the characteristics of your cluster have no secrets for you, and you decide to make selections
- of nodes manually, you have to use the "Available Cluster Nodes" box and save them as custom selections.
+ If the characteristics of your cluster have no secrets for you, and you decide to make
+ selections of nodes manually, you have to use the "Available Cluster Nodes" box and 
+ save them as custom selections.
 
 
- .. note:: Adding a default policy to a kind of processing will be treated in the Set up Your Preferences part.
-	       Adding a special policy to a kind of processing will be treated in the Processing Your Data part.
+ .. note:: Adding a default policy to a kind of processing will be treated in the Set up
+	Your Preferences part. Adding a special policy to a kind of processing will be treated 
+	in the Processing Your Data part.
 
 
 Set up Your Preferences
 =======================
 
 The preference tab in the Youpi interface is as important as the condor setup tab.
-It handles global options for youpi and it is user dependant. Each user can set his preferences 
-for processing data, manage his style themes and define his own permissions.
+It handles global options for youpi and it is user dependant. Each user can set his
+preferences for processing data, manage his style themes and define his own permissions.
 
 - Default shopping cart item behaviour
 
- You can define a **default shopping cart item behaviour**, means if you intend to use policies or
- selections for each processing plugin of youpi. Once this done, you can opt for the selections and policies 
- you have created in the **Condor setup**, and affect to plugins.
+ You can define a **default shopping cart item behaviour**, means if you intend to use 
+ policies or selections for each processing plugin of youpi. Once this done, you can
+ opt for the selections and policies you have created in the **Condor setup**, and 
+ affect to plugins.
 
 - Default permissions
 
- Youpi authorize to fully custom your data permissions as a user/group UNIX like permissions.
- You can change the default one (set to 640) or change the visibility for a group or anyone.
+ Youpi authorize to fully custom your data permissions as a user/group UNIX like 
+ permissions.You can change the default one (set to 640) or change the visibility
+ for a group or anyone.
  
 - Themes
 
- To improve readability, Youpi provides themes that can be changed anytime, during your navigation.
- It makes Youpi interface more accessible, for example concerning visually impaired users.
+ To improve readability, Youpi provides themes that can be changed anytime, during
+ your navigation.It makes Youpi interface more accessible, for example concerning 
+ visually impaired users.
 
 Organize your data with tags
 ============================
 
+Tags are keywords or terms associated with or assigned to a piece of information.
+In the Youpi case, let's say that this is a metadata (a text field) that you could
+assigned to one or a set of images to "labelize" them. Then it will help you find
+your "foo" set or your "bar" group of images.
+
+The tagging tab is a  
 
 Processing Your Data
 ====================
