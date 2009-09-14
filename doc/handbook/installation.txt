@@ -65,7 +65,7 @@ Here is a dependency tree to better visualize Youpi's software dependencies. All
 packages are required and must be installed on a computer host for a *standalone 
 installation*:
 
-.. figure:: figures/dependencies_tree.svg
+.. figure:: figures/dependencies_tree_standalone.svg
    :width: 500pt
 
 
@@ -108,9 +108,64 @@ installation*:
 
 .. warning:: Since Youpi mainly depends on Python, we highly recommand to install 
              Python first. This way, all required packages using Python will depend 
-             on a Python version *supported by Youpi*.
+             on a Python version supported by Youpi.
 
-The following table:
+As specified in the `Software packages`_ section, here are the packages you must install:
+
+- Python
+- Apache
+- Apache mod_python
+- MySQL client only
+- Django
+- Condor
+- Python csjon
+- Python matplotlib
+- Python magic
+- Mysql-Python
+- NumPy
+- ImageMagick
+- CFITSIO
+- QualityFITS
+- Scamp
+- Swarp
+- Sextractor
+- Stiff
+
+As an example here is the command one would follow to install most components using a 
+`Ubuntu`_ GNU/Linux distribution::
+
+	$ sudo apt-get install blah
+
+.. _Ubuntu: http://www.ubuntu.com/
+
+Cluster Installation
+--------------------
+
+The *cluster installation* process is slightly lighter than the *standalone* one. Only the 
+following software packages are needed on the computer hosting Youpi:
+
+.. figure:: figures/dependencies_tree_cluster.svg
+   :width: 500pt
+
+As specified in the `Software packages`_ section, here are the packages you must install:
+
+- Python
+- Apache
+- Apache mod_python
+- MySQL client only
+- Django
+- Condor
+- Python csjon
+- Python matplotlib
+- Python magic
+- Mysql-Python
+- NumPy
+
+Software packages
+-----------------
+
+Here is a list of all packages involved in a Youpi installation. Some of them may not be 
+required if you perform a `cluster installation`_:
 
 ==================== ========================================== ===========
 Software package     Supported version                          Description
@@ -172,11 +227,6 @@ Software package     Supported version                          Description
 .. _Sextractor: http://astromatic.iap.fr/software/sextractor
 .. _Stiff: http://astromatic.iap.fr/software/stiff
 
-
-Cluster Installation
---------------------
-
-*TBW*
 
 
 Installation

@@ -1,0 +1,38 @@
+digraph G {
+	size="5,5";
+	rankdir = LR;
+
+	youpi [label="Youpi software"];
+	condor [label="Condor"];
+	django [label="Django"];
+	modpython [label="Apache mod_python"];
+	mysqlpython [label="MySQL-Python"];
+	python [label="Python"];
+	pythoncjson	[label="Python cjson"];
+	pythonmagic	[label="Python magic"];
+	pythonmplib	[label="Python Matplotlib"];
+	pythonnumpy	[label="Python Numpy"];
+	apache [label="Apache"];
+	mysql [label="MySQL client"];
+
+	youpi -> apache;
+	youpi -> condor;
+	youpi -> django;
+	youpi -> modpython;
+	youpi -> pythoncjson;
+	youpi -> pythonmagic;
+	youpi -> pythonmplib;
+	youpi -> pythonnumpy;
+	youpi -> mysqlpython;
+
+	mysqlpython -> mysql;
+	django -> python;
+	django -> mysqlpython;
+	modpython -> apache;
+	modpython -> python;
+	pythonmagic -> python;
+	pythonmplib -> python;
+	pythoncjson -> python;
+	pythonnumpy -> python;
+	mysqlpython -> python;
+}
