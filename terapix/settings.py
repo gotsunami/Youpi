@@ -242,3 +242,6 @@ INSTALLED_APPS = (
 SESSION_SAVE_EVERY_REQUEST = True
 
 AUTH_PROFILE_MODULE = 'youpi.siteprofile'
+
+# Override all FIXME sections with your values
+from local_conf import *
