@@ -154,6 +154,11 @@ preferences for processing data, manage his style themes and define his own perm
  your navigation.It makes Youpi interface more accessible, for example concerning 
  visually impaired users.
 
+The image selector
+==================
+
+
+
 Organize your data with tags
 ============================
 
@@ -162,7 +167,31 @@ In the Youpi case, let's say that this is a metadata (a text field) that you cou
 assigned to one or a set of images to "labelize" them. Then it will help you find
 your "foo" set or your "bar" group of images.
 
-The tagging tab is a  
+The tagging tab interface is divided in two parts:
+
+- Available tags
+ 
+ it shows all tags created in Youpi. You can add a new tag by completing the drop
+ down box with:
+
+	- a mandatory name (the one which is displayed)
+	- a comment (not mandatory)
+	- a style color for text, background and border
+
+Tags can be edited, and shared by changing visibility permissions, like your data.
+Then restrictions to a group or to the rest of the world, the graphic elements of 
+tags can be set up through this part by double clicking on the tag. 
+
+
+- Select images
+
+As explained in the image selector section, once your selection is done, youpi has
+a drag and drop solution that is simply to grab the tag you want to apply to images,
+drag it on the empty light blue box of the image selector and mark (or unmark ) your
+selection.
+
+ .. Note:: A tag is a selection parameter that you can use in the image selector in 
+	order to find all images with a specific tag, for example untag a tagged selection. 
 
 Processing Your Data
 ====================
