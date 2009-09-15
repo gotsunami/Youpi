@@ -233,11 +233,18 @@ Installation on Ubuntu Linux
 ----------------------------
 
 As an example here is the command one would issue to install most components using a 
-`Ubuntu`_ GNU/Linux distribution::
+`Ubuntu`_ GNU/Linux distribution. For a *standalone installation*, you should issue the 
+following command::
 
 	$ sudo apt-get install python2.5 apache2 libapache2-mod-python mysql-server \ 
-    > mysql-client python-django python-cjson python-matplotlib python-magick \
-    > python-mysqldb python-numpy imagemagick
+	> mysql-client python-django python-cjson python-matplotlib python-magick \
+	> python-mysqldb python-numpy imagemagick
+
+While for a *cluster installation*, you might want to try::
+
+	$ sudo apt-get install python2.5 apache2 libapache2-mod-python mysql-client \
+	> python-django python-cjson python-matplotlib python-magick python-mysqldb \
+	> python-numpy
 
 As you can see, not all dependencies are available through the Ubuntu's debian-like 
 ``dpkg`` facility because they are not packaged for that Linux distribution. Thus, it's 
@@ -264,9 +271,12 @@ your choice::
 	$ chown -R www-data:www-data youpi
 
 .. warning:: For security reasons, decompressing the tarball in a directory under your 
-             ``Apache``'s ``DOCUMENT_ROOT`` is *not recommanded*.
+             Apache's ``DocumentRoot`` is *not recommanded*. Further information if available 
+             in the `official Django's documentation`_.
 
 .. _source code of Youpi: `Getting Youpi`_
+.. _official Django's documentation: http://docs.djangoproject.com/en/dev/intro/tutorial01/#intro-tutorial01
+
 
 Configuration
 =============
