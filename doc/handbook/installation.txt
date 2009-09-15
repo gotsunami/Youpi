@@ -27,10 +27,10 @@ For the moment, two configurations can be considered while setting up a Youpi en
   be able to process your images on a computer cluster. The *cluster installation* steps are 
   lighter than those required for a fully operational *standalone installation* because there 
   are much less software requirements. Most of the packages have only to be installated on the 
-  cluster nodes, while the computer running Youpi only needs *Condor* and some Python software 
-  packages.
+  cluster nodes, while the computer running Youpi only needs *Condor* and some Python-related 
+  software packages.
 
-  .. note:: In both cases, you always need to have a running Condor installation on the host 
+  .. note:: In any case, you always need to have a running Condor installation on the host 
             running Youpi. Indeed, Youpi needs to be able to submit jobs on the cluster (the 
             ``condor_submit`` command is used internally to submit jobs).
 
@@ -106,37 +106,32 @@ installation*:
 	vim-7.1.lzm                                                                                                                                                         
 	xfce-4.4.3.lzm
 
-.. warning:: Since Youpi mainly depends on Python, we highly recommand to install 
-             Python first. This way, all required packages using Python will depend 
-             on a Python version supported by Youpi.
+.. warning:: Since Youpi mainly depends on ``Python``, we highly recommand to install 
+             ``Python`` first. This way, you can specify (force) which version of ``Python``
+             you want to install so that all required packages using it will depend on a 
+             ``Python`` version supported by Youpi.
 
 As specified in the `Software packages`_ section, here are the packages you must install:
 
-- Python
-- Apache
-- Apache mod_python
-- MySQL client only
-- Django
-- Condor
-- Python csjon
-- Python matplotlib
-- Python magic
-- Mysql-Python
-- NumPy
-- ImageMagick
-- CFITSIO
-- QualityFITS
-- Scamp
-- Swarp
-- Sextractor
-- Stiff
+- ``Python``
+- ``Apache``
+- ``Apache mod_python``
+- ``MySQL client and server``
+- ``Django``
+- ``Condor``
+- ``Python csjon``
+- ``Python matplotlib``
+- ``Python magic``
+- ``Mysql-Python``
+- ``NumPy``
+- ``ImageMagick``
+- ``CFITSIO``
+- ``QualityFITS``
+- ``Scamp``
+- ``Swarp``
+- ``Sextractor``
+- ``Stiff``
 
-As an example here is the command one would follow to install most components using a 
-`Ubuntu`_ GNU/Linux distribution::
-
-	$ sudo apt-get install blah
-
-.. _Ubuntu: http://www.ubuntu.com/
 
 Cluster Installation
 --------------------
@@ -149,17 +144,17 @@ following software packages are needed on the computer hosting Youpi:
 
 As specified in the `Software packages`_ section, here are the packages you must install:
 
-- Python
-- Apache
-- Apache mod_python
-- MySQL client only
-- Django
-- Condor
-- Python csjon
-- Python matplotlib
-- Python magic
-- Mysql-Python
-- NumPy
+- ``Python``
+- ``Apache``
+- ``Apache mod_python``
+- ``MySQL client only``
+- ``Django``
+- ``Condor``
+- ``Python csjon``
+- ``Python matplotlib``
+- ``Python magic``
+- ``Mysql-Python``
+- ``NumPy``
 
 Software packages
 -----------------
@@ -228,12 +223,50 @@ Software package     Supported version                          Description
 .. _Stiff: http://astromatic.iap.fr/software/stiff
 
 
-
 Installation
 ============
 
-This section will guide through the Youpi installation process. As you will see, 
+This section will guide through the Youpi installation process.
 
+
+Installation on Ubuntu Linux
+----------------------------
+
+As an example here is the command one would issue to install most components using a 
+`Ubuntu`_ GNU/Linux distribution::
+
+	$ sudo apt-get install python2.5 apache2 libapache2-mod-python mysql-server \ 
+    > mysql-client python-django python-cjson python-matplotlib python-magick \
+    > python-mysqldb python-numpy imagemagick
+
+As you can see, not all dependencies are available through the Ubuntu's debian-like 
+``dpkg`` facility because they are not packaged for that Linux distribution. Thus, it's 
+up to you to install the remaining sofware, either from the source (for ``CFITSIO``) or 
+from the ``rpm`` binary packages available for ``Condor``, ``QualityFITS``, ``Scamp``, 
+``Swarp``, ``Sextractor`` and ``Stiff``, all available for download from their respective 
+websites (see the `Software Packages`_ section).
+
+.. note:: Debian-like users (such as Ubuntu ones) can use tools like ``alien``  to convert 
+          ``rpm`` binary packages to ``deb`` binary archives that you can later install 
+          with the ``dpkg`` tool.
+        
+
+.. _Ubuntu: http://www.ubuntu.com/
+
+
+Installing Youpi
+----------------
+
+Once you get the `source code of Youpi`_, uncompress the tarball in the directory of 
+your choice::
+
+	$ tar xvjf youpi-x.x.tar.gz
+	$ chown -R www-data:www-data youpi
+
+.. warning:: For security reasons, decompressing the tarball in a directory under your 
+             ``Apache``'s ``DOCUMENT_ROOT`` is *not recommanded*.
+
+.. _source code of Youpi: `Getting Youpi`_
 
 Configuration
 =============
@@ -242,6 +275,8 @@ MySQL
 -----
 
 *TBW*
+
+.. _apache_config:
 
 Apache
 ------
