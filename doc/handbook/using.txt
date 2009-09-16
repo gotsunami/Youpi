@@ -154,10 +154,6 @@ preferences for processing data, manage his style themes and define his own perm
  your navigation.It makes Youpi interface more accessible, for example concerning 
  visually impaired users.
 
-The image selector
-==================
-
-
 
 Organize your data with tags
 ============================
@@ -195,6 +191,74 @@ selection.
 
 Processing Your Data
 ====================
+
+For each plugin implemented, as a computing process which could be run on FITS images 
+through Youpi, there are severals steps to observe, represented as tabs as shown in the
+figure. To process images and for each plugin, you must pass through each tab of the 
+plugin from the left to the right.
+
+The first is the selection of a subset of ingested images in Youpi. So, a powerfull 
+selection tool has been made, which allows to sort, group images by specific fields: 
+the **image selector**.
+
+The image selector
+------------------
+
+An instance of the image selector is provided for each plugin under the "select images"
+tab. If you want to select all images in Youpi, observed through "i.MP9701" channel and 
+among them select all images contained in the D1 field of the sky, this tool will 
+automatically do the selection for you.
+
+There are two kind of selections:
+
+ - Single selection
+ 
+ In single selection you will be able to constuct basics selections of images, based on:
+ 
+ 	- several FITS header fields and others types of criteria
+	- on a list of images in plain-text separated by semicolons("Select from text file" button)
+
+ You can even import *n* plain-text files in order to construct *n* basic selections.
+
+ - Batch selection
+
+Batch selection grant to raise multiple selections based on coordinates on the 
+celestial sphere. You can define circles with a center and a radius and each image
+which have his center field **in** the circle, will be selected. XML files with
+a special DTD are the means to do such selections in Youpi.
+
+Here is the DTD
+
+::
+
+ <batch>
+ 	<selection>
+ 		<label>SEL1</label>
+ 		<alpha>33.1</alpha>
+ 		<delta>-6.3</delta>
+ 		<radius>0.1</radius>
+ 	</selection>
+ 	<selection>
+ 		<label>SEL2</label>
+ 		<alpha>22.0</alpha>
+ 		<delta>-6.3</delta>
+ 		<radius>0.1</radius>
+ 	</selection>
+ 	...
+ </batch>
+
+
+Alpha, delta are the circle coordinates center. Each selection node is a proper one.	
+With this other method of selection, you will have one list of as many selection nodes
+as contained in the XML file.A sky visualisation of your selections in batch mode, is 
+generated (even the center of each image selected).To see this visualisation, check 
+the corrsponding checkbox on the image selector in Batch selection.
+
+ 
+.. Note:: For all selections you have done under single or batch, it's possible to save, edit or 
+ delete selections from the top left panel of the image selector.
+
+
 
 The Shopping Cart
 =================
