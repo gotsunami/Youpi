@@ -241,5 +241,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 AUTH_PROFILE_MODULE = 'youpi.siteprofile'
 
-# Override all FIXME sections with your values
-from local_conf import *
+# Override all FIXME sections with your values, if any
+try: from local_conf import *
+except ImportError: pass
