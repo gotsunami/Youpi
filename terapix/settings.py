@@ -16,7 +16,6 @@
 #
 # my_setting.py:
 # from settings_base import *
-# HOME = '/my/home'
 #
 # FIXME: This is a -dist file that must be filled with you
 # FIXME: own values. Lines that require a modification end 
@@ -31,8 +30,6 @@ import os, os.path
 #
 ##########################################################################################################
 
-
-HOME 				= '/path/to/youpi/parent/dir/' 	# FIXME
 
 # ImageMagick support
 #
@@ -64,7 +61,7 @@ ADMINS = (
 DATABASE_NAME 		= 'dbname'						# FIXME
 DATABASE_USER 		= 'user'						# FIXME 
 DATABASE_PASSWORD 	= 'pass'						# FIXME
-DATABASE_HOST 		= 'hostname'					# FIXME. Set to empty string for localhost
+DATABASE_HOST 		= 'localhost'					# FIXME. Set to empty string for localhost
 DATABASE_PORT 		= ''             				# Set to empty string for default
 
 # Local time zone for this installation. Choices can be found here:
@@ -97,7 +94,8 @@ DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 MANAGERS = ADMINS
 
-TRUNK 			= os.path.join(HOME, 'youpi')
+# TODO: rename TRUNK to PROJECT_DIR
+TRUNK			= os.getcwd()[:-len('terapix') - 1] 
 APP_URL_PREFIX  = '/youpi'
 AUP				= APP_URL_PREFIX 	# For short
 
