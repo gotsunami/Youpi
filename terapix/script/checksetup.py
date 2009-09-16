@@ -108,8 +108,9 @@ def setup_db():
 
 	# Check user profile
 	user = User.objects.all()[0]
-	p = user.get_profile()
-	if not p:
+	try:
+		p = user.get_profile()
+	except:
 		# Create a new profile
 		groups = user.groups.all()
 		if not groups:
@@ -176,7 +177,7 @@ def setup_users():
 	else:
 		logger.log("No user found, adding a default one (%s)" % YOUPI_USER)
 		# Add at least one user
-		user = User.objects.create_user(username = YOUPI_USER, password = YOUPI_USER)
+		user = User.objects.create_user(username = YOUPI_USER, email = 'root@localhost', password = YOUPI_USER)
 		user.is_staff = False
 		user.is_active = False
 		user.save()
@@ -199,8 +200,11 @@ def setup():
 	setup_users()
 	setup_db()
 	setup_policies()
-	
 
-if __name__ == '__main__':
+def run():
+	global logger 
 	logger = Logger()
 	setup()
+	
+if __name__ == '__main__':
+	run()
