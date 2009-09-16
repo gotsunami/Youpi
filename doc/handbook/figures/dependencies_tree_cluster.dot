@@ -14,6 +14,7 @@ digraph G {
 	pythonnumpy	[label="Python Numpy"];
 	apache [label="Apache"];
 	mysql [label="MySQL client"];
+	geos [label="Geos"];
 
 	youpi -> apache;
 	youpi -> condor;
@@ -24,6 +25,7 @@ digraph G {
 	youpi -> pythonmplib;
 	youpi -> pythonnumpy;
 	youpi -> mysqlpython;
+	youpi -> geos;
 
 	mysqlpython -> mysql;
 	django -> python;

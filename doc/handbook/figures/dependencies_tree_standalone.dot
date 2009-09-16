@@ -23,6 +23,7 @@ digraph G {
 	stiff [label="Stiff"];
 	swarp [label="Swarp"];
 	qfits [label="QualityFITS"];
+	geos [label="Geos"];
 
 	youpi -> apache;
 	youpi -> cfitsio;
@@ -36,6 +37,7 @@ digraph G {
 	youpi -> pythonmplib;
 	youpi -> pythonnumpy;
 	youpi -> mysqlpython;
+	youpi -> geos;
 
 	youpi -> scamp;
 	youpi -> sextractor;
