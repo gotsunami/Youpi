@@ -90,7 +90,6 @@ installation*:
 	deps[youpi]-condor-7.3.2.lzm                                                                                                                                        
 	deps[youpi]-django-1.1.lzm                                                                                                                                          
 	deps[youpi]-imagemagick-6.5.2.lzm                                                                                                                                   
-	deps[youpi]-mod_python-3.3.1.lzm                                                                                                                                    
 	deps[youpi]-mysql-python-1.2.2.lzm                                                                                                                                  
 	deps[youpi]-pyfits-2.1.1.lzm                                                                                                                                        
 	deps[youpi]-python-2.5.2.lzm                                                                                                                                        
@@ -115,7 +114,7 @@ As specified in the `Software packages`_ section, here are the packages you must
 
 - ``Python``
 - ``Apache``
-- ``Apache mod_python``
+- ``Apache mod_wsgi``
 - ``MySQL client and server``
 - ``Django``
 - ``Condor``
@@ -147,7 +146,7 @@ As specified in the `Software packages`_ section, here are the packages you must
 
 - ``Python``
 - ``Apache``
-- ``Apache mod_python``
+- ``Apache mod_wsgi``
 - ``MySQL client only``
 - ``Django``
 - ``Condor``
@@ -170,8 +169,9 @@ Software package     Supported version                          Description
 |python|_            **2.5.x**; 2.6 and later **not supported** General-purpose high-level programming 
                                                                 Language
 `Apache`_            **2.x**                                    Apache HTTP server project
-`Apache mod_python`_ **3.3.x** and later                        Apache module that embeds the Python 
-                                                                interpreter within the server
+`Apache mod_wsgi`_   **2.3** and later                          Apache module which can host any Python application 
+                                                                which supports the Python `WSGI`_ interface interpreter 
+                                                                within the server
 `MySQL`_             **5.x** and later                          Relational database management system 
                                                                 (RDBMS)
 |django|_            **1.1.x**                                  Python web framework
@@ -208,7 +208,8 @@ Software package     Supported version                          Description
 ==================== ========================================== ===========
 
 .. _Apache: http://httpd.apache.org/
-.. _Apache mod_python: http://www.modpython.org/
+.. _Apache mod_wsgi: http://code.google.com/p/modwsgi/
+.. _WSGI: http://www.wsgi.org/
 .. _MySQL: http://www.mysql.com/
 .. _Condor: http://www.cs.wisc.edu/condor/
 .. _Python cjson: http://pypi.python.org/pypi/python-cjson/
@@ -271,14 +272,23 @@ Installing Youpi
 ----------------
 
 Once you get the `source code of Youpi`_, uncompress the tarball in the directory of 
-your choice::
+your choice, which may be your home directory. Let's use your ``$HOME`` environement 
+variable as the base directory for installation::
 
+	$ cd
 	$ tar xvjf youpi-x.x.tar.gz
-	$ chown -R www-data:www-data youpi
 
 .. warning:: For security reasons, decompressing the tarball in a directory under your 
              Apache's ``DocumentRoot`` is *not recommanded*. Further information if available 
              in the `official Django's documentation`_.
+
+A ``youpi`` directory has just been created in your home dir. Now, give ownership to your 
+web server's user::
+
+	$ chown -R www-data:www-data youpi
+
+In your case, this may not be ``www-data`` but ``apache`` or ``www`` depending on your Linux 
+distribution. Just look at the entries in your ``/etc/password`` and ``/etc/group`` system files.
 
 .. _source code of Youpi: `Getting Youpi`_
 .. _official Django's documentation: http://docs.djangoproject.com/en/dev/intro/tutorial01/#intro-tutorial01
@@ -287,8 +297,49 @@ your choice::
 Configuration
 =============
 
+Now that everything is installed, a little more work is needed to get the things up and running.
+You are advise to follow the configuration order suggested in the following sections since 
+they depend on each other.
+
 MySQL
 -----
+
+First, you have to configure your MySQL server to allow using a dedicated database for Youpi.
+Connect to the server with a privileged user account and issue the following commands::
+
+	mysql> grant all privileges on youpi.* to youpiuser@'%' identified by 'secret';
+	mysql> flush privileges;
+	mysql> create database youpi;
+
+All access privileges are granted to the ``youpi`` database and you can access it with the 
+``youpiuser`` login and ``secret`` password. The ``youpiuser@'%'`` part means you can 
+access your database from any host, which may not be what you want. To improve security, 
+you may consider specifying a more restrictive rule. You might want to check the 
+`MySQL Reference Manual`_ for further details.
+
+You may want to check if you can connect to your newly created database from MySQL 
+command line client::
+
+	$ mysql -u youpiuser -p youpi
+	Enter password: ****
+	mysql>
+
+.. _MySQL Reference Manual: http://dev.mysql.com/doc/refman/5.0/en/grant.html
+
+Django Configuration
+--------------------
+
+Now that your database is properly configured, you have to setup Youpi's Django installation.
+All the configuration options are available in a ``settings.py-dist`` file distributed 
+with Youpi. Most part of this file will remain untouched but some variables have to 
+be setup properly in order to match your installation environment::
+
+	$ cd $HOME/youpi/terapix
+	$ cp settings.py-dist settings.py
+
+
+Initial Setup Checks
+--------------------
 
 *TBW*
 
