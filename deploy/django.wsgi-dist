@@ -1,0 +1,12 @@
+import os, sys
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
+# For Matplotlib
+os.environ['MPLCONFIGDIR'] = '/path/to/tmp' # FIXME
+
+# Path to Django app
+sys.path.append('/path/to/django/app')	# FIXME
+sys.path.append('/path/to/django/app/terapix') #FIXME
+
+import django.core.handlers.wsgi
+application = django.core.handlers.wsgi.WSGIHandler()
