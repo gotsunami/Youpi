@@ -11,9 +11,9 @@ from django.core.management.base import BaseCommand, CommandError
 class Command(BaseCommand):
 	option_list = BaseCommand.option_list + (
 		make_option('--password', dest = 'password', default = None, 
-			help="Specifies the user passord. If not specified, it will be set to the username's value."),
-		make_option('--activate', action = 'store_false', dest = 'active', 
-			help="Specifies the user passord. If not specified, it will be set to the username's value."),
+			help="Specifies the user password. If not specified, it will be set to the username's value."),
+		make_option('--activate', action = 'store_true', dest = 'active', default = False,
+			help="Activate the user account so that he is able to log in."),
 	)
 	help = 'Used to create a Youpi user account.'
 	args = 'username'
@@ -33,10 +33,7 @@ class Command(BaseCommand):
 		except User.DoesNotExist:
 			user = User.objects.create_user(username, '', password)
 			user.is_staff= False
-			if options.get('active'):
-				user.is_active = True
-			else:
-				user.is_active = False
+			user.is_active = options.get('active')
 			user.save()
 
 		print "Youpi user '%s' created successfully." % username
