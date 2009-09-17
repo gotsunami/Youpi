@@ -7,7 +7,7 @@ digraph G {
 	condor [label="Condor"];
 	django [label="Django"];
 	magic [label="Image Magick"];
-	modpython [label="Apache mod_python"];
+	modwsgi [label="Apache mod_wsgi"];
 	mysqlpython [label="MySQL-Python"];
 	pyfits [label="PyFITS"];
 	python [label="Python"];
@@ -30,7 +30,7 @@ digraph G {
 	youpi -> condor;
 	youpi -> django;
 	youpi -> magic;
-	youpi -> modpython;
+	youpi -> modwsgi;
 	youpi -> pyfits;
 	youpi -> pythoncjson;
 	youpi -> pythonmagic;
@@ -49,8 +49,8 @@ digraph G {
 	mysqlpython -> mysql;
 	django -> python;
 	django -> mysqlpython;
-	modpython -> apache;
-	modpython -> python;
+	modwsgi -> apache;
+	modwsgi -> python;
 	pythonmagic -> python;
 	pythonmplib -> python;
 	pythoncjson -> python;
