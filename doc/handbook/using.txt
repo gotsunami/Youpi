@@ -205,8 +205,8 @@ The image selector
 ------------------
 
 An instance of the image selector is provided for each plugin under the "select images"
-tab. If you want to select all images in Youpi, observed through "i.MP9701" channel and 
-among them select all images contained in the D1 field of the sky, this tool will 
+tab. If you want to select all images in Youpi, observed through "i.MP9701" channel, and 
+among them, select all images contained in the D1 field of the sky, this tool will 
 automatically do the selection for you.
 
 There are two kind of selections:
@@ -216,9 +216,11 @@ There are two kind of selections:
  In single selection you will be able to constuct basics selections of images, based on:
  
  	- several FITS header fields and others types of criteria
-	- on a list of images in plain-text separated by semicolons("Select from text file" button)
+	- on a list of images in plain-text separated by semicolons
 
  You can even import *n* plain-text files in order to construct *n* basic selections.
+
+
 
  - Batch selection
 
@@ -252,13 +254,59 @@ Alpha, delta are the circle coordinates center. Each selection node is a proper 
 With this other method of selection, you will have one list of as many selection nodes
 as contained in the XML file.A sky visualisation of your selections in batch mode, is 
 generated (even the center of each image selected).To see this visualisation, check 
-the corrsponding checkbox on the image selector in Batch selection.
+the corresponding checkbox on the image selector in Batch selection.
 
  
-.. Note:: For all selections you have done under single or batch, it's possible to save, edit or 
+.. Note:: For all selections you have done under single or batch mode, it's possible to save, edit or 
  delete selections from the top left panel of the image selector.
 
+Processing your data considering plugins
+----------------------------------------
 
+Most of plugins require specific input data, as weight maps, flat maps ahead files etc.
+The select data path tab helps you inputting such files when they don't appear to be an
+output product of an other plugin, or simply at the beginning of the pipeline process.
+
+Custom configuration
+^^^^^^^^^^^^^^^^^^^^
+
+Every plugins need a configuration file to run, and, they all have a default configuration
+file for generic processing. Youpi provides the default one for each implemented plugin.
+If you need to finely tune your processing, you can also create your own by editing in place
+the default one in the configFile editor, or upload it from your computer. Once your tuned
+file has been saved, select it and you can go to the next tab.
+
+.. Warning:: A plugin configuration file obeys to a formal syntax, changing keyword value
+ would be sufficient ...
+
+Set output directory
+^^^^^^^^^^^^^^^^^^^^
+
+Every plugin outputs are written by default in a preseted path:
+
+/processing_output/user/plugin/
+
+The processing output directory is defined at the first step of Youpi configuration. Then
+youpi completes this path with the Youpi's user name and the name of the plugin concerned 
+by the processing.You can add one more custom level directory in the output directory tab.
+
+Input versus Output validation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Each plugin implemented in Youpi has his own input/output data. In a pipeline context,
+output data from one could be the input of another, and every IN/OUT dependancies between
+them, are handled. The input data validation tab has its purpose, take care of ouput-input
+bridges between plugins. when all previous tabs have been treated, the only thing you have
+to do is click in the input data validation button to see if things are going well.If it's 
+not, you might assume that previous tabs have not been fully carried or just missed.
+
+Adding to the cart
+^^^^^^^^^^^^^^^^^^
+
+If you pass through all tabs of your plugin, it means that you are now about to add your 
+processing to the cart. By clicking on the ADD TO CART button (in the top right of the 
+interface) a message will appears to confirm that. If something is wrong an error message
+will guide you to the related tab which needed to be fixed.
 
 The Shopping Cart
 =================
