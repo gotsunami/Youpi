@@ -282,13 +282,7 @@ variable as the base directory for installation::
              Apache's ``DocumentRoot`` is *not recommanded*. Further information if available 
              in the `official Django's documentation`_.
 
-A ``youpi`` directory has just been created in your home dir. Now, give ownership to your 
-web server's user::
-
-	$ chown -R www-data:www-data youpi
-
-In your case, this may not be ``www-data`` but ``apache`` or ``www`` depending on your Linux 
-distribution. Just look at the entries in your ``/etc/password`` and ``/etc/group`` system files.
+A ``youpi`` directory has just been created in your home dir. 
 
 .. _source code of Youpi: `Getting Youpi`_
 .. _official Django's documentation: http://docs.djangoproject.com/en/dev/intro/tutorial01/#intro-tutorial01
@@ -300,6 +294,8 @@ Configuration
 Now that everything is installed, a little more work is needed to get the things up and running.
 You are advise to follow the configuration order suggested in the following sections since 
 they depend on each other.
+
+.. _mysqlsetup:
 
 MySQL
 -----
@@ -326,6 +322,11 @@ command line client::
 
 .. _MySQL Reference Manual: http://dev.mysql.com/doc/refman/5.0/en/grant.html
 
+Condor
+------
+
+*TBW*
+
 Django Configuration
 --------------------
 
@@ -338,7 +339,8 @@ be setup properly in order to match your installation environment::
 	$ cp settings.py-dist settings.py
 
 You now have to tailor your ``settings.py``'s contents with appropriate values for all 
-lines marked with a ``#FIXME`` comment. Here is the list of variables you need to check:
+lines marked with a ``#FIXME`` comment. Here is the list of important variables you need 
+to check:
 
 ``HAS_CONVERT``
 	Defaults to ``True``. Youpi will try to generate thumbnails with the ``convert`` tool 
@@ -367,20 +369,21 @@ lines marked with a ``#FIXME`` comment. Here is the list of variables you need t
 	the FTP protocol with the ``condor_transfer.pl`` tool distributed with Youpi.
 	``FTP_URL`` should only contain the name of the target host (running a FTP server)
 	that will receive the processing output data. For example, if your ``PROCESSING_OUTPUT``
-	directory is located on your ``data.mydomain.org`` host, just set your ``FTP_URL`` 
+	directory is located on your ``data.example.org`` host, just set your ``FTP_URL`` 
 	this way::
 
-		FTP_URL = 'ftp://data.mydomain.org/'
+		FTP_URL = 'ftp://data.example.org/'
 
 ``WWW_FITSIN_PREFIX``
 	Must point to your web server responsible for serving your HTML results over HTTP. For 
-	example, all ``QualityFITS`` results will belong to a ``PROCESSING_OUTPUT/USER/fitsin/OUTPUT_DIRECTORY/IMAGE_NAME/qualityFITS/``
-	directory. ``PROCESSING_OUTPUT`` is the ``settings.py`` parameter you just configured 
-	while ``OUTPUT_DIRECTORY`` and ``IMAGE_NAME`` are variables used by the ``QualityFITS`` 
+	example, all ``QualityFITS`` results will belong to a 
+	``PROCESSING_OUTPUT/USER/fitsin/OUTPUT_DIRECTORY/IMAGE_NAME/qualityFITS/`` directory. 
+	``PROCESSING_OUTPUT`` is the ``settings.py`` parameter you just configured while 
+	``OUTPUT_DIRECTORY`` and ``IMAGE_NAME`` are variables used by the ``QualityFITS`` 
 	plugin. So, in order to serve those results and make them available fro, Youpi in your 
 	web browser, you will have to configure your web server so that it servers content from 
 	the ``PROCESSING_OUTPUT`` directory. Let's say you want to serve all Youpi results stored 
-	in ``/var/youpi/results/`` (your ``PROCESSING_OUTPUT`` directory) from your ``data.mydomain.org`` 
+	in ``/var/youpi/results/`` (your ``PROCESSING_OUTPUT`` directory) from your ``data.example.org`` 
 	host with your Apache web server listening on port 9000. Then you might want to add this 
 	entry in your Apache configuration file::
 
@@ -399,21 +402,81 @@ lines marked with a ``#FIXME`` comment. Here is the list of variables you need t
 	written in the default ``settings.py-dist`` file, they have the same value as ``WWW_FITSIN_PREFIX``, 
 	which is the default behaviour since they share the same ``PROCESSING_OUTPUT`` directory.
 
+``DATABASE_NAME``
+	The name of the MySQL database you want to use with Youpi. The value must match the one 
+	you used in the :ref:`mysqlsetup` section. Also, you will have to set the ``DATABASE_USER``, 
+	``DATABASE_PASSWORD``, ``DATABASE_HOST`` and ``DATABASE_PORT`` variables appropriately.
 
+``ADMINS``
+	A Python tuple of tuples for Youpi administrators. Put your name and email to receive
+	notifications when a problem occurs.
+
+``TRUNK``
+	This is the path of your Youpi installation, which is a concatenation of the path where you 
+	uncompressed the Youpi distribution tarball (your ``$HOME`` directory in the example) and 
+	the ``youpi`` suffix. In this case, your ``TRUNK`` variable should be set to::
+
+		TRUNK = '/home/user/youpi'
+
+	if ``/home/user`` is your ``$HOME`` directory.
+
+That's it. You are done with the basic configuration variables. The remaining of the 
+``settings.py`` file can be left untouched.
+
+Instead of heavily modifying the ``settings.py`` file directly, it is also possible to 
+overwritte its variables using a separate ``local_conf.py`` file, which will be imported 
+automatically by Django when processing ``settings.py``. This is a good place to set your 
+database configuration settings for example. A tipically ``local_conf.py`` file may look 
+like this::
+
+	# Testing database (do not use for production)
+	DEBUG               = True	
+	DATABASE_NAME       = 'youpitest'
+	DATABASE_USER       = 'debug'     
+	DATABASE_PASSWORD   = 'debug'    
+	DATABASE_HOST       = 'db.example.org'	
+
+.. warning:: Some configuration variables must not be overwritten in a ``local_conf.py`` 
+			 file since other variables defined in ``settings.py`` may depend on their 
+			 definition. All variables can be defined in ``local_conf.py`` except for 
+			 ``TRUNK``, ``CMD_CONVERT``, ``CONVERT_THUMB_OPT``, ``FTP_URL``, 
+			 ``PROCESSING_OUTPUT`` and ``WWW_FITSIN_PREFIX``.
+
+Now, give ownership to your web server's user::
+
+	$ chown -R www-data:www-data $HOME/youpi
+
+In your case, this may not be ``www-data`` but ``apache`` or ``www`` depending on your Linux 
+distribution. Just look at the entries in your ``/etc/password`` and ``/etc/group`` system files.
 
 Initial Setup Checks
 --------------------
 
-*TBW*
+Now it's time to run first-time installation checks involving creating the database structure, 
+then populating it with initial data and creating a database admin account. Most of Youpi 
+management is done from the ``$HOME/youpi/terapix`` directory using the ``manage.py`` command 
+line script.
+
+In order to create the database structure, ask the Django manager to issue the ``syncdb`` 
+command::
+
+	$ cd $HOME/youpi/terapix
+	$ python manage.py syncdb
+
+This will create all the database tables required by Youpi. It will also ask for a login, a 
+valid email address and a password in order to create an *active* admin account. Only *active 
+accounts* are allowed to authenticate and enter the Youpi application. Populating the 
+database with initial data and running some safety checks involves the ``checksetup`` command::
+
+	$ python manage.py checksetup
+
+.. note:: This command is non-destructive: you can use it whenever you want. It will only 
+		  check that everything in the database is setup properly and will not alter or 
+		  damage your data in any way.
 
 .. _apache_config:
 
 Apache
-------
-
-*TBW*
-
-Condor
 ------
 
 *TBW*

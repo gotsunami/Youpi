@@ -79,7 +79,8 @@ LANGUAGE_CODE 		= 'en-us'
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL 			= 'http://hostname/path'					# FIXME
-
+# Path to your Youpi installation
+TRUNK			= '/path/to/youpi/installation/dir/'			# FIXME
 
 
 ##########################################################################################################
@@ -89,13 +90,10 @@ MEDIA_URL 			= 'http://hostname/path'					# FIXME
 ##########################################################################################################
 
 
-
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 MANAGERS = ADMINS
 
-# TODO: rename TRUNK to PROJECT_DIR
-TRUNK			= os.getcwd()[:-len('terapix') - 1] 
 APP_URL_PREFIX  = '/youpi'
 AUP				= APP_URL_PREFIX 	# For short
 
