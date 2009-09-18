@@ -330,12 +330,75 @@ Django Configuration
 --------------------
 
 Now that your database is properly configured, you have to setup Youpi's Django installation.
-All the configuration options are available in a ``settings.py-dist`` file distributed 
-with Youpi. Most part of this file will remain untouched but some variables have to 
+All the configuration options are available in the ``settings.py-dist`` file distributed 
+with Youpi. Most parts of this file will remain untouched but some variables have to 
 be setup properly in order to match your installation environment::
 
 	$ cd $HOME/youpi/terapix
 	$ cp settings.py-dist settings.py
+
+You now have to tailor your ``settings.py``'s contents with appropriate values for all 
+lines marked with a ``#FIXME`` comment. Here is the list of variables you need to check:
+
+``HAS_CONVERT``
+	Defaults to ``True``. Youpi will try to generate thumbnails with the ``convert`` tool 
+	available in the ``ImageMagick`` software package. You can set it to ``False`` if you 
+	don't plan to use this feature.
+
+``CMD_CONVERT``
+	If ``HAS_CONVERT`` is set to ``True``, fill in the full path to the ``convert``
+	program.
+
+``CMD_STIFF``
+	Fill in the full path to the ``stiff``.
+
+``CMD_IMCOPY``
+	Fill in the full path to the ``imcopy`` program (parts of the `CFITSIO`_ package).
+
+``PROCESSING_OUTPUT``
+	Path to the directory were all your processing data results are going to be stored.
+	Youpi uses a per-user per-application storage policy. Thus, John's `Scamp`_ user 
+	results will be stored in ``PROCESSING_OUTPUT/john/scamp/``. Of course, this 
+	directory can point to any remote networked path (``NFS`` for example).
+
+``FTP_URL``
+	``URL`` for FTP transfer. To maximize performance during network transfers, all 
+	results data are transferred back to the ``PROCESSING_OUTPUT`` directory using 
+	the FTP protocol with the ``condor_transfer.pl`` tool distributed with Youpi.
+	``FTP_URL`` should only contain the name of the target host (running a FTP server)
+	that will receive the processing output data. For example, if your ``PROCESSING_OUTPUT``
+	directory is located on your ``data.mydomain.org`` host, just set your ``FTP_URL`` 
+	this way::
+
+		FTP_URL = 'ftp://data.mydomain.org/'
+
+``WWW_FITSIN_PREFIX``
+	Must point to your web server responsible for serving your HTML results over HTTP. For 
+	example, all ``QualityFITS`` results will belong to a ``PROCESSING_OUTPUT/USER/fitsin/OUTPUT_DIRECTORY/IMAGE_NAME/qualityFITS/``
+	directory. ``PROCESSING_OUTPUT`` is the ``settings.py`` parameter you just configured 
+	while ``OUTPUT_DIRECTORY`` and ``IMAGE_NAME`` are variables used by the ``QualityFITS`` 
+	plugin. So, in order to serve those results and make them available fro, Youpi in your 
+	web browser, you will have to configure your web server so that it servers content from 
+	the ``PROCESSING_OUTPUT`` directory. Let's say you want to serve all Youpi results stored 
+	in ``/var/youpi/results/`` (your ``PROCESSING_OUTPUT`` directory) from your ``data.mydomain.org`` 
+	host with your Apache web server listening on port 9000. Then you might want to add this 
+	entry in your Apache configuration file::
+
+		Listen 9000 
+		<VirtualHost *:9000>
+			DocumentRoot "/var/youpi/results/"
+			<Directory "/var/youpi/results/">
+				Options Indexes MultiViews FollowSymLinks
+				AllowOverride None
+				Order allow,deny
+				Allow from all
+			</Directory>
+		</VirtualHost>
+
+	The same applies for ``WWW_FITSIN_SCAMP``, ``WWW_FITSIN_SEX`` and ``WWW_FITSIN_SWARP``. As 
+	written in the default ``settings.py-dist`` file, they have the same value as ``WWW_FITSIN_PREFIX``, 
+	which is the default behaviour since they share the same ``PROCESSING_OUTPUT`` directory.
+
 
 
 Initial Setup Checks
