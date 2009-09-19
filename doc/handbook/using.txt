@@ -1,8 +1,15 @@
 ***********
 Using Youpi
 ***********
+The Youpi web interface is splitted in tabs. Each tab corresponds to a specific
+task and, this section, will describe the functionnality related to the tab header.
 
-Befor diving into Youpi, let's first introduce to the basic functionnalitites of
+.. image:: /img/tabs.jpg
+   	:width: 600 px
+   	:align: center
+
+
+Before diving into Youpi, let's first introduce to the basic functionnalities of
 the pipeline.
 
 Pre-ingestion of FITS Tables
@@ -138,7 +145,7 @@ preferences for processing data, manage his style themes and define his own perm
 - Default shopping cart item behaviour
 
  You can define a **default shopping cart item behaviour**, means if you intend to use 
- policies or selections for each processing plugin of youpi. Once this done, you can
+ policies or selections, for each processing plugin of youpi. Once this done, you can
  opt for the selections and policies you have created in the **Condor setup**, and 
  affect to plugins.
 
@@ -284,6 +291,8 @@ Set output directory
 
 Every plugin outputs are written by default in a preseted path:
 
+::
+
 /processing_output/user/plugin/
 
 The processing output directory is defined at the first step of Youpi configuration. Then
@@ -310,6 +319,23 @@ will guide you to the related tab which needed to be fixed.
 
 The Shopping Cart
 =================
+
+The shopping cart comes naturally, after adding to cart one or many processings, elaborated
+from plugins of the *processing your data* tab. It represents a visual synthesis of 
+processings, sorted by plugin and ready to be run. A summary of your parameters are shown 
+as a quick view. Then you can decide to delete, save for a later use, or run the 
+corresponding processing as *jobs* handled by Condor. The *saved items* tab will summarize
+your saved processings with elementary informations, and an *add to cart* click will push 
+them back to the cart, ready to be computed.
+
+.. Note:: During your logged session, if cookies are activated, you will keep your cart
+ with your items added, even if you continue browsing the Youpi interface and without 
+ saving them. But it is recommended to *save for later* your items in the cart, not to be 
+ punish by a simple network disconnection.
+
+Runtime options are about management of jobs through Condor. If you have set a default 
+condor configuration (i.e Condor Setup), or if you intend to provide a custom configuration 
+for a specific process, it can be managed through this dropdown box.
 
 Live Monitoring of Processings
 ==============================
