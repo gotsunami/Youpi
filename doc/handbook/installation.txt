@@ -282,7 +282,11 @@ variable as the base directory for installation::
              Apache's ``DocumentRoot`` is *not recommanded*. Further information if available 
              in the `official Django's documentation`_.
 
-A ``youpi`` directory has just been created in your home dir. 
+A ``youpi`` directory has just been created in your home dir. Let's set ``$YOUPI_INSTALL_DIR`` to
+point to your newly created ``youpi`` directory. We will use this variable later to refer to your 
+Youpi's installation base directory::
+
+	$ export YOUPI_INSTALL_DIR=$HOME/youpi
 
 .. _source code of Youpi: `Getting Youpi`_
 .. _official Django's documentation: http://docs.djangoproject.com/en/dev/intro/tutorial01/#intro-tutorial01
@@ -325,7 +329,15 @@ command line client::
 Condor
 ------
 
-*TBW*
+Your Condor installation and configuration depends on your Youpi's installation kind.
+Configuring Condor itself is outside the scope of this document, but you can browse 
+the `official Condor documentation`_ instead.
+
+The most important requirement for Youpi to work properly is to be able to submit 
+jobs from the machine hosting the Youpi installation. The ``condor_q`` command must 
+be in your ``$PATH``.
+
+.. _official Condor documentation: http://www.cs.wisc.edu/condor/manual/
 
 Django Configuration
 --------------------
@@ -335,7 +347,7 @@ All the configuration options are available in the ``settings.py-dist`` file dis
 with Youpi. Most parts of this file will remain untouched but some variables have to 
 be setup properly in order to match your installation environment::
 
-	$ cd $HOME/youpi/terapix
+	$ cd $YOUPI_INSTALL_DIR/terapix
 	$ cp settings.py-dist settings.py
 
 You now have to tailor your ``settings.py``'s contents with appropriate values for all 
@@ -412,13 +424,10 @@ to check:
 	notifications when a problem occurs.
 
 ``TRUNK``
-	This is the path of your Youpi installation, which is a concatenation of the path where you 
-	uncompressed the Youpi distribution tarball (your ``$HOME`` directory in the example) and 
-	the ``youpi`` suffix. In this case, your ``TRUNK`` variable should be set to::
+	This is the path of your Youpi installation, put the value of your ``$YOUPI_INSTALL_DIR``
+	here::
 
 		TRUNK = '/home/user/youpi'
-
-	if ``/home/user`` is your ``$HOME`` directory.
 
 That's it. You are done with the basic configuration variables. The remaining of the 
 ``settings.py`` file can be left untouched.
@@ -444,7 +453,7 @@ like this::
 
 Now, give ownership to your web server's user::
 
-	$ chown -R www-data:www-data $HOME/youpi
+	$ chown -R www-data:www-data $YOUPI_INSTALL_DIR
 
 In your case, this may not be ``www-data`` but ``apache`` or ``www`` depending on your Linux 
 distribution. Just look at the entries in your ``/etc/password`` and ``/etc/group`` system files.
@@ -460,7 +469,7 @@ line script.
 In order to create the database structure, ask the Django manager to issue the ``syncdb`` 
 command::
 
-	$ cd $HOME/youpi/terapix
+	$ cd $YOUPI_INSTALL_DIR/terapix
 	$ python manage.py syncdb
 
 This will create all the database tables required by Youpi. It will also ask for a login, a 
@@ -479,16 +488,43 @@ database with initial data and running some safety checks involves the ``checkse
 Apache
 ------
 
-*TBW*
+Deploying Youpi into production using Apache is easy since Youpi comes with handy tools to help 
+you get ready easily. From the ``$YOUPI_INSTALL_DIR/terapix`` directory, just issue the following 
+command::
+
+	$ python manage.py checksetup --wsgi --apache
+
+The ``--wsgi`` option will create a ``$YOUPI_INSTALL_DIR/deploy/django.wsgi`` configuration file 
+ready to use - with values matching your current Youpi installation - with any web server supporting 
+the WSGI (`Web Server Gateway Interface`_) specification.
+
+The ``--apache`` option will generate a ``$YOUPI_INSTALL_DIR/deploy/youpi.conf`` configuration 
+file ready to use with your Apache web server. You can either copy this file to your web server's
+configuration files directory or copy its contents to your ``httpd.conf`` file.
+
+Now just reload Apache before testing your installation::
+
+	$ sudo /etc/init.d/apache2 reload
+
+Congratulations! The configuration step is over :)
+
+.. _Web Server Gateway Interface: http://wsgi.org/wsgi/What_is_WSGI
 
 
 Testing Your Installation
 =========================
 
-*TBW*
-
+At this point, you are ready to run Youpi. Just point your browser to the web server running 
+Youpi, say ``http://myhost/youpi/``. The login page should appear. If not, you may start checking 
+your server's logs and reread all the configuration steps in this chapter.
 
 Upgrading to New Releases
 =========================
 
-*TBW*
+Upgrading to new releases is as easy as installing the new version of Youpi and running 
+the ``checksetup`` script again::
+
+	$ cd $YOUPI_INSTALL_DIR/terapix
+	$ python manage.py checksetup
+
+This command will take care of all the details, updating the database anytime it is required.
