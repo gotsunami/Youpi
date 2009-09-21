@@ -584,7 +584,7 @@ notify_user             = monnerville@iap.fr
 				raise ValueError, userData
 
 			condor_submit_img_entries = """
-arguments                = %s /usr/local/bin/condor_transfert.pl /usr/local/bin/qualityFITS -vv""" % encUserData
+arguments                = %s %s /usr/local/bin/qualityFITS -vv""" % (encUserData, CMD_CONDOR_TRANSFER)
 
 			userData['Warnings'] = {}
 			userData['Warnings'][str(img.name) + '.fits'] = []

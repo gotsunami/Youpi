@@ -237,7 +237,7 @@ class Swarp(ProcessingPlugin):
 		tf.close()
 
 		#
-		# Pre-processing script runned by condor_transfert.pl
+		# Pre-processing script runned by condor_transfer.pl
 		# This is mandatory in order to be able to uncompress the weight maps
 		# preProcFile is filled later
 		#
@@ -343,19 +343,22 @@ sys.exit(exit_code)
 		os.chmod(preProcFile, RWX_ALL)
 
 		condor_submit_entry = """
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- ./%(preprocscript)s
+arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- ./%(preprocscript)s
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
-queue""" %  {	'encuserdata' 	: encUserData, 
-				'swarp'			: CMD_SWARP,
-				'params'		: swarp_params,
-				'config'		: os.path.basename(customrc),
-				'userdata'		: userData, 
-				'transferfile'  : transferFile,
-				'user'			: request.user.username,
-				'imgsfile'		: os.path.basename(swarpImgsFile),
-				'preprocscript'	: os.path.basename(preProcFile),
-				'tpxupload'		: FTP_URL + resultsOutputDir }
+queue""" %  {	
+		'condor_transfer'	: CMD_CONDOR_TRANSFER,
+		'encuserdata' 		: encUserData, 
+		'swarp'				: CMD_SWARP,
+		'params'			: swarp_params,
+		'config'			: os.path.basename(customrc),
+		'userdata'			: userData, 
+		'transferfile'  	: transferFile,
+		'user'				: request.user.username,
+		'imgsfile'			: os.path.basename(swarpImgsFile),
+		'preprocscript'		: os.path.basename(preProcFile),
+		'tpxupload'			: FTP_URL + resultsOutputDir,
+	}
 
 		csf.write(condor_submit_entry)
 		csf.close()

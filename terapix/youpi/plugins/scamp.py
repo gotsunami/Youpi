@@ -328,18 +328,19 @@ notify_user             = monnerville@iap.fr
 
 		condor_submit_entry = """
 # YOUPI_USER_DATA = %(userdata)s
-arguments               = %(encuserdata)s /usr/local/bin/condor_transfert.pl -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null
+arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'scamp'			: CMD_SCAMP,
-		'encuserdata' 	: encUserData, 
-		'params'		: scamp_params,
-		'config'		: os.path.basename(customrc),
-		'userdata'		: userData, 
-		'user'			: request.user.username,
-		'tpxupload'		: FTP_URL + resultsOutputDir,
-		'transferfile'	: transferFile,
-		'ldacsfile'		: catalogFile,
+		'condor_transfer'	: CMD_CONDOR_TRANSFER,
+		'scamp'				: CMD_SCAMP,
+		'encuserdata' 		: encUserData, 
+		'params'			: scamp_params,
+		'config'			: os.path.basename(customrc),
+		'userdata'			: userData, 
+		'user'				: request.user.username,
+		'tpxupload'			: FTP_URL + resultsOutputDir,
+		'transferfile'		: transferFile,
+		'ldacsfile'			: catalogFile,
 	}
 
 		csf.write(condor_submit_entry)
