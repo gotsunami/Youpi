@@ -5,7 +5,6 @@ The Youpi web interface is splitted in tabs. Each tab corresponds to a specific
 task and, this section, will describe the functionnality related to the tab header.
 
 .. image:: /img/tabs.jpg
-   	:width: 600 px
    	:align: center
 
 
@@ -340,8 +339,36 @@ for a specific process, it can be managed through this dropdown box.
 Live Monitoring of Processings
 ==============================
 
+After having launched jobs, from the shopping cart to the Condor management system, Youpi 
+provides a realtime instant view of all proccessed jobs, with related nodes in which jobs
+are running, and the status of the management. You will be able to stop and kill your own
+jobs and assuming that you give data permissions to your team, they could do the same.
+The interface for live monitoring is decomposed in pages referencing 10 running jobs per
+pages (pages are represented by the top red numbers above jobs).
+
+
 Processing Results
 ==================
+
+The processing history tab is separated for the moment, in 2 parts. The first one is a 
+*processing selector* under the *history* tab, and proposes a custom search of processings 
+by plugin: filtering by user, status, plugin and displaying jobs results in the right panel 
+on click on the desired result. Results in red are the one which failed, green are successful.
+
+Once you click on the results you want to display, you can see a full description of it in the
+right panel. For every plugins some of element results are the same:
+ 
+ - Images, as produced png files from the processing, can be viewed by clicking on their displayed thumb version
+ - permissions that have been defined for this processing
+ - A set of Condor LOG files(output log, main log, error log) are available in one click
+ - the running parameters and the related configuration file you set to launch the job are viewable(dropdown box)
+ - the plugin output information
+
+The second part is the *statistics* tab and permit, by browsing your related output directory
+processing, to resume processing images status. It is a quick way to know if 100% of your images
+group has been successfully processed.
+
+
 
 Generating Reports
 ==================
