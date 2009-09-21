@@ -1,12 +1,21 @@
+#
+# You can use this file with any webserver supporting WSGI such
+# as Apache.
+#
+# You should run 
+#   python manage.py --wsgi 
+# from the terapix subdirectory to substitute the values 
+# automatically and get a working conf file.
+#
 import os, sys
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
 # For Matplotlib
-os.environ['MPLCONFIGDIR'] = '/path/to/tmp' # FIXME
+os.environ['MPLCONFIGDIR'] = '${tmp}'
 
 # Path to Django app
-sys.path.append('/path/to/django/app')	# FIXME
-sys.path.append('/path/to/django/app/terapix') #FIXME
+sys.path.append('${installation_path}')
+sys.path.append(os.path.join('${installation_path}', 'terapix'))
 
 import django.core.handlers.wsgi
 application = django.core.handlers.wsgi.WSGIHandler()

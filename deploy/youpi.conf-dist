@@ -1,0 +1,15 @@
+# Apache config file for Youpi
+
+Alias /media/ ${installation_path}/terapix/media/
+
+<Directory ${installation_path}/terapix/media>
+	Order deny,allow
+	Allow from all
+</Directory>
+
+WSGIScriptAlias / ${deploy_path}/django.wsgi
+
+<Directory ${deploy_path}>
+	Order allow,deny
+	Allow from all
+</Directory>
