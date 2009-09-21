@@ -1,7 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Youpi french translations
+# Copyright (C) 2009 Terapix
+# This file is distributed under the same license as the Youpi package.
+# Mathias Monnerville <monnerville@iap.fr>, 2009.
 #
 #, fuzzy
 msgid ""
@@ -18,23 +18,23 @@ msgstr ""
 
 #: terapix/templates/404.html:4 terapix/templates/404.html.py:8
 msgid "Page not found"
-msgstr ""
+msgstr "Page non trouvée"
 
 #: terapix/templates/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Désolé mais la page demandée n'a pu être trouvée."
 
 #: terapix/templates/500.html:4 terapix/templates/admin/base.html:36
 msgid "Home"
-msgstr ""
+msgstr "Accueil"
 
 #: terapix/templates/500.html:4
 msgid "Server error"
-msgstr ""
+msgstr "Erreur du serveur"
 
 #: terapix/templates/500.html:6
 msgid "Server error (500)"
-msgstr ""
+msgstr "Erreur du serveur (500)"
 
 #: terapix/templates/500.html:9
 msgid "Server Error <em>(500)</em>"
@@ -48,11 +48,11 @@ msgstr ""
 
 #: terapix/templates/base.html:46 terapix/templates/admin/base.html:28
 msgid "Change password"
-msgstr ""
+msgstr "Changer votre mot de passe"
 
 #: terapix/templates/base.html:48 terapix/templates/admin/base.html:29
 msgid "Log out"
-msgstr ""
+msgstr "Se déconnecter"
 
 #: terapix/templates/base_site.html:4
 msgid "Youpi"
@@ -60,7 +60,7 @@ msgstr ""
 
 #: terapix/templates/admin/base.html:26
 msgid "Welcome,"
-msgstr ""
+msgstr "Bonjour "
 
 #: terapix/templates/admin/base_site.html:4
 msgid "Youpi site admin"
@@ -72,12 +72,12 @@ msgstr ""
 
 #: terapix/templates/registration/login.html:17
 msgid "Username:"
-msgstr ""
+msgstr "Utilisateur:"
 
 #: terapix/templates/registration/login.html:20
 msgid "Password:"
-msgstr ""
+msgstr "Mot de passe:"
 
 #: terapix/templates/registration/login.html:26
 msgid "Log in"
-msgstr ""
+msgstr "Se connecter"
