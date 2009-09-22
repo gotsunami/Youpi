@@ -11,10 +11,7 @@
 #
 ##############################################################################
 
-
-import time
-from types import *
-#
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -27,7 +24,8 @@ from terapix.youpi.cviews import *
 from terapix.youpi.models import *
 #
 import cjson as json
-from settings import *
+import time
+from types import *
 
 @login_required
 @profile

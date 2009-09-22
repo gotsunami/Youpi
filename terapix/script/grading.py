@@ -26,8 +26,8 @@ if '..' not in sys.path:
 
 try:
 	from django.db import IntegrityError
+	from django.conf import settings
 	#
-	from terapix.settings import *
 	from terapix.youpi.models import *
 except ImportError:
 	print 'Please run this command from the terapix subdirectory.'

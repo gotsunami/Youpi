@@ -13,6 +13,7 @@
 
 # vim: set ts=4
 
+from django.conf import settings
 from django.contrib.sessions.models import Session
 #
 import glob, sys, types, re, os, string, os.path
@@ -23,9 +24,8 @@ from types import *
 from terapix.youpi.auth import *
 from terapix.youpi.models import *
 from terapix.exceptions import *
-from terapix.settings import *
 
-PLUGIN_DIRS = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins')
+PLUGIN_DIRS = os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 
@@ -54,7 +54,6 @@ class ProcessingPlugin:
 		the cluster so that it can retreive all job information from Condor.
 		@return Condor Id string
 		"""
-
 		random.seed()
 		return "%s:%f-%d" % (self.id, time.time(), random.randint(1, 1000000))
 
@@ -65,8 +64,7 @@ class ProcessingPlugin:
 		The returned name should then be used by plugins to add some content to it.
 		@return Path to a non existing file
 		"""
-
-		return "%s/CONDOR-%s-%s.txt" % (CONDOR_LOG_DIR, self.id, time.time())
+		return "%s/CONDOR-%s-%s.txt" % (settings.CONDOR_LOG_DIR, self.id, time.time())
 
 	def getConfigValue(self, content, keyword):
 		"""
@@ -103,7 +101,7 @@ class ProcessingPlugin:
 		@return Path to a non existing file
 		"""
 
-		return "%s/%s-%s.rc" % (CONDOR_LOG_DIR, self.id.upper(), time.time())
+		return "%s/%s-%s.rc" % (settings.CONDOR_LOG_DIR, self.id.upper(), time.time())
 
 	def getCondorLogFilenames(self):
 		"""
@@ -112,7 +110,7 @@ class ProcessingPlugin:
 		@return Dictionnary with paths to Condor log files
 		"""
 
-		pattern = os.path.join(CONDOR_LOG_DIR, self.id.upper() + '.%s.$(Cluster).$(Process)')
+		pattern = os.path.join(settings.CONDOR_LOG_DIR, self.id.upper() + '.%s.$(Cluster).$(Process)')
 
 		return {
 			'log'	: pattern % "log",
@@ -130,7 +128,7 @@ class ProcessingPlugin:
 		@return The full output directory path
 		"""
 
-		if not oldPath: return os.path.join(PROCESSING_OUTPUT, request.user.username, self.id)
+		if not oldPath: return os.path.join(settings.PROCESSING_OUTPUT, request.user.username, self.id)
 		return oldPath.replace(oldUserName, request.user.username)
 
 	def getConfigFileContent(self, request):
@@ -271,7 +269,7 @@ class ProcessingPlugin:
 
 		# Default config files to use
 		return [
-			{'path': os.path.join(PLUGINS_CONF_DIR, self.id + '.conf.default'), 'type': 'config'},
+			{'path': os.path.join(settings.PLUGINS_CONF_DIR, self.id + '.conf.default'), 'type': 'config'},
 		]
 
 	def __saveDefaultConfigFileToDB(self, request):

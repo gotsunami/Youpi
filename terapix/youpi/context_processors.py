@@ -16,7 +16,7 @@ A set of custom Youpi request processors that return dictionaries to be merged i
 template context. Each function takes the request object as its only parameter
 and returns a dictionary to add to the context.
 
-These are referenced from the setting TEMPLATE_CONTEXT_PROCESSORS and used by
+They are referenced from the setting TEMPLATE_CONTEXT_PROCESSORS and used by
 RequestContext.
 """
 
@@ -25,7 +25,8 @@ def appmenu(request):
 	Returns context variables for Youpi's release system (Application menu).
 	"""
 
-	from terapix.settings import AUP
+	from django.conf import settings
+	AUP = settings.AUP
 	
 	app_menu = {'normal' : ( 	
 					{'title' : 'Home', 				'id' : 'home', 			'href' : AUP},

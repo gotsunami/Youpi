@@ -21,9 +21,9 @@ from types import *
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.youpi.models import *
 from terapix.exceptions import *
-from terapix.settings import *
 from terapix.youpi.auth import read_proxy
 #
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response 
 from django.template import RequestContext
@@ -141,7 +141,7 @@ class Scamp(ProcessingPlugin):
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList)
-				pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath)) 
+				pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath)) 
 				data = pipe.readlines()
 				pipe.close()
 				cluster_ids.append(self.getClusterId(data))
@@ -267,7 +267,7 @@ class Scamp(ProcessingPlugin):
 		udf.close()
 
 		csf = open(csfPath, 'w')
-		submit_file_path = os.path.join(TRUNK, 'terapix')
+		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 
 	 	# Generates CSF
 		condor_submit_file = """
@@ -281,7 +281,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settingspath)s/settings_base.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(userdata)s, %(ldacsfile)s, %(transferfile)s, %(settingspath)s/NOP
+transfer_input_files    = %(settingspath)s/local_conf.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(userdata)s, %(ldacsfile)s, %(transferfile)s, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -316,7 +316,7 @@ notify_user             = monnerville@iap.fr
 
 		try:
 			xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
-			scamp_params = "-XSL_URL %s" % os.path.join(WWW_SCAMP_PREFIX, 
+			scamp_params = "-XSL_URL %s" % os.path.join(settings.WWW_SCAMP_PREFIX, 
 														request.user.username, 
 														userData['Kind'], 
 														userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
@@ -331,14 +331,14 @@ notify_user             = monnerville@iap.fr
 arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: CMD_CONDOR_TRANSFER,
-		'scamp'				: CMD_SCAMP,
+		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
+		'scamp'				: settings.CMD_SCAMP,
 		'encuserdata' 		: encUserData, 
 		'params'			: scamp_params,
 		'config'			: os.path.basename(customrc),
 		'userdata'			: userData, 
 		'user'				: request.user.username,
-		'tpxupload'			: FTP_URL + resultsOutputDir,
+		'tpxupload'			: settings.FTP_URL + resultsOutputDir,
 		'transferfile'		: transferFile,
 		'ldacsfile'			: catalogFile,
 	}

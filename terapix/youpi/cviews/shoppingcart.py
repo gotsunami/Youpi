@@ -16,6 +16,7 @@ import time
 from types import *
 import cjson as json
 #
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
@@ -25,8 +26,6 @@ from django.template import RequestContext
 from terapix.youpi.models import *
 from terapix.youpi.cviews import *
 from terapix.youpi.auth import read_proxy
-#
-from settings import *
 
 def cart_cookie_check(request):
 	"""

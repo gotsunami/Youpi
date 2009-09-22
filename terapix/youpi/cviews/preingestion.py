@@ -21,6 +21,7 @@ import os, os.path, sys, pprint
 import socket, time
 from types import *
 #
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
@@ -34,8 +35,6 @@ from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 from terapix.youpi.cviews import *
 from terapix.youpi.pluginmanager import PluginManagerError, PluginError
-#
-from terapix.settings import *
 
 def processing_save_image_selection(request):
 	"""
@@ -228,6 +227,7 @@ def preingestion_tables_count(request):
 
 def preingestion_run(request):
 	"""
+	FIXME: _old_ code need fixes
 	"""
 
 	try:
@@ -236,10 +236,10 @@ def preingestion_run(request):
 	except Exception, e:
 		return HttpResponseForbidden()
 
-	db = DB(host = DATABASE_HOST,
-			user = DATABASE_USER,
-			passwd = DATABASE_PASSWORD,
-			db = DATABASE_NAME)
+	db = DB(host = settings.DATABASE_HOST,
+			user = settings.DATABASE_USER,
+			passwd = settings.DATABASE_PASSWORD,
+			db = settings.DATABASE_NAME)
 
 	g = DBGeneric(db.con)
 
@@ -309,10 +309,10 @@ def preingestion_table_fields(request):
 	except Exception, e:
 		return HttpResponseForbidden()
 
-	db = DB(host = DATABASE_HOST,
-			user = DATABASE_USER,
-			passwd = DATABASE_PASSWORD,
-			db = DATABASE_NAME)
+	db = DB(host = settings.DATABASE_HOST,
+			user = settings.DATABASE_USER,
+			passwd = settings.DATABASE_PASSWORD,
+			db = settings.DATABASE_NAME)
 
 	g = DBGeneric(db.con)
 
@@ -503,10 +503,10 @@ def preingestion_custom_query(request):
 			query += ')'
 
 	# Now executes query
-	db = DB(host = DATABASE_HOST,
-			user = DATABASE_USER,
-			passwd = DATABASE_PASSWORD,
-			db = DATABASE_NAME)
+	db = DB(host = settings.DATABASE_HOST,
+			user = settings.DATABASE_USER,
+			passwd = settings.DATABASE_PASSWORD,
+			db = settings.DATABASE_NAME)
 
 	g = DBGeneric(db.con)
 

@@ -22,6 +22,7 @@ import xml.dom.minidom as dom
 from types import *
 from stat import *
 #
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
@@ -38,8 +39,6 @@ from terapix.youpi.pluginmanager import PluginManagerError
 #
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
-#
-from terapix.settings import *
 
 def condor_status(request):
 	return HttpResponse(str({'results' : get_condor_status()}), mimetype = 'text/plain')
@@ -75,9 +74,9 @@ def image_grading(request, pluginName, fitsId):
 		try:
 			path = plugin.getUrlToGradingData(request, fitsId)
 		except IndexError:
-			return HttpResponseRedirect(AUP + '/results/')
+			return HttpResponseRedirect(settings.AUP + '/results/')
 	else:
-		return HttpResponseRedirect(AUP + '/results/')
+		return HttpResponseRedirect(settings.AUP + '/results/')
 
 	return render_to_response('grading.html', {'www' : path, 'pluginName' : pluginName, 'fitsId' : fitsId}, context_instance = RequestContext(request))
 
@@ -364,7 +363,7 @@ def get_live_monitoring(request, nextPage = -1):
 	then full data set is returned.
 	"""
 
-	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_q -xml'))
+	pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_q -xml'))
 	data = pipe.readlines()
 	pipe.close()
 
@@ -532,7 +531,7 @@ def query_condor_node_for_versions(request):
 				'UserID' 		: str(request.user.id)}
 
  	# Generates CSF
-	submit_file_path = os.path.join(TRUNK, 'terapix')
+	submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 	condor_submit_file = """
 #
 # Condor submission file
@@ -543,7 +542,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %s/settings_base.py, %s/settings.py, %s/DBGeneric.py, %s/NOP
+transfer_input_files    = %s/local_conf.py, %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
 # YOUPI_USER_DATA = %s
@@ -571,7 +570,7 @@ queue
 	f.write(condor_submit_file);
 	f.close();
 
-	job = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csf))
+	job = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csf))
 	job.close()
 
 	return HttpResponse(str({'Versions' : []}), mimetype = 'text/plain')
@@ -600,7 +599,7 @@ def job_cancel(request):
 		proc = str(post['ProcId'])
 		rmJobs = ["%s.%s" % (cluster, proc)]
 	
-	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_rm %s" % string.join(rmJobs, ' ')))
+	pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_rm %s" % string.join(rmJobs, ' ')))
 	data = pipe.readlines()
 	pipe.close()
 
@@ -629,7 +628,6 @@ def condor_ingestion(request):
 	# is base64 encoded to avoid bad caracter handling. The condor ingestion script 
 	# will then de-serialize its first argument to access the data
 	#
-	#script_args = { 'path' : request.POST.get('path', NULLSTRING),
 	script_args = { 'path' : path,
 					'email' : email,
 					'user_id' : request.user.id,
@@ -644,7 +642,7 @@ def condor_ingestion(request):
 	userData = { 'Descr' 		: str("Ingestion (%s) of FITS images " % ingestionId),
 				'UserID' 		: str(request.user.id)}
 
-	submit_file_path = os.path.join(TRUNK, 'terapix')
+	submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 	node = "Machine == \"%s\"" % machine
 
 	# Add any custom Condor requirements, if any
@@ -657,7 +655,7 @@ def condor_ingestion(request):
 		# if not machine only compose the requirements
 		machine = node
 
-	f = open(CONDORFILE + '_' + ingestionId, 'w')
+	f = open(settings.CONDORFILE + '_' + ingestionId, 'w')
 	f.write("""
 executable = %s/ingestion.py
 universe                = vanilla
@@ -670,7 +668,7 @@ arguments               = "%s"
 
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
-transfer_input_files    = %s/settings_base.py, %s/settings.py, %s/DBGeneric.py, %s/NOP
+transfer_input_files    = %s/local_conf.py, %s/settings.py, %s/DBGeneric.py, %s/NOP
 initialdir				= %s
 transfer_output_files   = NOP
 # Logs
@@ -691,13 +689,13 @@ queue
 		os.path.join(submit_file_path, 'script'),
 		userData,
 		base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
-		CONDOR_OUTPUT + '_' + ingestionId,
-		CONDOR_ERROR + '_' + ingestionId,
-		CONDOR_LOG + '_' + ingestionId ))
+		settings.CONDOR_OUTPUT + '_' + ingestionId,
+		settings.CONDOR_ERROR + '_' + ingestionId,
+		settings.CONDOR_LOG + '_' + ingestionId ))
 
 	f.close()
 
-	job = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % (CONDORFILE + '_' + ingestionId)))
+	job = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % (settings.CONDORFILE + '_' + ingestionId)))
 	resp = job.readlines()
 	job.close()
 

@@ -22,7 +22,7 @@ from sets import Set
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
-from terapix.settings import *
+from django.conf import settings
 from terapix.youpi.auth import read_proxy
 #
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
@@ -458,7 +458,7 @@ class QualityFitsIn(ProcessingPlugin):
 
 		csf = open(csfPath, 'w')
 
-		submit_file_path = os.path.join(TRUNK, 'terapix')
+		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 
 		# Get filenames for Condor log files (log, error, out)
 		logs = self.getCondorLogFilenames()
@@ -475,7 +475,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settingspath)s/settings_base.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(settingspath)s/NOP
+transfer_input_files    = %(settingspath)s/local_conf.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -569,7 +569,7 @@ notify_user             = monnerville@iap.fr
 			#
 			# Delaying job startup will prevent "Too many connections" MySQL errors
 			# and will decrease the load of the node that will receive all qualityFITS data
-			# results (PROCESSING_OUTPUT) back. Every job queued will be put to sleep StartupDelay 
+			# results (settings.PROCESSING_OUTPUT) back. Every job queued will be put to sleep StartupDelay 
 			# seconds
 			#
 			userData['StartupDelay'] = step
@@ -584,7 +584,7 @@ notify_user             = monnerville@iap.fr
 				raise ValueError, userData
 
 			condor_submit_img_entries = """
-arguments                = %s %s /usr/local/bin/qualityFITS -vv""" % (encUserData, CMD_CONDOR_TRANSFER)
+arguments                = %s %s /usr/local/bin/qualityFITS -vv""" % (encUserData, settings.CMD_CONDOR_TRANSFER)
 
 			userData['Warnings'] = {}
 			userData['Warnings'][str(img.name) + '.fits'] = []
@@ -612,7 +612,7 @@ arguments                = %s %s /usr/local/bin/qualityFITS -vv""" % (encUserDat
 			condor_submit_img_entries += """
 # YOUPI_USER_DATA = %s
 environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%s""" %  (	userData, 
-																															FTP_URL + resultsOutputDir,
+																															settings.FTP_URL + resultsOutputDir,
 																															base64.encodestring(marshal.dumps(userData)).replace('\n', '') ) 
 
 			condor_submit_img_entries += "\nqueue"
@@ -645,7 +645,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList)
-				pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_submit %s 2>&1' % csfPath)) 
+				pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_submit %s 2>&1' % csfPath)) 
 				data = pipe.readlines()
 				pipe.close()
 				cluster_ids.append(self.getClusterId(data))
@@ -797,7 +797,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		except KeyError, e:
 			raise PluginError, 'Bad parameters'
 
-		pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_q -xml"))
+		pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_q -xml"))
 		data = pipe.readlines()
 		pipe.close()
 
@@ -887,7 +887,7 @@ environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin
 		cluster = str(post['ClusterId'])
 		proc = str(post['ProcId'])
 
-		pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_rm %s.%s" % (cluster, proc)))
+		pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_rm %s.%s" % (cluster, proc)))
 		data = pipe.readlines()
 		pipe.close()
 

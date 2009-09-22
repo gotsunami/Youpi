@@ -21,6 +21,7 @@ matplotlib.use('Agg')
 from matplotlib.pylab import *
 from random import *
 #
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest
@@ -29,8 +30,6 @@ from django.template import RequestContext
 #
 from terapix.youpi.models import *
 from terapix.youpi.cviews import *
-#
-from settings import *
 
 def rand_color():
 	"""
@@ -185,8 +184,8 @@ def plot_sky_selections(request):
 
 	# Save images to disk
 	imgRoot = 'sky'
-	imgName = os.path.join(MEDIA_ROOT, 'pubtmp', imgRoot + '.png')
-	tnName = os.path.join(MEDIA_ROOT, 'pubtmp', imgRoot + '_tn.png')
+	imgName = os.path.join(settings.MEDIA_ROOT, 'pubtmp', imgRoot + '.png')
+	tnName = os.path.join(settings.MEDIA_ROOT, 'pubtmp', imgRoot + '_tn.png')
 
 	savefig(imgName, dpi=140)
 	savefig(tnName, dpi=40)

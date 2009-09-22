@@ -11,15 +11,13 @@
 #
 ##############################################################################
 
-
+from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
 from django.template import Template, Context
 #
 from terapix.youpi.forms import *
 from terapix.youpi.cviews import *
-#
-from terapix.settings import *
 
 def test_form(request):
 	if request.method == 'POST':

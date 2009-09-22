@@ -32,8 +32,9 @@ import marshal, base64, zlib
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
-from terapix.settings import *
 from terapix.youpi.auth import read_proxy
+#
+from django.conf import settings
 
 class Skeleton(ProcessingPlugin):
 	"""
@@ -57,7 +58,7 @@ class Skeleton(ProcessingPlugin):
 		self.jsSource = 'plugins/skeleton.js' 							# Custom javascript
 
 		# Decomment to disable the plugin
-		self.enable = PROCESSING_SKELETON_ENABLE
+		self.enable = settings.PROCESSING_SKELETON_ENABLE
 
 		# Will queue jobCount jobs on the cluster
 		self.jobCount = 5
@@ -77,7 +78,7 @@ class Skeleton(ProcessingPlugin):
 
 		try:
 			csfPath = self.__getCondorSubmissionFile(request)
-			pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
+			pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
 			data = pipe.readlines()
 			pipe.close()
 			cluster_ids.append(self.getClusterId(data))
@@ -135,7 +136,7 @@ queue""" % ({
 	'command': self.command,
 })
 
-		submit_file_path = os.path.join(TRUNK, 'terapix')
+		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 		# Get filenames for Condor log files (log, error, out)
 		logs = self.getCondorLogFilenames()
 
@@ -154,7 +155,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settingspath)s/settings_base.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(settingspath)s/NOP
+transfer_input_files    = %(settingspath)s/local_conf.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(settingspath)s/NOP
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 # YOUPI_USER_DATA = %(dataclear)s

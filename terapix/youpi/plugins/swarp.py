@@ -20,9 +20,9 @@ from stat import *
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
-from terapix.settings import *
 from terapix.youpi.auth import read_proxy
 #
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response 
 from django.template import RequestContext
@@ -73,7 +73,7 @@ class Swarp(ProcessingPlugin):
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList, headDataPaths[k])
-				pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath)) 
+				pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath)) 
 				data = pipe.readlines()
 				pipe.close()
 				cluster_ids.append(self.getClusterId(data))
@@ -209,7 +209,7 @@ class Swarp(ProcessingPlugin):
 		udf.write(base64.encodestring(marshal.dumps(bigUserData)).replace('\n', ''))
 		udf.close()
 
-		submit_file_path = os.path.join(TRUNK, 'terapix')
+		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 
 		# Get filenames for Condor log files (log, error, out)
 		logs = self.getCondorLogFilenames()
@@ -256,7 +256,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settings)s/settings_base.py, %(settings)s/settings.py, %(script)s/stack_ingestion.py, %(script)s/DBGeneric.py, %(config)s, %(userdata)s, %(swarplist)s, %(transferfile)s, %(preprocfile)s, %(nop)s/NOP
+transfer_input_files    = %(settings)s/local_conf.py, %(settings)s/settings.py, %(script)s/stack_ingestion.py, %(script)s/DBGeneric.py, %(config)s, %(userdata)s, %(swarplist)s, %(transferfile)s, %(preprocfile)s, %(nop)s/NOP
 initialdir				= %(script)s
 transfer_output_files   = NOP
 log                     = %(log)s
@@ -293,7 +293,7 @@ notify_user             = monnerville@iap.fr
 
 		try:
 			xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
-			swarp_params = "-XSL_URL %s" % os.path.join(WWW_SWARP_PREFIX, 
+			swarp_params = "-XSL_URL %s" % os.path.join(settings.WWW_SWARP_PREFIX, 
 														request.user.username, 
 														userData['Kind'], 
 														userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
@@ -320,7 +320,7 @@ def debug(msg):
 fzs = glob.glob('*.fits.fz')
 for fz in fzs:
 	msg = "Swarp Preprocessing: uncompressing %s - " % fz
-	exit_code = os.system(" """[:-1] + CMD_IMCOPY + """ %s %s" % (fz, fz[:-3]))
+	exit_code = os.system(" """[:-1] + settings.CMD_IMCOPY + """ %s %s" % (fz, fz[:-3]))
 	if exit_code == 0:
 		debug(msg + "OK")
 	else:
@@ -332,7 +332,7 @@ for fz in fzs:
 exit_code = os.system("%(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>&1")
 sys.exit(exit_code)
 """ % {
-	'swarp'			: CMD_SWARP,
+	'swarp'			: settings.CMD_SWARP,
 	'params'		: swarp_params,
 	'imgsfile'		: os.path.basename(swarpImgsFile),
 	'config'		: os.path.basename(customrc),
@@ -347,9 +347,9 @@ arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: CMD_CONDOR_TRANSFER,
+		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
 		'encuserdata' 		: encUserData, 
-		'swarp'				: CMD_SWARP,
+		'swarp'				: settings.CMD_SWARP,
 		'params'			: swarp_params,
 		'config'			: os.path.basename(customrc),
 		'userdata'			: userData, 
@@ -357,7 +357,7 @@ queue""" %  {
 		'user'				: request.user.username,
 		'imgsfile'			: os.path.basename(swarpImgsFile),
 		'preprocscript'		: os.path.basename(preProcFile),
-		'tpxupload'			: FTP_URL + resultsOutputDir,
+		'tpxupload'			: settings.FTP_URL + resultsOutputDir,
 	}
 
 		csf.write(condor_submit_entry)

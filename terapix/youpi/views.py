@@ -13,6 +13,7 @@
 
 # vim: set ts=4
 
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import views
 from django.contrib.auth.models import * 
@@ -42,7 +43,6 @@ import magic
 from types import *
 from copy import deepcopy
 #
-from settings import *
 from common import *
 
 # Custom views
@@ -80,7 +80,7 @@ def preferences(request):
 	config = ConfigParser.RawConfigParser()
 
 	# Looks for themes
-	theme_dirs = glob.glob(os.path.join(MEDIA_ROOT, 'themes', '*'))
+	theme_dirs = glob.glob(os.path.join(settings.MEDIA_ROOT, 'themes', '*'))
 	themes = []
 
 	for dir in theme_dirs:
@@ -195,7 +195,7 @@ def processing(request):
 	menu_id = 'processing'
 	return render_to_response('processing.html', { 	
 						'plugins' 			: manager.plugins,
-						'processing_output' : PROCESSING_OUTPUT,
+						'processing_output' : settings.PROCESSING_OUTPUT,
 						'selected_entry_id'	: menu_id,
 						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
@@ -323,7 +323,7 @@ def render_plugin(request, pluginId):
 	return render_to_response('processing_plugin.html', { 	
 						'plugin' 			: plugin,
 						'selected_entry_id'	: menu_id, 
-						'processing_output' : PROCESSING_OUTPUT,
+						'processing_output' : settings.PROCESSING_OUTPUT,
 						'title' 			: plugin.id.capitalize(),
 					}, 
 					context_instance = RequestContext(request))
@@ -333,7 +333,7 @@ def render_plugin(request, pluginId):
 def soft_version_monitoring(request):
 	menu_id = 'monitoring'
 	return render_to_response( 'softs_versions.html', {	
-				'report' 			: len(SOFTS), 
+				'report' 			: len(settings.SOFTS), 
 				'selected_entry_id'	: menu_id, 
 				'title' 			: get_title_from_menu_id(menu_id),
 			},
@@ -388,7 +388,7 @@ def single_result(request, pluginId, taskId):
 def logout(request):
 	auth.logout(request)
 	# Redirect to home page
-	return HttpResponseRedirect(AUP)
+	return HttpResponseRedirect(settings.AUP)
 
 def browse_api(request, type):
 	if type == 'py' or type == 'python':
@@ -407,7 +407,7 @@ def aff_img(request,image_name):
 	This is a callback function (as defined in django's urls.py file).
 	"""
 
-	db = MySQLdb.connect(host = DATABASE_HOST, user = DATABASE_USER, passwd = DATABASE_PASSWORD, db = DATABASE_NAME)
+	db = MySQLdb.connect(host = settings.DATABASE_HOST, user = settings.DATABASE_USER, passwd = settings.DATABASE_PASSWORD, db = settings.DATABASE_NAME)
 	cursor = db.cursor()
 	cursor.execute("SELECT * FROM youpi_image where name='%s'" % image_name)
 	list_param = []
@@ -480,7 +480,7 @@ def open_populate(request, behaviour, tv_name, path):
 			'canhavechildren' : 1,
 			'onopenpopulate' : str(tv_name) + '.branchPopulate',
 			'syspath' : "/%s/%s/" % (str(path), label),
-			'openlink' : AUP + "/populate/%s/%s/%s/%s/" % (str(behaviour), str(tv_name), str(path), label),
+			'openlink' : settings.AUP + "/populate/%s/%s/%s/%s/" % (str(behaviour), str(tv_name), str(path), label),
 			'num_fits_children' : len(fitsFiles)
 		})
 			
@@ -559,7 +559,7 @@ def open_populate_generic(request, patterns, fb_name, path):
 			'canhavechildren' : 1,
 			'onopenpopulate' : str(fb_name) + '.getResultHandler()',
 			'syspath' : "/%s/%s/" % (str(path), label),
-			'openlink' : AUP + "/populate_generic/%s/%s/%s/%s/" % (str(patterns), str(fb_name), str(path), label),
+			'openlink' : settings.AUP + "/populate_generic/%s/%s/%s/%s/" % (str(patterns), str(fb_name), str(path), label),
 			'num_children' : len(files)
 		})
 			
@@ -610,7 +610,7 @@ def history_ingestion(request):
 							header[5] 	: [ing.check_QSO_status, 'check'],
 							header[6]	: [ing.check_multiple_ingestion, 'check'],
 							header[7]	: [ing.exit_code, 'exit'],
-							header[8]	: ['View log', 'link', str(AUP + "/history/ingestion/report/%d/" % ing.id)]
+							header[8]	: ['View log', 'link', str(settings.AUP + "/history/ingestion/report/%d/" % ing.id)]
 			})
 
 	# Be aware that JS code WILL search for data and header keys
@@ -698,7 +698,7 @@ def processing_imgs_from_idlist_post(request):
 		currentPage = 1
 	else:
 		currentPage = int(page)
-	maxPerPage = IMS_MAX_PER_PAGE
+	maxPerPage = settings.IMS_MAX_PER_PAGE
 	nbPages = count / maxPerPage
 	if count % maxPerPage > 0:
 		nbPages += 1
@@ -742,7 +742,7 @@ def get_selected_ids_from_pagination(request):
 
 	# Build integer list from ranges
 	ids = unremap(ids).split(',')
-	range = IMS_MAX_PER_PAGE
+	range = settings.IMS_MAX_PER_PAGE
 	idList = []
 
 	k = j = 0
@@ -1454,7 +1454,7 @@ def get_condor_log_files_links(request):
 		raise PluginError, "POST argument error. Unable to process data."
 
 	task = Processing_task.objects.filter(id = taskId)[0]
-	pattern = os.path.join(CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
+	pattern = os.path.join(settings.CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
 	logs = {
 		'log': pattern % 'log', 
 		'error': pattern % 'err', 
@@ -1488,7 +1488,7 @@ def show_condor_log_file(request, kind, taskId):
 	except:
 		return HttpResponseBadRequest('Bad request')
 
-	pattern = os.path.join(CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
+	pattern = os.path.join(settings.CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
 
 	logs = {
 		'log': pattern % 'log', 

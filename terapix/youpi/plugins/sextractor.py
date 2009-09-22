@@ -20,9 +20,9 @@ import xml.dom.minidom as dom
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
-from terapix.settings import *
 from terapix.youpi.auth import read_proxy
 #
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response 
 from django.template import RequestContext
@@ -174,7 +174,7 @@ class Sextractor(ProcessingPlugin):
 				if not len(imgList):
 					continue
 				csfPath = self.__getCondorSubmissionFile(request, imgList)
-				pipe = os.popen(os.path.join(CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
+				pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
 				data = pipe.readlines()
 				pipe.close()
 				cluster_ids.append(self.getClusterId(data))
@@ -319,7 +319,7 @@ class Sextractor(ProcessingPlugin):
 
 		step = 0 							# At least step seconds between two job start
 
-		submit_file_path = os.path.join(TRUNK, 'terapix')
+		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 		# Generates CSF
 		condor_submit_file = """
 #
@@ -335,7 +335,7 @@ universe                = vanilla
 transfer_executable     = True
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files    =  %(settings)s/settings_base.py, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv, %(mandpath)s/sex.default.nnw
+transfer_input_files    =  %(settings)s/local_conf.py, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv, %(mandpath)s/sex.default.nnw
 initialdir				= %(initdir)s
 transfer_output_files   = NOP
 log                     = /tmp/SEX.log.$(Cluster).$(Process)
@@ -353,7 +353,7 @@ notify_user             = semah@iap.fr
 		'nop' 			: submit_file_path, 
 		'param' 		: custompc,
 		'initdir' 		: os.path.join(submit_file_path, 'script'),
-		'mandpath' 		: os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
+		'mandpath' 		: os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
 		'requirements' 	: req }
 
 		csf.write(condor_submit_file)
@@ -437,7 +437,7 @@ notify_user             = semah@iap.fr
 			# Parameters to use for each job
 			try:
 				xslPath = re.search(r'file://(.*)$', self.getConfigValue(contconf.split('\n'), 'XSL_URL')).group(1)
-				sex_params = "-XSL_URL %s" % (os.path.join(	WWW_SEX_PREFIX, 
+				sex_params = "-XSL_URL %s" % (os.path.join(	settings.WWW_SEX_PREFIX, 
 															request.user.username, 
 															userData['Kind'], 
 															userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
@@ -507,9 +507,9 @@ arguments               = %(encuserdata)s %(condor_transfer)s %(sextractor)s %(i
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: CMD_CONDOR_TRANSFER,
+		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
 		'encuserdata' 		: encUserData, 
-		'sextractor'		: CMD_SEX,
+		'sextractor'		: settings.CMD_SEX,
 		'params'			: sex_params,
 		'img'				: path,
 		'img2'				: path2,
@@ -517,7 +517,7 @@ queue""" %  {
 		'param'				: os.path.basename(custompc),
 		'userdata'			: userData,
 		'user'				: request.user.username,
-		'tpxupload'			: FTP_URL + userData['ResultsOutputDir'] +'/',
+		'tpxupload'			: settings.FTP_URL + userData['ResultsOutputDir'] +'/',
 	}
 
 			else:
@@ -526,16 +526,16 @@ arguments               = %(encuserdata)s %(condor_transfer)s %(sextractor)s %(p
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: CMD_CONDOR_TRANSFER,
+		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
 		'encuserdata' 		: encUserData,
-		'sextractor'		: CMD_SEX,
+		'sextractor'		: settings.CMD_SEX,
 		'params'			: sex_params,
 		'img'				: path,
 		'config'			: os.path.basename(customrc),
 		'param'     	    : os.path.basename(custompc),
 		'userdata'			: userData,
 		'user'				: request.user.username,
-		'tpxupload'			: FTP_URL + userData['ResultsOutputDir'] +'/',
+		'tpxupload'			: settings.FTP_URL + userData['ResultsOutputDir'] +'/',
 	}
 
 			csf.write(condor_submit_entry)
@@ -646,7 +646,7 @@ queue""" %  {
 		Sextractor parameter file.
 		"""
 
-		defaultCF.append({'path': os.path.join(PLUGINS_CONF_DIR, self.id + '.param.default'), 'type': 'param'})
+		defaultCF.append({'path': os.path.join(settings.PLUGINS_CONF_DIR, self.id + '.param.default'), 'type': 'param'})
 		return defaultCF
 
 	def reports(self):
