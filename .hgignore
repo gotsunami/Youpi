@@ -1,0 +1,12 @@
+# Ignore file for Youpi project
+syntax: glob
+
+*.pyc
+*~
+deploy/django.wsgi
+deploy/youpi.conf
+doc/handbook/build
+doc/handbook/dot-error.log
+doc/handbook/figures/*.eps
+terapix/local_conf.py
+terapix/settings.py
