@@ -17,11 +17,11 @@ if '..' not in sys.path:
 	sys.path.insert(0, '..')
 
 try:
+	from django.conf import settings
 	from django.contrib.auth.models import User
 	from django.db.models import Q
 	from django.db import IntegrityError
 	#
-	from terapix.settings import *
 	from terapix.youpi.models import *
 	from terapix.youpi.pluginmanager import PluginManager
 except ImportError:
@@ -133,7 +133,7 @@ def setup_db():
 	t = ConfigType.objects.filter(name = 'config')[0]
 	for plugin in manager.plugins:
 		try:
-			name = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', plugin.id + '.conf.default')
+			name = os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', plugin.id + '.conf.default')
 			f = open(name, 'r')
 			config = string.join(f.readlines())
 			f.close()
@@ -151,7 +151,7 @@ def setup_db():
 	# Add default parameter file for Sextractor (sex.param.default)
 
 	try:
-		name = os.path.join(TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.param.default')
+		name = os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.param.default')
 		f = open(name, 'r')
 		param = string.join(f.readlines())
 		f.close()
@@ -194,12 +194,28 @@ def setup_policies():
 		pol.nodeselection = 'MEM,G,1,M'
 		pol.save()
 	else:
-		logger.log("ALL policy found")
+		logger.log("Policy 'ALL' found")
+
+def check_local_conf():
+	"""
+	The settings.py conf file always try to import a local_conf.py file which may
+	be used for local settings. Since this local_conf.py is not versionned at all,
+	this function ensure that at least an empty local_conf.py file is available 
+	to prevent any import issues.
+	"""
+	try:
+		import terapix.local_conf
+	except ImportError:
+		f = open(os.path.join(os.getcwd(), 'local_conf.py'), 'w')
+		f.write("# Add your local customizations here\n");
+		f.close()
+		logger.log('Created local_conf.py')
 
 def setup():
 	setup_users()
 	setup_db()
 	setup_policies()
+	check_local_conf()
 
 def run():
 	global logger 

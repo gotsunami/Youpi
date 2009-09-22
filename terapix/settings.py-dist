@@ -12,10 +12,8 @@
 ##############################################################################
 
 # Base Django settings for terapix project.
-# Parts of it can be overwritten by creating a new settings file:
-#
-# my_setting.py:
-# from settings_base import *
+# Parts of it can be overwritten by creating a local_conf.py file
+# which is imported at the end of this file.
 #
 # FIXME: This is a -dist file that must be filled with you
 # FIXME: own values. Lines that require a modification end 
@@ -241,6 +239,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 AUTH_PROFILE_MODULE = 'youpi.siteprofile'
 
-# Override all FIXME sections with your values, if any
-try: from local_conf import *
-except ImportError: pass
+# Override all FIXME sections with your values.
+# This file can be empty
+from local_conf import *
