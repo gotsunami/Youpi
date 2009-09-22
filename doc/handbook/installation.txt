@@ -433,7 +433,7 @@ That's it. You are done with the basic configuration variables. The remaining of
 ``settings.py`` file can be left untouched.
 
 Instead of heavily modifying the ``settings.py`` file directly, it is also possible to 
-overwritte its variables using a separate ``local_conf.py`` file, which will be imported 
+overwrite its variables using a separate ``local_conf.py`` file, which will be imported 
 automatically by Django when processing ``settings.py``. This is a good place to set your 
 database configuration settings for example. A tipically ``local_conf.py`` file may look 
 like this::
