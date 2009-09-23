@@ -4,15 +4,16 @@ Using Youpi
 The Youpi web interface is splitted in tabs. Each tab corresponds to a specific
 task and, this section, will describe the functionnality related to the tab header.
 
-.. image:: /img/tabs.jpg
+.. image:: /figures/tabs.jpg
    	:align: center
-
 
 Before diving into Youpi, let's first introduce to the basic functionnalities of
 the pipeline.
 
 Pre-ingestion of FITS Tables
 ============================
+
+.. image:: /figures/preingestion.png
 
 Every sky survey, depending on a survey program, has a limited observation time
 through telescopes.
@@ -38,6 +39,8 @@ For example, CFHT provides FITS tables, and CFHTLS provides log files.
 
 FITS Data Ingestion
 ===================
+
+.. image:: /figures/ingestion.png
 
 A FITS image is the most important entity in youpi.
 The ingestion process make your images their first entries in the pipeline.
@@ -104,6 +107,8 @@ during the image lifetime and  through the pipeline.
 Deal With Condor Setup
 ======================
 
+.. image:: /figures/condor.png
+
 The condor Setup tab will show in real time your cluster status and let customize basic or
 advanced policies related to your cluster functionalities. Condor is a specialized workload
 management system for compute-intensive jobs. Like other full-featured batch systems, Condor 
@@ -137,6 +142,8 @@ There are 2 different ways to dispatch resources from this interface:
 Set up Your Preferences
 =======================
 
+.. image:: /figures/preferences.png
+
 The preference tab in the Youpi interface is as important as the condor setup tab.
 It handles global options for youpi and it is user dependant. Each user can set his
 preferences for processing data, manage his style themes and define his own permissions.
@@ -163,6 +170,8 @@ preferences for processing data, manage his style themes and define his own perm
 
 Organize your data with tags
 ============================
+
+.. image:: /figures/tag.png
 
 Tags are keywords or terms associated with or assigned to a piece of information.
 In the Youpi case, let's say that this is a metadata (a text field) that you could
@@ -197,6 +206,8 @@ selection.
 
 Processing Your Data
 ====================
+
+.. image:: /figures/processing.png
 
 For each plugin implemented, as a computing process which could be run on FITS images 
 through Youpi, there are severals steps to observe, represented as tabs as shown in the
@@ -319,6 +330,8 @@ will guide you to the related tab which needed to be fixed.
 The Shopping Cart
 =================
 
+.. image:: /figures/shopping.png
+
 The shopping cart comes naturally, after adding to cart one or many processings, elaborated
 from plugins of the *processing your data* tab. It represents a visual synthesis of 
 processings, sorted by plugin and ready to be run. A summary of your parameters are shown 
@@ -339,16 +352,20 @@ for a specific process, it can be managed through this dropdown box.
 Live Monitoring of Processings
 ==============================
 
+.. image:: /figures/activemonitoring.png
+
 After having launched jobs, from the shopping cart to the Condor management system, Youpi 
 provides a realtime instant view of all proccessed jobs, with related nodes in which jobs
-are running, and the status of the management. You will be able to stop and kill your own
-jobs and assuming that you give data permissions to your team, they could do the same.
-The interface for live monitoring is decomposed in pages referencing 10 running jobs per
-pages (pages are represented by the top red numbers above jobs).
+are running, the management status, the owner. You will be able to  kill your own jobs and 
+assuming that you give data permissions to your team, they could do the same.The interface 
+for live monitoring is decomposed in pages referencing 10 running jobs per pages (pages are
+represented by the top red numbers above jobs).
 
 
 Processing Results
 ==================
+
+.. image:: /figures/results.png
 
 The processing history tab is separated for the moment, in 2 parts. The first one is a 
 *processing selector* under the *history* tab, and proposes a custom search of processings 
@@ -372,3 +389,10 @@ group has been successfully processed.
 
 Generating Reports
 ==================
+.. image:: /figures/reporting.png
+
+Every actions, leaded by the user during his session on youpi, have database impacts. It
+means that at anytime, youpi could generate from your account or from all, global or very 
+specific reports:
+
+ - Number of images ingested, processed, graded by yourself 
