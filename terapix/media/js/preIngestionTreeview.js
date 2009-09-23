@@ -17,10 +17,11 @@
  */
 preIng_treeview = {
 	tree : null,
-	init_path : '/home/nis/semah',
+	init_path : null,
 	behaviour : 'binary_tables',
 	name : 'preIng_treeview',
-	init : function (host, div_tree) {
+	init : function (host, div_tree, init_path) {
+		this.init_path = init_path;
 		preIng_treeview.host = host;
 		// root's JSON branch
 		preIng_treeview.root = [

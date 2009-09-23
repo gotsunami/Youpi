@@ -76,10 +76,10 @@ function ingestionType()
 	div_ing.appendChild(div_tree);
 
 	file_browser = new FileBrowser('div_tree', 'file_browser');
-	file_browser.setHeaderTitle('Cluster Path Browser');
-	file_browser.setRootTitle('Terapix Cluster');
+	file_browser.setHeaderTitle(_fileBrowserSettings.headerTitle);
+	file_browser.setRootTitle(_fileBrowserSettings.rootTitle);
+	file_browser.setRootDataPath(_fileBrowserSettings.rootDataPath);
 	file_browser.setFilteringPatterns(['*.fits']);
-	file_browser.setRootDataPath('/data');
 	file_browser.setSubmitButtonHandler(process_form);
 	file_browser.setSelectionMode(file_browser.getSelectionModes().MULTI);
 	file_browser.render();

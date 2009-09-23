@@ -57,6 +57,13 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
+# Embedded file browsers settings
+FILE_BROWSER_HEADER_TITLE = 'Path Browser'
+FILE_BROWSER_ROOT_TITLE = 'Local Filesystem'
+FILE_BROWSER_ROOT_DATA_PATH = '/path/to/root/directory'	# FIXME
+# Email sent when a job fails
+CONDOR_NOTIFY_USER = 'youremail@your.domain' # FIXME
+
 # MySQL settings
 DATABASE_NAME 		= 'dbname'						# FIXME
 DATABASE_USER 		= 'user'						# FIXME 
@@ -212,6 +219,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 	'django.core.context_processors.i18n',
 	'django.core.context_processors.media',
 	'terapix.youpi.context_processors.appmenu',
+	'terapix.youpi.context_processors.settings',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -342,19 +342,22 @@ log                     = /tmp/SEX.log.$(Cluster).$(Process)
 error                   = /tmp/SEX.err.$(Cluster).$(Process)
 output                  = /tmp/SEX.out.$(Cluster).$(Process)
 notification            = Error
-notify_user             = semah@iap.fr
+notify_user             = %(condornotify)s
 # Computed Req string
 %(requirements)s
-""" % {	'description'	: self.description,
-		'wrapper' 		: os.path.join(submit_file_path, 'script'),
-		'settings' 		: submit_file_path, 
-		'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
-		'config' 		: customrc,
-		'nop' 			: submit_file_path, 
-		'param' 		: custompc,
-		'initdir' 		: os.path.join(submit_file_path, 'script'),
-		'mandpath' 		: os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
-		'requirements' 	: req }
+""" % {	
+	'condornotify'	: settings.CONDOR_NOTIFY_USER,
+	'description'	: self.description,
+	'wrapper' 		: os.path.join(submit_file_path, 'script'),
+	'settings' 		: submit_file_path, 
+	'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
+	'config' 		: customrc,
+	'nop' 			: submit_file_path, 
+	'param' 		: custompc,
+	'initdir' 		: os.path.join(submit_file_path, 'script'),
+	'mandpath' 		: os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
+	'requirements' 	: req,
+}
 
 		csf.write(condor_submit_file)
 

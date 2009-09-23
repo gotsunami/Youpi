@@ -30,7 +30,7 @@ db = DB(host = DATABASE_HOST,
 
 g = DBGeneric(db.con)
 
-os.chdir('/home/nis/semah/FITSTABLE')
+os.chdir('/path/to/fitstables/') # FIXME
 k = glob.glob('*.log')
 while k <> 0:
         log = k.pop()

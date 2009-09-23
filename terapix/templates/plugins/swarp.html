@@ -38,9 +38,9 @@
 
 	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}', {type: 'config'});
 	fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
-	fm_file_browser.setRootTitle('Terapix Cluster');
+	fm_file_browser.setRootTitle(_fileBrowserSettings.rootTitle);
 	fm_file_browser.setFilteringPatterns(['*.fits', '*.reg']);
-	fm_file_browser.setRootDataPath('/data');
+	fm_file_browser.setRootDataPath(_fileBrowserSettings.rootDataPath);
 
 	// Enable user output custom directory
 	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');

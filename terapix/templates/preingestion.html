@@ -115,7 +115,7 @@ function preingestion_history()
 	var autoHook = false;
 	defaultOptions.boxImage = '/media/js/3rdParty/progressbar/images/bramus/percentImage.png';
 	defaultOptions.barImage = '/media/js/3rdParty/progressbar/images/bramus/percentImage_back2.png';
-	preIng_treeview.init('{{ hostname }}', 'treeview');
+	preIng_treeview.init('{{ hostname }}', 'treeview', _fileBrowserSettings.rootDataPath);
 </script>
 
 {% endblock %}

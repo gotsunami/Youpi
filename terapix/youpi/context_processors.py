@@ -24,7 +24,6 @@ def appmenu(request):
 	"""
 	Returns context variables for Youpi's release system (Application menu).
 	"""
-
 	from django.conf import settings
 	AUP = settings.AUP
 	
@@ -45,5 +44,11 @@ def appmenu(request):
 					{'title' : 'Shopping cart',		'id' : 'shoppingcart', 	'href' : AUP + '/cart/'},
 				)
 	}
+	return {'menu': app_menu}
 
-	return { 'menu': app_menu }
+def settings(request):
+	"""
+	Returns a reference to application settings
+	"""
+	from django.conf import settings
+	return {'settings': settings}

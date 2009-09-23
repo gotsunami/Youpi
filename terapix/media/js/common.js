@@ -1186,9 +1186,9 @@ var boxes = {
 
 		var selectedPath = null;
 		box_file_browser = new LightFileBrowser('box_file_browser');
-		box_file_browser.setRootTitle('Terapix Cluster');
+		box_file_browser.setRootTitle(_fileBrowserSettings.rootTitle);
 		box_file_browser.setFilteringPatterns(filePatterns);
-		box_file_browser.setRootDataPath('/data');
+		box_file_browser.setRootDataPath(_fileBrowserSettings.rootDataPath);
 		box_file_browser.setTreeviewHeight('300px');
 		box_file_browser.setBranchClickedHandler(function(path) {
 			selectedPath = path;

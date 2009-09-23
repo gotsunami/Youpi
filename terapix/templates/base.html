@@ -16,6 +16,14 @@
 var guistyle = '{{ user.get_profile.guistyle }}';
 </script>
 {% endblock %}
+<script type="text/javascript">
+// Used with all filebrowsers
+var _fileBrowserSettings = {
+	headerTitle: '{{ settings.FILE_BROWSER_HEADER_TITLE }}',
+	rootTitle: '{{ settings.FILE_BROWSER_ROOT_TITLE }}',
+	rootDataPath: '{{ settings.FILE_BROWSER_ROOT_DATA_PATH }}'
+};
+</script>
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 </head>
 {% load i18n %}

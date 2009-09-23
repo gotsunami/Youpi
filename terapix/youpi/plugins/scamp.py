@@ -288,9 +288,10 @@ log                     = %(log)s
 error                   = %(errlog)s
 output                  = %(outlog)s
 notification            = Error
-notify_user             = monnerville@iap.fr
+notify_user             = %(condornotify)s
 # Computed Req string
 %(requirements)s""" % { 
+	'condornotify'	: settings.CONDOR_NOTIFY_USER,
 	'wrapperpath'	: os.path.join(submit_file_path, 'script'),
 	'settingspath'	: submit_file_path, 
 	'scriptpath'	: os.path.join(submit_file_path, 'script'),

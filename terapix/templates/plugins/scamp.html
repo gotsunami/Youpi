@@ -47,9 +47,9 @@
 	var cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}', {type: 'config'});
 
 	var fm_file_browser = new FileBrowser('{{ plugin.id }}_fbw_div', 'fm_file_browser');
-	fm_file_browser.setRootTitle('Terapix Cluster');
+	fm_file_browser.setRootTitle(_fileBrowserSettings.rootTitle);
 	fm_file_browser.setFilteringPatterns(['*.ahead']);
-	fm_file_browser.setRootDataPath('/data');
+	fm_file_browser.setRootDataPath(_fileBrowserSettings.rootDataPath);
 
 	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
 	selector.addPath('.ahead data', 'ahead', { mandatory: true });
