@@ -220,6 +220,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 	'django.core.context_processors.media',
 	'terapix.youpi.context_processors.appmenu',
 	'terapix.youpi.context_processors.settings',
+	'terapix.youpi.context_processors.version',
 )
 
 MIDDLEWARE_CLASSES = (

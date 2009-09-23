@@ -52,3 +52,14 @@ def settings(request):
 	"""
 	from django.conf import settings
 	return {'settings': settings}
+
+def version(request):
+	"""Return version information if available."""
+	try:
+		import terapix.__version__ as v
+		version = v.version
+	except ImportError:
+		version = 'unknown'
+
+	return {'appversion': version}
+
