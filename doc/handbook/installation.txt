@@ -68,43 +68,6 @@ installation*:
 .. figure:: figures/dependencies_tree_standalone.svg
    :width: 500pt
 
-
-.. apache2-2.2.10.lzm                                                                                                                                                  
-	deps[condor]-classadds-1.0.1.lzm                                                                                                                                    
-	deps[condor]-glibc-2.8.lzm                                                                                                                                          
-	deps[condor]-gsoap-2.7.12.lzm                                                                                                                                       
-	deps[condor]-keyutils-libs-1.2.3.lzm                                                                                                                                
-	deps[condor]-krb5-libs-1.6.3.lzm                                                                                                                                    
-	deps[condor]-libselinux-2.0.73.lzm                                                                                                                                  
-	deps[condor]-openldap-2.4.12.lzm                                                                                                                                    
-	deps[condor]-openssl-0.9.8.lzm                                                                                                                                      
-	deps[condor]-postgresql-libs-8.3.7.lzm                                                                                                                              
-	deps[mysql-python]-mysql-5.0.51b.lzm                                                                                                                                
-	deps[pyfits]-numpy-1.3.0.lzm                                                                                                                                        
-	deps[scamp]-libtool-ltdl-2.2.6.lzm                                                                                                                                  
-	deps[scamp]-plplot-5.9.2.lzm                                                                                                                                        
-	deps[scamp]-plplot-libs-5.9.2.lzm                                                                                                                                   
-	deps[scamp]-qhull-1.7-el5.lzm                                                                                                                                       
-	deps[xfce4]-vte.0.17.4.lzm                                                                                                                                          
-	deps[youpi]-cfitsio-3.140.lzm                                                                                                                                       
-	deps[youpi]-condor-7.3.2.lzm                                                                                                                                        
-	deps[youpi]-django-1.1.lzm                                                                                                                                          
-	deps[youpi]-imagemagick-6.5.2.lzm                                                                                                                                   
-	deps[youpi]-mysql-python-1.2.2.lzm                                                                                                                                  
-	deps[youpi]-pyfits-2.1.1.lzm                                                                                                                                        
-	deps[youpi]-python-2.5.2.lzm                                                                                                                                        
-	deps[youpi]-python-cjson-1.0.5.lzm                                                                                                                                  
-	deps[youpi]-python-magic-0.1.lzm                                                                                                                                    
-	deps[youpi]-python-matplotlib-0.98.5.2.lzm                                                                                                                          
-	fr.terapix.youpi-svn.lzm                                                                                                                                            
-	mercurial-1.3.1.lzm
-	net.astromatic.scamp-1.5.5.lzm                                                                                                                                      
-	net.astromatic.sextractor-2.8.6.lzm                                                                                                                                 
-	net.astromatic.stiff-1.12.lzm                                                                                                                                       
-	net.astromatic.swarp-2.17.6.lzm                                                                                                                                     
-	vim-7.1.lzm                                                                                                                                                         
-	xfce-4.4.3.lzm
-
 .. warning:: Since Youpi mainly depends on ``Python``, we highly recommand to install 
              ``Python`` first. This way, you can specify (force) which version of ``Python``
              you want to install so that all required packages using it will depend on a 
@@ -126,6 +89,7 @@ As specified in the `Software packages`_ section, here are the packages you must
 - ``Geos``
 - ``ImageMagick``
 - ``CFITSIO``
+- ``Condor transfer script``
 - ``QualityFITS``
 - ``Scamp``
 - ``Swarp``
@@ -194,6 +158,10 @@ Software package     Supported version                          Description
 `CFITSIO`_           **3.x** and later                          Youpi uses the ``imcopy`` tool internally 
                                                                 (part of the `FITS utility programs`_ bundled 
                                                                 with CFITSIO)
+Condor tranfer       Any version distributed with Youpi         Youpi comes with a ``condor_transfer.pl`` script which is used to 
+                                                                optimize data transfer between hosts on a cluster. This perl script uses 
+                                                                the ``libparallel-forkmanager-perl`` package. You have to set the `CMD_CONDOR_TRANSFER`_ 
+                                                                variable in your ``settings.py`` file.
 `QualityFITS`_
 `Scamp`_             **1.4.x** and later                        Reads SExtractor catalogs and computes 
                                                                 astrometric and photometric solutions for any 
@@ -245,7 +213,7 @@ following command::
 
 	$ sudo apt-get install python2.5 apache2 libapache2-mod-python mysql-server \ 
 	> mysql-client python-django python-cjson python-matplotlib python-magick \
-	> python-mysqldb python-numpy imagemagick
+	> python-mysqldb python-numpy imagemagick libparallel-forkmanager-perl
 
 While for a *cluster installation*, you might want to try::
 
@@ -368,6 +336,16 @@ to check:
 
 ``CMD_IMCOPY``
 	Fill in the full path to the ``imcopy`` program (parts of the `CFITSIO`_ package).
+
+.. _CMD_CONDOR_TRANSFER:
+
+``CMD_CONDOR_TRANSFER``
+	Path to the provided ``condor_transfer.pl`` script used during job processings. This file is 
+	executed on the processing machines (Condor nodes). If you are performing a *standalone 
+	installation*, set ``CMD_CONDOR_TRANSFER`` to ``$YOUPI_INSTALL_DIR/tools/condor_transfer.pl`` 
+	since everything is installed locally. In case of a *cluster installation*, the ``condor_transfer
+	.pl`` must be installed on *all cluster nodes* accepting jobs. Put this script in the 
+	same directory on all nodes and update the ``CMD_CONDOR_TRANSFER`` variable accordingly.
 
 ``PROCESSING_OUTPUT``
 	Path to the directory were all your processing data results are going to be stored.

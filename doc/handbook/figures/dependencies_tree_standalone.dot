@@ -17,6 +17,8 @@ digraph G {
 	pythonnumpy	[label="Python Numpy"];
 	apache [label="Apache"];
 	mysql [label="MySQL"];
+	mysql [label="MySQL"];
+	condortrpl [label="Condor transfer script"];
 
 	scamp [label="Scamp"];
 	sextractor [label="Sextractor"];
@@ -38,6 +40,7 @@ digraph G {
 	youpi -> pythonnumpy;
 	youpi -> mysqlpython;
 	youpi -> geos;
+	youpi -> condortrpl;
 
 	youpi -> scamp;
 	youpi -> sextractor;
