@@ -414,6 +414,17 @@ to check:
 	written in the default ``settings.py-dist`` file, they have the same value as ``WWW_FITSIN_PREFIX``, 
 	which is the default behaviour since they share the same ``PROCESSING_OUTPUT`` directory.
 
+``FILE_BROWSER_ROOT_DATA_PATH``
+	Youpi allows you to select some local or remote (NFS mounted) data path using a file browser 
+	widget. In order to display directory contents properly you need to set this variable to 
+	the root data path you plan to use for accessing your data. It can be any directory or mount 
+	point. For example if your NFS shares are mounted under ``/mnt/nfs``, use this value as the 
+	root path to your data. Feel free to change the ``FILE_BROWSER_ROOT_TITLE`` if the default 
+	value doesn't suit your needs.
+
+``CONDOR_NOTIFY_USER``
+	Any valid email address where Condor is going to send job processing errors, if any.
+
 ``DATABASE_NAME``
 	The name of the MySQL database you want to use with Youpi. The value must match the one 
 	you used in the :ref:`mysqlsetup` section. Also, you will have to set the ``DATABASE_USER``, 
@@ -438,12 +449,18 @@ automatically by Django when processing ``settings.py``. This is a good place to
 database configuration settings for example. A tipically ``local_conf.py`` file may look 
 like this::
 
+	CMD_CONDOR_TRANSFER = '/usr/local/bin/condor_transfert.pl'
 	# Testing database (do not use for production)
-	DEBUG               = True	
 	DATABASE_NAME       = 'youpitest'
 	DATABASE_USER       = 'debug'     
 	DATABASE_PASSWORD   = 'debug'    
 	DATABASE_HOST       = 'db.example.org'	
+	#
+	FILE_BROWSER_HEADER_TITLE = 'Cluster Path Browser'
+	FILE_BROWSER_ROOT_TITLE = 'Network Filesystem'
+	FILE_BROWSER_ROOT_DATA_PATH = '/mnt/nfs'
+	# Email sent when a job fails
+	CONDOR_NOTIFY_USER = 'monnerville@iap.fr'
 
 .. warning:: Some configuration variables must not be overwritten in a ``local_conf.py`` 
 			 file since other variables defined in ``settings.py`` may depend on their 
