@@ -19,6 +19,8 @@ digraph G {
 	mysql [label="MySQL"];
 	mysql [label="MySQL"];
 	condortrpl [label="Condor transfer script"];
+	perl [label="Perl"];
+	curl [label="cURL"];
 
 	scamp [label="Scamp"];
 	sextractor [label="Sextractor"];
@@ -62,4 +64,6 @@ digraph G {
 	pyfits -> python;
 	pyfits -> pythonnumpy;
 	pythonmplib -> pythonnumpy;
+	condortrpl -> perl;
+	condortrpl -> curl;
 }

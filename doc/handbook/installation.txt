@@ -90,6 +90,7 @@ As specified in the `Software packages`_ section, here are the packages you must
 - ``ImageMagick``
 - ``CFITSIO``
 - ``Condor transfer script``
+- ``cURL``
 - ``QualityFITS``
 - ``Scamp``
 - ``Swarp``
@@ -162,6 +163,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
                                                                 optimize data transfer between hosts on a cluster. This perl script uses 
                                                                 the ``libparallel-forkmanager-perl`` package. You have to set the `CMD_CONDOR_TRANSFER`_ 
                                                                 variable in your ``settings.py`` file.
+`cURL`_              **7.x** and later                          Command line tool for transferring files with URL syntax, supporting various protocols.
 `QualityFITS`_
 `Scamp`_             **1.4.x** and later                        Reads SExtractor catalogs and computes 
                                                                 astrometric and photometric solutions for any 
@@ -191,6 +193,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
 .. _GeoDjango: http://code.djangoproject.com/wiki/GeoDjango
 .. _ImageMagick: http://www.imagemagick.org
 .. _CFITSIO: http://heasarc.gsfc.nasa.gov/fitsio/
+.. _cURL: http://curl.haxx.se/
 .. _FITS utility programs: http://heasarc.gsfc.nasa.gov/docs/software/fitsio/cexamples.html
 .. _Scamp: http://astromatic.iap.fr/software/scamp
 .. _Swarp: http://astromatic.iap.fr/software/swarp
@@ -213,7 +216,7 @@ following command::
 
 	$ sudo apt-get install python2.5 apache2 libapache2-mod-python mysql-server \ 
 	> mysql-client python-django python-cjson python-matplotlib python-magick \
-	> python-mysqldb python-numpy imagemagick libparallel-forkmanager-perl
+	> python-mysqldb python-numpy imagemagick libparallel-forkmanager-perl curl
 
 While for a *cluster installation*, you might want to try::
 
