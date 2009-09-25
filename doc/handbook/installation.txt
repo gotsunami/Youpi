@@ -61,7 +61,7 @@ depends on the type of installation - *standalone* or *cluster* - you want to pe
 Standalone Installation
 -----------------------
 
-Here is a dependency tree to better visualize Youpi's software dependencies. All those 
+Here is a partial dependency tree to better visualize Youpi's software dependencies. All those 
 packages are required and must be installed on a computer host for a *standalone 
 installation*:
 
@@ -92,6 +92,9 @@ As specified in the `Software packages`_ section, here are the packages you must
 - ``Condor transfer script``
 - ``cURL``
 - ``QualityFITS``
+- ``WCS library``
+- ``PSFEx``
+- ``WeightWatcher``
 - ``Scamp``
 - ``Swarp``
 - ``Sextractor``
@@ -165,6 +168,12 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
                                                                 variable in your ``settings.py`` file.
 `cURL`_              **7.x** and later                          Command line tool for transferring files with URL syntax, supporting various protocols.
 `QualityFITS`_
+`WCS library`_       **4.2** and later                          Library for the FITS "World Coordinate System" (WCS)   
+`PSFEx`_             **2.4.2** and later                        PSFEx stands for "PSF Extractor": a software that makes PSF models for use with the 
+                                                                SExtractor program
+`WeightWatcher`_     **1.8.8** and later                        program that combines weight-maps, flag-maps and polygon data in order to produce control 
+                                                                maps which can directly be used in astronomical image-processing packages like Drizzle, 
+                                                                Swarp or SExtractor
 `Scamp`_             **1.4.x** and later                        Reads SExtractor catalogs and computes 
                                                                 astrometric and photometric solutions for any 
                                                                 arbitrary sequence of FITS images in a 
@@ -194,6 +203,9 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
 .. _ImageMagick: http://www.imagemagick.org
 .. _CFITSIO: http://heasarc.gsfc.nasa.gov/fitsio/
 .. _cURL: http://curl.haxx.se/
+.. _WCS library: http://www.atnf.csiro.au/people/mcalabre/WCS/
+.. _PSFEx: http://terapix.iap.fr/soft/psfex
+.. _WeightWatcher: http://http://astromatic.iap.fr/software/weightwatcher
 .. _FITS utility programs: http://heasarc.gsfc.nasa.gov/docs/software/fitsio/cexamples.html
 .. _Scamp: http://astromatic.iap.fr/software/scamp
 .. _Swarp: http://astromatic.iap.fr/software/swarp

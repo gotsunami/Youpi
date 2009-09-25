@@ -21,13 +21,16 @@ digraph G {
 	condortrpl [label="Condor transfer script"];
 	perl [label="Perl"];
 	curl [label="cURL"];
+	geos [label="Geos"];
+	wcslib [label="WCS library"];
 
 	scamp [label="Scamp"];
 	sextractor [label="Sextractor"];
 	stiff [label="Stiff"];
 	swarp [label="Swarp"];
 	qfits [label="QualityFITS"];
-	geos [label="Geos"];
+	psfex [label="PSFEx"];
+	ww [label="WeightWatcher"];
 
 	youpi -> apache;
 	youpi -> cfitsio;
@@ -51,6 +54,10 @@ digraph G {
 	youpi -> qfits;
 
 	qfits -> cfitsio;
+	qfits -> perl;
+	qfits -> ww;
+	qfits -> psfex;
+	qfits -> wcslib;
 	mysqlpython -> mysql;
 	django -> python;
 	django -> mysqlpython;
