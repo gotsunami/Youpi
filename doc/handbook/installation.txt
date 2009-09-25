@@ -350,6 +350,12 @@ to check:
 	.pl`` must be installed on *all cluster nodes* accepting jobs. Put this script in the 
 	same directory on all nodes and update the ``CMD_CONDOR_TRANSFER`` variable accordingly.
 
+``CONDOR_TRANSFER_OPTIONS``
+	Any options you might want to set on the ``CMD_CONDOR_TRANSFER`` command line. For more 
+	information, see the ``man`` page::
+
+		$ $YOUPI_INSTALL_DIR/tools/condor_transfer.pl --man
+
 ``PROCESSING_OUTPUT``
 	Path to the directory were all your processing data results are going to be stored.
 	Youpi uses a per-user per-application storage policy. Thus, John's `Scamp`_ user 
