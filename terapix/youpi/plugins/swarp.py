@@ -348,7 +348,7 @@ arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)
 # YOUPI_USER_DATA = %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
+		'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
 		'encuserdata' 		: encUserData, 
 		'swarp'				: settings.CMD_SWARP,
 		'params'			: swarp_params,

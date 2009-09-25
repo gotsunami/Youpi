@@ -585,7 +585,10 @@ notify_user             = %(condornotify)s
 				raise ValueError, userData
 
 			condor_submit_img_entries = """
-arguments                = %s %s /usr/local/bin/qualityFITS -vv""" % (encUserData, settings.CMD_CONDOR_TRANSFER)
+arguments                = %(encuserdata)s %(condor_transfer)s /usr/local/bin/qualityFITS -vv""" % {
+								'encuserdata'				: encUserData, 
+								'condor_transfer'			: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+			}
 
 			userData['Warnings'] = {}
 			userData['Warnings'][str(img.name) + '.fits'] = []

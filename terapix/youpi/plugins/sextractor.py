@@ -510,7 +510,7 @@ arguments               = %(encuserdata)s %(condor_transfer)s %(sextractor)s %(i
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
+		'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
 		'encuserdata' 		: encUserData, 
 		'sextractor'		: settings.CMD_SEX,
 		'params'			: sex_params,
@@ -529,7 +529,7 @@ arguments               = %(encuserdata)s %(condor_transfer)s %(sextractor)s %(p
 # YOUPI_USER_DATA 		= %(userdata)s
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
+		'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
 		'encuserdata' 		: encUserData,
 		'sextractor'		: settings.CMD_SEX,
 		'params'			: sex_params,

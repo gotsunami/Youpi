@@ -41,6 +41,8 @@ PROCESSING_OUTPUT 	= '/output/path/for/results/'	# FIXME
 FTP_URL 			= 'ftp://hostname/'				# FIXME
 # Path to the condor_transfer.pl Perl script
 CMD_CONDOR_TRANSFER	= '/path/to/condor_transfer'	# FIXME
+# Custom options to CMD_CONDOR_TRANSFER passed on the command line
+CONDOR_TRANSFER_OPTIONS	= ''
 
 # Used to build URI to QFITS html data path (image name + 'qualityFITS' directory
 # will be appended). 
