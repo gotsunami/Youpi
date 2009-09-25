@@ -657,41 +657,39 @@ def condor_ingestion(request):
 
 	f = open(settings.CONDORFILE + '_' + ingestionId, 'w')
 	f.write("""
-executable = %s/ingestion.py
+executable = %(script)s/ingestion.py
 universe                = vanilla
 transfer_executable     = True
-requirements            = %s
+requirements            = %(req)s
 
 # Arguments (base64 encoded + python serialization with marshal)
-# Args equal to: %s
-arguments               = "%s"
+# Args equal to: %(clear_args)s
+arguments               = "%(args)s"
 
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
-transfer_input_files    = %s/local_conf.py, %s/settings.py, %s/DBGeneric.py, %s/NOP
-initialdir				= %s
+transfer_input_files    = %(project_root)s/local_conf.py, %(project_root)s/settings.py, %(script)s/DBGeneric.py, %(project_root)s/NOP
+initialdir				= %(script)s
 transfer_output_files   = NOP
 # Logs
-# YOUPI_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%s
-output                  = %s
-error                   = %s
-log                     = %s
+# YOUPI_USER_DATA = %(clear_userdata)s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(userdata)s
+output                  = %(log_output)s
+error                   = %(log_error)s
+log                     = %(log_log)s
 queue
-""" % (	os.path.join(submit_file_path, 'script'), 
-		machine, 
-		str(script_args),
-		# Base64 encoding + marshal serialization
-		base64.encodestring(marshal.dumps(script_args)).replace('\n', NULLSTRING),
-		submit_file_path,
-		os.path.join(submit_file_path, 'script'),
-		submit_file_path,
-		os.path.join(submit_file_path, 'script'),
-		userData,
-		base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
-		settings.CONDOR_OUTPUT + '_' + ingestionId,
-		settings.CONDOR_ERROR + '_' + ingestionId,
-		settings.CONDOR_LOG + '_' + ingestionId ))
+""" % {	
+	'script'		: os.path.join(submit_file_path, 'script'), 
+	'req'			: machine, 
+	'clear_args'	: str(script_args),
+	'args'			: base64.encodestring(marshal.dumps(script_args)).replace('\n', NULLSTRING),
+	'project_root'	: submit_file_path,
+	'clear_userdata': userData,
+	'userdata'		: base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
+	'log_output'	: settings.CONDOR_OUTPUT + '_' + ingestionId,
+	'log_error'		: settings.CONDOR_ERROR + '_' + ingestionId,
+	'log_log'		: settings.CONDOR_LOG + '_' + ingestionId,
+})
 
 	f.close()
 
