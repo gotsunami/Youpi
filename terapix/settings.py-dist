@@ -19,7 +19,7 @@
 # FIXME: own values. Lines that require a modification end 
 # with a FIXME comment.
 
-import os, os.path
+import os, os.path, socket
 
 
 ##########################################################################################################
