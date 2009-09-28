@@ -14,6 +14,7 @@
 from types import *
 import os.path, time
 import xml.dom.minidom as dom
+import cjson as json
 #
 import matplotlib
 # Do NOT use GTK backend
@@ -50,7 +51,6 @@ def plot_sky_selections(request):
 	- Filename: name of server-side XML file used to retreive selections content
 	- Selections: list of selections
 	"""
-
 	try:
 		fileName = request.POST['Filename']
 		plotCenter = int(request.POST.get('PlotCenter', '0'))
@@ -131,15 +131,13 @@ def plot_sky_selections(request):
 	
 			if x[0] >= 180:
 				x[0] -= 360
-	
 			x[0] *= (math.pi)/180
 			y[0] *= (math.pi)/180
 			
 			randcolor = rand_color()
-
 			scatter(x,y, s = 1, marker = 'o', antialiased=True, label='_nolegend_',color = randcolor)	
-	
-			plot(bbx, bby, color = randcolor, linewidth=0.5, label= label+ " (Ra = "+str(alpha_center)+", Dec = "+str(delta_center)+", radius = "+str(radius)+")", aa = 'True')
+			plot(bbx, bby, color = randcolor, linewidth=0.5, 
+					label = label + " (Ra = "+str(alpha_center)+", Dec = "+str(delta_center)+", radius = "+str(radius)+")", aa = 'True')
 			
 		if plotCenter:
 			x = []
@@ -181,19 +179,21 @@ def plot_sky_selections(request):
 			scatter(x,y, s = 0.002, marker = 'o', antialiased=True, label=str(len(sel)) + ' images',color = rand_color())	
 			legend()
 
-
 	# Save images to disk
 	imgRoot = 'sky'
-	imgName = os.path.join(settings.MEDIA_ROOT, 'pubtmp', imgRoot + '.png')
-	tnName = os.path.join(settings.MEDIA_ROOT, 'pubtmp', imgRoot + '_tn.png')
+	imgName = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, imgRoot + '.png')
+	tnName = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, imgRoot + '_tn.png')
 
 	savefig(imgName, dpi=140)
 	savefig(tnName, dpi=40)
 
 	clf() 
 
-	return HttpResponse(str({'nbSelections' : len(data), 
-						'imgName' : str('/media/pubtmp/' + imgRoot + '.png'), 
-						'tnName' : str('/media/pubtmp/' + imgRoot + '_tn.png'), 'sels' : selections }), 
-						mimetype = 'text/plain')
-
+	imgPath = os.path.join('/media/', settings.MEDIA_TMP, imgRoot) 
+	return HttpResponse(json.encode({
+			'nbSelections' 	: len(data), 
+			'imgName' 		: imgPath + '.png',
+			'tnName' 		: imgPath + '_tn.png',
+			'sels' 			: selections 
+		}), 
+		mimetype = 'text/plain')

@@ -198,6 +198,8 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = os.path.join(TRUNK, 'terapix', 'media')
+# Worldwide writable directory to store content accessible under MEDIA_ROOT
+MEDIA_TMP = 'pubtmp'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
