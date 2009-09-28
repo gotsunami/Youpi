@@ -12,7 +12,6 @@ manager = PluginManager()
 
 NULLSTRING = ''
 WHITESPACE = ' '
-HOST_DOMAIN = '.clic.iap.fr'
 
 def pref_save_default_condor_config(user):
 	"""

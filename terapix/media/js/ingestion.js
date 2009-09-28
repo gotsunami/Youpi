@@ -277,8 +277,6 @@ function submitIngestion(ingestionId) {
 	var log = $('cluster_log_div');
 	var paths = file_browser.getSelectedDataPaths();
 	var path = paths[ingestionPathCurrentIndex][0];
-	var host = path.substr(file_browser.getRootDataPath().length+1);
-	host = host.substr(0, host.search('/'));
 
 	var tab = $('cluster_log_table');
 	var tr, td;
@@ -345,8 +343,7 @@ function submitIngestion(ingestionId) {
 			'&ReportEmail=' + $('input_email').value +
 			'&CheckSkipVerify=' + ($('check_verify').checked ? 'yes' : 'no') +
 			'&CheckQSOStatus=' + ($('check_qso_status').checked  ? 'yes' : 'no') +
-			'&CheckAllowSeveralTimes=' + ($('check_allow_several_times').checked  ? 'yes' : 'no') +
-			'&Host=' + host;
+			'&CheckAllowSeveralTimes=' + ($('check_allow_several_times').checked  ? 'yes' : 'no');
 
 	// Send HTTP POST request
 	xhr.setBusyMsg('Preparing ingestion of ' + path);

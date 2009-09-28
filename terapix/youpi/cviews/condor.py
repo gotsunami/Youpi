@@ -614,13 +614,25 @@ def condor_ingestion(request):
 	try:
 		path = request.POST['Path']
 		ingestionId = request.POST['IngestionId']
-		machine = request.POST['Host'] + HOST_DOMAIN
-		email = request.POST.get('ReportEmail', 'monnerville@iap.fr')
+		email = request.POST.get('ReportEmail', settings.CONDOR_NOTIFY_USER)
 		checkAllowSeveralTimes = request.POST.get('CheckAllowSeveralTimes', 'no')
 		checkSkipVerify = request.POST.get('CheckSkipVerify', 'no')
 		checkQSOStatus = request.POST.get('CheckQSOStatus', 'no')
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
+
+	# Find machine
+	clean_path = re.sub(settings.FILE_BROWSER_ROOT_DATA_PATH, '', path)
+	m = re.search(settings.INGESTION_HOST_PATTERN, clean_path)
+	if m: 
+		host = m.group(1)
+		# Now searches among user-defined mappings
+		for pattern, value in settings.INGESTION_HOSTS_MAPPING.iteritems():
+			if re.match(pattern, host):
+				machine = value.replace('\1', host)
+				break
+	else: 
+		machine = settings.INGESTION_DEFAULT_HOST
 
 	#
 	# Dictionnary that will be serialized with marshal module and passed
