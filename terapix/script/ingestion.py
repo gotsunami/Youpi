@@ -409,10 +409,12 @@ def run_ingestion():
 		chaname = getFITSField(header, 'filter')
 		flat = getFITSField(header,'IMRED_FF')
 		mask = getFITSField(header,'IMRED_MK')
-		fl = flat.split('.fits')
-		ma = mask.split('.fits')
-		flat = fl[0]+FITSEXT
-		mask = ma[0]+FITSEXT
+		if flat:
+			fl = flat.split('.fits')
+			flat = fl[0] + FITSEXT
+		if mask:
+			ma = mask.split('.fits')
+			mask = ma[0] + FITSEXT
 		ra = getFITSField(header,'RA_DEG')
 		de = getFITSField(header,'DEC_DEG') 
 
