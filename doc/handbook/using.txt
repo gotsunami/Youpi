@@ -405,6 +405,6 @@ Generating Reports
 Every actions, leaded by the user during his session on youpi, have database impacts. It
 means that, at anytime, youpi could generate from your account, global or very specific reports.
 The reports engine works with a graphic library, and can generate statistic images including
- histogramms, plots and many others features taht could enhance graphically your data results
+histogramms, plots and many others features taht could enhance graphically your data results
 from the pipeline.
 the pipeline.
