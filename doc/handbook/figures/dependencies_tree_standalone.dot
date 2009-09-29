@@ -17,13 +17,21 @@ digraph G {
 	pythonnumpy	[label="Python Numpy"];
 	apache [label="Apache"];
 	mysql [label="MySQL"];
+	mysql [label="MySQL"];
+	condortrpl [label="Condor transfer script"];
+	perl [label="Perl"];
+	curl [label="cURL"];
+	geos [label="Geos"];
+	wcslib [label="WCS library"];
+	fitsverify [label="Fitsverify"];
 
 	scamp [label="Scamp"];
 	sextractor [label="Sextractor"];
 	stiff [label="Stiff"];
 	swarp [label="Swarp"];
 	qfits [label="QualityFITS"];
-	geos [label="Geos"];
+	psfex [label="PSFEx"];
+	ww [label="WeightWatcher"];
 
 	youpi -> apache;
 	youpi -> cfitsio;
@@ -38,6 +46,8 @@ digraph G {
 	youpi -> pythonnumpy;
 	youpi -> mysqlpython;
 	youpi -> geos;
+	youpi -> condortrpl;
+	youpi -> fitsverify;
 
 	youpi -> scamp;
 	youpi -> sextractor;
@@ -46,6 +56,10 @@ digraph G {
 	youpi -> qfits;
 
 	qfits -> cfitsio;
+	qfits -> perl;
+	qfits -> ww;
+	qfits -> psfex;
+	qfits -> wcslib;
 	mysqlpython -> mysql;
 	django -> python;
 	django -> mysqlpython;
@@ -59,4 +73,6 @@ digraph G {
 	pyfits -> python;
 	pyfits -> pythonnumpy;
 	pythonmplib -> pythonnumpy;
+	condortrpl -> perl;
+	condortrpl -> curl;
 }

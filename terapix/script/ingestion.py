@@ -351,7 +351,7 @@ def run_ingestion():
 
 		debug("%03d/%03d %s" % (idx, total, fitsfile))
 		
-		fitsverify = os.system("fitsverify -q -e %s" % fitsfile)
+		fitsverify = os.system(CMD_FITSVERIFY + " -q -e %s" % fitsfile)
 		
 		if skip_fitsverify == 'yes':
 			#
@@ -409,10 +409,12 @@ def run_ingestion():
 		chaname = getFITSField(header, 'filter')
 		flat = getFITSField(header,'IMRED_FF')
 		mask = getFITSField(header,'IMRED_MK')
-		fl = flat.split('.fits')
-		ma = mask.split('.fits')
-		flat = fl[0]+FITSEXT
-		mask = ma[0]+FITSEXT
+		if flat:
+			fl = flat.split('.fits')
+			flat = fl[0] + FITSEXT
+		if mask:
+			ma = mask.split('.fits')
+			mask = ma[0] + FITSEXT
 		ra = getFITSField(header,'RA_DEG')
 		de = getFITSField(header,'DEC_DEG') 
 

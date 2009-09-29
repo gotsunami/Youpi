@@ -332,16 +332,16 @@ notify_user             = %(condornotify)s
 arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null
 environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
 queue""" %  {	
-		'condor_transfer'	: settings.CMD_CONDOR_TRANSFER,
-		'scamp'				: settings.CMD_SCAMP,
-		'encuserdata' 		: encUserData, 
-		'params'			: scamp_params,
-		'config'			: os.path.basename(customrc),
-		'userdata'			: userData, 
-		'user'				: request.user.username,
-		'tpxupload'			: settings.FTP_URL + resultsOutputDir,
-		'transferfile'		: transferFile,
-		'ldacsfile'			: catalogFile,
+		'condor_transfer'			: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+		'scamp'						: settings.CMD_SCAMP,
+		'encuserdata' 				: encUserData, 
+		'params'					: scamp_params,
+		'config'					: os.path.basename(customrc),
+		'userdata'					: userData, 
+		'user'						: request.user.username,
+		'tpxupload'					: settings.FTP_URL + resultsOutputDir,
+		'transferfile'				: transferFile,
+		'ldacsfile'					: catalogFile,
 	}
 
 		csf.write(condor_submit_entry)

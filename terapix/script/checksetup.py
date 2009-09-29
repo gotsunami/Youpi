@@ -11,7 +11,7 @@
 #
 ##############################################################################
 
-import sys, os, string
+import sys, os, string, stat
 os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
 if '..' not in sys.path:
 	sys.path.insert(0, '..')
@@ -29,6 +29,7 @@ except ImportError:
 	sys.exit(1)
 
 YOUPI_USER = 'youpiadm'
+RWXALL = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
 
 class LoggerError(Exception): pass
 
@@ -47,6 +48,9 @@ class Logger:
 		self.group = group
 		self.title = title
 		print "[%s] %s" % (group, title)
+
+	def endGroup(self):
+		self.group = None
 
 	def log(self, msg):
 		if self.group:
@@ -203,6 +207,7 @@ def check_local_conf():
 	this function ensure that at least an empty local_conf.py file is available 
 	to prevent any import issues.
 	"""
+	logger.endGroup()
 	try:
 		import terapix.local_conf
 	except ImportError:
@@ -211,11 +216,31 @@ def check_local_conf():
 		f.close()
 		logger.log('Created local_conf.py')
 
+def setup_tmp_media():
+	"""
+	Check that settings.MEDIA_TMP directory exists and is worldwide writable
+	"""
+	logger.endGroup()
+	mediadir = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP)
+	if not os.path.exists(mediadir):
+		os.mkdir(mediadir)
+		os.chmod(mediadir, RWXALL)
+		logger.log("Created missing %s directory" % settings.MEDIA_TMP)
+	else:
+		# check permissions
+		try:
+			os.chmod(mediadir, RWXALL) 
+			logger.log("Permissions OK for %s" % mediadir)
+		except OSError, e:
+			logger.log("! Unable to set 0777 permissions to '%s' directory.\nPlease set the permissions accordingly." % mediadir)
+			sys.exit(1)
+
 def setup():
 	setup_users()
 	setup_db()
 	setup_policies()
 	check_local_conf()
+	setup_tmp_media()
 
 def run():
 	global logger 

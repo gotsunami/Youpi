@@ -61,49 +61,12 @@ depends on the type of installation - *standalone* or *cluster* - you want to pe
 Standalone Installation
 -----------------------
 
-Here is a dependency tree to better visualize Youpi's software dependencies. All those 
+Here is a partial dependency tree to better visualize Youpi's software dependencies. All those 
 packages are required and must be installed on a computer host for a *standalone 
 installation*:
 
 .. figure:: figures/dependencies_tree_standalone.svg
-   :width: 500pt
-
-
-.. apache2-2.2.10.lzm                                                                                                                                                  
-	deps[condor]-classadds-1.0.1.lzm                                                                                                                                    
-	deps[condor]-glibc-2.8.lzm                                                                                                                                          
-	deps[condor]-gsoap-2.7.12.lzm                                                                                                                                       
-	deps[condor]-keyutils-libs-1.2.3.lzm                                                                                                                                
-	deps[condor]-krb5-libs-1.6.3.lzm                                                                                                                                    
-	deps[condor]-libselinux-2.0.73.lzm                                                                                                                                  
-	deps[condor]-openldap-2.4.12.lzm                                                                                                                                    
-	deps[condor]-openssl-0.9.8.lzm                                                                                                                                      
-	deps[condor]-postgresql-libs-8.3.7.lzm                                                                                                                              
-	deps[mysql-python]-mysql-5.0.51b.lzm                                                                                                                                
-	deps[pyfits]-numpy-1.3.0.lzm                                                                                                                                        
-	deps[scamp]-libtool-ltdl-2.2.6.lzm                                                                                                                                  
-	deps[scamp]-plplot-5.9.2.lzm                                                                                                                                        
-	deps[scamp]-plplot-libs-5.9.2.lzm                                                                                                                                   
-	deps[scamp]-qhull-1.7-el5.lzm                                                                                                                                       
-	deps[xfce4]-vte.0.17.4.lzm                                                                                                                                          
-	deps[youpi]-cfitsio-3.140.lzm                                                                                                                                       
-	deps[youpi]-condor-7.3.2.lzm                                                                                                                                        
-	deps[youpi]-django-1.1.lzm                                                                                                                                          
-	deps[youpi]-imagemagick-6.5.2.lzm                                                                                                                                   
-	deps[youpi]-mysql-python-1.2.2.lzm                                                                                                                                  
-	deps[youpi]-pyfits-2.1.1.lzm                                                                                                                                        
-	deps[youpi]-python-2.5.2.lzm                                                                                                                                        
-	deps[youpi]-python-cjson-1.0.5.lzm                                                                                                                                  
-	deps[youpi]-python-magic-0.1.lzm                                                                                                                                    
-	deps[youpi]-python-matplotlib-0.98.5.2.lzm                                                                                                                          
-	fr.terapix.youpi-svn.lzm                                                                                                                                            
-	mercurial-1.3.1.lzm
-	net.astromatic.scamp-1.5.5.lzm                                                                                                                                      
-	net.astromatic.sextractor-2.8.6.lzm                                                                                                                                 
-	net.astromatic.stiff-1.12.lzm                                                                                                                                       
-	net.astromatic.swarp-2.17.6.lzm                                                                                                                                     
-	vim-7.1.lzm                                                                                                                                                         
-	xfce-4.4.3.lzm
+   :width: 450pt
 
 .. warning:: Since Youpi mainly depends on ``Python``, we highly recommand to install 
              ``Python`` first. This way, you can specify (force) which version of ``Python``
@@ -112,25 +75,31 @@ installation*:
 
 As specified in the `Software packages`_ section, here are the packages you must install:
 
-- ``Python``
 - ``Apache``
 - ``Apache mod_wsgi``
-- ``MySQL client and server``
-- ``Django``
+- ``CFITSIO``
 - ``Condor``
-- ``Python csjon``
-- ``Python matplotlib``
-- ``Python magic``
-- ``Mysql-Python``
-- ``NumPy``
+- ``Condor transfer script``
+- ``cURL``
+- ``Django``
+- ``Fitsverify``
 - ``Geos``
 - ``ImageMagick``
-- ``CFITSIO``
+- ``MySQL client and server``
+- ``Mysql-Python``
+- ``NumPy``
+- ``PSFEx``
+- ``Python``
+- ``Python cjson``
+- ``Python matplotlib``
+- ``Python magic``
 - ``QualityFITS``
 - ``Scamp``
-- ``Swarp``
 - ``Sextractor``
 - ``Stiff``
+- ``Swarp``
+- ``WCS library``
+- ``WeightWatcher``
 
 
 Cluster Installation
@@ -144,18 +113,18 @@ following software packages are needed on the computer hosting Youpi:
 
 As specified in the `Software packages`_ section, here are the packages you must install:
 
-- ``Python``
 - ``Apache``
 - ``Apache mod_wsgi``
-- ``MySQL client only``
-- ``Django``
 - ``Condor``
-- ``Python csjon``
-- ``Python matplotlib``
-- ``Python magic``
+- ``Django``
+- ``Geos``
+- ``MySQL client only``
 - ``Mysql-Python``
 - ``NumPy``
-- ``Geos``
+- ``Python``
+- ``Python cjson``
+- ``Python matplotlib``
+- ``Python magic``
 
 Software packages
 -----------------
@@ -172,6 +141,9 @@ Software package     Supported version                          Description
 `Apache mod_wsgi`_   **2.3** and later                          Apache module which can host any Python application 
                                                                 which supports the Python `WSGI`_ interface interpreter 
                                                                 within the server
+`Fitsverify`_        all                                        Program that rigorously checks whether a FITS format data file conforms to all 
+                                                                the requirements defined in the FITS (Flexible Image Transport System) Standard 
+                                                                document
 `MySQL`_             **5.x** and later                          Relational database management system 
                                                                 (RDBMS)
 |django|_            **1.1.x**                                  Python web framework
@@ -194,7 +166,18 @@ Software package     Supported version                          Description
 `CFITSIO`_           **3.x** and later                          Youpi uses the ``imcopy`` tool internally 
                                                                 (part of the `FITS utility programs`_ bundled 
                                                                 with CFITSIO)
+Condor tranfer       Any version distributed with Youpi         Youpi comes with a ``condor_transfer.pl`` script which is used to 
+                                                                optimize data transfer between hosts on a cluster. This perl script uses 
+                                                                the ``libparallel-forkmanager-perl`` package. You have to set the `CMD_CONDOR_TRANSFER`_ 
+                                                                variable in your ``settings.py`` file.
+`cURL`_              **7.x** and later                          Command line tool for transferring files with URL syntax, supporting various protocols.
 `QualityFITS`_
+`WCS library`_       **4.2** and later                          Library for the FITS "World Coordinate System" (WCS)   
+`PSFEx`_             **2.4.2** and later                        PSFEx stands for "PSF Extractor": a software that makes PSF models for use with the 
+                                                                SExtractor program
+`WeightWatcher`_     **1.8.8** and later                        program that combines weight-maps, flag-maps and polygon data in order to produce control 
+                                                                maps which can directly be used in astronomical image-processing packages like Drizzle, 
+                                                                Swarp or SExtractor
 `Scamp`_             **1.4.x** and later                        Reads SExtractor catalogs and computes 
                                                                 astrometric and photometric solutions for any 
                                                                 arbitrary sequence of FITS images in a 
@@ -209,6 +192,7 @@ Software package     Supported version                          Description
 
 .. _Apache: http://httpd.apache.org/
 .. _Apache mod_wsgi: http://code.google.com/p/modwsgi/
+.. _Fitsverify: http://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/
 .. _WSGI: http://www.wsgi.org/
 .. _MySQL: http://www.mysql.com/
 .. _Condor: http://www.cs.wisc.edu/condor/
@@ -223,6 +207,10 @@ Software package     Supported version                          Description
 .. _GeoDjango: http://code.djangoproject.com/wiki/GeoDjango
 .. _ImageMagick: http://www.imagemagick.org
 .. _CFITSIO: http://heasarc.gsfc.nasa.gov/fitsio/
+.. _cURL: http://curl.haxx.se/
+.. _WCS library: http://www.atnf.csiro.au/people/mcalabre/WCS/
+.. _PSFEx: http://terapix.iap.fr/soft/psfex
+.. _WeightWatcher: http://http://astromatic.iap.fr/software/weightwatcher
 .. _FITS utility programs: http://heasarc.gsfc.nasa.gov/docs/software/fitsio/cexamples.html
 .. _Scamp: http://astromatic.iap.fr/software/scamp
 .. _Swarp: http://astromatic.iap.fr/software/swarp
@@ -245,7 +233,7 @@ following command::
 
 	$ sudo apt-get install python2.5 apache2 libapache2-mod-python mysql-server \ 
 	> mysql-client python-django python-cjson python-matplotlib python-magick \
-	> python-mysqldb python-numpy imagemagick
+	> python-mysqldb python-numpy imagemagick libparallel-forkmanager-perl curl
 
 While for a *cluster installation*, you might want to try::
 
@@ -369,6 +357,25 @@ to check:
 ``CMD_IMCOPY``
 	Fill in the full path to the ``imcopy`` program (parts of the `CFITSIO`_ package).
 
+.. _CMD_CONDOR_TRANSFER:
+
+``CMD_CONDOR_TRANSFER``
+	Path to the provided ``condor_transfer.pl`` script used during job processings. This file is 
+	executed on the processing machines (Condor nodes). If you are performing a *standalone 
+	installation*, set ``CMD_CONDOR_TRANSFER`` to ``$YOUPI_INSTALL_DIR/tools/condor_transfer.pl`` 
+	since everything is installed locally. In case of a *cluster installation*, the ``condor_transfer
+	.pl`` must be installed on *all cluster nodes* accepting jobs. Put this script in the 
+	same directory on all nodes and update the ``CMD_CONDOR_TRANSFER`` variable accordingly.
+
+``CONDOR_TRANSFER_OPTIONS``
+	Any options you might want to set on the ``CMD_CONDOR_TRANSFER`` command line. For more 
+	information, see the ``man`` page::
+
+		$ $YOUPI_INSTALL_DIR/tools/condor_transfer.pl --man
+
+``CMD_FITSVERIFY``
+	Path to the ``fitsverify`` command (used during images ingestion)
+
 ``PROCESSING_OUTPUT``
 	Path to the directory were all your processing data results are going to be stored.
 	Youpi uses a per-user per-application storage policy. Thus, John's `Scamp`_ user 
@@ -422,6 +429,31 @@ to check:
 	root path to your data. Feel free to change the ``FILE_BROWSER_ROOT_TITLE`` if the default 
 	value doesn't suit your needs.
 
+``INGESTION_HOST_PATTERN``
+	Regular expression used at ingestion step to determine the target hostname (a cluster node) 
+	that will be used as a Condor requirement target machine. You must use only one set of 
+	parenthesis; Youpi will try to search a match in the complete path to your input images 
+	directory. Note that the ``FILE_BROWSER_ROOT_DATA_PATH`` is substracted from the current path 
+	to the data before applying your host pattern.
+
+``INGESTION_HOST_MAPPING``
+	Whenever ``INGESTION_HOST_PATTERN`` matches your path-to-images directory, a real hostname will 
+	be searched in the ``INGESTION_HOST_MAPPING`` dictionary. If the precedent pattern matches a key 
+	in this dictionary, the corresponding value will be used as a Condor target hostname requirement. 
+	For example, if your path to input images is something like ``/path/to/root/directory/host5/testing/megacam/``,
+	then you could set the following variables in your ``local_conf.py``::
+
+		INGESTION_HOST_PATTERN  = r'^/(.*?)/.*$'
+		INGESTION_HOST_MAPPING = {'host5': 'host5.mydomain.org'}
+		# Keys can also be declared as regexps 
+		#INGESTION_HOST_MAPPING = {r'host.*': '\1.mydomain.org'}
+
+	Since ``host5`` will match, the corresponding value ``host5.mydomain.org`` will be used. You can 
+	also use regular expressions. In this case, ``\1`` matches the current hostname value matched.
+
+``INGESTION_DEFAULT_HOST``
+	Hostname used as a Condor requirement target machine if no match is found at all.
+
 ``CONDOR_NOTIFY_USER``
 	Any valid email address where Condor is going to send job processing errors, if any.
 
@@ -450,6 +482,7 @@ database configuration settings for example. A tipically ``local_conf.py`` file 
 like this::
 
 	CMD_CONDOR_TRANSFER = '/usr/local/bin/condor_transfert.pl'
+	CMD_FITSVERIFY		= 'fitsverify'
 	# Testing database (do not use for production)
 	DATABASE_NAME       = 'youpitest'
 	DATABASE_USER       = 'debug'     
@@ -461,6 +494,8 @@ like this::
 	FILE_BROWSER_ROOT_DATA_PATH = '/mnt/nfs'
 	# Email sent when a job fails
 	CONDOR_NOTIFY_USER = 'monnerville@iap.fr'
+	INGESTION_HOST_PATTERN = r'^/(.*?)/.*$'
+	INGESTION_HOSTS_MAPPING = {r'.*ix.*': '\1.domain.org'}
 
 .. warning:: Some configuration variables must not be overwritten in a ``local_conf.py`` 
 			 file since other variables defined in ``settings.py`` may depend on their 
