@@ -351,7 +351,7 @@ def run_ingestion():
 
 		debug("%03d/%03d %s" % (idx, total, fitsfile))
 		
-		fitsverify = os.system("fitsverify -q -e %s" % fitsfile)
+		fitsverify = os.system(CMD_FITSVERIFY + " -q -e %s" % fitsfile)
 		
 		if skip_fitsverify == 'yes':
 			#

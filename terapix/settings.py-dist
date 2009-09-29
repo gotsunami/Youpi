@@ -43,6 +43,7 @@ FTP_URL 			= 'ftp://hostname/'				# FIXME
 CMD_CONDOR_TRANSFER	= '/path/to/condor_transfer'	# FIXME
 # Custom options to CMD_CONDOR_TRANSFER passed on the command line
 CONDOR_TRANSFER_OPTIONS	= ''
+CMD_FITSVERIFY		= '/path/to/fitsverify'			# FIXME
 
 # Used to build URI to QFITS html data path (image name + 'qualityFITS' directory
 # will be appended). 
@@ -71,7 +72,7 @@ FILE_BROWSER_ROOT_DATA_PATH = '/path/to/root/directory'	# FIXME
 # will be substracted from the current path to data before apply your host pattern.
 INGESTION_HOST_PATTERN = r'(.*?)/.*$'			# FIXME
 # If INGESTION_HOST_PATTERN matches, a real hostname will be searched to use it as 
-# a Condor requirement target machine. Supposer your path to input images is like
+# a Condor requirement target machine. Suppose your path to input images is like
 # '/path/to/root/directory/host5/testing/megacam/'. You should set your 
 # INGESTION_HOST_PATTERN to '(.*?)/.*$' in order to match 'host5'. Then you can set
 # your hosts mapping to {'host5': 'host5.mydomain.org'}. Keys can be also be declared as 

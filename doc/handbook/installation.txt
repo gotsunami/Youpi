@@ -368,6 +368,9 @@ to check:
 
 		$ $YOUPI_INSTALL_DIR/tools/condor_transfer.pl --man
 
+``CMD_FITSVERIFY``
+	Path to the ``fitsverify`` command (used during images ingestion)
+
 ``PROCESSING_OUTPUT``
 	Path to the directory were all your processing data results are going to be stored.
 	Youpi uses a per-user per-application storage policy. Thus, John's `Scamp`_ user 
@@ -420,6 +423,31 @@ to check:
 	point. For example if your NFS shares are mounted under ``/mnt/nfs``, use this value as the 
 	root path to your data. Feel free to change the ``FILE_BROWSER_ROOT_TITLE`` if the default 
 	value doesn't suit your needs.
+
+``INGESTION_HOST_PATTERN``
+	Regular expression used at ingestion step to determine the target hostname (a cluster node) 
+	that will be used as a Condor requirement target machine. You must use only one set of 
+	parenthesis; Youpi will try to search a match in the complete path to your input images 
+	directory. Note that the ``FILE_BROWSER_ROOT_DATA_PATH`` is substracted from the current path 
+	to the data before applying your host pattern.
+
+``INGESTION_HOST_MAPPING``
+	Whenever ``INGESTION_HOST_PATTERN`` matches your path-to-images directory, a real hostname will 
+	be searched in the ``INGESTION_HOST_MAPPING`` dictionary. If the precedent pattern matches a key 
+	in this dictionary, the corresponding value will be used as a Condor target hostname requirement. 
+	For example, if your path to input images is something like ``/path/to/root/directory/host5/testing/megacam/``,
+	then you could set the following variables in your ``local_conf.py``::
+
+		INGESTION_HOST_PATTERN  = r'^/(.*?)/.*$'
+		INGESTION_HOST_MAPPING = {'host5': 'host5.mydomain.org'}
+		# Keys can be also be declared as regexps 
+		#INGESTION_HOST_MAPPING = {r'host.*': '\1.mydomain.org'}
+
+	Since ``host5`` will match, the corresponding value ``host5.mydomain.org`` will be used. You can 
+	also use regular expressions. In this case, ``\1`` matches the current hostname value matched.
+
+``INGESTION_DEFAULT_HOST``
+	Hostname used as a Condor requirement target machine if no match is found at all.
 
 ``CONDOR_NOTIFY_USER``
 	Any valid email address where Condor is going to send job processing errors, if any.
