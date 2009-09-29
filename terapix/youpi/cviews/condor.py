@@ -625,12 +625,15 @@ def condor_ingestion(request):
 	clean_path = re.sub(settings.FILE_BROWSER_ROOT_DATA_PATH, '', path)
 	m = re.search(settings.INGESTION_HOST_PATTERN, clean_path)
 	if m: 
-		host = m.group(1)
-		# Now searches among user-defined mappings
-		for pattern, value in settings.INGESTION_HOSTS_MAPPING.iteritems():
-			if re.match(pattern, host):
-				machine = value.replace('\1', host)
-				break
+		try:
+			host = m.group(1)
+			# Now searches among user-defined mappings
+			for pattern, value in settings.INGESTION_HOSTS_MAPPING.iteritems():
+				if re.match(pattern, host):
+					machine = value.replace('\1', host)
+					break
+		except IndexError:
+			machine = settings.INGESTION_DEFAULT_HOST
 	else: 
 		machine = settings.INGESTION_DEFAULT_HOST
 
