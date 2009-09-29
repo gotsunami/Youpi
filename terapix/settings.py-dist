@@ -70,7 +70,7 @@ FILE_BROWSER_ROOT_DATA_PATH = '/path/to/root/directory'	# FIXME
 # You must use only one set of parenthesis aka '()' and Youpi will look for 
 # a match in the complete path to your input images. Thus, the FILE_BROWSER_ROOT_DATA_PATH 
 # will be substracted from the current path to data before apply your host pattern.
-INGESTION_HOST_PATTERN = r'(.*?)/.*$'			# FIXME
+INGESTION_HOST_PATTERN = r'^/(.*?)/.*$'			# FIXME
 # If INGESTION_HOST_PATTERN matches, a real hostname will be searched to use it as 
 # a Condor requirement target machine. Suppose your path to input images is like
 # '/path/to/root/directory/host5/testing/megacam/'. You should set your 
@@ -81,7 +81,7 @@ INGESTION_HOST_PATTERN = r'(.*?)/.*$'			# FIXME
 INGESTION_HOSTS_MAPPING = {}					# FIXME
 # If no match is found, INGESTION_DEFAULT_HOST is used as a Condor requirement 
 # target machine (fqdn)
-INGESTION_DEFAULT_HOST = socket.gethostname()
+INGESTION_DEFAULT_HOST = socket.gethostname() # FIXME
 # Email sent when a job fails
 CONDOR_NOTIFY_USER = 'youremail@your.domain' # FIXME
 

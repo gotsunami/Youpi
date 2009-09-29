@@ -23,6 +23,7 @@ digraph G {
 	curl [label="cURL"];
 	geos [label="Geos"];
 	wcslib [label="WCS library"];
+	fitsverify [label="Fitsverify"];
 
 	scamp [label="Scamp"];
 	sextractor [label="Sextractor"];
@@ -46,6 +47,7 @@ digraph G {
 	youpi -> mysqlpython;
 	youpi -> geos;
 	youpi -> condortrpl;
+	youpi -> fitsverify;
 
 	youpi -> scamp;
 	youpi -> sextractor;

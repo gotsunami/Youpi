@@ -66,7 +66,7 @@ packages are required and must be installed on a computer host for a *standalone
 installation*:
 
 .. figure:: figures/dependencies_tree_standalone.svg
-   :width: 500pt
+   :width: 450pt
 
 .. warning:: Since Youpi mainly depends on ``Python``, we highly recommand to install 
              ``Python`` first. This way, you can specify (force) which version of ``Python``
@@ -75,30 +75,31 @@ installation*:
 
 As specified in the `Software packages`_ section, here are the packages you must install:
 
-- ``Python``
 - ``Apache``
 - ``Apache mod_wsgi``
-- ``MySQL client and server``
-- ``Django``
-- ``Condor``
-- ``Python csjon``
-- ``Python matplotlib``
-- ``Python magic``
-- ``Mysql-Python``
-- ``NumPy``
-- ``Geos``
-- ``ImageMagick``
 - ``CFITSIO``
+- ``Condor``
 - ``Condor transfer script``
 - ``cURL``
-- ``QualityFITS``
-- ``WCS library``
+- ``Django``
+- ``Fitsverify``
+- ``Geos``
+- ``ImageMagick``
+- ``MySQL client and server``
+- ``Mysql-Python``
+- ``NumPy``
 - ``PSFEx``
-- ``WeightWatcher``
+- ``Python``
+- ``Python cjson``
+- ``Python matplotlib``
+- ``Python magic``
+- ``QualityFITS``
 - ``Scamp``
-- ``Swarp``
 - ``Sextractor``
 - ``Stiff``
+- ``Swarp``
+- ``WCS library``
+- ``WeightWatcher``
 
 
 Cluster Installation
@@ -112,18 +113,18 @@ following software packages are needed on the computer hosting Youpi:
 
 As specified in the `Software packages`_ section, here are the packages you must install:
 
-- ``Python``
 - ``Apache``
 - ``Apache mod_wsgi``
-- ``MySQL client only``
-- ``Django``
 - ``Condor``
-- ``Python csjon``
-- ``Python matplotlib``
-- ``Python magic``
+- ``Django``
+- ``Geos``
+- ``MySQL client only``
 - ``Mysql-Python``
 - ``NumPy``
-- ``Geos``
+- ``Python``
+- ``Python cjson``
+- ``Python matplotlib``
+- ``Python magic``
 
 Software packages
 -----------------
@@ -140,6 +141,9 @@ Software package     Supported version                          Description
 `Apache mod_wsgi`_   **2.3** and later                          Apache module which can host any Python application 
                                                                 which supports the Python `WSGI`_ interface interpreter 
                                                                 within the server
+`Fitsverify`_        all                                        Program that rigorously checks whether a FITS format data file conforms to all 
+                                                                the requirements defined in the FITS (Flexible Image Transport System) Standard 
+                                                                document
 `MySQL`_             **5.x** and later                          Relational database management system 
                                                                 (RDBMS)
 |django|_            **1.1.x**                                  Python web framework
@@ -188,6 +192,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
 
 .. _Apache: http://httpd.apache.org/
 .. _Apache mod_wsgi: http://code.google.com/p/modwsgi/
+.. _Fitsverify: http://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/
 .. _WSGI: http://www.wsgi.org/
 .. _MySQL: http://www.mysql.com/
 .. _Condor: http://www.cs.wisc.edu/condor/
@@ -440,7 +445,7 @@ to check:
 
 		INGESTION_HOST_PATTERN  = r'^/(.*?)/.*$'
 		INGESTION_HOST_MAPPING = {'host5': 'host5.mydomain.org'}
-		# Keys can be also be declared as regexps 
+		# Keys can also be declared as regexps 
 		#INGESTION_HOST_MAPPING = {r'host.*': '\1.mydomain.org'}
 
 	Since ``host5`` will match, the corresponding value ``host5.mydomain.org`` will be used. You can 
@@ -477,6 +482,7 @@ database configuration settings for example. A tipically ``local_conf.py`` file 
 like this::
 
 	CMD_CONDOR_TRANSFER = '/usr/local/bin/condor_transfert.pl'
+	CMD_FITSVERIFY		= 'fitsverify'
 	# Testing database (do not use for production)
 	DATABASE_NAME       = 'youpitest'
 	DATABASE_USER       = 'debug'     
@@ -488,6 +494,8 @@ like this::
 	FILE_BROWSER_ROOT_DATA_PATH = '/mnt/nfs'
 	# Email sent when a job fails
 	CONDOR_NOTIFY_USER = 'monnerville@iap.fr'
+	INGESTION_HOST_PATTERN = r'^/(.*?)/.*$'
+	INGESTION_HOSTS_MAPPING = {r'.*ix.*': '\1.domain.org'}
 
 .. warning:: Some configuration variables must not be overwritten in a ``local_conf.py`` 
 			 file since other variables defined in ``settings.py`` may depend on their 
