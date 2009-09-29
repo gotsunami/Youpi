@@ -4,9 +4,6 @@ Using Youpi
 The Youpi web interface is splitted in tabs. Each tab corresponds to a specific
 task and, this section, will describe the functionnality related to the tab header.
 
-.. image:: /figures/tabs.jpg
-   	:align: center
-
 Before diving into Youpi, let's first introduce to the basic functionnalities of
 the pipeline.
 
@@ -14,6 +11,7 @@ Pre-ingestion of FITS Tables
 ============================
 
 .. image:: /figures/preingestion.png
+   :width: 800
 
 Every sky survey, depending on a survey program, has a limited observation time
 through telescopes.
@@ -41,6 +39,7 @@ FITS Data Ingestion
 ===================
 
 .. image:: /figures/ingestion.png
+   :width: 800
 
 A FITS image is the most important entity in youpi.
 The ingestion process make your images their first entries in the pipeline.
@@ -108,6 +107,7 @@ Deal With Condor Setup
 ======================
 
 .. image:: /figures/condor.png
+   :width: 800
 
 The condor Setup tab will show in real time your cluster status and let customize basic or
 advanced policies related to your cluster functionalities. Condor is a specialized workload
@@ -143,6 +143,7 @@ Set up Your Preferences
 =======================
 
 .. image:: /figures/preferences.png
+   :width: 800
 
 The preference tab in the Youpi interface is as important as the condor setup tab.
 It handles global options for youpi and it is user dependant. Each user can set his
@@ -172,6 +173,7 @@ Organize your data with tags
 ============================
 
 .. image:: /figures/tag.png
+   :width: 800
 
 Tags are keywords or terms associated with or assigned to a piece of information.
 In the Youpi case, let's say that this is a metadata (a text field) that you could
@@ -208,6 +210,7 @@ Processing Your Data
 ====================
 
 .. image:: /figures/processing.png
+   :width: 800
 
 For each plugin implemented, as a computing process which could be run on FITS images 
 through Youpi, there are severals steps to observe, represented as tabs as shown in the
@@ -309,6 +312,10 @@ The processing output directory is defined at the first step of Youpi configurat
 youpi completes this path with the Youpi's user name and the name of the plugin concerned 
 by the processing.You can add one more custom level directory in the output directory tab.
 
+::
+
+/processing_output/user/plugin/mySpecialProcess/
+
 Input versus Output validation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -331,12 +338,13 @@ The Shopping Cart
 =================
 
 .. image:: /figures/shopping.png
+   :width: 800
 
 The shopping cart comes naturally, after adding to cart one or many processings, elaborated
 from plugins of the *processing your data* tab. It represents a visual synthesis of 
 processings, sorted by plugin and ready to be run. A summary of your parameters are shown 
 as a quick view. Then you can decide to delete, save for a later use, or run the 
-corresponding processing as *jobs* handled by Condor. The *saved items* tab will summarize
+corresponding processing as *jobs*, handled by Condor. The *saved items* tab will summarize
 your saved processings with elementary informations, and an *add to cart* click will push 
 them back to the cart, ready to be computed.
 
@@ -353,6 +361,7 @@ Live Monitoring of Processings
 ==============================
 
 .. image:: /figures/activemonitoring.png
+   :width: 800
 
 After having launched jobs, from the shopping cart to the Condor management system, Youpi 
 provides a realtime instant view of all proccessed jobs, with related nodes in which jobs
@@ -366,6 +375,7 @@ Processing Results
 ==================
 
 .. image:: /figures/results.png
+   :width: 800
 
 The processing history tab is separated for the moment, in 2 parts. The first one is a 
 *processing selector* under the *history* tab, and proposes a custom search of processings 
@@ -390,9 +400,11 @@ group has been successfully processed.
 Generating Reports
 ==================
 .. image:: /figures/reporting.png
+   :width: 800
 
 Every actions, leaded by the user during his session on youpi, have database impacts. It
-means that at anytime, youpi could generate from your account or from all, global or very 
-specific reports:
-
- - Number of images ingested, processed, graded by yourself 
+means that, at anytime, youpi could generate from your account, global or very specific reports.
+The reports engine works with a graphic library, and can generate statistic images including
+ histogramms, plots and many others features taht could enhance graphically your data results
+from the pipeline.
+the pipeline.
