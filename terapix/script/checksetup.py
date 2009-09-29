@@ -65,10 +65,15 @@ def setup_db():
 
 	logger.setGroup('init', 'Setup database with mandatoy data')
 
-	#surveys = Survey.objects.all()
-	#if surveys:
-		# Check that MEGACAM and WIRCAM instruments exist
-#		instrus = Instrument.objects.filter(Q(name = 'MEGACAM') | Q(name = 'WIRCAM'))
+	# Checks for available instruments
+	instrus = Instrument.objects.filter(Q(name = 'Megacam') | Q(name = 'Wircam'))
+	if not instrus:
+		for name in ('Megacam', 'Wircam'):
+			i = Instrument(name = name)
+			i.save()
+			logger.log("Added instrument: '%s'" % (name))
+	else:
+		logger.log('Default instruments found')
 
 	# Default first quality evaluation comments
 	logger.log('Adding default first quality evaluation comments')
