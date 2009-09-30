@@ -454,6 +454,9 @@ to check:
 ``INGESTION_DEFAULT_HOST``
 	Hostname used as a Condor requirement target machine if no match is found at all.
 
+``INGESTION_MAIL_FROM``
+	Email address used for mail notifications when ingesting images.
+
 ``CONDOR_NOTIFY_USER``
 	Any valid email address where Condor is going to send job processing errors, if any.
 
