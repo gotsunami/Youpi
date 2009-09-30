@@ -1394,14 +1394,16 @@ def stats_ingestion(request):
 	imgs_per_instru = []
 	for inst in instruments:
 		imgcount = Image.objects.filter(instrument = inst).count()
-		percent = imgcount*100./total_images
+		try: percent = imgcount*100./total_images
+		except ZeroDivisionError: percent = 0
 		imgs_per_instru.append({'instrument': str(inst.name), 'count': int(imgcount), 'percent': percent})
 
 	channels = Channel.objects.all().order_by('name')
 	imgs_per_channel = []
 	for c in channels:
 		imgCount = Image.objects.filter(channel = c).count()
-		percent = imgCount*100./total_images
+		try: percent = imgCount*100./total_images
+		except ZeroDivisionError: percent = 0
 		imgs_per_channel.append({'channel': str(c.name), 'count': int(imgCount), 'percent': percent})
 
 	data = {
