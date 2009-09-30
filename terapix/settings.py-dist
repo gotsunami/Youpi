@@ -82,6 +82,9 @@ INGESTION_HOSTS_MAPPING = {}					# FIXME
 # If no match is found, INGESTION_DEFAULT_HOST is used as a Condor requirement 
 # target machine (fqdn)
 INGESTION_DEFAULT_HOST = socket.gethostname() # FIXME
+# Set to False to disable sending mail at the end of the ingestion
+INGESTION_SEND_MAIL = True
+INGESTION_MAIL_FROM = 'youpi-bot@your.domain'	# FIXME
 # Email sent when a job fails
 CONDOR_NOTIFY_USER = 'youremail@your.domain' # FIXME
 

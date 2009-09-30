@@ -34,12 +34,6 @@ NULLSTRING = ''
 DEBUG_LEVELS = (INFO, WARNING, FATAL)
 
 #
-# SEND_MAIL = 0: no mail is sent; debugging is sent to stdout
-# SEND_MAIL = 1: mail is sent to local mailer for delivery
-#
-SEND_MAIL = 1
-
-#
 # Debugging information is logged to this file which will be sent
 # by email at the end of the process
 #
@@ -98,7 +92,7 @@ def sendmail(status, to, start, end, runame):
 	Send email report (plain text) to user
 	"""
 
-	global clog, email, SEND_MAIL, script_args, g, ingestionId
+	global clog, email, script_args, g, ingestionId
 
 	# Updates end time
 	try:
@@ -163,9 +157,9 @@ Elapsed time: %.02f seconds
 
 	msg = "Subject: [Youpi] Report for ingestion %s [%d]\r\nFrom: youpi_noreply@iap.fr\r\nTo: %s\r\n\n%s\n%s" % (script_args['ingestion_id'], status, email, body, log) 
 
-	if SEND_MAIL:
+	if INGESTION_SEND_MAIL:
 		s = smtplib.SMTP('localhost')
-		s.sendmail('condor-tpx@iap.fr', email, msg)
+		s.sendmail(INGESTION_MAIL_FROM, email, msg)
 		s.quit()
 	else:
 		print msg
