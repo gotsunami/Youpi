@@ -171,7 +171,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
                                                                 the ``libparallel-forkmanager-perl`` package. You have to set the `CMD_CONDOR_TRANSFER`_ 
                                                                 variable in your ``settings.py`` file.
 `cURL`_              **7.x** and later                          Command line tool for transferring files with URL syntax, supporting various protocols.
-`QualityFITS`_
+`QualityFITS`_       **1.13.9** and later                       Open source Quality Assessment software used at Terapix
 `WCS library`_       **4.2** and later                          Library for the FITS "World Coordinate System" (WCS)   
 `PSFEx`_             **2.4.2** and later                        PSFEx stands for "PSF Extractor": a software that makes PSF models for use with the 
                                                                 SExtractor program
@@ -208,6 +208,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
 .. _ImageMagick: http://www.imagemagick.org
 .. _CFITSIO: http://heasarc.gsfc.nasa.gov/fitsio/
 .. _cURL: http://curl.haxx.se/
+.. _QualityFITS: http://youpi.terapix.fr/release/qualityfits-1.13.9-1.src.rpm
 .. _WCS library: http://www.atnf.csiro.au/people/mcalabre/WCS/
 .. _PSFEx: http://terapix.iap.fr/soft/psfex
 .. _WeightWatcher: http://http://astromatic.iap.fr/software/weightwatcher
