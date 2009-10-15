@@ -23,6 +23,7 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbi
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 #
+from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.cviews import *
 from terapix.youpi.auth import read_proxy
@@ -68,9 +69,9 @@ def cart_add_item(request):
 	# Useful to get a rather unique item ID in the shopping cart
 	plugObj.itemCounter += 1
 
-	request.session['cart']['plugins'][plugin].append({ 'date' : time.asctime(), 
-														'userData' : userData,
-														'itemCounter' : plugObj.itemCounter})
+	request.session['cart']['plugins'][plugin].append({ 'date' 			: time.asctime(), 
+														'userData' 		: userData,
+														'itemCounter' 	: plugObj.itemCounter})
 
 	return HttpResponse(str({'data' : str(userData)}), mimetype = 'text/plain')
 
@@ -98,6 +99,8 @@ def cart_delete_item(request):
 		del request.session['cart']['plugins'][plugin][:]
 	else:
 		del request.session['cart']['plugins'][plugin][idx]
+		if len(request.session['cart']['plugins'][plugin]) == 0:
+			del request.session['cart']['plugins'][plugin]
 
 	return HttpResponse(str({'data' : 'done'}), mimetype = 'text/plain')
 
