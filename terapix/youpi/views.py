@@ -1349,6 +1349,12 @@ def get_image_info(request):
 
 	try: runName = Rel_ri.objects.filter(image = img)[0].run.name
 	except: runName = None
+	
+	if img.is_validated == True:
+		vStatus = 'VALIDATED'
+	else:
+		vStatus = 'OBSERVED'
+
 	data = {
 		'name'		: img.name + '.fits',
 		'path'		: img.path,
@@ -1359,6 +1365,7 @@ def get_image_info(request):
 		'flat'		: img.flat,
 		'mask'		: img.mask,
 		'reg'		: img.reg,
+		'status'	: vStatus,
 		'instrument': img.instrument.name,
 		'run'		: runName,
 		'channel'	: img.channel.name,
