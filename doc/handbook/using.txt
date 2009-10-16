@@ -7,33 +7,6 @@ task and, this section, will describe the functionnality related to the tab head
 Before diving into Youpi, let's first introduce to the basic functionnalities of
 the pipeline.
 
-Pre-ingestion of FITS Tables
-============================
-
-.. image:: /figures/preingestion.png
-   :width: 800
-
-Every sky survey, depending on a survey program, has a limited observation time
-through telescopes.
-It means that a known number of images is produced from the instrument, and each
-image is a part of the sky cover defined for the survey program.
-In a certain way, the Pre-ingestion step allows to ingest FITS tables (provided 
-by the observatory in which depends the survey) in which are listed all images 
-observed through the instrument and for a survey.
-A FITS table is a FITS formated file containing for each image, associated meta-data.
-
-The Pre-ingestion is not a mandatory step because it depends of the meta-data
-provided by the telescope for each image observed and produced.
-As we know there are many sky observation through many different instruments for
-multiple science issues, and mixing all meta-data types in one format is a very 
-difficult task.
-
-For example, CFHT provides FITS tables, and CFHTLS provides log files.
-
-.. note:: The goal of this step is to pre-ingest meta-data from futures ingested 
-		  images in order to verify the existence of those images during the 
-		  ingestion.
-
 
 FITS Data Ingestion
 ===================
@@ -75,16 +48,6 @@ Data integrity control
 Fitsverify is integrated to the ingestion at its low level checking, it will 
 verify that the structure of the FITS image is not corrupted and will not affect 
 the futur processing of it.
-
-Meta-data control (CFHT case, with pre-ingestion)
-This option is related to the pre-ingestion step. If no pre-ingestion have been done 
-before, uncheck it to pass the control successfully. Otherwise, it is based on the 
-check of the QSO status value filled during pre-ingestion. Checking this option means 
-that you will ingest only images that have been preingested and with the QSO status 
-value as validated (i.e certified and usable for science issues).
-
-Meta-data control (Normal case, without pre-ingestion)
-Uncheck this option if no pre-ingestion step has been done.
 
 Youpi allows the possibility to ingest the same image many times
 The image will have the same name but the generated checksum, computed and linked 
