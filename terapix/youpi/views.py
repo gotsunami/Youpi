@@ -207,21 +207,6 @@ def processing(request):
 
 @login_required
 @profile
-def preingestion(request):
-	"""
-	Related to preIngestion step
-	"""
-	
-	menu_id = 'preingestion'
-	return render_to_response('preingestion.html', {	
-						'hostname'			: socket.gethostname(), 
-						'selected_entry_id'	: menu_id, 
-						'title' 			: get_title_from_menu_id(menu_id),
-					},
-					context_instance = RequestContext(request))
-
-@login_required
-@profile
 def ing(request):
 	"""
 	Related to ingestion step.
