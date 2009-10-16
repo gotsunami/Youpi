@@ -290,7 +290,7 @@ document.observe('shoppingCart:itemRemoved', function() {
 			{% if cartHasData %}
 			<div style="padding-top: 20px;">
 			<div id="master_condor_log_div"></div>
-			{% for plugin in plugins %}
+			{% for plugin in cart_plugins %}
 				{% if plugin.hasItemsInCart %}
 			<table width="50%" class="shoppingCart">
 				<tr>

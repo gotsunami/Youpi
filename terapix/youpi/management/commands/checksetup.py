@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from optparse import make_option
-import os, os.path
+import os, os.path, sys
 import string
 
 class Command(BaseCommand):
@@ -51,6 +51,11 @@ class Command(BaseCommand):
 		apache = options['apache']
 		
 		if not (wsgi or apache):
+			# First checks that all models are synced
+			print "Running syncdb..."; sys.stdout.flush()
+			from django.core.management import call_command
+			call_command('syncdb')
+			print "Running checksetup..."
 			from terapix.script import checksetup
 			checksetup.run()
 			return

@@ -165,11 +165,14 @@ def cart_view(request):
 	if 'cart' not in request.session:
 		request.session['cart'] = {'plugins' : {}}
 
+	# Current items for user session
+	cart_items = []
 	for plugin, dataList in request.session['cart']['plugins'].iteritems():
 		plugObj = manager.getPluginByName(plugin)
 		if len(dataList):
 			plugObj.setData(dataList)
 			cartHasData = True
+			cart_items.append(plugObj)
 		else:
 			plugObj.removeData()
 
@@ -178,6 +181,7 @@ def cart_view(request):
 
 	menu_id = 'shoppingcart'
 	return render_to_response('shoppingcart.html', {	
+					'cart_plugins' 		: cart_items, 
 					'plugins' 			: manager.plugins, 
 					'cartHasData' 		: cartHasData, 
 					# Cluster node available policies + selections
