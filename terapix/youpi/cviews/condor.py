@@ -617,7 +617,7 @@ def condor_ingestion(request):
 		email = request.POST.get('ReportEmail', settings.CONDOR_NOTIFY_USER)
 		checkAllowSeveralTimes = request.POST.get('CheckAllowSeveralTimes', 'no')
 		checkSkipVerify = request.POST.get('CheckSkipVerify', 'no')
-		checkQSOStatus = request.POST.get('CheckQSOStatus', 'no')
+		selectValidationStatus = request.POST.get('SelectValidationStatus', 'no')
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
@@ -649,7 +649,7 @@ def condor_ingestion(request):
 					'ingestion_id' : ingestionId,
 					'allow_several_ingestions' : checkAllowSeveralTimes,
 					'skip_fitsverify' : checkSkipVerify,
-					'skip_qso_status' : checkQSOStatus,
+					'select_validation_status' : selectValidationStatus,
 					'host' : machine
 	}
 

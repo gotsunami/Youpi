@@ -70,11 +70,8 @@ function ingestion_history() {
 									<div style="width: 600px">
 										<table class="flatmask">
 											<tr>
-												<th>Ingestion Type</th>
-												<td class="ingestion_type">
-													<select id="select_type" onchange="ingestionType();">
-														<option name="b" id="condor" value="condor">Cluster ingestion (through Condor)</option>
-													</select>
+												<td class="ingestion_type" colspan="2">
+												Cluster ingestion (through Condor)
 												</td>
 											</tr>
 											<tr>
@@ -92,22 +89,28 @@ function ingestion_history() {
 											<tr>
 												<th>Options</th>
 												<td width="100%">
+													<label>All images will be ingested with the flag :</label>
+													<select id="select_validation" onclick="force_validation();"/>
+														<option name="V" id="validated" value="yes">VALIDATED</option>
+														<option name="O" id="observed" value="no">OBSERVED</option>
+													</select>
+													<div style="width: 90%">
+														<div id ="warn0" class="warning" style="display:none"></div>
+													</div>
+
+													<br/>
+
 													<input id="check_verify" onclick="force_fitsverify()" type="checkbox" name="check_skip_fitsverify" value="yes" checked="checked"/>
-													<label>Skip ingestion for non fitsverify compliant images</label>
+													<label>Skip ingestion for non FITS compliant images</label>
 													<div style="width: 90%">
-														<div id ="warn" class="warning" style="display:none"></div>
+														<div id ="warn1" class="warning" style="display:none"></div>
 													</div>
 													<br/>
-													<input id="check_qso_status" onclick="force_qso_status()" type="checkbox" name="check_skip_qso_status" value="yes" checked="checked"/>
-													<label>Skip ingestion when <strong>QSO status</strong> does not match <q>validated</q></label>
-													<div style="width: 90%">
-														<div align="center" id ="warn2" class="warning" style="display:none"></div>
-													</div>
-													<br/>
+
 													<input id="check_allow_several_times" onclick="force_check_allow_several_times()" type="checkbox" name="check_several_ingestions" value="yes" checked="checked"/>
 													<label>Allow images with the same name but different checksums to be re-ingested</label>
 													<div style="width: 90%">
-														<div align="center" id="warn3" class="warning" style="display:none"></div> 
+														<div align="center" id="warn2" class="warning" style="display:none"></div> 
 													</div>
 												</td>
 											</tr>

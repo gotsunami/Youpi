@@ -10,16 +10,14 @@
 ul.actionlist li { list-style-type:none; }
 
 td.ingestion_type {
-	font-size: 14pt;
+	font-size: 10pt;
 	text-align: center;
 	vertical-align: middle;
 	color: white;
+	font-weight: bold;
+	background-color: #5b80b2;
 }
 
-td.ingestion_type select {
-	color: brown;
-	font-weight: bold;
-}
 
 td.vcenter {
 	vertical-align: middle;

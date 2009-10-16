@@ -236,8 +236,7 @@ class Image(models.Model):
 	flat = models.CharField(max_length = 200,blank=True,null=True,help_text="associated flat image")
 	mask = models.CharField(max_length = 200,blank=True,null=True,help_text="associated mask image")
 	reg = models.CharField(max_length = 200,blank=True,null=True,help_text="associated region (polygon) image")
-	# From preingestion step
-	QSOstatus = models.CharField(max_length = 20,blank=True,null=True,help_text="Status from the related FITS table ")
+	is_validated = models.NullBooleanField('Validation status', default=False)
 
 	# FKs constraints
 	channel = models.ForeignKey(Channel, db_column='channel_id')
@@ -471,7 +470,7 @@ class Ingestion(models.Model):
 	label = models.CharField(unique = True, max_length = 80, help_text="Unique ingestion identifier")
 	check_states = ((False, 'No'), (True, 'Yes'))
 	check_fitsverify = models.NullBooleanField('Fitsverify status', default=False, choices = check_states)
-	check_QSO_status = models.NullBooleanField('QSO status', default=False, choices = check_states)
+	is_validated = models.NullBooleanField('Validation status', default=False, choices = check_states)
 	check_multiple_ingestion = models.NullBooleanField('Multiple ingestion status', default=False, choices = check_states)
 	exit_code = models.NullBooleanField('Exit code status', default=False, choices = ((False, 'Failure'), (True, 'Success')))
 	# Serialized data (base64 encoding over zlib compression)
