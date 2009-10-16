@@ -267,6 +267,7 @@ INSTALLED_APPS = (
 	'django.contrib.sessions',
 	'django.contrib.sites',
 	'django.contrib.admin',
+	'terapix.django_evolution',
 	'terapix.youpi',
 )
 
