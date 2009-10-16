@@ -18,10 +18,24 @@ Version 0.5.2
 - Removed all parts related to preingestion
 - Check setup script handles database schema updates automatically
 
-Important notes
-~~~~~~~~~~~~~~~
+**Release Notes:**
 
-Blah
+In order to upgrade from 0.5.1, please do the following:
+
+0. Make a **backup of your data**.
+
+1. Edit your ``settings.py`` file and add the line ``terapix.django_evolution`` to your 
+   ``INSTALLED_APPS`` variable so it looks like the following::
+
+	INSTALLED_APPS = (
+	...
+	'terapix.django_evolution',
+	'terapix.youpi',
+	)
+
+2. Let Youpi inspect your installation setup with::
+
+	$ python manage.py checksetup
 
 Version 0.5.1
 -------------
