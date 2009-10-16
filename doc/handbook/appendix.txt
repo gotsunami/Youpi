@@ -2,6 +2,34 @@
 Appendixes
 ##########
 
+*********
+ChangeLog
+*********
+
+.. contents::
+   :local:
+
+Version 0.5.2
+-------------
+
+:Date: *To be released*
+
+- Fixed shopping cart issues
+- Removed all parts related to preingestion
+- Check setup script handles database schema updates automatically
+
+Important notes
+~~~~~~~~~~~~~~~
+
+Blah
+
+Version 0.5.1
+-------------
+
+:Date: 30 September 2009
+
+First public release.
+
 ******************************
 GNU Free Documentation License
 ******************************
