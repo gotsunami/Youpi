@@ -51,10 +51,14 @@ class Command(BaseCommand):
 		apache = options['apache']
 		
 		if not (wsgi or apache):
+			from django.core.management import call_command
 			# First checks that all models are synced
 			print "Running syncdb..."; sys.stdout.flush()
-			from django.core.management import call_command
 			call_command('syncdb')
+			# Check for schema evolutions
+			call_command('evolve', execute = True)
+
+			# Now check setup
 			print "Running checksetup..."
 			from terapix.script import checksetup
 			checksetup.run()
