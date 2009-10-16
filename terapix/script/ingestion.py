@@ -135,7 +135,7 @@ The job has exited %s.
 
 The following options have been set from the Youpi web interface:
 - Skip ingestion for non fitsverify compliant images: %s
-- Skip ingestion when QSO status does not match 'validated': %s
+- Images flagged as VALIDATED: %s
 - Allow images to be ingested several times: %s
 
 Data have been processed on %s from directory:
@@ -146,7 +146,7 @@ Completed at: %s
 Elapsed time: %.02f seconds
 		""" % ( status_msg,									# Exit code
 				script_args['skip_fitsverify'],				# Skip ingestion (fitsverify)
-				script_args['skip_qso_status'],				# Skip ingestion (QSO status)
+				script_args['select_validation_status'],	# define the images status for ingestion
 				script_args['allow_several_ingestions'],	# Multiple ingestions
 				script_args['host'],						# Processing host
 				script_args['path'],						# Path to data
@@ -274,13 +274,21 @@ def run_ingestion():
 	total = len(fitsFiles)
 	debug("Number of images to process: %d" % total)
 
+	if script_args['select_validation_status'] == 'yes':
+		vStatus = 'VALIDATED'
+	else:
+		vStatus = 'OBSERVED'
+
+	debug("Every images will be flagged as %s during the ingestion" % vStatus)
+
+
 	# 
 	# Due to integrity constraints, entries have to be created into
 	# youpi_ingestion
 	#
 
 	# Add a new entry into youpi_ingestion table
-	vars = [['skip_fitsverify', 0], ['skip_qso_status', 0], ['allow_several_ingestions', 0]]
+	vars = [['skip_fitsverify', 0], ['select_validation_status', 0], ['allow_several_ingestions', 0]]
 
 	for i in vars:
 		if script_args[i[0]] == 'yes':
@@ -297,7 +305,7 @@ def run_ingestion():
 					user_id = user_id,
 					label = ingestion_id,
 					check_fitsverify  = vars[0][1],
-					check_qso_status = vars[1][1],
+					is_validated = vars[1][1],
 					check_multiple_ingestion = vars[2][1],
 					path = path,
 					group_id = perms['group_id'],
@@ -311,6 +319,8 @@ def run_ingestion():
 		g.con.rollback()
 		sendmail(1, email, duration_stime, time.time(), 'ERROR')
 		sys.exit(1)
+
+	is_validated_for_image = vars[1][1]
 
 	#
 	# Get instruments
@@ -553,47 +563,10 @@ def run_ingestion():
 
 		#
 		# Image not yet ingested
-		# Check QSO status part
+		# select validation status
 		#
-		res = g.execute("""select QSOstatus from youpi_fitstables where name ="%s" and run="%s";""" %(old,runame))
-		
-		if not res :
-			debug("%s is not present in Pre-ingestion step. Using default QSOStatus: OBSERVED" % fitsfile)
-			res = (('OBSERVED'),)
 
-		statqso = res[0][0]
 
-		try:
-			skip_qso_status = script_args['skip_qso_status']
-		except KeyError, e:
-			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
-			sys.exit(1)
-			
-		process = True
-
-		if skip_qso_status == 'yes':
-			#
-			# Images will be ingested even if their QSO status are not validated
-			# BUT such images containing qsostatus = "observed" must be flagged in the ingestion mail report 
-			# as OBSERVED AND NOT VALIDATED which mean that those data images can't be used for science issues
-			#
-			if res[0][0] != 'VALIDATED':
-				# OBSERVED
-				process = False
-				debug("\tQSOStatus: different than VALIDATED and it won't be ingested", WARNING)
-			else:
-				debug("\tQSOStatus: VALIDATED")
-				
-		else:
-			if res[0][0] != 'VALIDATED':
-				debug("\tQSOStatus: different than VALIDATED but will be ingested", WARNING)
-			else:
-				debug("\tQSOStatus: VALIDATED")
-		
-		if not process:
-			continue
-		
 		if detector == 'MegaCam' or  i == 'MegaPrime':
 			iname = 'Megacam'
 	
@@ -637,10 +610,10 @@ def run_ingestion():
 				checksum = checksum,
 				flat = flat,
 				mask = mask,
-				QSOstatus = statqso,
 				path = path,
 				alpha = ra,
 				delta = de,
+				is_validated = is_validated_for_image,
 				channel_id = res[0][1],
 				ingestion_id = ingestionId,
 				instrument_id = res[0][2]

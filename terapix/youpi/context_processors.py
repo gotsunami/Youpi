@@ -29,7 +29,6 @@ def appmenu(request):
 	
 	app_menu = {'normal' : ( 	
 					{'title' : 'Home', 				'id' : 'home', 			'href' : AUP},
-					{'title' : 'Pre-ingestion',		'id' : 'preingestion',	'href' : AUP + '/preIngestion/'},
 					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : AUP + '/ingestion/'},
 					{'title' : 'Tags', 				'id' : 'tags',			'href' : AUP + '/tags/'},
 					{'title' : 'Processing', 		'id' : 'processing', 	'href' : AUP + '/processing/'},

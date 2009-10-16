@@ -27,10 +27,25 @@ var runIngestionsClickedCount = 0;
  * checked
  *
  */
+
+function force_validation()
+{
+	var check = $("select_validation");
+	var d = $('warn0');
+	if (check.options[check.selectedIndex].value == 'no') {
+		d.setAttribute('style', 'display:block');
+		d.setAttribute('width', '50%');
+		d.innerHTML = "<p>Changing this options means that you assume those futures ingested images are not usable for science issues and will be flagged, as <strong>OBSERVED</strong>, in the database.</p>";
+	}
+	else {
+		d.setAttribute('style', 'display:none');
+	}
+}
+
 function force_fitsverify()
 {
 	var check = $("check_verify");
-	var d = $('warn');
+	var d = $('warn1');
 	if (check.checked == false) {
 		d.setAttribute('style', 'display:block');
 		d.setAttribute('width', '50%');
@@ -41,23 +56,10 @@ function force_fitsverify()
 	}
 }
 
-function force_qso_status()
-{
-	var check = $("check_qso_status");
-	var d = $('warn2');
-	if (check.checked == false) {
-		d.setAttribute('style', 'display:block');
-		d.innerHTML = "<p>When QSO status is validated, we ensure that Fits data integrity is relevant for real science issues<br>This box could be checked to limit <strong>processing</strong> problems</p>";
-	}
-	else {
-		d.setAttribute('style', 'display:none');
-	}
-}
-
 function force_check_allow_several_times()
 {
 	var check = $("check_allow_several_times");
-	var d = $('warn3');
+	var d = $('warn2');
 	if (check.checked == false) {
 		d.setAttribute('style', 'display:block');
 		d.innerHTML="<table><tr><td colspan=\"2\"><p>If <strong>checked</strong>, an image already ingested will be ingested again with a <q><tt class=\"filename\">_#.fits</tt></q> (underscore + number) appended to its db name.<br>For example, <tt class=\"filename\">image.fits</tt> will be renamed to <tt class=\"filename\">image_1.fits</tt> if it has been already ingested.</p><tr><th>Ingestion</th><th>Name</th></tr><tr><td align=\"center\" class=\"number\">1</td><td><tt class=\"filename\">image.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">2</td><td><tt class=\"filename\">image_1.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">...</td></tr><tr><td align=\"center\" class=\"number\">n</td><td><tt class=\"filename\">image_(n-1).fits</tt></td></tr></td></tr></table>";
@@ -341,8 +343,8 @@ function submitIngestion(ingestionId) {
 	post = 	'Path=' + path + 
 			'&IngestionId=' + ingestionId + '_' + (ingestionPathCurrentIndex+1) + 
 			'&ReportEmail=' + $('input_email').value +
+			'&SelectValidationStatus=' + ($('select_validation').options[$('select_validation').selectedIndex].value) +
 			'&CheckSkipVerify=' + ($('check_verify').checked ? 'yes' : 'no') +
-			'&CheckQSOStatus=' + ($('check_qso_status').checked  ? 'yes' : 'no') +
 			'&CheckAllowSeveralTimes=' + ($('check_allow_several_times').checked  ? 'yes' : 'no');
 
 	// Send HTTP POST request

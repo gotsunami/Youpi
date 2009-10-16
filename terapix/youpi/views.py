@@ -596,7 +596,7 @@ def history_ingestion(request):
 	# header var must be a list not a tuple since it get passed 'as is' to the json 
 	# dictionary
 	#
-	header = ['start', 'duration', 'ID', 'user', 'fitsverify', 'qsostatus', 'multiple', 'exit', 'log']
+	header = ['start', 'duration', 'ID', 'user', 'fitsverified', 'validated', 'multiple', 'exit', 'log']
 
 	data = []
 	for ing in res:
@@ -611,7 +611,7 @@ def history_ingestion(request):
 							header[2] 	: [str(ing.label), 'str'],
 							header[3] 	: [str(ing.user.username), 'str'],
 							header[4]	: [ing.check_fitsverify, 'check'],
-							header[5] 	: [ing.check_QSO_status, 'check'],
+							header[5] 	: [ing.is_validated, 'check'],
 							header[6]	: [ing.check_multiple_ingestion, 'check'],
 							header[7]	: [ing.exit_code, 'exit'],
 							header[8]	: ['View log', 'link', str(settings.AUP + "/history/ingestion/report/%d/" % ing.id)]
@@ -1374,7 +1374,6 @@ def get_image_info(request):
 		'flat'		: img.flat,
 		'mask'		: img.mask,
 		'reg'		: img.reg,
-		'qsostatus'	: img.QSOstatus,
 		'instrument': img.instrument.name,
 		'run'		: runName,
 		'channel'	: img.channel.name,
