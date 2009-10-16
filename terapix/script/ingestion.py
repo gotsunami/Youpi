@@ -320,6 +320,7 @@ def run_ingestion():
 		sendmail(1, email, duration_stime, time.time(), 'ERROR')
 		sys.exit(1)
 
+	global is_validated_for_image
 	is_validated_for_image = vars[1][1]
 
 	#
