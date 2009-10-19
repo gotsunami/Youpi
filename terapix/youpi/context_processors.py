@@ -55,7 +55,7 @@ def settings(request):
 def version(request):
 	"""Return version information if available."""
 	try:
-		import terapix.__version__ as v
+		import terapix.youpi.__version__ as v
 		version = v.version
 	except ImportError:
 		version = 'unknown'
