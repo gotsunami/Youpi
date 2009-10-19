@@ -33,7 +33,11 @@ In order to upgrade from 0.5.1, please do the following:
 	'terapix.youpi',
 	)
 
-2. Let Youpi inspect your installation setup with::
+2. Let Django installs ``django-evolution``'s required database tables::
+
+	$ python manage.py syncdb
+
+3. Finally, let Youpi inspect your installation setup with::
 
 	$ python manage.py checksetup
 
