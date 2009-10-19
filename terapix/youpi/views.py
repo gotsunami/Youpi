@@ -26,6 +26,7 @@ from django.db.models import Q
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 #
+from terapix.lib.common import *
 from terapix.youpi.models import *
 from terapix.youpi.auth import Permissions
 from terapix.script.preingestion import preingest_table
@@ -42,9 +43,6 @@ import socket, time
 import magic
 from types import *
 from copy import deepcopy
-#
-from common import *
-
 # Custom views
 from terapix.exceptions import *
 from terapix.youpi.pluginmanager import PluginManagerError, PluginError
