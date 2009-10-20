@@ -316,10 +316,8 @@ class Sextractor(ProcessingPlugin):
 
 		step = 0 							# At least step seconds between two job start
 
-		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
-
+		# Generate CSF
 		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
-		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
 		cluster.setTransferInputFiles([
 			customrc,
 			custompc,

@@ -134,11 +134,8 @@ queue""" % ({
 	'command': self.command,
 })
 
-		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
-
 		# Generate CSF
 		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
-		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
 		csf.write(cluster.getSubmissionFileContent())
 		csf.write(args)
 		csf.close()

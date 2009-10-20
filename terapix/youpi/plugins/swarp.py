@@ -240,7 +240,6 @@ class Swarp(ProcessingPlugin):
 		preProcFile = os.path.join('/tmp/', "swarp-preprocessing-%s.py" % time.time())
 
 		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
-		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
 		cluster.setTransferInputFiles([
 			os.path.join(submit_file_path, 'script', 'stack_ingestion.py'),
 			customrc,

@@ -133,6 +133,7 @@ class YoupiCondor(Condor):
 		Condor.__init__(self, desc)
 		self.request = request
 		self.id = pluginId
+		self.setExecutable(os.path.join(settings.TRUNK, 'terapix', 'script', 'wrapper_processing.py'))
 
 	def getSubmissionFileContent(self):
 		if not self._transfer_input_files:
