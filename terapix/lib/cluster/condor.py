@@ -135,6 +135,9 @@ class YoupiCondor(Condor):
 		self.id = pluginId
 
 	def getSubmissionFileContent(self):
+		if not self._transfer_input_files:
+			# Add at least required files
+			self.setTransferInputFiles([])
 		self.updateData()
 		self.data.update({
 			'more' : "initialdir = %s\nnotify_user = %s" % (os.path.join(settings.TRUNK, 'terapix', 'script'), settings.CONDOR_NOTIFY_USER)
@@ -143,6 +146,16 @@ class YoupiCondor(Condor):
 
 	def __repr__(self):
 		return "<Youpi Condor Submission File exec: %s desc: %s>" % (self._executable, self._desc)
+
+	def setTransferInputFiles(self, files):
+		"""
+		Adds Youpi required files such as local_conf.py, settings.py, DBGeneric.py and NOP
+		"""
+		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
+		for file in ('local_conf.py', 'settings.py', os.path.join('script', 'DBGeneric.py'), 'NOP'): 
+			files.append(os.path.join(submit_file_path, file))
+
+		super(YoupiCondor, self).setTransferInputFiles(files)
 
 	def getRequirementString(self):
 		"""

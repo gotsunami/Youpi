@@ -321,11 +321,7 @@ class Sextractor(ProcessingPlugin):
 		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
 		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
 		cluster.setTransferInputFiles([
-			os.path.join(submit_file_path, 'local_conf.py'),
-			os.path.join(submit_file_path, 'settings.py'),
-			os.path.join(submit_file_path, 'script', 'DBGeneric.py'),
 			customrc,
-			os.path.join(submit_file_path, 'NOP'),
 			custompc,
 			os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.default.conv'),
 			os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.default.nnw'),

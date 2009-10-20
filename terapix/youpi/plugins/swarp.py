@@ -242,15 +242,11 @@ class Swarp(ProcessingPlugin):
 		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
 		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
 		cluster.setTransferInputFiles([
-			os.path.join(submit_file_path, 'local_conf.py'),
-			os.path.join(submit_file_path, 'settings.py'),
 			os.path.join(submit_file_path, 'script', 'stack_ingestion.py'),
-			os.path.join(submit_file_path, 'script', 'DBGeneric.py'),
 			customrc,
 			os.path.join('/tmp/', userdataFile),
 			os.path.join('/tmp/', transferFile),
 			preProcFile,
-			os.path.join(submit_file_path, 'NOP')
 		])
 		csf.write(cluster.getSubmissionFileContent())
 

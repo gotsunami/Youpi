@@ -15,6 +15,6 @@
 
 from terapix.lib.cluster.exceptions import *
 
-class Cluster:
+class Cluster(object):
 	def __init__(self):
 		pass
