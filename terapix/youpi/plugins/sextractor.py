@@ -21,6 +21,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.auth import read_proxy
+import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
@@ -79,7 +80,7 @@ class Sextractor(ProcessingPlugin):
 		except Exception, e:
 				raise PluginError, "POST argument error. Unable to process data:  %s" %e
 
-		items = CartItem.objects.filter(kind__name__exact = self.id)
+		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
 		if items:
 			itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
 		else:
@@ -239,10 +240,6 @@ class Sextractor(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 		
-
-		# Builds realtime Condor requirements string
-		req = self.getCondorRequirementString(request)
-
 		#
 		# File selection and storage.(for the configuration file and the parameter file)
 		#
@@ -286,7 +283,7 @@ class Sextractor(ProcessingPlugin):
 		sexpc.close()
 
 		# Condor submission file
-		csfPath = "/tmp/sex-condor-%s.txt" % now
+		csfPath = condor.Condor.getSubmitFilePath(self.id)
 		csf = open(csfPath, 'w')
 		images = Image.objects.filter(id__in = idList)
 
@@ -320,46 +317,20 @@ class Sextractor(ProcessingPlugin):
 		step = 0 							# At least step seconds between two job start
 
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
-		# Generates CSF
-		condor_submit_file = """
-#
-# Condor submission file
-# Please not that this file has been generated automatically by Youpi
-# http://clix.iap.fr/youpi/
-#
 
-# Plugin: %(description)s
-
-executable              = %(wrapper)s/wrapper_processing.py
-universe                = vanilla
-transfer_executable     = True
-should_transfer_files   = YES
-when_to_transfer_output = ON_EXIT
-transfer_input_files    =  %(settings)s/local_conf.py, %(settings)s/settings.py, %(dbgeneric)s/DBGeneric.py, %(config)s, %(nop)s/NOP, %(param)s, %(mandpath)s/sex.default.conv, %(mandpath)s/sex.default.nnw
-initialdir				= %(initdir)s
-transfer_output_files   = NOP
-log                     = /tmp/SEX.log.$(Cluster).$(Process)
-error                   = /tmp/SEX.err.$(Cluster).$(Process)
-output                  = /tmp/SEX.out.$(Cluster).$(Process)
-notification            = Error
-notify_user             = %(condornotify)s
-# Computed Req string
-%(requirements)s
-""" % {	
-	'condornotify'	: settings.CONDOR_NOTIFY_USER,
-	'description'	: self.description,
-	'wrapper' 		: os.path.join(submit_file_path, 'script'),
-	'settings' 		: submit_file_path, 
-	'dbgeneric' 	: os.path.join(submit_file_path, 'script'),
-	'config' 		: customrc,
-	'nop' 			: submit_file_path, 
-	'param' 		: custompc,
-	'initdir' 		: os.path.join(submit_file_path, 'script'),
-	'mandpath' 		: os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf'),
-	'requirements' 	: req,
-}
-
-		csf.write(condor_submit_file)
+		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
+		cluster.setTransferInputFiles([
+			os.path.join(submit_file_path, 'local_conf.py'),
+			os.path.join(submit_file_path, 'settings.py'),
+			os.path.join(submit_file_path, 'script', 'DBGeneric.py'),
+			customrc,
+			os.path.join(submit_file_path, 'NOP'),
+			custompc,
+			os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.default.conv'),
+			os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.default.nnw'),
+		])
+		csf.write(cluster.getSubmissionFileContent())
 
 		#
 		# Delaying job startup will prevent "Too many connections" MySQL errors

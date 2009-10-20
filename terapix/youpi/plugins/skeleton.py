@@ -33,6 +33,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.auth import read_proxy
+import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
 
@@ -106,7 +107,7 @@ class Skeleton(ProcessingPlugin):
 
 		now = time.time()
 		# Condor submission file
-		csfPath = self.getCondorSubmitFilePath()
+		csfPath = condor.Condor.getSubmitFilePath(self.id)
 		csf = open(csfPath, 'w')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
@@ -117,9 +118,6 @@ class Skeleton(ProcessingPlugin):
 					'ItemID' 			: itemId, 
 					'ResultsOutputDir'	: str(resultsOutputDir)											# Mandatory for WP
 				} 
-
-		# Builds realtime Condor requirements string
-		req = self.getCondorRequirementString(request)
 
 		# Real command to perform here
 		args = ''
@@ -137,56 +135,21 @@ queue""" % ({
 })
 
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
-		# Get filenames for Condor log files (log, error, out)
-		logs = self.getCondorLogFilenames()
 
-	 	# Generates CSF
-		condor_submit_file = """
-#
-# Condor submission file
-# Please not that this file has been generated automatically by Youpi
-# http://clix.iap.fr/youpi/
-#
-
-# Plugin: %(name)s
-
-executable              = %(wrapperpath)s/wrapper_processing.py
-universe                = vanilla
-transfer_executable     = True
-should_transfer_files   = YES
-when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settingspath)s/local_conf.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(settingspath)s/NOP
-initialdir				= %(initdir)s
-transfer_output_files   = NOP
-# YOUPI_USER_DATA = %(dataclear)s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(dataenc)s
-log                     = %(log)s
-error                   = %(errlog)s
-output                  = %(outlog)s
-notification            = Error
-notify_user             = monnerville@iap.fr
-# Computed Req string
-%(requirements)s
-%(args)s""" % {	
-	'name'			: self.description,
-	'wrapperpath'	: os.path.join(submit_file_path, 'script'),
-	'settingspath'	: submit_file_path, 
-	'scriptpath'	: os.path.join(submit_file_path, 'script'),
-	'initdir'		: os.path.join(submit_file_path, 'script'),
-	'dataclear'		: userData, 
-	'dataenc'		: base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
-	'requirements'	: req, 
-	'args'			: args,
-	'log'			: logs['log'],
-	'errlog'		: logs['error'],
-	'outlog'		: logs['out'],
-}
-
-		csf.write(condor_submit_file)
+		# Generate CSF
+		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
+		cluster.setTransferInputFiles([
+			os.path.join(submit_file_path, 'local_conf.py'),
+			os.path.join(submit_file_path, 'settings.py'),
+			os.path.join(submit_file_path, 'script', 'DBGeneric.py'),
+			os.path.join(submit_file_path, 'NOP'),
+		])
+		csf.write(cluster.getSubmissionFileContent())
+		csf.write(args)
 		csf.close()
 
 		return csfPath
-
 
 	def getTaskInfo(self, request):
 		"""
@@ -206,16 +169,6 @@ notify_user             = monnerville@iap.fr
 			err_log = str(zlib.decompress(base64.decodestring(task.error_log)))
 		else:
 			err_log = ''
-
-		#
-		# Result log content, if any show be saved in a custom DB table for the plugin
-		#
-		# data = YourDjangoModel.objects.filter(task__id = taskid)[0]
-		# if data.rlog:
-		#	rlog = str(zlib.decompress(base64.decodestring(data.qflog)))
-		# else:
-		#	rlog = ''
-		#
 
 		return {	'TaskId'	: str(taskid),
 					'Title' 	: str("%s" % self.description),
@@ -250,7 +203,7 @@ notify_user             = monnerville@iap.fr
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
-		items = CartItem.objects.filter(kind__name__exact = self.id)
+		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
 		if items:
 			itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
 		else:

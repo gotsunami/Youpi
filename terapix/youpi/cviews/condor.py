@@ -33,9 +33,9 @@ from django.contrib.auth.models import User
 #
 from terapix.youpi.auth import *
 from terapix.youpi.cviews import *
-from terapix.youpi.cviews.condreqstr import *
 from terapix.youpi.models import *
 from terapix.youpi.pluginmanager import PluginManagerError
+from terapix.lib.cluster.condor import get_condor_status, get_requirement_string
 #
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *

@@ -17,10 +17,12 @@ import os, sys, os.path, re, time, string
 import marshal, base64, zlib
 from stat import *
 #
+import terapix.lib.cluster.condor as condor
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.auth import read_proxy
+import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
@@ -130,9 +132,6 @@ class Swarp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
-		# Builds realtime Condor requirements string
-		req = self.getCondorRequirementString(request)
-
 		#
 		# Config file selection and storage.
 		#
@@ -167,7 +166,7 @@ class Swarp(ProcessingPlugin):
 		swrc.close()
 
 		# Condor submission file
-		csfPath = self.getCondorSubmitFilePath()
+		csfPath = condor.Condor.getSubmitFilePath(self.id)
 		csf = open(csfPath, 'w')
 
 		# Swarp file containing a list of images to process (one per line)
@@ -211,9 +210,6 @@ class Swarp(ProcessingPlugin):
 
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 
-		# Get filenames for Condor log files (log, error, out)
-		logs = self.getCondorLogFilenames()
-
 		# Weight maps support
 		if useQFITSWeights:
 			weight_files = self.getWeightPathsFromImageSelection(request, idList)
@@ -242,48 +238,21 @@ class Swarp(ProcessingPlugin):
 		# preProcFile is filled later
 		#
 		preProcFile = os.path.join('/tmp/', "swarp-preprocessing-%s.py" % time.time())
-		
-	 	# Generates CSF
-		condor_submit_file = """
-#
-# Condor submission file
-# Please not that this file has been generated automatically by Youpi
-#
-# Plugin: %(description)s
 
-executable              = %(script)s/wrapper_processing.py
-universe                = vanilla
-transfer_executable     = True
-should_transfer_files   = YES
-when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settings)s/local_conf.py, %(settings)s/settings.py, %(script)s/stack_ingestion.py, %(script)s/DBGeneric.py, %(config)s, %(userdata)s, %(swarplist)s, %(transferfile)s, %(preprocfile)s, %(nop)s/NOP
-initialdir				= %(script)s
-transfer_output_files   = NOP
-log                     = %(log)s
-error                   = %(errlog)s
-output                  = %(outlog)s
-notification            = Error
-notify_user             = %(condornotify)s
-# Computed Req string
-%(requirements)s
-""" % {	
-	'condornotify'	: settings.CONDOR_NOTIFY_USER,
-	'description'	: self.description,
-	'script' 		: os.path.join(submit_file_path, 'script'),
-	'settings' 		: submit_file_path, 
-	'config' 		: customrc,
-	'swarplist' 	: swarpImgsFile,
-	'nop' 			: submit_file_path, 
-	'requirements' 	: req,
-	'log'			: logs['log'],
-	'errlog'		: logs['error'],
-	'outlog'		: logs['out'],
-	'transferfile'  : os.path.join('/tmp/', transferFile),
-	'userdata'		: os.path.join('/tmp/', userdataFile),
-	'preprocfile'	: preProcFile,
-}
-
-		csf.write(condor_submit_file)
+		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
+		cluster.setTransferInputFiles([
+			os.path.join(submit_file_path, 'local_conf.py'),
+			os.path.join(submit_file_path, 'settings.py'),
+			os.path.join(submit_file_path, 'script', 'stack_ingestion.py'),
+			os.path.join(submit_file_path, 'script', 'DBGeneric.py'),
+			customrc,
+			os.path.join('/tmp/', userdataFile),
+			os.path.join('/tmp/', transferFile),
+			preProcFile,
+			os.path.join(submit_file_path, 'NOP')
+		])
+		csf.write(cluster.getSubmissionFileContent())
 
 		# Base64 encoding + marshal serialization
 		# Will be passed as argument 1 to the wrapper script
@@ -618,7 +587,7 @@ queue""" %  {
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
-		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-name')
+		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
 		if items:
 			itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
 		else:

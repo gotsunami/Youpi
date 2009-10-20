@@ -57,15 +57,6 @@ class ProcessingPlugin:
 		random.seed()
 		return "%s:%f-%d" % (self.id, time.time(), random.randint(1, 1000000))
 
-	def getCondorSubmitFilePath(self):
-		"""
-		Returns the path to Condor submit file path.
-		Each call generates a new filename so that no file gets overwritten.
-		The returned name should then be used by plugins to add some content to it.
-		@return Path to a non existing file
-		"""
-		return "%s/CONDOR-%s-%s.txt" % (settings.CONDOR_LOG_DIR, self.id, time.time())
-
 	def getConfigValue(self, content, keyword):
 		"""
 		Parses all lines of content looking for a keyword.
@@ -102,21 +93,6 @@ class ProcessingPlugin:
 		"""
 
 		return "%s/%s-%s.rc" % (settings.CONDOR_LOG_DIR, self.id.upper(), time.time())
-
-	def getCondorLogFilenames(self):
-		"""
-		Returns a dictionnary with entries for the log, error and output filenames 
-		that should be used by plugins generating Condor submission files.
-		@return Dictionnary with paths to Condor log files
-		"""
-
-		pattern = os.path.join(settings.CONDOR_LOG_DIR, self.id.upper() + '.%s.$(Cluster).$(Process)')
-
-		return {
-			'log'	: pattern % "log",
-			'error'	: pattern % "err",
-			'out'	: pattern % "out",
-		}
 
 	def getUserResultsOutputDir(self, request, oldPath = None, oldUserName = None):
 		"""
@@ -419,58 +395,6 @@ class ProcessingPlugin:
 				raise CondorSubmitError, "Condor error:\n%s" % string.join(submit_content[1:], '')
 
 		return { 'count' : count, 'clusterId' : cid, 'data' : [str(s) for s in submit_content] }
-
-	def getCondorRequirementString(self, request):
-		"""
-		Realtime and powerful Condor requirement string generation
-		"""
-
-		from terapix.youpi.cviews.condreqstr import *
-
-		post = request.POST
-		try:
-			condorSetup = post['CondorSetup']
-		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
-
-		vms = get_condor_status()
-
-		if condorSetup == 'default':
-			dflt_setup = marshal.loads(base64.decodestring(request.user.get_profile().dflt_condor_setup))
-			# Check Behaviour: policy or selection
-			if not dflt_setup.has_key(self.id):
-				raise PluginError, "No default Condor setup found for '%s' plugin." % self.optionLabel
-
-			db = dflt_setup[self.id]['DB']
-			if db == 'policy':
-				pol = CondorNodeSel.objects.filter(label = dflt_setup[self.id]['DP'], is_policy = True)[0]
-				req = get_requirement_string(pol.nodeselection, vms)
-			else:
-				# Default behaviour is 'selection'
-				req = get_requirement_string_from_selection(dflt_setup[self.id]['DS'])
-
-		elif condorSetup == 'custom':
-			try:
-				c_policy = str(post['Policy'])
-				c_selection = None
-			except Exception, e:
-				try:
-					c_selection = str(post['Selection'])
-					c_policy = None
-				except Exception, e:
-					raise PluginError, 'condorSetup POST argument error. Unable to process data'
-
-			if c_policy:
-				pol = CondorNodeSel.objects.filter(label = c_policy, is_policy = True)[0]
-				req = get_requirement_string(pol.nodeselection, vms)
-			else:
-				req = get_requirement_string_from_selection(c_selection)
-
-		# Add any custom Condor requirements, if any
-		custom_req = request.user.get_profile().custom_condor_req
-		if custom_req: req = "%s && (%s))" % (req[:-1], custom_req)
-
-		return req
 
 	def deleteCartItem(self, request):
 		post = request.POST

@@ -13,11 +13,8 @@
 
 # vim: set ts=4
 
-import os, string, re
-import xml.dom.minidom as dom
-import base64, marshal
-#
-from terapix.youpi.models import *
-#
-from django.conf import settings
+from terapix.lib.cluster.exceptions import *
 
+class Cluster:
+	def __init__(self):
+		pass

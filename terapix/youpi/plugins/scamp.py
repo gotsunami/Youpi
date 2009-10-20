@@ -22,6 +22,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.youpi.models import *
 from terapix.exceptions import *
 from terapix.youpi.auth import read_proxy
+import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
@@ -96,7 +97,7 @@ class Scamp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
 
-		items = CartItem.objects.filter(kind__name__exact = self.id)
+		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
 		if items:
 			itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
 		else:
@@ -172,9 +173,6 @@ class Scamp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
-		# Builds realtime Condor requirements string
-		req = self.getCondorRequirementString(request)
-
 		#
 		# Config file selection and storage.
 		#
@@ -209,10 +207,10 @@ class Scamp(ProcessingPlugin):
 		scamprc.close()
 
 		# Condor submission file
-		csfPath = self.getCondorSubmitFilePath()
+		csfPath = condor.Condor.getSubmitFilePath(self.id)
 
 		# Get filenames for Condor log files (log, error, out)
-		logs = self.getCondorLogFilenames()
+		logs = condor.Condor.getLogFilenames(self.id)
 		images = Image.objects.filter(id__in = idList)
 
 		xmlName = self.getConfigValue(content.split('\n'), 'XML_NAME')
@@ -269,44 +267,19 @@ class Scamp(ProcessingPlugin):
 		csf = open(csfPath, 'w')
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 
-	 	# Generates CSF
-		condor_submit_file = """
-#
-# Condor submission file
-# Please not that this file has been generated automatically by Youpi
-# http://clix.iap.fr/youpi/
-#
-executable              = %(wrapperpath)s/wrapper_processing.py
-universe                = vanilla
-transfer_executable     = True
-should_transfer_files   = YES
-when_to_transfer_output = ON_EXIT
-transfer_input_files    = %(settingspath)s/local_conf.py, %(settingspath)s/settings.py, %(scriptpath)s/DBGeneric.py, %(conf)s, %(userdata)s, %(ldacsfile)s, %(transferfile)s, %(settingspath)s/NOP
-initialdir				= %(initdir)s
-transfer_output_files   = NOP
-log                     = %(log)s
-error                   = %(errlog)s
-output                  = %(outlog)s
-notification            = Error
-notify_user             = %(condornotify)s
-# Computed Req string
-%(requirements)s""" % { 
-	'condornotify'	: settings.CONDOR_NOTIFY_USER,
-	'wrapperpath'	: os.path.join(submit_file_path, 'script'),
-	'settingspath'	: submit_file_path, 
-	'scriptpath'	: os.path.join(submit_file_path, 'script'),
-	'conf'			: customrc,
-	'initdir'		: os.path.join(submit_file_path, 'script'),
-	'requirements'	: req ,
-	'ldacsfile'		: os.path.join('/tmp/', catalogFile),
-	'log'			: logs['log'],
-	'errlog'		: logs['error'],
-	'outlog'		: logs['out'],
-	'transferfile'	: os.path.join('/tmp/', transferFile),
-	'userdata'		: os.path.join('/tmp/', userdataFile),
-}
-
-		csf.write(condor_submit_file)
+		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster.setExecutable(os.path.join(submit_file_path, 'script', 'wrapper_processing.py'))
+		cluster.setTransferInputFiles([
+			os.path.join(submit_file_path, 'local_conf.py'),
+			os.path.join(submit_file_path, 'settings.py'),
+			os.path.join(submit_file_path, 'script', 'DBGeneric.py'),
+			customrc,
+			os.path.join('/tmp/', userdataFile),
+			os.path.join('/tmp/', catalogFile),
+			os.path.join('/tmp/', transferFile),
+			os.path.join(submit_file_path, 'NOP')
+		])
+		csf.write(cluster.getSubmissionFileContent())
 
 		# Base64 encoding + marshal serialization
 		# Will be passed as argument 1 to the wrapper script
