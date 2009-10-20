@@ -29,7 +29,7 @@ PLUGIN_DIRS = os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins')
 sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 
-class ProcessingPlugin: 
+class ProcessingPlugin(object): 
 	type = 'YOUPIPLUGIN'
 
 	def __init__(self):

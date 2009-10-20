@@ -36,6 +36,7 @@ from terapix.youpi.cviews import *
 from terapix.youpi.models import *
 from terapix.youpi.pluginmanager import PluginManagerError
 from terapix.lib.cluster.condor import get_condor_status, get_requirement_string
+from terapix.exceptions import *
 #
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
@@ -467,7 +468,7 @@ def condor_hosts(request):
 	return HttpResponse(str({'Hosts' : hosts}), mimetype = 'text/plain')
 
 def condor_softs(request):
-	return HttpResponse(str({'Softs' : [str(soft[0]) for soft in SOFTS]}), mimetype = 'text/plain')
+	return HttpResponse(str({'Softs' : [str(soft[0]) for soft in settings.SOFTS]}), mimetype = 'text/plain')
 
 def get_softs_versions(request):
 	"""
@@ -508,6 +509,11 @@ def query_condor_node_for_versions(request):
 
 	descr = str("Sofware version check on %s" % node)
 
+	# Requirement string
+	req = "slot1@%s" % node
+	custom_req = request.user.get_profile().custom_condor_req
+	if custom_req: req = "\"%s\" && (%s)" % (req, custom_req)
+
 	# Check if information is stored
 	misc = MiscData.objects.filter(key = 'software_version')
 	if misc:
@@ -546,16 +552,17 @@ transfer_input_files    = %s/local_conf.py, %s/settings.py, %s/DBGeneric.py, %s/
 initialdir				= %s
 transfer_output_files   = NOP
 # YOUPI_USER_DATA = %s
-environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin; YOUPI_USER_DATA=%s
+environment             = PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%s
 arguments               = "%s"
 log                     = /tmp/VCHECK.log.$(Cluster).$(Process)
 error                   = /tmp/VCHECK.err.$(Cluster).$(Process)
 output                  = /tmp/VCHECK.out.$(Cluster).$(Process)
 notification            = Error
 notify_user             = monnerville@iap.fr
-requirements            = Machine == "%s"
+requirements            = Name == %s
 queue
 """ % (	os.path.join(submit_file_path, 'script'),
+		submit_file_path, 
 		submit_file_path, 
 		os.path.join(submit_file_path, 'script'),
 		submit_file_path, 
@@ -563,7 +570,7 @@ queue
 		userData, 
 		base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
 		base64.encodestring(marshal.dumps(userData)).replace('\n', ''), 
-		node )
+		req )
 
 	csf = "/tmp/csf_version_check-%s-%s.txt" % (node, time.time())
 	f = open(csf, 'w')

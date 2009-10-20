@@ -28,6 +28,10 @@ import base64, marshal
 class CondorError(Exception): pass
 
 class Condor(Cluster):
+	"""
+	Base class for generating a Condor submission file. This class can be 
+	used from the CLI.
+	"""
 	# Static header
 	_csfHeader = """#
 # Condor submission file
@@ -60,6 +64,7 @@ transfer_input_files    = %(transfer)s
 		Returns the path to Condor submit file path.
 		Each call generates a new filename so that no file gets overwritten.
 		The returned name should then be used by plugins to add some content to it.
+
 		@param caption a short word that will be appended to the final file name
 		@return Path to a non existing file
 		"""
@@ -129,6 +134,10 @@ transfer_input_files    = %(transfer)s
 
 
 class YoupiCondor(Condor):
+	"""
+	Processing plugins use this class to easily generate a Condor submission file needed for 
+	submitting their jobs.
+	"""
 	def __init__(self, request, pluginId, desc = None):
 		Condor.__init__(self, desc)
 		self.request = request

@@ -48,6 +48,7 @@ def process(userData):
 	node = userData['Node']
 	key = 'software_version'
 	res = g.execute("SELECT id, data FROM youpi_miscdata WHERE `key`=\"%s\"" % key)
+	group_id = g.execute("SELECT dflt_group_id FROM youpi_siteprofile WHERE user_id=%s" % user_id)[0][0]
 
 	versions = {}
 	for soft in SOFTS:
@@ -78,6 +79,7 @@ def process(userData):
 			g.setTableName('youpi_miscdata')
 			g.insert(	key = key,
 						user_id = user_id,
+						group_id = group_id,
 						data = base64.encodestring(marshal.dumps({node : versions})).replace('\n', ''))
 			g.con.commit()
 		except Exception, e:

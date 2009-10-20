@@ -260,17 +260,23 @@ function run_checks() {
 
 {% block content %}
 <div align="center">
-	<div style="text-align: left; width: 90%;">
-		<h1>Software version check</h1>
-		<div class="tip" style="width: 400px;">
-			<div id="cluster_nodes_div" style="margin: 0px;"></div>
-			<div id="cluster_softs_div" style="margin: 0px;"></div>
+	<div id="submenu">
+		<div id="menuitem_sub_1" style="text-align: left; width: 90%;">
+			<h1 style="margin-top: 30px">Software version check</h1>
+			<div class="tip" style="width: 400px;">
+				<div id="cluster_nodes_div" style="margin: 0px;"></div>
+				<div id="cluster_softs_div" style="margin: 0px;"></div>
+			</div>
+			<div>[ <a href="#" onclick="force_reload();">Force refresh</a> ]</div>
+			<div id="cluster_versions_div"></div>
 		</div>
-		<div>[ <a href="#" onclick="force_reload();">Force refresh</a> ]</div>
-		<div id="cluster_versions_div"></div>
 	</div>
 </div>
 <script type="text/javascript">
+	var menu;
+	document.observe('dom:loaded', function() {
+		menu = new SubMenu('submenu', ['Software Versions']);
+	});
 	run_checks();
 </script>
 {% endblock %}
