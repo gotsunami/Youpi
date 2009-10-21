@@ -505,11 +505,12 @@ class ProcessingPlugin(object):
 		return "My description " + str(task.id)
 
 
-class PluginManager:
+class PluginManager(object):
 	"""
 	Plugin manager responsible of loading custom processing plugins
 	"""
-	plugins = []
+	__instances = {}
+
 	def __init__(self):
 		# Looks for plugins
 		self.__loadPlugins()
@@ -523,21 +524,18 @@ class PluginManager:
 			__import__(os.path.basename(file)[:-3])
 
 		for obj in ProcessingPlugin.__subclasses__():
-			plugin = obj()
-			if plugin not in self.plugins:
-				self.plugins.append(plugin)
+			if obj not in self.__instances:
+				self.__instances[obj] = obj()
 
-		self.__order()
-
-	def __order(self):
-		"""
-		Order list of plugins, order by index property
-		"""
-
+	@property
+	def plugins(self):
+		active_plugins = [plugin for plugin in self.__instances.values() if plugin.enable]
+		# Sort by index property
 		try:
-			self.plugins.sort(lambda x,y: cmp(x.index, y.index))
+			active_plugins.sort(lambda x,y: cmp(x.index, y.index))
 		except AttributeError:
 			raise PluginManagerError, "Unable to sort plugins by index. Missing index property."
+		return active_plugins
 
 	def getPluginByName(self, iname):
 		"""
