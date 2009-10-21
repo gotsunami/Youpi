@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib.sessions.models import Session
 #
 import glob, sys, types, re, os, string, os.path
-import marshal, base64, random, time
+import marshal, base64, time
 import magic
 from types import *
 #
@@ -30,8 +30,9 @@ sys.path.insert(0, PLUGIN_DIRS)
 sys.path.insert(0, PLUGIN_DIRS[:-len('/plugins')])
 
 class ProcessingPlugin(object): 
-	type = 'YOUPIPLUGIN'
-
+	"""
+	Base processing plugin class.
+	"""
 	def __init__(self):
 		self.enable = True
 		self.id = 'base'
@@ -54,6 +55,7 @@ class ProcessingPlugin(object):
 		the cluster so that it can retreive all job information from Condor.
 		@return Condor Id string
 		"""
+		import random
 		random.seed()
 		return "%s:%f-%d" % (self.id, time.time(), random.randint(1, 1000000))
 
@@ -504,30 +506,27 @@ class ProcessingPlugin(object):
 
 
 class PluginManager:
+	"""
+	Plugin manager responsible of loading custom processing plugins
+	"""
+	plugins = []
 	def __init__(self):
-		self.plugins = []
 		# Looks for plugins
+		self.__loadPlugins()
 
+	def __loadPlugins(self):
+		"""
+		Dynamically loads plugins from the settings.PLUGIN_DIRS directory
+		"""
 		pyfiles = glob.glob(os.path.join(PLUGIN_DIRS, '*.py'))
-		try:
-			for file in pyfiles:
-				module = __import__(os.path.basename(file)[:-3])
-				# Find class derived from ProcessingPlugin
-				for var in dir(module):
-					if type(eval('module.' + var)) == types.ClassType:
-						if var != ProcessingPlugin.__name__:
-							obj = eval('module.' + var)()
-							# Don't know why isinstance and issubclass not working as expected
-							if hasattr(obj, 'type'):
-								if obj.type == 'YOUPIPLUGIN' and obj.enable:
-									self.plugins.append(obj)
-							
-							del obj
+		for file in pyfiles:
+			__import__(os.path.basename(file)[:-3])
 
-		except ImportError, e:
-			raise PluginManagerError, "Error importing %s: %s" % (file, e)
+		for obj in ProcessingPlugin.__subclasses__():
+			plugin = obj()
+			if plugin not in self.plugins:
+				self.plugins.append(plugin)
 
-		# Order plugins by index (useful to get a displaying order)
 		self.__order()
 
 	def __order(self):
