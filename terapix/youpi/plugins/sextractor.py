@@ -284,7 +284,6 @@ class Sextractor(ProcessingPlugin):
 
 		# Condor submission file
 		csfPath = condor.Condor.getSubmitFilePath(self.id)
-		csf = open(csfPath, 'w')
 		images = Image.objects.filter(id__in = idList)
 
 		xmlName = self.getConfigValue(contconf.split('\n'), 'XML_NAME')
@@ -324,7 +323,6 @@ class Sextractor(ProcessingPlugin):
 			os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.default.conv'),
 			os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.default.nnw'),
 		])
-		csf.write(cluster.getSubmissionFileContent())
 
 		#
 		# Delaying job startup will prevent "Too many connections" MySQL errors
@@ -385,8 +383,6 @@ class Sextractor(ProcessingPlugin):
 				elif os.path.isfile(dualFlagPath):
 					dualFlag = dualFlagPath
 
-
-
 			#
 			# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
 			# They are later used by the wrapper script to get the name of error log file easily
@@ -416,51 +412,48 @@ class Sextractor(ProcessingPlugin):
 
 			sex_params += " -WRITE_XML YES "
 
-			#Addding weight support 
+			# Adds weight support 
 			if weightPath:
 				if not os.path.exists(weight):
-					raise PluginError, "the weight file %s doesn't exists" %weight
+					raise PluginError, "the weight file %s doesn't exists" % weight
 				else:
-					sex_params += "-WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE %s" % (weight)
+					sex_params += "-WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE %s" % weight
 					#support for dual weight
 					if dualWeightPath:
 						if not os.path.exists(dualWeight):
-							raise PluginError, "the dual weight file %s doesn't exists" %dualWeight
+							raise PluginError, "the dual weight file %s doesn't exists" % dualWeight
 						else:
 							sex_params += ",%s" % (dualWeight)
 			elif (not weightPath and dualWeightPath):
 				if not os.path.exists(dualWeight):
-					raise PluginError, "the dual weight file %s doesn't exists" %dualWeight
+					raise PluginError, "the dual weight file %s doesn't exists" % dualWeight
 				else:
-					sex_params += "-WEIGHT_TYPE NONE, MAP_WEIGHT -WEIGHT_IMAGE NONE, %s" % (dualWeight)
+					sex_params += "-WEIGHT_TYPE NONE, MAP_WEIGHT -WEIGHT_IMAGE NONE, %s" % dualWeight
 
-
-			#Addding flag support 
+			# Adds flag support 
 			if flagPath:
 				if not os.path.exists(flag):
-					raise PluginError, "the flag file %s doesn't exists" %flag
+					raise PluginError, "the flag file %s doesn't exists" % flag
 				else:
-					sex_params += " -FLAG_IMAGE %s" % (flag)	
+					sex_params += " -FLAG_IMAGE %s" % flag
 					#support for dual weight
 					if dualFlagPath:
 						if not os.path.exists(dualFlag):
-							raise PluginError, "the dual flag file %s doesn't exists" %dualFlag
+							raise PluginError, "the dual flag file %s doesn't exists" % dualFlag
 						else:
-							sex_params += ",%s" % (dualFlag)
+							sex_params += ",%s" % dualFlag
 			elif (not flagPath and dualFlagPath):
 				if not os.path.exists(dualFlag):
-					raise PluginError, "the dual flag file %s doesn't exists" %dualFlag
+					raise PluginError, "the dual flag file %s doesn't exists" % dualFlag
 				else:
-					sex_params += "-FLAG_IMAGE NONE,%s" % (dualFlag)
-
-
+					sex_params += "-FLAG_IMAGE NONE,%s" % dualFlag
 				
-			#Addding psf support 
+			# Adds psf support 
 			if psfPath:
 				if not os.path.exists(psf):
-					raise PluginError, "the psf file %s doesn't exists" %psf
+					raise PluginError, "the psf file %s doesn't exists" % psf
 				else:
-					sex_params += " -PSF_NAME %s" % (psf)
+					sex_params += " -PSF_NAME %s" % psf
 
 			# Base64 encoding + marshal serialization
 			# Will be passed as argument 1 to the wrapper script
@@ -470,46 +463,29 @@ class Sextractor(ProcessingPlugin):
 				raise ValueError, userData
 
 			if dualMode == '1':
-				condor_submit_entry = """
-arguments               = %(encuserdata)s %(condor_transfer)s %(sextractor)s %(img)s,%(img2)s %(params)s -c %(config)s -PARAMETERS_NAME %(param)s
-# YOUPI_USER_DATA 		= %(userdata)s
-environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
-queue""" %  {	
-		'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
-		'encuserdata' 		: encUserData, 
-		'sextractor'		: settings.CMD_SEX,
-		'params'			: sex_params,
-		'img'				: path,
-		'img2'				: path2,
-		'config'			: os.path.basename(customrc),
-		'param'				: os.path.basename(custompc),
-		'userdata'			: userData,
-		'user'				: request.user.username,
-		'tpxupload'			: settings.FTP_URL + userData['ResultsOutputDir'] +'/',
-	}
-
+				# Use dual mode
+				images_arg = "%s,%s" % (path, path2)
 			else:
-				condor_submit_entry = """
-arguments               = %(encuserdata)s %(condor_transfer)s %(sextractor)s %(params)s %(img)s -c %(config)s -PARAMETERS_NAME %(param)s
-# YOUPI_USER_DATA 		= %(userdata)s
-environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
-queue""" %  {	
-		'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
-		'encuserdata' 		: encUserData,
-		'sextractor'		: settings.CMD_SEX,
-		'params'			: sex_params,
-		'img'				: path,
-		'config'			: os.path.basename(customrc),
-		'param'     	    : os.path.basename(custompc),
-		'userdata'			: userData,
-		'user'				: request.user.username,
-		'tpxupload'			: settings.FTP_URL + userData['ResultsOutputDir'] +'/',
-	}
+				images_arg = path
 
-			csf.write(condor_submit_entry)
+			cluster.addQueue(
+				queue_args = str("%(encuserdata)s %(condor_transfer)s %(sextractor)s %(images_arg)s %(params)s -c %(config)s -PARAMETERS_NAME %(param)s" % {
+					'encuserdata' 		: encUserData, 
+					'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+					'sextractor'		: settings.CMD_SEX,
+					'images_arg'		: images_arg,
+					'params'			: sex_params,
+					'config'			: os.path.basename(customrc),
+					'param'				: os.path.basename(custompc),
+				}),
+				queue_env = {
+					'USERNAME'				: request.user.username,
+					'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + userData['ResultsOutputDir'] + '/',
+					'YOUPI_USER_DATA'		: encUserData,
+				}
+			)
 
-		csf.close()
-
+		cluster.write(csfPath)
 		return csfPath
 
 	def getTaskInfo(self, request):

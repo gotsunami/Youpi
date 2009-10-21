@@ -167,7 +167,6 @@ class Swarp(ProcessingPlugin):
 
 		# Condor submission file
 		csfPath = condor.Condor.getSubmitFilePath(self.id)
-		csf = open(csfPath, 'w')
 
 		# Swarp file containing a list of images to process (one per line)
 		images = Image.objects.filter(id__in = idList)
@@ -239,16 +238,6 @@ class Swarp(ProcessingPlugin):
 		#
 		preProcFile = os.path.join('/tmp/', "swarp-preprocessing-%s.py" % time.time())
 
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
-		cluster.setTransferInputFiles([
-			os.path.join(submit_file_path, 'script', 'stack_ingestion.py'),
-			customrc,
-			os.path.join('/tmp/', userdataFile),
-			os.path.join('/tmp/', transferFile),
-			preProcFile,
-		])
-		csf.write(cluster.getSubmissionFileContent())
-
 		# Base64 encoding + marshal serialization
 		# Will be passed as argument 1 to the wrapper script
 		try:
@@ -307,26 +296,31 @@ sys.exit(exit_code)
 		RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO 
 		os.chmod(preProcFile, RWX_ALL)
 
-		condor_submit_entry = """
-arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- ./%(preprocscript)s
-# YOUPI_USER_DATA = %(userdata)s
-environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
-queue""" %  {	
-		'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
-		'encuserdata' 		: encUserData, 
-		'swarp'				: settings.CMD_SWARP,
-		'params'			: swarp_params,
-		'config'			: os.path.basename(customrc),
-		'userdata'			: userData, 
-		'transferfile'  	: transferFile,
-		'user'				: request.user.username,
-		'imgsfile'			: os.path.basename(swarpImgsFile),
-		'preprocscript'		: os.path.basename(preProcFile),
-		'tpxupload'			: settings.FTP_URL + resultsOutputDir,
-	}
-
-		csf.write(condor_submit_entry)
-		csf.close()
+		#
+		# Generate CSF
+		#
+		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster.setTransferInputFiles([
+			os.path.join(submit_file_path, 'script', 'stack_ingestion.py'),
+			customrc,
+			os.path.join('/tmp/', userdataFile),
+			os.path.join('/tmp/', transferFile),
+			preProcFile,
+		])
+		cluster.addQueue(
+			queue_args = str("%(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- ./%(preprocscript)s" % {
+				'encuserdata' 		: encUserData, 
+				'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+				'transferfile'  	: transferFile,
+				'preprocscript'		: os.path.basename(preProcFile),
+			}),
+			queue_env = {
+				'USERNAME'				: request.user.username,
+				'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + resultsOutputDir, 
+				'YOUPI_USER_DATA'		: encUserData,
+			}
+		)
+		cluster.write(csfPath)
 
 		return csfPath
 

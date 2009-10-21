@@ -507,7 +507,7 @@ class ProcessingPlugin(object):
 
 class PluginManager(object):
 	"""
-	Plugin manager responsible of loading custom processing plugins
+	Plugin manager responsible for loading custom processing plugins
 	"""
 	__instances = {}
 
@@ -529,6 +529,9 @@ class PluginManager(object):
 
 	@property
 	def plugins(self):
+		"""
+		@return List of currently activated plugins, sorted by their index property
+		"""
 		active_plugins = [plugin for plugin in self.__instances.values() if plugin.enable]
 		# Sort by index property
 		try:

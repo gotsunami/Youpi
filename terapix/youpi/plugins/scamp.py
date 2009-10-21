@@ -264,17 +264,6 @@ class Scamp(ProcessingPlugin):
 		udf.write(base64.encodestring(marshal.dumps(bigUserData)).replace('\n', ''))
 		udf.close()
 
-		csf = open(csfPath, 'w')
-		# Generate CSF
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
-		cluster.setTransferInputFiles([
-			customrc,
-			os.path.join('/tmp/', userdataFile),
-			os.path.join('/tmp/', catalogFile),
-			os.path.join('/tmp/', transferFile),
-		])
-		csf.write(cluster.getSubmissionFileContent())
-
 		# Base64 encoding + marshal serialization
 		# Will be passed as argument 1 to the wrapper script
 		try:
@@ -294,25 +283,33 @@ class Scamp(ProcessingPlugin):
 			# No custom XSL_URL value
 			scamp_params = ''
 
-		condor_submit_entry = """
-# YOUPI_USER_DATA = %(userdata)s
-arguments               = %(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null
-environment             = USERNAME=%(user)s; TPX_CONDOR_UPLOAD_URL=%(tpxupload)s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(encuserdata)s
-queue""" %  {	
-		'condor_transfer'			: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
-		'scamp'						: settings.CMD_SCAMP,
-		'encuserdata' 				: encUserData, 
-		'params'					: scamp_params,
-		'config'					: os.path.basename(customrc),
-		'userdata'					: userData, 
-		'user'						: request.user.username,
-		'tpxupload'					: settings.FTP_URL + resultsOutputDir,
-		'transferfile'				: transferFile,
-		'ldacsfile'					: catalogFile,
-	}
-
-		csf.write(condor_submit_entry)
-		csf.close()
+		#
+		# Generate CSF
+		#
+		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster.setTransferInputFiles([
+			customrc,
+			os.path.join('/tmp/', userdataFile),
+			os.path.join('/tmp/', catalogFile),
+			os.path.join('/tmp/', transferFile),
+		])
+		cluster.addQueue(
+			queue_args = str("%(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null" % {
+				'encuserdata' 		: encUserData, 
+				'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+				'transferfile'		: transferFile,
+				'scamp'				: settings.CMD_SCAMP,
+				'params'			: scamp_params,
+				'config'			: os.path.basename(customrc),
+				'ldacsfile'			: catalogFile,
+			}),
+			queue_env = {
+				'USERNAME'				: request.user.username,
+				'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + resultsOutputDir, 
+				'YOUPI_USER_DATA'		: encUserData,
+			}
+		)
+		cluster.write(csfPath)
 
 		return csfPath
 

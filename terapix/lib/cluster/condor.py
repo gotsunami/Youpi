@@ -53,10 +53,10 @@ output                  = %(out)s
 notification            = Error
 transfer_input_files    = %(transfer)s
 %(more)s
-# Computed Req string
 %(requirements)s
+%(queues)s
 """
-	attrs = ['_executable', '_desc', '_transfer_input_files']
+	attrs = ['_executable', '_desc', '_transfer_input_files', '_queues']
 
 	@staticmethod
 	def getSubmitFilePath(caption):
@@ -94,28 +94,65 @@ transfer_input_files    = %(transfer)s
 
 		if desc:
 			self._desc = str(desc)
+		self.__dict__['_queues'] = []
 
 	def updateData(self):
 		self.data = {
 			'description'	: self._desc, 
 			'exec'			: self._executable, 
 			'transfer'		: self._transfer_input_files,
-			'requirements'	: self.getRequirementString(),
+			'more'			: '',
+			'requirements'	: '',
 		}
-		self.data.update(self.getLogFilenames(self.id))
+		queues_csf = ''
+		for queue in self._queues:
+			if queue.has_key('args'): queues_csf += "arguments = %s\n"  % queue['args']
+			if queue.has_key('env'): queues_csf += "environment = %s\n" % '; '.join(['%s=%s' % (k.upper(), v) for k,v in queue['env'].iteritems()])
+			queues_csf += 'queue\n\n'
 
-	def __str__(self):
-		self.updateData()
-		return self._csfHeader % data
+		self.data.update(queues = queues_csf)
+		self.data.update(self.getLogFilenames('job'))
 
 	def __repr__(self):
 		return "<Condor Submission File exec: %s desc: %s>" % (self._executable, self._desc)
 
+	def addQueue(self, queue_args = None, queue_env = None):
+		"""
+		Queues a Condor job, with optional arguments queue_args and queue_env environment.
+		@param queue_args string of any argument that must be passed to the executable
+		@param queue_env dictionary of variables used to define environment variables
+		"""
+		if queue_args and (type(queue_args) != types.StringType):
+			raise TypeError, 'queue_args must be a string'
+
+		if queue_env and (type(queue_env) != types.DictType):
+			raise TypeError, 'queue_env must be a dictionary'
+
+		queue_data = {}
+		if queue_args: queue_data['args'] = queue_args
+		if queue_env: queue_data['env'] = queue_env
+		self._queues.append(queue_data)
+
+	def removeQueue(self, idx):
+		"""
+		Remove queue for active Condor queue list
+		@param idx index of the queue in the list
+		"""
+		if type(idx) != types.IntType:
+			raise TypeError, "idx must be a positive integer"
+		try:
+			del self._queues[idx]
+		except IndexError:
+			raise IndexError, "No queue at position %d to remove. Index out of range" % idx
+
 	def write(self, filename):
-		pass
+		f = open(filename, 'w')
+		f.write(self.getSubmissionFileContent())
+		f.close()
 
 	def getSubmissionFileContent(self):
-		return "%s" % self
+		self.updateData()
+		return self._csfHeader % self.data
 
 	def setExecutable(self, filename):
 		if type(filename) != types.StringType:
@@ -148,10 +185,21 @@ class YoupiCondor(Condor):
 		if not self._transfer_input_files:
 			# Add at least required files
 			self.setTransferInputFiles([])
+
+		# Supply a suitable PATH environment variable to all queues
+		# Must be done _before_ calling updateData()
+		for queue in self._queues:
+			if not queue.has_key('env'): queue['env'] = {}
+			# FIXME: define PATH in settings.py
+			queue['env']['PATH'] = '/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin'
+
 		self.updateData()
 		self.data.update({
+			'requirements'	: self.getRequirementString(),
 			'more' : "initialdir = %s\nnotify_user = %s" % (os.path.join(settings.TRUNK, 'terapix', 'script'), settings.CONDOR_NOTIFY_USER)
 		})
+		self.data.update(self.getLogFilenames(self.id))
+
 		return self._csfHeader % self.data
 
 	def __repr__(self):

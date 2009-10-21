@@ -454,12 +454,9 @@ class QualityFitsIn(ProcessingPlugin):
 
 		step = 2 							# At least step seconds between two job start
 
-		csf = open(csfPath, 'w')
-
 		# Generate CSF
 		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([customrc])
-		csf.write(cluster.getSubmissionFileContent())
 
 		# Check if already successful processings
 		process_images = []
@@ -484,7 +481,7 @@ class QualityFitsIn(ProcessingPlugin):
 		if not process_images:
 			raise PluginAllDataAlreadyProcessed
 
-		# One image per job
+		# One image per job queue
 		for img in process_images:
 			path = os.path.join(img.path, img.name + '.fits')
 			# FLAT checks
@@ -546,47 +543,38 @@ class QualityFitsIn(ProcessingPlugin):
 			except ValueError:
 				raise ValueError, userData
 
-			condor_submit_img_entries = """
-arguments                = %(encuserdata)s %(condor_transfer)s /usr/local/bin/qualityFITS -vv""" % {
-								'encuserdata'				: encUserData, 
-								'condor_transfer'			: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+			image_args = "%(encuserdata)s %(condor_transfer)s /usr/local/bin/qualityFITS -vv" % {
+				'encuserdata'		: encUserData, 
+				'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
 			}
 
 			userData['Warnings'] = {}
 			userData['Warnings'][str(img.name) + '.fits'] = []
-			if imgFlat:
-				condor_submit_img_entries += " -F %s" % imgFlat
-			else:
-				userData['Warnings'][str(img.name) + '.fits'].append('No suitable flat data found')
 
-			if imgMask:
-				condor_submit_img_entries += " -M %s" % imgMask
-			else:
-				userData['Warnings'][str(img.name) + '.fits'].append('No suitable mask data found')
+			if imgFlat: image_args += " -F %s" % imgFlat
+			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable flat data found')
 
-			if imgReg:
-				condor_submit_img_entries += " -P %s" % imgReg
-			else:
-				userData['Warnings'][str(img.name) + '.fits'].append('No suitable reg file found')
+			if imgMask: image_args += " -M %s" % imgMask
+			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable mask data found')
+
+			if imgReg: image_args += " -P %s" % imgReg
+			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable reg file found')
 
 			if not len(userData['Warnings'][str(img.name) + '.fits']):
 				del userData['Warnings'][str(img.name) + '.fits']
 
-			condor_submit_img_entries += """ -c %s %s""" % (os.path.basename(customrc), path)
+			image_args += " -c %s %s" % (os.path.basename(customrc), path)
 
-			# Add per-job custom environment variable
-			condor_submit_img_entries += """
-# YOUPI_USER_DATA = %s
-environment             = TPX_CONDOR_UPLOAD_URL=%s; PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%s""" %  (	userData, 
-																															settings.FTP_URL + resultsOutputDir,
-																															base64.encodestring(marshal.dumps(userData)).replace('\n', '') ) 
+			# Finally, adds Condor queue
+			cluster.addQueue(
+				queue_args = str(image_args), 
+				queue_env = {
+					'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + resultsOutputDir, 
+					'YOUPI_USER_DATA'		: base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+				}
+			)
 
-			condor_submit_img_entries += "\nqueue"
-			csf.write(condor_submit_img_entries)
-
-
-		csf.close()
-
+		cluster.write(csfPath)
 		return csfPath
 
 	def process(self, request):

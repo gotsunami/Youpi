@@ -119,27 +119,23 @@ class Skeleton(ProcessingPlugin):
 					'ResultsOutputDir'	: str(resultsOutputDir)											# Mandatory for WP
 				} 
 
+		#
+		# Generate CSF
+		#
+		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+
 		# Real command to perform here
 		args = ''
 		for x in range(self.jobCount):
 			# Mandatory for WP
 			userData['JobID'] = self.getUniqueCondorJobId()
 			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+			cluster.addQueue(
+				queue_args = str("%(data)s %(command)s" % {'data': encUserData, 'command': self.command,}),
+				queue_env = {'YOUPI_USER_DATA': encUserData,}
+			)
 
-			args += """
-arguments 		= %(data)s %(command)s
-environment		= PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin:/opt/condor/bin; YOUPI_USER_DATA=%(data)s
-queue""" % ({
-	'data': encUserData, 
-	'command': self.command,
-})
-
-		# Generate CSF
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
-		csf.write(cluster.getSubmissionFileContent())
-		csf.write(args)
-		csf.close()
-
+		cluster.write(csfPath)
 		return csfPath
 
 	def getTaskInfo(self, request):
