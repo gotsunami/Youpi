@@ -296,11 +296,12 @@ sys.exit(exit_code)
 		#
 		# Generate CSF
 		#
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([
 			os.path.join(submit_file_path, 'script', 'stack_ingestion.py'),
 			customrc,
 			os.path.join('/tmp/', userdataFile),
+			swarpImgsFile,
 			os.path.join('/tmp/', transferFile),
 			preProcFile,
 		])

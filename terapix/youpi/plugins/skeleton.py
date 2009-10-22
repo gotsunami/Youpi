@@ -119,7 +119,7 @@ class Skeleton(ProcessingPlugin):
 		#
 		# Generate CSF
 		#
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 
 		# Real command to perform here
 		args = ''

@@ -283,7 +283,7 @@ class Scamp(ProcessingPlugin):
 		#
 		# Generate CSF
 		#
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([
 			customrc,
 			os.path.join('/tmp/', userdataFile),

@@ -452,7 +452,7 @@ class QualityFitsIn(ProcessingPlugin):
 		step = 2 							# At least step seconds between two job start
 
 		# Generate CSF
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([customrc])
 
 		# Check if already successful processings

@@ -27,7 +27,7 @@ import base64, marshal
 
 class CondorError(Exception): pass
 
-class Condor(Cluster):
+class CondorCSF(Cluster):
 	"""
 	Base class for generating a Condor submission file. This class can be 
 	used from the CLI.
@@ -170,7 +170,7 @@ transfer_input_files    = %(transfer)s
 		self._transfer_input_files = ', '.join(files)
 
 
-class YoupiCondor(Condor):
+class YoupiCondorCSF(CondorCSF):
 	"""
 	Processing plugins use this class to easily generate a Condor submission file needed for 
 	submitting their jobs.
@@ -213,7 +213,7 @@ class YoupiCondor(Condor):
 		for file in ('local_conf.py', 'settings.py', os.path.join('script', 'DBGeneric.py'), 'NOP'): 
 			files.append(os.path.join(submit_file_path, file))
 
-		super(YoupiCondor, self).setTransferInputFiles(files)
+		super(YoupiCondorCSF, self).setTransferInputFiles(files)
 
 	def getRequirementString(self):
 		"""

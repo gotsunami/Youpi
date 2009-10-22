@@ -313,7 +313,7 @@ class Sextractor(ProcessingPlugin):
 		step = 0 							# At least step seconds between two job start
 
 		# Generate CSF
-		cluster = condor.YoupiCondor(request, self.id, desc = self.optionLabel)
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([
 			customrc,
 			custompc,
