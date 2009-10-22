@@ -204,7 +204,7 @@ class Scamp(ProcessingPlugin):
 		scamprc.close()
 
 		# Condor submission file
-		csfPath = condor.Condor.getSubmitFilePath(self.id)
+		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 
 		# Get filenames for Condor log files (log, error, out)
 		logs = condor.Condor.getLogFilenames(self.id)

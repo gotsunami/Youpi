@@ -176,7 +176,7 @@ class YoupiCondorCSF(CondorCSF):
 	submitting their jobs.
 	"""
 	def __init__(self, request, pluginId, desc = None):
-		Condor.__init__(self, desc)
+		CondorCSF.__init__(self, desc)
 		self.request = request
 		self.id = pluginId
 		self.setExecutable(os.path.join(settings.TRUNK, 'terapix', 'script', 'wrapper_processing.py'))

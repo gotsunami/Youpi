@@ -104,7 +104,7 @@ class Skeleton(ProcessingPlugin):
 
 		now = time.time()
 		# Condor submission file
-		csfPath = condor.Condor.getSubmitFilePath(self.id)
+		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 		csf = open(csfPath, 'w')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor

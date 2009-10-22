@@ -280,7 +280,7 @@ class Sextractor(ProcessingPlugin):
 		sexpc.close()
 
 		# Condor submission file
-		csfPath = condor.Condor.getSubmitFilePath(self.id)
+		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 		images = Image.objects.filter(id__in = idList)
 
 		xmlName = self.getConfigValue(contconf.split('\n'), 'XML_NAME')

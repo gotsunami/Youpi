@@ -163,7 +163,7 @@ class Swarp(ProcessingPlugin):
 		swrc.close()
 
 		# Condor submission file
-		csfPath = condor.Condor.getSubmitFilePath(self.id)
+		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 
 		# Swarp file containing a list of images to process (one per line)
 		images = Image.objects.filter(id__in = idList)

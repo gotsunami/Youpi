@@ -431,7 +431,7 @@ class QualityFitsIn(ProcessingPlugin):
 		qfrc.close()
 
 		# Condor submission file
-		csfPath = condor.Condor.getSubmitFilePath(self.id)
+		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 
 		images = Image.objects.filter(id__in = idList)
 		# Content of YOUPI_USER_DATA env variable passed to Condor
