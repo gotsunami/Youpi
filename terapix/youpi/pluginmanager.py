@@ -34,7 +34,6 @@ class ProcessingPlugin(object):
 	Base processing plugin class.
 	"""
 	def __init__(self):
-		self.enable = True
 		self.id = 'base'
 		self.shortName = 'My short name here'
 		self.optionLabel = 'My option label'
@@ -519,20 +518,29 @@ class PluginManager(object):
 		"""
 		Dynamically loads plugins from the settings.PLUGIN_DIRS directory
 		"""
-		pyfiles = glob.glob(os.path.join(PLUGIN_DIRS, '*.py'))
-		for file in pyfiles:
-			__import__(os.path.basename(file)[:-3])
+		for name in settings.YOUPI_ACTIVE_PLUGINS:
+			if name.endswith('.py'): name = name[:-3]
+			try: __import__(name)
+			except ImportError:
+				raise PluginManagerError, "Unable to load plugin. No plugin named '%s.py'" % name
 
 		for obj in ProcessingPlugin.__subclasses__():
 			if obj not in self.__instances:
 				self.__instances[obj] = obj()
+
+	def reload(self):
+		"""
+		Force reloading all plugins specified in settings.YOUPI_ACTIVE_PLUGINS
+		"""
+		self.__instances = {}
+		self.__loadPlugins()
 
 	@property
 	def plugins(self):
 		"""
 		@return List of currently activated plugins, sorted by their index property
 		"""
-		active_plugins = [plugin for plugin in self.__instances.values() if plugin.enable]
+		active_plugins = self.__instances.values()
 		# Sort by index property
 		try:
 			active_plugins.sort(lambda x,y: cmp(x.index, y.index))

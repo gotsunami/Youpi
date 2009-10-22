@@ -12,7 +12,7 @@
 ##############################################################################
 
 """
-Class to generate CSV reports
+Classes to generate CSV reports
 """
 
 from types import ListType, TupleType

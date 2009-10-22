@@ -54,9 +54,6 @@ class Scamp(ProcessingPlugin):
 		self.jsSource = 'plugins/scamp.js' 							# Custom javascript
 		self.isAstromatic = True									# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
-		# Decomment to disable the plugin
-		#self.enable = False
-
 	def getSavedItems(self, request):
 		"""
 		Returns a user's saved items. 

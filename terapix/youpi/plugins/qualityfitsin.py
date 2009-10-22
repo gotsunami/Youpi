@@ -60,9 +60,6 @@ class QualityFitsIn(ProcessingPlugin):
 		self.itemCartTemplate = 'plugins/qualityfitsin_item_cart.html' 		# Template for custom rendering into the shopping cart
 		self.jsSource = 'plugins/qualityfitsin.js' 							# Custom javascript
 
-		# Decomment to disable the plugin
-		#self.enable = False
-
 	def saveCartItem(self, request):
 		"""
 		Serialize cart item into DB.

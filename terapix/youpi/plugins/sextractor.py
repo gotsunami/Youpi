@@ -54,9 +54,6 @@ class Sextractor(ProcessingPlugin):
 		self.jsSource 			= 'plugins/sextractor.js' 								# Custom javascript
 		self.isAstromatic 		= True													# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
-		self.enable = True 
-		self.jobCount = 10
-
 	def saveCartItem(self, request):
 		post = request.POST
 		

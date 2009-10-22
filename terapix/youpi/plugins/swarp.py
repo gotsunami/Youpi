@@ -49,9 +49,6 @@ class Swarp(ProcessingPlugin):
 		self.jsSource = 'plugins/swarp.js' 							# Custom javascript
 		self.isAstromatic = True									# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
-		# Decomment to disable the plugin
-		#self.enable = False
-
 	def process(self, request):
 		"""
 		Do the job.

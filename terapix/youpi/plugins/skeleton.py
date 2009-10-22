@@ -58,9 +58,6 @@ class Skeleton(ProcessingPlugin):
 		self.itemCartTemplate = 'plugins/skeleton_item_cart.html' 		# Template for custom rendering into the shopping cart
 		self.jsSource = 'plugins/skeleton.js' 							# Custom javascript
 
-		# Decomment to disable the plugin
-		self.enable = settings.PROCESSING_SKELETON_ENABLE
-
 		# Will queue jobCount jobs on the cluster
 		self.jobCount = 5
 		self.command = '/usr/bin/uptime'
