@@ -411,3 +411,141 @@ def get_requirement_string_from_selection(selName):
 
 	return req
 
+class CondorQueue(object):
+	"""
+	Handles a Condor processing queue
+	"""
+	__condor_q_bin = 'condor_q'
+	# Interesting class Ads
+	__condor_q_classAds = ('ClusterId', 'ProcId', 'JobStatus', 'RemoteHost', 'JobStartDate', 'Env')
+	__condor_q_args = ''
+
+	def __repr__(self):
+		jobs, count = self.getJobs()
+		return "<Condor queue, %d jobs>" % count
+
+	class CondorJob(object):
+		"""
+		Describe a Condor job
+		"""
+		def __init__(self, classAds):
+			"""
+			@param classAds dictionary sets class ads names and values for the current Condor job
+			Every key/value is stored as a property
+			"""
+			if type(classAds) != types.DictType:
+				raise TypeError, "classAds parameter must be a dictionary"
+			self.__dict__['classAds'] = classAds
+
+			for k, v in classAds.iteritems():
+				self.__dict__[k] = v
+
+		def __setattr__(self, name, value):
+			"""
+			Prevents overwritting class Ads properties
+			"""
+			if self.classAds.has_key(name):
+				raise AttributeError, "Can't set attribute (this is a Condor class ad)"
+			self.__dict__[name] = value
+
+		def __repr__(self):
+			msg = ''
+			if self.isRunning(): msg = " on %s since %s" % (self.RemoteHost, self.getJobDuration())
+			return "<CondorJob %s.%s is %s%s>" % (self.ClusterId, self.ProcId, self.JobStatusFull.lower(), msg)
+
+		def isRunning(self):
+			"""
+			Whether the job is running
+			"""
+			return int(self.JobStatus) == 2
+
+		def getJobDuration(self):
+			"""
+			Returns the job runtime duration
+			"""
+			secs = time.time() - int(self.JobStartDate)
+			h = m = 0
+			s = int(secs)
+			if s > 60:
+				m = s/60
+				s = s%60
+				if m > 60:
+					h = m/60
+					m = m%60
+
+			return "%02d:%02d:%02d" % (h, m, s)
+
+	@property
+	def condor_q_path(self):
+		return self.__condor_q_bin
+
+	def __init__(self, envPath = None, globalPool = False):
+		"""
+		@param envPath Path to the condor_q binary
+		@param globalPool Get queues of all the submitters in the Condor system
+		"""
+		if envPath:
+			if type(envPath) != types.StringType:
+				raise TypeError, "envPath must be a string"
+			self.__condor_q_bin = os.path.join(settings.CONDOR_BIN_PATH, self.__condor_q_bin)
+
+		if globalPool:
+			if type(globalPool) != types.BooleanType:
+				raise TypeError, "globalPool must be a boolean"
+			self.__condor_q_args += ' -global'
+
+		# Builds condor_q CLI arguments
+		cliArgs = ''
+		cAdsLen = len(self.__condor_q_classAds)
+		for i in range(cAdsLen):
+			if i < cAdsLen - 1: sep = '||'
+			else: sep = '\n'
+			cliArgs += "-format \"%s" + sep + "\" " + self.__condor_q_classAds[i] + ' '
+		self.__condor_q_args = cliArgs
+
+	def getJobs(self):
+		"""
+		Returns a tuple with a list of current active Condor jobs and 
+		the number of jobs is that list.
+		@return Tuple (CondorJob list, jobs count)
+		"""
+		pipe = os.popen(self.__condor_q_bin + ' ' + self.__condor_q_args)
+		# Raw data
+		data = pipe.readlines()
+		pipe.close()
+
+		# Build CondorJob instances
+		jobs = []
+		for info in data:
+			parts = info.split('||')
+			params = {}
+			if len(parts) < len(self.__condor_q_classAds):
+				# This happens when no given class ad is available 
+				# from Condor for a job. Most often it means that 
+				# the job is not yet running... so we have to rebuild 
+				# a correct 'parts' list
+				k = 0
+				for ad in self.__condor_q_classAds:
+					if ad in ('RemoteHost', 'JobStartDate'):
+						parts.insert(k, None)
+					k += 1
+
+			for k in range(len(self.__condor_q_classAds)):
+				try:
+					params[self.__condor_q_classAds[k]] = parts[k]
+				except IndexError:
+					print info
+					raise
+
+			if 'JobStatus' in self.__condor_q_classAds:
+				status = int(params['JobStatus'])
+				if status == 2: status_full = 'Running'
+				elif status == 5: status_full = 'Hold'
+				else: status_full = 'Idle'
+				params['JobStatusFull'] = status_full
+
+			# Adds new job
+			jobs.append(self.CondorJob(params))
+
+		return jobs, len(jobs)
+
