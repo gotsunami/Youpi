@@ -14,15 +14,24 @@ Version 0.5.2
 
 :Date: *To be released*
 
-- Fixed shopping cart issues
-- Removed all parts related to preingestion
-- Check setup script handles database schema updates automatically
+**Bug fixes**:
 
-**Release Notes:**
+- Fixed shopping cart issues (session related)
+- Fixed the "Software version check" feature
+- Swarp plugin: fixed final stack ingestion issues
+
+**Improvements**:
+
+- Check setup script handles database schema updates automatically
+- Core API related to Condor cluster management greatly improved
+- Plugin manager OOP design improved
+- Removed all parts related to preingestion step (no more needed)
+
+**Release Notes**:
 
 In order to upgrade from 0.5.1, please do the following:
 
-0. Make a **backup of your data**.
+0. Make a **backup of your database**.
 
 1. Edit your ``settings.py`` file and add the line ``terapix.django_evolution`` to your 
    ``INSTALLED_APPS`` variable so it looks like the following::
@@ -33,9 +42,10 @@ In order to upgrade from 0.5.1, please do the following:
 	'terapix.youpi',
 	)
 
-2. Let Django installs ``django-evolution``'s required database tables::
+2. From the ``settings.py-dist`` file, copy the ``YOUPI_ACTIVE_PLUGINS`` variable 
+   into your ``settings.py`` or ``local_conf.py`` file::
 
-	$ python manage.py syncdb
+	YOUPI_ACTIVE_PLUGINS = ('qualityfitsin', 'scamp', 'swarp', 'sextractor')
 
 3. Finally, let Youpi inspect your installation setup with::
 
