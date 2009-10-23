@@ -207,7 +207,7 @@ class Scamp(ProcessingPlugin):
 		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 
 		# Get filenames for Condor log files (log, error, out)
-		logs = condor.Condor.getLogFilenames(self.id)
+		logs = condor.CondorCSF.getLogFilenames(self.id)
 		images = Image.objects.filter(id__in = idList)
 
 		xmlName = self.getConfigValue(content.split('\n'), 'XML_NAME')
