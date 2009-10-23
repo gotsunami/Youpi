@@ -149,15 +149,20 @@ def run_stack_ingestion(g, stackFile, user_id):
 		debug("[Warning] A stack image with the same name is already ingested. The stack image will be ingested as '%s'" % fitsNoExt)
 		debug("[Warning] The IMAGEOUT_NAME value will be updated to match '%s' and the stack image will be renamed on disk" % fitsNoExt)
 
+	# Check for ingestion label
+	ing_label = 'Stack ' + os.path.basename(fitsNoExt)
+	res = g.execute("""select label from youpi_ingestion where label = "%s";""" % ing_label)
+	if res: ing_label += '_1'
+
 	g.setTableName('youpi_ingestion')
 	g.insert(	start_ingestion_date = getNowDateTime(duration_stime),
 				end_ingestion_date = getNowDateTime(duration_stime),
 				# FIXME
 				email = '',
 				user_id = user_id,
-				label = "Stack %s" % os.path.basename(fitsNoExt),
+				label = ing_label,
 				check_fitsverify  = 0,
-				check_qso_status = 0,
+				is_validated = 1,
 				check_multiple_ingestion =0,
 				path = ipath,
 				group_id = perms['group_id'],
