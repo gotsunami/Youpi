@@ -469,7 +469,12 @@ class CondorQueue(object):
 			"""
 			Returns the job runtime duration
 			"""
-			secs = time.time() - int(self.JobStartDate)
+			try:
+				secs = time.time() - int(self.JobStartDate)
+			except TypeError:
+				# Job not running yet
+				return None
+
 			h = m = 0
 			s = int(secs)
 			if s > 60:

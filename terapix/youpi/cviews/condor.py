@@ -355,77 +355,30 @@ def autocomplete(request, key, value):
 
 def get_live_monitoring(request, nextPage = -1):
 	"""
-	Parses XML output from Condor and returns a JSON object.
-	Only Youpi's related job are monitored. A Youpi job must have 
-	an environment variable named YOUPI_USER_DATA which can contain
-	serialized base64-encoded data to be parsed.
-
-	nextPage: id of the page of 'limit' results to display. If nextPage == -1
+	Only Youpi's related job are monitored.
+	@param nextPage id of the page of 'limit' results to display. If nextPage == -1
 	then full data set is returned.
 	"""
 
-	pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_q -xml'))
-	data = pipe.readlines()
-	pipe.close()
+	from terapix.lib.cluster.condor import YoupiCondorQueue
+	q = YoupiCondorQueue()
+	jobs, jobCount = q.getJobs()
 
-	res = []
 	# Max jobs per page
 	limit = 10
 
-	# Removes first 3 lines (not XML)
-	doc = dom.parseString(string.join(data[3:]))
-	jNode = doc.getElementsByTagName('c')
-
-	# Youpi Condor job count
-	jobCount = 0
-
-	for job in jNode:
-		jobData = {}
-		data = job.getElementsByTagName('a')
-
-		for a in data:
-			if a.getAttribute('n') == 'ClusterId':
-				jobData['ClusterId'] = str(a.firstChild.firstChild.nodeValue)
-
-			elif a.getAttribute('n') == 'ProcId':
-				jobData['ProcId'] = str(a.firstChild.firstChild.nodeValue)
-
-			elif a.getAttribute('n') == 'JobStatus':
-				# 2: running, 1: pending
-				jobData['JobStatus'] = str(a.firstChild.firstChild.nodeValue)
-
-			elif a.getAttribute('n') == 'RemoteHost':
-				jobData['RemoteHost'] = str(a.firstChild.firstChild.nodeValue)
-
-			elif a.getAttribute('n') == 'JobStartDate':
-				secs = (time.time() - int(a.firstChild.firstChild.nodeValue))
-				h = m = 0
-				s = int(secs)
-				if s > 60:
-					m = s/60
-					s = s%60
-					if m > 60:
-						h = m/60
-						m = m%60
-
-				jobData['JobDuration'] = "%02d:%02d:%02d" % (h, m, s)
-
-			elif a.getAttribute('n') == 'Env':
-				# Try to look for YOUPI_USER_DATA environment variable
-				# If this is variable is found then this is a Youpi's job so we can keep it
-				env = str(a.firstChild.firstChild.nodeValue)
-				if env.find('YOUPI_USER_DATA') >= 0:
-					m = re.search('YOUPI_USER_DATA=(.*?)$', env)
-					userData = m.groups(0)[0]	
-					c = userData.find(';')
-					if c > 0:
-						userData = userData[:c]
-					jobData['UserData'] = marshal.loads(base64.decodestring(str(userData)))
-					# Add 'Owner' field to dict
-					jobData['UserData']['Owner'] = str(User.objects.filter(id = int(jobData['UserData']['UserID']))[0].username)
-
-					res.append(jobData)
-					jobCount += 1
+	res = []
+	for job in jobs:
+		job.UserData['Owner'] = str(User.objects.filter(id = int(job.UserData['UserID']))[0].username)
+		res.append({
+			'ClusterId'		: job.ClusterId, 
+			'ProcId'		: job.ProcId, 
+			'JobStatus'		: job.JobStatus, 
+			'RemoteHost'	: job.RemoteHost,
+			'JobStartDate'	: job.JobStartDate,
+			'JobDuration'	: job.getJobDuration(),
+			'UserData'		: job.UserData,
+		})
 
 	if nextPage >= 1:
 		# Computes total pages
@@ -455,7 +408,7 @@ def live_monitoring(request):
 		raise HttpResponseServerError('Bad parameters')
 
 	res, jobCount, pageCount, nextPage = get_live_monitoring(request, int(nextPage))
-	return HttpResponse(str({'results' : res, 'JobCount' : jobCount, 'PageCount' : pageCount, 'nextPage' : nextPage}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'results' : res, 'JobCount' : jobCount, 'PageCount' : pageCount, 'nextPage' : nextPage}), mimetype = 'text/plain')
 
 def condor_hosts(request):
 	vms = get_condor_status()
