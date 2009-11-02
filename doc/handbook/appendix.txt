@@ -24,6 +24,7 @@ Version 0.5.2
 
 - Check setup script handles database schema updates automatically
 - Core API related to Condor cluster management greatly improved
+- Monitoring Condor jobs from the "Active Monitoring" page is much faster
 - Plugin manager OOP design improved
 - Removed all parts related to preingestion step (no more needed)
 

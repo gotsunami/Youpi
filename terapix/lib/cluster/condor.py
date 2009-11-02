@@ -490,7 +490,9 @@ class CondorQueue(object):
 			"""
 			Remove the job from the Condor queue
 			"""
-			pass
+			pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_rm %s.%s"  % (self.ClusterId, self.ProcId)))
+			data = pipe.readlines()
+			pipe.close()
 
 	@property
 	def condor_q_path(self):
@@ -566,9 +568,14 @@ class CondorQueue(object):
 
 		return tuple(jobs), len(jobs)
 
-	def removeJob(self, jobId):
-		pass
-
+	def removeJob(self, job):
+		"""
+		Remove a job from the Condor queue.
+		@param job CondorJob instance
+		"""
+		if not isinstance(job, self.CondorJob):
+			raise TypeError, "job must be a CondorJob instance"
+		job.remove()
 
 class YoupiCondorQueue(CondorQueue):
 	"""
