@@ -2,6 +2,8 @@
 Appendixes
 ##########
 
+.. _changelog:
+
 *********
 ChangeLog
 *********
@@ -12,7 +14,7 @@ ChangeLog
 Version 0.5.2
 -------------
 
-:Date: *To be released*
+**Release Date**: *To be released*
 
 **Bug fixes**:
 
@@ -55,7 +57,7 @@ In order to upgrade from 0.5.1, please do the following:
 Version 0.5.1
 -------------
 
-:Date: 30 September 2009
+**Release Date**: 30 September 2009
 
 First public release.
 

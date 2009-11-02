@@ -27,9 +27,9 @@ Developer FAQ
 I'm facing issues with foreign keys and integrity. How do I restart from scratch with a clean DB, keeping all my data?
 ----------------------------------------------------------------------------------------------------------------------
 
-1. First, let's set up some environment variables::
+1. First, let's set up some environment variables (those values are available in your ``settings.py`` config file)::
 
-	$ export _DBUSER=yulia _HOST=dbterapix _DB=youpi_yulia
+	$ export _DBUSER=login _HOST=server _DB=dbname
 
 2. Do a **full backup** of your data::
 
@@ -74,5 +74,5 @@ I'm facing issues with foreign keys and integrity. How do I restart from scratch
 
 6. Finally, import your previously saved data::
 
-	$ mysql -u${_DBUSER} -h${_HOST} -p ${_DB} &lt; backup-dataonly.sql
+	$ mysql -u${_DBUSER} -h${_HOST} -p ${_DB} < backup-dataonly.sql
 

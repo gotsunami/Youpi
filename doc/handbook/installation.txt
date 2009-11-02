@@ -577,10 +577,5 @@ your server's logs and reread all the configuration steps in this chapter.
 Upgrading to New Releases
 =========================
 
-Upgrading to new releases is as easy as installing the new version of Youpi and running 
-the ``checksetup`` script again::
-
-	$ cd $YOUPI_INSTALL_DIR/terapix
-	$ python manage.py checksetup
-
-This command will take care of all the details, updating the database anytime it is required.
+Before upgrading to a newer version of Youpi, please ensure you have a recent backup of your database 
+data. Then read the *release notes* in the :ref:`changelog` section carefully.
