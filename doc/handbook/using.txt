@@ -16,12 +16,18 @@ FITS Data Ingestion
 
 A FITS image is the most important entity in youpi.
 The ingestion process make your images their first entries in the pipeline.
+ 
+
+
 Once your cluster path is defined in your configuration files, you can easily 
-browse your cluster to find your directories containing FITS images with the 
-cluster path browser. It is a real time tree view of your cluster architecture.
+browse your cluster to find out which directories contain FITS images from the 
+cluster path browser.
+ 
+
+It is a real time tree view of your cluster architecture.
 Powerful and user friendly, here is a graphical way to navigate through folders and 
 have a quick view of the number of contained FITS images. It counts automatically 
-the number of FITS images, and, display it after the name of the folder.No number 
+the number of FITS images, and, display it after the name of the folder. No number 
 means no fits image.
 
 Several paths can be selected by clicking on folders from the browser and your 
@@ -44,15 +50,26 @@ ingestion tab process:
 
 A set of options is proposed to add a fine-grain control during ingestion:
 
-Data integrity control
-Fitsverify is integrated to the ingestion at its low level checking, it will 
-verify that the structure of the FITS image is not corrupted and will not affect 
-the futur processing of it.
+- **Observed vs validated data**
 
-Youpi allows the possibility to ingest the same image many times
-The image will have the same name but the generated checksum, computed and linked 
-to the image in the youpi database, will be different.
-Youpi allows to keep data integrity, uniqueness, and tracks of the ingestion process.
+ For each ingestion done under Youpi, you can specify a flag "validated" or "observed"
+ which will be applied for all ingested images, and let you determine a first step of
+ classification and validation.
+ Flag images as validated means that future ingested images are usable for science issue.
+ Flag images as observed is the opposite, and permit to exclude automatically from 
+ future processing.
+
+- **Data integrity control**
+ 
+ Fitsverify is integrated to the ingestion at its low level checking, it will 
+ verify that the structure of the FITS image is not corrupted and will not affect 
+ the futur processing of it.
+
+- **Youpi allows the possibility to ingest the same image many times**
+
+ The image will have the same name but the generated checksum, computed and linked 
+ to the image in the youpi database, will be different.
+ Youpi allows to keep data integrity, uniqueness, and tracks of the ingestion process.
 
 
 
@@ -63,7 +80,7 @@ Youpi allows to keep data integrity, uniqueness, and tracks of the ingestion pro
 
 
 It adds more flexibility for searching, classifying, sorting operations which are needed 
-during the image lifetime and  through the pipeline.
+during the image lifetime and through the pipeline.
 
 
 Deal With Condor Setup
