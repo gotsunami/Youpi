@@ -417,12 +417,18 @@ class CondorQueue(object):
 	"""
 	__condor_q_bin = 'condor_q'
 	# Interesting class Ads
+	# Do NOT change class ads order, see the getJobs() function
 	__condor_q_classAds = ('ClusterId', 'ProcId', 'JobStatus', 'RemoteHost', 'JobStartDate', 'Env')
 	__condor_q_args = ''
 
 	def __repr__(self):
 		jobs, count = self.getJobs()
-		return "<Condor queue, %d jobs>" % count
+		if count > 0:
+			msg = "%d job" % count
+			if count > 1: msg += 's'
+		else:
+			msg = 'no job'
+		return "<Condor queue, %s>" % msg
 
 	class CondorJob(object):
 		"""
@@ -474,6 +480,12 @@ class CondorQueue(object):
 					m = m%60
 
 			return "%02d:%02d:%02d" % (h, m, s)
+
+		def remove(self):
+			"""
+			Remove the job from the Condor queue
+			"""
+			pass
 
 	@property
 	def condor_q_path(self):
@@ -547,5 +559,37 @@ class CondorQueue(object):
 			# Adds new job
 			jobs.append(self.CondorJob(params))
 
-		return jobs, len(jobs)
+		return tuple(jobs), len(jobs)
 
+	def removeJob(self, jobId):
+		pass
+
+
+class YoupiCondorQueue(CondorQueue):
+	"""
+	Handles a Condor processing queue for Youpi: only jobs with a YOUPI_USER_DATA env variable are 
+	are Youpi jobs.
+	"""
+	def __init__(self, envPath = None, globalPool = False):
+		CondorQueue.__init__(self, envPath, globalPool)
+
+	def getJobs(self):
+		"""
+		Override CondorQueue.getJobs() in order to keep only Youpi-related jobs.
+		"""
+		jobs, count = super(YoupiCondorQueue, self).getJobs()
+		youpiJobs = []
+		for job in jobs:
+			if job.Env.find('YOUPI_USER_DATA') >= 0:
+				youpiJobs.append(job)
+		del jobs
+
+		# Set user data
+		for job in youpiJobs:
+			m = re.search('YOUPI_USER_DATA=(.*?)$', job.Env)
+			userData = m.groups(0)[0]
+			c = userData.find(';')
+			if c > 0: userData = userData[:c]
+			job.UserData = marshal.loads(base64.decodestring(str(userData)))
+
+		return tuple(youpiJobs), count
