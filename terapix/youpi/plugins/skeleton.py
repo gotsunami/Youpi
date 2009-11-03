@@ -182,7 +182,7 @@ class Skeleton(ProcessingPlugin):
 
 		post = request.POST
 		try:
-			itemID = str(post['ItemID'])
+			itemID = str(post['ItemId'])
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."

@@ -16,17 +16,27 @@
 			{# pluginId_forloop.counter is the tr element's id needed to remove the item from the cart once submitted #}
 			<div class="submitItem">
 				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
-				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster" 
-				onclick="boxes.confirm('Are you sure you want to submit this item to the cluster?', function() {
-						{{ plugin.id }}.run(	'{{ plugin.id }}_{{ forloop.counter0 }}', 
-												'{{ plugin.itemPrefix }}{{ data.itemCounter }}',
-												'{{ data.userData.resultsOutputDir }}');});"/>
-				</p>
+				<p><img id="{{ plugin.id }}_{{ forloop.counter0 }}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster" />
 			</div>
-			<div>or</div>
-			<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" onclick="{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter0 }}', 
-				'{{ plugin.itemPrefix }}{{ data.itemCounter }}',
-				'{{ data.userData.resultsOutputDir }}');"/>
+			<img id="{{ plugin.id }}_{{ forloop.counter0 }}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.gif"/>
 		</td>
 	</tr>
 </table>
+
+<script type="text/javascript">
+	document.observe('dom:loaded', function() {
+		$('{{ plugin.id }}_{{ forloop.counter0 }}_run').observe('click', function() {
+			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
+			boxes.confirm('Are you sure you want to submit this item to the cluster?', function() {
+				{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
+			});
+		});
+
+		$('{{ plugin.id }}_{{ forloop.counter0 }}_save').observe('click', function() {
+			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
+			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
+		});
+	});
+</script>

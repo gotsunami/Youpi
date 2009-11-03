@@ -42,14 +42,14 @@ var {{ plugin.id }} = {
 	 */
 	addSelectionToCart: function() {
 		// Do your sanity checks here
-		// FIXME: checks...
 	
 		// Custom output directory
-		var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
+		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidskel + '/';
 	
 		// Set mandatory structures
-		var p_data = {	plugin_name : '{{ plugin.id }}', 
-					userData : {resultsOutputDir: output_data_path}
+		var p_data = {	
+			plugin_name : uidskel,
+			userData : {resultsOutputDir: output_data_path}
 		};
 	
 		// Add entry into the shopping cart
@@ -67,12 +67,13 @@ var {{ plugin.id }} = {
 	 * Run processing
 	 *
 	 * Parameters:
-	 *	name - string: name part of ID 
-	 *  row - integer: for row number
+	 *  trid - string: for row number
+	 *  opts - hash: options
+	 *  silent - boolean: silently submit item to the cluster
 	 *
 	 */ 
-	run: function(trid, itemId, resultsOutputDir, silent) {
-		var silent = silent == true ? true : false;
+	run: function(trid, opts, silent) {
+		var silent = typeof silent == 'boolean' ? silent : false;
 		var runopts = get_runtime_options(trid);
 		var logdiv = $('master_condor_log_div');
 	
@@ -90,20 +91,35 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}' + 
-					'&Method=process' +
-					'&ResultsOutputDir=' + resultsOutputDir +
-					// runtime options related
-					'&' + runopts.clusterPolicy +	
-					'&ItemId=' + runopts.itemPrefix + itemId + 
-					'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0);
-		r.send('/youpi/process/plugin/', post);
+		opts = $H(opts);
+		opts.set('Plugin', uidskel);
+		opts.set('Method', 'process');
+		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
+		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
+
+		r.send('/youpi/process/plugin/', opts.toQueryString());
 	},
 
+	/*
+	 * Function:  reprocessAllFailedProcessings
+	 * One click for reprocessing failed processings
+	 *
+	 * Parameters:
+	 *  taskList - array: list of task Ids
+	 *
+	 */ 
 	reprocessAllFailedProcessings: function(tasksList) {
 		alert('TODO...');
 	},
 
+	/*
+	 * Function: renderOutputDirStats
+	 * One click for reprocessing failed processings
+	 *
+	 * Parameters:
+	 *  taskList - array: list of task Ids
+	 *
+	 */ 
 	renderOutputDirStats: function(container_id) {
 		var container = $(container_id).update();
 	
@@ -157,10 +173,24 @@ var {{ plugin.id }} = {
 		container.insert(tab);
 	},
 
-	saveItemForLater: function(trid, itemId, resultsOutputDir) {
+	/*
+	 * Function: saveItemForLater
+	 * Save item for later processing then remove item from the shopping cart
+	 *
+	 * Parameters:
+	 *  trid - string: for row number
+	 *  opts - hash: options
+	 *  silent - boolean: silently submit item to the cluster
+	 *
+	 */ 
+	saveItemForLater: function(trid, opts, silent) {
+		opts = $H(opts);
+		opts.set('Plugin', uidskel);
+		opts.set('Method', 'saveCartItem');
+
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				'{{ plugin.id}}_result',
+				uidskel + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -170,17 +200,18 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=saveCartItem' + 
-					'&ItemID=' + runopts.itemPrefix + itemId +
-					'&ResultsOutputDir=' + resultsOutputDir;
-		r.send('/youpi/process/plugin/', post);
+		r.send('/youpi/process/plugin/', opts.toQueryString());
 	},
 
 	/*
+	 * Function: resultsShowEntryDetails
 	 * Displays custom result information. 'resp' contains 
 	 * server-side info to display
 	 *
-	 */
+	 * Parameters:
+	 *  container_id - string: id of DOM container
+	 *
+	 */ 
 	resultsShowEntryDetails: function(container_id) {
 		var tr, th, td;
 		// See templates/results.html, function showDetails(...)
@@ -195,56 +226,53 @@ var {{ plugin.id }} = {
 		tab.insert(tr);
 	
 		// Duration
-		var tdiv = new Element('div', {'class': 'duration'});
-		tdiv.insert(resp['Start'] + '<br/>');
-		tdiv.insert(resp['End'] + '<br/>');
-		var src;
-		resp['Success'] ? src = 'success' : src = 'error';
-		var img = new Element(	'img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif',
-										style: 'padding-right: 5px;'
-		});
+		var tdiv = new Element('div').addClassName('duration');
+		tdiv.insert(resp.Start + '<br/>');
+		tdiv.insert(resp.End + '<br/>');
+		var src = resp.Success ? 'success' : 'error';
+		var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'}).setStyle({paddingRight: '5px'});
 		tdiv.insert(img);
-		tdiv.insert(resp['Duration']);
+		tdiv.insert(resp.Duration);
 		tr = new Element('tr');
-		td = new Element('td', {style: 'border-bottom: 2px #5b80b2 solid'});
+		td = new Element('td').setStyle({borderBottom: '2px #5b80b2 solid'});
 		td.insert(tdiv);
 		tr.insert(td);
 		tab.insert(tr);
 	
 		// User
-		var udiv = new Element('div', {'class': 'user'});
-		udiv.insert('Job initiated by ' + resp['User']);
+		var udiv = new Element('div').addClassName('user');
+		udiv.insert('Job initiated by ' + resp.User);
 		udiv.insert(new Element('br'));
 		udiv.insert('Exit status: ');
 		udiv.insert(new Element('br'));
-		var txt;
-		resp['Success'] ? txt = 'success' : txt = 'failure';
-		var exit_s = new Element('span', {'class': 'exit_' + txt}).update(txt);
+		var txt = resp.Success ? 'success' : 'failure';
+		var exit_s = new Element('span').addClassName('exit_' + txt).update(txt);
 		udiv.insert(exit_s);
 		td.insert(udiv);
 	
 		tr = new Element('tr');
 		td = new Element('td', {style: 'padding: 0px'});
-		var tab2 = new Element('table', {'class': 'qfits-result-entry-params'});
+		var tab2 = new Element('table').addClassName('qfits-result-entry-params');
 		td.insert(tab2);
 		tr.insert(td);
 		tab.insert(tr);
 	
 		// Error log file when failure
-		if (!resp['Success']) {
+		if (!resp.Success) {
 			tr = new Element('tr');
-			td = new Element('td', {style: 'border-bottom: 2px #5b80b2 solid',
-									colspan: '2'
-			});
+			td = new Element('td', {colspan: 2}).setStyle({borderBottom: '2px #5b80b2 solid'});
 			var but = new Element('input', {type: 'button',
 											value: 'Toggle error log file view',
-											onclick: "toggleDisplay('log-" + resp['TaskId'] + "');"
+											onclick: "toggleDisplay('log-" + resp.TaskId + "');"
 			});
 			td.insert(but);
-			var cdiv = new Element('div', { id: 'log-' + resp['TaskId'],
-											style: 'height: 200px; overflow: auto; background-color: black; padding-left: 5px; display: none'
-			});
-			var pre = new Element('pre').update(resp['Log']);
+			var cdiv = new Element('div', {id: 'log-' + resp.TaskId}).setStyle({
+				height: '200px', 
+				overflow: 'auto', 
+				backgroundColor: 'black', 
+				paddingLeft: '5px'
+			}).hide();
+			var pre = new Element('pre').update(resp.Log);
 			cdiv.insert(pre);
 			td.insert(cdiv);
 			tr.insert(td);
@@ -253,14 +281,14 @@ var {{ plugin.id }} = {
 		
 		// Permissions
 		tr = new Element('tr');
-		td = new Element('td', {style: 'padding: 0px'});
+		td = new Element('td').setStyle({padding: '0px'});
 		td.update(ResultsHelpers.getPermissionsEntry(resp.TaskId));
 		tr.insert(td);
 		tab2.insert(tr);
 
 		// Condor Job Logs
 		tr = new Element('tr');
-		td = new Element('td', {style: 'padding: 0px'});
+		td = new Element('td').setStyle({padding: '0px'});
 		td.update(ResultsHelpers.getCondorJobLogsEntry(resp.ClusterId, resp.TaskId));
 		tr.insert(td);
 		tab2.insert(tr);
@@ -269,9 +297,14 @@ var {{ plugin.id }} = {
 		container.insert(d);
 	},
 
+	/*
+	 * Function: showSavedItems
+	 * Display saved cart items
+	 *
+	 */ 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_{{ plugin.id }}').update();
-		var div = new Element('div', {'class': 'savedItems', id: '{{ plugin.id }}_saved_items_div'});
+		var cdiv = $('plugin_menuitem_sub_' + uidskel).update();
+		var div = new Element('div', {'class': 'savedItems', id: uidskel + '_saved_items_div'});
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
@@ -281,8 +314,8 @@ var {{ plugin.id }} = {
 				function(resp) {
 					div.update();
 	
-					var total = resp['result'].length;
-					var countNode = $('plugin_{{ plugin.id }}_saved_count').update();
+					var total = resp.result.length;
+					var countNode = $('plugin_' + uidskel + '_saved_count').update();
 					var txt;
 					if (total > 0)
 						txt = total + ' item' + (total > 1 ? 's' : '');
@@ -290,16 +323,14 @@ var {{ plugin.id }} = {
 						txt = 'No item';
 					countNode.update(txt);
 	
-					var table = new Element('table', {'class': 'savedItems'});
+					var table = new Element('table').addClassName('savedItems');
 					var tr, th;
-					var icon = new Element('img', {	'src': '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png',
-													'style': 'vertical-align:middle; margin-right: 10px;'
-					});
+					var icon = new Element('img', {'src': '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/' + uidskel + '.png'}).setStyle({verticalAlign: 'middle', marginRight: '10px'});
 	
 					tr = new Element('tr');
-					th = new Element('th', {'colspan': '8'});
+					th = new Element('th', {'colspan': 8});
 					th.insert(icon);
-					th.insert('{{ plugin.description }}: ' + resp['result'].length + ' saved item' + (resp['result'].length > 1 ? 's' : ''));
+					th.insert('{{ plugin.description }}: ' + resp.result.length + ' saved item' + (resp.result.length > 1 ? 's' : ''));
 					tr.insert(th);
 					table.insert(tr);
 	
@@ -312,22 +343,24 @@ var {{ plugin.id }} = {
 	
 					var delImg, trid;
 					var tabi, tabitr, tabitd;
-					for (var k=0; k < resp['result'].length; k++) {
-						trid = '{{ plugin.id }}_saved_item_' + k + '_tr';
+					resp.result.each(function(res, k) {
+						trid = uidskel + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
+						// Delete
 						delImg = new Element('img', {	id: uidskel + '_del_saved_item_' + k,	
-														style: 'margin-right: 5px',
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif',
-														onclick: "{{ plugin.id }}.delSavedItem('" + trid + "', '" + 
-															resp['result'][k]['name'] + "')"
-						}).hide();
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
+						}).setStyle({marginRight: '5px'}).hide();
+						delImg.c_data = {trid: trid, name: res.name};
+						delImg.observe('click', function() {
+							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
+						});
 	
 						// Date
-						td = new Element('td').update(resp['result'][k]['date']);
+						td = new Element('td').update(res.date);
 						tr.insert(td);
 	
 						// Permissions
-						td = new Element('td', {'class': 'config'}).update(get_permissions('cartitem', resp['result'][k]['itemId'], function(r, imgId) {
+						td = new Element('td').addClassName('config').update(get_permissions('cartitem', res.itemId, function(r, imgId) {
 							// imgId is the misc parameter passed to get_permissions()
 							var img = $(imgId);
 							r.currentUser.write ? img.show() : img.hide();
@@ -335,27 +368,30 @@ var {{ plugin.id }} = {
 						tr.insert(td);
 	
 						// Name
-						td = new Element('td', {'class': 'name'}).update(resp['result'][k]['name']);
+						td = new Element('td').addClassName('name').update(res.name);
 						tr.insert(td);
 	
 						// Description
-						td = new Element('td').update(resp['result'][k]['descr']);
+						td = new Element('td').update(res.descr);
 						tr.insert(td);
 						
-						// Delete
+						// Insert delete button
 						td = new Element('td');
 						td.insert(delImg);
 
-						delImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif',
-														onclick: "{{ plugin.id }}.addToCart('" + resp['result'][k]['resultsOutputDir'] + "')"
+						// Add to cart button
+						addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
+						addImg.c_data = $H(res);
+						addImg.observe('click', function() {
+							{{ plugin.id }}.addToCart(this.c_data);
 						});
-						td.insert(delImg);
+						td.insert(addImg);
 
 						tr.insert(td);
 						table.insert(tr);
-					}
+					});
 	
-					if (resp['result'].length) {
+					if (resp.result.length) {
 						div.insert(table);
 					}
 					else {
@@ -365,10 +401,22 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
-		r.send('/youpi/process/plugin/', post);
+		var post = {
+			Plugin: uidskel,
+			Method: 'getSavedItems'
+		};
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
+	/*
+	 * Function: delSavedItem
+	 * Delete a saved cart item
+	 *
+	 * Parameters:
+	 *  trid - string: row id
+	 *  name - string: item's name
+	 *
+	 */ 
 	delSavedItem: function(trid, name) {
 		var r = confirm("Are you sure you want to delete saved item '" + name + "'?");
 		if (!r) return;
@@ -411,9 +459,17 @@ var {{ plugin.id }} = {
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
-	addToCart: function(resultsOutputDir) {
-		var p_data = {	plugin_name : '{{ plugin.id }}', 
-						userData : {'resultsOutputDir' : resultsOutputDir}
+	/*
+	 * Function: addToCart
+	 * Add a skel item to cart
+	 *
+	 * Parameters:
+	 *  data - hash: any user data
+	 *
+	 */ 
+	addToCart: function(data) {
+		var p_data = {	plugin_name : uidskel,
+						userData : data
 		};
 	
 		s_cart.addProcessing(p_data,
