@@ -22,7 +22,7 @@ designed to allow custom programs to operate a wide range of processings on data
 For this purpose, Youpi comes with an easy and convenient API allowing third-party 
 developpers to extend its standard functionalities.
 
-Basically, a Youpi processing plugin is made of four distinct files. One of them is a 
+Basically, a Youpi processing plugin is made of *four distinct files*. One of them is a 
 Python script used for all server-side actions, such as (but not limited to) database 
 interactions, variables or constants you would like |django|_ to substitute in your HTML 
 templates, and class member methods you would like to be available to the public 
@@ -30,24 +30,85 @@ interface of your plugin (so you can call them using AJAX calls from your Javasc
 files). The remaining three files are client-side related: a Javascript file holding 
 all your client-side routines and two HTML templates files for rendering the plugin on 
 the processing page and rendering the plugin related items in the shopping cart 
-respectively.
+respectively. Finally, when you are done writting your new plugin, the |pm| will find, 
+register and load your code into Youpi's processing data structure. 
 
-Finally, when you are done writting your new plugin, the |pm| will find, 
-register and load your code into Youpi's processing part. Let's begin with a simple 
-example.
+But first, let's begin with a simple example.
 
 Hello, world!
 =============
 
-*TBW*
+This short tutorial will guide you into the process of creating a simple plugin that will 
+do nothing useful but running a ``uname -a`` shell command on your Condor cluster. You will 
+learn how to start with the right set of files - because you don't need to start from 
+scratch  - and make minor modifications to get your new plugin work smoothly within Youpi.
+
+Youpi comes with a ``skeleton`` plugin that is designed to provide all the mandatory data 
+structures needed to build a working plugin. In a default configuration environment, the 
+|pm| does not load it since its name is not part of the ``YOUPI_ACTIVE_PLUGINS`` list. You 
+can load by updating your ``settings.py`` or ``local_conf.py`` configuration file with the 
+following statement::
+
+	YOUPI_ACTIVE_PLUGINS = ('skeleton', 'qualityfitsin', 'scamp', 'swarp', 'sextractor')
+
+Once loaded, the ``skeleton`` plugin is available on Youpi's *processing page* and you should 
+see its "Skel" icon in the bottom right corner of the available processings list. The purpose 
+of this plugin is to submit five ``uptime`` shell commands to the cluster. You can add a 
+``skeleton`` job to the shopping cart by clicking on the "Add to cart" button. As we may expect, 
+the plugin fully integrates with the shopping cart and Condor. From the shopping cart, you 
+can save this job for later processing or submit it to the cluster.
+
+That said, let's concentrate on our new plugin. Since the ``uname -a`` command displays 
+information about UNIX systems, we will call it ``system``. This value will be used as an 
+internal name: it's a unique plugin identifier keyword.
+
+Let's set up the directory structure by duplicating all ``skeleton``'s files located in the 
+``$YOUPI_INSTALL_DIR/terapix/templates/plugins`` directory::
+
+	$ cp skeleton.js system.js
+	$ cp skeleton.html system.html
+	$ cp skeleton_item_cart.html system_item_cart.html 
+
+Then duplicate the server-side code from the ``$YOUPI_INSTALL_DIR/terapix/youpi/plugins`` 
+directory::
+
+	$ cp skeleton.py system.py
+
+Now edit ``system.py`` and perform the following changes:
+
+- Rename ``Skeleton`` class to ``System``
+- Change the following attributes to match the new ``system`` plugin::
+
+	self.id =  'system' # This is your internal plugin id. It must be unique accross all plugins in use.
+	self.description = 'System tutorial'
+	self.optionLabel = 'My first plugin'
+	self.itemPrefix = 'SYS' # Used to prefix shopping cart items name
+	# Now set source file names
+	self.template = 'plugins/system.html' # Main template, rendered in the processing page
+	self.itemCartTemplate = 'plugins/system_item_cart.html' # Template for custom rendering into the shopping cart
+	self.jsSource = 'plugins/system.js' # Custom javascript
+	self.jobCount = 10 # Will queue 10 jobs on the cluster
+	# The actual command to perform
+	self.command = 'uname -a'
+
+Next, activate your new plugin by editing your ``settings.py`` (or ``local_conf.py`` depending 
+on your installation)::
+
+	YOUPI_ACTIVE_PLUGINS = ('system', 'skeleton', 'qualityfitsin', 'scamp', 'swarp', 'sextractor')
+
+Finally, run the ``checksetup.py`` script to ensure your plugin is registered into the database::
+
+	$ python manage.py checksetup
+
+That's it. Your plugin should be available on the the processing page. Just point your browser 
+to ``/youpi/processing/``.
 
 Naming Conventions
 ==================
 
-Before we continue with a concrete example in the next section, let us have a brief 
-discussion about naming policy related to Youpi plugin development. All your 
-plugins related files should live in two places (only those paths will be searched 
-for file inclusion), in a ``templates`` or ``youpi/plugins/`` directory.
+Let us have a brief discussion about naming policy related to Youpi plugin development. All 
+your plugins related files should live in two places (only those paths will be searched 
+for file inclusion), in the ``terapix/templates`` or ``terapix/youpi/plugins/`` directory.
 
 The ``templates`` directory, which should hold all your HTML and JavaScript 
 client-side template files. Let ``myplugin`` be your new plugin's name. In order 
