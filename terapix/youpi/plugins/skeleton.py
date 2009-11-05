@@ -16,14 +16,13 @@
 #
 # Mandatory data members
 #
-# def __getCondorSubmissionFile(self, request)
-# def getOutputDirStats(self, outputDir)
-# def getResultEntryDescription(self, task)
-# def getSavedItems(self, request)
-# def getTaskInfo(self, request)
-# def process(self, request)
-# def reprocessAllFailedProcessings(self, request)
-# def saveCartItem(self, request)
+# def __getCondorSubmissionFile(self, request)		: generates a suitable Condor submission file
+# def getResultEntryDescription(self, task)			: returns custom result entry description for a task.
+# def getSavedItems(self, request)					: returns a user's saved items for this plugin 
+# def getTaskInfo(self, request)					: returns information about a finished processing task. Used on the results page.
+# def process(self, request)						: generates and submits a Condor submission file (CSF)
+# def reprocessAllFailedProcessings(self, request)	: returns parameters to allow reprocessing of failed processings
+# def saveCartItem(self, request)					: save cart item's custom data to DB
 #
 
 import sys, os.path, re, time, string
@@ -43,9 +42,7 @@ class Skeleton(ProcessingPlugin):
 	"""
 	def __init__(self):
 		ProcessingPlugin.__init__(self)
-		#
-		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)
-		#
+
 		self.id = 'skel'
 		self.optionLabel = 'Skeleton (DEMO)'
 		self.description = 'Skeleton DEMO processing'
@@ -89,7 +86,7 @@ class Skeleton(ProcessingPlugin):
 
 	def __getCondorSubmissionFile(self, request):
 		"""
-		Generates a suitable Condor submission for processing self.command jobs on the cluster.
+		Generates a suitable Condor submission file for processing self.command jobs on the cluster.
 		"""
 
 		post = request.POST
@@ -177,7 +174,7 @@ class Skeleton(ProcessingPlugin):
 
 	def saveCartItem(self, request):
 		"""
-		Save cart item custom data to DB
+		Save cart item's custom data to DB
 		"""
 
 		post = request.POST
@@ -210,6 +207,7 @@ class Skeleton(ProcessingPlugin):
 		"""
 		Returns parameters to allow reprocessing of failed processings
 		"""
+		# FIXME: TODO
 		pass
 
 	def getSavedItems(self, request):
