@@ -226,8 +226,8 @@ var {{ plugin.id }} = {
 		// See templates/results.html, function showDetails(...)
 		var resp = currentReturnedData;
 		var container = $(container_id);
-		var d = new Element('div', {'class': 'entryResult'});
-		var tab = new Element('table', {'class': 'fileBrowser', 'style': 'width: 100%'});
+		var d = new Element('div').addClassName('entryResult');
+		var tab = new Element('table').addClassName('fileBrowser').setStyle({width: '100%'});
 	
 		tr = new Element('tr');
 		th = new Element('th').update(resp['Title']);
@@ -313,7 +313,7 @@ var {{ plugin.id }} = {
 	 */ 
 	showSavedItems: function() {
 		var cdiv = $('plugin_menuitem_sub_' + uidskel).update();
-		var div = new Element('div', {'class': 'savedItems', id: uidskel + '_saved_items_div'});
+		var div = new Element('div', {id: uidskel + '_saved_items_div'}).addClassName('savedItems');
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
