@@ -34,7 +34,6 @@ class ProcessingPlugin(object):
 	Base processing plugin class.
 	"""
 	def __init__(self):
-		self.id = 'base'
 		self.shortName = 'My short name here'
 		self.optionLabel = 'My option label'
 		# Default HTML template
@@ -331,7 +330,7 @@ class ProcessingPlugin(object):
 
 	def getOutputDirStats(self, outputDir):
 		"""
-		Return some skeleton-related statistics about processings from outputDir.
+		Return some related statistics about processings from outputDir.
 		"""
 
 		headers = ['Task success', 'Task failures', 'Total processings']
@@ -516,7 +515,9 @@ class PluginManager(object):
 
 	def __loadPlugins(self):
 		"""
-		Dynamically loads plugins from the settings.PLUGIN_DIRS directory
+		Dynamically loads plugins from the settings.PLUGIN_DIRS directory.
+		Ensure that each plugin has an id attribute and is unique accross all
+		registered plugins.
 		"""
 		for name in settings.YOUPI_ACTIVE_PLUGINS:
 			if name.endswith('.py'): name = name[:-3]
@@ -527,6 +528,17 @@ class PluginManager(object):
 		for obj in ProcessingPlugin.__subclasses__():
 			if obj not in self.__instances:
 				self.__instances[obj] = obj()
+				if not hasattr(self.__instances[obj], 'id'):
+					raise PluginManagerError, "Plugin %s does not have an id attribute which is mandatory" % obj
+
+		# Ensure plugin id is unique
+		ids = {}
+		for plug in self.__instances.values():
+			if not ids.has_key(plug.id): ids[plug.id] = []
+			ids[plug.id].append(plug)
+		for id, plugs in ids.iteritems():
+			if len(plugs) > 1:
+				raise PluginManagerError, "The %s plugins can't have the same id attribute '%s'" % (plugs, id)
 
 	def reload(self):
 		"""
