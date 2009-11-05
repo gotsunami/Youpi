@@ -11,6 +11,8 @@
  *
  *****************************************************************************/
 
+/* vim: set ts=4 */
+
 /*
  * Group: Skeleton Plugin
  *
@@ -21,27 +23,32 @@
  *
  * Mandatory function prototypes:
  *
- * - addSelectionToCart()
- * - addToCart(resultsOutputDir)
- * - delSavedItem(trid, name)
- * - renderOutputDirStats(container_id)
- * - reprocessAllFailedProcessings(tasksList)
- * - resultsShowEntryDetails(container_id)
- * - run(trid, resultsOutputDir, silent)
- * - saveItemForLater(trid, itemId, resultsOutputDir)
- * - showSavedItems()
+ * addSelectionToCart()						: adds current selection to cart
+ * addToCart(data)							: adds a previously saved selection to cart
+ * delSavedItem(trid, name)					: deletes a previously saved item
+ * renderOutputDirStats(container_id)		: renders some statistics (from the results page)
+ * reprocessAllFailedProcessings(tasksList)	: one click for reprocessing failed processings from the results page
+ * resultsShowEntryDetails(container_id)	: displays custom results information on the results page
+ * run(trid, opts, silent)					: submits a job to the cluster
+ * saveItemForLater(trid, opts, silent)		: save item for later processing then remove item from the shopping cart
+ * showSavedItems()							: displays saved cart items
  *
  */
 
+/* global */
 var uidskel = '{{ plugin.id }}';
 
 var {{ plugin.id }} = {
 	/*
 	 * Function: addSelectionToCart
+	 * Add the current selection to cart.
+	 * Since this is a demo plugin, no real selection has been made. It's just adding the output data 
+	 * directory to the userData variable
 	 *
 	 */
 	addSelectionToCart: function() {
 		// Do your sanity checks here
+		var msg = 'One Skeleton-related job has been added to the cart. This is a DEMO plugin: it does nothing useful.';
 	
 		// Custom output directory
 		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidskel + '/';
@@ -53,18 +60,18 @@ var {{ plugin.id }} = {
 		};
 	
 		// Add entry into the shopping cart
-		s_cart.addProcessing(	p_data,
-								// Custom handler
-								function() {
-									document.fire('notifier:notify', 'One Skeleton-related job has been added to the cart.Since this is a DEMO plugin, ' +
-											"it will do nothing but running five '/usr/bin/uptime' jobs on the cluster.");
-								}
+		s_cart.addProcessing(	
+			p_data,
+			// Custom handler
+			function() {
+				document.fire('notifier:notify', msg);
+			}
 		);
 	},
 
 	/*
 	 * Function: run
-	 * Run processing
+	 * Submits a job to the cluster
 	 *
 	 * Parameters:
 	 *  trid - string: for row number
@@ -82,7 +89,7 @@ var {{ plugin.id }} = {
 				null,	
 				// Custom handler for results
 				function(resp) {
-					r = resp['result'];
+					r = resp.result;
 					var success = update_condor_submission_log(resp, silent);
 					if (!success) return;
 	
@@ -102,7 +109,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function:  reprocessAllFailedProcessings
-	 * One click for reprocessing failed processings
+	 * One click for reprocessing failed processings from the results page
 	 *
 	 * Parameters:
 	 *  taskList - array: list of task Ids
@@ -114,10 +121,11 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function: renderOutputDirStats
-	 * One click for reprocessing failed processings
+	 * Renders some statistics (from the results page)
+	 * Those stats are bound to the results output directory.
 	 *
 	 * Parameters:
-	 *  taskList - array: list of task Ids
+	 *  container_id - string: DOM container id
 	 *
 	 */ 
 	renderOutputDirStats: function(container_id) {
@@ -125,18 +133,19 @@ var {{ plugin.id }} = {
 	
 		// global var defined in results.html
 		var resp = output_dir_stats_data;
-		var stats = resp['Stats'];
+		var stats = resp.Stats;
 	
-		var tab = new Element('table', {'class': 'output_dir_stats'});
+		var tab = new Element('table').addClassName('output_dir_stats');
 		var tr,th,td;
 		var tr = new Element('tr');
 		// Headers
-		var headers = $H({	task_success: 'Task success',
-							task_failure: 'Task failures',
-							task_total: 'Total processings'
+		var headers = $H({	
+			task_success: 'Task success',
+			task_failure: 'Task failures',
+			task_total: 'Total processings'
 		});
 		headers.each(function(header) {
-			th = new Element('th', {'class': header.key, 'colspan': '2'}).update(header.value);
+			th = new Element('th', {'colspan': '2'}).addClassName(header.key).update(header.value);
 			tr.insert(th);
 		});
 		tab.insert(tr);
@@ -163,10 +172,10 @@ var {{ plugin.id }} = {
 				default:
 					break;
 			}
-			var td = new Element('td', {'class': cls}).update(val);
+			var td = new Element('td').addClassName(cls).update(val);
 			tr.insert(td);
 
-			td = new Element('td', {'class': cls}).update(percent);
+			td = new Element('td').addClassName(cls).update(percent);
 			tr.insert(td);
 		});
 		tab.insert(tr);
@@ -205,8 +214,8 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function: resultsShowEntryDetails
-	 * Displays custom result information. 'resp' contains 
-	 * server-side info to display
+	 * Displays custom results information on the results page. 
+	 * 'resp' contains server-side info to display
 	 *
 	 * Parameters:
 	 *  container_id - string: id of DOM container
@@ -299,7 +308,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function: showSavedItems
-	 * Display saved cart items
+	 * Displays saved cart items
 	 *
 	 */ 
 	showSavedItems: function() {
