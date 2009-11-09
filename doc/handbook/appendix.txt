@@ -34,9 +34,31 @@ Version 0.5.2
 
 In order to upgrade from 0.5.1, please do the following:
 
+.. warning:: Following these steps in order is important. Please do not issue a ``checksetup`` 
+             command before step 4. The database structure has to be manually altered first (step 1).
+
 0. Make a **backup of your database**.
 
-1. Edit your ``settings.py`` file and add the line ``terapix.django_evolution`` to your 
+1. Connect to your MySQL databsase and issue the following statements::
+
+	$ python manage.py dbshell
+	mysql> alter table youpi_image drop `QSOstatus`;
+	mysql> alter table youpi_image add `is_validated` bool;
+	mysql> update youpi_image set is_validated=1;
+	mysql> alter table youpi_ingestion drop `check_QSO_status`;
+	mysql> alter table youpi_ingestion add `is_validated` bool;
+	mysql> update youpi_ingestion set is_validated=1;
+
+   .. note:: you have to do this upgrade manually when updating from version 0.5.1 to 0.5.2. Future
+             database upgrades will be performed automatically using the "Django evolution" 
+             application activated at step 3.
+
+2. From the ``settings.py-dist`` file, copy the ``YOUPI_ACTIVE_PLUGINS`` variable 
+   into your ``settings.py`` or ``local_conf.py`` file::
+
+	YOUPI_ACTIVE_PLUGINS = ('qualityfitsin', 'scamp', 'swarp', 'sextractor')
+
+3. Edit your ``settings.py`` file and add the line ``terapix.django_evolution`` to your 
    ``INSTALLED_APPS`` variable so it looks like the following::
 
 	INSTALLED_APPS = (
@@ -45,12 +67,9 @@ In order to upgrade from 0.5.1, please do the following:
 	'terapix.youpi',
 	)
 
-2. From the ``settings.py-dist`` file, copy the ``YOUPI_ACTIVE_PLUGINS`` variable 
-   into your ``settings.py`` or ``local_conf.py`` file::
 
-	YOUPI_ACTIVE_PLUGINS = ('qualityfitsin', 'scamp', 'swarp', 'sextractor')
-
-3. Finally, let Youpi inspect your installation setup with::
+4. Finally, let Youpi inspect your installation setup and tell the ``django-evolution`` application to 
+   make an initial snapshot of the database structure::
 
 	$ python manage.py checksetup
 
