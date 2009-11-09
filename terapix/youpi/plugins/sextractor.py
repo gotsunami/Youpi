@@ -396,16 +396,18 @@ class Sextractor(ProcessingPlugin):
 			userData['JobID'] = self.getUniqueCondorJobId()
 
 			# Parameters to use for each job
+			sex_params = ''
 			try:
-				xslPath = re.search(r'file://(.*)$', self.getConfigValue(contconf.split('\n'), 'XSL_URL')).group(1)
+				xslPath = re.search(r'(file|http)://(.*)$', self.getConfigValue(contconf.split('\n'), 'XSL_URL')).group(1)
 				sex_params = "-XSL_URL %s" % (os.path.join(	settings.WWW_SEX_PREFIX, 
 															request.user.username, 
 															userData['Kind'], 
 															userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
 															os.path.basename(xslPath)) )
 			except TypeError, e:
-				# No custom XSL_URL value
-				sex_params = ''
+				pass
+			except AttributeError, e:
+				pass
 
 			sex_params += " -WRITE_XML YES "
 
