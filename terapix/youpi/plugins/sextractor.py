@@ -236,7 +236,7 @@ class Sextractor(ProcessingPlugin):
 			reprocessValid 			= int(post['ReprocessValid'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
-		
+
 		#
 		# File selection and storage.(for the configuration file and the parameter file)
 		#
@@ -391,7 +391,7 @@ class Sextractor(ProcessingPlugin):
 			else:
 				userData['Descr'] = str("%s of %s (Single Mode), %s" % (self.optionLabel, img.name, xmlRootName))		# Mandatory for Active Monitoring Interface (AMI)
 
-			userData['ResultsOutputDir'] = str(os.path.join(resultsOutputDir, img.name))
+			userData['ResultsOutputDir'] = resultsOutputDir
 			# Mandatory for WP
 			userData['JobID'] = self.getUniqueCondorJobId()
 

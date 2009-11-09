@@ -463,6 +463,7 @@ def process(userData, kind_id, argv):
 
 		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
 		os.mkdir(imgName)
+		os.chmod(imgName, RWX_ALL)
 		os.system("mv sex-config* sex-param* *.conv *.nnw %s" %(imgName))
 		os.chdir(imgName)
 
