@@ -211,7 +211,7 @@ class Swarp(ProcessingPlugin):
 			weight_files = self.getWeightPathsFromImageSelection(request, idList)
 			weight_files = string.join([dat[1] for dat in weight_files], ', ')
 		else:
-			weight_files = string.join([os.path.join(weigthPath, img.name + '_weight.fits.fz') for img in images], ', ')
+			weight_files = string.join([os.path.join(weightPath, img.name + '_weight.fits') for img in images], ', ')
 
 		# .head files support
 		head_files = os.path.join(submit_file_path, 'NOP')
@@ -242,8 +242,9 @@ class Swarp(ProcessingPlugin):
 		except ValueError:
 			raise ValueError, userData
 
+		swarp_params = ''
 		try:
-			xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
+			xslPath = re.search(r'(file|http)://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
 			swarp_params = "-XSL_URL %s" % os.path.join(settings.WWW_SWARP_PREFIX, 
 														request.user.username, 
 														userData['Kind'], 
@@ -251,8 +252,9 @@ class Swarp(ProcessingPlugin):
 														os.path.basename(xslPath)
 											)
 		except TypeError, e:
-			# No custom XSL_URL value
-			swarp_params = ''
+			pass
+		except AttributeError, e:
+			pass
 
 		# Now generates the preprocessing Python script needed to be able 
 		# to uncompress all .fz weight maps

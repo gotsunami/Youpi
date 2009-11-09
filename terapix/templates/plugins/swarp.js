@@ -125,21 +125,29 @@ var {{ plugin.id }} = {
 
 			return;
 		}
-	
-		log.msg_status('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no checks for successful QFITS are ' +
-			'made at this time</b>. ');
+		else {
+			log.msg_status('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no checks for successful QFITS are ' +
+				'made at this time</b>. ');
+			var sName = {{ plugin.id }}.ims.getSavedSelectionUsed() ? "<span class=\"saved_selection_used\">" + {{ plugin.id }}.ims.getSavedSelectionUsed() + "</span>" : "";
+			log.msg_status("Using output data path '" + output_data_path + "'");
+			if (sName.length)
+				log.msg_status("Using '" + sName + "' for image selection (" + total + ' image' + (total > 1 ? 's' : '') + ")");
+			else
+				log.msg_status("Found " + total + ' image' + (total > 1 ? 's' : '') + " selected");
+			log.msg_status("Using '<span class=saved_selection_used>" + config + "</span>' as configuration file");
 
-		// Checks for Scamp processings (for .head files support)
-		{{ plugin.id }}.checkForScampData(pre, function() {
-			{{ plugin.id }}.do_addSelectionToCart({
-				useQFITSWeights: 0,
-				config: config, 
-				idList: sels, 
-				weightPath: weightPath, 
-				resultsOutputDir: output_data_path,
-				headDataPaths: {{ plugin.id }}.headDataPaths.join(',')
+			// Checks for Scamp processings (for .head files support)
+			{{ plugin.id }}.checkForScampData(pre, function() {
+				{{ plugin.id }}.do_addSelectionToCart({
+					useQFITSWeights: 0,
+					config: config, 
+					idList: sels, 
+					weightPath: weightPath, 
+					resultsOutputDir: output_data_path,
+					headDataPaths: {{ plugin.id }}.headDataPaths.join(',')
+				});
 			});
-		});
+		}
 	},
 
 	do_addSelectionToCart: function(data) {
