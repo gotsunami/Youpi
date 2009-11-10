@@ -570,7 +570,7 @@ def process(userData, kind_id, argv):
 
 			# Copy XSL stylesheet
 			try:
-				xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+				xslPath = re.search(r'(http|file)://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
 				copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
 			except TypeError, e:
 				# No custom XSL_URL value
@@ -627,7 +627,7 @@ def process(userData, kind_id, argv):
 
 			# Copy XSL stylesheet
 			try:
-				xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+				xslPath = re.search(r'(http|file)://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
 				copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
 			except TypeError, e:
 				# No custom XSL_URL value
@@ -737,7 +737,7 @@ def process(userData, kind_id, argv):
 
 			# Copy XSL stylesheet
 			try:
-				xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
+				xslPath = re.search(r'(http|file)://(.*)$', getConfigValue(configContent, 'XSL_URL')).group(1)
 				copyFileChmodAll(xslPath, userData['ResultsOutputDir'])
 			except TypeError, e:
 				# No custom XSL_URL value
