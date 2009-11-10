@@ -13,6 +13,7 @@ FITS Data Ingestion
 
 .. image:: /figures/ingestion.png
    :width: 800
+   :scale: 90
 
 A FITS image is the most important entity in youpi.
 The ingestion process make your images their first entries in the pipeline.
@@ -88,6 +89,7 @@ Deal With Condor Setup
 
 .. image:: /figures/condor.png
    :width: 800
+   :scale: 90
 
 The condor Setup tab will show in real time your cluster status and let customize basic or
 advanced policies related to your cluster functionalities. Condor is a specialized workload
@@ -124,6 +126,7 @@ Set up Your Preferences
 
 .. image:: /figures/preferences.png
    :width: 800
+   :scale: 90
 
 The preference tab in the Youpi interface is as important as the condor setup tab.
 It handles global options for youpi and it is user dependant. Each user can set his
@@ -154,6 +157,7 @@ Organize your data with tags
 
 .. image:: /figures/tag.png
    :width: 800
+   :scale: 90
 
 Tags are keywords or terms associated with or assigned to a piece of information.
 In the Youpi case, let's say that this is a metadata (a text field) that you could
@@ -191,6 +195,7 @@ Processing Your Data
 
 .. image:: /figures/processing.png
    :width: 800
+   :scale: 90
 
 For each plugin implemented, as a computing process which could be run on FITS images 
 through Youpi, there are severals steps to observe, represented as tabs as shown in the
@@ -299,7 +304,7 @@ by the processing.You can add one more custom level directory in the output dire
 Input versus Output validation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Each plugin implemented in Youpi has his own input/output data. In a pipeline context,
+Each plugin implemented in Youpi has its own input/output data. In a pipeline context,
 output data from one could be the input of another, and every IN/OUT dependancies between
 them, are handled. The input data validation tab has its purpose, take care of ouput-input
 bridges between plugins. when all previous tabs have been treated, the only thing you have
@@ -319,6 +324,7 @@ The Shopping Cart
 
 .. image:: /figures/shopping.png
    :width: 800
+   :scale: 90
 
 The shopping cart comes naturally, after adding to cart one or many processings, elaborated
 from plugins of the *processing your data* tab. It represents a visual synthesis of 
@@ -342,6 +348,7 @@ Live Monitoring of Processings
 
 .. image:: /figures/activemonitoring.png
    :width: 800
+   :scale: 90
 
 After having launched jobs, from the shopping cart to the Condor management system, Youpi 
 provides a realtime instant view of all proccessed jobs, with related nodes in which jobs
@@ -356,6 +363,7 @@ Processing Results
 
 .. image:: /figures/results.png
    :width: 800
+   :scale: 90
 
 The processing history tab is separated for the moment, in 2 parts. The first one is a 
 *processing selector* under the *history* tab, and proposes a custom search of processings 
@@ -381,10 +389,11 @@ Generating Reports
 ==================
 .. image:: /figures/reporting.png
    :width: 800
+   :scale: 90
 
 Every actions, leaded by the user during his session on youpi, have database impacts. It
 means that, at anytime, youpi could generate from your account, global or very specific reports.
 The reports engine works with a graphic library, and can generate statistic images including
-histogramms, plots and many others features taht could enhance graphically your data results
+histogramms, plots and many others features that could enhance graphically your data results
 from the pipeline.
-the pipeline.
+
