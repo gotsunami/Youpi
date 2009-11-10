@@ -295,7 +295,7 @@ function ConfigFileWidget(container, pluginId, options)
 
 	function _saveConfig() {
 		var textNode = $(id + '_' + _options.type + '_save_text');
-		var name = textNode.value.replace('+', '%2B');
+		var name = textNode.value;
 	
 		if (name.length == 0) {
 			alert('Cannot save a ' + _options.type + ' file with an empty name!');
