@@ -23,51 +23,42 @@ function build_menu(colCount) {
 	plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description }}', '{{ plugin.optionLabel }}'];
 {% endfor %}
 
-	var container = document.getElementById('plugin_menu_div');
-	var tab = document.createElement('table');
-	tab.setAttribute('class', 'plugin_menu');
+	var container = $('plugin_menu_div');
+	var tab = new Element('table').addClassName('plugin_menu');
 
 	var tr, td, pdiv, tdiv;
 	var i = 0;
-	tr = document.createElement('tr');
-	tab.appendChild(tr);
+	tr = new Element('tr');
+	tab.insert(tr);
 
-	for(var k=0; k < plugin_data.length; k++) {
+	plugin_data.each(function(plugin) {
 		if (i >= colCount) {
-			tr = document.createElement('tr');
-			tab.appendChild(tr);
+			tr = new Element('tr');
+			tab.insert(tr);
 			i = 0;
 		}
-		td = document.createElement('td');
-		pdiv = document.createElement('div');
-		pdiv.setAttribute('onclick', 'location.href="/youpi/processing/' + plugin_data[k][0] + '/"');
-		pdiv.setAttribute('class', "processing_menu_entry");
+		td = new Element('td');
+		pdiv = new Element('div').addClassName('processing_menu_entry');
+		pdiv.c_data =  plugin[0];
+		pdiv.observe('click', function() {
+			location.href='/youpi/processing/' + this.c_data + '/';
+		});
 
-		var img = document.createElement('img');
-		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/48x48/' + plugin_data[k][0] + '.png');
-		img.setAttribute('style', 'margin-right: 10px;');
+		var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/48x48/' + plugin[0] + '.png'});
+		img.setStyle({marginRight: '10px;'});
 
-		tdiv = document.createElement('div');
-		tdiv.setAttribute('style', "padding: 2px;");
+		tdiv = new Element('div').setStyle({padding: '2px;'});
+		var desc = new Element('span').addClassName('desc').update(plugin[1]);
+		var label = new Element('span').addClassName('label').update(plugin[2]);
 
-		var desc = document.createElement('span');
-		desc.setAttribute('class', 'desc');
-		desc.appendChild(document.createTextNode(plugin_data[k][1]));
-		var label = document.createElement('span');
-		label.setAttribute('class', 'label');
-		label.appendChild(document.createTextNode(plugin_data[k][2]));
+		tdiv.insert(desc).insert(new Element('br')).insert(label);
 
-		tdiv.appendChild(desc);
-		tdiv.appendChild(document.createElement('br'));
-		tdiv.appendChild(label);
-
-		pdiv.appendChild(img);
-		pdiv.appendChild(tdiv);
-		td.appendChild(pdiv);
-		tr.appendChild(td);
+		pdiv.insert(img).insert(tdiv);
+		td.insert(pdiv);
+		tr.insert(td);
 		i++;
-	}
-	container.appendChild(tab);
+	});
+	container.insert(tab);
 }
 </script>
 {% endblock %}
