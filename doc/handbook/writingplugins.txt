@@ -74,7 +74,7 @@ directory::
 
 	$ cp skeleton.py system.py
 
-Now edit ``system.py`` and perform the following changes:
+Edit your ``system.py`` file and perform the following changes:
 
 - Rename ``Skeleton`` class to ``System``
 - Change the following attributes to match the new ``system`` plugin::
@@ -90,6 +90,15 @@ Now edit ``system.py`` and perform the following changes:
 	self.jobCount = 10 # Will queue 10 jobs on the cluster
 	# The actual command to perform
 	self.command = 'uname -a'
+
+You also have to edit the ``system.html`` file and set some appropriate description by replacing 
+the actual ``<p>`` HTML elements::
+
+	<p>Add system jobs to the cart</p>
+
+Now edit ``system_item_cart.html`` and replace old ``<p>`` content from the ``skeleton`` plugin::
+
+	<p>This is a system job</p>
 
 Next, activate your new plugin by editing your ``settings.py`` (or ``local_conf.py`` depending 
 on your installation)::
