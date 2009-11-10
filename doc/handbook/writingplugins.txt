@@ -91,14 +91,11 @@ Edit your ``system.py`` file and perform the following changes:
 	# The actual command to perform
 	self.command = 'uname -a'
 
-You also have to edit the ``system.html`` file and set some appropriate description by replacing 
-the actual ``<p>`` HTML elements::
+You also have to edit both ``system.html`` and ``system_item_cart.html`` templates and set some appropriate 
+descriptions by replacing the actual ``<p>`` HTML elements with::
 
-	<p>Add system jobs to the cart</p>
-
-Now edit ``system_item_cart.html`` and replace old ``<p>`` content from the ``skeleton`` plugin::
-
-	<p>This is a system job</p>
+	<p>Add system jobs to the cart</p> # in system.html
+	<p>This is a system job</p>        # in system_item_cart.html
 
 Next, activate your new plugin by editing your ``settings.py`` (or ``local_conf.py`` depending 
 on your installation)::
