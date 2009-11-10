@@ -99,10 +99,14 @@ def setup_db():
 		try:
 			kind = Processing_kind(name = plugin.id, label = plugin.optionLabel)
 			kind.save()
-			logger.log('Added ' + plugin.id)
+			action = "Added"
 		except IntegrityError:
-			# Already existing
-			pass
+			# Already existing, then possibliy updates label
+			kind = Processing_kind.objects.filter(name = plugin.id)[0]
+			kind.label = plugin.optionLabel
+			kind.save()
+			action = "Updated"
+		logger.log("%s '%s' processing kind" % (action, plugin.id))
 
 	# Default config types
 	logger.log('Adding default configuration file types')
