@@ -398,18 +398,24 @@ class Sextractor(ProcessingPlugin):
 			# Parameters to use for each job
 			sex_params = ''
 			try:
-				xslPath = re.search(r'(file|http)://(.*)$', self.getConfigValue(contconf.split('\n'), 'XSL_URL')).group(1)
-				sex_params = "-XSL_URL %s" % (os.path.join(	settings.WWW_SEX_PREFIX, 
-															request.user.username, 
-															userData['Kind'], 
-															userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
-															os.path.basename(xslPath)) )
+				url = self.getConfigValue(content.split('\n'), 'XSL_URL')
+				xslPath = re.search(r'file://(.*)$', url)
+				if xslPath:
+					# This is a local (or NFS) path, Youpi will serve it
+					sex_params = "-XSL_URL %s" % os.path.join(
+						settings.WWW_SEX_PREFIX, 
+						request.user.username, 
+						userData['Kind'], 
+						userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+						os.path.basename(xslPath.group(1))
+					)
+				else:
+					# Copy attribute as is
+					if url: sex_params = "-XSL_URL " + url
 			except TypeError, e:
 				pass
 			except AttributeError, e:
 				pass
-
-			sex_params += " -WRITE_XML YES "
 
 			# Adds weight support 
 			if weightPath:

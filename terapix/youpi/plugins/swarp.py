@@ -244,13 +244,20 @@ class Swarp(ProcessingPlugin):
 
 		swarp_params = ''
 		try:
-			xslPath = re.search(r'(file|http)://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
-			swarp_params = "-XSL_URL %s" % os.path.join(settings.WWW_SWARP_PREFIX, 
-														request.user.username, 
-														userData['Kind'], 
-														userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
-														os.path.basename(xslPath)
-											)
+			url = self.getConfigValue(content.split('\n'), 'XSL_URL')
+			xslPath = re.search(r'file://(.*)$', url)
+			if xslPath:
+				# This is a local (or NFS) path, Youpi will serve it
+				swarp_params = "-XSL_URL %s" % os.path.join(
+					settings.WWW_SWARP_PREFIX, 
+					request.user.username, 
+					userData['Kind'], 
+					userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+					os.path.basename(xslPath.group(1))
+				)
+			else:
+				# Copy attribute as is
+				if url: swarp_params = "-XSL_URL " + url
 		except TypeError, e:
 			pass
 		except AttributeError, e:

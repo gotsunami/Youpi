@@ -268,17 +268,26 @@ class Scamp(ProcessingPlugin):
 		except ValueError:
 			raise ValueError, userData
 
+		scamp_params = ''
 		try:
-			xslPath = re.search(r'file://(.*)$', self.getConfigValue(content.split('\n'), 'XSL_URL')).group(1)
-			scamp_params = "-XSL_URL %s" % os.path.join(settings.WWW_SCAMP_PREFIX, 
-														request.user.username, 
-														userData['Kind'], 
-														userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
-														os.path.basename(xslPath)
-											)
+			url = self.getConfigValue(content.split('\n'), 'XSL_URL')
+			xslPath = re.search(r'file://(.*)$', url)
+			if xslPath:
+				# This is a local (or NFS) path, Youpi will serve it
+				scamp_params = "-XSL_URL %s" % os.path.join(
+					settings.WWW_SCAMP_PREFIX, 
+					request.user.username, 
+					userData['Kind'], 
+					userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+					os.path.basename(xslPath.group(1))
+				)
+			else:
+				# Copy attribute as is
+				if url: scamp_params = "-XSL_URL " + url
 		except TypeError, e:
-			# No custom XSL_URL value
-			scamp_params = ''
+			pass
+		except AttributeError, e:
+			pass
 
 		#
 		# Generate CSF
