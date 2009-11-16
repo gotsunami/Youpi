@@ -35,6 +35,8 @@ register and load your code into Youpi's processing data structure.
 
 But first, let's begin with a simple example.
 
+.. _hello_world_tutorial:
+
 Hello, world!
 =============
 
@@ -119,92 +121,81 @@ Naming Conventions
 ==================
 
 Let us have a brief discussion about naming policy related to Youpi plugin development. All 
-your plugins related files should live in two places (only those paths will be searched 
-for file inclusion), in the ``terapix/templates`` or ``terapix/youpi/plugins/`` directory.
+your plugins related files must live in two places (only those paths will be searched 
+for file inclusion), either in the ``terapix/templates/plugins/`` or ``terapix/youpi/plugins/`` 
+directory:
 
-The ``templates`` directory, which should hold all your HTML and JavaScript 
-client-side template files. Let ``myplugin`` be your new plugin's name. In order 
-to respect Youpi naming policy, you should prepend file names with the ``plugin`` 
-keyword (note the underscore). So, you should create and use the following files::
+- The ``templates`` directory is the one which should hold all your HTML and JavaScript 
+  client-side template files. In the previous :ref:`hello_world_tutorial` section, we created a 
+  simple plugin named ``system``. In order to respect Youpi naming policy, every plugin must 
+  define three template files::
 
-	templates/plugin_myplugin_item_cart.html
-	templates/plugin_myplugin.html
-	templates/plugin_myplugin.js
+	templates/plugins/system_item_cart.html
+	templates/plugins/system.html
+	templates/plugins/system.js
 
-Files in this directory get substituted by |django| before client-side rendering. 
-One might wonder why every plugin's JavaScript file is in there and why it needs 
-to be substituted. The reason for this rather unexpected location (it should 
-preferably belong to the ``media/js`` directory, defined to be the location 
-holding all JavaScript-related files) is that server-side |django| substitution 
-may help with the lack of robust namespacing support in JavaScript. Let us consider 
-the rendering of the HTML processing page, as defined in the ``templates/processing.html`` 
-file. Two parts are of interest::
+  Files in this directory get substituted by |django| before client-side rendering. 
+  One might wonder why every plugin's JavaScript file is in there too and why it needs 
+  to be substituted. The reason for this rather unexpected location (it should 
+  preferably belong to the ``media/js`` directory, defined to be the location 
+  holding all JavaScript-related files) is that server-side |django| substitution 
+  is required at several places in order to make the plugin system working properly. 
 
-	<script type="text/javascript">
-	  {# Load custom plugin's javascript code if available #}
-	  {% for plugin in plugins %}
-	  {% include plugin.jsSource %} <co id="co-jsplugin"/>
-	  {% endfor %}
-	</script>
-	...
-	{% for plugin in plugins %}
-	{% if forloop.first %}
-	<div id="menuitem_{{ plugin.id }}">
-	  {% else %}
-	<div id="menuitem_{{ plugin.id }}" style="display: none">
-	  {% endif %}
-	  <table width="100%">
-		<tr>
-		  <td>
-			<p>Plugin description: {{ plugin.description }}, version {{ plugin.version }}</p>
-			<div align="center">{% include plugin.template %}</div> <co id="co-ptemplate"/>
-		  </td>
-		</tr>
-	  </table>
-	</div>
-	{% endfor %}
+  As of today, three template files include your plugin's source code directly in their 
+  body:
 
-``{% include plugin.jsSource %}`` includes each registered plugin's javascript code. 
-The ``include`` statement is a |django|'s built-in template tag which loads a template 
-file and renders it *with the current context*, thus making the ``plugin`` variable 
-available into your JavaScript ``jsSource`` file too.
+  ========================== =========================== =============================================================
+  Template file              Included file argument      Purpose
+  ========================== =========================== =============================================================
+  ``processing_plugin.html`` ``plugin.jsSource``         Plugin's javascript code and
+                             ``plugin.template``         plugin HTML template for rendering on the processing page
+  ``single_result.html``     ``plugin.jsSource``         Plugin javascript code
+  ``shoppingcart.html``      ``plugin.jsSource``         Plugin's javascript code and
+                             ``plugin.itemCartTemplate`` plugin HTML template for rendering items in the shopping cart
+  ========================== =========================== =============================================================
 
-{% include plugin.template %} shows how plugin HTML template data is included into 
-the final HTML document.
+  In the ``shoppingcart.html`` template for example, the plugin's ``jsSource`` javascript file 
+  and ``itemCartTemplate`` are included using the ``include`` tag when |django| wants to render 
+  the shopping cart template. The ``include`` statement is a |django|'s built-in template tag 
+  which loads a template file and renders it *with the current context* so that variables in the 
+  current context can be substituted in every plugin's templates. Since the ``plugin`` variable is 
+  a Python object (which inherits the ``ProcessingPlugin`` class), |django|'s template system is 
+  able to access all its data members. 
 
-Since the ``plugin`` variable is a Python object (which inherits the ``Spica2Plugin`` 
-class), |django|'s template system is able to access all its data members. Context 
-variable lookup can get around this namespacing issue by, for example, prefixing 
-function and variable names with the plugin's unique identifier. Therefore, instead 
-of writing this::
-
-	function my_plugin_function() {}
-	var my_global_var;
-	<div id="my_unique_id"></div>
-
-do write instead::
-
-	function {{ plugin.id }}_my_plugin_function() {}
-	var {{ plugin.id }}_my_global_var;
-	<div id="{{ plugin.id }}_my_unique_id"></div>
-
-Let ``myid`` be your plugin's unique identifier. After rendering, final HTML data 
-will look like this::
-
-	function <emphasis role="strong">myid</emphasis>_my_plugin_function() {}
-	var <emphasis role="strong">myid</emphasis>_my_global_var;
-	<div id="<emphasis role="strong">myid</emphasis>_my_unique_id"></div>
-
-The ``youpi/plugins/`` directory, which should hold your server-side Python ascript. 
-There is no particular naming policy since all Python files that belongs to this 
-directory are parsed by the |pm| at registration time. For example, 
-default plugin Python filenames are among the following::
+- The ``youpi/plugins/`` directory, which should hold your server-side Python script. 
+  There is no particular naming policy since all Python files that belongs to this 
+  directory are parsed and registered by the |pm| automatically. For example, default plugin 
+  Python filenames are among the following::
 
 	youpi/plugins/qualityfitsin.py
 	youpi/plugins/qualityfitsout.py
 	youpi/plugins/sextractor.py
 	youpi/plugins/scamp.py
 	youpi/plugins/swarp.py
+	youpi/plugins/skel.py
+
+.. note:: As a general rule, you should follow the coding style used in the ``skeleton`` plugin.
+
+Most importantly, every plugin's javascript ``jsSource`` code should basically have the same 
+overall structure than the one provided by ``skeleton``::
+
+	/* global variable (name must be unique): 'uid' + plugin.id */
+	var uidsystem = '{{ plugin.id }}';
+
+	// This is the main plugin object, acting as a function container
+	var {{ plugin.id }} = {
+		// Variables
+		var1: val1,
+		...
+		// Functions
+		function1: function() {},
+		function2: function() {},
+		...
+		functionn: function() {}
+	};
+
+Following this structure will ensure that Youpi is able to find the :ref:`minimal_set_functions` 
+(we will talk about that later) needed in order for your plugin to integrate properly with it.
 
 
 About Ajax Calls
@@ -331,6 +322,13 @@ level, every plugin's method have to return a JSON-aware Python dictionary.
           JavaScript and is supported in almost all today's web browsers 
 .. [#JSON] JavaScript Object Notation data-interchange format
 
+
+.. _minimal_set_functions:
+
+Minimal Set of Mandatory Functions
+==================================
+
+*TBW*
 
 Active Monitoring Interface Integration
 =======================================
