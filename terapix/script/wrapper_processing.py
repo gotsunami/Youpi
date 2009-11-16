@@ -534,10 +534,6 @@ def process(userData, kind_id, argv):
 			except Exception, e:
 				raise WrapperError, e
 
-	elif kind == 'skel':
-		if exit_code == 0:
-			success = 1
-
 	elif kind == 'scamp':
 		if exit_code == 0:
 			# FIXME: look for scamp.xml; parse it and look for errors in it
@@ -757,8 +753,9 @@ def process(userData, kind_id, argv):
 				debug("[Warning] IMAGEOUT_NAME keyword not found in configuration file")
 
 	else:
-		# Put other processing stuff here
-		pass
+		# Default: success is set to that task_end_log marks the job as successful
+		if exit_code == 0:
+			success = 1
 
 
 	################### END OF POST-PROCESSING  ################################################
