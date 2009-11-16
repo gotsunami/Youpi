@@ -231,7 +231,7 @@ class YoupiCondorCSF(CondorCSF):
 			dflt_setup = marshal.loads(base64.decodestring(self.request.user.get_profile().dflt_condor_setup))
 			# Check Behaviour: policy or selection
 			if not dflt_setup.has_key(self.id):
-				raise CondorError, "No default Condor setup found for '%s' plugin." % self.optionLabel
+				raise CondorError, "No default Condor setup found for '%s' plugin (id: %s)." % (self._desc, self.id)
 
 			db = dflt_setup[self.id]['DB']
 			if db == 'policy':
