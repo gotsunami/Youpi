@@ -12,6 +12,7 @@
 ##############################################################################
 
 import sys, os, string, stat
+import marshal, base64
 os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
 if '..' not in sys.path:
 	sys.path.insert(0, '..')
@@ -30,6 +31,7 @@ except ImportError:
 
 YOUPI_USER = 'youpiadm'
 RWXALL = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
+manager = None # Global manager
 
 class LoggerError(Exception): pass
 
@@ -62,7 +64,7 @@ def setup_db():
 	"""
 	Database setup.
 	"""
-
+	global manager
 	logger.setGroup('init', 'Setup database with mandatoy data')
 
 	# Checks for available instruments
@@ -119,27 +121,30 @@ def setup_db():
 			# Already existing
 			pass
 
-	# Check user profile
-	user = User.objects.all()[0]
-	try:
-		p = user.get_profile()
-	except:
-		# Create a new profile
-		groups = user.groups.all()
-		if not groups:
-			# No user groups; add default one
-			grp = Group(name = user.username)
-			try:
-				grp.save()
-			except IntegrityError:
-				# Already exits
-				grp = Group.objects.filter(name = user.username)[0]
-			user.groups.add(grp)
-		else:
-			grp = groups[0]
+	# Adding user profile for all registered users
+	users = User.objects.all()
+	for user in users:
+		try:
+			p = user.get_profile()
+		except:
+			# Create a new profile
+			groups = user.groups.all()
+			if not groups:
+				# No user groups; add default one
+				grp = Group(name = user.username)
+				try:
+					grp.save()
+				except IntegrityError:
+					# Already exits
+					grp = Group.objects.filter(name = user.username)[0]
+				user.groups.add(grp)
+			else:
+				grp = groups[0]
 
-		p = SiteProfile(user = user, dflt_group = grp, dflt_mode = '640')
-		p.save()
+			p = SiteProfile(user = user, dflt_group = grp, dflt_mode = '640')
+			p.save()
+
+	user = User.objects.all()[0]
 
 	# Default configuration files
 	logger.log('Adding default configuration files')
@@ -162,7 +167,6 @@ def setup_db():
 			pass
 
 	# Add default parameter file for Sextractor (sex.param.default)
-
 	try:
 		name = os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'conf', 'sex.param.default')
 		f = open(name, 'r')
@@ -209,6 +213,40 @@ def setup_policies():
 	else:
 		logger.log("Policy 'ALL' found")
 
+def setup_default_condor_setup():
+	"""
+	Checks that all users have a default condor setup in their profile (for every plugin).
+	Already existing values will remain untouched, missing default setup will be added.
+	"""
+	logger.setGroup('Condor setup', 'Checking that all users have a default condor setup in their profile')
+	users = User.objects.all()
+	for user in users:
+		p = user.get_profile()
+		if len(p.dflt_condor_setup) == 0:
+			# No default Condor setup rules
+			logger.log("Missing Condor setup in %s's profile" % user.username)
+			setup = {}
+			for plugin in manager.plugins:
+				# Default is to use the ALL policy
+				setup[plugin.id] = {'DB': 'policy', 'DS': '', 'DP': 'ALL'}
+			p.dflt_condor_setup = base64.encodestring(marshal.dumps(setup)).replace('\n', '')
+			p.save()
+			logger.log("Added default Condor setup rules for %s" % user.username)
+		else:
+			# Ok, existing but maybe default rules for some (newly created?) plugins are missing
+			setup = marshal.loads(base64.decodestring(p.dflt_condor_setup))
+			updated = False
+			for plugin in manager.plugins:
+				if not setup.has_key(plugin.id):
+					setup[plugin.id] = {'DB': 'policy', 'DS': '', 'DP': 'ALL'}
+					updated = True
+			p.dflt_condor_setup = base64.encodestring(marshal.dumps(setup)).replace('\n', '')
+			p.save()
+			if updated:
+				logger.log("Updated default Condor setup rules for %s" % user.username)
+			else:
+				logger.log("Default Condor setup rules for %s look good" % user.username)
+
 def check_local_conf():
 	"""
 	The settings.py conf file always try to import a local_conf.py file which may
@@ -248,6 +286,7 @@ def setup():
 	setup_users()
 	setup_db()
 	setup_policies()
+	setup_default_condor_setup()
 	check_local_conf()
 	setup_tmp_media()
 
