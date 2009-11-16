@@ -91,11 +91,17 @@ Edit your ``system.py`` file and perform the following changes:
 	# The actual command to perform
 	self.command = 'uname -a'
 
-You also have to edit both ``system.html`` and ``system_item_cart.html`` templates and set some appropriate 
-descriptions by replacing the actual ``<p>`` HTML elements with::
+You also have to edit both ``system.html`` and ``system_item_cart.html`` templates and set some 
+appropriate descriptions by replacing the actual ``<p>`` HTML elements with::
 
 	<p>Add system jobs to the cart</p> # in system.html
 	<p>This is a system job</p>        # in system_item_cart.html
+
+Also update your ``system.js`` file by renaming the global variable ``uidskel`` (located at the 
+top of the file) with ``uidsystem``::
+
+	/* global */
+	var uidsystem = '{{ plugin.id }}';
 
 Next, activate your new plugin by editing your ``settings.py`` (or ``local_conf.py`` depending 
 on your installation)::

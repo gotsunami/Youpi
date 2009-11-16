@@ -11,8 +11,8 @@
 #
 ##############################################################################
 
-import sys, os, string, stat
-import marshal, base64
+import sys, os, string, stat, shutil
+import marshal, base64, glob
 os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
 if '..' not in sys.path:
 	sys.path.insert(0, '..')
@@ -218,7 +218,7 @@ def setup_default_condor_setup():
 	Checks that all users have a default condor setup in their profile (for every plugin).
 	Already existing values will remain untouched, missing default setup will be added.
 	"""
-	logger.setGroup('Condor setup', 'Checking that all users have a default condor setup in their profile')
+	logger.setGroup('condor', 'Checking that all users have a default condor setup in their profile')
 	users = User.objects.all()
 	for user in users:
 		p = user.get_profile()
@@ -282,6 +282,22 @@ def setup_tmp_media():
 			logger.log("! Unable to set 0777 permissions to '%s' directory.\nPlease set the permissions accordingly." % mediadir)
 			sys.exit(1)
 
+def setup_icons():
+	"""
+	Checks that all plugins have an icon in img/16x16, img/32x32 and img/48x48 directories (for every theme).
+	If not found, copy plugin.png to `plugin.id`.png
+	"""
+	logger.endGroup()
+	logger.setGroup('icons', 'Checking that all plugins have a 16x16, 32x32 and 48x48 existing icon')
+	tdirs = glob.glob(os.path.join(settings.MEDIA_ROOT, 'themes', '*'))
+	for plugin in manager.plugins:
+		for td in tdirs:
+			for res in ('16x16', '32x32', '48x48'):
+				dst = os.path.join(td, 'img', res, plugin.id + '.png')
+				if not os.path.exists(dst):
+					logger.log("Plugin '%s': no suitable icon found in %s, adding one..." % (plugin.id, res))
+					shutil.copy(os.path.join(settings.MEDIA_ROOT, 'themes', 'default', 'img', res, 'plugin.png'), dst)
+
 def setup():
 	setup_users()
 	setup_db()
@@ -289,6 +305,7 @@ def setup():
 	setup_default_condor_setup()
 	check_local_conf()
 	setup_tmp_media()
+	setup_icons()
 
 def run():
 	global logger 
