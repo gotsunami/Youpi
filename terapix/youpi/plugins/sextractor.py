@@ -398,7 +398,7 @@ class Sextractor(ProcessingPlugin):
 			# Parameters to use for each job
 			sex_params = ''
 			try:
-				url = self.getConfigValue(content.split('\n'), 'XSL_URL')
+				url = self.getConfigValue(contconf.split('\n'), 'XSL_URL')
 				xslPath = re.search(r'file://(.*)$', url)
 				if xslPath:
 					# This is a local (or NFS) path, Youpi will serve it
