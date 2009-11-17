@@ -16,19 +16,35 @@ Version 0.5.2
 
 **Release Date**: *To be released*
 
-**Bug fixes**:
-
-- Fixed shopping cart issues (session related)
-- Fixed the "Software version check" feature
-- Swarp plugin: fixed final stack ingestion issues
-
 **Improvements**:
 
-- Check setup script handles database schema updates automatically
-- Core API related to Condor cluster management greatly improved
-- Monitoring Condor jobs from the "Active Monitoring" page is much faster
+- Check setup script: handles database schema updates automatically (`621`_); now handles default condor setup parameters (`680`_)
+- Core API related to Condor cluster management greatly improved (`651`_, `653`_, `654`_, `655`_)
+- Monitoring Condor jobs from the "Active Monitoring" page is much faster (`654`_)
 - Plugin manager OOP design improved
-- Removed all parts related to preingestion step (no more needed)
+- Removed all parts related to preingestion step (no more needed) (`622`_)
+- Handbook updated
+
+**Bug fixes**:
+
+- Fixed shopping cart issues (session related) (`620`_)
+- Fixed the "Software version check" feature (`641`_)
+- Swarp plugin: fixed final stack ingestion issues; fixed bug preventing swarp item cluster submission (`667`_)
+- Sextractor plugin: fixed bad weight image name in dual image mode; fixed a data path issue (`669`_)
+- All plugins: fixed bad XSL stylesheet URI handling (`678`_)
+
+.. _620: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/c58f073194b3
+.. _621: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/100fdf85f9be
+.. _622: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/c0a131324fb0
+.. _641: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/cbe545487bc1
+.. _651: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/dbeff3586116
+.. _653: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/4f70c2c0f8d5
+.. _654: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/2b67655bf0bd
+.. _655: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/6fe8598e41db
+.. _667: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/bc526fafb9e2
+.. _669: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/8e28a03a586a
+.. _678: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/298a3821d8ee
+.. _680: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/2d601bee86d6
 
 **Release Notes**:
 
