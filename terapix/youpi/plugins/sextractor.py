@@ -337,46 +337,35 @@ class Sextractor(ProcessingPlugin):
 			# WEIGHT checks
 			if weightPath:
 				if os.path.isdir(weightPath):
-					#then catch the img.name + "_weight.fits"
 					weight = os.path.join(weightPath, img.name + '_weight.fits')
-
 				elif os.path.isfile(weightPath):
 					weight = weightPath
 
 			# flag checks
 			if flagPath:
 				if os.path.isdir(flagPath):
-					#then catch the img.name + "_weight.fits"
 					flag = os.path.join(flagPath, img.name + '_flag.fits')
-
 				elif os.path.isfile(flagPath):
 					flag = flagPath
-
 			
 			# PSF checks
 			if psfPath:
 				if os.path.isdir(psfPath):
-					#then catch the img.name + "_weight.fits"
 					psf = os.path.join(psfPath, img.name + '.psf')
-
 				elif os.path.isfile(psfPath):
 					psf = psfPath
 
-			#Dual WEIGHT checks
+			# Dual WEIGHT checks
 			if dualWeightPath:
 				if os.path.isdir(dualWeightPath):
-					#then catch the img.name + "_weight.fits"
-					dualWeight = os.path.join(dualWeightPath, img.name + '_weight.fits')
-
+					dualWeight = os.path.join(dualWeightPath, imgdual[0].name + '_weight.fits')
 				elif os.path.isfile(dualWeightPath):
 					dualWeight = dualWeightPath
 
-			#Dual flag checks
+			# Dual flag checks
 			if dualFlagPath:
 				if os.path.isdir(dualFlagPath):
-					#then catch the img.name + "_weight.fits"
 					dualFlag = os.path.join(dualFlagPath, img.name + '_flag.fits')
-
 				elif os.path.isfile(dualFlagPath):
 					dualFlag = dualFlagPath
 
@@ -422,7 +411,7 @@ class Sextractor(ProcessingPlugin):
 				if not os.path.exists(weight):
 					raise PluginError, "the weight file %s doesn't exists" % weight
 				else:
-					sex_params += "-WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE %s" % weight
+					sex_params += " -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE %s" % weight
 					#support for dual weight
 					if dualWeightPath:
 						if not os.path.exists(dualWeight):
@@ -433,7 +422,7 @@ class Sextractor(ProcessingPlugin):
 				if not os.path.exists(dualWeight):
 					raise PluginError, "the dual weight file %s doesn't exists" % dualWeight
 				else:
-					sex_params += "-WEIGHT_TYPE NONE, MAP_WEIGHT -WEIGHT_IMAGE NONE, %s" % dualWeight
+					sex_params += " -WEIGHT_TYPE NONE, MAP_WEIGHT -WEIGHT_IMAGE NONE, %s" % dualWeight
 
 			# Adds flag support 
 			if flagPath:
@@ -451,7 +440,7 @@ class Sextractor(ProcessingPlugin):
 				if not os.path.exists(dualFlag):
 					raise PluginError, "the dual flag file %s doesn't exists" % dualFlag
 				else:
-					sex_params += "-FLAG_IMAGE NONE,%s" % dualFlag
+					sex_params += " -FLAG_IMAGE NONE,%s" % dualFlag
 				
 			# Adds psf support 
 			if psfPath:
