@@ -1,0 +1,149 @@
+/*
+	Vertical Accordions
+*/
+.accordion_toggle {
+	display: block;
+	height: 30px;
+	width: 680px;
+	background: url(../js/3rdParty/accordion/images/accordion_toggle.jpg) no-repeat top right #a9d06a;
+	padding: 0 10px 0 10px;
+	line-height: 30px;
+	color: #ffffff;
+	font-weight: normal;
+	text-decoration: none;
+	outline: none;
+	font-size: 12px;
+	color: #000000;
+	border-bottom: 1px solid #cde99f;
+	cursor: pointer;
+	margin: 0 0 0 0;
+}
+
+.accordion_toggle_active {
+	background: url(../js/3rdParty/accordion/images/accordion_toggle_active.jpg) no-repeat top right #e0542f;
+	color: #ffffff;
+	border-bottom: 1px solid #f68263;
+}
+
+.accordion_content {
+	background-color: #ffffff;
+	color: #444444;
+	overflow: hidden;
+}
+	
+	.accordion_content h2 {
+		margin: 15px 0 5px 10px;
+		color: #0099FF;
+	}
+	
+	.accordion_content p {
+		line-height: 150%;
+		padding: 5px 10px 15px 10px;
+	}
+	
+.vertical_accordion_toggle {
+	display: block;
+	height: 30px;
+	text-align: left;
+	background: url(../img/h_gradient_disabled.png) repeat-x left top #D4DCF6;
+	padding: 0 10px 0 10px;
+	line-height: 30px;
+	color: #ffffff;
+	font-weight: normal;
+	text-decoration: none;
+	outline: none;
+	font-size: 12px;
+	color: #000000;
+	border-bottom: 1px solid #000000;
+	cursor: pointer;
+	margin: 0 0 0 0;
+	padding-left: 10px;
+}
+
+.vertical_accordion_toggle_active {
+	background: url(../img/h_gradient_enabled.png) repeat-x left top brown;
+	color: #ffffff;
+	border-bottom: 1px solid orange;
+	font-weight: bold;
+}
+
+.vertical_accordion_content {
+	color: #444444;
+	overflow: hidden;
+	background: url(../img/expander-back.png) repeat-x left top #ffffff;
+}
+
+	.vertical_accordion_content h2 {
+		margin: 15px 0 5px 10px;
+		color: #0099FF;
+	}
+
+	.vertical_accordion_content p {
+		line-height: 150%;
+		padding: 5px 10px 15px 10px;
+	}
+
+
+	
+/*
+	Horizontal Accordion
+*/
+
+.horizontal_accordion_toggle {
+	/* REQUIRED */
+	float: left;	/* This make sure it stays horizontal */
+	/* REQUIRED */
+
+	display: block;
+	height: 100px;
+	width: 30px;
+	background: url(../js/3rdParty/accordion/images/h_accordion_toggle.jpg) no-repeat top left #a9d06a;
+	color: #ffffff;
+	text-decoration: none;
+	outline: none;
+	border-right: 1px solid #cde99f;
+	cursor: pointer;
+	margin: 0 0 0 0;
+}
+
+.horizontal_accordion_toggle_active {
+	background: url(../js/3rdParty/accordion/images/h_accordion_toggle_active.jpg) no-repeat top left #e0542f;
+	border-right: 1px solid #f68263;
+}
+
+.horizontal_accordion_content {
+	/* REQUIRED */
+	height: 100px;	/* We need to define a height for the accordion as it stretches the width */
+	float: left;	/* This make sure it stays horizontal */
+	/* REQUIRED */
+	
+	overflow: hidden;
+	background-color: #ffffff;
+	color: #444444;
+}
+	
+	.horizontal_accordion_content p {
+		width: 450px;
+		line-height: 150%;
+		padding: 5px 10px 15px 10px;
+	}
+			
+			
+/* Container styling*/
+#horizontal_container {
+margin: 20px auto 20px auto;
+width: 680px;   
+height: 100px;    
+}
+
+#vertical_nested_container {
+margin: 20px auto 20px auto;
+width: 620px;
+}
+
+.accordion_disabled {
+	color: gray;
+	font-style: italic;
+	font-weight: normal;
+	cursor: default;
+}
