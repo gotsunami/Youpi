@@ -206,35 +206,16 @@ var {{ plugin.id }} = {
 				null,	
 				// Custom handler for results
 				function(resp) {
-					// Silently remove item from the cart
-					removeAllChildrenNodes(div);
-					removeAllChildrenNodes(div);
+					div.update();
 	
-					var total = resp['result'].length;
-					var countNode = $('plugin_{{ plugin.id }}_saved_count');
-					countNode.innerHTML = '';
-					var txt;
-					if (total > 0)
-						txt = total + ' item' + (total > 1 ? 's' : '');
-					else
-						txt = 'No item';
-					countNode.appendChild(document.createTextNode(txt));
-	
+					var total = resp.result.length;
+					if (total == 0) {
+        	            div.update('No saved item');
+						return;
+					}
 					var table = new Element('table');
 					table.setAttribute('class', 'savedItems');
 					var tr, th;
-					var icon = new Element('img');
-					icon.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}' + '.png');
-					icon.setAttribute('style', 'vertical-align: middle; margin-right: 10px;');
-
-					tr = new Element('tr');
-					th = new Element('th');
-					th.setAttribute('colspan', '8');
-					th.appendChild(icon);
-					th.appendChild(document.createTextNode('{{ plugin.description }}: ' + resp['result'].length + ' saved item' + (resp['result'].length > 1 ? 's' : '')));
-					tr.appendChild(th);
-					table.appendChild(tr);
-	
 					tr = new Element('tr');
 					var header = ['Date', 'Permissions', 'Name', '# images', 'Config', 'Paths', 'Action'];
 					for (var k=0; k < header.length; k++) {
@@ -362,14 +343,7 @@ var {{ plugin.id }} = {
 		
 						table.appendChild(tr);
 					}
-	
-					if (resp['result'].length) {
-						div.appendChild(table);
-					}
-					else {
-						div.appendChild(icon);
-						div.appendChild(document.createTextNode('  : no saved item'));
-					}
+					div.insert(table);
 				}
 		);
 	

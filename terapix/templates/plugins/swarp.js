@@ -842,27 +842,12 @@ var {{ plugin.id }} = {
 					div.update();
 	
 					var total = resp['result'].length;
-					var countNode = $('plugin_' + uidswarp + '_saved_count').update();
-					var txt;
-					if (total > 0)
-						txt = total + ' item' + (total > 1 ? 's' : '');
-					else
-						txt = 'No item';
-					countNode.update(txt);
-	
+					if (total == 0) {
+        	            div.update('No saved item');
+						return;
+					}
 					var table = new Element('table', {'class': 'savedItems'});
 					var tr, th;
-					var icon = new Element('img', {	'src': '/media/themes/{{ user.get_profile.guistyle }}/img/32x32/' + uidswarp + '.png',
-													'style': 'vertical-align:middle; margin-right: 10px;'
-					});
-	
-					tr = new Element('tr');
-					th = new Element('th', {'colspan': '8'});
-					th.insert(icon);
-					th.insert('{{ plugin.description }}: ' + resp['result'].length + ' saved item' + (resp['result'].length > 1 ? 's' : ''));
-					tr.insert(th);
-					table.insert(tr);
-	
 					tr = new Element('tr');
 					var headers = $A(['Date', 'Permissions', 'Name', '# images', 'Config', 'Paths', 'Action']);
 					headers.each(function(header) {
@@ -949,14 +934,7 @@ var {{ plugin.id }} = {
 						tr.insert(td);
 						table.insert(tr);
 					});
-
-					if (resp.result.length) {
-						div.insert(table);
-					}
-					else {
-    	                div.insert(icon);
-        	            div.insert('  : no saved item');
-					}
+					div.insert(table);
 				}
 		);
 	

@@ -533,6 +533,7 @@ table.shoppingCart div.submitItem {
 }
 
 table.savedItems {
+	width: 100%;
 }
 
 table.savedItems img {
@@ -541,7 +542,8 @@ table.savedItems img {
 
 table.savedItems th {
 	text-align: center;
-	background-color: lightgray;
+	background-color: #F7F7F7;
+	border-bottom: 1px solid #cccccc;
 }
 
 table.savedItems td {

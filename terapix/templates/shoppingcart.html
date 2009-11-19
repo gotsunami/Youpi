@@ -9,10 +9,12 @@
 
 <!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/accordion.css"/>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
 <script type="text/javascript" src="/media/js/3rdParty/modalbox/modalbox.js"></script>
 <script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript" src="/media/js/condorpanel.js"></script>
+<script type="text/javascript" src="/media/js/accordion.js"></script>
 <script type="text/javascript">
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -102,7 +104,7 @@ function getSavedItemsStats() {
 				var st = $H(resp.stats);
 				st.keys().each(function(uid) {
 					var total = st.get(uid);
-					$('plugin_' + uid + '_saved_count').update(total > 0 ? total : 'No item');
+					$('plugin_' + uid + '_saved_count').update(total > 0 ? total + ' item' + (total > 1 ? 's' : '') : 'No item');
 				});
 
 				var pattern = 'plugin_menuitem_sub_';
@@ -255,10 +257,19 @@ function proceed_cart() {
  *
  */
 // Menu handling
-var menu;
+var menu, acc;
 document.observe('dom:loaded', function() {
 	menu = new SubMenu('submenu', ['Cart items', 'Saved items']);
 	menu.setOnClickHandler(1, getSavedItemsStats);
+	acc = new Accordion('accordion', {
+		duration: 0.5,
+		openHandler: function(idx) {
+			var pattern = 'plugin_menuitem_sub_';
+			var pid = $$('div[id^=' + pattern + ']')[idx].readAttribute('id').sub(pattern, '');
+			eval(pid + '.showSavedItems()');	
+		}
+	});
+	acc.open(0);
 });
 
 // A shopping cart item has just been removed
@@ -339,33 +350,19 @@ document.observe('shoppingCart:itemRemoved', function() {
 			<p class="title">
 				Please select a type of processing in order to display relevant saved items:
 			</p>
-			<div class="menu">
-				<ul class="icon_smart_tabnav" id="saved_menu">
+			<div id="accordion" style="width: 70%; margin: auto;">
 			{% for plugin in plugins %}
-				{% if forloop.first %}
-					<li class="enabled">
-				{% else %}
-					<li class="disabled">
-				{% endif %}
-						<a 	href="#" id="plugin_entry_{{ forloop.counter0 }}" 
-							onclick="{{ plugin.id }}.showSavedItems(); swap_display(this.id, 'plugin_menuitem_sub_{{ plugin.id }}', 'saved_menu', 'plugin_menuitem_sub_');">
-							<div style="background: transparent url(/media/themes/{{ user.get_profile.guistyle }}/img/32x32/{{ plugin.id }}.png) center left no-repeat; padding-left: 30px;">
-								{{ plugin.description }}
-								<div id="plugin_{{ plugin.id }}_saved_count" class="count"></div>
-							</div>
-						</a>
-					</li>
+				<h1 class="vertical_accordion_toggle">
+					<img src="/media/themes/{{ user.get_profile.guistyle }}/img/16x16/{{ plugin.id }}.png"/>
+					{{ plugin.description }} - <span id="plugin_{{ plugin.id }}_saved_count" class="count"/>
+				</h1>
+				<div class="vertical_accordion_content">
+					<div>
+						<div class="ontent" align="center" id="plugin_menuitem_sub_{{ plugin.id }}"></div>
+					</div>
+				</div>
 			{% endfor %}
-				</ul>
 			</div>
-			{% for plugin in plugins %}
-				{% if forloop.first %}
-			<div class="content" align="center" id="plugin_menuitem_sub_{{ plugin.id }}">
-				{% else %}
-			<div clas="content" align="center" style="display: none;" id="plugin_menuitem_sub_{{ plugin.id }}">
-				{% endif %}
-			</div>
-			{% endfor %}
 		</div>
 	</div>
 </div>
