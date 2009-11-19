@@ -105,6 +105,16 @@ function getSavedItemsStats() {
 				st.keys().each(function(uid) {
 					var total = st.get(uid);
 					$('plugin_' + uid + '_saved_count').update(total > 0 ? total + ' item' + (total > 1 ? 's' : '') : 'No item');
+					// Disable panel when no saved items in it
+					if (total == 0) {
+						var panel = $('plugin_' + uid + '_saved_count').up(sc_accordion.headers[0]);
+						sc_accordion.headers.each(function(head, k) {
+							if (head == panel) {
+								sc_accordion.disable(k);
+								throw $break;
+							}
+						});
+					}
 				});
 
 				var pattern = 'plugin_menuitem_sub_';
@@ -257,11 +267,11 @@ function proceed_cart() {
  *
  */
 // Menu handling
-var menu, acc;
+var menu, sc_accordion;
 document.observe('dom:loaded', function() {
 	menu = new SubMenu('submenu', ['Cart items', 'Saved items']);
 	menu.setOnClickHandler(1, getSavedItemsStats);
-	acc = new Accordion('accordion', {
+	sc_accordion = new Accordion('accordion', {
 		duration: 0.5,
 		openHandler: function(idx) {
 			var pattern = 'plugin_menuitem_sub_';
@@ -269,7 +279,7 @@ document.observe('dom:loaded', function() {
 			eval(pid + '.showSavedItems()');	
 		}
 	});
-	acc.open(0);
+	sc_accordion.open(0);
 });
 
 // A shopping cart item has just been removed
