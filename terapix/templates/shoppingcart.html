@@ -364,7 +364,8 @@ document.observe('shoppingCart:itemRemoved', function() {
 			{% for plugin in plugins %}
 				<h1 class="vertical_accordion_toggle">
 					<img src="/media/themes/{{ user.get_profile.guistyle }}/img/16x16/{{ plugin.id }}.png"/>
-					{{ plugin.description }} - <span id="plugin_{{ plugin.id }}_saved_count" class="count"/>
+					<span style="font-weight: bold;">{{ plugin.description }}</span> 
+					({{ plugin.optionLabel }}) - <span class="tagwidget" id="plugin_{{ plugin.id }}_saved_count" class="count"/>
 				</h1>
 				<div class="vertical_accordion_content">
 					<div>
