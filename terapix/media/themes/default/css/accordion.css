@@ -45,7 +45,7 @@
 	display: block;
 	height: 30px;
 	text-align: left;
-	background: url(../img/h_gradient_disabled.png) repeat-x left top #D4DCF6;
+	background: url(../img/misc/h_gradient_disabled.png) repeat-x left top #ffffff;
 	padding: 0 10px 0 10px;
 	line-height: 30px;
 	color: #ffffff;
@@ -54,23 +54,23 @@
 	outline: none;
 	font-size: 12px;
 	color: #000000;
-	border-bottom: 1px solid #000000;
+	border-bottom: 1px solid #cccccc;
 	cursor: pointer;
 	margin: 0 0 0 0;
 	padding-left: 10px;
 }
 
 .vertical_accordion_toggle_active {
-	background: url(../img/h_gradient_enabled.png) repeat-x left top brown;
+	background: url(../img/misc/h_gradient_enabled.png) repeat-x left top #DAC8B5;
 	color: #ffffff;
-	border-bottom: 1px solid orange;
+	border-bottom: 1px solid brown;
 	font-weight: bold;
 }
 
 .vertical_accordion_content {
 	color: #444444;
 	overflow: hidden;
-	background: url(../img/expander-back.png) repeat-x left top #ffffff;
+	background: url(../img/misc/expander-back.png) repeat-x left top #ffffff;
 }
 
 	.vertical_accordion_content h2 {
