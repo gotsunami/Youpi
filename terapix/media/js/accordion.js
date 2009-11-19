@@ -27,7 +27,7 @@ var Accordion = Class.create({
 		this.headers = $$('#' + container + ' .' + this.opts.get('className').toggle);
 		this.headers.each(function(node) {
 			node.observe('click', function(event) {
-				// Open element
+				// Open element; 'this' context is bound to the class, so we must use Event#findElement() to retrieve current element
 				this._open(event.findElement());
 			}.bind(this));
 		}.bind(this));
@@ -36,12 +36,13 @@ var Accordion = Class.create({
 	},
 	// Should be private
 	_open: function(node) {
-		// First close all opened parts
+		// Looks for current context container * to get the current element
+		var ccontext;
+		var toggle_node = node.hasClassName(this.opts.get('className').toggle) ? node : node.up('.' + this.opts.get('className').toggle);
+		ccontext = toggle_node.next('.' + this.opts.get('className').content);
+
+		// Close all open panels
 		var opens = $$('.' +  this.opts.get('className').content);
-		// Current context div
-		// 'this' context is bound to the class, so we must use Event#findElement()
-		// to get the current element
-		var ccontext = node.next('.' + this.opts.get('className').content);
 		opens.each(function(e) {
 			if (e.visible()) {
 				e.previous('.' + this.opts.get('className').toggle).removeClassName(this.opts.get('className').toggle + '_active');
@@ -59,7 +60,7 @@ var Accordion = Class.create({
 				// Check current index
 				var idx;
 				this.headers.each(function(n, k) {
-					if (n == node) {
+					if (n == toggle_node) {
 						idx = k;
 						throw $break;
 					}
