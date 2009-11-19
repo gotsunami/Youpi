@@ -16,10 +16,10 @@ var Accordion = Class.create({
 				content: 'vertical_accordion_content'
 			},
 			direction: 'vertical',
-			// On open custom handler
-			openHandler: null,
-			// Animation duration
-			duration: 0.6
+			openHandler: null, // On open custom handler
+			closeHandler: null, // On close custom handler
+			duration: 0.6, // Animation duration
+			slideDelay: 0
 		});
 		if (typeof opts == 'object') this.opts.update(opts);
 
@@ -50,25 +50,28 @@ var Accordion = Class.create({
 			}
 		}.bind(this));
 
+		// Check current index
+		var idx;
+		this.headers.each(function(n, k) {
+			if (n == toggle_node) {
+				idx = k;
+				throw $break;
+			}
+		});
 		// Apply effect on node
 		if (this.opts.get('direction') == 'vertical') {
 			if (ccontext.visible()) {
-				ccontext.slideUp({duration: this.opts.get('duration')});
+				ccontext.slideUp({duration: this.opts.get('duration'), delay: this.opts.get('slideDelay')});
 				ccontext.previous('.' + this.opts.get('className').toggle).removeClassName(this.opts.get('className').toggle + '_active');
+				// Call custom close handler 
+				var handler = this.opts.get('closeHandler');
+				if (handler && typeof handler == 'function') handler(idx);
 			}
 			else {
-				// Check current index
-				var idx;
-				this.headers.each(function(n, k) {
-					if (n == toggle_node) {
-						idx = k;
-						throw $break;
-					}
-				});
-				// Call custom handler _before_ sliding
+				// Call custom open handler _before_ sliding
 				var handler = this.opts.get('openHandler');
 				if (handler && typeof handler == 'function') handler(idx);
-				ccontext.slideDown({duration: this.opts.get('duration')});
+				ccontext.slideDown({duration: this.opts.get('duration'), delay: this.opts.get('slideDelay')});
 				ccontext.previous('.' + this.opts.get('className').toggle).addClassName(this.opts.get('className').toggle + '_active');
 			}
 		}
