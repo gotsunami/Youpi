@@ -8,8 +8,11 @@ Before diving into Youpi, let's first introduce to the basic functionnalities of
 the pipeline.
 
 
+Guided Tour of Functionalities
+==============================
+
 FITS Data Ingestion
-===================
+-------------------
 
 .. image:: /figures/ingestion.png
    :width: 800
@@ -85,7 +88,7 @@ during the image lifetime and through the pipeline.
 
 
 Deal With Condor Setup
-======================
+----------------------
 
 .. image:: /figures/condor.png
    :width: 800
@@ -122,7 +125,7 @@ There are 2 different ways to dispatch resources from this interface:
 
 
 Set up Your Preferences
-=======================
+-----------------------
 
 .. image:: /figures/preferences.png
    :width: 800
@@ -153,7 +156,7 @@ preferences for processing data, manage his style themes and define his own perm
 
 
 Organize your data with tags
-============================
+----------------------------
 
 .. image:: /figures/tag.png
    :width: 800
@@ -191,7 +194,7 @@ selection.
 	order to find all images with a specific tag, for example untag a tagged selection. 
 
 Processing Your Data
-====================
+--------------------
 
 .. image:: /figures/processing.png
    :width: 800
@@ -320,7 +323,7 @@ interface) a message will appears to confirm that. If something is wrong an erro
 will guide you to the related tab which needed to be fixed.
 
 The Shopping Cart
-=================
+-----------------
 
 .. image:: /figures/shopping.png
    :width: 800
@@ -344,7 +347,7 @@ condor configuration (i.e Condor Setup), or if you intend to provide a custom co
 for a specific process, it can be managed through this dropdown box.
 
 Live Monitoring of Processings
-==============================
+------------------------------
 
 .. image:: /figures/activemonitoring.png
    :width: 800
@@ -359,7 +362,7 @@ represented by the top red numbers above jobs).
 
 
 Processing Results
-==================
+------------------
 
 .. image:: /figures/results.png
    :width: 800
@@ -386,7 +389,7 @@ group has been successfully processed.
 
 
 Generating Reports
-==================
+------------------
 .. image:: /figures/reporting.png
    :width: 800
    :scale: 90
@@ -397,3 +400,7 @@ The reports engine works with a graphic library, and can generate statistic imag
 histogramms, plots and many others features that could enhance graphically your data results
 from the pipeline.
 
+Cookbook
+========
+
+*TBW*
