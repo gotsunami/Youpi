@@ -207,8 +207,8 @@ to do powerful things inside your client scripts, such as manipulating the DOM [
 according to the response received by the XHR query.
 
 If you are dealing with AJAX calls in Youpi, your are advised to use the simple 
-XHR object defined in file ``media/js/xhr.js`` that works as a wrapper with 
-convenient methods. It provides a very simple API with some useful callback mechanisms 
+``HttpRequest`` object defined in ``media/js/xhr.js`` file. It works as a wrapper with 
+convenient methods and provides a very simple API with some useful callback mechanisms 
 for error and result handling. As you can see, its use is rather straightforward::
 
 	<script type="text/javascript" src="/media/js/xhr.js"></script>
@@ -219,12 +219,15 @@ for error and result handling. As you can see, its use is rather straightforward
 		'container',
 		null,
 		function(resp) { 
-		  var data = resp['result'];
+		  var data = resp.result;
 		}
 	  );
 
-	  var post = 'Key1=' + value1 + '&amp;Key2=' + value2;
-	  r.send('/url/to/server/script/', post); <co id="co-post_send"/>
+	  var post = {
+	    Key1: int1,
+	    Key2: 'str2'
+	  };
+	  r.send('/uri/to/server/', $H(post).toQueryString());
 	</script>
 
 First, you have to set an HTML ``div`` element which acts like a block container. 
@@ -233,78 +236,88 @@ while waiting for incoming data.  Set this parameter to ``null`` if you want no
 "loading..." message to be displayed. The ``div``'s ``id`` must be unique in the 
 document.
 
-The ``null`` parameter indicates that no custom error handler is defined, so the 
-default one (displaying an error message embedded into the ``div`` container) will 
-be used instead.
+The second parameter of ``HttpRequest`` is set to ``null`` to indicate that no custom 
+error handler is defined, so the default one -- displaying an error message embedded 
+into the ``div`` container -- will be used instead.
 
 The last argument is about handling results. You should define a callback function 
 with only one argument. This function prototype has to be used every time you want 
-to access your results.  Once the XHR object gets a successful response from the 
-server, it passes an evaluation of the returned data to your custom handler code. 
+to access your results.  Once the ``HttpRequest`` object gets a successful response from 
+the server, it passes an evaluation of the returned data to your custom handler code. 
 Your data, if any, will always be accessible through the content of ``resp.result`` 
 and can be of any supported JavaScript type.
 
-Handle your response here.
+You can optionally set POST data parameters -- in the example ``Key1`` and ``Key2`` -- 
+and send them by calling the ``send()`` method. Youpi's ``HttpRequest`` object only supports 
+POST HTTP requests; the ``Content-type`` request header is always set to 
+``application/x-www-form-urlencoded``. Thus, you can submit optional POST data as a second 
+parameter to its ``send()`` function, which actually sends the query to the server.
 
-Defines some parameters to be sent as POST data.
+On the server-side part, Youpi provides a way to call a specific member method in your 
+Python plugin code from your plugin's JavaScript code. A dedicated |django|'s URL has been 
+defined for that purpose and serves as a *unique entry point*, so that you can use it to 
+access any member method of any available plugin. 
 
-Finally, call the ``send()`` method to send the POST HTTP query.
+Let's have a look at its definition in ``urls.py``::
 
-Youpi's XHR object only supports POST HTTP requests; the ``Content-type`` 
-request header is always set to ``application/x-www-form-urlencoded``. Thus, 
-you can submit optional &post; data as a second parameter to its ``send()`` 
-function, the only one that effectively issues the query.
+	(r'^youpi/process/plugin/$', 'processing_plugin')
 
-When you are writing a processing plugin for Youpi, you have to write both 
-client-side - your HTML template file(s) and your JavaScript ``jsSource`` file 
-- and server-side code (your Python class that inherits ``YoupiPlugin``). Because 
-all your plugin's server-side code have to be a part of your Python class, Youpi 
-provides a way to call a specific member method from your plugin's JavaScript code. 
-A dedicated |django|'s URL has been defined and serves as a unique entry point, 
-so that you can use it to access any member method of any available plugin. 
-Have a look at its definition in ``urls.py``::
-
-	(r'^spica2/process/plugin/$', 'processing_plugin')
-
-This line explicitely maps the ``/spica2/process/plugin/`` URL to the server-side 
-|django|'s callback function ``processing_plugin()`` defined in ``views.py``::
+This line explicitely maps the ``/youpi/process/plugin/`` URL to the server-side 
+``processing_plugin()`` |django|'s callback function defined in ``views.py``::
 
 	def processing_plugin(request):
-		try:
-			pluginName = request.POST['Plugin']
-			method = request.POST['Method']
-		except Exception, e:
-			return HttpResponseBadRequest('Incorrect POST data')
+	  try:
+  	    pluginName = request.POST['Plugin']
+	    method = request.POST['Method']
+	  except Exception, e:
+	    return HttpResponseBadRequest('Incorrect POST data')
 
-		plugin = manager.getPluginByName(pluginName)
-		try:
-			res = eval('plugin.' + method + '(request)')
-		except AttributeError:
-			raise PluginError, "Plugin '%s' has no method '%s'" % (plugin.id, method)
+	plugin = manager.getPluginByName(pluginName)
+	try:
+	  res = eval('plugin.' + method + '(request)')
+	except AttributeError:
+	  raise PluginError, "Plugin '%s' has no method '%s'" % (plugin.id, method)
 
-		# Response must be a JSON-like object
-		return HttpResponse(str({'result' : res}), mimetype = 'text/plain')
-
-``Plugin`` and ``Method`` are required POST parameters. The former is the plugin's 
-identifier, the latter your plugin's method member that is to be executed. 
-
-Asks the |pm| which plugin matches this ``pluginName`` string identifier; it raises 
-a ``PluginManagerError`` Python exception if no plugin with this name has been found.
-
-Executes the requested method. As you can see, the ``request`` variable is passed to 
-every plugin method so that you can access easily request parameters from your plugin
-code. 
-
-Finally, the function returns a Python dictionary that matches the JSON [#JSON]_ format.
+	# Response must is a JSON object
+	return HttpResponse(json.encode({'result': res}), mimetype = 'text/plain')
 
 The ``processing_plugin()`` function is defined as a |django| *view function* which 
-is a Python function that takes a web request - an ``HttpRequest`` object - as argument 
-and returns a web response. The ``request`` variable is an ``HttpRequest`` instance 
-that holds really useful information such as the HTTP method used in the request, GET 
-or POST data parameters, all HTTP headers, session and currently logged-in user data. 
+is a Python function that takes a web request -- an ``HttpRequest`` object -- as first argument 
+and returns a web response -- ``HttpResponse`` object. The ``request`` variable is an 
+``HttpRequest`` instance that holds really useful information such as the HTTP method used 
+in the request, GET or POST data parameters, all HTTP headers, session and currently logged-in 
+user data. 
 
-The JSON response is well suited for transmitting structured data over a network 
-connection and can be natively processed by JavaScript within your callback response 
+``Plugin`` and ``Method`` are required POST parameters. The former is the plugin's 
+identifier, the latter your plugin's method member that is to be executed. So, in 
+order to be able to call a plugin method from your Javascript snippet, you *must* 
+provide POST data to the ``send()`` function with at least the plugin name and method 
+name you want to reach::
+
+	var r = new HttpRequest(
+	  ...
+	);
+
+	var post = {
+	  // Required
+	  Plugin: 'plugin_id',
+	  Method: 'plugin_method',
+	  // Optional
+	  Key1: int1,
+	  ...
+	  Key2: 'str2'
+	};
+	r.send('/youpi/process/plugin/', $H(post).toQueryString());
+
+As you can see in the ``eval()`` function call, the ``request`` variable is passed to 
+any plugin method so that you can access easily request data parameters from your plugin
+code. 
+
+Finally, the ``processing_plugin()`` function returns a  JSON [#JSON]_ object. You can then 
+access the data through the ``resp.result`` variable.
+
+Also, note that the JSON response is well suited for transmitting structured data over a 
+network connection and can be natively processed by JavaScript within your callback response 
 handler::
 
 	function myHandler(resp) {
@@ -314,7 +327,9 @@ handler::
 	}
 
 Thus, in order for your response to be parsed and processed successfully at client-side 
-level, every plugin's method have to return a JSON-aware Python dictionary.
+level, every plugin's method have to return a JSON-aware **Python dictionary** that will be 
+finally formatted to a JSON object by the ``processing_plugin()`` method (by returning an 
+``HttpResponse`` whose data is JSON encoded with the ``json.encode(...)`` statement).
 
 .. rubric:: Footnotes
 
