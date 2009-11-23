@@ -403,4 +403,60 @@ from the pipeline.
 Cookbook
 ========
 
-*TBW*
+If you want to have an instant use of Youpi, please follow those steps.
+Understand that you can use it as a image processing pipeline, or an image 
+processing software.
+
+How I put my images inside of Youpi, before processing them?
+============================================================
+
+In order to let Youpi handling your FITS images, the first thing you have 
+to do is to indicate Youpi the location of your images in the cluster, this is 
+the ingestion.
+
+Go to the ingestion tab and click on the "run ingestion" tab 
+
+**1. In the Cluster Path Browser box:**
+
+- Deploy the Network Filesystem by clicking on the "plus" icon
+- Browse directories until reaching your FITS images location(the number between 
+  brackets is a FITS images count)
+- Select single or multiple paths by clicking on the directories of FITS 
+  images (selected paths will be added on the box under the filesystem browser)
+
+.. Note:: Ability to delete wrong selected path by clicking on the left red cross
+ or the "clear selection" button
+
+**2. In the Ingestion parameters and options box:**
+
+- Labelize the future ingestion with identification string or number 
+
+It permits to find all images ingested under this ingestion ID, for example, for 
+later processing use or sorting issue (See the "How do i process my images?" section)
+
+- Pay attention to the options 
+
+You may want to flag your images as good or bad on the fly of the ingestion. 
+Then choose "validated" or "observed".
+
+There are two others options:
+
+- Checking the FITS data integrity of images
+- As images are unique by there name, calculating checksum make them unique also by 
+  content.
+
+**3. Run ingestions from the selected paths box:**
+
+If you agree with your paths to images in this box you can press the "run ingestions" button
+
+How I process my images with Youpi?
+===================================
+
+Of course it depends of the kind of processing you want to apply to images, but for all 
+processing kind available in Youpi, the instructions are the same.
+
+Go to the processing tab of the interface and all available processing kinds will be listed 
+(understand them as "plugins" of Youpi).
+
+After clicking on your choosen plugin, 
+
