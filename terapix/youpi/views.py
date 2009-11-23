@@ -779,7 +779,7 @@ def processing_plugin(request):
 		raise PluginEvalError, e
 
 	# Response must be a JSON-like object
-	return HttpResponse(str({'result' : res}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'result': res}), mimetype = 'text/plain')
 
 def batch_view_content(request, fileName):
 	"""
