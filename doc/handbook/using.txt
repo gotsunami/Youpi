@@ -407,8 +407,8 @@ If you want to have an instant use of Youpi, please follow those steps.
 Understand that you can use it as a image processing pipeline, or an image 
 processing software.
 
-How I put my images inside of Youpi, before processing them?
-============================================================
+How do I put my images inside of Youpi, before processing them?
+------------------------------------------------------------
 
 In order to let Youpi handling your FITS images, the first thing you have 
 to do is to indicate Youpi the location of your images in the cluster, this is 
@@ -449,8 +449,8 @@ There are two others options:
 
 If you agree with your paths to images in this box you can press the "run ingestions" button
 
-How I process my images with Youpi?
-===================================
+How do I process my images with Youpi?
+--------------------------------------
 
 Of course it depends of the kind of processing you want to apply to images, but for all 
 processing kind available in Youpi, the instructions are the same.
