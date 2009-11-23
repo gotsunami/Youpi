@@ -408,7 +408,7 @@ Understand that you can use it as a image processing pipeline, or an image
 processing software.
 
 How do I put my images inside of Youpi, before processing them?
-------------------------------------------------------------
+---------------------------------------------------------------
 
 In order to let Youpi handling your FITS images, the first thing you have 
 to do is to indicate Youpi the location of your images in the cluster, this is 
@@ -447,16 +447,38 @@ There are two others options:
 
 **3. Run ingestions from the selected paths box:**
 
-If you agree with your paths to images in this box you can press the "run ingestions" button
+If you agree with your paths to images in this box you can press the "run ingestions" 
+button.
 
 How do I process my images with Youpi?
 --------------------------------------
 
-Of course it depends of the kind of processing you want to apply to images, but for all 
-processing kind available in Youpi, the instructions are the same.
+Of course it depends of the kind of processing you want to apply to images, but for 
+all processing kind available in Youpi, the following instructions are the same.
 
-Go to the processing tab of the interface and all available processing kinds will be listed 
-(understand them as "plugins" of Youpi).
+Go to the processing tab of the interface and all available processing kinds will be 
+listed (understand them as "plugins" of Youpi).
 
-After clicking on your choosen plugin, 
+After clicking on your choosen plugin, and assuming that you are aware of how they 
+globally work (in term of command line use), you have to browse the red tabs (under the 
+processing tab) from the leftest to the rightest by completing each one with your 
+parameters.
+In fact, let's say roughly that each option of your command line corresponds to a plugin tab!
+
+.. image:: /figures/browsing_tabs.png
+
+- **Select images**
+
+First step of the configuration process, it permits to choose images that have been ingested
+according to section above.
+
+For example, you'd use images from ingestion with a given ingestion ID (See the "How do i put
+my images inside Youpi" section), you just have to select the ingestion ID field in the select
+box and you will see your ingestion ID label.
+
+Click on the "**Find** images" button to see them appearing.
+
+- **Select data paths**
+- **Select a configuration file**
+- **Set output directory**
 
