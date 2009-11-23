@@ -46,7 +46,10 @@ var Accordion = Class.create({
 		opens.each(function(e) {
 			if (e.visible()) {
 				e.previous('.' + this.opts.get('className').toggle).removeClassName(this.opts.get('className').toggle + '_active');
-				e.slideUp({duration: this.opts.get('duration')});
+				if (this.opts.get('direction') == 'vertical')
+					e.slideUp({duration: this.opts.get('duration')});
+				else
+					e.shrink({duration: this.opts.get('duration'), delay: this.opts.get('slideDelay'), direction: 'left'});
 			}
 		}.bind(this));
 
@@ -72,6 +75,23 @@ var Accordion = Class.create({
 				var handler = this.opts.get('openHandler');
 				if (handler && typeof handler == 'function') handler(idx);
 				ccontext.slideDown({duration: this.opts.get('duration'), delay: this.opts.get('slideDelay')});
+				ccontext.previous('.' + this.opts.get('className').toggle).addClassName(this.opts.get('className').toggle + '_active');
+			}
+		}
+		else {
+			// Horizontal orientation
+			if (ccontext.visible()) {
+				ccontext.shrink({duration: this.opts.get('duration'), delay: this.opts.get('slideDelay'), direction: 'left'});
+				ccontext.previous('.' + this.opts.get('className').toggle).removeClassName(this.opts.get('className').toggle + '_active');
+				// Call custom close handler 
+				var handler = this.opts.get('closeHandler');
+				if (handler && typeof handler == 'function') handler(idx);
+			}
+			else {
+				// Call custom open handler _before_ sliding
+				var handler = this.opts.get('openHandler');
+				if (handler && typeof handler == 'function') handler(idx);
+				ccontext.grow({duration: this.opts.get('duration'), delay: this.opts.get('slideDelay'), direction: 'left'});
 				ccontext.previous('.' + this.opts.get('className').toggle).addClassName(this.opts.get('className').toggle + '_active');
 			}
 		}
