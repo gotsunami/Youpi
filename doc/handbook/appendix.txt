@@ -14,7 +14,7 @@ ChangeLog
 Version 0.5.2
 -------------
 
-**Release Date**: *To be released*
+**Release Date**: 28 November 2009
 
 **Improvements**:
 
