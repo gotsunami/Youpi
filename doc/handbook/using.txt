@@ -11,6 +11,8 @@ the pipeline.
 Guided Tour of Functionalities
 ==============================
 
+.. _ingestion_section:
+
 FITS Data Ingestion
 -------------------
 
@@ -208,6 +210,8 @@ plugin from the left to the right.
 The first is the selection of a subset of ingested images in Youpi. So, a powerfull 
 selection tool has been made, which allows to sort, group images by specific fields: 
 the **image selector**.
+
+.. _image_selector_section:
 
 The image selector
 ------------------
@@ -450,6 +454,10 @@ There are two others options:
 If you agree with your paths to images in this box you can press the "run ingestions" 
 button.
 
+
+.. note:: To have more informations on ingestion under Youpi, see :ref:`ingestion_section`
+
+
 How do I process my images with Youpi?
 --------------------------------------
 
@@ -462,7 +470,7 @@ listed (understand them as "plugins" of Youpi).
 After clicking on your choosen plugin, and assuming that you are aware of how they 
 globally work (in term of command line use), you have to browse the red tabs (under the 
 processing tab) from the leftest to the rightest by completing each one with your 
-parameters.
+parameters (those you'd use in a command line context).
 In fact, let's say roughly that each option of your command line corresponds to a plugin tab!
 
 .. image:: /figures/browsing_tabs.png
@@ -476,9 +484,38 @@ For example, you'd use images from ingestion with a given ingestion ID (See the 
 my images inside Youpi" section), you just have to select the ingestion ID field in the select
 box and you will see your ingestion ID label.
 
-Click on the "**Find** images" button to see them appearing.
+Click on the "**Find** images" button to see them appearing. All selected images (see or change
+the check box state of the image) will be those which will be processed.
 
+.. note:: Many others fields could be used to sort and select images, develop the select box to
+ see them.
+  
 - **Select data paths**
+
+As the cluster path browser box used during the ingestion, the path selector has the same goal: 
+browse the whole cluster to target your data and include them as input data. Once a path 
+is clicked, it is set in the "select path" box. Click on the desired button to assign to the right
+type of data.
+
+.. note:: understand that you don't target the file itself, you 've just permit to look inside a path
+ and Youpi will match for the right name according to the image name concatenated with the type
+ of data as input.
+
+**Examples**
+
+**WEIGHT** : 0123456789.fits will be processed with the 0123456789_weight.fits weight file, contained
+in the path you have choosen through this tab.
+**AHEAD** : 0123456789.fits needs the 0123456789.ahead file contained in the path you have choosen.
+
 - **Select a configuration file**
+
+If configuration files for such softwares as SCamp, Sextractor, etc ... have no secrets for you, you can:
+- Use the default one, provided by the soft (choose default file in the select box)
+- Edit the default to design your own configuration file and save it in the database for later use
+- Import several configuration files to match by selection names from images selector (see :ref:`image_
+selector_section`).
+
 - **Set output directory**
 
+Every plugins(kind of processing) running under Youpi, create output data. You can decide to store
+output data in youe output directory....
