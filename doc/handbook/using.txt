@@ -539,12 +539,18 @@ tasks added. Press the "run" button to launch your processing tasks on the clust
 
 Ho do I check status of my processings tasks (jobs) on the cluster?
 -------------------------------------------------------------------
+Go to the left tabs menu and press the "Active Monitoring" tab.Youpi displays all jobs 
+running on the cluster.A status is provided for each job and killing jobs is enabled 
+if they are yours.
 
 
 How do I check results from processing ?
 ----------------------------------------
 
-Go to the left tab menu and press the results tab. Select the owner and the kind of
-processings you want to display. You can even search for the processed image name.
+Go to the left tabs menu and press the "Results" tab. Select the owner and the kind of
+processings you want to display by completing criterias in the "processing history"
+panel on the left. You can even search for the processed image name.
+
+After finding your results displayed as
 
 
