@@ -385,6 +385,7 @@ class Plugin_fitsin(models.Model):
 	# QFits results ingestion log
 	qflog = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to QF output HTML data")
+	exitIfFlatMissing = models.NullBooleanField('Exit if flat is missing', default = True)
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')
