@@ -11,6 +11,32 @@ ChangeLog
 .. contents::
    :local:
 
+Version 0.5.3
+-------------
+
+**Release Date**: *To Be Released*
+
+**Improvements**:
+
+- QualityFITS plugin: new option in the GUI to ensure a QFits job halt immediately if the flat image Youpi is looking for is missing.
+
+**Release Notes**:
+
+In order to upgrade from 0.5.2, please do the following:
+
+0. Make a **backup of your database**.
+
+1. The database structure has changed. Just tell Youpi to inspect your installation and upgrade the database::
+
+	$ python manage.py checksetup
+
+Everytime the database structure has to be updated, you will be prompted for confirmation::
+
+	Are you sure you want to execute the evolutions?
+	Type 'yes' to continue, or 'no' to cancel:
+
+If you have made a database backup, you can safely answer: ``yes``.
+
 Version 0.5.2
 -------------
 
