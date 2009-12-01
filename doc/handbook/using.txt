@@ -272,6 +272,7 @@ the corresponding checkbox on the image selector in Batch selection.
 .. Note:: For all selections you have done under single or batch mode, it's possible to save, edit or 
  delete selections from the top left panel of the image selector.
 
+.. Note:: ** saved selections matching mode **
 Processing your data considering plugins
 ----------------------------------------
 
@@ -290,6 +291,8 @@ file has been saved, select it and you can go to the next tab.
 
 .. Warning:: A plugin configuration file obeys to a formal syntax, changing keyword value
  would be sufficient ...
+
+.. _output_directory_section:
 
 Set output directory
 ^^^^^^^^^^^^^^^^^^^^
@@ -475,7 +478,7 @@ In fact, let's say roughly that each option of your command line corresponds to 
 
 .. image:: /figures/browsing_tabs.png
 
-- **Select images**
+* **Select images**
 
 First step of the configuration process, it permits to choose images that have been ingested
 according to section above.
@@ -490,32 +493,58 @@ the check box state of the image) will be those which will be processed.
 .. note:: Many others fields could be used to sort and select images, develop the select box to
  see them.
   
-- **Select data paths**
+* **Select data paths**
 
 As the cluster path browser box used during the ingestion, the path selector has the same goal: 
-browse the whole cluster to target your data and include them as input data. Once a path 
+browse the whole cluster to target your data, and, include them as input data. Once a path 
 is clicked, it is set in the "select path" box. Click on the desired button to assign to the right
-type of data.
+type of data and. Once it's done, select it in the select box of the concerned type.
 
-.. note:: understand that you don't target the file itself, you 've just permit to look inside a path
- and Youpi will match for the right name according to the image name concatenated with the type
- of data as input.
+.. warning:: understand that you don't target the file itself, you 've just permit to look inside a path
+ and Youpi will match for the right name based on differents conventions:
 
-**Examples**
+ **WEIGHT** : 0123456789.fits will be processed with the 0123456789_weight.fits weight file, contained
+ in the path you have choosen through this tab.
 
-**WEIGHT** : 0123456789.fits will be processed with the 0123456789_weight.fits weight file, contained
-in the path you have choosen through this tab.
-**AHEAD** : 0123456789.fits needs the 0123456789.ahead file contained in the path you have choosen.
+ **AHEAD** : 0123456789.fits needs the 0123456789.ahead file contained in the path you have choosen.
 
-- **Select a configuration file**
+ **FLAT & MASK** : the name of the right flat and mask to use for processing, is contained in the header 
+ of 0123456789.fits. Youpi will match the flat and mask header's name with files contained in your choosen
+ path.
+
+
+* **Select a configuration file**
 
 If configuration files for such softwares as SCamp, Sextractor, etc ... have no secrets for you, you can:
-- Use the default one, provided by the soft (choose default file in the select box)
-- Edit the default to design your own configuration file and save it in the database for later use
-- Import several configuration files to match by selection names from images selector (see :ref:`image_
-selector_section`).
 
-- **Set output directory**
+- Use the default one, provided by the soft (choose default file in the select box).
 
-Every plugins(kind of processing) running under Youpi, create output data. You can decide to store
-output data in youe output directory....
+- Edit the default to design your own configuration file and save it in the database for later use.
+
+- Import several configuration files to match by selection names from image selector (see :ref:`image_selector_section`).
+
+
+* **Set output directory**
+
+Every plugins(kind of processing) running under Youpi, create output data. You can 
+decide to store output data in the output directory of your choice (see :ref:`output_directory_section`).
+
+.. warning:: For now, Youpi allows only creation of one level depth directory.
+ 
+* **Add to cart and run processing tasks**
+
+Complete the configuration of processing by pressing the "add to cart" button. Go to 
+the "shopping cart" tab, in the top right of the interface, to see your own processing 
+tasks added. Press the "run" button to launch your processing tasks on the cluster.
+
+Ho do I check status of my processings tasks (jobs) on the cluster?
+-------------------------------------------------------------------
+
+
+How do I check results from processing ?
+----------------------------------------
+
+Go to the left tab menu and press the results tab. Select the owner and the kind of
+processings you want to display. You can even search for the processed image name.
+
+
