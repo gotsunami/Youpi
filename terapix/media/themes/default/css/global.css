@@ -657,10 +657,13 @@ div.selectionModeTitle {
 	text-decoration: underline;
 }
 
-div.listsOfSelections {
+.listsOfSelections, .flatMissing {
 	color: darkgreen; 
-	margin-left: 20px;
 	font-size: 9px;
+}
+
+.listsOfSelections {
+	margin-left: 20px;
 }
 
 .flatLetter {
@@ -690,6 +693,7 @@ table.plugin_small {
 table.plugin_small td {
 	border: none;
 	font-size: 9px;
+	padding: 1px;
 }
 
 table.cleantd td {
