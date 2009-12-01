@@ -56,13 +56,16 @@ var {{ plugin.id }} = {
 	},
 	
 	/*
-	 * fitsinId allows to retreive config file by content (not by name) when reprocessing data
+	 * Function: run
+	 * Run processing
 	 *
-	 * Note: 
-	 *  trid is also used as an element prefix id
+	 * Parameters:
+	 *  trid - string: for row number
+	 *  opts - hash: options
+	 *  silent - boolean: silently submit item to the cluster
 	 *
-	 */
-	run: function(trid, idList, itemId, flat, mask, reg, config, resultsOutputDir, taskId, silent) {
+	 */ 
+	run: function(trid, opts, silent) {
 		var silent = silent == true ? true : false;
 		var txt = '';
 		var runopts = get_runtime_options(trid);
@@ -74,19 +77,13 @@ var {{ plugin.id }} = {
 		otherImgs = tds[1].select('img');
 		otherImgs.invoke('hide');
 	
-		if (!silent) {
-			var r = confirm('Are you sure you want to submit this item to the cluster?' + txt);
-			if (!r) return;
-		}
-	
 		var logdiv = $('master_condor_log_div');
-	
 		var r = new HttpRequest(
 				logdiv,
 				null,	
 				// Custom handler for results
 				function(resp) {
-					r = resp['result'];
+					r = resp.result;
 					var success = update_condor_submission_log(resp, silent);
 					if (!success) {
 						[delImg, runDiv].invoke('show');
@@ -98,22 +95,14 @@ var {{ plugin.id }} = {
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}' + 
-					'&Method=process' + 
-					'&IdList=' + idList + 
-					'&FlatPath=' + flat +
-					'&MaskPath=' + mask + 
-					'&RegPath=' + reg + 
-					'&TaskId=' + taskId + 
-					'&ResultsOutputDir=' + resultsOutputDir + 
-					'&Config=' + config +
-					// runtime options related
-					'&' + runopts.clusterPolicy +	
-					'&ItemId=' + runopts.itemPrefix + itemId + 
-					'&ReprocessValid=' + (runopts.reprocessValid ?  1 : 0);
-	
-		r.setBusyMsg('Sending jobs to the cluster, please wait');
-		r.send('/youpi/process/plugin/', post);
+		// Adds various options
+		opts = $H(opts);
+		opts.set('Plugin', uidfitsin);
+		opts.set('Method', 'process');
+		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
+		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
+
+		r.send('/youpi/process/plugin/', opts.toQueryString());
 	},
 
 	sendAll: function(data) {
@@ -165,31 +154,24 @@ var {{ plugin.id }} = {
 		{{ plugin.id }}.sendAll(data);
 	},
 
-	// Mandatory function
-	saveItemForLater: function(trid, idList, itemId, flat, mask, reg, resultsOutputDir, config, taskId, silent) {
+	saveItemForLater: function(trid, opts, silent) {
+		opts = $H(opts);
+		opts.set('Plugin', uidfitsin);
+		opts.set('Method', 'saveCartItem');
+
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				'{{ plugin.id}}_result',
+				uidswarp + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
-					document.fire('notifier:notify', 'QualityFits item saved successfully');
+					document.fire('notifier:notify', 'QualityFITS item saved successfully');
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
 				}
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}' + 
-					'&Method=saveCartItem' + 
-					'&IdList=' + idList + 
-					'&ItemID=' + runopts.itemPrefix + itemId + 
-					'&FlatPath=' + flat +
-					'&MaskPath=' + mask + 
-					'&RegPath=' + reg + 
-					'&TaskId=' + taskId + 
-					'&ResultsOutputDir=' + resultsOutputDir + 
-					'&Config=' + config;
-		r.send('/youpi/process/plugin/', post);
+		r.send('/youpi/process/plugin/', opts.toQueryString());
 	},
 
 	// Mandatory function
@@ -328,16 +310,12 @@ var {{ plugin.id }} = {
 						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
 						delImg.setAttribute('onclick', "{{ plugin.id }}.delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
 						td.insert(delImg.hide());
-						addImg = new Element('img');
-						addImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif');
-						addImg.setAttribute('onclick', "{{ plugin.id }}.addToCart('" + 
-								resp['result'][k]['idList'] + "','" + 
-								resp['result'][k]['config'] + "','" + 
-								resp['result'][k]['flatPath'] + "','" +
-								resp['result'][k]['maskPath'] + "','" +
-								resp['result'][k]['regPath'] + "','" +
-								resp['result'][k]['resultsOutputDir'] + "','" +
-								resp['result'][k]['taskId'] + "')");
+
+						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
+						addImg.c_data = $H(resp.result[k]);
+						addImg.observe('click', function() {
+							{{ plugin.id }}.addToCart(this.c_data);
+						});
 						td.insert(addImg);
 						tr.insert(td);
 		
@@ -351,23 +329,17 @@ var {{ plugin.id }} = {
 		r.send('/youpi/process/plugin/', post);
 	},
 
-	addToCart: function(idList, config, flatPath, maskPath, regPath, resultsOutputDir, taskId) {
-		var p_data = {	plugin_name : '{{ plugin.id }}', 
-						userData :	{ 	'config' : config,
-										'imgList' : idList,
-										'flatPath' : flatPath,
-										'maskPath' : maskPath,
-										'taskId' : taskId,
-										'regPath' : regPath,
-										'resultsOutputDir' : resultsOutputDir
-						}
+	addToCart: function(data) {
+		var p_data = {
+			plugin_name: uidfitsin,
+			userData: data
 		};
-
+	
 		s_cart.addProcessing(p_data,
-							// Custom hanlder
-							function() {
-								window.location.reload();
-							}
+				// Custom hanlder
+				function() {
+					window.location.reload();
+				}
 		);
 	},
 
@@ -465,7 +437,7 @@ var {{ plugin.id }} = {
 					p_data = {	plugin_name : '{{ plugin.id }}', 
 								userData : { 	'config' : 'The one used for the last processing',
 												'taskId' : taskId,
-												'imgList' : '[[' + data.ImageId + ']]',
+												'idList' : '[[' + data.ImageId + ']]',
 												'flatPath' : data.Flat, 
 												'maskPath' : data.Mask, 
 												'regPath' : data.Reg,
@@ -691,8 +663,6 @@ var {{ plugin.id }} = {
 			td = new Element('td');
 			td.setAttribute('class', 'reprocess');
 			img = new Element('img');
-			// FIXME
-			//img.setAttribute('onclick', "{{ plugin.id }}.reprocess_image('" + hist[k]['FitsinId'] + "');");
 			img.setAttribute('onclick', "{{ plugin.id }}.reprocessImage('" + hist[k]['TaskId'] + "');");
 			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
 			td.appendChild(img);
@@ -1019,7 +989,7 @@ var {{ plugin.id }} = {
 		}
 
 		// OPTIONAL
-		var rSel = $('{{plugin.id}}_regs_select');
+		var rSel = $('{{ plugin.id }}_regs_select');
 		var regPath = '';
 		if (rSel) {
 			var path = rSel.options[rSel.selectedIndex].text;
@@ -1045,23 +1015,22 @@ var {{ plugin.id }} = {
 		// Finally, add to the shopping cart
 		var total = {{ plugin.id }}_ims.getImagesCount();
 
-		p_data = {	plugin_name	: '{{ plugin.id }}', 
-					userData 	: {	'config' : config,
-									'imgList' : sels, 
-									'flatPath' : mandpaths[0], 
-									'maskPath' : mandpaths[1], 
-									'regPath' : regPath,
-									'resultsOutputDir' : output_data_path
+		p_data = {	plugin_name: uidfitsin,
+					userData: {	
+						config: config,
+						idList: sels, 
+						flatPath: mandpaths[0], 
+						maskPath: mandpaths[1], 
+						regPath: regPath,
+						resultsOutputDir: output_data_path,
+						exitIfFlatMissing: $(uidfitsin + '_exit_flat_option').checked ? 1:0,
 					}
 		};
 
-		s_cart.addProcessing(	p_data,
-								// Custom handler
-								function() {
-									document.fire('notifier:notify', 'The current image selection (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
-										') has been\nadded to the cart.');
-								}
-		);
+		s_cart.addProcessing(p_data, function() {
+			document.fire('notifier:notify', 'The current image selection (' + total + ' ' + 
+				(total > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
+		});
 	},
 
 	/*
@@ -1070,23 +1039,23 @@ var {{ plugin.id }} = {
 	 *
 	 * Parameters:
 	 *
-	 * imgList - array of arrays of idLists
+	 * idList - array of arrays of idLists
 	 *
 	 */
-	displayImageCount: function(imgList, container_id) {
+	displayImageCount: function(idList, container_id) {
 		var container = $(container_id);
-		var imgList = eval(imgList);
+		var idList = eval(idList);
 		var c = 0;
 		var txt;
-		imgList.length > 1 ? txt = 'Batch' : txt = 'Single';
+		idList.length > 1 ? txt = 'Batch' : txt = 'Single';
 		var selDiv = new Element('div', {'class': 'selectionModeTitle'}).update(txt + ' selection mode:');
 		container.insert(selDiv);
 
 		selDiv = new Element('div', {'class': 'listsOfSelections'});
 
-		for (var k=0; k < imgList.length; k++) {
-			c = imgList[k].toString().split(',').length;
-			if (imgList.length > 1)
+		for (var k=0; k < idList.length; k++) {
+			c = idList[k].toString().split(',').length;
+			if (idList.length > 1)
 				txt = 'Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '');
 			else
 				txt = c + ' image' + (c > 1 ? 's' : '');
@@ -1121,15 +1090,17 @@ var {{ plugin.id }} = {
 				var proc = r['Processings'];
 
 				for (var k=0; k < proc.length; k++) {
-					p_data = {	plugin_name : '{{ plugin.id }}', 
-								userData : {config 			: 'The one used for the last processing',
-											fitsinId		: proc[k]['FitsinId'],
-											imgList 		: proc[k]['ImgList'],
-											flatPath		: proc[k]['Flat'],
-											maskPath		: proc[k]['Mask'],
-											regPath 		: proc[k]['Reg'],
-											taskId			: proc[k]['TaskId'],
-											resultsOutputDir: proc[k]['ResultsOutputDir']
+					p_data = {	plugin_name: uidfitsin, 
+								userData: {
+									config: 'The one used for the last processing',
+									fitsinId: proc[k]['FitsinId'],
+									idList: proc[k]['IdList'],
+									flatPath: proc[k]['Flat'],
+									maskPath: proc[k]['Mask'],
+									regPath: proc[k]['Reg'],
+									taskId: proc[k]['TaskId'],
+									resultsOutputDir: proc[k]['ResultsOutputDir'],
+									exitIfFlatMissing: proc[k]['ExitIfFlatMissing']
 								}
 					};
 		

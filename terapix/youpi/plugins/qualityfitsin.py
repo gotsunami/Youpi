@@ -70,30 +70,33 @@ class QualityFitsIn(ProcessingPlugin):
 		post = request.POST
 		try:
 			idList = eval(post['IdList'])
-			itemID = str(post['ItemID'])
+			itemId = str(post['ItemId'])
 			flatPath = post['FlatPath']
 			maskPath = post['MaskPath']
 			regPath = post['RegPath']
 			config = post['Config']
 			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
+			exitIfFlatMissing = post['ExitIfFlatMissing']
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
 
 		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
 		if items:
-			itemName = "%s-%d" % (itemID, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
+			itemName = "%s-%d" % (itemId, int(re.search(r'.*-(\d+)$', items[0].name).group(1))+1)
 		else:
-			itemName = "%s-%d" % (itemID, len(items)+1)
+			itemName = "%s-%d" % (itemId, len(items)+1)
 
 		# Custom data
-		data = { 'idList' : idList, 
-				 'flatPath' : flatPath, 
-				 'maskPath' : maskPath, 
-				 'regPath' : regPath, 
+		data = { 'idList' 			: idList, 
+				 'flatPath' 		: flatPath, 
+				 'maskPath' 		: maskPath, 
+				 'regPath' 			: regPath, 
 				 'taskId'			: taskId,
 				 'resultsOutputDir' : resultsOutputDir, 
-				 'config' : config }
+				 'exitIfFlatMissing': exitIfFlatMissing, 
+				 'config' 			: config 
+		}
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
 		profile = request.user.get_profile()
@@ -114,6 +117,8 @@ class QualityFitsIn(ProcessingPlugin):
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
+			if not data.has_key('exitIfFlatMissing'):
+				data['exitIfFlatMissing'] = 0
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
@@ -124,6 +129,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'regPath' 			: str(data['regPath']), 
 						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
 						'name' 				: str(it.name),
+						'exitIfFlatMissing' : int(data['exitIfFlatMissing']),
 						'config' 			: str(data['config'])})
 
 		return res
@@ -397,6 +403,7 @@ class QualityFitsIn(ProcessingPlugin):
 			config = post['Config']
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
+			exitIfFlatMissing = int(post['ExitIfFlatMissing'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -447,6 +454,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Flat' 				: str(flatPath), 
 					'Mask' 				: str(maskPath), 
 					'Reg' 				: str(regPath), 
+					'ExitIfFlatMissing'	: exitIfFlatMissing,
 					'Config' 			: str(post['Config'])} 
 
 		step = 2 							# At least step seconds between two job start
@@ -719,16 +727,17 @@ class QualityFitsIn(ProcessingPlugin):
 
 		tasks = Processing_task.objects.filter(id__in = tasksList)
 		imgs = Rel_it.objects.filter(task__in = tasks)
-		imgList = [[int(img.image.id) for img in imgs]]
+		idList = [[int(img.image.id) for img in imgs]]
 		fitsin = Plugin_fitsin.objects.filter(task__in = tasks)[0]
 
 		processings = {	'ResultsOutputDir' 	: str(tasks[0].results_output_dir), 
 						'TaskId'			: int(tasks[0].id), # Used to retrieve config file content
-						'ImgList' 			: str(imgList),
-						'Count'				: len(imgList),
+						'IdList' 			: str(idList),
+						'Count'				: len(idList),
 						'Flat' 				: str(fitsin.flat),
 						'Mask' 				: str(fitsin.mask),
 						'Reg' 				: str(fitsin.reg),
+						'ExitIfFlatMissing'	: str(fitsin.exitIfFlatMissing),
 						'FitsinId' 			: int(fitsin.id) }
 
 		return { 'Processings' : [processings] }

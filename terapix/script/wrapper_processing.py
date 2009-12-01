@@ -364,6 +364,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 							flat = userData['Flat'],
 							mask = userData['Mask'],
 							reg = userData['Reg'],
+							exitIfFlatMissing = userData['ExitIfFlatMissing'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
@@ -453,6 +454,7 @@ def process(userData, kind_id, argv):
 	g = DBGeneric(db.con)
 
 	start = getNowDateTime(time.time())
+	(imgName, task_id, g) = task_start_log(userData, start, kind_id)
 
 
 	################### PRE-PROCESSING STUFF GOES HERE ########################################
@@ -474,6 +476,24 @@ def process(userData, kind_id, argv):
 			debug("Sextractor Preprocessing: uncompressing %s" % fz)
 			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
 
+	elif kind == 'fitsin':
+		flatname = g.execute("SELECT flat FROM youpi_image WHERE id=%s" % userData['ImgID'])[0][0]
+		if userData['ExitIfFlatMissing']:
+			# Check for flat file
+			flatFile = os.path.join(userData['Flat'], flatname)
+			if not os.path.exists(flatFile):
+				exit_code = 1
+				success = 0
+				debug("Error: FLAT file %s has not been found (and you asked Youpi to halt in this case)" % flatFile)
+				debug("Exiting now...")
+				task_end_log(userData, g, storeLog, task_id, success, kind)
+				debug("Exited (code %d)" % exit_code)
+				sys.exit(exit_code)
+			else:
+				debug("Found FLAT file: %s" % flatFile)
+		else:
+			debug("No check for FLAT image %s existence (checkbox was unchecked)" % flatname)
+
 
 	################### END OF PRE-PROCESSING  ################################################
 
@@ -486,8 +506,6 @@ def process(userData, kind_id, argv):
 	except:
 		pass
 	debug("Command line execution terminated (code %d)" % exit_code)
-
-	(imgName, task_id, g) = task_start_log(userData, start, kind_id)
 
 
 	################### POST-PROCESSING STUFF GOES HERE ########################################
@@ -515,6 +533,7 @@ def process(userData, kind_id, argv):
 							flat = userData['Flat'],
 							mask = userData['Mask'],
 							reg = userData['Reg'],
+							exitIfFlatMissing = userData['ExitIfFlatMissing'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
