@@ -273,6 +273,7 @@ the corresponding checkbox on the image selector in Batch selection.
  delete selections from the top left panel of the image selector.
 
 .. Note:: ** saved selections matching mode **
+
 Processing your data considering plugins
 ----------------------------------------
 
@@ -411,8 +412,6 @@ Cookbook
 ========
 
 If you want to have an instant use of Youpi, please follow those steps.
-Understand that you can use it as a image processing pipeline, or an image 
-processing software.
 
 How do I put my images inside of Youpi, before processing them?
 ---------------------------------------------------------------
@@ -539,8 +538,9 @@ tasks added. Press the "run" button to launch your processing tasks on the clust
 
 Ho do I check status of my processings tasks (jobs) on the cluster?
 -------------------------------------------------------------------
-Go to the left tabs menu and press the "Active Monitoring" tab.Youpi displays all jobs 
-running on the cluster.A status is provided for each job and killing jobs is enabled 
+
+Go to the left tabs menu and press the "Active Monitoring" tab. Youpi displays all jobs 
+running on the cluster. A status is provided for each job and killing jobs is enabled 
 if they are yours.
 
 
@@ -548,9 +548,11 @@ How do I check results from processing ?
 ----------------------------------------
 
 Go to the left tabs menu and press the "Results" tab. Select the owner and the kind of
-processings you want to display by completing criterias in the "processing history"
-panel on the left. You can even search for the processed image name.
+processings you want to display, by completing criterias in the "processing history"
+panel, on the left. You can even search for the processed image name in the funnel text box.
+Click on the "start searching" button.
 
-After finding your results displayed as
-
+After filtering your results by criterias, processings tasks are displayed as vertical 
+scrollbar list. Click on the box, relative to your expected image processing result, and 
+the result of the processed image will appear.
 
