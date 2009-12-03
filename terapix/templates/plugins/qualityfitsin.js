@@ -690,6 +690,12 @@ var {{ plugin.id }} = {
 		td.appendChild(document.createTextNode(resp['ImgPath'] + resp['ImgName'] + '.fits'));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
+
+		// Exit if flat missing?
+		tr = new Element('tr');
+		tr.insert(new Element('td').update('Exit if flat missing:'));
+		tr.insert(new Element('td').update(resp.ExitIfFlatMissing ? 'yes' : 'no'));
+		tab2.insert(tr);
 	
 		// Flat
 		tr = new Element('tr');

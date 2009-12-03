@@ -255,17 +255,18 @@ class QualityFitsIn(ProcessingPlugin):
 			h_gcount = 0
 			if h_evals:
 				h_gcount = len(h_evals)
-			history.append({'User' 			: str(h.task.user.username),
-							'Success' 		: h.task.success,
-							'Start' 		: str(h.task.start_date),
-							'Duration' 		: str(h.task.end_date-h.task.start_date),
-							'Hostname' 		: str(h.task.hostname),
-							'GradingCount'	: h_gcount,
-							'TaskId'		: str(h.task.id),
-							'FitsinId'		: str(h_fits.id),
-							'Flat' 			: str(h_fits.flat),
-							'Mask' 			: str(h_fits.mask),
-							'Reg' 			: str(h_fits.reg)
+			history.append({'User' 				: str(h.task.user.username),
+							'Success' 			: h.task.success,
+							'Start' 			: str(h.task.start_date),
+							'Duration' 			: str(h.task.end_date-h.task.start_date),
+							'Hostname' 			: str(h.task.hostname),
+							'GradingCount'		: h_gcount,
+							'TaskId'			: str(h.task.id),
+							'FitsinId'			: str(h_fits.id),
+							'Flat' 				: str(h_fits.flat),
+							'Mask' 				: str(h_fits.mask),
+							'Reg' 				: str(h_fits.reg),
+							'ExitIfFlatMissing'	: h_fits.exitIfFlatMissing,
 							})
 
 		try:
@@ -332,6 +333,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Flat' 				: str(data.flat),
 					'Mask' 				: str(data.mask),
 					'Reg' 				: str(data.reg),
+					'ExitIfFlatMissing'	: data.exitIfFlatMissing,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.qfconfig))),
 					'WWW' 				: str(data.www),
 					'ImgName' 			: str(img.name),
