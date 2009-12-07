@@ -144,7 +144,8 @@ def search(pattern, replace = None, force = False, verbose = False):
 									print "  %6d %s" % (1, clear[key])
 								else:
 									# Replacing one element
-									encAfter = base64.encodestring(marshal.dumps(clear[key])).replace('\n', '')
+									clear[key] = clear[key].replace(pattern, replace)
+									encAfter = base64.encodestring(marshal.dumps(clear)).replace('\n', '')
 									q = "UPDATE %s SET %s = '%s' WHERE id=%s" % (data['table'], f, encAfter, r[0])
 									if force:
 										# Issue SQL queries
