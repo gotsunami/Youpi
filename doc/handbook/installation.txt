@@ -83,6 +83,7 @@ As specified in the `Software packages`_ section, here are the packages you must
 - ``cURL``
 - ``Django``
 - ``Fitsverify``
+- ``Firefox``
 - ``Geos``
 - ``ImageMagick``
 - ``MySQL client and server``
@@ -117,6 +118,7 @@ As specified in the `Software packages`_ section, here are the packages you must
 - ``Apache mod_wsgi``
 - ``Condor``
 - ``Django``
+- ``Firefox``
 - ``Geos``
 - ``MySQL client only``
 - ``Mysql-Python``
@@ -135,8 +137,8 @@ required if you perform a `cluster installation`_:
 ==================== ========================================== ===========
 Software package     Supported version                          Description
 ==================== ========================================== ===========
-|python|_            **2.5.x**; 2.6 and later **not supported** General-purpose high-level programming 
-                                                                Language
+`Firefox`_           **2.0** and later                          We fully support this web browser at the moment. Safari is reported to be working and IE is not supported.
+|python|_            **2.5.x**; 2.6 and later **not supported** General-purpose high-level programming language
 `Apache`_            **2.x**                                    Apache HTTP server project
 `Apache mod_wsgi`_   **2.3** and later                          Apache module which can host any Python application 
                                                                 which supports the Python `WSGI`_ interface interpreter 
@@ -190,6 +192,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
                                                                 TIFF format for illustration purposes
 ==================== ========================================== ===========
 
+.. _Firefox: http://www.mozilla.com/firefox/
 .. _Apache: http://httpd.apache.org/
 .. _Apache mod_wsgi: http://code.google.com/p/modwsgi/
 .. _Fitsverify: http://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/
