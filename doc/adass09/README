@@ -1,0 +1,7 @@
+Youpi paper for ASP ADASS 2009 
+------------------------------
+
+adassconf.sty        Required style file for the ADASS Proceedings
+asp2006.sty          Required style file for the ASP Conference Series
+README               This file  
+youpi.tex            4 pages LaTeX source file for Youpi paper

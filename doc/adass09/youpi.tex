@@ -1,0 +1,505 @@
+%ADASS_PROCEEDINGS_FORM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% SAMPLE2.TEX -- ADASS XVII (2007)-- ADASS Conference Proceedings sample
+% paper with complicated markup. Based on ADASS XI (01) version.
+%
+% This is a comprehensive example, meaning that we have made use of each
+% of the capabilities of the LaTeX + the ASPCONF macro package that we think
+% you may need to use. 
+%
+% Much of the input will be enclosed by braces (i.e., { }).  The
+% percent sign, "%", denotes the start of a comment; text after it
+% will be ignored by LaTeX.  You might also notice in some of the
+% examples below the use of "\ " after a period; this prevents LaTeX
+% from interpreting the period as the end of a sentence and putting
+% extra space after it.   
+% 
+% You should check your paper by processing it with LaTeX.  For
+% details about how to run LaTeX as well as how to print out the User
+% Guide, consult the README file.  
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+\documentclass[11pt,twoside]{article}  % Leave intact
+\usepackage{asp2006}
+\usepackage{adassconf}
+
+\begin{document}   % Leave intact
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% Enter the proper paper identification code.  The ID code for your paper 
+% is the session number associated with your presentation as published 
+% in the official conference proceedings.  You can find this number by 
+% locating your abstract in the printed proceedings that you received 
+% at the meeting, or on-line at the conference web site.
+%
+% This identifier will not appear in your paper; however, it allows different
+% papers in the proceedings to cross-reference each other.  Note that
+% you should only have one \paperID, and it should not include a
+% trailing period.
+
+\paperID{O4.1}
+
+%-----------------------------------------------------------------------
+%		            Paper Title 
+%-----------------------------------------------------------------------
+% Enter the title of the paper.
+%
+% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
+
+\title{Collapsed Cores in Globular Clusters, Gauge-Boson Couplings,
+       and ASP Conference \LaTeX\ Macro Sample}
+       
+%-----------------------------------------------------------------------
+%          Short Title & Author list for page headers
+%-----------------------------------------------------------------------
+% Please supply the author list and the title (abbreviated if necessary) as 
+% arguments to \markboth.
+%
+% The author last names for the page header must appear in one of 
+% these formats:
+%
+% EXAMPLES:
+%     LASTNAME
+%     LASTNAME1 and LASTNAME2
+%     LASTNAME1, LASTNAME2, and LASTNAME3
+%     LASTNAME et al.
+%
+% Use the "et al." form in the case of four or more authors.
+%
+% If the title is too long to fit in the header, shorten it: 
+%
+% EXAMPLE: change
+%    Rapid Development for Distributed Computing, with Implications for the Virtual Observatory
+% to:
+%    Rapid Development for Distributed Computing
+
+\markboth{Djorgovski, King, and Biemesderfer}{Collapsed Cores in Globular Clusters}
+
+%-----------------------------------------------------------------------
+%		          Authors of Paper
+%-----------------------------------------------------------------------
+% Enter the authors followed by their affiliations.  The \author and
+% \affil commands may appear multiple times as necessary.  List each
+% author by giving the first name or initials first followed by the
+% last name. Do not include street addresses and postal codes, but 
+% do include the country name or abbreviation. 
+%
+% If the list of authors is lengthy and there are several institutional 
+% affiliations, you can save space by using the \altaffilmark and \altaffiltext 
+% commands in place of the \affil command.
+
+\author{S.\ Djorgovski\altaffilmark{1,2}, Ivan R.\ King}
+\affil{Astronomy Department, University of California, Berkeley, CA, USA}
+
+\author{C.~D.\ Biemesderfer\altaffilmark{3}}
+\affil{National Optical Astronomy Observatory, Tucson, AZ, USA}
+
+% Notice that some of these authors have alternate affiliations, which
+% are identified by the \altaffilmark after each name.  The actual alternate
+% affiliation information is typeset in footnotes at the bottom of the
+% first page, and the text itself is specified in \altaffiltext commands.
+% There is a separate \altaffiltext for each alternate affiliation
+% indicated above.
+
+\altaffiltext{1}{Visiting Astronomer, Cerro Tololo Inter-American Observatory. 
+CTIO is operated by AURA, Inc.\ under cooperative agreement with the National
+Science Foundation} 
+\altaffiltext{2}{Society of Fellows, Harvard University} 
+\altaffiltext{3}{Patron, Alonso's Bar and Grill}
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case you need to be contacted concerning your
+% submission.  Enter your name as the contact along with your email
+% address.
+
+\contact{Serge Djorgovski}
+\email{sdj@caltech.edu}
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% Specify how each author name should appear in the author index.  The 
+% \paindex{ } should be used to indicate the primary author, and the
+% \aindex for all other co-authors.  You MUST use the following syntax: 
+%
+%    \aindex{LASTNAME, F.~M.}
+% 
+% where F is the first initial and M is the second initial (if used). Please 
+% ensure that there are no extraneous spaces anywhere within the command 
+% argument. This guarantees that authors that appear in multiple papers
+% will appear only once in the author index. Authors must be listed in the order
+% of the \paindex and \aindex commmands.
+
+\paindex{Djorgovski, S.}
+\aindex{King, I.~R.}
+\aindex{Biemesderfer, C.~D.}
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Enter up to 6 keywords that are relevant to the topic of your paper.  These 
+% will NOT be printed as part of your paper; however, they will guide the creation 
+% of the subject index for the proceedings.  Please use entries from the
+% standard list where possible, which can be found in the index for the 
+% ADASS XVI proceedings. Separate topics from sub-topics with an exclamation 
+% point (!). 
+
+\keywords{astronomy!globular clusters}
+
+% We reset the footnote counter for the hyperlink since it does not
+% appear to recognize the previous 3 footnotes generated from the
+% altaffilmarks.  
+
+\setcounter{footnote}{3}
+
+%-----------------------------------------------------------------------
+%			       Abstract
+%-----------------------------------------------------------------------
+% Type abstract in the space below.  Consult the User Guide and Latex
+% Information file for a list of supported macros (e.g. for typesetting 
+% special symbols). Do not leave a blank line between \begin{abstract} 
+% and the start of your text.
+
+\begin{abstract}          % Leave intact
+This is a preliminary report on surface photometry of the major
+fraction of known globular clusters, to see which of them show the
+signs of a collapsed core.  We also show off the results of some
+recreational mathematics.
+\end{abstract}
+
+%-----------------------------------------------------------------------
+%			      Main Body
+%-----------------------------------------------------------------------
+% Place the text for the main body of the paper here.  You should use
+% the \section command to label the various sections; use of
+% \subsection is optional.  Significant words in section titles should
+% be capitalized.  Sections and subsections will be numbered
+% automatically. 
+
+\section{Introduction}
+
+A focal problem today in the dynamics of globular clusters is core
+collapse.  It has been predicted by theory for decades (H\`enon 1961;
+%Lynden-Bell \& Wood 1968; 
+Spitzer 1985; Roberts 2003), but observation has
+been less alert to the phenomenon. For many years the central brightness
+peak in M15 (King 1975) seemed a unique anomaly.
+Then Auri\`ere (1982) suggested a central peak in NGC 6397, and a limited
+photographic survey of ours (Djorgovski \& King 1984) found three more
+cases, including NGC 6624, whose sharp center had often been remarked on.
+
+\section{Observations}
+
+% The command \htmladdnormallinkfoot puts the link as a
+% footnote in the printed paper.  The command \htmladdnormallink with
+% the same arguments will ignore the link in the printed copy.
+
+All our observations were short direct exposures with
+\htmladdnormallinkfoot{CCD's}{http://www.noao.edu/}.
+
+\begin{enumerate}
+\item At Lick Observatory we used a TI 500$\times$500 chip 
+and a GEC 575$\times$385, on the 1-m Nickel reflector.  The only
+filter available at Lick was red.
+\item At CTIO we used a GEC 575$\times$385, with
+$B, V,$ and $R$ filters, and an RCA 512$\times$320, with $U, B, V, R,$
+and $I$ filters, on the 1.5-m reflector. In the CTIO observations we
+tried to concentrate on the shortest practicable wavelengths; but
+faintness, reddening, and poor short-wavelength sensitivity often kept
+us from observing in $U$ or even in $B$.
+\end{enumerate}
+
+All four cameras had scales of the order of 0\farcs4 pixel$^{-1}$, and our
+field sizes were around 3\arcmin.
+%
+The CCD images are unfortunately not always suitable, for very poor
+clusters or for clusters with large cores.  Since the latter are
+easily studied by other means, we augmented our own CCD profiles by
+collecting from the literature a number of star-count profiles (King
+et al.\ 1968; Peterson 1976; Ortolani et al.\ 1985) as well as
+photoelectric profiles (King 1966) and electronographic profiles (Kron,
+Hewitt, \& Wasserman 1984).  In a few cases we judged normality by eye estimates on
+one of the Sky Surveys.
+
+% In this section, we see the use of the \subsection command to set off
+% an independent subsection.  We only have one in this example; in 
+% general there should be more than one.
+
+\section{Helicity Amplitudes}
+
+It has been realized that helicity amplitudes provide a convenient
+means for Feynman-diagram evaluations.  These amplitude-level
+techniques are particularly convenient for calculations involving many
+Feynman diagrams, where the usual trace techniques for the amplitude
+squared becomes unwieldy.  Our calculations use the helicity
+techniques developed by other authors (Hagiwara \& Zeppenfeld 1986);
+we briefly summarize below.
+
+\subsection{Formalism} \label{hairymath}
+
+% We show the use of several of the displayed math environments
+% described in the User Guide, and you get a healthy dose of
+% mathematical typesetting examples.  Also, observe the use of the LaTeX
+% \label command after the \subsection to give a symbolic tag to the
+% subsection for cross-referencing in a \ref command.  LaTeX
+% automatically numbers the sections, equations, tables, etc. as it
+% goes, so in general you don't know what number something is going to
+% have.  We'll refer to the "hairymath" section a little later.
+
+A tree-level amplitude in $e^+e^-$ collisions can be expressed in
+terms of fermion strings of the form
+\begin{equation}
+\bar v(p_2,\sigma_2)P_{-\tau}\not\!a_1\not\!a_2\cdots
+\not\!a_nu(p_1,\sigma_1)\;,
+\end{equation}
+where $p$ and $\sigma$ label the initial $e^{\pm}$ four-momenta and
+helicities $(\sigma = \pm 1)$, $\not\!a_i=a^\mu_i\gamma_\mu$, and
+$P_\tau=\frac{1}{2}(1+\tau\gamma_5)$ is a chirality projection
+operator $(\tau = \pm1)$.  The $a^\mu_i$ may be formed from particle
+four-momenta, gauge-boson polarization vectors or fermion strings with
+an uncontracted Lorentz index associated with final-state fermions.
+
+\subsubsection{Weyl spinors}
+
+The Weyl spinors are given in terms of helicity eigenstates
+$\chi_\lambda(p)$ with $\lambda=\pm1$ by
+\begin{eqnarray}
+u(p,\lambda)_\pm & = & (E\pm\lambda|{\bf p}|)^{1/2}\chi_\lambda(p)\;,
+\nonumber \\ & & \\
+v(p,\lambda)_\pm & = & \pm\lambda(E\mp\lambda|{\bf p}|)^{1/2}\chi
+_{-\lambda}(p) \nonumber
+\end{eqnarray}
+
+% In these sections, we see some additional math-related markup, and we
+% have references to one of the tables (occurs later in the document)
+% and the "hairymath" section immediately preceding this one.
+%
+% In the second paragraph, note the use of in-text math ($stuff$) including
+% a couple of the miscellaneous symbol commands defined in the macro package.
+%
+% This is the last section of the paper, so there is an \acknowledgments
+% section at the end of the main body.
+
+\section{Floating Material and So Forth}
+
+Consider a task that computes profile parameters for a modified
+Lorentzian of the form
+\begin{equation}
+I = \frac{1}{1 + d_{1}^{P (1 + d_{2} )}}
+\end{equation}
+where
+\begin{displaymath}
+d_{1} = \sqrt{ \left( \begin{array}{c} \frac{x_{1}}{R_{maj}} 
+\end{array} \right) ^{2} + 
+\left( \begin{array}{c} \frac{y_{1}}{R_{min}} \end{array} \right) ^{2} }
+\end{displaymath}
+\begin{displaymath}
+d_{2} = \sqrt{ \left( \begin{array}{c} \frac{x_{1}}{P R_{maj}}
+\end{array} \right) ^{2} + 
+\left( \begin{array}{c} \frac{y_{1}}{P R_{min}} \end{array} \right) ^{2} }
+\end{displaymath}
+\[x_{1} = (x - x_{0}) \cos \Theta + (y - y_{0}) \sin \Theta \]
+\[y_{1} = -(x - x_{0}) \sin \Theta + (y - y_{0}) \cos \Theta \]
+
+In these expressions $x_{0}$,$y_{0}$ is the star center, and $\Theta$
+is the angle with the $x$ axis.  Results of this task are shown in
+Table~\ref{O4.1-tbl-1}.  It is not clear how these sorts of analyses may
+affect determination of $M_{\sun}$ and $M_{\earth}$, but the
+assumption is that the alternate results should be less than 90\deg\
+out of phase with previous values.
+
+\begin{itemize}
+\item Note that enumerated lists work as expected, with
+proper margins and indentation. The list at the
+beginning of the paper is enumerated.
+\item Itemized lists also work as expected, with proper
+margins and indentation.  This list is itemized.
+\end{itemize}
+
+% Tables can be generated using the deluxetable environment, the same
+% environment used in the AASTeX macro package.  Here \scriptsize
+% was used to force the table to fit on the printed page.
+%
+% Column headings are specified within a \tablehead command, using the
+% \colhead command to specify each column heading (or the LaTex command
+% \multicolumn may be used).  The data is entered between the \startdata
+% and \enddata commands.  Use the & as a column delimiter and end each
+% data line with \nl.  For details see the User Guide.
+
+\begin{deluxetable}{crrrrrrrrrrr}
+\scriptsize
+\tablecaption{Terribly relevant tabular information. \label{O4.1-tbl-1}}
+\tablehead{
+\colhead{Star} & \colhead{Height} & \colhead{$d_{x}$}  &   \colhead{$d_{y}$} & 
+\colhead{$n$}  & \colhead{$\chi^2$} & \colhead{$R_{min}$} &
+\multicolumn{1}{c}{$P$\tablenotemark{a}} & \colhead{$P R_{maj}$} & 
+\colhead{$P R_{min}$} 
+} 
+\startdata
+1 &33472.5 &$-$0.1 &0.4    &53 &27.4  &1.940 &3.900 &68.3  &116.2 \nl
+2 &27802.4 &$-$0.3 &$-$0.2 &60 &3.7   &1.510 &2.156 &6.8   &7.5   \nl
+3 &29210.6 &0.9    &0.3    &60 &3.4   &1.551 &2.159 &6.7   &7.3   \nl
+4 & 9607.4 &$-$0.4 &$-$0.4 &60 &1.4   &1.574 &2.343 &8.0   &8.9   \nl
+5 &31638.6 &1.6    &0.1    &39 &315.2 &3.075 &7.488 &92.1  &25.3  \nl
+\enddata
+% Text for table footnotes must follow the tabular environment but must
+% be inside the table environment.  Note that it is OK to put \ref's
+% in \tablenotetext.
+ 
+\tablenotetext{a}{Sample footnote for Table~\ref{O4.1-tbl-1}}
+\tablecomments{Table end notes apply to the entire table}
+\end{deluxetable}
+
+% In the figure environment the \caption command should contain only the 
+% caption text.  The "Figure N." identification is generated by the
+% \caption command on its own.
+%
+% In this example we insert the \epscale command before the \plotone
+% command to override the default scaling of the figure. 
+%
+% You cannot use footnotes within figures.
+
+This paragraph has been placed here to illustrate the
+relationship between floating elements and running text.  A sample
+figure appears in Figure~\ref{O4.1-fig-1}.
+\begin{figure}[t]
+\epsscale{0.70}
+% \plotone{figure.eps}
+\caption{A particularly ghostly figure.} \label{O4.1-fig-1}
+\end{figure}
+We insert the figure in the text file immediately after the sentence
+in which it is called out; this happens to be in the middle of a
+paragraph.  Notice that this paragraph continues on after the 
+\texttt{figure} environment is closed. The typeset text of the paragraph will
+not be broken by the figure; rather, the figure will be floated to
+a place (top or bottom of a page, possibly after the
+paragraph) close to the textual material in which it is embedded in
+the source file.
+ 
+% The same tabular data presented above in the deluxetable environment is
+% aligned below within the "tabular" environment. Observe
+% that our tabular environment is embedded within a "center" environment,
+% which is in turn inside a "table" environment.
+%
+% We need the table environment for autonumbering and caption generation,
+% which is why it is not enough to have a centered tabular.
+%
+% Within the tabular environment, please note that we use no vertical
+% rules, and the horizontal rules are inserted with \tableline (*not* \hline).
+% Note that a couple of the column headings require special annotation, i.e.,
+% footnotes for tables.  They are marked and tagged with \tablenotemark.
+% \tablenotemarks could be placed on individual data entries as well,
+% but try not to go berserk doing this.
+%
+% It is necessary to \label tables and figures *after* the \caption has been
+% specified because the table/figure number is generated by \caption, not
+% by \begin{whatever}.
+
+We repeat Table~\ref{O4.1-tbl-1} which was formatted using the 
+\texttt{deluxetable} environment, but this time we use the \LaTeX\ table
+environment (see Table \ref{O4.1-tbl-2}).  Either table environment
+is acceptable, but the \texttt{deluxetable} environment is preferred.
+%
+\begin{table}
+\caption{Terribly relevant tabular information.} \label{O4.1-tbl-2}
+\begin{center}\scriptsize
+\begin{tabular}{crrrrrrrrrr}
+\tableline\tableline
+Star & Height & $d_{x}$ & $d_{y}$ & $n$ & $\chi^2$ & $R_{min}$ &
+\multicolumn{1}{c}{$P$\tablenotemark{a}} & $P R_{maj}$ & $P R_{min}$ & 
+\multicolumn{1}{c}{$\Theta$\tablenotemark{b}}\\
+\tableline
+1 &33472.5 &$-$0.1 &0.4    &53 &27.4  &1.940 &3.900 &68.3  &116.2 &$-$27.639 \nl
+2 &27802.4 &$-$0.3 &$-$0.2 &60 &3.7   &1.510 &2.156 &6.8   &7.5   &$-$26.764 \nl
+3 &29210.6 &0.9    &0.3    &60 &3.4   &1.551 &2.159 &6.7   &7.3   &$-$40.272 \nl
+4 & 9607.4 &$-$0.4 &$-$0.4 &60 &1.4   &1.574 &2.343 &8.0   &8.9   &$-$33.417 \nl
+5 &31638.6 &1.6    &0.1    &39 &315.2 &3.075 &7.488 &92.1  &25.3  &$-$12.052 \nl
+\tableline
+\end{tabular}
+\end{center}
+
+% Text for table footnotes must follow the tabular environment but must
+% be inside the table environment.  Note that it is OK to put \ref's
+% in \tablenotetext's.
+
+\tablenotetext{a}{Sample footnote for Table~\ref{O4.1-tbl-2}}
+\tablenotetext{b}{Another sample footnote for Table~\ref{O4.1-tbl-2}}
+\tablecomments{Table end notes apply to the entire table}
+\end{table}
+%
+However, reducing the text size does sacrifice the readability of the
+numbers in the table, and the table environment does allow more
+control over the spacing of the columns.  
+In each table, note the use of the math mode minus
+sign (\texttt{\$-\$}) instead of the text mode dash.
+
+% Finally, we have a little acknowledgments section. Do NOT place 
+% acknowledgments in a separate \section. 
+
+\acknowledgments
+
+We are grateful to V.\ Barger, T.\ Han, and R.~J.~N.\ Phillips for doing
+the math in section \ref{hairymath} of this paper.
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+% List your references below within the reference environment
+% (i.e. between the \begin{references} and \end{references} tags).
+% Each new reference should begin with a \reference command which sets
+% up the proper indentation.  
+%    NOTE: all citations in the text _must_ have a corresponding entry in 
+%    the reference list, and all references must be cited in the text.
+%
+% Observe the following order when listing bibliographical 
+% information for each reference:  author name(s), publication 
+% year, journal name, volume, and page number for articles. 
+% URLs to the reference may be given either in-line, or as a footnote. 
+% Note that many journal names are available as macros; see
+% the User Guide for a listing "macro-ized" journals. 
+%
+% You may find the following tricks to be helpful:
+%
+%   o  "\ " after a period prevents LaTeX from interpreting the period 
+%      as an end of a sentence.
+%   o  \adassxvi is a macro that expands to the full title, editor,
+%      and publishing information for the ADASS XVI conference
+%      proceedings.  Such macros are defined for ADASS conferences I
+%      through the most recently published proceedings.
+%   o  When referencing a paper in the current volume, use the
+%      \adassxvii and \paperref macros.  The argument to \paperref is
+%      the paper ID code for the paper you are referencing.  See the 
+%      note in the "Paper ID Code" section above for details on how to 
+%      determine the paper ID code for the paper you reference.  
+
+\begin{references}
+
+\reference Auri\`ere, M.\  1982, \aap, 109, 301
+\reference Djorgovski, S., \& King, I.\ R.\  1984, \apj, 277, L49
+\reference Hagiwara, K., \& Zeppenfeld, D.\  1986, Nucl.Phys., 274, 1
+\reference H\'enon, M.\  1961, Ann.d'Ap., 24, 369
+\reference King, I.~R.\  1966, \aj, 71, 276
+\reference King, I.~R.\  1975, in Dynamics of Stellar Systems, ed.\ A.\ Hayli
+    (Dordrecht: Reidel), 99
+\reference King, I.\ R., Hedemann, E., Hodge, S\ M., \& White, R.~E.
+    1968, \aj, 73, 456
+\reference Kron, G.~E., Hewitt, A.~V., \& Wasserman, L.~H.\
+    1984, \pasp, 96, 198
+\reference Lynden-Bell, D., \& Wood, R.\  1968, \mnras, 138, 495
+\reference Ortolani, S., Rosino, L., \& Sandage, A.\  1985, \aj, 90, 473
+\reference Peterson, C.~J.\  1976, \aj, 81, 617
+\reference Roberts, D.~A.\ 2008, \adassxvii, \paperref{P1.3}
+\reference Spitzer, L.\  1985, in Dynamics of Star Clusters,
+    ed.~J.~Goodman \& P.~Hut (Dordrecht: Reidel), 109
+    
+\end{references}
+
+% Do not place any material after the references section
+
+\end{document}  % Leave intact
