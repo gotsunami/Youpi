@@ -49,8 +49,7 @@
 %
 % EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
 
-\title{Collapsed Cores in Globular Clusters, Gauge-Boson Couplings,
-       and ASP Conference \LaTeX\ Macro Sample}
+\title{Youpi, a Web-based Astronomical Image Processing Pipeline}
        
 %-----------------------------------------------------------------------
 %          Short Title & Author list for page headers
@@ -76,7 +75,8 @@
 % to:
 %    Rapid Development for Distributed Computing
 
-\markboth{Djorgovski, King, and Biemesderfer}{Collapsed Cores in Globular Clusters}
+%\markboth{Djorgovski, King, and Biemesderfer}{Collapsed Cores in Globular Clusters}
+\markboth{Monnerville and Semah}{Youpi, a Web-based Astronomical Image Processing Pipeline}
 
 %-----------------------------------------------------------------------
 %		          Authors of Paper
@@ -91,11 +91,14 @@
 % affiliations, you can save space by using the \altaffilmark and \altaffiltext 
 % commands in place of the \affil command.
 
-\author{S.\ Djorgovski\altaffilmark{1,2}, Ivan R.\ King}
-\affil{Astronomy Department, University of California, Berkeley, CA, USA}
+%\author{S.\ Djorgovski\altaffilmark{1,2}, Ivan R.\ King}
+%\affil{Astronomy Department, University of California, Berkeley, CA, USA}
 
-\author{C.~D.\ Biemesderfer\altaffilmark{3}}
-\affil{National Optical Astronomy Observatory, Tucson, AZ, USA}
+\author{M.\ Monnerville}
+\affil{Terapix, Institut d'Astrophysique de Paris, University of Pierre et Marie Curie, UMR 7095, Paris, France}
+
+\author{G.\ Semah}
+\affil{Terapix, Institut d'Astrophysique de Paris, CNRS, UMR 7095, Paris, France}
 
 % Notice that some of these authors have alternate affiliations, which
 % are identified by the \altaffilmark after each name.  The actual alternate
@@ -104,11 +107,11 @@
 % There is a separate \altaffiltext for each alternate affiliation
 % indicated above.
 
-\altaffiltext{1}{Visiting Astronomer, Cerro Tololo Inter-American Observatory. 
-CTIO is operated by AURA, Inc.\ under cooperative agreement with the National
-Science Foundation} 
-\altaffiltext{2}{Society of Fellows, Harvard University} 
-\altaffiltext{3}{Patron, Alonso's Bar and Grill}
+%\altaffiltext{1}{Visiting Astronomer, Cerro Tololo Inter-American Observatory. 
+%CTIO is operated by AURA, Inc.\ under cooperative agreement with the National
+%Science Foundation} 
+%\altaffiltext{2}{Society of Fellows, Harvard University} 
+%\altaffiltext{3}{Patron, Alonso's Bar and Grill}
 
 %-----------------------------------------------------------------------
 %			 Contact Information
@@ -118,8 +121,8 @@ Science Foundation}
 % submission.  Enter your name as the contact along with your email
 % address.
 
-\contact{Serge Djorgovski}
-\email{sdj@caltech.edu}
+\contact{Mathias Monnerville}
+\email{monnerville@iap.fr}
 
 %-----------------------------------------------------------------------
 %		      Author Index Specification
@@ -136,9 +139,12 @@ Science Foundation}
 % will appear only once in the author index. Authors must be listed in the order
 % of the \paindex and \aindex commmands.
 
-\paindex{Djorgovski, S.}
-\aindex{King, I.~R.}
-\aindex{Biemesderfer, C.~D.}
+%\paindex{Djorgovski, S.}
+%\aindex{King, I.~R.}
+%\aindex{Biemesderfer, C.~D.}
+
+\paindex{Monnerville, M.}
+\aindex{Semah, G.}
 
 %-----------------------------------------------------------------------
 %			Subject Index keywords
@@ -150,7 +156,8 @@ Science Foundation}
 % ADASS XVI proceedings. Separate topics from sub-topics with an exclamation 
 % point (!). 
 
-\keywords{astronomy!globular clusters}
+%\keywords{astronomy!globular clusters}
+\keywords{astronomy!pipeline clusters}
 
 % We reset the footnote counter for the hyperlink since it does not
 % appear to recognize the previous 3 footnotes generated from the
@@ -166,11 +173,21 @@ Science Foundation}
 % special symbols). Do not leave a blank line between \begin{abstract} 
 % and the start of your text.
 
-\begin{abstract}          % Leave intact
-This is a preliminary report on surface photometry of the major
-fraction of known globular clusters, to see which of them show the
-signs of a collapsed core.  We also show off the results of some
-recreational mathematics.
+%\begin{abstract}          % Leave intact
+%This is a preliminary report on surface photometry of the major
+%fraction of known globular clusters, to see which of them show the
+%signs of a collapsed core.  We also show off the results of some
+%recreational mathematics.
+%\end{abstract}
+
+\begin{abstract} 
+Youpi stands for ``YOUpi is your processing PIpeline''. It is a modern, 
+easy to use yet powerful web application providing high level functionalities 
+to perform data reduction on scientific FITS images. Built on top of various 
+open source reduction tools released to the community by TERAPIX, Youpi can 
+help organize your data, manage your processing jobs on a computer cluster 
+in real time (using Condor) and facilitate teamwork by allowing fine-grain 
+sharing of results and data.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -184,15 +201,21 @@ recreational mathematics.
 
 \section{Introduction}
 
-A focal problem today in the dynamics of globular clusters is core
-collapse.  It has been predicted by theory for decades (H\`enon 1961;
-%Lynden-Bell \& Wood 1968; 
-Spitzer 1985; Roberts 2003), but observation has
-been less alert to the phenomenon. For many years the central brightness
-peak in M15 (King 1975) seemed a unique anomaly.
-Then Auri\`ere (1982) suggested a central peak in NGC 6397, and a limited
-photographic survey of ours (Djorgovski \& King 1984) found three more
-cases, including NGC 6624, whose sharp center had often been remarked on.
+Dealing with data reduction can quickly become a tedious task especially 
+from an organizational point of view: one have to remember every input data 
+paths involved in the whole processing, have to deal with many obscur command 
+lines or scripts. Youpi has been designed to reduce the hassle of dealing with 
+obscur command line operations.
+
+%A focal problem today in the dynamics of globular clusters is core
+%collapse.  It has been predicted by theory for decades (H\`enon 1961;
+%%Lynden-Bell \& Wood 1968; 
+%Spitzer 1985; Roberts 2003), but observation has
+%been less alert to the phenomenon. For many years the central brightness
+%peak in M15 (King 1975) seemed a unique anomaly.
+%Then Auri\`ere (1982) suggested a central peak in NGC 6397, and a limited
+%photographic survey of ours (Djorgovski \& King 1984) found three more
+%cases, including NGC 6624, whose sharp center had often been remarked on.
 
 \section{Observations}
 
