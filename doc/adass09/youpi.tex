@@ -40,7 +40,7 @@
 % you should only have one \paperID, and it should not include a
 % trailing period.
 
-\paperID{O4.1}
+\paperID{F4}
 
 %-----------------------------------------------------------------------
 %		            Paper Title 
@@ -95,10 +95,10 @@
 %\affil{Astronomy Department, University of California, Berkeley, CA, USA}
 
 \author{M.\ Monnerville}
-\affil{Terapix, Institut d'Astrophysique de Paris, University of Pierre et Marie Curie, UMR 7095, Paris, France}
+\affil{Terapix, Institut d'Astrophysique de Paris, University of Pierre et Marie Curie, UMR 7095, Paris, F-75014, France}
 
 \author{G.\ Semah}
-\affil{Terapix, Institut d'Astrophysique de Paris, CNRS, UMR 7095, Paris, France}
+\affil{Terapix, Institut d'Astrophysique de Paris, CNRS, UMR 7095, Paris, F-75014, France}
 
 % Notice that some of these authors have alternate affiliations, which
 % are identified by the \altaffilmark after each name.  The actual alternate
@@ -182,12 +182,12 @@
 
 \begin{abstract} 
 Youpi stands for ``YOUpi is your processing PIpeline''. It is a modern, 
-easy to use yet powerful web application providing high level functionalities 
-to perform data reduction on scientific FITS images. Built on top of various 
-open source reduction tools released to the community by TERAPIX, Youpi can 
-help organize your data, manage your processing jobs on a computer cluster 
-in real time (using Condor) and facilitate teamwork by allowing fine-grain 
-sharing of results and data.
+easy to use web application providing high level functionalities to perform 
+data reduction on scientific FITS images. Built on top of various open source 
+reduction tools released to the community by Terapix, Youpi can help organize 
+your data, manage your processing jobs on a computer cluster in real time 
+(using Condor) and facilitate teamwork by allowing fine-grain sharing of 
+results and data.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -201,269 +201,61 @@ sharing of results and data.
 
 \section{Introduction}
 
-Dealing with data reduction can quickly become a tedious task especially 
-from an organizational point of view: one have to remember every input data 
-paths involved in the whole processing, have to deal with many obscur command 
-lines or scripts. Youpi has been designed to reduce the hassle of dealing with 
-obscur command line operations.
+Many data reduction pipeline softwares are available today. We put a lot 
+of efforts in building a rather generic and versatile pipeline that can be used 
+as well for large surveys than for smaller PI data processing. The project has 
+been released to the community and is freely available under an open source 
+license. 
+For the moment, 
+CONDOR
 
-%A focal problem today in the dynamics of globular clusters is core
-%collapse.  It has been predicted by theory for decades (H\`enon 1961;
-%%Lynden-Bell \& Wood 1968; 
-%Spitzer 1985; Roberts 2003), but observation has
-%been less alert to the phenomenon. For many years the central brightness
-%peak in M15 (King 1975) seemed a unique anomaly.
-%Then Auri\`ere (1982) suggested a central peak in NGC 6397, and a limited
-%photographic survey of ours (Djorgovski \& King 1984) found three more
-%cases, including NGC 6624, whose sharp center had often been remarked on.
+Youpi can be seen as a high level interface
 
-\section{Observations}
 
-% The command \htmladdnormallinkfoot puts the link as a
-% footnote in the printed paper.  The command \htmladdnormallink with
-% the same arguments will ignore the link in the printed copy.
+\section{Handling FITS Data Ingestion}
 
-All our observations were short direct exposures with
-\htmladdnormallinkfoot{CCD's}{http://www.noao.edu/}.
+Youpi provides a way to keep track of your images so you can use them for later 
+processing. By selecting -- with a graphical tool (Fig. \ref{fig:pathsel}) -- 
+one or several data paths to your FITS images (available either locally or on the 
+network by using network shares), you will instruct Youpi to read their header and 
+add relevant information to the database. You will get a detailled email report at 
+the end of ingestion. Once ingested, images are available for processing and tools 
+are provided (see section \ref{sec:ims}) to select them and make criteria-based 
+image selections.
 
-\begin{enumerate}
-\item At Lick Observatory we used a TI 500$\times$500 chip 
-and a GEC 575$\times$385, on the 1-m Nickel reflector.  The only
-filter available at Lick was red.
-\item At CTIO we used a GEC 575$\times$385, with
-$B, V,$ and $R$ filters, and an RCA 512$\times$320, with $U, B, V, R,$
-and $I$ filters, on the 1.5-m reflector. In the CTIO observations we
-tried to concentrate on the shortest practicable wavelengths; but
-faintness, reddening, and poor short-wavelength sensitivity often kept
-us from observing in $U$ or even in $B$.
-\end{enumerate}
-
-All four cameras had scales of the order of 0\farcs4 pixel$^{-1}$, and our
-field sizes were around 3\arcmin.
-%
-The CCD images are unfortunately not always suitable, for very poor
-clusters or for clusters with large cores.  Since the latter are
-easily studied by other means, we augmented our own CCD profiles by
-collecting from the literature a number of star-count profiles (King
-et al.\ 1968; Peterson 1976; Ortolani et al.\ 1985) as well as
-photoelectric profiles (King 1966) and electronographic profiles (Kron,
-Hewitt, \& Wasserman 1984).  In a few cases we judged normality by eye estimates on
-one of the Sky Surveys.
-
-% In this section, we see the use of the \subsection command to set off
-% an independent subsection.  We only have one in this example; in 
-% general there should be more than one.
-
-\section{Helicity Amplitudes}
-
-It has been realized that helicity amplitudes provide a convenient
-means for Feynman-diagram evaluations.  These amplitude-level
-techniques are particularly convenient for calculations involving many
-Feynman diagrams, where the usual trace techniques for the amplitude
-squared becomes unwieldy.  Our calculations use the helicity
-techniques developed by other authors (Hagiwara \& Zeppenfeld 1986);
-we briefly summarize below.
-
-\subsection{Formalism} \label{hairymath}
-
-% We show the use of several of the displayed math environments
-% described in the User Guide, and you get a healthy dose of
-% mathematical typesetting examples.  Also, observe the use of the LaTeX
-% \label command after the \subsection to give a symbolic tag to the
-% subsection for cross-referencing in a \ref command.  LaTeX
-% automatically numbers the sections, equations, tables, etc. as it
-% goes, so in general you don't know what number something is going to
-% have.  We'll refer to the "hairymath" section a little later.
-
-A tree-level amplitude in $e^+e^-$ collisions can be expressed in
-terms of fermion strings of the form
-\begin{equation}
-\bar v(p_2,\sigma_2)P_{-\tau}\not\!a_1\not\!a_2\cdots
-\not\!a_nu(p_1,\sigma_1)\;,
-\end{equation}
-where $p$ and $\sigma$ label the initial $e^{\pm}$ four-momenta and
-helicities $(\sigma = \pm 1)$, $\not\!a_i=a^\mu_i\gamma_\mu$, and
-$P_\tau=\frac{1}{2}(1+\tau\gamma_5)$ is a chirality projection
-operator $(\tau = \pm1)$.  The $a^\mu_i$ may be formed from particle
-four-momenta, gauge-boson polarization vectors or fermion strings with
-an uncontracted Lorentz index associated with final-state fermions.
-
-\subsubsection{Weyl spinors}
-
-The Weyl spinors are given in terms of helicity eigenstates
-$\chi_\lambda(p)$ with $\lambda=\pm1$ by
-\begin{eqnarray}
-u(p,\lambda)_\pm & = & (E\pm\lambda|{\bf p}|)^{1/2}\chi_\lambda(p)\;,
-\nonumber \\ & & \\
-v(p,\lambda)_\pm & = & \pm\lambda(E\mp\lambda|{\bf p}|)^{1/2}\chi
-_{-\lambda}(p) \nonumber
-\end{eqnarray}
-
-% In these sections, we see some additional math-related markup, and we
-% have references to one of the tables (occurs later in the document)
-% and the "hairymath" section immediately preceding this one.
-%
-% In the second paragraph, note the use of in-text math ($stuff$) including
-% a couple of the miscellaneous symbol commands defined in the macro package.
-%
-% This is the last section of the paper, so there is an \acknowledgments
-% section at the end of the main body.
-
-\section{Floating Material and So Forth}
-
-Consider a task that computes profile parameters for a modified
-Lorentzian of the form
-\begin{equation}
-I = \frac{1}{1 + d_{1}^{P (1 + d_{2} )}}
-\end{equation}
-where
-\begin{displaymath}
-d_{1} = \sqrt{ \left( \begin{array}{c} \frac{x_{1}}{R_{maj}} 
-\end{array} \right) ^{2} + 
-\left( \begin{array}{c} \frac{y_{1}}{R_{min}} \end{array} \right) ^{2} }
-\end{displaymath}
-\begin{displaymath}
-d_{2} = \sqrt{ \left( \begin{array}{c} \frac{x_{1}}{P R_{maj}}
-\end{array} \right) ^{2} + 
-\left( \begin{array}{c} \frac{y_{1}}{P R_{min}} \end{array} \right) ^{2} }
-\end{displaymath}
-\[x_{1} = (x - x_{0}) \cos \Theta + (y - y_{0}) \sin \Theta \]
-\[y_{1} = -(x - x_{0}) \sin \Theta + (y - y_{0}) \cos \Theta \]
-
-In these expressions $x_{0}$,$y_{0}$ is the star center, and $\Theta$
-is the angle with the $x$ axis.  Results of this task are shown in
-Table~\ref{O4.1-tbl-1}.  It is not clear how these sorts of analyses may
-affect determination of $M_{\sun}$ and $M_{\earth}$, but the
-assumption is that the alternate results should be less than 90\deg\
-out of phase with previous values.
-
-\begin{itemize}
-\item Note that enumerated lists work as expected, with
-proper margins and indentation. The list at the
-beginning of the paper is enumerated.
-\item Itemized lists also work as expected, with proper
-margins and indentation.  This list is itemized.
-\end{itemize}
-
-% Tables can be generated using the deluxetable environment, the same
-% environment used in the AASTeX macro package.  Here \scriptsize
-% was used to force the table to fit on the printed page.
-%
-% Column headings are specified within a \tablehead command, using the
-% \colhead command to specify each column heading (or the LaTex command
-% \multicolumn may be used).  The data is entered between the \startdata
-% and \enddata commands.  Use the & as a column delimiter and end each
-% data line with \nl.  For details see the User Guide.
-
-\begin{deluxetable}{crrrrrrrrrrr}
-\scriptsize
-\tablecaption{Terribly relevant tabular information. \label{O4.1-tbl-1}}
-\tablehead{
-\colhead{Star} & \colhead{Height} & \colhead{$d_{x}$}  &   \colhead{$d_{y}$} & 
-\colhead{$n$}  & \colhead{$\chi^2$} & \colhead{$R_{min}$} &
-\multicolumn{1}{c}{$P$\tablenotemark{a}} & \colhead{$P R_{maj}$} & 
-\colhead{$P R_{min}$} 
-} 
-\startdata
-1 &33472.5 &$-$0.1 &0.4    &53 &27.4  &1.940 &3.900 &68.3  &116.2 \nl
-2 &27802.4 &$-$0.3 &$-$0.2 &60 &3.7   &1.510 &2.156 &6.8   &7.5   \nl
-3 &29210.6 &0.9    &0.3    &60 &3.4   &1.551 &2.159 &6.7   &7.3   \nl
-4 & 9607.4 &$-$0.4 &$-$0.4 &60 &1.4   &1.574 &2.343 &8.0   &8.9   \nl
-5 &31638.6 &1.6    &0.1    &39 &315.2 &3.075 &7.488 &92.1  &25.3  \nl
-\enddata
-% Text for table footnotes must follow the tabular environment but must
-% be inside the table environment.  Note that it is OK to put \ref's
-% in \tablenotetext.
- 
-\tablenotetext{a}{Sample footnote for Table~\ref{O4.1-tbl-1}}
-\tablecomments{Table end notes apply to the entire table}
-\end{deluxetable}
-
-% In the figure environment the \caption command should contain only the 
-% caption text.  The "Figure N." identification is generated by the
-% \caption command on its own.
-%
-% In this example we insert the \epscale command before the \plotone
-% command to override the default scaling of the figure. 
-%
-% You cannot use footnotes within figures.
-
-This paragraph has been placed here to illustrate the
-relationship between floating elements and running text.  A sample
-figure appears in Figure~\ref{O4.1-fig-1}.
 \begin{figure}[t]
-\epsscale{0.70}
-% \plotone{figure.eps}
-\caption{A particularly ghostly figure.} \label{O4.1-fig-1}
+\epsscale{0.40}
+\plotone{ingestion.eps}
+\caption{Using the data path selector during image ingestion. Three data paths have 
+been selected. Everyone of them will be queued for ingestion on the Condor Cluster.}\label{fig:pathsel}
 \end{figure}
-We insert the figure in the text file immediately after the sentence
-in which it is called out; this happens to be in the middle of a
-paragraph.  Notice that this paragraph continues on after the 
-\texttt{figure} environment is closed. The typeset text of the paragraph will
-not be broken by the figure; rather, the figure will be floated to
-a place (top or bottom of a page, possibly after the
-paragraph) close to the textual material in which it is embedded in
-the source file.
- 
-% The same tabular data presented above in the deluxetable environment is
-% aligned below within the "tabular" environment. Observe
-% that our tabular environment is embedded within a "center" environment,
-% which is in turn inside a "table" environment.
-%
-% We need the table environment for autonumbering and caption generation,
-% which is why it is not enough to have a centered tabular.
-%
-% Within the tabular environment, please note that we use no vertical
-% rules, and the horizontal rules are inserted with \tableline (*not* \hline).
-% Note that a couple of the column headings require special annotation, i.e.,
-% footnotes for tables.  They are marked and tagged with \tablenotemark.
-% \tablenotemarks could be placed on individual data entries as well,
-% but try not to go berserk doing this.
-%
-% It is necessary to \label tables and figures *after* the \caption has been
-% specified because the table/figure number is generated by \caption, not
-% by \begin{whatever}.
 
-We repeat Table~\ref{O4.1-tbl-1} which was formatted using the 
-\texttt{deluxetable} environment, but this time we use the \LaTeX\ table
-environment (see Table \ref{O4.1-tbl-2}).  Either table environment
-is acceptable, but the \texttt{deluxetable} environment is preferred.
-%
-\begin{table}
-\caption{Terribly relevant tabular information.} \label{O4.1-tbl-2}
-\begin{center}\scriptsize
-\begin{tabular}{crrrrrrrrrr}
-\tableline\tableline
-Star & Height & $d_{x}$ & $d_{y}$ & $n$ & $\chi^2$ & $R_{min}$ &
-\multicolumn{1}{c}{$P$\tablenotemark{a}} & $P R_{maj}$ & $P R_{min}$ & 
-\multicolumn{1}{c}{$\Theta$\tablenotemark{b}}\\
-\tableline
-1 &33472.5 &$-$0.1 &0.4    &53 &27.4  &1.940 &3.900 &68.3  &116.2 &$-$27.639 \nl
-2 &27802.4 &$-$0.3 &$-$0.2 &60 &3.7   &1.510 &2.156 &6.8   &7.5   &$-$26.764 \nl
-3 &29210.6 &0.9    &0.3    &60 &3.4   &1.551 &2.159 &6.7   &7.3   &$-$40.272 \nl
-4 & 9607.4 &$-$0.4 &$-$0.4 &60 &1.4   &1.574 &2.343 &8.0   &8.9   &$-$33.417 \nl
-5 &31638.6 &1.6    &0.1    &39 &315.2 &3.075 &7.488 &92.1  &25.3  &$-$12.052 \nl
-\tableline
-\end{tabular}
-\end{center}
+\section{Data Processing}
 
-% Text for table footnotes must follow the tabular environment but must
-% be inside the table environment.  Note that it is OK to put \ref's
-% in \tablenotetext's.
+Youpi is a high-level tool for freely available low-level software packages released 
+to the astronomer community by Terapix. We currently support image quality assessment 
+(and image quality grading) through the \emph{QualityFITS} software, computing astrometric 
+and photometric solutions using \emph{SCAMP}, resampling and co-adding images using \emph{SWarp} 
+and extracting sources and building source catalogues using \emph{SExtractor}.
 
-\tablenotetext{a}{Sample footnote for Table~\ref{O4.1-tbl-2}}
-\tablenotetext{b}{Another sample footnote for Table~\ref{O4.1-tbl-2}}
-\tablecomments{Table end notes apply to the entire table}
-\end{table}
-%
-However, reducing the text size does sacrifice the readability of the
-numbers in the table, and the table environment does allow more
-control over the spacing of the columns.  
-In each table, note the use of the math mode minus
-sign (\texttt{\$-\$}) instead of the text mode dash.
+\section{Data Management}
+\subsection{Tools For Data Browsing}
+\subsection{The Image Selector}\label{sec:ims}
+\subsection{Organize Data With Tags}
+\subsection{The Processing Cart}
 
-% Finally, we have a little acknowledgments section. Do NOT place 
-% acknowledgments in a separate \section. 
+\section{Processing Results}
+
+toto
+
+\section{Cluster Computing With Condor}
+Aaaaa
+\subsection{Embedded Condor Policies}
+BBBBBB
+\subsection{Live Monitoring of Processings}
+CCCCC
+
+\section{Cluster Computing With Condor}
 
 \acknowledgments
 
