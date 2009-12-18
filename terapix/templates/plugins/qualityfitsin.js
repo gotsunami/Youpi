@@ -528,7 +528,8 @@ var {{ plugin.id }} = {
 				gdiv.addClassName('graded').update('Image graded ' + resp.GradingCount + ' time' + (resp.GradingCount > 1 ? 's' : ''));
 			else 
 				gdiv.addClassName('notgraded').update('Image not graded yet');
-			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').update('Grade it now!');
+			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').update('<u>G</u>rade it now!');
+			nowdiv.insert(new Element('a', {href: '#', accesskey: 'g'}).setStyle({color: 'transparent'}));
 			nowdiv.writeAttribute('title', 'Click to grade this image on a separate page');
 			nowdiv.observe('click', function() {
 				window.open("/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', '_blank');
