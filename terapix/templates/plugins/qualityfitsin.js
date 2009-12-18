@@ -524,19 +524,16 @@ var {{ plugin.id }} = {
 		// Grading
 		if (resp.Success) {
 			var gdiv = new Element('div');
-			if (resp.GradingCount > 0) {
-				gdiv.writeAttribute('class', 'notgraded');
-				var a = new Element('a', {href: "/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', target: '_blank'});
-				a.insert('Image graded ' + resp.GradingCount + ' time' + (resp.GradingCount > 1 ? 's' : ''));
-				gdiv.insert(a);
-			}
-			else {
-				gdiv.writeAttribute('class', 'notgraded');
-				gdiv.insert('Image not graded yet').insert(new Element('br'));
-				var a = new Element('a', {href: "/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', target: '_blank'});
-				a.insert('Grade it now !');
-				gdiv.insert(a);
-			}
+			if (resp.GradingCount > 0)
+				gdiv.addClassName('graded').update('Image graded ' + resp.GradingCount + ' time' + (resp.GradingCount > 1 ? 's' : ''));
+			else 
+				gdiv.addClassName('notgraded').update('Image not graded yet');
+			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').update('Grade it now!');
+			nowdiv.writeAttribute('title', 'Click to grade this image on a separate page');
+			nowdiv.observe('click', function() {
+				window.open("/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', '_blank');
+			});
+			gdiv.insert(nowdiv);
 			td.insert(gdiv);
 		}
 	
