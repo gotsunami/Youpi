@@ -217,14 +217,14 @@ Youpi can be seen as a high level interface
 Youpi provides a way to keep track of your images so you can use them for later 
 processing. By selecting -- with a graphical tool (Fig. \ref{fig:pathsel}) -- 
 one or several data paths to your FITS images (available either locally or on the 
-network by using network shares), you will instruct Youpi to read their header and 
-add relevant information to the database. You will get a detailled email report at 
-the end of ingestion. Once ingested, images are available for processing and tools 
-are provided (see section \ref{sec:ims}) to select them and make criteria-based 
+network by using network shares such as NFS), you will instruct Youpi to read their 
+header and add relevant information to the database. You will get a detailled email 
+report at the end of ingestion. Once ingested, images are available for processing 
+and tools are provided (see section \ref{sec:ims}) to select them and make criteria-based 
 image selections.
 
 \begin{figure}[t]
-\epsscale{0.40}
+\epsscale{0.20}
 \plotone{ingestion.eps}
 \caption{Using the data path selector during image ingestion. Three data paths have 
 been selected. Everyone of them will be queued for ingestion on the Condor Cluster.}\label{fig:pathsel}
@@ -232,7 +232,7 @@ been selected. Everyone of them will be queued for ingestion on the Condor Clust
 
 \section{Data Processing}
 
-Youpi is a high-level tool for freely available low-level software packages released 
+Youpi is a high-level tool for freely available, low-level software packages released 
 to the astronomer community by Terapix. We currently support image quality assessment 
 (and image quality grading) through the \emph{QualityFITS} software, computing astrometric 
 and photometric solutions using \emph{SCAMP}, resampling and co-adding images using \emph{SWarp} 
@@ -254,8 +254,6 @@ Aaaaa
 BBBBBB
 \subsection{Live Monitoring of Processings}
 CCCCC
-
-\section{Cluster Computing With Condor}
 
 \acknowledgments
 
