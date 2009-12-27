@@ -201,16 +201,20 @@ results and data.
 
 \section{Introduction}
 
-Many data reduction pipeline softwares are available today. We put a lot 
-of efforts in building a rather generic and versatile pipeline that can be used 
-as well for large surveys than for smaller PI data processing. The project has 
-been released to the community and is freely available under an open source 
-license. 
-For the moment, 
-CONDOR
+Many data reduction pipeline softwares are available today. Youpi is an attempt to
+build a rather generic and versatile web-based pipeline suitable for both large 
+surveys and smaller PI data processing. It currently supports working with images 
+from the Megacam, WIRCam and Ultra-VISTA instruments, and we plan to add support 
+for more in the future. 
 
-Youpi can be seen as a high level interface
+Youpi is designed to help in data management by keeping track of all data locations 
+and parameters involved during the pipeline's life cycle, from the moment FITS images 
+are ingested into the database to the moment final processing results are produced.
 
+This pipeline tends to be quite versatile since it can be used on a single host -- a 
+desktop computer or even a laptop -- or on larger installations such as computer 
+clusters. The project is actively maintained at Terapix, published under an open 
+source license and has first been released to the community on Septembre 2009.
 
 \section{Handling FITS Data Ingestion}
 
@@ -218,7 +222,7 @@ Youpi provides a way to keep track of your images so you can use them for later
 processing. By selecting -- with a graphical tool (Fig. \ref{fig:pathsel}) -- 
 one or several data paths to your FITS images (available either locally or on the 
 network by using network shares such as NFS), you will instruct Youpi to read their 
-header and add relevant information to the database. You will get a detailled email 
+headers and add relevant information to the database. You will get a detailled email 
 report at the end of ingestion. Once ingested, images are available for processing 
 and tools are provided (see section \ref{sec:ims}) to select them and make criteria-based 
 image selections.
