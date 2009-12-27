@@ -214,18 +214,19 @@ are ingested into the database to the moment final processing results are produc
 This pipeline tends to be quite versatile since it can be used on a single host -- a 
 desktop computer or even a laptop -- or on larger installations such as computer 
 clusters. The project is actively maintained at Terapix, published under an open 
-source license and has first been released to the community on Septembre 2009.
+source license and has first been released to the community on September 2009.
 
 \section{Handling FITS Data Ingestion}
 
-Youpi provides a way to keep track of your images so you can use them for later 
+Ingesting images is probably the main entry point for firstime users in using Youpi.
+Indeed, Youpi provides a way to keep track of your images so you can use them for later 
 processing. By selecting -- with a graphical tool (Fig. \ref{fig:pathsel}) -- 
 one or several data paths to your FITS images (available either locally or on the 
 network by using network shares such as NFS), you will instruct Youpi to read their 
-headers and add relevant information to the database. You will get a detailled email 
-report at the end of ingestion. Once ingested, images are available for processing 
-and tools are provided (see section \ref{sec:ims}) to select them and make criteria-based 
-image selections.
+headers and add relevant information to the database, then you will get a detailled 
+email report at the end of ingestion. Now that images are ingested once and for all, 
+they are available for later processing and tools are provided (see section \ref{sec:ims}) 
+to select them by making criteria-based image selections.
 
 \begin{figure}[t]
 \epsscale{0.20}
@@ -236,22 +237,44 @@ been selected. Everyone of them will be queued for ingestion on the Condor Clust
 
 \section{Data Processing}
 
-Youpi is a high-level tool for freely available, low-level software packages released 
-to the astronomer community by Terapix. We currently support image quality assessment 
-(and image quality grading) through the \emph{QualityFITS} software, computing astrometric 
-and photometric solutions using \emph{SCAMP}, resampling and co-adding images using \emph{SWarp} 
-and extracting sources and building source catalogues using \emph{SExtractor}.
+Youpi is a high-level tool acting as a wrapper for freely available, low-level software 
+packages released to the astronomer community by Terapix. Through the use of these packages, 
+we currently support image quality assessment using the \emph{QualityFITS} software, 
+computing astrometric and photometric solutions using \emph{SCAMP}, resampling and co-adding 
+images using \emph{SWarp} and extracting sources and building source catalogues using 
+\emph{SExtractor}.
+
+All of these processings are internally available as plugins. Some of them can be disabled 
+in order to meet your needs. This plugin architecture is very modular and comprehensive 
+documentation is available for writting custom plugins that would extend Youpi's default 
+processing capabilities.
+
+Since sharing data and results with other people such as PIs or teammates will certainly 
+be a necessity at some point, Youpi ensure that only authorized people gain access to data 
+you want to expose by simulating a Unix-like file permission system. Most of the data sets 
+and results produced can be given permissions for the owner, a group and the rest of the 
+world. This way you can define access policy for members of a group and decide whether non 
+members can access the data (Fig. \ref{fig:permissions}).
+
+\begin{figure}[t]
+\epsscale{0.40}
+\plotone{permissions.eps}
+\caption{A QualityFITS result set has been given read-write permission for the owner, read-only 
+access for all members of group "Terapix" an no access at all for the others.}\label{fig:permissions}
+\end{figure}
+
+% grading
+% users management
 
 \section{Data Management}
+The benefits of letting Youpi manage your input data
 \subsection{Tools For Data Browsing}
 \subsection{The Image Selector}\label{sec:ims}
 \subsection{Organize Data With Tags}
 \subsection{The Processing Cart}
 
 \section{Processing Results}
-
 toto
-
 \section{Cluster Computing With Condor}
 Aaaaa
 \subsection{Embedded Condor Policies}
