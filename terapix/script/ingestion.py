@@ -551,16 +551,19 @@ def run_ingestion():
 			# Compare checksums
 			dbchecksum = res[0][1]
 			if checksum == dbchecksum:
-				# Do nothing because the same physical image is already ingested
-				debug("\tImage with same name and checksum already ingested. Skipping...")
-				continue
-
-			# Different checksums, so go ahead
-			fitsNoExt = freshImageName(fitsNoExt, g)
-			if allowSeveralIngestions != 'yes':
-				if old != fitsNoExt:
-					debug("\tAlready ingested. Skipping...")
+				# Option On will allow multiple ingestion(for same checksum, computation of new name)
+				if allowSeveralIngestions == 'yes':
+					fitsNoExt = freshImageName(fitsNoExt, g)
+					debug("\tImage with same name and checksum: multiple option state to ON, Ingestion...")
+				
+				else:
+					debug("\tImage with same name and checksum: multiple option state to OFF, Skipping...")
 					continue
+
+			else:
+				debug("Image already exists in database (same odometer number for different checksum, skipping...", WARNING)
+
+
 
 		#
 		# Image not yet ingested
