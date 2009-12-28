@@ -228,7 +228,7 @@ email report at the end of ingestion. Now that images are ingested once and for 
 they are available for later processing and tools are provided (see section \ref{sec:ims}) 
 to select them by making criteria-based image selections.
 
-\begin{figure}[t]
+\begin{figure}[h]
 \epsscale{0.20}
 \plotone{ingestion.eps}
 \caption{Using the data path selector during image ingestion. Three data paths have 
@@ -256,20 +256,61 @@ and results produced can be given permissions for the owner, a group and the res
 world. This way you can define access policy for members of a group and decide whether non 
 members can access the data (Fig. \ref{fig:permissions}).
 
-\begin{figure}[t]
+\begin{figure}[h!]
 \epsscale{0.40}
 \plotone{permissions.eps}
 \caption{A QualityFITS result set has been given read-write permission for the owner, read-only 
 access for all members of group "Terapix" an no access at all for the others.}\label{fig:permissions}
 \end{figure}
 
-% grading
-% users management
-
 \section{Data Management}
-The benefits of letting Youpi manage your input data
-\subsection{Tools For Data Browsing}
+
+Being able to assist the astronomer in data management and data sharing has been an important 
+goal since the beginning of the project. As such, Youpi comes with many widgets and tools that 
+make selecting and organizing data or dealing with configuration files and results a breeze.
+
+\subsection{The Data Path Selector}
+
+Whichever processing plugin you have selected, an embedded path selector is available so you 
+can select and save data paths in real time from within your Internet browser (Fig. \ref{fig:browser}).
+For example, if you want to compute astrometric and photometric solutions for a bunch of images 
+using the \emph{SCAMP} plugin, you will have to provide a path to external \emph{.ahead} files.
+The path selector widget will let you browse local -- and remote, if you are using network mounts -- 
+filesystems, then you will be able to save those directories for later reuse.
+
+\begin{figure}[h]
+\epsscale{0.70}
+\plotone{browser.eps}
+\caption{The path selector widget (on the left) is used to select a directory holding \emph{.ahead} 
+files required for a \emph{SCAMP} processing.}\label{fig:browser}
+\end{figure}
+
 \subsection{The Image Selector}\label{sec:ims}
+
+The image selector (Fig. \ref{fig:ims}) is a tool dedicated to build selections of previously 
+ingested images.  Using it is a required step since Youpi processings need FITS images as input. 
+Several facilities are provided in order to make selecting images as painless as possible. 
+Multiple search criteria can be combined at a time. Ingested images can be searched by \emph{RUNID}, 
+\emph{channel}, \emph{grade} -- since Youpi provides an integrated interface for image 
+quality assessment, \emph{image name} (using regular expressions), \emph{ingestion ID}, 
+\emph{instrument name}, \emph{object name}, \emph{tag} and \emph{saved selection}.
+
+Once a selection of images has been made, basic editing commands can be used to save the 
+current selection, and saved selections can be deleted or merged with any other. In order 
+to increase the image selector's flexibility in building selections of images, options have 
+been added to allow uploading a plain text file describing the selection (one image name 
+and optional checksum per line) or batch importing all text files within a directory. 
+These two features allow creating saved selections on-the-fly rather than doing it manually.
+This can be interesting if you are working on a large survey involving lots of images because
+you can decide to prepare all your selections of images first before starting processing them.
+
+\begin{figure}[h]
+\epsscale{0.70}
+\plotone{ims.eps}
+\caption{A selection of 1450 images is built by retreiving all images from the 
+\emph{CFHTLS-T0006-W3\_Scamp} saved selection.}\label{fig:ims}
+\end{figure}
+
 \subsection{Organize Data With Tags}
 \subsection{The Processing Cart}
 
