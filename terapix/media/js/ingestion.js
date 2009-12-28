@@ -60,12 +60,12 @@ function force_check_allow_several_times()
 {
 	var check = $("check_allow_several_times");
 	var d = $('warn2');
-	if (check.checked == false) {
-		d.setAttribute('style', 'display:block');
+	d.setAttribute('style', 'display:block');
+	if (check.checked == true) {
 		d.innerHTML="<table><tr><td colspan=\"2\"><p>If <strong>checked</strong>, an image already ingested will be ingested again with a <q><tt class=\"filename\">_#.fits</tt></q> (underscore + number) appended to its db name.<br>For example, <tt class=\"filename\">image.fits</tt> will be renamed to <tt class=\"filename\">image_1.fits</tt> if it has been already ingested.</p><tr><th>Ingestion</th><th>Name</th></tr><tr><td align=\"center\" class=\"number\">1</td><td><tt class=\"filename\">image.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">2</td><td><tt class=\"filename\">image_1.fits</tt></td></tr><tr><td align=\"center\" class=\"number\">...</td></tr><tr><td align=\"center\" class=\"number\">n</td><td><tt class=\"filename\">image_(n-1).fits</tt></td></tr></td></tr></table>";
 	}
 	else {
-		d.setAttribute('style', 'display:none');
+		d.innerHTML="<p>If <strong>not checked</strong>, an image already ingested will be skipped...</p>";
 	}
 }
 
