@@ -1,25 +1,5 @@
-%ADASS_PROCEEDINGS_FORM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% SAMPLE2.TEX -- ADASS XVII (2007)-- ADASS Conference Proceedings sample
-% paper with complicated markup. Based on ADASS XI (01) version.
-%
-% This is a comprehensive example, meaning that we have made use of each
-% of the capabilities of the LaTeX + the ASPCONF macro package that we think
-% you may need to use. 
-%
-% Much of the input will be enclosed by braces (i.e., { }).  The
-% percent sign, "%", denotes the start of a comment; text after it
-% will be ignored by LaTeX.  You might also notice in some of the
-% examples below the use of "\ " after a period; this prevents LaTeX
-% from interpreting the period as the end of a sentence and putting
-% extra space after it.   
-% 
-% You should check your paper by processing it with LaTeX.  For
-% details about how to run LaTeX as well as how to print out the User
-% Guide, consult the README file.  
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
+% Youpi paper for ADASS 2009 @ Sapporo, Japan
+
 \documentclass[11pt,twoside]{article}  % Leave intact
 \usepackage{asp2006}
 \usepackage{adassconf}
@@ -46,8 +26,6 @@
 %		            Paper Title 
 %-----------------------------------------------------------------------
 % Enter the title of the paper.
-%
-% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
 
 \title{Youpi, a Web-based Astronomical Image Processing Pipeline}
        
@@ -75,7 +53,6 @@
 % to:
 %    Rapid Development for Distributed Computing
 
-%\markboth{Djorgovski, King, and Biemesderfer}{Collapsed Cores in Globular Clusters}
 \markboth{Monnerville and Semah}{Youpi, a Web-based Astronomical Image Processing Pipeline}
 
 %-----------------------------------------------------------------------
@@ -91,27 +68,11 @@
 % affiliations, you can save space by using the \altaffilmark and \altaffiltext 
 % commands in place of the \affil command.
 
-%\author{S.\ Djorgovski\altaffilmark{1,2}, Ivan R.\ King}
-%\affil{Astronomy Department, University of California, Berkeley, CA, USA}
-
 \author{M.\ Monnerville}
 \affil{Terapix, Institut d'Astrophysique de Paris, University of Pierre et Marie Curie, UMR 7095, Paris, F-75014, France}
 
 \author{G.\ Semah}
 \affil{Terapix, Institut d'Astrophysique de Paris, CNRS, UMR 7095, Paris, F-75014, France}
-
-% Notice that some of these authors have alternate affiliations, which
-% are identified by the \altaffilmark after each name.  The actual alternate
-% affiliation information is typeset in footnotes at the bottom of the
-% first page, and the text itself is specified in \altaffiltext commands.
-% There is a separate \altaffiltext for each alternate affiliation
-% indicated above.
-
-%\altaffiltext{1}{Visiting Astronomer, Cerro Tololo Inter-American Observatory. 
-%CTIO is operated by AURA, Inc.\ under cooperative agreement with the National
-%Science Foundation} 
-%\altaffiltext{2}{Society of Fellows, Harvard University} 
-%\altaffiltext{3}{Patron, Alonso's Bar and Grill}
 
 %-----------------------------------------------------------------------
 %			 Contact Information
@@ -156,8 +117,7 @@
 % ADASS XVI proceedings. Separate topics from sub-topics with an exclamation 
 % point (!). 
 
-%\keywords{astronomy!globular clusters}
-\keywords{astronomy!pipeline clusters}
+\keywords{astronomy!pipeline clusters condor}
 
 % We reset the footnote counter for the hyperlink since it does not
 % appear to recognize the previous 3 footnotes generated from the
@@ -172,13 +132,6 @@
 % Information file for a list of supported macros (e.g. for typesetting 
 % special symbols). Do not leave a blank line between \begin{abstract} 
 % and the start of your text.
-
-%\begin{abstract}          % Leave intact
-%This is a preliminary report on surface photometry of the major
-%fraction of known globular clusters, to see which of them show the
-%signs of a collapsed core.  We also show off the results of some
-%recreational mathematics.
-%\end{abstract}
 
 \begin{abstract} 
 Youpi stands for ``YOUpi is your processing PIpeline''. It is a modern, 
@@ -218,7 +171,7 @@ source license and has first been released to the community on September 2009.
 
 \section{Handling FITS Data Ingestion}
 
-Ingesting images is probably the main entry point for firstime users in using Youpi.
+Ingesting images is probably the main entry point for firstime users coming to Youpi.
 Indeed, Youpi provides a way to keep track of your images so you can use them for later 
 processing. By selecting -- with a graphical tool --
 one or several data paths to your FITS images (available either locally or on the 
@@ -265,7 +218,7 @@ The path selector widget will let you browse local -- and remote, if you are usi
 filesystems, then you will be able to save those directories for later reuse.
 
 \begin{figure}[h]
-\epsscale{0.50}
+\epsscale{0.55}
 \plotone{browser.eps}
 \caption{The path selector widget (on the left) is used to select a directory holding \emph{.ahead} 
 files required for a \emph{SCAMP} processing.}\label{fig:browser}
@@ -343,12 +296,16 @@ Since Condor natively supports those kind of machine requirements in its submiss
 Youpi comes with a page dedicated to Condor requirements setup. From this page, users can 
 define custom policies or selections. Custom policies are \emph{dynamic rules}: criteria
 such as available memory, disk space or slot/host name can be defined using regular expressions.
-Dynamic rules will only be computed just before job submission -- by querying Condor in real 
-time -- from the processing cart to the cluster. On the other side, custom selections are 
+Dynamic rules will only be computed just before job submission from the processing cart -- by 
+querying Condor in real time -- to the cluster. On the other side, custom selections are 
 made of \emph{static nodes} selected among the available cluster nodes displayed on the screen.
 
 \subsection{Live Monitoring of Processings}
-CCCCC
+
+Once jobs have been submitted to the Condor cluster, they can be monitored directly from 
+within your browser on Youpi's \emph{Active Monitoring} page. Important information such as 
+job's description, remote host, run time, job's owner and current status are displayed and 
+refreshed in real time, without reloading the page.
 
 %-----------------------------------------------------------------------
 %			      References
