@@ -220,20 +220,13 @@ source license and has first been released to the community on September 2009.
 
 Ingesting images is probably the main entry point for firstime users in using Youpi.
 Indeed, Youpi provides a way to keep track of your images so you can use them for later 
-processing. By selecting -- with a graphical tool (Fig. \ref{fig:pathsel}) -- 
+processing. By selecting -- with a graphical tool --
 one or several data paths to your FITS images (available either locally or on the 
 network by using network shares such as NFS), you will instruct Youpi to read their 
 headers and add relevant information to the database, then you will get a detailled 
 email report at the end of ingestion. Now that images are ingested once and for all, 
 they are available for later processing and tools are provided (see section \ref{sec:ims}) 
 to select them by making criteria-based image selections.
-
-\begin{figure}[h]
-\epsscale{0.20}
-\plotone{ingestion.eps}
-\caption{Using the data path selector during image ingestion. Three data paths have 
-been selected. Everyone of them will be queued for ingestion on the Condor Cluster.}\label{fig:pathsel}
-\end{figure}
 
 \section{Data Processing}
 
@@ -254,14 +247,7 @@ be a necessity at some point, Youpi ensure that only authorized people gain acce
 you want to expose by simulating a Unix-like file permission system. Most of the data sets 
 and results produced can be given permissions for the owner, a group and the rest of the 
 world. This way you can define access policy for members of a group and decide whether non 
-members can access the data (Fig. \ref{fig:permissions}).
-
-\begin{figure}[h!]
-\epsscale{0.40}
-\plotone{permissions.eps}
-\caption{A QualityFITS result set has been given read-write permission for the owner, read-only 
-access for all members of group "Terapix" an no access at all for the others.}\label{fig:permissions}
-\end{figure}
+members can access the data.
 
 \section{Data Management}
 
@@ -279,7 +265,7 @@ The path selector widget will let you browse local -- and remote, if you are usi
 filesystems, then you will be able to save those directories for later reuse.
 
 \begin{figure}[h]
-\epsscale{0.70}
+\epsscale{0.50}
 \plotone{browser.eps}
 \caption{The path selector widget (on the left) is used to select a directory holding \emph{.ahead} 
 files required for a \emph{SCAMP} processing.}\label{fig:browser}
@@ -305,28 +291,64 @@ This can be interesting if you are working on a large survey involving lots of i
 you can decide to prepare all your selections of images first before starting processing them.
 
 \begin{figure}[h]
-\epsscale{0.70}
+\epsscale{0.50}
 \plotone{ims.eps}
 \caption{A selection of 1450 images is built by retreiving all images from the 
 \emph{CFHTLS-T0006-W3\_Scamp} saved selection.}\label{fig:ims}
 \end{figure}
 
-\subsection{Organize Data With Tags}
+\subsection{Organizing Data With Tags}
+
+A tag is a non-hierarchical keyword that can be assigned to a piece of information. Youpi 
+allows tagging ingested images in order to add some kind of metadata useful for item 
+description. Tagged images can later be searched by tag name using the image selector and 
+can thus be retreived easily. Applying tags on a selection of images is easy (Fig. \ref{fig:tags}): 
+just create a new tag -- or use an existing one -- and drag and drop it over a dedicated 
+drop zone to mark or unmark the current selection. Any number of tags can be applied to an 
+image.
+
+\begin{figure}[h]
+\epsscale{0.50}
+\plotone{tags.eps}
+\caption{Dragging the \emph{field-D4} tag over a selection of images.}\label{fig:tags}
+\end{figure}
+
 \subsection{The Processing Cart}
 
-\section{Processing Results}
-toto
+Before running any processing with Youpi, all input images, parameters and configuration 
+files that describe the processing are first bundled together in one processing cart item. 
+The processing cart acts like shopping carts on commercial websites. Many processing items 
+can be added to it. This is a convenient place for sharing processings between users -- because 
+processing items can be saved for later use and loaded back to the processing cart at anytime 
+by others -- or for setting runtime options before submitting the job on the cluster.
+
 \section{Cluster Computing With Condor}
-Aaaaa
+
+Youpi heavily relies on \emph{Condor} for running processings. Condor is an open source 
+high-throughput computing software framework for distributed parallelization of computationally 
+intensive tasks and is well suited for working with a cluster of computers.
+
+Ingestions are submitted as Condor jobs as well as processing cart items. Youpi handles 
+all input parameters and generates a \emph{Condor submission file} -- a plain text file 
+specifying job requirements, environment and complete command line -- ready to be executed 
+on the Condor cluster.
+
 \subsection{Embedded Condor Policies}
-BBBBBB
+
+Most of the time, depending on the nature of the processing, it is better to target a 
+specific subset of cluster nodes. A job that requires a lot of memory to run is better 
+handled on machines with lots of RAM. The same applies for CPU intensive tasks.
+
+Since Condor natively supports those kind of machine requirements in its submission files,
+Youpi comes with a page dedicated to Condor requirements setup. From this page, users can 
+define custom policies or selections. Custom policies are \emph{dynamic rules}: criteria
+such as available memory, disk space or slot/host name can be defined using regular expressions.
+Dynamic rules will only be computed just before job submission -- by querying Condor in real 
+time -- from the processing cart to the cluster. On the other side, custom selections are 
+made of \emph{static nodes} selected among the available cluster nodes displayed on the screen.
+
 \subsection{Live Monitoring of Processings}
 CCCCC
-
-\acknowledgments
-
-We are grateful to V.\ Barger, T.\ Han, and R.~J.~N.\ Phillips for doing
-the math in section \ref{hairymath} of this paper.
 
 %-----------------------------------------------------------------------
 %			      References
@@ -364,20 +386,6 @@ the math in section \ref{hairymath} of this paper.
 \reference Auri\`ere, M.\  1982, \aap, 109, 301
 \reference Djorgovski, S., \& King, I.\ R.\  1984, \apj, 277, L49
 \reference Hagiwara, K., \& Zeppenfeld, D.\  1986, Nucl.Phys., 274, 1
-\reference H\'enon, M.\  1961, Ann.d'Ap., 24, 369
-\reference King, I.~R.\  1966, \aj, 71, 276
-\reference King, I.~R.\  1975, in Dynamics of Stellar Systems, ed.\ A.\ Hayli
-    (Dordrecht: Reidel), 99
-\reference King, I.\ R., Hedemann, E., Hodge, S\ M., \& White, R.~E.
-    1968, \aj, 73, 456
-\reference Kron, G.~E., Hewitt, A.~V., \& Wasserman, L.~H.\
-    1984, \pasp, 96, 198
-\reference Lynden-Bell, D., \& Wood, R.\  1968, \mnras, 138, 495
-\reference Ortolani, S., Rosino, L., \& Sandage, A.\  1985, \aj, 90, 473
-\reference Peterson, C.~J.\  1976, \aj, 81, 617
-\reference Roberts, D.~A.\ 2008, \adassxvii, \paperref{P1.3}
-\reference Spitzer, L.\  1985, in Dynamics of Star Clusters,
-    ed.~J.~Goodman \& P.~Hut (Dordrecht: Reidel), 109
     
 \end{references}
 
