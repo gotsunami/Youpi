@@ -173,7 +173,7 @@ first been released to the community on September 2009.
 
 Ingesting images is the main entry point for novice users coming to Youpi. By selecting -- with 
 a graphical tool -- one or several data paths that locate its FITS images (available either 
-locally or on the network by using network shares such as NFS), the user notify Youpi to read 
+locally or on the network by using network shares such as NFS), the user notifies Youpi to read 
 their headers and ingest the relevant information in the database. When the ingestion is completed, 
 Youpi reports the details of the ingestion to the user by email. The ingestion can be carried 
 once, so any image ingested can then be used at any time for later processing. Youpi provides 
@@ -186,7 +186,7 @@ Youpi is a high-level tool acting as a wrapper for freely available, low-level s
 released by Terapix (Goranova et al 2009): it currently supports \emph{QualityFITS}, the image 
 quality assessment software; the astrometric and photometric calibration tool, \emph{SCAMP} 
 (Bertin 2006); the image resampling and stacking software, \emph{SWarp}; and the source extraction 
-and calalogue production tool, \emph{SExtractor}.
+and catalogue production tool, \emph{SExtractor}.
 
 All of these processings are internally available as plugins. Some of them can be disabled 
 in order to meet any specific or fragmented processing sequence requested by the user. This 
@@ -234,7 +234,7 @@ manually. This can be interesting if you are working on a large survey involving
 because the user can then decide to prepare all its selections of images before processing them.
 
 \begin{figure}[h]
-\epsscale{0.95}
+\epsscale{1}
 \plotone{ims.eps}
 \caption{A selection of 1450 images is built by retreiving all images from the 
 \emph{CFHTLS-T0006-W3\_Scamp} saved selection.}\label{fig:ims}
@@ -245,12 +245,12 @@ because the user can then decide to prepare all its selections of images before 
 A tag is a non-hierarchical keyword that can be assigned to a piece of information. Youpi allows 
 tagging ingested images in order to add some kind of metadata useful for item description. Tagged 
 images can later be searched by tag name using the image selector. Applying tags on a selection of 
-images is easy (Fig. \ref{fig:tags}): a user just create a new tag -- or use an existing one -- and 
+images is easy (Fig. \ref{fig:tags}): a user just creates a new tag -- or use an existing one -- and 
 drag and drop it over a dedicated drop zone to mark or unmark the current selection. The number 
 of tags that can be applied to an image is unlimited.
 
 \begin{figure}[h]
-\epsscale{0.95}
+\epsscale{1}
 \plotone{tags.eps}
 \caption{Dragging the \emph{field-D4} tag over a selection of images.}\label{fig:tags}
 \end{figure}
