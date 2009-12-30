@@ -4,4 +4,4 @@
 all: pdf
 
 pdf:
-	@latex youpi.tex && dvipdf youpi.dvi
+	@latex F4.monnerville.tex && dvipdf F4.monnerville.dvi
