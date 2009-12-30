@@ -68,11 +68,11 @@
 % affiliations, you can save space by using the \altaffilmark and \altaffiltext 
 % commands in place of the \affil command.
 
-\author{M.\ Monnerville}
-\affil{Terapix, Institut d'Astrophysique de Paris, University of Pierre et Marie Curie, UMR 7095, Paris, F-75014, France}
+\author{M.\ Monnerville, G.\ Semah}
+\affil{Terapix, Institut d'Astrophysique de Paris, CNRS, University of Pierre et Marie Curie, UMR 7095, Paris, F-75014, France}
 
-\author{G.\ Semah}
-\affil{Terapix, Institut d'Astrophysique de Paris, CNRS, UMR 7095, Paris, F-75014, France}
+%\author{G.\ Semah}
+%\affil{Terapix, Institut d'Astrophysique de Paris, CNRS, UMR 7095, Paris, F-75014, France}
 
 %-----------------------------------------------------------------------
 %			 Contact Information
@@ -134,13 +134,12 @@
 % and the start of your text.
 
 \begin{abstract} 
-Youpi stands for ``YOUpi is your processing PIpeline''. It is a modern, 
-easy to use web application providing high level functionalities to perform 
-data reduction on scientific FITS images. Built on top of various open source 
-reduction tools released to the community by Terapix, Youpi can help organize 
-your data, manage your processing jobs on a computer cluster in real time 
-(using Condor) and facilitate teamwork by allowing fine-grain sharing of 
-results and data.
+Youpi\footnote{http://youpi.terapix.fr/} stands for ``YOUpi is your processing PIpeline''. 
+It is a modern, easy to use web application providing high level functionalities to perform 
+data reduction on scientific FITS images. It is built on top of open source processing tools 
+that are released to the community by Terapix, in order to organize your data on a computer 
+cluster, to manage your processing jobs in real time (using Condor), and to facilitate teamwork 
+by allowing fine-grain sharing of results and data.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -154,97 +153,88 @@ results and data.
 
 \section{Introduction}
 
-Many data reduction pipeline softwares are available today. Youpi is an attempt to
-build a rather generic and versatile web-based pipeline suitable for both large 
-surveys and smaller PI data processing. It currently supports working with images 
-from the Megacam, WIRCam and Ultra-VISTA instruments, and we plan to add support 
-for more in the future. 
+Many computer-based astronomical image processing pipelines are available today. In contrast, 
+Youpi is a generic and versatile web-based pipeline that is suitable to handle both large 
+public surveys, like the CFHTLS (Goranova et al 2009), and PI data. It currently supports 
+images from the CFHT-MegaCam, CFHT-WIRCam and ESO-VISTA-VIRCAM instruments, but we plan to 
+support more in the future. 
 
-Youpi is designed to help in data management by keeping track of all data locations 
-and parameters involved during the pipeline's life cycle, from the moment FITS images 
-are ingested into the database to the moment final processing results are produced.
+Youpi is designed to run and supervise data management by keeping track of all data locations 
+and parameters involved during the pipeline's life cycle. It starts at the onset of the FITS 
+images ingestion into the database and keeps running until the final processing results are 
+produced.
 
-This pipeline tends to be quite versatile since it can be used on a single host -- a 
-desktop computer or even a laptop -- or on larger installations such as computer 
-clusters. The project is actively maintained at Terapix, published under an open 
-source license and has first been released to the community on September 2009.
+This pipeline is versatile since it can be used on a single host -- a desktop computer or even 
+a laptop -- or on larger installations such as computer clusters. Youpi is actively maintained 
+at Terapix\footnote{http://terapix.iap.fr/} and published under an open source license. It has 
+first been released to the community on September 2009.
 
 \section{Handling FITS Data Ingestion}
 
-Ingesting images is probably the main entry point for firstime users coming to Youpi.
-Indeed, Youpi provides a way to keep track of your images so you can use them for later 
-processing. By selecting -- with a graphical tool --
-one or several data paths to your FITS images (available either locally or on the 
-network by using network shares such as NFS), you will instruct Youpi to read their 
-headers and add relevant information to the database, then you will get a detailled 
-email report at the end of ingestion. Now that images are ingested once and for all, 
-they are available for later processing and tools are provided (see section \ref{sec:ims}) 
-to select them by making criteria-based image selections.
+Ingesting images is the main entry point for novice users coming to Youpi. By selecting -- with 
+a graphical tool -- one or several data paths that locate its FITS images (available either 
+locally or on the network by using network shares such as NFS), the user notify Youpi to read 
+their headers and ingest the relevant information in the database. When the ingestion is completed, 
+Youpi reports the details of the ingestion to the user by email. The ingestion can be carried 
+once, so any image ingested can then be used at any time for later processing. Youpi provides 
+effective tools (see section \ref{sec:ims}) to define selection criteria and set valid requests 
+to it. 
 
 \section{Data Processing}
 
-Youpi is a high-level tool acting as a wrapper for freely available, low-level software 
-packages released to the astronomer community by Terapix. Through the use of these packages, 
-we currently support image quality assessment using the \emph{QualityFITS} software, 
-computing astrometric and photometric solutions using \emph{SCAMP}, resampling and co-adding 
-images using \emph{SWarp} and extracting sources and building source catalogues using 
-\emph{SExtractor}.
+Youpi is a high-level tool acting as a wrapper for freely available, low-level software packages 
+released by Terapix (Goranova et al 2009): it currently supports \emph{QualityFITS}, the image 
+quality assessment software; the astrometric and photometric calibration tool, \emph{SCAMP} 
+(Bertin 2006); the image resampling and stacking software, \emph{SWarp}; and the source extraction 
+and calalogue production tool, \emph{SExtractor}.
 
 All of these processings are internally available as plugins. Some of them can be disabled 
-in order to meet your needs. This plugin architecture is very modular and comprehensive 
-documentation is available for writting custom plugins that would extend Youpi's default 
-processing capabilities.
+in order to meet any specific or fragmented processing sequence requested by the user. This 
+plugin architecture is very modular and versatile. A comprehensive documentation provides user 
+instructions to write custom plugins that would extend Youpi's default processing capabilities.
 
-Since sharing data and results with other people such as PIs or teammates will certainly 
-be a necessity at some point, Youpi ensure that only authorized people gain access to data 
-you want to expose by simulating a Unix-like file permission system. Most of the data sets 
-and results produced can be given permissions for the owner, a group and the rest of the 
-world. This way you can define access policy for members of a group and decide whether non 
-members can access the data.
+Youpi manages data access rights and protections by simulating a Unix-like file permission system. 
+Each user has a personnal password protected account, where its data sets and results can have 
+user-defined permissions for the owner, a group and the rest of the world. Permissions can be 
+modified according to user wishes to share images, data products or even pipeline configuration 
+files.
 
 \section{Data Management}
 
 Being able to assist the astronomer in data management and data sharing has been an important 
-goal since the beginning of the project. As such, Youpi comes with many widgets and tools that 
-make selecting and organizing data or dealing with configuration files and results a breeze.
+goal since the beginning of the project. As such, the Youpi user interface has many widgets 
+and tools that make data selection and organisation, or the management and set up of configuration 
+and results files easy.
 
 \subsection{The Data Path Selector}
 
-Whichever processing plugin you have selected, an embedded path selector is available so you 
-can select and save data paths in real time from within your Internet browser (Fig. \ref{fig:browser}).
-For example, if you want to compute astrometric and photometric solutions for a bunch of images 
-using the \emph{SCAMP} plugin, you will have to provide a path to external \emph{.ahead} files.
-The path selector widget will let you browse local -- and remote, if you are using network mounts -- 
-filesystems, then you will be able to save those directories for later reuse.
-
-\begin{figure}[h]
-\epsscale{0.55}
-\plotone{browser.eps}
-\caption{The path selector widget (on the left) is used to select a directory holding \emph{.ahead} 
-files required for a \emph{SCAMP} processing.}\label{fig:browser}
-\end{figure}
+Whichever processing plugin selected, an embedded path selector can select and save data paths 
+in real time from the user's Internet browser. For example, to derive the astrometric and photometric 
+calibrations of a bunch of images using the \emph{SCAMP} plugin, the user must provide a path to 
+external \emph{.ahead} files. The path selector widget can browse the user's local -- and remote, 
+if network mounts are used -- filesystems, and save those directories for later reuse.
 
 \subsection{The Image Selector}\label{sec:ims}
 
-The image selector (Fig. \ref{fig:ims}) is a tool dedicated to build selections of previously 
-ingested images.  Using it is a required step since Youpi processings need FITS images as input. 
-Several facilities are provided in order to make selecting images as painless as possible. 
-Multiple search criteria can be combined at a time. Ingested images can be searched by \emph{RUNID}, 
-\emph{channel}, \emph{grade} -- since Youpi provides an integrated interface for image 
-quality assessment, \emph{image name} (using regular expressions), \emph{ingestion ID}, 
-\emph{instrument name}, \emph{object name}, \emph{tag} and \emph{saved selection}.
+The image selector (Fig. \ref{fig:ims}) is a selection tool to set up image lists based on previously 
+ingested images. Using it is a required step since any Youpi processing need FITS images as input. 
+Several facilities are provided in order to make the image selection as painless as possible. 
+Multiple search criteria can be combined together. Ingested images can be searched using the 
+following fields: \emph{RUNID}, \emph{channel}, \emph{grade} (since Youpi provides an integrated 
+interface for image quality assessment), \emph{image name} (using regular expressions), 
+\emph{ingestion ID}, \emph{instrument name}, \emph{object name}, \emph{tag} and 
+\emph{saved selection}.
 
-Once a selection of images has been made, basic editing commands can be used to save the 
-current selection, and saved selections can be deleted or merged with any other. In order 
-to increase the image selector's flexibility in building selections of images, options have 
-been added to allow uploading a plain text file describing the selection (one image name 
-and optional checksum per line) or batch importing all text files within a directory. 
-These two features allow creating saved selections on-the-fly rather than doing it manually.
-This can be interesting if you are working on a large survey involving lots of images because
-you can decide to prepare all your selections of images first before starting processing them.
+Once a selection of images is completed, basic editing commands can be used to save the current 
+selection. Saved selections can also be deleted or merged with any other. In order to increase the 
+image selector's flexibility, options have been added to upload a plain text file describing the 
+selection (one image name and optional checksum per line) or to batch-import all text files within 
+a directory. These two features allow Youpi to create and save selections on-the-fly rather than 
+manually. This can be interesting if you are working on a large survey involving lots of images 
+because the user can then decide to prepare all its selections of images before processing them.
 
 \begin{figure}[h]
-\epsscale{0.50}
+\epsscale{0.95}
 \plotone{ims.eps}
 \caption{A selection of 1450 images is built by retreiving all images from the 
 \emph{CFHTLS-T0006-W3\_Scamp} saved selection.}\label{fig:ims}
@@ -252,97 +242,61 @@ you can decide to prepare all your selections of images first before starting pr
 
 \subsection{Organizing Data With Tags}
 
-A tag is a non-hierarchical keyword that can be assigned to a piece of information. Youpi 
-allows tagging ingested images in order to add some kind of metadata useful for item 
-description. Tagged images can later be searched by tag name using the image selector and 
-can thus be retreived easily. Applying tags on a selection of images is easy (Fig. \ref{fig:tags}): 
-just create a new tag -- or use an existing one -- and drag and drop it over a dedicated 
-drop zone to mark or unmark the current selection. Any number of tags can be applied to an 
-image.
+A tag is a non-hierarchical keyword that can be assigned to a piece of information. Youpi allows 
+tagging ingested images in order to add some kind of metadata useful for item description. Tagged 
+images can later be searched by tag name using the image selector. Applying tags on a selection of 
+images is easy (Fig. \ref{fig:tags}): a user just create a new tag -- or use an existing one -- and 
+drag and drop it over a dedicated drop zone to mark or unmark the current selection. The number 
+of tags that can be applied to an image is unlimited.
 
 \begin{figure}[h]
-\epsscale{0.50}
+\epsscale{0.95}
 \plotone{tags.eps}
 \caption{Dragging the \emph{field-D4} tag over a selection of images.}\label{fig:tags}
 \end{figure}
 
 \subsection{The Processing Cart}
 
-Before running any processing with Youpi, all input images, parameters and configuration 
-files that describe the processing are first bundled together in one processing cart item. 
-The processing cart acts like shopping carts on commercial websites. Many processing items 
-can be added to it. This is a convenient place for sharing processings between users -- because 
-processing items can be saved for later use and loaded back to the processing cart at anytime 
-by others -- or for setting runtime options before submitting the job on the cluster.
+Before running any processing with Youpi, all input images, parameters and configuration files 
+that describe the processing are first bundled together in one processing cart item. The 
+processing cart acts like shopping carts on commercial websites. Many processing items can be 
+added to it. This is a convenient place for sharing processings between users -- because processing 
+items can be saved for later use and loaded back to the processing cart at anytime by others -- or 
+for setting runtime options before submitting the job on the cluster.
 
 \section{Cluster Computing With Condor}
 
 Youpi heavily relies on \emph{Condor} for running processings. Condor is an open source 
 high-throughput computing software framework for distributed parallelization of computationally 
-intensive tasks and is well suited for working with a cluster of computers.
+intensive tasks. It is therefore well suited for working with a cluster of computers.
 
-Ingestions are submitted as Condor jobs as well as processing cart items. Youpi handles 
-all input parameters and generates a \emph{Condor submission file} -- a plain text file 
-specifying job requirements, environment and complete command line -- ready to be executed 
-on the Condor cluster.
+Ingestions as well as processing cart items are submitted as Condor jobs. Youpi handles all 
+input parameters and generates a \emph{Condor submission file} -- a plain text file specifying 
+job requirements, environment and complete command line -- ready to be executed on the Condor cluster.
 
-\subsection{Embedded Condor Policies}
+Depending on the nature of the processing, it may be useful to target a specific subset of cluster 
+nodes. For example, a job that requires a lot of memory to run is better handled on machines with 
+lots of RAM, only. Similar restrictions also apply for CPU intensive tasks.
 
-Most of the time, depending on the nature of the processing, it is better to target a 
-specific subset of cluster nodes. A job that requires a lot of memory to run is better 
-handled on machines with lots of RAM. The same applies for CPU intensive tasks.
+Since Condor natively supports those kind of machine requirements in its submission files, Youpi's 
+menu contains a page dedicated to Condor requirements setup. From this page, users can define 
+custom policies or selections. Custom policies are \emph{dynamic rules}: criteria such as 
+available memory, disk space or slot/host name can be defined using regular expressions. Dynamic 
+rules will only be computed just before job submission from the processing cart -- by querying 
+Condor in real time -- to the cluster. In contrast, custom selections are made of \emph{static nodes} 
+selected among the available cluster nodes displayed on the screen.
 
-Since Condor natively supports those kind of machine requirements in its submission files,
-Youpi comes with a page dedicated to Condor requirements setup. From this page, users can 
-define custom policies or selections. Custom policies are \emph{dynamic rules}: criteria
-such as available memory, disk space or slot/host name can be defined using regular expressions.
-Dynamic rules will only be computed just before job submission from the processing cart -- by 
-querying Condor in real time -- to the cluster. On the other side, custom selections are 
-made of \emph{static nodes} selected among the available cluster nodes displayed on the screen.
-
-\subsection{Live Monitoring of Processings}
-
-Once jobs have been submitted to the Condor cluster, they can be monitored directly from 
-within your browser on Youpi's \emph{Active Monitoring} page. Important information such as 
-job's description, remote host, run time, job's owner and current status are displayed and 
-refreshed in real time, without reloading the page.
-
-%-----------------------------------------------------------------------
-%			      References
-%-----------------------------------------------------------------------
-% List your references below within the reference environment
-% (i.e. between the \begin{references} and \end{references} tags).
-% Each new reference should begin with a \reference command which sets
-% up the proper indentation.  
-%    NOTE: all citations in the text _must_ have a corresponding entry in 
-%    the reference list, and all references must be cited in the text.
-%
-% Observe the following order when listing bibliographical 
-% information for each reference:  author name(s), publication 
-% year, journal name, volume, and page number for articles. 
-% URLs to the reference may be given either in-line, or as a footnote. 
-% Note that many journal names are available as macros; see
-% the User Guide for a listing "macro-ized" journals. 
-%
-% You may find the following tricks to be helpful:
-%
-%   o  "\ " after a period prevents LaTeX from interpreting the period 
-%      as an end of a sentence.
-%   o  \adassxvi is a macro that expands to the full title, editor,
-%      and publishing information for the ADASS XVI conference
-%      proceedings.  Such macros are defined for ADASS conferences I
-%      through the most recently published proceedings.
-%   o  When referencing a paper in the current volume, use the
-%      \adassxvii and \paperref macros.  The argument to \paperref is
-%      the paper ID code for the paper you are referencing.  See the 
-%      note in the "Paper ID Code" section above for details on how to 
-%      determine the paper ID code for the paper you reference.  
+Once jobs have been submitted to the Condor cluster, they can be monitored directly from within 
+your browser on Youpi's \emph{Active Monitoring} page. Important information such as job's 
+description, remote host, run time, job's owner and current status are displayed and refreshed 
+in real time, without reloading the page.
 
 \begin{references}
 
-\reference Auri\`ere, M.\  1982, \aap, 109, 301
-\reference Djorgovski, S., \& King, I.\ R.\  1984, \apj, 277, L49
-\reference Hagiwara, K., \& Zeppenfeld, D.\  1986, Nucl.Phys., 274, 1
+\reference Bertin, E., 2006, ASPC, 351, 112. 
+\reference Goranova, Y. Hudelot, P. Magnard, F., McCracken, H.,
+ Mellier, Y., Monnerville, M., Schultheis, M., S\'emah, G., Cuillandre, J.-C., Aussel, H., 2009, {\it The CFHTLS T0006 Release},
+ {\tt http://terapix.iap.fr/cplt/T0006/T0006-doc.pdf}\\
     
 \end{references}
 
