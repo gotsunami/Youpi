@@ -183,7 +183,7 @@ class MiscData(models.Model):
 class CartItem(models.Model):
 	"""
 	Standalone table, no foreign key constraint.
-	Useful to store (serialized) data related to shopping cart items
+	Useful to store (serialized) data related to processing cart items
 	"""
 	
 	# Name of configuration content
@@ -200,7 +200,7 @@ class CartItem(models.Model):
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
 	
 	class Meta:
-		verbose_name="Saved item of shopping cart"
+		verbose_name="Saved item of processing cart"
 
 	def __unicode__(self):
 		return self.name

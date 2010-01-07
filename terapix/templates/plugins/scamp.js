@@ -57,14 +57,14 @@ var {{ plugin.id }} = {
 					userData.set('config', 'The one used for this Scamp processing');
 					userData.set('taskId', taskId);
 
-					// Add to the shopping cart
+					// Add to the processing cart
 					var p_data = {	plugin_name	: uidscamp,
 									userData 	: userData,
 					};
 				
 					s_cart.addProcessing(p_data, function() {
 						document.fire('notifier:notify', 'Scamp scheduled for reprocessing (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
-							') and added to the shopping cart.');
+							') and added to the processing cart.');
 					});
 				}
 		);
@@ -286,12 +286,12 @@ var {{ plugin.id }} = {
 			aheadPath: {{ plugin.id }}.aheadPath
 		};
 
-		// Finally, add to the shopping cart
+		// Finally, add to the processing cart
 		p_data = {	plugin_name	: uidscamp,
 					userData 	: data
 		};
 	
-		// Add entry into the shopping cart
+		// Add entry into the processing cart
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
@@ -1053,7 +1053,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function displayImageCount
-	 * Renders list of images to be processed as a summary (used in the shopping cart plugin rendering)
+	 * Renders list of images to be processed as a summary (used in the processing cart plugin rendering)
 	 *
 	 * Parameters:
 	 *
@@ -1096,7 +1096,7 @@ var {{ plugin.id }} = {
 				var d = resp['result'];
 				container.innerHTML = '';
 				var log = new Logger(container);
-				log.msg_status('Adding to shopping cart...');
+				log.msg_status('Adding to processing cart...');
 				var totalSels = d['IdList'].length;
 				var idList = '[[';
 				for (var k=0; k < d['IdList'].length; k++) {
@@ -1113,7 +1113,7 @@ var {{ plugin.id }} = {
 							}
 				};
 	
-				// Add entry into the shopping cart
+				// Add entry into the processing cart
 				s_cart.addProcessing(	p_data,
 										// Custom handler
 										function() {
@@ -1126,7 +1126,7 @@ var {{ plugin.id }} = {
 		);
 	
 		var post = 'Plugin={{ plugin.id }}&Method=getImgIdListFromLDACFiles&TaskId=' + taskId + '&LDACFiles=' + ldac_files;
-		xhr.setBusyMsg('Adding subselection to shopping cart');
+		xhr.setBusyMsg('Adding subselection to processing cart');
 		xhr.send('/youpi/process/plugin/', post);
 	}
 };

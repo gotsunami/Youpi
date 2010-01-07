@@ -12,12 +12,12 @@
  *****************************************************************************/
 
 /*
- * Class: ShoppingCart
- * Basic shopping cart implementation
+ * Class: ProcessingCart
+ * Basic processing cart implementation
  *
  * File:
  *
- *  shoppingcart.js
+ *  processingcart.js
  *
  * Dependencies:
  *
@@ -28,7 +28,7 @@
  * container - string or DOM: name of parent DOM block container
  *
  */
-function ShoppingCart(container)
+function ProcessingCart(container)
 {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ function ShoppingCart(container)
 
 	/*
 	 * Function: _render
-	 * Renders shopping cart
+	 * Renders processing cart
 	 *
 	 */ 
 	function _render() {
@@ -103,7 +103,7 @@ function ShoppingCart(container)
 
 	/*
 	 * Function: addProcessing
-	 * Adds an item to the shopping cart
+	 * Adds an item to the processing cart
 	 *
 	 * Parameters:
 	 *  obj - object: arbitrary object
@@ -148,7 +148,7 @@ function ShoppingCart(container)
 
 	/*
 	 * Function: deletePluginItem
-	 * Deletes an item from the shopping cart
+	 * Deletes an item from the processing cart
 	 *
 	 * Parameters:
 	 *  obj - object: arbitrary object
@@ -186,7 +186,7 @@ function ShoppingCart(container)
 
 	/*
 	 * Function: deleteAllPluginItem
-	 * Deletes an item from the shopping cart
+	 * Deletes an item from the processing cart
 	 *
 	 * Parameters:
 	 *  obj - object: arbitrary object

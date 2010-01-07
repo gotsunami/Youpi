@@ -53,7 +53,7 @@ Version 0.5.2
 
 **Bug fixes**:
 
-- Fixed shopping cart issues (session related) (`620`_)
+- Fixed processing cart issues (session related) (`620`_)
 - Fixed the "Software version check" feature (`641`_)
 - Swarp plugin: fixed final stack ingestion issues; fixed bug preventing swarp item cluster submission (`667`_)
 - Sextractor plugin: fixed bad weight image name in dual image mode; fixed a data path issue (`669`_)

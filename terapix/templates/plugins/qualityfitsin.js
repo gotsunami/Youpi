@@ -450,7 +450,7 @@ var {{ plugin.id }} = {
 							// Custom handler
 							function() {
 								document.fire('notifier:notify', 'The current image has been scheduled for reprocessing. ' +
-									'An item has been added to the shopping cart.');
+									'An item has been added to the processing cart.');
 							}
 					);
 				}
@@ -1016,7 +1016,7 @@ var {{ plugin.id }} = {
 			}
 		}
 
-		// Finally, add to the shopping cart
+		// Finally, add to the processing cart
 		var total = {{ plugin.id }}_ims.getImagesCount();
 
 		p_data = {	plugin_name: uidfitsin,
@@ -1039,7 +1039,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function displayImageCount
-	 * Renders list of images to be processed as a summary (used in the shopping cart plugin rendering)
+	 * Renders list of images to be processed as a summary (used in the processing cart plugin rendering)
 	 *
 	 * Parameters:
 	 *
@@ -1071,7 +1071,7 @@ var {{ plugin.id }} = {
 	},
 
 	/*
-	 * This function will add an item to the shopping cart for reprocessing all failed processings
+	 * This function will add an item to the processing cart for reprocessing all failed processings
 	 * currently selected at a time. 
 	 *
 	 * Note that its behaviour is specific for qualityFits data processing:
@@ -1112,7 +1112,7 @@ var {{ plugin.id }} = {
 											// Custom handler
 											function() {
 												container.innerHTML = "<img src=\"/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon-yes.gif\"/> Done. A cart item for reprocessing all " + 
-													tasksList.split(',').length + " images at once has been<br/>added to your <a href=\"/youpi/cart/\">shopping cart</a>.";
+													tasksList.split(',').length + " images at once has been<br/>added to your <a href=\"/youpi/cart/\">processing cart</a>.";
 											}
 					);
 				}

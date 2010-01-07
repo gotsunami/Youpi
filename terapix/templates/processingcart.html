@@ -88,7 +88,7 @@ function removeItemFromCart(trid, force) {
 			n.fade({ 
 				afterFinish: function() { 
 					n.remove(); 
-					document.fire('shoppingCart:itemRemoved');
+					document.fire('processingCart:itemRemoved');
 				}
 			});
 		}
@@ -282,9 +282,9 @@ document.observe('dom:loaded', function() {
 	sc_accordion.open(0);
 });
 
-// A shopping cart item has just been removed
-document.observe('shoppingCart:itemRemoved', function() {
-	// Is the shopping cart empty?
+// A processing cart item has just been removed
+document.observe('processingCart:itemRemoved', function() {
+	// Is the processing cart empty?
 	var container = menu.getContentNodeForCurrentEntry();
 	if (!container.select('table.shoppingCart').length) {
 		container.update();
@@ -294,7 +294,7 @@ document.observe('shoppingCart:itemRemoved', function() {
 		d.appear();
 	}
 
-	document.fire('notifier:notify', 'Item removed from the shopping cart');
+	document.fire('notifier:notify', 'Item removed from the processing cart');
 });
 </script>
 
@@ -325,7 +325,7 @@ document.observe('shoppingCart:itemRemoved', function() {
 				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
 					<td style="text-align: right">
 						<p style="text-align: right; font-size: 80%">Item <b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> added on {{ data.date }}</p>
-						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="boxes.confirm('Are you sure you want to delete this item from the shopping cart?', function() {removeItemFromCart('{{ plugin.id }}_{{ forloop.counter0 }}');});"/>
+						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif" onclick="boxes.confirm('Are you sure you want to delete this item from the processing cart?', function() {removeItemFromCart('{{ plugin.id }}_{{ forloop.counter0 }}');});"/>
 						<div class="sc_item_numbering">{{ forloop.counter }}</div>
 					</td>
 					<td width="100%" colspan="2">

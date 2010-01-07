@@ -153,12 +153,12 @@ var {{ plugin.id }} = {
 	do_addSelectionToCart: function(data) {
 		var total = {{ plugin.id }}.ims.getImagesCount();
 
-		// Add to the shopping cart
+		// Add to the processing cart
 		p_data = {	plugin_name	: uidswarp,
 					userData 	: data
 		};
 	
-		// Add entry into the shopping cart
+		// Add entry into the processing cart
 		s_cart.addProcessing(	p_data,
 								// Custom handler
 								function() {
@@ -354,7 +354,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function displayImageCount
-	 * Renders list of images to be processed as a summary (used in the shopping cart plugin rendering)
+	 * Renders list of images to be processed as a summary (used in the processing cart plugin rendering)
 	 *
 	 * Parameters:
 	 *
@@ -459,7 +459,7 @@ var {{ plugin.id }} = {
 					userData.set('config', 'The one used for this Swarp processing');
 					userData.set('taskId', taskId);
 
-					// Add to the shopping cart
+					// Add to the processing cart
 					var p_data = {	plugin_name	: uidswarp,
 								userData 	: userData,
 					};
@@ -468,7 +468,7 @@ var {{ plugin.id }} = {
 											// Custom handler
 											function() {
 												alert('Swarp scheduled for reprocessing (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
-													') and\nadded to the shopping cart.');
+													') and\nadded to the processing cart.');
 											}
 					);
 				}

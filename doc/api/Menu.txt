@@ -45,7 +45,7 @@ Timestamp: Updated month day, year
 Group: Core Javascript  {
 
    File: ImageSelector  (/home/nis/monnerville/youpi/terapix/media/js/imageselector.js)
-   File: ShoppingCart  (/home/nis/monnerville/youpi/terapix/media/js/shoppingcart.js)
+   File: ProcessingCart  (/home/nis/monnerville/youpi/terapix/media/js/processingcart.js)
    }  # Group: Core Javascript
 
 Group: Plugins  {

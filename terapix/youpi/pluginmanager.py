@@ -44,7 +44,7 @@ class ProcessingPlugin(object):
 
 		# Plugin data (to be processed)
 		self.__data = [] 
-		# Used to generate rather unique item ID in shopping cart
+		# Used to generate rather unique item ID in processing cart
 		self.itemCounter = 0
 
 	def getUniqueCondorJobId(self):
@@ -351,7 +351,7 @@ class ProcessingPlugin(object):
 
 	def hasItemsInCart(self):
 		"""
-		Returns True if this plugin has items in shopping cart.
+		Returns True if this plugin has items in processing cart.
 		"""
 		return len(self.__data) > 0
 

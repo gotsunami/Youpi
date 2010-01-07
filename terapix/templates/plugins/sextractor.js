@@ -103,7 +103,7 @@ var {{ plugin.id }} = {
 	do_addSelectionToCart: function(data) {
 		var total = {{ plugin.id }}.ims1.getImagesCount();
 
-		// Finally, add to the shopping cart
+		// Finally, add to the processing cart
 		p_data = {	plugin_name : uidsex , 
 					userData 	: data
 		};
@@ -119,7 +119,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function displayImageCount
-	 * Renders list of images to be processed as a summary (used in the shopping cart plugin rendering)
+	 * Renders list of images to be processed as a summary (used in the processing cart plugin rendering)
 	 *
 	 * Parameters:
 	 *
@@ -268,7 +268,7 @@ var {{ plugin.id }} = {
 				function(resp) {
 					// Silently remove item from the cart
 					removeItemFromCart(trid, true);
-					// Global function (in shoppingcart.html)
+					// Global function (in processingcart.html)
 					showSavedItems();
 				}
 		);

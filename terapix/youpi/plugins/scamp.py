@@ -44,13 +44,13 @@ class Scamp(ProcessingPlugin):
 		self.id = 'scamp'
 		self.optionLabel = 'Astro-Photo calibration'
 		self.description = 'Scamp'
-		# Item prefix in shopping cart. This should be short string since
+		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SCAMP'
 		self.index = 20
 
 		self.template = 'plugins/scamp.html' 						# Main template, rendered in the processing page
-		self.itemCartTemplate = 'plugins/scamp_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.itemCartTemplate = 'plugins/scamp_item_cart.html' 		# Template for custom rendering into the processing cart
 		self.jsSource = 'plugins/scamp.js' 							# Custom javascript
 		self.isAstromatic = True									# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
@@ -650,7 +650,7 @@ class Scamp(ProcessingPlugin):
 
 	def getReprocessingParams(self, request):
 		"""
-		Returns all information for reprocessing a calibration (so that it can be added to the shopping cart).
+		Returns all information for reprocessing a calibration (so that it can be added to the processing cart).
 		"""
 
 		try:

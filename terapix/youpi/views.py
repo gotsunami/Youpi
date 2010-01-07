@@ -46,7 +46,7 @@ from copy import deepcopy
 # Custom views
 from terapix.exceptions import *
 from terapix.youpi.pluginmanager import PluginManagerError, PluginError
-from terapix.youpi.cviews.shoppingcart import *
+from terapix.youpi.cviews.processingcart import *
 from terapix.youpi.cviews.condor import *
 from terapix.youpi.cviews.preingestion import *
 from terapix.youpi.cviews.plot import *
@@ -156,7 +156,7 @@ def documentation(request):
 @profile
 def cart_view(request):
 	"""
-	Renders shopping cart view.
+	Renders processing cart view.
 	"""
 
 	cartHasData = False
@@ -177,8 +177,8 @@ def cart_view(request):
 	policies = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
 	selections = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
 
-	menu_id = 'shoppingcart'
-	return render_to_response('shoppingcart.html', {	
+	menu_id = 'processingcart'
+	return render_to_response('processingcart.html', {	
 					'cart_plugins' 		: cart_items, 
 					'plugins' 			: manager.plugins, 
 					'cartHasData' 		: cartHasData, 

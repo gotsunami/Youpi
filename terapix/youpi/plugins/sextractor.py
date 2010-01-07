@@ -44,13 +44,13 @@ class Sextractor(ProcessingPlugin):
 		self.id = 'sex'
 		self.optionLabel = 'Sources extractor'
 		self.description = 'Sextractor'
-		# Item prefix in shopping cart. This should be short string since
+		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SEX'
 		self.index = 1
 
 		self.template 			= 'plugins/sextractor.html' 							# Main template, rendered in the processing page
-		self.itemCartTemplate 	= 'plugins/sextractor_item_cart.html' 					# Template for custom rendering into the shopping cart
+		self.itemCartTemplate 	= 'plugins/sextractor_item_cart.html' 					# Template for custom rendering into the processing cart
 		self.jsSource 			= 'plugins/sextractor.js' 								# Custom javascript
 		self.isAstromatic 		= True													# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 

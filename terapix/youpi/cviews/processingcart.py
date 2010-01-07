@@ -30,7 +30,7 @@ from terapix.youpi.auth import read_proxy
 
 def cart_cookie_check(request):
 	"""
-	Check for the existence of cookie related to shopping cart
+	Check for the existence of cookie related to processing cart
 	"""
 	if 'cart' not in request.session:
 		request.session['cart'] = {'plugins' : {}}
@@ -39,7 +39,7 @@ def cart_cookie_check(request):
 
 def cart_add_item(request):
 	"""
-	Add one item into shopping cart
+	Add one item into processing cart
 	"""
 	try:
 		plugin = request.POST['plugin']
@@ -66,7 +66,7 @@ def cart_add_item(request):
 		request.session['cart']['plugins'][plugin] = []
 
 	plugObj = manager.getPluginByName(plugin)
-	# Useful to get a rather unique item ID in the shopping cart
+	# Useful to get a rather unique item ID in the processing cart
 	plugObj.itemCounter += 1
 
 	request.session['cart']['plugins'][plugin].append({ 'date' 			: time.asctime(), 

@@ -39,13 +39,13 @@ class Swarp(ProcessingPlugin):
 		self.id = 'swarp'
 		self.optionLabel = 'Image stacking'
 		self.description = 'Resampling and coaddition'
-		# Item prefix in shopping cart. This should be short string since
+		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SWARP'
 		self.index = 50
 
 		self.template = 'plugins/swarp.html' 						# Main template, rendered in the processing page
-		self.itemCartTemplate = 'plugins/swarp_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.itemCartTemplate = 'plugins/swarp_item_cart.html' 		# Template for custom rendering into the processing cart
 		self.jsSource = 'plugins/swarp.js' 							# Custom javascript
 		self.isAstromatic = True									# Part of the www.astromatic.net software suite (Scamp, Swarp, Sextractor...)
 
@@ -534,7 +534,7 @@ sys.exit(exit_code)
 
 	def getReprocessingParams(self, request):
 		"""
-		Returns all information for reprocessing a stack (so that it can be added to the shopping cart).
+		Returns all information for reprocessing a stack (so that it can be added to the processing cart).
 		"""
 
 		try:

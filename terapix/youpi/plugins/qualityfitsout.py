@@ -31,12 +31,12 @@ class QualityFitsIn(ProcessingPlugin):
 		self.id = 'fitsout'
 		self.optionLabel = 'Last Quality Evaluation'
 		self.description = 'QualiyFits-Out processing'
-		# Item prefix in shopping cart. This should be short string since
+		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'QFO'
 		self.index = 40
 
-		# Template for custom rendering into the shopping cart
+		# Template for custom rendering into the processing cart
 		self.itemCartTemplate = 'plugin_qualityfitsout_item_cart.html'
 		# Custom javascript
 		self.jsSource = 'plugin_qualityfitsout.js'

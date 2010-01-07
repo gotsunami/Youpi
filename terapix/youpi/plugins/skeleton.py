@@ -46,13 +46,13 @@ class Skeleton(ProcessingPlugin):
 		self.id = 'skel'
 		self.optionLabel = 'Skeleton (DEMO)'
 		self.description = 'Skeleton DEMO processing'
-		# Item prefix in shopping cart. This should be short string since
+		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SKEL'
 		self.index = 65535
 
 		self.template = 'plugins/skeleton.html' 						# Main template, rendered in the processing page
-		self.itemCartTemplate = 'plugins/skeleton_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.itemCartTemplate = 'plugins/skeleton_item_cart.html' 		# Template for custom rendering into the processing cart
 		self.jsSource = 'plugins/skeleton.js' 							# Custom javascript
 
 		# Will queue jobCount jobs on the cluster

@@ -29,7 +29,7 @@ templates, and class member methods you would like to be available to the public
 interface of your plugin (so you can call them using AJAX calls from your Javascript 
 files). The remaining three files are client-side related: a Javascript file holding 
 all your client-side routines and two HTML templates files for rendering the plugin on 
-the processing page and rendering the plugin related items in the shopping cart 
+the processing page and rendering the plugin related items in the processing cart 
 respectively. Finally, when you are done writting your new plugin, the |pm| will find, 
 register and load your code into Youpi's processing data structure. 
 
@@ -56,8 +56,8 @@ following statement::
 Once loaded, the ``skeleton`` plugin is available on Youpi's *processing page* and you should 
 see its "Skel" icon in the bottom right corner of the available processings list. The purpose 
 of this plugin is to submit five ``uptime`` shell commands to the cluster. You can add a 
-``skeleton`` job to the shopping cart by clicking on the "Add to cart" button. As we may expect, 
-the plugin fully integrates with the shopping cart and Condor. From the shopping cart, you 
+``skeleton`` job to the processing cart by clicking on the "Add to cart" button. As we may expect, 
+the plugin fully integrates with the processing cart and Condor. From the processing cart, you 
 can save this job for later processing or submit it to the cluster.
 
 That said, let's concentrate on our new plugin. Since the ``uname -a`` command displays 
@@ -84,10 +84,10 @@ Edit your ``system.py`` file and perform the following changes:
 	self.id =  'system' # This is your internal plugin id. It must be unique accross all plugins in use.
 	self.description = 'System tutorial'
 	self.optionLabel = 'My first plugin'
-	self.itemPrefix = 'SYS' # Used to prefix shopping cart items name
+	self.itemPrefix = 'SYS' # Used to prefix processing cart items name
 	# Now set source file names
 	self.template = 'plugins/system.html' # Main template, rendered in the processing page
-	self.itemCartTemplate = 'plugins/system_item_cart.html' # Template for custom rendering into the shopping cart
+	self.itemCartTemplate = 'plugins/system_item_cart.html' # Template for custom rendering into the processing cart
 	self.jsSource = 'plugins/system.js' # Custom javascript
 	self.jobCount = 10 # Will queue 10 jobs on the cluster
 	# The actual command to perform
@@ -150,13 +150,13 @@ directory:
   ``processing_plugin.html`` ``plugin.jsSource``         Plugin's javascript code and
                              ``plugin.template``         plugin HTML template for rendering on the processing page
   ``single_result.html``     ``plugin.jsSource``         Plugin javascript code
-  ``shoppingcart.html``      ``plugin.jsSource``         Plugin's javascript code and
-                             ``plugin.itemCartTemplate`` plugin HTML template for rendering items in the shopping cart
+  ``processingcart.html``    ``plugin.jsSource``         Plugin's javascript code and
+                             ``plugin.itemCartTemplate`` plugin HTML template for rendering items in the processing cart
   ========================== =========================== =============================================================
 
-  In the ``shoppingcart.html`` template for example, the plugin's ``jsSource`` javascript file 
+  In the ``processingcart.html`` template for example, the plugin's ``jsSource`` javascript file 
   and ``itemCartTemplate`` are included using the ``include`` tag when |django| wants to render 
-  the shopping cart template. The ``include`` statement is a |django|'s built-in template tag 
+  the processing cart template. The ``include`` statement is a |django|'s built-in template tag 
   which loads a template file and renders it *with the current context* so that variables in the 
   current context can be substituted in every plugin's templates. Since the ``plugin`` variable is 
   a Python object (which inherits the ``ProcessingPlugin`` class), |django|'s template system is 
@@ -520,18 +520,18 @@ optionLabel
 	that no particular checks are performed so that plugins with the same ``optionLabel``
 	value will have the same menu title, which is not what you might want. This variable 
 	is referenced by three template files: ``processing.html``, ``plugin_default.html``
-	and ``shoppingcart.html``.
+	and ``processingcart.html``.
 
 description
 	Short inline string used to display some plugin's general action. Youpi uses this 
 	variable to name the low-level program that really does the job. While the ``optionLabel`` 
 	variable should hold a rather general option name, the ``description`` data member should 
 	be used to define more accurate, lower level kind of information. This variable is 
-	referenced by the templates files ``processing.html`` and ``shoppingcart.html``.
+	referenced by the templates files ``processing.html`` and ``processingcart.html``.
 
 itemPrefix
-	String used at the shopping cart level to add a custom prefix to items' names in the 
-	cart. The only file referencing this variable is the ``shoppingcart.html`` template.
+	String used at the processing cart level to add a custom prefix to items' names in the 
+	cart. The only file referencing this variable is the ``processingcart.html`` template.
 
 template
 	String used to specify the Django template file to use for custom HTML rendering on 
@@ -557,16 +557,16 @@ template
 	used instead, reminding you that you certainly missed something. 
 
 itemCartTemplate
-	String defining a Django HTML template that will be included into the shopping cart 
+	String defining a Django HTML template that will be included into the processing cart 
 	template for custom rendering. This is where you decide what your plugin's related 
-	items will look like and behave on the shopping cart page. The only file referencing 
-	this variable is the ``shoppingcart.html`` template.
+	items will look like and behave on the processing cart page. The only file referencing 
+	this variable is the ``processingcart.html`` template.
 
 jsSource
 	String used to specify a filename containing some custom JavaScript source code for 
 	your plugin. Even if you don't have any JavaScript code to put into this file right 
 	now, it is a good practice to create an empty file and set up your ``jsSource`` data 
-	member accordingly. Indeed, core templates files such as ``shoppingcart.html`` *will* 
+	member accordingly. Indeed, core templates files such as ``processingcart.html`` *will* 
 	try to include every plugin's external JavaScript code::
 
 		{# Load custom plugin's javascript code when needed #}
@@ -574,6 +574,6 @@ jsSource
 		{% include plugin.jsSource %}
 		{% endfor %}
 
-	The ``jsSource`` variable is referenced by three template files: ``shoppingcart.html``, 
+	The ``jsSource`` variable is referenced by three template files: ``processingcart.html``, 
 	``results.html`` and ``single_results.html``.
 

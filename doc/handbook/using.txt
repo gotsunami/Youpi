@@ -137,9 +137,9 @@ The preference tab in the Youpi interface is as important as the condor setup ta
 It handles global options for youpi and it is user dependant. Each user can set his
 preferences for processing data, manage his style themes and define his own permissions.
 
-- Default shopping cart item behaviour
+- Default processing cart item behaviour
 
- You can define a **default shopping cart item behaviour**, means if you intend to use 
+ You can define a **default processing cart item behaviour**, means if you intend to use 
  policies or selections, for each processing plugin of youpi. Once this done, you can
  opt for the selections and policies you have created in the **Condor setup**, and 
  affect to plugins.
@@ -330,14 +330,14 @@ processing to the cart. By clicking on the ADD TO CART button (in the top right 
 interface) a message will appears to confirm that. If something is wrong an error message
 will guide you to the related tab which needed to be fixed.
 
-The Shopping Cart
------------------
+The Processing Cart
+-------------------
 
 .. image:: /figures/shopping.png
    :width: 800
    :scale: 90
 
-The shopping cart comes naturally, after adding to cart one or many processings, elaborated
+The processing cart comes naturally, after adding to cart one or many processings, elaborated
 from plugins of the *processing your data* tab. It represents a visual synthesis of 
 processings, sorted by plugin and ready to be run. A summary of your parameters are shown 
 as a quick view. Then you can decide to delete, save for a later use, or run the 
@@ -361,7 +361,7 @@ Live Monitoring of Processings
    :width: 800
    :scale: 90
 
-After having launched jobs, from the shopping cart to the Condor management system, Youpi 
+After having launched jobs, from the processing cart to the Condor management system, Youpi 
 provides a realtime instant view of all proccessed jobs, with related nodes in which jobs
 are running, the management status, the owner. You will be able to  kill your own jobs and 
 assuming that you give data permissions to your team, they could do the same.The interface 
@@ -533,7 +533,7 @@ decide to store output data in the output directory of your choice (see :ref:`ou
 * **Add to cart and run processing tasks**
 
 Complete the configuration of processing by pressing the "add to cart" button. Go to 
-the "shopping cart" tab, in the top right of the interface, to see your own processing 
+the "processing cart" tab, in the top right of the interface, to see your own processing 
 tasks added. Press the "run" button to launch your processing tasks on the cluster.
 
 Ho do I check status of my processings tasks (jobs) on the cluster?

@@ -11,7 +11,7 @@ Handy features are available out of the box. With Youpi, you can:
 
 - Easily keep track of your data
 - Tag FITS images with labels
-- Prepare your tasks then save them for later processing by adding them to a shopping cart
+- Prepare your tasks then save them for later processing by adding them to a processing cart
 - Define sophisticated rules to match only subsets of your Condor cluster on which you can 
   run your processing jobs
 - Monitor and kill your jobs running on the cluster in realtime from the interface

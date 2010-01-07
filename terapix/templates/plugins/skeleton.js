@@ -30,7 +30,7 @@
  * reprocessAllFailedProcessings(tasksList)	: one click for reprocessing failed processings from the results page
  * resultsShowEntryDetails(container_id)	: displays custom results information on the results page
  * run(trid, opts, silent)					: submits a job to the cluster
- * saveItemForLater(trid, opts, silent)		: save item for later processing then remove item from the shopping cart
+ * saveItemForLater(trid, opts, silent)		: save item for later processing then remove item from the processing cart
  * showSavedItems()							: displays saved cart items
  *
  */
@@ -59,7 +59,7 @@ var {{ plugin.id }} = {
 			userData : {resultsOutputDir: output_data_path}
 		};
 	
-		// Add entry into the shopping cart
+		// Add entry into the processing cart
 		s_cart.addProcessing(	
 			p_data,
 			// Custom handler
@@ -184,7 +184,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function: saveItemForLater
-	 * Save item for later processing then remove item from the shopping cart
+	 * Save item for later processing then remove item from the processing cart
 	 *
 	 * Parameters:
 	 *  trid - string: for row number

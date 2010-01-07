@@ -3,7 +3,7 @@ digraph G {
 	plugm 	[label="pluginmanager.py", style=rounded, shape=diamond];
 	proc 	[label="processing.html", style=rounded, shape=diamond];
 	plug 	[label="plugin_default.html", style=rounded, shape=diamond];
-	shop 	[label="shoppingcart.html", style=rounded, shape=diamond];
+	shop 	[label="processingcart.html", style=rounded, shape=diamond];
 	res 	[label="results.html", style=rounded, shape=diamond];
 	sres 	[label="single_result.html", style=rounded, shape=diamond];
 	templ 	[label="template"];

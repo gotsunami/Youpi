@@ -18,7 +18,7 @@ digraph G {
 			jshowSavedItems [label="showSavedItems"];
 			jdelSavedItem [label="delSavedItem"];
 			jresultsShowEntryDetails [label="resultsShowEntryDetails"];
-			jdelCartSavedItem [label="Delete shopping cart\nsaved item", shape=house, color=orange];
+			jdelCartSavedItem [label="Delete processing cart\nsaved item", shape=house, color=orange];
 			jrenderOutputDirStats [label="renderOutputDirStats"];
 			jreprocessAllFailedProcessings [label="reprocessAllFailedProcessings"];
 
@@ -85,11 +85,11 @@ digraph G {
 			hprocRendering [label="Dynamic HTML\nrendering", shape=house, color=orange];
 		}
 
-		subgraph cluster_shopping_cart_html {
-			label="shoppingcart.html";
+		subgraph cluster_processing_cart_html {
+			label="processingcart.html";
 			color=red;
 			hdelete [label="Delete cart item", shape=house, color=orange];
-			hsavedItems [label="Show all shopping\ncart saved items", shape=house, color=orange];
+			hsavedItems [label="Show all processing\ncart saved items", shape=house, color=orange];
 			hremoveItemFromCart [label="removeItemFromCart"];
 			hshowSavedItems [label="showSavedItems"];
 		}
@@ -100,8 +100,8 @@ digraph G {
 			jresultsShowDetails [label="results_showDetails"];
 		}
 
-		subgraph cluster_shopping_cart_js {
-			label="shoppingcart.js";
+		subgraph cluster_processing_cart_js {
+			label="processingcart.js";
 			color=blue;
 			addProcessing [label="addProcessing"];
 			addItem [label="addItem"];
@@ -112,7 +112,7 @@ digraph G {
 		}
 	
 		subgraph cluster_cart_py {
-			label="shoppingcart.py";
+			label="processingcart.py";
 			color=green;
 			cartAddItem [label="cart_add_item"];
 			cartDeleteItem [label="cart_delete_item"];

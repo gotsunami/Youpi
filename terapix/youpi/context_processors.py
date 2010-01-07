@@ -40,7 +40,7 @@ def appmenu(request):
 					# Display order is inverted
 					{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : AUP + '/preferences/'},
 					{'title' : 'Condor Setup', 		'id' : 'condorsetup', 	'href' : AUP + '/condor/setup/'},
-					{'title' : 'Shopping cart',		'id' : 'shoppingcart', 	'href' : AUP + '/cart/'},
+					{'title' : 'Processing cart',	'id' : 'processingcart','href' : AUP + '/cart/'},
 				)
 	}
 	return {'menu': app_menu}

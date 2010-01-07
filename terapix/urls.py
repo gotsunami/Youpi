@@ -122,7 +122,7 @@ urlpatterns = patterns(
 	(r'^youpi/history/ingestion/report/(.*?)/$', 'show_ingestion_report'),
 	(r'^youpi/history/preingestion/$', 'history_preingestion'),
 
-	# Shopping cart related
+	# Processing cart related
 	(r'^youpi/cart/$', 'cart_view'),
 	(r'^youpi/cart/cookiecheck/$', 'cart_cookie_check'),
 	(r'^youpi/cart/additem/$', 'cart_add_item'),

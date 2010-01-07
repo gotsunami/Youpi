@@ -51,13 +51,13 @@ class QualityFitsIn(ProcessingPlugin):
 		self.id = 'fitsin'
 		self.optionLabel = 'First Quality Evaluation'
 		self.description = 'QualityFits-In processing'
-		# Item prefix in shopping cart. This should be short string since
+		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'QF'
 		self.index = 0
 
 		self.template = 'plugins/qualityfitsin.html' 						# Main template, rendered in the processing page
-		self.itemCartTemplate = 'plugins/qualityfitsin_item_cart.html' 		# Template for custom rendering into the shopping cart
+		self.itemCartTemplate = 'plugins/qualityfitsin_item_cart.html' 		# Template for custom rendering into the processing cart
 		self.jsSource = 'plugins/qualityfitsin.js' 							# Custom javascript
 
 	def saveCartItem(self, request):
@@ -629,7 +629,7 @@ class QualityFitsIn(ProcessingPlugin):
 
 	def getReprocessingParams(self, request):
 		"""
-		Returns all information for reprocessing an image (so that it can be added to the shopping cart).
+		Returns all information for reprocessing an image (so that it can be added to the processing cart).
 		Information needed: related image ID, flat, mask and reg data path, resultsOutputDir
 		"""
 
