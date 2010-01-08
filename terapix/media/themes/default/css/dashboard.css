@@ -109,9 +109,9 @@ div.tip {
 }
 
 div.warning {
-	background: #F0F8FF url('../img/34x34/warning.png') no-repeat top left;
+	background: #EBC3AD url('../img/34x34/warning.png') no-repeat top left;
 	padding-left: 40px;
-	border: 2px solid #B0C4DE;
+	border: 2px solid #D8A587;
 }
 
 div.modal_warning {
