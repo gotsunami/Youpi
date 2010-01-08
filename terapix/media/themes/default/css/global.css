@@ -766,6 +766,7 @@ div.gradenow {
 	color: #888888;
 	cursor: pointer;
 	text-align: center;
+	white-space: nowrap;
 }
 
 div.gradenow:hover {

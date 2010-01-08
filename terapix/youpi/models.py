@@ -444,6 +444,7 @@ class FirstQEval(models.Model):
 	class Meta:
 		verbose_name = "First Quality Evaluation"
 		unique_together = ('user', 'fitsin')
+		permissions = (('can_grade', "Can grade a QualityFITSed image"),)
 
 class FinalQEval(models.Model):
 	"""

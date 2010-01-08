@@ -66,10 +66,18 @@
 					</td>
 					<td>
 						<div style="padding: 0px; width: 300px">
-							<u>Your grade</u>{% if userGrade %} (<a href="/youpi/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a>){% endif %}:<br/>
+							<u>Your grade</u>
+							{% if userGrade %} 
+								{% if perms.youpi.can_grade %}
+								(<a href="/youpi/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a>)
+								{% endif %}
+							{% endif %}:<br/>
 							<div id="current_grade_div" style="margin-top: 10px;"></div>
 							<script type="text/javascript">
 								var mygrade = new GradingWidget('current_grade_div');
+								{% if not perms.youpi.can_grade %}
+								mygrade.setActive(false);
+								{% endif %}
 								{% if userGrade %}
 								mygrade.setCharGrade('{{ userGrade }}');
 								{% endif %}

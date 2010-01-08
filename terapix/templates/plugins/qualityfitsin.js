@@ -521,23 +521,6 @@ var {{ plugin.id }} = {
 		udiv.appendChild(exit_s);
 		td.appendChild(udiv);
 	
-		// Grading
-		if (resp.Success) {
-			var gdiv = new Element('div');
-			if (resp.GradingCount > 0)
-				gdiv.addClassName('graded').update('Image graded ' + resp.GradingCount + ' time' + (resp.GradingCount > 1 ? 's' : ''));
-			else 
-				gdiv.addClassName('notgraded').update('Image not graded yet');
-			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').update('<u>G</u>rade it now!');
-			nowdiv.insert(new Element('a', {href: '#', accesskey: 'g'}).setStyle({color: 'transparent'}));
-			nowdiv.writeAttribute('title', 'Click to grade this image on a separate page');
-			nowdiv.observe('click', function() {
-				window.open("/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', '_blank');
-			});
-			gdiv.insert(nowdiv);
-			td.insert(gdiv);
-		}
-	
 		tr = new Element('tr');
 		td = new Element('td');
 		td.setAttribute('style', 'padding: 0px');
@@ -588,7 +571,46 @@ var {{ plugin.id }} = {
 		td.update(ResultsHelpers.getPermissionsEntry(resp.TaskId));
 		tr.insert(td);
 		tab2.insert(tr);
+		
+		// Image grading
+		if (resp.Success) {
+			tr = new Element('tr');
+			td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
+			td.insert('Image Grading');
+			tr.insert(td);
+			tab2.insert(tr);
 
+			tr = new Element('tr');
+			td = new Element('td');
+		{% if not perms.youpi.can_grade %}
+			var pgd = new Element('div').setStyle({width: '180px'}).addClassName('warning');
+			td.insert(pgd.update("You don't have permission to grade qualityFITSed images."));
+		{% endif %}
+			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').setStyle({width: '-moz-fit-content'}).update('<u>G</u>rade it now!');
+			nowdiv.insert(new Element('a', {href: '#', accesskey: 'g'}).setStyle({color: 'transparent'}));
+			nowdiv.writeAttribute('title', 'Click to grade this image on a separate page');
+			nowdiv.observe('click', function() {
+		{% if perms.youpi.can_grade %}
+			window.open("/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', '_blank');
+		{% else %}
+			alert("You don't have permission to grade images. Please contact an administrator.");
+		{% endif %}
+			});
+			td.insert(nowdiv);
+			tr.insert(td);
+
+			td = new Element('td');
+			var gdiv = new Element('div').setStyle({padding: '5px'});
+			if (resp.GradingCount > 0)
+				gdiv.addClassName('graded').update('Image graded ' + resp.GradingCount + ' time' + (resp.GradingCount > 1 ? 's' : ''));
+			else 
+				gdiv.addClassName('notgraded').update('Image not graded yet');
+
+			td.insert(gdiv);
+			tr.insert(td);
+			tab2.insert(tr);
+		}
+	
 		// Condor Job Logs
 		tr = new Element('tr');
 		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
@@ -846,39 +868,39 @@ var {{ plugin.id }} = {
 		}
 
 		d.appendChild(tab);
-		container.appendChild(d);
+		container.insert(d);
 
-		if (resp['Success']) {
-			if (resp['GradingCount'] > 0) {
-				var graddiv;
+		if (resp.Success) {
+			if (resp.GradingCount > 0) {
+				// Add available grades
+				var graddiv, gtr, gtd;
 				var gradwid;
-				var gtab = new Element('table');
-				gtab.setAttribute('class', 'qfits-result-entry-grades');
-				gdiv.appendChild(gtab);
-				for (var g=0; g < resp['Grades'].length; g++) {
-					tr = new Element('tr');
-					td = new Element('td');
-					td.appendChild(document.createTextNode(resp['Grades'][g][1]));
-					tr.appendChild(td);
-					gtab.appendChild(tr);
+				var gtab = new Element('table').addClassName('qfits-result-entry-grades').setStyle({marginTop: '10px'});
+				gdiv.insert(gtab);
+				for (var p=0; p < resp.Grades.length; p++) {
+					gtr = new Element('tr');
+					gtd = new Element('td');
+					gtd.appendChild(document.createTextNode(resp['Grades'][p][1]));
+					gtr.appendChild(gtd);
 
-					td = new Element('td');
+					gtd = new Element('td');
 					graddiv = new Element('div');
 					graddiv.setAttribute('align', 'right');
-					graddiv.setAttribute('id', 'grade_div_' + g);
-					td.appendChild(graddiv);
-					tr.appendChild(td);
-					gtab.appendChild(tr);
+					graddiv.setAttribute('id', 'grade_div_' + p);
+					gtd.appendChild(graddiv);
+					gtr.appendChild(gtd);
+					gtab.appendChild(gtr);
 					// Variable name does not matter (as 2nd argument) because the widget 
 					// is turned into a read-only widget with setActive(false)
-					gradwid = new GradingWidget('grade_div_' + g);
+					gradwid = new GradingWidget('grade_div_' + p);
 					gradwid.setLegendEnabled(false);
 					gradwid.setActive(false);
-					gradwid.setCharGrade(resp['Grades'][g][1]);
+					gradwid.setCharGrade(resp.Grades[p][1]);
 
-					td = new Element('td');
-					td.appendChild(document.createTextNode(resp['Grades'][g][0]));
-					tr.appendChild(td);
+					gtd = new Element('td');
+					gtd.insert(resp.Grades[p][0]);
+					gtr.appendChild(gtd);
+					gtab.appendChild(gtr);
 				}
 			}
 		}
