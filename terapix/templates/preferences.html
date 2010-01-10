@@ -219,8 +219,8 @@ function load_config() {
 	<div style="width: 100%; display: none;" id="menuitem_sub_1">
 		<div class="prefs_condor">
 			<h1>Default Permissions to apply</h1>
-			You can change your default permissions for accessing data. Theses values are used everytime you work within Youpi and allow you to 
-			control your data access.
+			<p>You can change your default permissions for accessing data. Theses values are used everytime 
+			you work within Youpi and allow you to control your data access.</p>
 			<div style="margin-top: 10px;">
 				<table class="defaultCondorSetup">
 					<tr>
@@ -229,6 +229,21 @@ function load_config() {
 					</tr>
 				</table>
 			</div>
+		</div>
+		<div class="prefs_condor">
+			<h1>Active User Permissions</h1>
+			<p>You are logged in as user <b>{{ user.username }}</b>, member of group(s): 
+			{% for group in user.groups.all %}
+			{{ group }}
+			{% endfor %}
+			</p>
+			<p>Here is the list of your permissions. In order to change any of them, please contact a Youpi administrator.</p>
+			<table class="permlist">
+				<tr>
+					<th>Permission Name</th>
+					<th>Granted</th>
+				</tr>
+			</table>
 		</div>
 	</div>
 	<div style="width: 100%" id="menuitem_sub_2">
@@ -257,13 +272,26 @@ function load_config() {
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
-			var m = new SubMenu('submenu', ['Default Condor Setup', 'Default Permissions', 'Themes']);
-
+		var m = new SubMenu('submenu', ['Default Condor Setup', 'Permissions', 'Themes']);
 		show_available_themes();
 		show_current_config_button();
 		load_config();
 
 		$('perms_mode_td').update(get_permissions('profile', 'any'));
+	
+		// Show available permissions
+		var tab = $$('table.permlist')[0];
+		var tr, td, img;
+	{% for p in global_perms %}
+		tr = new Element('tr');
+		td = new Element('td').update("{{ p.label }}");
+		tr.insert(td);
+		img = new Element('img');
+		img.writeAttribute('src', "/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon-{% if p.perm %}yes{% else %}no{% endif %}.gif");
+		td = new Element('td').update(img).addClassName('granted');
+		tr.insert(td);
+		tab.insert(tr);
+	{% endfor %}
 	});
 </script>
 {% endblock %}

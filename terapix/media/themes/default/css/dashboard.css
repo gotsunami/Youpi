@@ -641,3 +641,11 @@ div.ims_batch_log_div pre {
 	color: lightgray;
 	font-weight: bold;
 }
+
+.permlist th:first-child {
+	text-align: left;
+}
+
+.permlist .granted {
+	text-align: center;
+}

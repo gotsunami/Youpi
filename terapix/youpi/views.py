@@ -112,6 +112,20 @@ def preferences(request):
 	except EOFError:
 		config = None
 
+	# Global permissions (non data related)
+	user = request.user
+	glob_perms = [
+#		['Can run ingestions', 						'youpi.can_run_ingestions'],
+#		['Can view ingestion logs', 				'youpi.can_view_ing_logs'],
+#		['Can add tags', 							'youpi.can_add_tags'],
+#		['Can add items to the processing cart', 	'youpi.can_use_cart'],
+#		['Can do processing', 						'youpi.can_do_processing'],
+#		['Can monitor running jobs on the cluster', 'youpi.can_monitor_jobs'],
+#		['Can view processing results', 			'youpi.can_view_results'],
+		['Can grade qualityFITSed images', 			'youpi.can_grade'],
+#		['Can generate reports', 					'youpi.can_use_reporting'],
+	]
+
 	menu_id = 'preferences'
 	return render_to_response('preferences.html', {	
 						'themes'			: themes,
@@ -122,6 +136,7 @@ def preferences(request):
 						'config'			: config,
 						'selected_entry_id'	: menu_id, 
 						'title' 			: get_title_from_menu_id(menu_id),
+						'global_perms'		: [{'label': p[0], 'perm': user.has_perm(p[1])} for p in glob_perms],
 					}, 
 					context_instance = RequestContext(request))
 
