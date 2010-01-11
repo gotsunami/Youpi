@@ -43,117 +43,112 @@ function ingestion_history() {
 
 <!-- Main body -->
 {% block content %}
-	<div align="center">
-		<div id="pre_submenu">
-			<ul class="smart_tabnav_sub" id="tabnav2">
-				<li class="enabled"><a href="#" id="link_ingest" onclick="swap_display(this.id, 'menuitem_ingest', 'tabnav2', 'menuitem_')">Run ingestion</a></li>
-				<li class="disabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_'); ingestion_history();">History</a></li>
-			</ul>
-		</div>
-	<table class="preingestion">
-		<tr>
-			<td>
-				<p class="number_ingested">Number of ingested Images: {{ ingested }}</p>
-			</td>
-		</tr>
+<div id="submenu">
+	<div style="width: 100%; margin: auto;" id="menuitem_sub_0">
+		<table class="preingestion">
+			<tr>
+				<td><p class="number_ingested">Number of ingested Images: {{ ingested }}</p></td>
+			</tr>
+			<tr id="data">
+				<td align="center">
+					<div id="menuitem_ingest">
+						<form id="form_ingestion" name="form_ingestion" method="post" onsubmit="return process_form();">
+							<table>
+								<tr>
+									<td>
+										<div id="ingestion" style="float: left; height: 200px; width: 400px"></div>
+									</td>
+									<td>
+										<div style="width: 600px">
+											<table class="flatmask">
+												<tr>
+													<td class="ingestion_type" colspan="2">
+													Ingestion parameters and options
+													</td>
+												</tr>
+												<tr>
+													<th>Ingestion ID</th>
+													<td>
+														<input id="input_ingestion_id" type="text" name="ingestion_id" size="50"/>
+													</td>
+												</tr>
+												<tr>
+													<th>Send report to</th>
+													<td>
+														<input id="input_email" type="text" name="report_email" value="{{ user.email }}" size="50"/>
+													</td>
+												</tr>
+												<tr>
+													<th>Options</th>
+													<td width="100%">
+														<label>All images will be ingested with the flag :</label>
+														<select id="select_validation" onclick="force_validation();"/>
+															<option name="V" id="validated" value="yes">VALIDATED</option>
+															<option name="O" id="observed" value="no">OBSERVED</option>
+														</select>
+														<div style="width: 90%">
+															<div id ="warn0" class="warning" style="display:none"></div>
+														</div>
 
-		<tr id="data">
-			<td align="center">
-				<div id="menuitem_ingest">
-					<form id="form_ingestion" name="form_ingestion" method="post" onsubmit="return process_form();">
-						<table>
-							<tr>
-								<td>
-									<div id="ingestion" style="float: left; height: 200px; width: 400px"></div>
-								</td>
-								<td>
-									<div style="width: 600px">
-										<table class="flatmask">
-											<tr>
-												<td class="ingestion_type" colspan="2">
-												Ingestion parameters and options
-												</td>
-											</tr>
-											<tr>
-												<th>Ingestion ID</th>
-												<td>
-													<input id="input_ingestion_id" type="text" name="ingestion_id" size="50"/>
-												</td>
-											</tr>
-											<tr>
-												<th>Send report to</th>
-												<td>
-													<input id="input_email" type="text" name="report_email" value="{{ user.email }}" size="50"/>
-												</td>
-											</tr>
-											<tr>
-												<th>Options</th>
-												<td width="100%">
-													<label>All images will be ingested with the flag :</label>
-													<select id="select_validation" onclick="force_validation();"/>
-														<option name="V" id="validated" value="yes">VALIDATED</option>
-														<option name="O" id="observed" value="no">OBSERVED</option>
-													</select>
-													<div style="width: 90%">
-														<div id ="warn0" class="warning" style="display:none"></div>
-													</div>
+														<br/>
 
-													<br/>
+														<input id="check_verify" onclick="force_fitsverify()" type="checkbox" name="check_skip_fitsverify" value="yes" checked="checked"/>
+														<label>Skip ingestion for non FITS compliant images</label>
+														<div style="width: 90%">
+															<div id ="warn1" class="warning" style="display:none"></div>
+														</div>
+														<br/>
 
-													<input id="check_verify" onclick="force_fitsverify()" type="checkbox" name="check_skip_fitsverify" value="yes" checked="checked"/>
-													<label>Skip ingestion for non FITS compliant images</label>
-													<div style="width: 90%">
-														<div id ="warn1" class="warning" style="display:none"></div>
-													</div>
-													<br/>
-
-													<input id="check_allow_several_times" onclick="force_check_allow_several_times()" type="checkbox" name="check_several_ingestions" value="yes" checked="checked"/>
-													<label>Allow images with the same name (and same checksum) to be re-ingested </label>
-													<div style="width: 90%">
-														<div align="center" id="warn2" class="warning" style="display:none"></div> 
-													</div>
-												</td>
-											</tr>
-										</table>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td/>
-								<td>
-									<div id="cluster_log_div" style="margin-top: 30px;"></div>
-								</td>
-							</tr>
-						</table>
-					</form>
-				</div>
-
-				<div id="menuitem_history" style="display: none">
-					<table width="100%">
-						<tr>
-							<td style="text-align: left">
-								<p>History of ingestions (<a href="#" onclick="ingestion_history();">refresh</a>):</p>
-							</td>
-							<td style="text-align: right">
-								<span>Display 
-									<select id="select_history_limit" onchange="ingestion_history();">
-										<option value="0">all results</option>
-										<option value="10" selected="true">last 10 results</option>
-										<option value="20">last 20 results</option>
-										<option value="50">last 50 results</option>
-									</select>
-								</span>
-							</td>
-						</tr>
-					</table>
-					<div align="center" id="div_result"></div>
-				</div>
-			</td>
-		</tr>
-	</table>
+														<input id="check_allow_several_times" onclick="force_check_allow_several_times()" type="checkbox" name="check_several_ingestions" value="yes" checked="checked"/>
+														<label>Allow images with the same name (and same checksum) to be re-ingested </label>
+														<div style="width: 90%">
+															<div align="center" id="warn2" class="warning" style="display:none"></div> 
+														</div>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td/>
+									<td>
+										<div id="cluster_log_div" style="margin-top: 30px;"></div>
+									</td>
+								</tr>
+							</table>
+						</form>
+					</div>
+				</td>
+			</tr>
+		</table>
 	</div>
+	<div style="width: 100%; display: none;" id="menuitem_sub_1">
+		<table width="100%">
+			<tr>
+				<td style="text-align: left">
+					<p>History of ingestions (<a href="#" onclick="ingestion_history();">refresh</a>):</p>
+				</td>
+				<td style="text-align: right">
+					<span>Display 
+						<select id="select_history_limit" onchange="ingestion_history();">
+							<option value="0">all results</option>
+							<option value="10" selected="true">last 10 results</option>
+							<option value="20">last 20 results</option>
+							<option value="50">last 50 results</option>
+						</select>
+					</span>
+				</td>
+			</tr>
+		</table>
+		<div align="center" id="div_result"></div>
+	</div>
+</div>
 
-	<script type="text/javascript">
+<script type="text/javascript">
+	document.observe('dom:loaded', function() {
+		var m = new SubMenu('submenu', ['Run Ingestion', 'History']);
+		m.setOnClickHandler(1, ingestion_history);
 		ingestionType();
 
 		try {
@@ -167,6 +162,6 @@ function ingestion_history() {
 			};
 			var as = new _bsn.AutoSuggest('input_ingestion_id', options);
 		} catch(e) {}
-	</script>
-
+	});
+</script>
 {% endblock %}
