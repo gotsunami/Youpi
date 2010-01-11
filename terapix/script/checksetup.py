@@ -12,7 +12,7 @@
 ##############################################################################
 
 import sys, os, string, stat, shutil
-import marshal, base64, glob
+import marshal, base64, glob, zlib
 os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
 if '..' not in sys.path:
 	sys.path.insert(0, '..')
@@ -25,6 +25,7 @@ try:
 	#
 	from terapix.youpi.models import *
 	from terapix.youpi.pluginmanager import PluginManager
+	from terapix.lib.itt.instconfig import InstrumentConfig
 except ImportError:
 	print 'Please run this command from the terapix subdirectory.'
 	sys.exit(1)
@@ -184,6 +185,36 @@ def setup_db():
 		# Cannot save, already exits: do nothing
 		pass
 
+def setup_itt():
+	"""
+	Check ingestion translations tables
+	"""
+	instrus = Instrument.objects.filter(Q(name = 'Megacam') | Q(name = 'Wircam'))
+	for ins in instrus:
+		ins.name = ins.name.upper()
+		ins.save()
+
+	itts = glob.glob(os.path.join(settings.TRUNK, 'terapix', 'lib', 'itt', 'conf', '*.conf'))
+	for itt in itts:
+		name = os.path.basename(itt)[:-5].upper()
+		inst = Instrument.objects.filter(name = name)
+		# Parse it and get dictionnary mapping
+		ic = InstrumentConfig(itt)
+		content = ic.parse()
+		zcontent = base64.encodestring(zlib.compress(marshal.dumps(content), 9)).replace('\n', '')
+		if inst:
+			# Instrument already existing
+			inst = inst[0]
+			if not inst.itt:
+				inst.itt = zcontent
+				inst.save()
+				logger.log("Added ITT for instrument %s" % name)
+			else:
+				logger.log("Found ITT for instrument %s" % name)
+		else:
+			inst = Instrument(name = name, itt = zcontent)
+			inst.save()
+			logger.log("Added instrument %s and ITT" % name)
 
 def setup_users():
 	logger.setGroup('users', 'Check if there is at least one user')
@@ -301,6 +332,7 @@ def setup_icons():
 def setup():
 	setup_users()
 	setup_db()
+	setup_itt()
 	setup_policies()
 	setup_default_condor_setup()
 	check_local_conf()

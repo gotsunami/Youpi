@@ -226,12 +226,15 @@ def ing(request):
 	This is a callback function (as defined in django's urls.py file).
 	"""
 
+	insts = Instrument.objects.exclude(itt = None)
 	q = Image.objects.all().count()
 	menu_id = 'ing'
 	return render_to_response('ingestion.html', {	
 						'ingested' 			: q, 
 						'selected_entry_id'	: menu_id, 
 						'title' 			: get_title_from_menu_id(menu_id),
+						# Available ITTs (Instrument Translation Tables)
+						'itranstables'		: [inst.name for inst in insts],
 					}, 
 					context_instance = RequestContext(request))
 

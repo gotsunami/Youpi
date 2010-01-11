@@ -28,6 +28,7 @@
 <script type="text/javascript" src="/media/js/filebrowser.js"></script>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
+var gready = true;
 
 function ingestion_history() {
 	/*
@@ -37,6 +38,41 @@ function ingestion_history() {
 	 *
 	 */
 	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/youpi/history/ingestion/');
+}
+
+function updateContent(container, handler) {
+	var handler = typeof handler == 'function' ? handler : null;
+	var sel = $('itt_select');
+	var xhr = new HttpRequest(
+		null, // Use default error handler
+		null, // Custom handler for results
+		function(resp) {
+			var data = $H(resp.content);
+			var tab = new Element('table').addClassName('itt_table');
+			var tr, td;
+			data.each(function(pair) {
+				tr = new Element('tr');
+				td = new Element('td').update(pair.key + ';');
+				tr.insert(td);
+				var vals = $H(pair.value);
+				// Second col (mandatory)
+				td = new Element('td');
+				td.update(vals.get('SRC') + ';');
+				tr.insert(td);
+				// Third col (optional)
+				td = new Element('td');
+				td.update(vals.get('MAP'));
+				tr.insert(td);
+				tab.insert(tr);
+			});
+			var content = new Element('pre').addClassName('itt_content');
+			content.update("--------- Youpi Parameters for the " + resp.instrument + " Instrument ------------").insert(tab);
+			container.update(content);
+			if (handler) handler();
+		}
+	);
+	var post = { Instrument: sel.options[sel.selectedIndex].value }
+	xhr.send('/youpi/ingestion/ittContent/', $H(post).toQueryString());
 }
 </script>
 {% endblock %}
@@ -62,21 +98,27 @@ function ingestion_history() {
 										<div style="width: 600px">
 											<table class="flatmask">
 												<tr>
-													<td class="ingestion_type" colspan="2">
-													Ingestion parameters and options
+													<td class="ingestion_type" colspan="2">Ingestion parameters and options</td>
+												</tr>
+												<tr>
+													<th>Ingestion Translation Table</th>
+													<td style="vertical-align: middle">
+														<select id="itt_select" name="transtable">
+														{% for itt in itranstables %}
+														<option value="{{ itt }}">{{ itt }}</option>
+														{% endfor %}
+														</select>
+														<input id="itt_view_button" type="button" value="Show"/>
+														<div id="itt_content_div"></div>
 													</td>
 												</tr>
 												<tr>
 													<th>Ingestion ID</th>
-													<td>
-														<input id="input_ingestion_id" type="text" name="ingestion_id" size="50"/>
-													</td>
+													<td><input id="input_ingestion_id" type="text" name="ingestion_id" size="50"/></td>
 												</tr>
 												<tr>
 													<th>Send report to</th>
-													<td>
-														<input id="input_email" type="text" name="report_email" value="{{ user.email }}" size="50"/>
-													</td>
+													<td><input id="input_email" type="text" name="report_email" value="{{ user.email }}" size="50"/></td>
 												</tr>
 												<tr>
 													<th>Options</th>
@@ -87,22 +129,17 @@ function ingestion_history() {
 															<option name="O" id="observed" value="no">OBSERVED</option>
 														</select>
 														<div style="width: 90%">
-															<div id ="warn0" class="warning" style="display:none"></div>
-														</div>
-
-														<br/>
-
+															<div id ="warn0" class="warning" style="display: none;"></div>
+														</div><br/>
 														<input id="check_verify" onclick="force_fitsverify()" type="checkbox" name="check_skip_fitsverify" value="yes" checked="checked"/>
 														<label>Skip ingestion for non FITS compliant images</label>
 														<div style="width: 90%">
-															<div id ="warn1" class="warning" style="display:none"></div>
-														</div>
-														<br/>
-
+															<div id ="warn1" class="warning" style="display: none;"></div>
+														</div><br/>
 														<input id="check_allow_several_times" onclick="force_check_allow_several_times()" type="checkbox" name="check_several_ingestions" value="yes" checked="checked"/>
-														<label>Allow images with the same name (and same checksum) to be re-ingested </label>
+														<label>Allow images with the same name (and same checksum) to be re-ingested</label>
 														<div style="width: 90%">
-															<div align="center" id="warn2" class="warning" style="display:none"></div> 
+															<div align="center" id="warn2" class="warning" style="display: none;"></div> 
 														</div>
 													</td>
 												</tr>
@@ -149,6 +186,32 @@ function ingestion_history() {
 	document.observe('dom:loaded', function() {
 		var m = new SubMenu('submenu', ['Run Ingestion', 'History']);
 		m.setOnClickHandler(1, ingestion_history);
+		var c = $('itt_content_div');
+		c.hide();
+		var sel = $('itt_select');
+		sel.observe('change', function() {
+			if (c.visible()) updateContent(c);
+		});
+
+		$('itt_view_button').observe('click', function() {
+			if (!gready) return;
+			if (this.value == 'Hide') {
+				this.value = 'Show';
+				c.blindUp({
+					beforeStart: function() {gready = false;},
+					afterFinish: function() {gready = true;}
+				});
+			}
+			else {
+				this.value = 'Hide';
+				updateContent(c, function() {
+					c.blindDown({
+						beforeStart: function() {gready = false;},
+						afterFinish: function() {gready = true;}
+					});
+				});
+			}
+		});
 		ingestionType();
 
 		try {

@@ -16,7 +16,7 @@ import cjson as json
 import MySQLdb, pyfits
 import pprint, re, glob, string
 import math, md5, random
-import marshal, base64
+import marshal, base64, zlib
 import os, os.path, sys, pprint
 import socket, time
 from types import *
@@ -760,3 +760,19 @@ def processing_get_imgs_ids_from_release(request):
 		data.append([str(rel.image.id)])
 
 	return HttpResponse(str({'fields' : ['id'], 'data' : data}))
+
+def get_itt_content(request):
+	"""
+	Returns content of ingestion translation table
+	"""
+	try:
+		name = request.POST['Instrument']
+	except Exception, e:
+		return HttpResponseForbidden()
+
+	inst = Instrument.objects.filter(name = name)
+	if not inst:
+		return HttpResponseForbidden()
+
+	return HttpResponse(json.encode({'instrument': name, 'content': marshal.loads(zlib.decompress(base64.decodestring(inst[0].itt)))}))
+

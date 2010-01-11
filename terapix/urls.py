@@ -31,6 +31,7 @@ urlpatterns = patterns(
 	(r'^youpi/ingestion/$', 'ing'),
 	(r'^youpi/ingestion/ingestion2/$', 'condor_ingestion'),
 	(r'^youpi/ingestion/imgCount/$', 'ingestion_img_count'),
+	(r'^youpi/ingestion/ittContent/$', 'get_itt_content'),
 	(r'^youpi/image/info/$', 'get_image_info'),
 	(r'^youpi/img/(?P<image_name>.*?)/$', 'aff_img'),
 	(r'^youpi/processing/$', 'processing'),

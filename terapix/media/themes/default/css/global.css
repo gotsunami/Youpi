@@ -1605,3 +1605,31 @@ table.report_grading_stats tr.complete td.gradecomplete {
 	font-size: 12px;
 	font-weight: bold;
 }
+
+.itt_content {
+	color: grey;
+	font-family: typewriter;
+	max-height: 150px; 
+	overflow: auto;
+}
+
+.itt_table td, .itt_table tr {
+	border-bottom: 1px solid #DCDCDC;
+}
+
+.itt_table td:first-child {
+	color: #5B80B2;
+}
+
+.itt_table td:last-child {
+	color: #F18430;
+}
+.itt_table {
+	margin-top: 10px;
+}
+.itt_table td {
+	color: #65AC6A;
+}
+#itt_select {
+	color: brown;
+}

@@ -59,6 +59,8 @@ class Instrument(models.Model):
 	astrinstru_key = models.CharField(max_length = 255,blank=True,null=True,help_text="")
 	photinstru_key = models.CharField(max_length = 255,blank=True,null=True,help_text="")
 	path = models.CharField(max_length = 255,blank=True,null=True)
+	# Serialized data (base64 encoding over marshal serialization)
+	itt = models.TextField(null=True, help_text="Ingestion Translation Table")
 
 	def __unicode__(self):
 		return self.name
