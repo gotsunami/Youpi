@@ -205,12 +205,9 @@ def setup_itt():
 		if inst:
 			# Instrument already existing
 			inst = inst[0]
-			if not inst.itt:
-				inst.itt = zcontent
-				inst.save()
-				logger.log("Added ITT for instrument %s" % name)
-			else:
-				logger.log("Found ITT for instrument %s" % name)
+			inst.itt = zcontent
+			inst.save()
+			logger.log("Added ITT for instrument %s" % name)
 		else:
 			inst = Instrument(name = name, itt = zcontent)
 			inst.save()
