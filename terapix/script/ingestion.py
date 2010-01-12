@@ -395,6 +395,7 @@ def run_ingestion():
 		debug("\tmd5: %s (%.2f)" % (checksum, etime-stime))
 
 		r = pyfits.open(fitsfile)
+		debug("\tHDUs: %d (primary HDU + %d extensions)" % (len(r), len(r) - 1))
 		try:
 			header = getFITSheader(r, fitsfile, duration_stime)
 		except IngestionError, e:
