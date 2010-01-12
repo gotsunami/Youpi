@@ -116,7 +116,7 @@ def sendmail(status, to, start, end):
 		g.con.rollback()
 
 	# Log ingestion process duration
-	debug("Ingestion process over. It tooked %.2f sec." % (end - start))
+	debug("Ingestion process over. Tooked %.2f sec." % (end - start))
 
 	clog.close()
 	out = open(CLUSTER_LOG_FILE, 'r')
@@ -231,8 +231,8 @@ def getFITSField(hdulist, fieldname, default = None):
 		if default:
 			return default
 		else:
-			debug("\tMissing '%s' keyword; not found in header file" % srcKeyword, FATAL)
-			raise MissingKeywordError
+			debug("\tMissing '%s' keyword; not found in header file" % srcKeyword, WARNING)
+			raise MissingKeywordError, fieldname
 
 	return data
 
@@ -399,25 +399,31 @@ def run_ingestion():
 			h_dateobs = getFITSField(hdulist, 'YDATEOBS')
 			h_equinox = getFITSField(hdulist, 'YEQUINOX')
 			h_filter = getFITSField(hdulist, 'YFILTER')
-			h_flat = getFITSField(hdulist, 'YFLAT', '')
-			h_mask = getFITSField(hdulist, 'YMASK', '')
 			h_ra = getFITSField(hdulist, 'YRA')
 			h_dec = getFITSField(hdulist, 'YDEC')
-		except MissingKeywordError:
-			debug("\tImage Skipped" % q, WARNING)
+		except MissingKeywordError, fieldname:
+			debug("\tImage Skipped", WARNING)
 			continue
 
-		if h_flat:
-			fl = h_flat.split('.fits')
-			h_flat = fl[0] + FITSEXT
-		else:
+		try:
+			h_flat = getFITSField(hdulist, 'YFLAT')
+			if h_flat:
+				fl = h_flat.split('.fits')
+				h_flat = fl[0] + FITSEXT
+		except MissingKeywordError:
+			# Missing flat info don't halt image ingestion
 			debug("\tMissing flat information in header", WARNING)
+			h_flat = NULLSTRING
 
-		if h_mask:
-			ma = h_mask.split('.fits')
-			h_mask = ma[0] + FITSEXT
-		else:
+		try:
+			h_mask = getFITSField(hdulist, 'YMASK')
+			if h_mask:
+				ma = h_mask.split('.fits')
+				h_mask = ma[0] + FITSEXT
+		except MissingKeywordError:
+			# Missing flat info don't halt image ingestion
 			debug("\tMissing mask information in header", WARNING)
+			h_mask = NULLSTRING
 
 		#
 		# RUN DATABASE INGESTION

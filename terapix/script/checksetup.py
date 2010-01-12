@@ -207,7 +207,7 @@ def setup_itt():
 			inst = inst[0]
 			inst.itt = zcontent
 			inst.save()
-			logger.log("Added ITT for instrument %s" % name)
+			logger.log("Updated ITT for instrument %s" % name)
 		else:
 			inst = Instrument(name = name, itt = zcontent)
 			inst.save()
