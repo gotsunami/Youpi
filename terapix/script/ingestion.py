@@ -407,117 +407,113 @@ def run_ingestion():
 		# RUNID is mandatory. A default run UNKNOWN is used when RUNID info is not 
 		# found in the FITS header
 		#
-		runame = getFITSField(header, 'runid', 'UNKNOWN')
+		h_runid = getFITSField(header, 'runid', 'UNKNOWN')
+		h_instrument = getFITSField(header, 'instrume')
+		h_telescop = getFITSField(header, 'telescop')
+		h_detector = getFITSField(header, 'detector')
+		h_object = getFITSField(header, 'object')
+		h_airmass = getFITSField(header, 'airmass')
+		h_exptime = getFITSField(header, 'exptime')
+		h_dateobs = getFITSField(header, 'DATE-OBS')
+		h_equinox = getFITSField(header, 'equinox')
+		h_filter = getFITSField(header, 'filter')
+		h_flat = getFITSField(header,'IMRED_FF')
+		h_mask = getFITSField(header,'IMRED_MK')
+		h_ra = getFITSField(header,'RA_DEG')
+		h_dec = getFITSField(header,'DEC_DEG') 
 
-		# DBinstrument
-		i = getFITSField(header, 'instrume')
-		t = getFITSField(header, 'telescop')
-		detector = getFITSField(header, 'detector')
-		o = getFITSField(header, 'object')
-		a = getFITSField(header, 'airmass')
-		e = getFITSField(header, 'exptime')
-		d = getFITSField(header, 'DATE-OBS')
-		eq = getFITSField(header, 'equinox')
-		chaname = getFITSField(header, 'filter')
-		flat = getFITSField(header,'IMRED_FF')
-		mask = getFITSField(header,'IMRED_MK')
-		if flat:
-			fl = flat.split('.fits')
-			flat = fl[0] + FITSEXT
-		if mask:
-			ma = mask.split('.fits')
-			mask = ma[0] + FITSEXT
-		ra = getFITSField(header,'RA_DEG')
-		de = getFITSField(header,'DEC_DEG') 
+		if h_flat:
+			fl = h_flat.split('.fits')
+			h_flat = fl[0] + FITSEXT
+		if h_mask:
+			ma = h_mask.split('.fits')
+			h_mask = ma[0] + FITSEXT
 
 		#
 		# RUN DATABASE INGESTION
 		#
 		try:
-			res = g.execute("""select Name from youpi_run where name="%s";""" % runame)
+			res = g.execute("""select Name from youpi_run where name="%s";""" % h_runid)
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
 		except Exception, e:
 			debug("%s Run name unknown (%s), skipping file..." % (fitsfile, e))
 			continue
 		
-		debug("\t%s data detected" % detector)
+		debug("\t%s data detected" % h_detector)
 
 		instrument_id = -1
 		for val in instruments.values():
 			# Compiled pattern
 			cp = val[1]
-			if cp.match(detector):
+			if cp.match(h_detector):
 				instrument_id = val[0]
 
 		if instrument_id < 0:
-			debug("Matching instrument '%s' not found in DB. Image ingestion skipped." % detector, WARNING)
+			debug("Matching instrument '%s' not found in DB. Image ingestion skipped." % h_detector, WARNING)
 			continue
 
 		if not res:
-			if detector == 'MegaCam' or i == 'MegaPrime':
+			if h_detector == 'MegaCam' or i == 'MegaPrime':
 				try:
 					g.setTableName('youpi_run')
-					g.insert(	name = runame,
+					g.insert(	name = h_runid,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
 					debug(e, FATAL)
 					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), runame)
+					sendmail(1, email, duration_stime, time.time(), h_runid)
 					sys.exit(1)
 
 			elif (detector == 'WIRCam' or i == 'WIRCam'):
 				try:
 					g.setTableName('youpi_run')
-					g.insert(	name = runame,
+					g.insert(	name = h_runid,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
 					debug(e, FATAL)
 					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), runame)
+					sendmail(1, email, duration_stime, time.time(), h_runid)
 					sys.exit(1)
-
-			# elif (...)
-			# Other detectors go here
 		else:
-			print "%s: run %s already existing in DB" % (fitsfile, runame)
+			print "%s: run %s already existing in DB" % (fitsfile, h_runid)
 
 		#
 		# CHANNEL DATABASE INGESTION
 		#
 		try:
-			res = g.execute("""select Name from youpi_channel where name="%s";""" % chaname)
+			res = g.execute("""select Name from youpi_channel where name="%s";""" % h_filter)
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_filter)
 			sys.exit(1)
 
 		if not res:
 			if detector == 'MegaCam' and t == 'CFHT 3.6m' and i == 'MegaPrime':
 				try:
 					g.setTableName('youpi_channel')
-					g.insert(	name = chaname,
+					g.insert(	name = h_filter,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
 					debug(e, FATAL)
 					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), runame)
+					sendmail(1, email, duration_stime, time.time(), h_runid)
 					sys.exit(1)
 				
 			elif detector == 'WIRCam' and t == 'CFHT 3.6m' and i == 'WIRCam':
 				try:
 					g.setTableName('youpi_channel')
-					g.insert(	name = chaname,
+					g.insert(	name = h_filter,
 								instrument_id = instrument_id )
 				except MySQLdb.DatabaseError, e:
 					debug(e, FATAL)
 					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), runame)
+					sendmail(1, email, duration_stime, time.time(), h_runid)
 					sys.exit(1)
 		else:
-			print "%s: channel %s already existing in DB" % (fitsfile, chaname)
+			print "%s: channel %s already existing in DB" % (fitsfile, h_filter)
 	
 		#
 		# Image ingestion
@@ -537,14 +533,14 @@ def run_ingestion():
 			res = g.execute("""select name, checksum from youpi_image where name = "%s";""" % fitsNoExt);
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
 			
 		try:
 			allowSeveralIngestions = script_args['allow_several_ingestions']
 		except KeyError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
 
 		#
@@ -566,18 +562,13 @@ def run_ingestion():
 				else:
 					debug("\tImage with same name and checksum: multiple option state to OFF, Skipping...")
 					continue
-
 			else:
 				debug("Image already exists in database (same odometer number for different checksum, skipping...", WARNING)
-
-
 
 		#
 		# Image not yet ingested
 		# select validation status
 		#
-
-
 		if detector == 'MegaCam' or  i == 'MegaPrime':
 			iname = 'Megacam'
 	
@@ -595,35 +586,34 @@ def run_ingestion():
 			FROM youpi_run AS run, youpi_channel AS chan, youpi_instrument AS i
 			WHERE run.name = '%s'
 			AND chan.name = '%s'
-			AND i.name = '%s';""" % (runame, chaname, iname)
+			AND i.name = '%s';""" % (h_runid, h_fileter, iname)
 			res = g.execute(q)
 
 		except MySQLdb.DatabaseError, e:
 			debug("MySQL error: %s" % e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
 		except Exception, e:
 			debug("Unable to process SQL query: %s. Skipping image" % q, WARNING)
 			continue
 		
-
 		# Then insert image into db
 		try:
 			g.setTableName('youpi_image')
 			g.insert(
 				name = fitsNoExt,
-				object = o,
-				airmass = a,
-				exptime = e,
-				dateobs = d,
-				equinox = eq,
+				object = h_object,
+				airmass = h_airmass,
+				exptime = h_exptime,
+				dateobs = h_dateobs,
+				equinox = h_equinox,
 				ingestion_date = getNowDateTime(),
 				checksum = checksum,
-				flat = flat,
-				mask = mask,
+				flat = h_flat,
+				mask = h_mask,
 				path = path,
-				alpha = ra,
-				delta = de,
+				alpha = h_ra,
+				delta = h_dec,
 				is_validated = is_validated_for_image,
 				channel_id = res[0][1],
 				ingestion_id = ingestionId,
@@ -633,7 +623,7 @@ def run_ingestion():
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			g.con.rollback()
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
 	
 		except Exception, e:
@@ -641,7 +631,7 @@ def run_ingestion():
 			g.con.rollback()
 			debug("SQL Query: %s" % q)
 			debug("Python error: %s" % e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
 
 		# Filling youpi_rel_ri table
@@ -650,19 +640,17 @@ def run_ingestion():
 		try:
 			g.setTableName('youpi_rel_ri')
 			g.insert( run_id = res[0][0], image_id = g.con.insert_id() )
-	
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			g.con.rollback()
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
-	
 		except Exception, e:
 			debug(e, FATAL)
 			g.con.rollback()
 			debug("SQL Query: %s" % q)
 			debug("Python error: %s" % e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time(), h_runid)
 			sys.exit(1)
 
 		#
@@ -670,7 +658,7 @@ def run_ingestion():
 		#
 		footprint_start = time.time()
 		poly = []
-		for i in range(1,len(r)):
+		for i in range(1, len(r)):
 			pix1,pix2 = r[i].header['CRPIX1'],r[i].header['CRPIX2']
 			val1,val2 =  r[i].header['CRVAL1'],r[i].header['CRVAL2']
 			cd11,cd12,cd21,cd22 = r[i].header['CD1_1'],r[i].header['CD1_2'],r[i].header['CD2_1'],r[i].header['CD2_2']
@@ -681,7 +669,6 @@ def run_ingestion():
 			x3,y3 = nax1 - pix1, nax2 - pix2
 			x4,y4 = 1 - pix1, nax2 - pix2
 
-			# Manu's Method
 			ra1, dec1, ra2, dec2, ra3, dec3, ra4, dec4 = (	val1+cd11*x1+cd12*y1,
 			val2+cd21*x1+cd22*y1,
 			val1+cd11*x2+cd12*y2,
@@ -705,12 +692,12 @@ def run_ingestion():
 		except Exception, e:
 			debug(e, FATAL)
 			g.con.rollback()
-			runame = 'ERROR'
+			h_runid = 'ERROR'
 
 		#
 		# Preparing data to insert centerfield point
 		#
-		cf = "GeomFromText('POINT(%s %s)')" % (ra, de)
+		cf = "GeomFromText('POINT(%s %s)')" % (h_ra, h_dec)
 		qu = """UPDATE youpi_image SET centerfield=%s WHERE name="%s";""" % (cf, fitsNoExt)
 		try:
 			g.begin()
@@ -719,7 +706,7 @@ def run_ingestion():
 		except Exception, e:
 			debug(e, FATAL)
 			g.con.rollback()
-			runame = 'ERROR'
+			h_runid = 'ERROR'
 
 		debug("\tSky footprint/centerfield took: (%.2f)" % (time.time()-footprint_start))
 		# Done
@@ -731,7 +718,7 @@ def run_ingestion():
 	duration_etime = time.time()
 
 	# Send email notification to user
-	sendmail(0, email, duration_stime, duration_etime, runame)
+	sendmail(0, email, duration_stime, duration_etime, h_runid)
 	
 if __name__ == '__main__':
 	# Connection object to MySQL database 
