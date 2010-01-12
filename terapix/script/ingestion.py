@@ -41,6 +41,8 @@ CLUSTER_LOG_FILE = NULLSTRING
 
 email = NULLSTRING
 script_args = {}
+# Ingestion translation table
+ittdata = {}
 
 # SQL
 ingestionId = -1
@@ -49,6 +51,7 @@ g = None
 # Custom exceptions
 class DebugError(Exception): pass
 class IngestionError(Exception): pass
+class MissingKeywordError(Exception): pass
 
 class StringBuffer:
 	"""
@@ -93,7 +96,7 @@ def debug(msg, level = INFO):
 
 	clog.write("%s [%s] %s\n" % (getNowTime(time.time()), level, msg))
 
-def sendmail(status, to, start, end, runame):
+def sendmail(status, to, start, end):
 	"""
 	Send email report (plain text) to user
 	"""
@@ -111,7 +114,6 @@ def sendmail(status, to, start, end, runame):
 	except Exception, e:
 		debug(e, FATAL)
 		g.con.rollback()
-		runame = 'ERROR'
 
 	# Log ingestion process duration
 	debug("Ingestion process over. It tooked %.2f sec." % (end - start))
@@ -181,44 +183,6 @@ Elapsed time: %.02f seconds
 		debug(e, FATAL)
 		g.con.rollback()
 
-
-def getFITSheader(fitsObj, fitsfile, duration_stime):
-	"""
-	Returns a valid FITS header if found.
-	"""
-
-	global email
-
-	try:
-		h1 = fitsObj[1].header
-	except IndexError, e:
-		try:
-			h1 = fitsObj[0].header
-		except:
-			#
-			# Trick needed to get FITS info because r.info() prints to stdout
-			# directly
-			#
-			old = sys.stdout
-			buf = StringBuffer()
-			sys.stdout = buf
-			fitsObj.info()
-			sys.stdout = old
-
-			debug("Could not find FITS header. Aborted. Reason: %s" % e, WARNING)
-			debug("Don't know how to process %s" % fitsfile, WARNING)
-			debug("Content of %s is:\n%s" % (fitsfile, buf))
-			debug("Skipping processing of %s" % fitsfile, WARNING)
-			fitsObj.close()
-			raise IngestionError, 'No suitable header found. Could not process this image'
-	except Exception, e:
-			fitsObj.close()
-			debug("Erro while processing header of %s: %s" % (fitsfile, e), FATAL)
-			sendmail(1, email, duration_stime, time.time(), 'UNKNOWN')
-			sys.exit(1)
-
-	return h1
-
 def freshImageName(nameWithoutExt, g):
 	"""
 	Generates a new image name based on nameWithoutExt. Current implementation only append an 
@@ -233,25 +197,42 @@ def freshImageName(nameWithoutExt, g):
 		res = g.execute("select name from youpi_image where name like '" + nameWithoutExt + '%\';')
 	except MySQLdb.DatabaseError, e:
 		debug(e, FATAL)
-		sendmail(1, email, time.time(), time.time(), 'freshImageName() error')
+		sendmail(1, email, time.time(), time.time())
 		sys.exit(1)
 
 	newName += '_' + str(len(res))
 
 	return newName
 
-def getFITSField(fitsheader, fieldname, default = NULLSTRING):
+def getFITSField(hdulist, fieldname, default = None):
 	"""
-	Returns data associated with fieldname. If fieldname exists in FITS header, the 
-	returned value is equivalent to header[fieldname]. If fieldname does not exist,
-	the exception is catched and logged, the returned value is the content of default.
+	Returns data associated with fieldname. 
+	fieldname is a Youpi keyword starting by 'Y'.
+	If fieldname does not exist, the exception is catched and logged, the returned 
+	value is the content of default.
 	"""
 
-	try:
-		data = fitsheader[fieldname]
-	except KeyError, e:
-		debug("\tField not found in file's header (%s)" % e, WARNING)
-		return default
+	data = None
+	srcKeyword = ittdata[fieldname]['SRC']
+	# Looking for user-defined string
+	if srcKeyword.startswith('"') and srcKeyword.endswith('"'):
+		return srcKeyword[1:-1]
+
+	# Looking for FITS keyword in all extensions
+	for hdu in hdulist:
+		try:
+			data = str(hdu.header[srcKeyword]).strip()
+		except KeyError:
+			# Keyword not found in this extension, continue
+			pass
+
+	if not data:
+		# Keyword not found in any extension
+		if default:
+			return default
+		else:
+			debug("\tMissing '%s' keyword; not found in header file" % srcKeyword, FATAL)
+			raise MissingKeywordError
 
 	return data
 
@@ -260,7 +241,7 @@ def run_ingestion():
 	Ingestion procedure of FITS images in the database
 	"""
 
-	global log, email, script_args, ingestionId, g
+	global log, email, script_args, ingestionId, g, ittdata
 
 	email = script_args['email']
 	user_id = script_args['user_id']
@@ -280,13 +261,22 @@ def run_ingestion():
 	total = len(fitsFiles)
 	debug("Number of images to process: %d" % total)
 
+	try:
+		res = g.execute("""select id, itt from youpi_instrument where name="%s";""" % script_args['ittname'])
+	except MySQLdb.DatabaseError, e:
+		debug(e, FATAL)
+		sendmail(1, email, duration_stime, time.time())
+		sys.exit(1)
+	instrument_id = res[0][0]
+	# Get current ingestion translation table
+	ittdata = marshal.loads(zlib.decompress(base64.decodestring(res[0][1])))
+	debug("Selected instrument: %s" % script_args['ittname'])
+
 	if script_args['select_validation_status'] == 'yes':
 		vStatus = 'VALIDATED'
 	else:
 		vStatus = 'OBSERVED'
-
 	debug("Every images will be flagged as %s during the ingestion" % vStatus)
-
 
 	# 
 	# Due to integrity constraints, entries have to be created into
@@ -323,7 +313,7 @@ def run_ingestion():
 	except Exception, e:
 		debug(e, FATAL)
 		g.con.rollback()
-		sendmail(1, email, duration_stime, time.time(), 'ERROR')
+		sendmail(1, email, duration_stime, time.time())
 		sys.exit(1)
 
 	global is_validated_for_image
@@ -336,7 +326,7 @@ def run_ingestion():
 		res = g.execute("""select id, name from youpi_instrument;""")
 	except MySQLdb.DatabaseError, e:
 		debug(e, FATAL)
-		sendmail(1, email, duration_stime, time.time(), '')
+		sendmail(1, email, duration_stime, time.time())
 		sys.exit(1)
 	
 	instruments = {}
@@ -353,7 +343,7 @@ def run_ingestion():
 			skip_fitsverify = script_args['skip_fitsverify']
 		except KeyError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), runame)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 			
 		process = True
@@ -394,40 +384,40 @@ def run_ingestion():
 		etime = time.time()
 		debug("\tmd5: %s (%.2f)" % (checksum, etime-stime))
 
-		r = pyfits.open(fitsfile)
-		debug("\tHDUs: %d (primary HDU + %d extensions)" % (len(r), len(r) - 1))
+		hdulist = pyfits.open(fitsfile)
+		hdulist.close()
+		debug("\tHDUs: %d (primary HDU + %d extensions)" % (len(hdulist), len(hdulist) - 1))
+
 		try:
-			header = getFITSheader(r, fitsfile, duration_stime)
-		except IngestionError, e:
-			# Do not process this image
-			debug("Skippin ingestion of %s" % fitsfile, WARNING)
+			h_runid = getFITSField(hdulist, 'YRUN', 'UNKNOWN')
+			h_insrument = getFITSField(hdulist, 'YINSTRUMENT')
+			h_telescop = getFITSField(hdulist, 'YTELESCOP')
+			h_detector = getFITSField(hdulist, 'YDETECTOR')
+			h_object = getFITSField(hdulist, 'YOBJECT')
+			h_airmass = getFITSField(hdulist, 'YAIRMASS')
+			h_exptime = getFITSField(hdulist, 'YEXPTIME')
+			h_dateobs = getFITSField(hdulist, 'YDATEOBS')
+			h_equinox = getFITSField(hdulist, 'YEQUINOX')
+			h_filter = getFITSField(hdulist, 'YFILTER')
+			h_flat = getFITSField(hdulist, 'YFLAT', '')
+			h_mask = getFITSField(hdulist, 'YMASK', '')
+			h_ra = getFITSField(hdulist, 'YRA')
+			h_dec = getFITSField(hdulist, 'YDEC')
+		except MissingKeywordError:
+			debug("\tImage Skipped" % q, WARNING)
 			continue
-		
-		#
-		# RUNID is mandatory. A default run UNKNOWN is used when RUNID info is not 
-		# found in the FITS header
-		#
-		h_runid = getFITSField(header, 'runid', 'UNKNOWN')
-		h_instrument = getFITSField(header, 'instrume')
-		h_telescop = getFITSField(header, 'telescop')
-		h_detector = getFITSField(header, 'detector')
-		h_object = getFITSField(header, 'object')
-		h_airmass = getFITSField(header, 'airmass')
-		h_exptime = getFITSField(header, 'exptime')
-		h_dateobs = getFITSField(header, 'DATE-OBS')
-		h_equinox = getFITSField(header, 'equinox')
-		h_filter = getFITSField(header, 'filter')
-		h_flat = getFITSField(header,'IMRED_FF')
-		h_mask = getFITSField(header,'IMRED_MK')
-		h_ra = getFITSField(header,'RA_DEG')
-		h_dec = getFITSField(header,'DEC_DEG') 
 
 		if h_flat:
 			fl = h_flat.split('.fits')
 			h_flat = fl[0] + FITSEXT
+		else:
+			debug("\tMissing flat information in header", WARNING)
+
 		if h_mask:
 			ma = h_mask.split('.fits')
 			h_mask = ma[0] + FITSEXT
+		else:
+			debug("\tMissing mask information in header", WARNING)
 
 		#
 		# RUN DATABASE INGESTION
@@ -436,21 +426,13 @@ def run_ingestion():
 			res = g.execute("""select Name from youpi_run where name="%s";""" % h_runid)
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 		except Exception, e:
 			debug("%s Run name unknown (%s), skipping file..." % (fitsfile, e))
 			continue
 		
 		debug("\t%s data detected" % h_detector)
-
-		try:
-			res = g.execute("""select instrument_id from youpi_instrument where name="%s";""" % script_args['ittname'])
-		except MySQLdb.DatabaseError, e:
-			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_filter)
-			sys.exit(1)
-		instrument_id = res[0][0]
 
 		if not res:
 			try:
@@ -460,7 +442,7 @@ def run_ingestion():
 			except MySQLdb.DatabaseError, e:
 				debug(e, FATAL)
 				g.con.rollback()
-				sendmail(1, email, duration_stime, time.time(), h_runid)
+				sendmail(1, email, duration_stime, time.time())
 				sys.exit(1)
 		else:
 			print "%s: run %s already existing in DB" % (fitsfile, h_runid)
@@ -472,7 +454,7 @@ def run_ingestion():
 			res = g.execute("""select Name from youpi_channel where name="%s";""" % h_filter)
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_filter)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 
 		if not res:
@@ -483,7 +465,7 @@ def run_ingestion():
 			except MySQLdb.DatabaseError, e:
 				debug(e, FATAL)
 				g.con.rollback()
-				sendmail(1, email, duration_stime, time.time(), h_runid)
+				sendmail(1, email, duration_stime, time.time())
 				sys.exit(1)
 		else:
 			print "%s: channel %s already existing in DB" % (fitsfile, h_filter)
@@ -506,14 +488,14 @@ def run_ingestion():
 			res = g.execute("""select name, checksum from youpi_image where name = "%s";""" % fitsNoExt);
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 			
 		try:
 			allowSeveralIngestions = script_args['allow_several_ingestions']
 		except KeyError, e:
 			debug(e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 
 		#
@@ -549,7 +531,7 @@ def run_ingestion():
 
 		except MySQLdb.DatabaseError, e:
 			debug("MySQL error: %s" % e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 		except Exception, e:
 			debug("Unable to process SQL query: %s. Skipping image" % q, WARNING)
@@ -581,7 +563,7 @@ def run_ingestion():
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			g.con.rollback()
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 	
 		except Exception, e:
@@ -589,7 +571,7 @@ def run_ingestion():
 			g.con.rollback()
 			debug("SQL Query: %s" % q)
 			debug("Python error: %s" % e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 
 		# Filling youpi_rel_ri table
@@ -601,14 +583,14 @@ def run_ingestion():
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			g.con.rollback()
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 		except Exception, e:
 			debug(e, FATAL)
 			g.con.rollback()
 			debug("SQL Query: %s" % q)
 			debug("Python error: %s" % e, FATAL)
-			sendmail(1, email, duration_stime, time.time(), h_runid)
+			sendmail(1, email, duration_stime, time.time())
 			sys.exit(1)
 
 		#
@@ -616,25 +598,27 @@ def run_ingestion():
 		#
 		footprint_start = time.time()
 		poly = []
-		for i in range(1, len(r)):
-			pix1,pix2 = r[i].header['CRPIX1'],r[i].header['CRPIX2']
-			val1,val2 =  r[i].header['CRVAL1'],r[i].header['CRVAL2']
-			cd11,cd12,cd21,cd22 = r[i].header['CD1_1'],r[i].header['CD1_2'],r[i].header['CD2_1'],r[i].header['CD2_2']
-			nax1,nax2 = r[i].header['NAXIS1'],r[i].header['NAXIS2']
+		for i in range(1, len(hdulist)):
+			pix1, pix2 = hdulist[i].header['CRPIX1'], hdulist[i].header['CRPIX2']
+			val1, val2 = hdulist[i].header['CRVAL1'], hdulist[i].header['CRVAL2']
+			cd11, cd12, cd21, cd22 = hdulist[i].header['CD1_1'], hdulist[i].header['CD1_2'], hdulist[i].header['CD2_1'], hdulist[i].header['CD2_2']
+			nax1, nax2 = hdulist[i].header['NAXIS1'], hdulist[i].header['NAXIS2']
 
 			x1,y1 = 1 - pix1, 1 - pix2
 			x2,y2 = nax1 - pix1, 1 - pix2
 			x3,y3 = nax1 - pix1, nax2 - pix2
 			x4,y4 = 1 - pix1, nax2 - pix2
 
-			ra1, dec1, ra2, dec2, ra3, dec3, ra4, dec4 = (	val1+cd11*x1+cd12*y1,
-			val2+cd21*x1+cd22*y1,
-			val1+cd11*x2+cd12*y2,
-			val2+cd21*x2+cd22*y2,
-			val1+cd11*x3+cd12*y3,
-			val2+cd21*x3+cd22*y3,
-			val1+cd11*x4+cd12*y4,
-			val2+cd21*x4+cd22*y4 )
+			ra1, dec1, ra2, dec2, ra3, dec3, ra4, dec4 = (
+				val1+cd11 * x1+cd12*y1,
+				val2+cd21 * x1+cd22*y1,
+				val1+cd11 * x2+cd12*y2,
+				val2+cd21 * x2+cd22*y2,
+				val1+cd11 * x3+cd12*y3,
+				val2+cd21 * x3+cd22*y3,
+				val1+cd11 * x4+cd12*y4,
+				val2+cd21 * x4+cd22*y4
+			)
 
 			poly.append("(%.20f %.20f, %.20f %.20f, %.20f %.20f, %.20f %.20f, %.20f %.20f)" % (ra1, dec1, ra2, dec2, ra3, dec3, ra4, dec4, ra1, dec1))
 
@@ -676,7 +660,7 @@ def run_ingestion():
 	duration_etime = time.time()
 
 	# Send email notification to user
-	sendmail(0, email, duration_stime, duration_etime, h_runid)
+	sendmail(0, email, duration_stime, duration_etime)
 	
 if __name__ == '__main__':
 	# Connection object to MySQL database 
@@ -706,10 +690,10 @@ if __name__ == '__main__':
 
 	except MySQLdb.DatabaseError, e:
 		debug(e, FATAL)
-		sendmail(1, 'monnerville@iap.fr', time.time(), time.time(), 'UNKNOWN')
+		sendmail(1, 'monnerville@iap.fr', time.time(), time.time())
 		sys.exit(1)
 
 	except IndexError, e:
 		debug("Incorrect arguments passed to the script: %s" % e, FATAL)
-		sendmail(1, 'monnerville@iap.fr', time.time(), time.time(), 'UNKNOWN')
+		sendmail(1, 'monnerville@iap.fr', time.time(), time.time())
 		sys.exit(1)
