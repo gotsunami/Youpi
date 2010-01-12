@@ -71,6 +71,12 @@ def getNowDateTime(lt = time.time()):
 	Returns local date time
 	"""
 	return "%4d-%02d-%02d %02d:%02d:%02d" % time.localtime(lt)[:6]
+
+def getNowTime(lt = time.time()):
+	"""
+	Returns local time
+	"""
+	return "%02d:%02d:%02d" % time.localtime(lt)[3:6]
 	
 def debug(msg, level = INFO):
 	"""
@@ -85,7 +91,7 @@ def debug(msg, level = INFO):
 	if level not in DEBUG_LEVELS:
 		raise DebugError, "No debugging level named: " + level
 
-	clog.write("%s [%s] %s\n" % (getNowDateTime(time.time()), level, msg))
+	clog.write("%s [%s] %s\n" % (getNowTime(time.time()), level, msg))
 
 def sendmail(status, to, start, end, runame):
 	"""
