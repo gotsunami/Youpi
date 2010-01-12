@@ -340,14 +340,17 @@ function submitIngestion(ingestionId) {
 		}
 	);
 
-	post = 	'Path=' + path + 
-			'&IngestionId=' + ingestionId + '_' + (ingestionPathCurrentIndex+1) + 
-			'&ReportEmail=' + $('input_email').value +
-			'&SelectValidationStatus=' + ($('select_validation').options[$('select_validation').selectedIndex].value) +
-			'&CheckSkipVerify=' + ($('check_verify').checked ? 'yes' : 'no') +
-			'&CheckAllowSeveralTimes=' + ($('check_allow_several_times').checked  ? 'yes' : 'no');
+	var post = 	{
+		Path: path,
+		IngestionId: ingestionId + '_' + (ingestionPathCurrentIndex+1),
+		ReportEmail: $('input_email').value,
+		SelectValidationStatus: $('select_validation').options[$('select_validation').selectedIndex].value,
+		CheckSkipVerify: $('check_verify').checked ? 'yes' : 'no',
+		CheckAllowSeveralTimes: $('check_allow_several_times').checked  ? 'yes' : 'no',
+		Itt: $('itt_select').options[$('itt_select').selectedIndex].value	
+	}
 
 	// Send HTTP POST request
 	xhr.setBusyMsg('Preparing ingestion of ' + path);
-	xhr.send('/youpi/ingestion/ingestion2/', post);
+	xhr.send('/youpi/ingestion/ingestion2/', $H(post).toQueryString());
 }

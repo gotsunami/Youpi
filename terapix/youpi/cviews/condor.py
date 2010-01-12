@@ -578,6 +578,7 @@ def condor_ingestion(request):
 		checkAllowSeveralTimes = request.POST.get('CheckAllowSeveralTimes', 'no')
 		checkSkipVerify = request.POST.get('CheckSkipVerify', 'no')
 		selectValidationStatus = request.POST.get('SelectValidationStatus', 'no')
+		ittname = request.POST['Itt']
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
@@ -603,14 +604,15 @@ def condor_ingestion(request):
 	# is base64 encoded to avoid bad caracter handling. The condor ingestion script 
 	# will then de-serialize its first argument to access the data
 	#
-	script_args = { 'path' : path,
-					'email' : email,
-					'user_id' : request.user.id,
-					'ingestion_id' : ingestionId,
-					'allow_several_ingestions' : checkAllowSeveralTimes,
-					'skip_fitsverify' : checkSkipVerify,
-					'select_validation_status' : selectValidationStatus,
-					'host' : machine
+	script_args = { 'path'						: path,
+					'email' 					: email,
+					'user_id' 					: request.user.id,
+					'ingestion_id' 				: ingestionId,
+					'allow_several_ingestions' 	: checkAllowSeveralTimes,
+					'skip_fitsverify' 			: checkSkipVerify,
+					'select_validation_status' 	: selectValidationStatus,
+					'host' 						: machine,
+					'ittname'					: ittname,
 	}
 
 	# Content of YOUPI_USER_DATA env variable passed to Condor

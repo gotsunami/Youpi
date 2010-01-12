@@ -444,39 +444,24 @@ def run_ingestion():
 		
 		debug("\t%s data detected" % h_detector)
 
-		instrument_id = -1
-		for val in instruments.values():
-			# Compiled pattern
-			cp = val[1]
-			if cp.match(h_detector):
-				instrument_id = val[0]
-
-		if instrument_id < 0:
-			debug("Matching instrument '%s' not found in DB. Image ingestion skipped." % h_detector, WARNING)
-			continue
+		try:
+			res = g.execute("""select instrument_id from youpi_instrument where name="%s";""" % script_args['ittname'])
+		except MySQLdb.DatabaseError, e:
+			debug(e, FATAL)
+			sendmail(1, email, duration_stime, time.time(), h_filter)
+			sys.exit(1)
+		instrument_id = res[0][0]
 
 		if not res:
-			if h_detector == 'MegaCam' or i == 'MegaPrime':
-				try:
-					g.setTableName('youpi_run')
-					g.insert(	name = h_runid,
-								instrument_id = instrument_id )
-				except MySQLdb.DatabaseError, e:
-					debug(e, FATAL)
-					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), h_runid)
-					sys.exit(1)
-
-			elif (detector == 'WIRCam' or i == 'WIRCam'):
-				try:
-					g.setTableName('youpi_run')
-					g.insert(	name = h_runid,
-								instrument_id = instrument_id )
-				except MySQLdb.DatabaseError, e:
-					debug(e, FATAL)
-					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), h_runid)
-					sys.exit(1)
+			try:
+				g.setTableName('youpi_run')
+				g.insert(	name = h_runid,
+							instrument_id = instrument_id )
+			except MySQLdb.DatabaseError, e:
+				debug(e, FATAL)
+				g.con.rollback()
+				sendmail(1, email, duration_stime, time.time(), h_runid)
+				sys.exit(1)
 		else:
 			print "%s: run %s already existing in DB" % (fitsfile, h_runid)
 
@@ -491,27 +476,15 @@ def run_ingestion():
 			sys.exit(1)
 
 		if not res:
-			if detector == 'MegaCam' and t == 'CFHT 3.6m' and i == 'MegaPrime':
-				try:
-					g.setTableName('youpi_channel')
-					g.insert(	name = h_filter,
-								instrument_id = instrument_id )
-				except MySQLdb.DatabaseError, e:
-					debug(e, FATAL)
-					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), h_runid)
-					sys.exit(1)
-				
-			elif detector == 'WIRCam' and t == 'CFHT 3.6m' and i == 'WIRCam':
-				try:
-					g.setTableName('youpi_channel')
-					g.insert(	name = h_filter,
-								instrument_id = instrument_id )
-				except MySQLdb.DatabaseError, e:
-					debug(e, FATAL)
-					g.con.rollback()
-					sendmail(1, email, duration_stime, time.time(), h_runid)
-					sys.exit(1)
+			try:
+				g.setTableName('youpi_channel')
+				g.insert(	name = h_filter,
+							instrument_id = instrument_id )
+			except MySQLdb.DatabaseError, e:
+				debug(e, FATAL)
+				g.con.rollback()
+				sendmail(1, email, duration_stime, time.time(), h_runid)
+				sys.exit(1)
 		else:
 			print "%s: channel %s already existing in DB" % (fitsfile, h_filter)
 	
@@ -565,28 +538,13 @@ def run_ingestion():
 			else:
 				debug("Image already exists in database (same odometer number for different checksum, skipping...", WARNING)
 
-		#
-		# Image not yet ingested
-		# select validation status
-		#
-		if detector == 'MegaCam' or  i == 'MegaPrime':
-			iname = 'Megacam'
-	
-		elif detector == 'WIRCam' or i == 'WIRCam':
-			iname = 'Wircam'
-		else:
-			# TODO: other type of detector ?
-			debug("Could not detect image's instrument type. Skipping...", WARNING)
-			continue
-	
 		# First gets run and channel IDs
 		try:
 			q = """
-			SELECT run.id, chan.id, i.id
-			FROM youpi_run AS run, youpi_channel AS chan, youpi_instrument AS i
+			SELECT run.id, chan.id
+			FROM youpi_run AS run, youpi_channel AS chan
 			WHERE run.name = '%s'
-			AND chan.name = '%s'
-			AND i.name = '%s';""" % (h_runid, h_fileter, iname)
+			AND chan.name = '%s';""" % (h_runid, h_filter)
 			res = g.execute(q)
 
 		except MySQLdb.DatabaseError, e:
@@ -617,7 +575,7 @@ def run_ingestion():
 				is_validated = is_validated_for_image,
 				channel_id = res[0][1],
 				ingestion_id = ingestionId,
-				instrument_id = res[0][2]
+				instrument_id = instrument_id
 			)
 	
 		except MySQLdb.DatabaseError, e:
