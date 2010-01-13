@@ -330,12 +330,17 @@ function queryUrlDisplayAsTable(container_id, select_limit_id, post_url, style)
 		null, // Use default error handler
 		// Custom handler for results
 		function(resp) {
-			removeAllChildrenNodes(container);
+			if (resp.Error) {
+				var d = new Element('div').addClassName('perm_not_granted').update(resp.Error);
+				container.update(d);
+				return;
+			}
+			container.update();
 			container.appendChild(getDOMTableFromResults(resp, style));
 		}
 	);
 
-	post = 	'limit=' + limit;
+	post =	'limit=' + limit;
 
 	// Send HTTP POST request
 	xhr.send(post_url, post);

@@ -30,6 +30,7 @@
 var guistyle = '{{ user.get_profile.guistyle }}';
 var gready = true;
 
+{% if perms.youpi.can_view_ing_logs %}
 function ingestion_history() {
 	/*
 	 * Arg 1: container id
@@ -39,6 +40,7 @@ function ingestion_history() {
 	 */
 	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/youpi/history/ingestion/');
 }
+{% endif %}
 
 function updateContent(container, handler) {
 	var handler = typeof handler == 'function' ? handler : null;
@@ -168,6 +170,13 @@ function updateContent(container, handler) {
 		</table>
 	</div>
 	<div style="width: 100%; display: none;" id="menuitem_sub_1">
+	{% if not perms.youpi.can_view_ing_logs %}
+		<div style="margin-top: 5px">
+			<div class="perm_not_granted" style="margin: auto; width: -moz-fit-content">
+				<label>You don't have permission to view ingestion logs</label>
+			</div>
+		</div>
+	{% else %}
 		<table width="100%">
 			<tr>
 				<td style="text-align: left">
@@ -186,13 +195,16 @@ function updateContent(container, handler) {
 			</tr>
 		</table>
 		<div align="center" id="div_result"></div>
+	{% endif %}
 	</div>
 </div>
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
 		var m = new SubMenu('submenu', ['Run Ingestion', 'History']);
+	{% if perms.youpi.can_view_ing_logs %}
 		m.setOnClickHandler(1, ingestion_history);
+	{% endif %}
 		var c = $('itt_content_div');
 		c.hide();
 		var sel = $('itt_select');

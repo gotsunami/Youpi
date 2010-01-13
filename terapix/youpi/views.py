@@ -586,6 +586,12 @@ def history_ingestion(request):
 		# Unlimitted
 		limit = 0
 
+	# First check for permission
+	if not request.user.has_perm('youpi.can_view_ing_logs'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to view ingestion logs",
+		}), mimetype = 'text/plain')
+
 	res = Ingestion.objects.all().order_by('-start_ingestion_date')
 
 	if limit > 0:
