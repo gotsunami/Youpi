@@ -13,8 +13,10 @@ Guided Tour of Functionalities
 
 .. _ingestion_section:
 
-FITS Data Ingestion
--------------------
+Generic FITS Image Ingestion
+----------------------------
+
+.. versionadded:: 0.6
 
 .. image:: /figures/ingestion.png
    :width: 800
@@ -23,8 +25,6 @@ FITS Data Ingestion
 A FITS image is the most important entity in youpi.
 The ingestion process make your images their first entries in the pipeline.
  
-
-
 Once your cluster path is defined in your configuration files, you can easily 
 browse your cluster to find out which directories contain FITS images from the 
 cluster path browser.
@@ -126,8 +126,8 @@ There are 2 different ways to dispatch resources from this interface:
 	in the Processing Your Data part.
 
 
-Set up Your Preferences
------------------------
+Preferences Setup
+-----------------
 
 .. image:: /figures/preferences.png
    :width: 800
@@ -157,8 +157,8 @@ preferences for processing data, manage his style themes and define his own perm
  visually impaired users.
 
 
-Organize your data with tags
-----------------------------
+Organize Data With Tags
+-----------------------
 
 .. image:: /figures/tag.png
    :width: 800
@@ -195,8 +195,8 @@ selection.
  .. Note:: A tag is a selection parameter that you can use in the image selector in 
 	order to find all images with a specific tag, for example untag a tagged selection. 
 
-Processing Your Data
---------------------
+Processing Data
+---------------
 
 .. image:: /figures/processing.png
    :width: 800
@@ -213,7 +213,7 @@ the **image selector**.
 
 .. _image_selector_section:
 
-The image selector
+The Image Selector
 ------------------
 
 An instance of the image selector is provided for each plugin under the "select images"
@@ -231,8 +231,6 @@ There are two kind of selections:
 	- on a list of images in plain-text separated by semicolons
 
  You can even import *n* plain-text files in order to construct *n* basic selections.
-
-
 
  - Batch selection
 
@@ -267,15 +265,14 @@ With this other method of selection, you will have one list of as many selection
 as contained in the XML file.A sky visualisation of your selections in batch mode, is 
 generated (even the center of each image selected).To see this visualisation, check 
 the corresponding checkbox on the image selector in Batch selection.
-
  
-.. Note:: For all selections you have done under single or batch mode, it's possible to save, edit or 
- delete selections from the top left panel of the image selector.
+.. Note:: For all selections you have done under single or batch mode, it's possible to save, 
+          edit or delete selections from the top left panel of the image selector.
 
 .. Note:: ** saved selections matching mode **
 
-Processing your data considering plugins
-----------------------------------------
+Processing Data Considering Plugins
+-----------------------------------
 
 Most of plugins require specific input data, as weight maps, flat maps ahead files etc.
 The select data path tab helps you inputting such files when they don't appear to be an
@@ -393,8 +390,6 @@ right panel. For every plugins some of element results are the same:
 The second part is the *statistics* tab and permit, by browsing your related output directory
 processing, to resume processing images status. It is a quick way to know if 100% of your images
 group has been successfully processed.
-
-
 
 Generating Reports
 ------------------

@@ -13,10 +13,10 @@ graph mcd {
 	configfile [label="{ Config File | [ Config Id ]\nContent\nData\nMode }"];
 	configtype [label="{ Config Type | [ Config Id ]\nName }"];
 	fitstables [label="{ FITS Tables | [ Name ]\nInstrument\nChannel\nRun\nQSO status\nObjet\nFitstable\nAbsorption\nAbsorption_err\nIs_phot }"];
-	image [label="{ Image | [ Image Id ]\nName\nSky Footprint\nPath\nAlpha\nDelta\nEquinox\nObject\nDate Obs\nExp time\nPhotc Header\nPhotc Custom\nPhotk\nAirmass\nAbsorption\nChecksum\nGain\nIngestion date\nFlat\nMask\nReg\nQSO status }"];
+	image [label="{ Image | [ Image Id ]\nName\nSky Footprint\nPath\nAlpha\nDelta\nEquinox\nObject\nDate Obs\nExp time\nPhotc Header\nPhotc Custom\nPhotk\nAirmass\nAbsorption\nChecksum\nGain\nIngestion date\nFlat\nMask\nReg\nIs Validated }"];
 	imageselections [label="{ Image selections | [ name ]\nData\nMode }"];
-	ingestion [label="{ Ingestion | [ Ingestion Id ]\nLabel\nEmail\nPath\nCheck fitsverify\nCheck QSO status\nCheck multiple ingestion\nExit code\nReport\nMode }"];
-	instrument [label="{ Instrument | [ Instrument Id ]\nName\nTelescope\nUrl\nTimezone\nAltitude\nNchips\nAstrinstru key\nPhotinstru_key\nPath }"];
+	ingestion [label="{ Ingestion | [ Ingestion Id ]\nLabel\nEmail\nPath\nCheck fitsverify\nCheck multiple ingestion\nExit code\nReport\nMode\nIs Validated }"];
+	instrument [label="{ Instrument | [ Instrument Id ]\nName\nTelescope\nUrl\nTimezone\nAltitude\nNchips\nAstrinstru key\nPhotinstru_key\nPath\nItt }"];
 	miscdata [label="{ Misc data | [ Key ]\nData\nMode }"];
 	run [label="{ Run | [ Name ]\nPI\nUrl\nEmail\nProcess request date\nDate start\nDate end\nDate download\nRelease date }"];
 	survey [label="{ Survey | [ Name ]\nComment\nUrl}"];
@@ -24,7 +24,7 @@ graph mcd {
 	authgroup [label="{ Group | (Django table auth_group) }", style=dashed, color=brown];
 	task [label="{ Processing task | [ Id ]\nSuccess\nError Log\nHostname\nResults output directory\nTitle\nMode }"];
 	processingkind [label="{ Processing kind | [ Internal name ]\nLabel }"];
-	pluginfitsin [label="{ FITSin plugin | [ Id ]\nAstoffra\nAstoffde\nAststdevra\nAststdevde\nAstrom accuracy\nPsfwhm min\nPsfwhm\nPsfwhm max\nPsfhld min\nPsfhld\nPsfhld max\nPsfel min\nPsfel\nPsfel max\nPsfchi2 min\nPsfchi2\nPsfchi2 max\nPsfresi min\nPsfresi\nPsfresi max\nPsfasym min\nPsfasym\nPsfasym max\nNstars min\nNstars\nNstars max\nBkg\nBkgstdev\nSatlev\nFlat Path\nMask Path\nRegion Path\nQualityFITS config\nResults Ingestion Log\nHTTP Url\nPrevious Release Grade\nPrevious Release Comment }"];
+	pluginfitsin [label="{ FITSin plugin | [ Id ]\nAstoffra\nAstoffde\nAststdevra\nAststdevde\nAstrom accuracy\nPsfwhm min\nPsfwhm\nPsfwhm max\nPsfhld min\nPsfhld\nPsfhld max\nPsfel min\nPsfel\nPsfel max\nPsfchi2 min\nPsfchi2\nPsfchi2 max\nPsfresi min\nPsfresi\nPsfresi max\nPsfasym min\nPsfasym\nPsfasym max\nNstars min\nNstars\nNstars max\nBkg\nBkgstdev\nSatlev\nFlat Path\nMask Path\nRegion Path\nQualityFITS config\nResults Ingestion Log\nHTTP Url\nPrevious Release Grade\nPrevious Release Comment\nExitIfFlatMissing }"];
 	pluginfitsout [label="{ FITSout plugin | [ Id ] }"];
 	pluginscamp [label="{ SCAMP plugin | [ Id ]\nConfig\nResults Ingestion Log\nHTTP Url\nLDAC Files\nThumbnails }"];
 	pluginswarp [label="{ SWARP plugin | [ Id ]\nConfig\nResults Ingestion Log\nHTTP Url\nThumbnails\nWeight Path\nUse QFITS Weights\nHead Path\nUse Head Files }"];

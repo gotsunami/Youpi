@@ -7,6 +7,10 @@ Managing Users And Groups
 
 *TBW*
 
+Changing User Permissions
+=========================
+
+*TBW*
 
 Database Backup
 ===============

@@ -11,14 +11,24 @@ ChangeLog
 .. contents::
    :local:
 
-Version 0.5.3
--------------
+Version 0.6
+-----------
 
 **Release Date**: *To Be Released*
 
 **Improvements**:
 
-- QualityFITS plugin: new option in the GUI to ensure a QFits job halt immediately if the flat image Youpi is looking for is missing.
+- Added support for generic FITS image ingestion using translation tables
+- Added several user permissions in order to be able to define more restrictive accounts
+- QualityFITS plugin: added an option to force exiting a QFits job immediately if the flat image 
+  is missing
+- Current user permissions are available on the 'Preferences' page
+- Added a keyboard shortcut for accessing the grading page
+- New path tool script useful to display/alter important stored (DB) data paths 
+
+**Bug fixes**:
+
+- Results page: fixed the 'already graded images' counter's value
 
 **Release Notes**:
 
@@ -49,7 +59,6 @@ Version 0.5.2
 - Monitoring Condor jobs from the "Active Monitoring" page is much faster (`654`_)
 - Plugin manager OOP design improved
 - Removed all parts related to preingestion step (no more needed) (`622`_)
-- Handbook updated
 
 **Bug fixes**:
 

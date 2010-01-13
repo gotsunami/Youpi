@@ -178,7 +178,7 @@ FITSIn Plugin
 	Maximum PSF asymmetry, Minimum number of PSF stars, Average number of PSF stars, Maximum 
 	number of PSF stars, Median background, Background RMS, Saturation level, Flat Path, Mask 
 	Path, Region Path, QualityFITS Config, Results Ingestion Log, HTTP Url, Previous Release 
-	Grade, Previous Release Comment)
+	Grade, Previous Release Comment, Exit If Flat Missing)
 
 FITSOut Plugin
 	FITSOut Plugin (*FITSOut Id*, Processing Task Id)
@@ -186,7 +186,7 @@ FITSOut Plugin
 Image
 	Image (*Image Id*, Ingestion Id, Channel Id, Instrument Id, Name, Sky Footprint, Path, 
 	Alpha, Delta, Equinox, Object, Date Obs, Exp time, Photc Header, Photc Custom, Photk, 
-	Airmass, Absorption, Checksum, Gain, Ingestion Date, Flat, Mask, Reg, QSO Status)
+	Airmass, Absorption, Checksum, Gain, Ingestion Date, Flat, Mask, Reg, Is Validated)
 
 Image-Task Relation
 	Image-Task Relation (*I--T Id, Image Id, Processing Task Id*)
@@ -199,12 +199,12 @@ Image Selections
 
 Ingestion
 	Ingestion (*Ingestion Id*, Django User Id, Django Group Id, Mode, Label, Start Ingestion 
-	Date, End Ingestion Date, Email, Path, Check Fitsverify, Check QSO Status, Check Multiple 
-	Ingestion, Exit Code, Report)
+	Date, End Ingestion Date, Email, Path, Check Fitsverify, Check Multiple, Ingestion, 
+	Exit Code, Report, Is Validated)
 
 Instrument
 	Instrument (*Instrument Id*, Name, Telescope, Url, Timezone, Altitude, Nchips, 
-	Astrinstru_key, Photinstru_key, Path)
+	Astrinstru_key, Photinstru_key, Path, Itt)
 
 Misc Data
 	Misc Data (*Misc Id*, Django User Id, Group User Id, Mode, Key, Data, Date)
