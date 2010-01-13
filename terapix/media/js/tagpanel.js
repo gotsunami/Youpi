@@ -23,6 +23,7 @@
  *
  * Constructor Parameters:
  *  container - string or DOM object: name of parent DOM block container
+ *  options - object: for the moment, only the {canAddTag: <bool>} option is supported (default: true)
  *
  * Signals:
  *  tagPanel:tagDroppedOnZone - signal emitted when a tag has been dropped successfully to a drop zone
@@ -31,7 +32,7 @@
  *  tagPanel:tagUpdated - signal emitted when a tag has been updated successfully
  *
  */
-function TagPanel(container) {
+function TagPanel(container, options) {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
 
@@ -42,6 +43,12 @@ function TagPanel(container) {
 	 *
 	 */
 	var _container = null;
+	/*
+	 * Var: _options
+	 * Hash for options
+	 *
+	 */
+	var _options;
 	/*
 	 * Var: _infoDiv
 	 * DOM div displaying info messages
@@ -302,6 +309,7 @@ function TagPanel(container) {
 
 		if (name.length == 0) {
 			alert("Can't save a tag with an empty name!");
+			var inp = $(_id + 'tag_name_input');
 			inp.highlight();
 			inp.focus();
 			return;
@@ -327,6 +335,7 @@ function TagPanel(container) {
 					function(r) {
 						var log = new Logger(_infoDiv);
 						if (r.Error) {
+							log.clear();
 							log.msg_error(r.Error);
 							return;
 						}
@@ -369,6 +378,7 @@ function TagPanel(container) {
 
 		if (name.length == 0) {
 			alert("Can't update a tag with an empty name!");
+			var inp = $(_id + 'tag_name_input');
 			inp.highlight();
 			inp.focus();
 			return;
@@ -492,13 +502,13 @@ function TagPanel(container) {
 
 				if (!r.tags.length) {
 					_infoDiv.update('No tags have been created so far. ');
-					_infoDiv.insert(s);
+					if (_options.get('canAddTag')) _infoDiv.insert(s);
 					return;
 				}
 
 				_infoDiv.appear();
 				_infoDiv.update('<b>' + r.tags.length + '</b> tag' + (r.tags.length > 1 ? 's' : '') + ' available.');
-				_infoDiv.insert(s);
+				if (_options.get('canAddTag')) _infoDiv.insert(s);
 				_tagsDiv.update();
 
 				// Show available tags
@@ -619,6 +629,10 @@ function TagPanel(container) {
 			throw "Please supply a valid DOM container!";
 			return;
 		}
+
+		// Options
+		_options = $H({canAddTag: true});
+		_options.update(options);
 
 		_infoDiv = new Element('div').setStyle({marginTop: '5px'});
 		_tagsDiv = new Element('div', {id: _id + 'tags_div'}).setStyle({marginTop: '5px'}).addClassName('tags').hide();

@@ -40,6 +40,11 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					<td style="border: none; max-width: 30%">
 						<div class="themes">
 							<h1>Available Tags</h1>
+						{% if not perms.youpi.add_tag %}
+							<div class="perm_not_granted" style="margin-top: 20px; width: -moz-fit-content">
+								<label>You don't have permission to add tags</label>
+							</div>
+						{% endif %}
 							<div id="tagpanel-div"/>
 						</div>
 					</td>
@@ -62,7 +67,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		var ims = new ImageSelector('imgselector-div', {help: false, editing: false, dropzone: true});
 		ims.setTableWidget(new AdvancedTable());
 
-		panel = new TagPanel('tagpanel-div');
+		panel = new TagPanel('tagpanel-div', {canAddTag: {% if perms.youpi.add_tag %}true{% else %}false{% endif %}});
 		document.observe('imageSelector:loaded', function() {
 			panel.setDropZone(ims.getDropZone());
 		});

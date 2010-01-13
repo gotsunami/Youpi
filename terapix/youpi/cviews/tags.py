@@ -120,6 +120,12 @@ def save_tag(request):
 	except Exception, e:
 		return HttpResponseForbidden()
 
+	# First check for permission
+	if not request.user.has_perm('youpi.add_tag'):
+		return HttpResponse(json.encode({
+			'Error': "Sorry, you don't have permission to add tags",
+		}), mimetype = 'text/plain')
+
 	profile = request.user.get_profile()
 	try:
 		tag = Tag(name = name, user = request.user, comment = comment, style = style, mode = profile.dflt_mode, group = profile.dflt_group)
