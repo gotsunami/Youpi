@@ -12,6 +12,7 @@
 <script type="text/javascript">
 
 var guistyle = '{{ user.get_profile.guistyle }}';
+{% if perms.youpi.can_run_softvc %}
 var all_nodes;
 var all_softs;
 
@@ -251,6 +252,7 @@ function force_reload() {
 function run_checks() {
 	get_cluster_nodes();
 }
+{% endif %}
 </script>
 {% endblock %}
 
@@ -263,12 +265,18 @@ function run_checks() {
 	<div id="submenu">
 		<div id="menuitem_sub_1" style="text-align: left; width: 90%;">
 			<h1 style="margin-top: 30px">Software version check</h1>
+		{% if not perms.youpi.can_run_softvc %}
+			<div class="perm_not_granted" style="margin-top: 20px; width: -moz-fit-content">
+				<label>You don't have permission to run a software version check</label>
+			</div>
+		{% else %}
 			<div class="tip" style="width: 400px;">
 				<div id="cluster_nodes_div" style="margin: 0px;"></div>
 				<div id="cluster_softs_div" style="margin: 0px;"></div>
 			</div>
 			<div>[ <a href="#" onclick="force_reload();">Force refresh</a> ]</div>
 			<div id="cluster_versions_div"></div>
+		{% endif %}
 		</div>
 	</div>
 </div>
@@ -277,6 +285,8 @@ function run_checks() {
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['Software Versions']);
 	});
+{% if perms.youpi.can_run_softvc %}
 	run_checks();
+{% endif %}
 </script>
 {% endblock %}

@@ -252,9 +252,11 @@ function cancelAllJobs(what) {
 			</li>
 		</ul>
 		<div align="center" style="width: 100%" id="menuitem_sub_0">
+		{% if perms.youpi.can_run_softvc %}
 			<div id="software_div" class="tip" style="margin-top: 30px; width: 300px;">To know the version of softwares running on the cluster, you can 
 				<a href="/youpi/monitoring/softwares/">run a software version check</a>.
 			</div>
+		{% endif %}
 		{% if perms.youpi.can_monitor_jobs %}
 			<div id="monitor_div"></div>
 		{% else %}
