@@ -184,7 +184,6 @@ class MiscData(models.Model):
 
 class CartItem(models.Model):
 	"""
-	Standalone table, no foreign key constraint.
 	Useful to store (serialized) data related to processing cart items
 	"""
 	
@@ -202,7 +201,7 @@ class CartItem(models.Model):
 	kind = models.ForeignKey(Processing_kind, db_column = 'kind_id')
 	
 	class Meta:
-		verbose_name="Saved item of processing cart"
+		verbose_name = "Saved item of processing cart"
 
 	def __unicode__(self):
 		return self.name
@@ -602,7 +601,9 @@ class Rel_tagi(models.Model):
 		unique_together = ('image', 'tag')
 
 class SiteProfile(models.Model):
-
+	"""
+	Per-user site profile
+	"""
 	# Current user GUI style
 	guistyle = models.CharField(max_length = 255, default = 'default')
 	dflt_condor_setup = models.TextField()
@@ -614,6 +615,16 @@ class SiteProfile(models.Model):
 	# FKs
 	user = models.ForeignKey(User, unique = True)
 	dflt_group = models.ForeignKey(Group)
+
+	class Meta:
+		permissions = (
+			('can_run_ingestions', "Can run ingestions on the cluster"),
+			('can_view_ing_logs', "Can view ingestion logs"),
+			('can_monitor_jobs', "Can monitor running jobs on the cluster"),
+			('can_view_results', "Can view processing results"),
+			('can_use_reporting', "Can generate reports"),
+			('can_run_softvc', "Can run a software version check"),
+		)
 
 class CondorNodeSel(models.Model):
 	"""

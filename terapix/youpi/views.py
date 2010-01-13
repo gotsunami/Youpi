@@ -115,15 +115,14 @@ def preferences(request):
 	# Global permissions (non data related)
 	user = request.user
 	glob_perms = [
-#		['Can run ingestions', 						'youpi.can_run_ingestions'],
-#		['Can view ingestion logs', 				'youpi.can_view_ing_logs'],
-#		['Can add tags', 							'youpi.can_add_tags'],
-#		['Can add items to the processing cart', 	'youpi.can_use_cart'],
-#		['Can do processing', 						'youpi.can_do_processing'],
-#		['Can monitor running jobs on the cluster', 'youpi.can_monitor_jobs'],
-#		['Can view processing results', 			'youpi.can_view_results'],
+		['Can run ingestions', 						'youpi.can_run_ingestions'],
+		['Can view ingestion logs', 				'youpi.can_view_ing_logs'],
+		['Can add tags', 							'youpi.add_tag'],
+		['Can monitor running jobs on the cluster', 'youpi.can_monitor_jobs'],
+		['Can view processing results', 			'youpi.can_view_results'],
 		['Can grade qualityFITSed images', 			'youpi.can_grade'],
-#		['Can generate reports', 					'youpi.can_use_reporting'],
+		['Can generate reports', 					'youpi.can_use_reporting'],
+		['Can run a software version check', 		'youpi.can_run_softvc'],
 	]
 
 	menu_id = 'preferences'
