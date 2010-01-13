@@ -83,7 +83,14 @@ function updateContent(container, handler) {
 	<div style="width: 100%; margin: auto;" id="menuitem_sub_0">
 		<table class="preingestion">
 			<tr>
-				<td><p class="number_ingested">Number of ingested Images: {{ ingested }}</p></td>
+				<td>
+				{% if not perms.youpi.can_submit_jobs %}
+					<div class="perm_not_granted" style="margin-top: 20px; margin: auto; width: -moz-fit-content">
+						<label>You don't have permission to run ingestions on the cluster</label>
+					</div>
+				{% endif %}
+					<p class="number_ingested">Number of ingested Images: {{ ingested }}</p>
+				</td>
 			</tr>
 			<tr id="data">
 				<td align="center">
@@ -212,7 +219,7 @@ function updateContent(container, handler) {
 				});
 			}
 		});
-		ingestionType();
+		ingestionType({% if perms.youpi.can_submit_jobs %}true{% else %}false{% endif %});
 
 		try {
 			var options = {

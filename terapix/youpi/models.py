@@ -618,7 +618,7 @@ class SiteProfile(models.Model):
 
 	class Meta:
 		permissions = (
-			('can_run_ingestions', "Can run ingestions on the cluster"),
+			('can_submit_jobs', "Can submit jobs on the cluster"),
 			('can_view_ing_logs', "Can view ingestion logs"),
 			('can_monitor_jobs', "Can monitor running jobs on the cluster"),
 			('can_view_results', "Can view processing results"),

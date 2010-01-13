@@ -69,7 +69,7 @@ function force_check_allow_several_times()
 	}
 }
 
-function ingestionType()
+function ingestionType(can_submit_jobs)
 {
 	var div_ing = $("ingestion");
 	var div_tree = document.createElement('div');
@@ -82,7 +82,13 @@ function ingestionType()
 	file_browser.setRootTitle(_fileBrowserSettings.rootTitle);
 	file_browser.setRootDataPath(_fileBrowserSettings.rootDataPath);
 	file_browser.setFilteringPatterns(['*.fits']);
-	file_browser.setSubmitButtonHandler(process_form);
+	if (can_submit_jobs)
+		file_browser.setSubmitButtonHandler(process_form);
+	else {
+		file_browser.setSubmitButtonHandler(function() {
+			alert("You don't have permission to run ingestions on the cluster");
+		});
+	}
 	file_browser.setSelectionMode(file_browser.getSelectionModes().MULTI);
 	file_browser.render();
 }
@@ -296,6 +302,11 @@ function submitIngestion(ingestionId) {
 		// Custom handler for results
 		function(resp) {
 			tr.removeChild(td);
+			if (resp.Error) {
+				var d = new Element('div').addClassName('perm_not_granted').update(resp.Error);
+				log.update(d);
+				return;
+			}
 
 			var fields = ['IngestionId', 'JobId', 'Host', 'Path', ''];
 			var img;
@@ -328,7 +339,6 @@ function submitIngestion(ingestionId) {
 					td.appendChild(document.createTextNode(resp[fields[k]]));
 				}
 				tr.appendChild(td);
-
 			}
 			
 			ingestionPathCurrentIndex++;

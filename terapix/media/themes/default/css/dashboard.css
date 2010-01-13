@@ -114,6 +114,17 @@ div.warning {
 	border: 2px solid #D8A587;
 }
 
+div.perm_not_granted {
+	background: #EBC3AD url('../img/admin/icon-no.gif') no-repeat 3px center;
+	padding: 3px;
+	padding-left: 18px;
+	border: 1px solid #D8A587;
+	border-bottom: 1px solid gray;
+	border-right: 1px solid gray;
+	width: -moz-fit-content;
+	-moz-border-radius: 5px;
+}
+
 div.modal_warning {
 	background: transparent url('../img/34x34/warning.png') no-repeat top left;
 	padding: 10px;

@@ -582,6 +582,12 @@ def condor_ingestion(request):
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
+	# First check for permission
+	if not request.user.has_perm('youpi.can_submit_jobs'):
+		return HttpResponse(json.encode({
+			'Error': "Sorry, you don't have permission to submit jobs on the cluster",
+		}), mimetype = 'text/plain')
+
 	# Find machine
 	clean_path = re.sub(settings.FILE_BROWSER_ROOT_DATA_PATH, '', path)
 	m = re.search(settings.INGESTION_HOST_PATTERN, clean_path)

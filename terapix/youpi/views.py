@@ -115,7 +115,7 @@ def preferences(request):
 	# Global permissions (non data related)
 	user = request.user
 	glob_perms = [
-		['Can run ingestions', 						'youpi.can_run_ingestions'],
+		['Can submit jobs on the cluster', 			'youpi.can_submit_jobs'],
 		['Can view ingestion logs', 				'youpi.can_view_ing_logs'],
 		['Can add tags', 							'youpi.add_tag'],
 		['Can monitor running jobs on the cluster', 'youpi.can_monitor_jobs'],
