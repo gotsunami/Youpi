@@ -319,6 +319,11 @@ function ProcessingHistoryWidget(container) {
 			function(resp) {
 				var r = resp.results;
 				var st = resp.Stats;
+				if (resp.Error) {
+					var d = new Element('div').addClassName('perm_not_granted').update(resp.Error);
+					container.update(d);
+					return;
+				}
 
 				// Display pages
 				var pdiv = $(_id + '_pages_div');

@@ -795,6 +795,10 @@ def processing_plugin(request):
 	except Exception, e:
 		raise PostDataError, e
 
+	if method == 'getTaskInfo':
+		if not request.user.has_perm('youpi.can_view_results'):
+			return HttpResponseForbidden("Sorry, you don't have permission to view processing results")
+
 	plugin = manager.getPluginByName(pluginName)
 	try:
 		res = eval('plugin.' + method + '(request)')

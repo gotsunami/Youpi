@@ -179,6 +179,12 @@ def task_filter(request):
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
+	# First check for permission
+	if not request.user.has_perm('youpi.can_view_results'):
+		return HttpResponse(json.encode({
+			'Error': "Sorry, you don't have permission to view processing results",
+		}), mimetype = 'text/plain')
+
 	lenAllTasks = Processing_task.objects.count()
 
 	anyStatus = False

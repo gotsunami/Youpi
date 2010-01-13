@@ -82,10 +82,16 @@ function get_stats() {
 			-->
 		</ul>
 	</div>
+{% if not perms.youpi.can_view_results %}
+	<div class="perm_not_granted" style="margin-top: 20px; width: -moz-fit-content">
+		<label>You don't have permission to view processing results</label>
+	</div>
+{% endif %}
 	<table class="preingestion">
 		<tr id="data">
 			<td align="center">
 				<div id="menuitem_history">
+				{% if perms.youpi.can_view_results %}
 					<table style="width: 95%">
 					<tr><td>
 					<div id="history_div"></div>
@@ -119,6 +125,7 @@ function get_stats() {
 					</td>
 					</tr>
 					</table>
+				{% endif %}
 				</div>
 				<div id="menuitem_stats" style="display: none">
 					<div style="margin-top: 20px; width: 500px;" class="tip">
@@ -133,11 +140,6 @@ function get_stats() {
 					</div>
 					<div style="margin-top: 20px;" id="dir_stats_div"></div>
 				</div>
-				<!--
-				<div id="menuitem_search" style="display: none">
-				TODO...
-				</div>
-				-->
 			</td>
 		</tr>
 	</table>
@@ -145,6 +147,7 @@ function get_stats() {
 <script type="text/javascript">
 	var p, pInfo;
 	document.observe('dom:loaded', function() {
+	{% if perms.youpi.can_view_results %}
 		p = new ProcessingHistoryWidget('history_div');
 		pInfo = new Array();
 		{% for plugin in plugins %}
@@ -152,6 +155,7 @@ function get_stats() {
 		{% endfor %}
 		p.setActivePlugins(pInfo);
 		p.render();
+	{% endif %}
 	});
 </script>
 {% endblock %}
