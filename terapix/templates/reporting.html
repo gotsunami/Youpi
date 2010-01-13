@@ -66,7 +66,13 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				{% endfor %}
 					</div>
 					<br/>
+				{% if not perms.youpi.can_use_reporting %}
+					<div class="perm_not_granted" style="margin-top: 20px; width: -moz-fit-content">
+						<label>You don't have permission to generate reports</label>
+					</div>
+				{% else %}
 					<input id="report_submit" type="submit" value="Generate!"/>	
+				{% endif %}
 					<div class="report_options" id="loading_div"/>
 				</form>
 			</div>
@@ -78,6 +84,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	document.observe('dom:loaded', function() {
 		$('loading_div').hide();
 		menu = new SubMenu('submenu', ['Reports']);
+	{% if perms.youpi.can_use_reporting %}
 		$('report_form').observe('submit', function() {
 			$('loading_div').update(getLoadingHTML('Please wait while generating report')).show();
 			var sel = $('report_select');
@@ -88,6 +95,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			var type = grp != sel ? grp.id : 'global';
 			$('report_form').action = '/youpi/report/' + type + '/' + selvalue + '/';
 		});
+	{% endif %}
 
 		// Hide options div
 		$('reports_options').select('div[id]').each(function(div) { div.hide(); });

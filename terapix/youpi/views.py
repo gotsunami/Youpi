@@ -1004,6 +1004,8 @@ def get_report(request, pluginId, reportId):
 	"""
 	Generate a report
 	"""
+	if not request.user.has_perm('youpi.can_use_reporting'):
+		return HttpResponseForbidden("Sorry, you don't have permission to generate reports")
 	try:
 		plugObj = manager.getPluginByName(pluginId)
 	except PluginManagerError:
