@@ -13,6 +13,7 @@
 
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
+{% if perms.youpi.can_monitor_jobs %}
 // Next page to display (used by monitorJobs())
 var gNextPage = 1;
 
@@ -28,6 +29,11 @@ function monitorJobs() {
 		null,
 		// Custom handler for results
 		function(resp) {
+			if (resp.Error) {
+				var d = new Element('div').addClassName('perm_not_granted').update(resp.Error);
+				container.update(d);
+				return;
+			}
 			r = resp['results'];
 			var div = document.createElement('div');
 			div.setAttribute('align', 'center');
@@ -228,6 +234,7 @@ function cancelAllJobs(what) {
 	var post = 'What=' + what;
 	r.send('/youpi/condor/cancel/', post);
 }
+{% endif %}
 </script>
 {% endblock %}
 
@@ -248,15 +255,23 @@ function cancelAllJobs(what) {
 			<div id="software_div" class="tip" style="margin-top: 30px; width: 300px;">To know the version of softwares running on the cluster, you can 
 				<a href="/youpi/monitoring/softwares/">run a software version check</a>.
 			</div>
+		{% if perms.youpi.can_monitor_jobs %}
 			<div id="monitor_div"></div>
+		{% else %}
+			<div class="perm_not_granted" style="margin-top: 20px; width: -moz-fit-content">
+				<label>You don't have permission to monitor jobs running on the cluster</label>
+			</div>
+		{% endif %}
 		</div>
 	</div>
 </div>
 
+{% if perms.youpi.can_monitor_jobs %}
 <script type="text/javascript">
 	var d = document.getElementById('monitor_div');
 	d.innerHTML = getLoadingHTML('Loading cluster data, please wait');
 	monitorJobs();
 </script>
+{% endif %}
 
 {% endblock %}

@@ -407,6 +407,12 @@ def live_monitoring(request):
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
+	# First check for permission
+	if not request.user.has_perm('youpi.can_monitor_jobs'):
+		return HttpResponse(json.encode({
+			'Error': "Sorry, you don't have permission to monitor running jobs on the cluster",
+		}), mimetype = 'text/plain')
+
 	res, jobCount, pageCount, nextPage = get_live_monitoring(request, int(nextPage))
 	return HttpResponse(json.encode({'results' : res, 'JobCount' : jobCount, 'PageCount' : pageCount, 'nextPage' : nextPage}), mimetype = 'text/plain')
 
