@@ -306,6 +306,13 @@ document.observe('processingCart:itemRemoved', function() {
 <div align="center">
 <div style="text-align: center;">
 	<div id="submenu">
+	{% if not perms.youpi.can_submit_jobs %}
+		<div style="margin-top: 5px;">
+			<div class="perm_not_granted" style="margin-top: 20px; margin: auto; width: -moz-fit-content">
+				<label>You don't have permission to submit jobs on the cluster</label>
+			</div>
+		</div>
+	{% endif %}
 		<div align="center" style="width: 100%" id="menuitem_sub_0">
 			{# Cart items #}
 			{% if cartHasData %}

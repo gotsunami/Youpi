@@ -798,6 +798,11 @@ def processing_plugin(request):
 	if method == 'getTaskInfo':
 		if not request.user.has_perm('youpi.can_view_results'):
 			return HttpResponseForbidden("Sorry, you don't have permission to view processing results")
+	elif method == 'process':
+		if not request.user.has_perm('youpi.can_submit_jobs'):
+			return HttpResponse(str({'result': {
+				'Error': "Sorry, you don't have permission to submit jobs on the cluster",
+			}}), mimetype = 'text/plain')
 
 	plugin = manager.getPluginByName(pluginName)
 	try:
