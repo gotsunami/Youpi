@@ -26,8 +26,8 @@ try:
 	from terapix.youpi.models import *
 	from terapix.youpi.pluginmanager import PluginManager
 	from terapix.lib.itt.instconfig import InstrumentConfig
-except ImportError:
-	print 'Please run this command from the terapix subdirectory.'
+except ImportError, e:
+	print "Please run this command from the terapix subdirectory: %s" % e
 	sys.exit(1)
 
 YOUPI_USER = 'youpiadm'
