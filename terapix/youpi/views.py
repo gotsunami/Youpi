@@ -127,7 +127,7 @@ def preferences(request):
 	# Adds can_use_plugin_* permissions, generated on-the-fly by the checksetup script
 	perms = Permission.objects.filter(codename__startswith = 'can_use_plugin_')
 	for pperm in perms:
-		glob_perms.append([pperm.name, pperm.codename])
+		glob_perms.append([pperm.name, 'youpi.' + pperm.codename])
 
 	menu_id = 'preferences'
 	return render_to_response('preferences.html', {	
@@ -213,6 +213,10 @@ def cart_view(request):
 @profile
 def processing(request):
 	menu_id = 'processing'
+	# Add info for can_use_plugin_* permissions
+	for p in manager.plugins:
+		p.accessGranted = request.user.has_perm('youpi.can_use_plugin_' + p.id)
+
 	return render_to_response('processing.html', { 	
 						'plugins' 			: manager.plugins,
 						'processing_output' : settings.PROCESSING_OUTPUT,
@@ -326,6 +330,9 @@ def render_plugin(request, pluginId):
 		plugin = manager.getPluginByName(pluginId)
 	except PluginManagerError, msg:
 		return HttpResponseNotFound("Error: %s" % msg)
+
+	if not request.user.has_perm('youpi.can_use_plugin_' + pluginId):
+		return HttpResponseForbidden("Sorry, you don't have permission to use the %s plugin" % plugin.description)
 
 	menu_id = 'processing'
 	return render_to_response('processing_plugin.html', { 	

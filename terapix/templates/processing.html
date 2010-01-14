@@ -20,7 +20,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 function build_menu(colCount) {
 	var plugin_data = new Array();
 {% for plugin in plugins %}
-	plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description }}', '{{ plugin.optionLabel }}'];
+plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description }}', '{{ plugin.optionLabel }}', {% if plugin.accessGranted %}true{% else %}false{% endif %}];
 {% endfor %}
 
 	var container = $('plugin_menu_div');
@@ -32,6 +32,10 @@ function build_menu(colCount) {
 	tab.insert(tr);
 
 	plugin_data.each(function(plugin) {
+		if (!plugin[3]) {
+			// Plugin access not granted
+			return;
+		}
 		if (i >= colCount) {
 			tr = new Element('tr');
 			tab.insert(tr);
