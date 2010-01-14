@@ -28,6 +28,7 @@ plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description
 
 	var tr, td, pdiv, tdiv;
 	var i = 0;
+	var granted = 0;
 	tr = new Element('tr');
 	tab.insert(tr);
 
@@ -36,6 +37,7 @@ plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description
 			// Plugin access not granted
 			return;
 		}
+		granted++;
 		if (i >= colCount) {
 			tr = new Element('tr');
 			tab.insert(tr);
@@ -62,7 +64,12 @@ plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description
 		tr.insert(td);
 		i++;
 	});
-	container.insert(tab);
+	if(!granted) {
+		var d = new Element('div').addClassName('perm_not_granted').update("Sorry, you don't have permission to do any processing");
+		container.update(d);
+	}	
+	else
+		container.insert(tab);
 }
 </script>
 {% endblock %}
