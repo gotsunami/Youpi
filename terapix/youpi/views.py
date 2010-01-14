@@ -124,6 +124,10 @@ def preferences(request):
 		['Can generate reports', 					'youpi.can_use_reporting'],
 		['Can run a software version check', 		'youpi.can_run_softvc'],
 	]
+	# Adds can_use_plugin_* permissions, generated on-the-fly by the checksetup script
+	perms = Permission.objects.filter(codename__startswith = 'can_use_plugin_')
+	for pperm in perms:
+		glob_perms.append([pperm.name, pperm.codename])
 
 	menu_id = 'preferences'
 	return render_to_response('preferences.html', {	

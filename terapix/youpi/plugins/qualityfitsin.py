@@ -50,7 +50,7 @@ class QualityFitsIn(ProcessingPlugin):
 		#
 		self.id = 'fitsin'
 		self.optionLabel = 'First Quality Evaluation'
-		self.description = 'QualityFits-In processing'
+		self.description = 'QualityFits'
 		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'QF'

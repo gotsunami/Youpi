@@ -19,7 +19,7 @@ if '..' not in sys.path:
 
 try:
 	from django.conf import settings
-	from django.contrib.auth.models import User
+	from django.contrib.auth.models import User, Permission
 	from django.db.models import Q
 	from django.db import IntegrityError
 	#
@@ -326,6 +326,25 @@ def setup_icons():
 					logger.log("Plugin '%s': no suitable icon found in %s, adding one..." % (plugin.id, res))
 					shutil.copy(os.path.join(settings.MEDIA_ROOT, 'themes', 'default', 'img', res, 'plugin.png'), dst)
 
+def check_plugin_permissions():
+	"""
+	Add custom can_use_plugin_* permissions for registered plugins
+	"""
+	logger.endGroup()
+	logger.setGroup('permissions', 'check custom permissions for registered plugins')
+	# Get permission content_type from existing can_submit_jobs permission
+	p = Permission.objects.filter(codename = 'can_submit_jobs')[0]
+	ct = p.content_type
+	for plugin in manager.plugins:
+		perm_name = 'can_use_plugin_' + plugin.id
+		p = Permission.objects.filter(codename = perm_name)
+		if p:
+			logger.log("Permission %s found" % perm_name)
+		else:
+			np = Permission(name = ("Can use %s plugin" % plugin.description)[:50], content_type = ct, codename = perm_name)
+			np.save()
+			logger.log("Added %s permission" % perm_name)
+
 def setup():
 	setup_users()
 	setup_db()
@@ -335,6 +354,7 @@ def setup():
 	check_local_conf()
 	setup_tmp_media()
 	setup_icons()
+	check_plugin_permissions()
 
 def run():
 	global logger 
