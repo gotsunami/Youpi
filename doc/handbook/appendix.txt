@@ -19,16 +19,18 @@ Version 0.6
 **Improvements**:
 
 - Added support for generic FITS image ingestion using translation tables
-- Added several user permissions in order to be able to define more restrictive accounts
+- Added `several global permissions`_ in order to be able to define more restrictive user accounts 
 - QualityFITS plugin: added an option to force exiting a QFits job immediately if the flat image 
-  is missing
-- Current user permissions are available on the 'Preferences' page
-- Added a keyboard shortcut for accessing the grading page
+  is missing 
+- Current user permissions are available on the 'Preferences' page 
+- Added a keyboard shortcut for accessing the grading page 
 - New path tool script useful to display/alter important stored (DB) data paths 
 
 **Bug fixes**:
 
-- Results page: fixed the 'already graded images' counter's value
+- Results page: fixed the 'already graded images' counter's value 
+
+.. _several global permissions: http://youpi.terapix.fr/docmat/commontasks.html#changing-permissions
 
 **Release Notes**:
 
@@ -54,32 +56,19 @@ Version 0.5.2
 
 **Improvements**:
 
-- Check setup script: handles database schema updates automatically (`621`_); now handles default condor setup parameters (`680`_)
-- Core API related to Condor cluster management greatly improved (`651`_, `653`_, `654`_, `655`_)
-- Monitoring Condor jobs from the "Active Monitoring" page is much faster (`654`_)
+- Check setup script: handles database schema updates automatically; now handles default condor setup parameters 
+- Core API related to Condor cluster management greatly improved 
+- Monitoring Condor jobs from the "Active Monitoring" page is much faster 
 - Plugin manager OOP design improved
-- Removed all parts related to preingestion step (no more needed) (`622`_)
+- Removed all parts related to preingestion step (no more needed) 
 
 **Bug fixes**:
 
-- Fixed processing cart issues (session related) (`620`_)
-- Fixed the "Software version check" feature (`641`_)
-- Swarp plugin: fixed final stack ingestion issues; fixed bug preventing swarp item cluster submission (`667`_)
-- Sextractor plugin: fixed bad weight image name in dual image mode; fixed a data path issue (`669`_)
-- All plugins: fixed bad XSL stylesheet URI handling (`678`_)
-
-.. _620: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/c58f073194b3
-.. _621: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/100fdf85f9be
-.. _622: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/c0a131324fb0
-.. _641: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/cbe545487bc1
-.. _651: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/dbeff3586116
-.. _653: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/4f70c2c0f8d5
-.. _654: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/2b67655bf0bd
-.. _655: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/6fe8598e41db
-.. _667: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/bc526fafb9e2
-.. _669: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/8e28a03a586a
-.. _678: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/298a3821d8ee
-.. _680: https://youpi.terapix.fr/mercurial/youpi/trunk/rev/2d601bee86d6
+- Fixed processing cart issues (session related)
+- Fixed the "Software version check" feature
+- Swarp plugin: fixed final stack ingestion issues; fixed bug preventing swarp item cluster submission
+- Sextractor plugin: fixed bad weight image name in dual image mode; fixed a data path issue
+- All plugins: fixed bad XSL stylesheet URI handling
 
 **Release Notes**:
 
