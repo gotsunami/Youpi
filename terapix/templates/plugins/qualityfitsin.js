@@ -583,7 +583,7 @@ var {{ plugin.id }} = {
 			tr = new Element('tr');
 			td = new Element('td');
 		{% if not perms.youpi.can_grade %}
-			var pgd = new Element('div').setStyle({width: '180px'}).addClassName('warning');
+			var pgd = new Element('div').addClassName('perm_not_granted');
 			td.insert(pgd.update("You don't have permission to grade qualityFITSed images."));
 		{% endif %}
 			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').setStyle({width: '-moz-fit-content'}).update('<u>G</u>rade it now!');
