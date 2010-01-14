@@ -7,10 +7,75 @@ Managing Users And Groups
 
 *TBW*
 
-Changing User Permissions
-=========================
+Changing Permissions
+====================
 
-*TBW*
+.. versionadded:: 0.6
+
+Global permissions can be set for restricting user accounts. They apply for both groups and
+users. Changing user or group permissions requires to log in to the administration interface, 
+available from the login page by following the "Access the administration interface" link. Only 
+user accounts with the ``Staff status`` permission are allowed to log into the admin site.
+
+Once logged on the admin site, select a group or user from the ``Auth`` section on the page then 
+scroll down to the ``Permissions`` subsection. All permissions are available as a multi-selection 
+list. Some of them are internally defined by Django and *are not used* by Youpi (selecting them would 
+have no effect).
+
+Here is the list of supported permissions in Youpi. Select any of the following to grant 
+permission:
+
+**Add tags**
+	Select the ``youpi | Tags | Can add Tags`` entry in order to allow users adding their own 
+	image tags. Note that this permission is for creating tags only. Owners of already existing tags 
+	but without this permission will be able to update or delete them.
+
+**Submit jobs on the cluster**
+	Select the ``youpi | site profile | Can submit jobs on the cluster`` entry to allow users submitting
+	jobs on the cluster. This permission is required in order to submit jobs from the processing cart and 
+	in order to run ingestions (because ingestions are submitted as cluster jobs too).
+
+**View ingestion logs**
+	Select the ``youpi | site profile | Can view ingestion logs`` entry to allow users viewing ingestion 
+	logs from the ingestion page. They are produced at the end of every ingestion and may contain information 
+	that you want to keep private.
+
+**Monitor running jobs on the cluster**
+	Select the ``youpi | site profile | Can monitor running jobs on the cluster`` entry to allow users 
+	monitoring jobs submitted by Youpi to the cluster.
+
+**View processing results**
+	Select the ``youpi | site profile | Can view processing results`` entry to allow users to display 
+	processing results from the ``Results`` page.
+
+**Generate reports**
+	Select the ``youpi | site profile | Can generate reports`` entry to allow users generating reports 
+	from the ``Reporting`` page.
+
+**Run a software version check**
+	Select the ``youpi | site profile | Can run a software version check`` entry to allow users running
+	software version checks from the ``Active Monitoring`` page. Note that version checks expose all 
+	software versions of low-level tools used by Youpi on the cluster.
+
+**Use the QualityFits plugin**
+	Select the ``youpi | site profile | Can use QualityFits plugin`` entry to allow users using the 
+	QualityFITS plugin. If granted, the plugin icon will appear on the ``Processing`` page.
+
+**Use the Scamp plugin**
+	Select the ``youpi | site profile | Can use Scamp plugin`` entry to allow users using the 
+	Scamp plugin. If granted, the plugin icon will appear on the ``Processing`` page.
+
+**Use the Sextractor plugin**
+	Select the ``youpi | site profile | Can use Sextractor plugin`` entry to allow users using the 
+	Sextractor plugin. If granted, the plugin icon will appear on the ``Processing`` page.
+
+**Use the Swarp plugin**
+	Select the ``youpi | site profile | Can use Swarp plugin`` entry to allow users using the 
+	Swarp plugin. If granted, the plugin icon will appear on the ``Processing`` page.
+
+**Use the Skeleton processing plugin**
+	Select the ``youpi | site profile | Can use Skeleton DEMO processing plugin`` entry to allow users 
+	using the Skeleton plugin. If granted, the plugin icon will appear on the ``Processing`` page.
 
 Database Backup
 ===============
