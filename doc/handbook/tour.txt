@@ -1,20 +1,17 @@
-***********
-Using Youpi
-***********
+******************************
+Guided Tour of Functionalities
+******************************
+
 The Youpi web interface is splitted in tabs. Each tab corresponds to a specific
 task and, this section, will describe the functionnality related to the tab header.
 
 Before diving into Youpi, let's first introduce to the basic functionnalities of
 the pipeline.
 
-
-Guided Tour of Functionalities
-==============================
-
 .. _ingestion_section:
 
 Generic FITS Image Ingestion
-----------------------------
+============================
 
 .. versionadded:: 0.6
 
@@ -207,9 +204,8 @@ A set of options is proposed to add a fine-grain control during ingestion:
 It adds more flexibility for searching, classifying, sorting operations which are needed 
 during the image lifetime and through the pipeline.
 
-
 Deal With Condor Setup
-----------------------
+======================
 
 .. image:: /figures/condor.png
    :width: 800
@@ -246,7 +242,7 @@ There are 2 different ways to dispatch resources from this interface:
 
 
 Preferences Setup
------------------
+=================
 
 .. image:: /figures/preferences.png
    :width: 800
@@ -277,7 +273,7 @@ preferences for processing data, manage his style themes and define his own perm
 
 
 Organize Data With Tags
------------------------
+=======================
 
 .. image:: /figures/tag.png
    :width: 800
@@ -315,7 +311,7 @@ selection.
 	order to find all images with a specific tag, for example untag a tagged selection. 
 
 Processing Data
----------------
+===============
 
 .. image:: /figures/processing.png
    :width: 800
@@ -333,7 +329,7 @@ the **image selector**.
 .. _image_selector_section:
 
 The Image Selector
-------------------
+==================
 
 An instance of the image selector is provided for each plugin under the "select images"
 tab. If you want to select all images in Youpi, observed through "i.MP9701" channel, and 
@@ -358,26 +354,23 @@ celestial sphere. You can define circles with a center and a radius and each ima
 which have his center field **in** the circle, will be selected. XML files with
 a special DTD are the means to do such selections in Youpi.
 
-Here is the DTD
+Here is the DTD::
 
-::
-
- <batch>
- 	<selection>
- 		<label>SEL1</label>
- 		<alpha>33.1</alpha>
- 		<delta>-6.3</delta>
- 		<radius>0.1</radius>
- 	</selection>
- 	<selection>
- 		<label>SEL2</label>
- 		<alpha>22.0</alpha>
- 		<delta>-6.3</delta>
- 		<radius>0.1</radius>
- 	</selection>
- 	...
- </batch>
-
+	 <batch>
+		<selection>
+			<label>SEL1</label>
+			<alpha>33.1</alpha>
+			<delta>-6.3</delta>
+			<radius>0.1</radius>
+		</selection>
+		<selection>
+			<label>SEL2</label>
+			<alpha>22.0</alpha>
+			<delta>-6.3</delta>
+			<radius>0.1</radius>
+		</selection>
+		...
+	 </batch>
 
 Alpha, delta are the circle coordinates center. Each selection node is a proper one.	
 With this other method of selection, you will have one list of as many selection nodes
@@ -391,14 +384,14 @@ the corresponding checkbox on the image selector in Batch selection.
 .. Note:: ** saved selections matching mode **
 
 Processing Data Considering Plugins
------------------------------------
+===================================
 
 Most of plugins require specific input data, as weight maps, flat maps ahead files etc.
 The select data path tab helps you inputting such files when they don't appear to be an
 output product of an other plugin, or simply at the beginning of the pipeline process.
 
 Custom configuration
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 Every plugins need a configuration file to run, and, they all have a default configuration
 file for generic processing. Youpi provides the default one for each implemented plugin.
@@ -412,24 +405,20 @@ file has been saved, select it and you can go to the next tab.
 .. _output_directory_section:
 
 Set output directory
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
-Every plugin outputs are written by default in a preseted path:
+Every plugin outputs are written by default in a preseted path::
 
-::
-
-/processing_output/user/plugin/
+	/processing_output/user/plugin/
 
 The processing output directory is defined at the first step of Youpi configuration. Then
 youpi completes this path with the Youpi's user name and the name of the plugin concerned 
-by the processing.You can add one more custom level directory in the output directory tab.
+by the processing.You can add one more custom level directory in the output directory tab::
 
-::
-
-/processing_output/user/plugin/mySpecialProcess/
+	/processing_output/user/plugin/mySpecialProcess/
 
 Input versus Output validation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------
 
 Each plugin implemented in Youpi has its own input/output data. In a pipeline context,
 output data from one could be the input of another, and every IN/OUT dependancies between
@@ -439,7 +428,7 @@ to do is click in the input data validation button to see if things are going we
 not, you might assume that previous tabs have not been fully carried or just missed.
 
 Adding to the cart
-^^^^^^^^^^^^^^^^^^
+------------------
 
 If you pass through all tabs of your plugin, it means that you are now about to add your 
 processing to the cart. By clicking on the ADD TO CART button (in the top right of the 
@@ -447,7 +436,7 @@ interface) a message will appears to confirm that. If something is wrong an erro
 will guide you to the related tab which needed to be fixed.
 
 The Processing Cart
--------------------
+===================
 
 .. image:: /figures/shopping.png
    :width: 800
@@ -471,7 +460,7 @@ condor configuration (i.e Condor Setup), or if you intend to provide a custom co
 for a specific process, it can be managed through this dropdown box.
 
 Live Monitoring of Processings
-------------------------------
+==============================
 
 .. image:: /figures/activemonitoring.png
    :width: 800
@@ -484,9 +473,8 @@ assuming that you give data permissions to your team, they could do the same.The
 for live monitoring is decomposed in pages referencing 10 running jobs per pages (pages are
 represented by the top red numbers above jobs).
 
-
 Processing Results
-------------------
+==================
 
 .. image:: /figures/results.png
    :width: 800
@@ -500,18 +488,19 @@ on click on the desired result. Results in red are the one which failed, green a
 Once you click on the results you want to display, you can see a full description of it in the
 right panel. For every plugins some of element results are the same:
  
- - Images, as produced png files from the processing, can be viewed by clicking on their displayed thumb version
- - permissions that have been defined for this processing
- - A set of Condor LOG files(output log, main log, error log) are available in one click
- - the running parameters and the related configuration file you set to launch the job are viewable(dropdown box)
- - the plugin output information
+- Images, as produced png files from the processing, can be viewed by clicking on their displayed thumb version
+- permissions that have been defined for this processing
+- A set of Condor LOG files(output log, main log, error log) are available in one click
+- the running parameters and the related configuration file you set to launch the job are viewable(dropdown box)
+- the plugin output information
 
 The second part is the *statistics* tab and permit, by browsing your related output directory
 processing, to resume processing images status. It is a quick way to know if 100% of your images
 group has been successfully processed.
 
 Generating Reports
-------------------
+==================
+
 .. image:: /figures/reporting.png
    :width: 800
    :scale: 90
@@ -521,152 +510,3 @@ means that, at anytime, youpi could generate from your account, global or very s
 The reports engine works with a graphic library, and can generate statistic images including
 histogramms, plots and many others features that could enhance graphically your data results
 from the pipeline.
-
-Cookbook
-========
-
-If you want to have an instant use of Youpi, please follow those steps.
-
-How do I put my images inside of Youpi, before processing them?
----------------------------------------------------------------
-
-In order to let Youpi handling your FITS images, the first thing you have 
-to do is to indicate Youpi the location of your images in the cluster, this is 
-the ingestion.
-
-Go to the ingestion tab and click on the "run ingestion" tab 
-
-**1. In the Cluster Path Browser box:**
-
-- Deploy the Network Filesystem by clicking on the "plus" icon
-- Browse directories until reaching your FITS images location(the number between 
-  brackets is a FITS images count)
-- Select single or multiple paths by clicking on the directories of FITS 
-  images (selected paths will be added on the box under the filesystem browser)
-
-.. Note:: Ability to delete wrong selected path by clicking on the left red cross
- or the "clear selection" button
-
-**2. In the Ingestion parameters and options box:**
-
-- Labelize the future ingestion with identification string or number 
-
-It permits to find all images ingested under this ingestion ID, for example, for 
-later processing use or sorting issue (See the "How do i process my images?" section)
-
-- Pay attention to the options 
-
-You may want to flag your images as good or bad on the fly of the ingestion. 
-Then choose "validated" or "observed".
-
-There are two others options:
-
-- Checking the FITS data integrity of images
-- As images are unique by there name, calculating checksum make them unique also by 
-  content.
-
-**3. Run ingestions from the selected paths box:**
-
-If you agree with your paths to images in this box you can press the "run ingestions" 
-button.
-
-
-.. note:: To have more informations on ingestion under Youpi, see :ref:`ingestion_section`
-
-
-How do I process my images with Youpi?
---------------------------------------
-
-Of course it depends of the kind of processing you want to apply to images, but for 
-all processing kind available in Youpi, the following instructions are the same.
-
-Go to the processing tab of the interface and all available processing kinds will be 
-listed (understand them as "plugins" of Youpi).
-
-After clicking on your choosen plugin, and assuming that you are aware of how they 
-globally work (in term of command line use), you have to browse the red tabs (under the 
-processing tab) from the leftest to the rightest by completing each one with your 
-parameters (those you'd use in a command line context).
-In fact, let's say roughly that each option of your command line corresponds to a plugin tab!
-
-.. image:: /figures/browsing_tabs.png
-
-* **Select images**
-
-First step of the configuration process, it permits to choose images that have been ingested
-according to section above.
-
-For example, you'd use images from ingestion with a given ingestion ID (See the "How do i put
-my images inside Youpi" section), you just have to select the ingestion ID field in the select
-box and you will see your ingestion ID label.
-
-Click on the "**Find** images" button to see them appearing. All selected images (see or change
-the check box state of the image) will be those which will be processed.
-
-.. note:: Many others fields could be used to sort and select images, develop the select box to
- see them.
-  
-* **Select data paths**
-
-As the cluster path browser box used during the ingestion, the path selector has the same goal: 
-browse the whole cluster to target your data, and, include them as input data. Once a path 
-is clicked, it is set in the "select path" box. Click on the desired button to assign to the right
-type of data and. Once it's done, select it in the select box of the concerned type.
-
-.. warning:: understand that you don't target the file itself, you 've just permit to look inside a path
- and Youpi will match for the right name based on differents conventions:
-
- **WEIGHT** : 0123456789.fits will be processed with the 0123456789_weight.fits weight file, contained
- in the path you have choosen through this tab.
-
- **AHEAD** : 0123456789.fits needs the 0123456789.ahead file contained in the path you have choosen.
-
- **FLAT & MASK** : the name of the right flat and mask to use for processing, is contained in the header 
- of 0123456789.fits. Youpi will match the flat and mask header's name with files contained in your choosen
- path.
-
-
-* **Select a configuration file**
-
-If configuration files for such softwares as SCamp, Sextractor, etc ... have no secrets for you, you can:
-
-- Use the default one, provided by the soft (choose default file in the select box).
-
-- Edit the default to design your own configuration file and save it in the database for later use.
-
-- Import several configuration files to match by selection names from image selector (see :ref:`image_selector_section`).
-
-
-* **Set output directory**
-
-Every plugins(kind of processing) running under Youpi, create output data. You can 
-decide to store output data in the output directory of your choice (see :ref:`output_directory_section`).
-
-.. warning:: For now, Youpi allows only creation of one level depth directory.
- 
-* **Add to cart and run processing tasks**
-
-Complete the configuration of processing by pressing the "add to cart" button. Go to 
-the "processing cart" tab, in the top right of the interface, to see your own processing 
-tasks added. Press the "run" button to launch your processing tasks on the cluster.
-
-Ho do I check status of my processings tasks (jobs) on the cluster?
--------------------------------------------------------------------
-
-Go to the left tabs menu and press the "Active Monitoring" tab. Youpi displays all jobs 
-running on the cluster. A status is provided for each job and killing jobs is enabled 
-if they are yours.
-
-
-How do I check results from processing ?
-----------------------------------------
-
-Go to the left tabs menu and press the "Results" tab. Select the owner and the kind of
-processings you want to display, by completing criterias in the "processing history"
-panel, on the left. You can even search for the processed image name in the funnel text box.
-Click on the "start searching" button.
-
-After filtering your results by criterias, processings tasks are displayed as vertical 
-scrollbar list. Click on the box, relative to your expected image processing result, and 
-the result of the processed image will appear.
-
