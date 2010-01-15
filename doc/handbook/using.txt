@@ -18,17 +18,136 @@ Generic FITS Image Ingestion
 
 .. versionadded:: 0.6
 
+Ingesting images is a required step before being able to process FITS images within 
+Youpi. During ingestion, Youpi reads information in the FITS header and store (ingest) 
+part of the data into the database. Along with those FITS keywords, important information 
+such as filename, image path or md5 checksum is saved to the database. This way, further 
+image processing with Youpi will use data stored at ingestion step.
+
+Youpi supports generic FITS image ingestion through its *ingestion translation table* (ITT) 
+feature. Means that almost any FITS image can be ingested as long as you provide a special 
+translation table which is a specific ingestion configuration file.
+
+For the moment, the Youpi software package is bundled with 3 predefined ITTs that allow 
+ingestion of FITS images from the MEGACAM, WIRCAM and VIRCAM instruments. Other intruments 
+can be supported as well by defining an ITT that tells Youpi which FITS keyword it should 
+look for in the FITS image header during ingestion. 
+
+**ITT File Format**
+	The ingestion translation table is a plain text file. Lines starting with an "``#``" 
+	will be treated as comments; blank lines are ignored. Every line of data must be a list 
+	of 2 or 3 semicolon-separated fields of the form::
+
+		Youpi keyword; Keyword mapping in source image[; keyword mapping for .ahead]
+
+	*Youpi Keyword*
+		The first column is an *internal* keyword required by Youpi and always starts with an 
+		"Y". During ingestion, Youpi will look for this keyword to *identify data* read in the 
+		source image's header by using the second column's value. The ingestion process will fail 
+		if you modify or remove Youpi keywords in the first column.
+
+	*Source Image Keyword Mapping*
+		The second column must be an uppercase FITS header keyword, as defined in the source image 
+		header you plan to ingest. If you don't want to use a FITS keyword but want to provide a 
+		static value, define a custom string value encapsulated by double quotes.
+		The current keyword value will be read in the FITS header and linked to the internal Youpi 
+		keyword defined in the first column.
+
+	*Keyword Mapping for .ahead*
+		The third (optional) column must be an uppercase FITS header keyword that will be used to 
+		generate ``.ahead`` files. Use it if you want to map a source image FITS keyword to another 
+		keyword name. Generated ``.ahead`` files will be passed to all low-level tools during processing.
+
+**Translation Table for MEGACAM**
+	Here is the ``megacam.conf`` file that adds support for MEGACAM image ingestion (and processing) 
+	into Youpi::
+
+		#--------- Youpi Parameters for MEGACAM Instrument ------------
+
+		YRUN;         RUNID
+		YINSTRUMENT;  DETECTOR
+		YTELESCOP;    TELESCOP
+		YDETECTOR;    DETECTOR
+		YOBJECT;      OBJECT
+		YAIRMASS;     AIRMASS
+		YEXPTIME;     EXPTIME
+		YDATEOBS;     DATE-OBS
+		YEQUINOX;     EQUINOX
+		YFILTER;      FILTER
+		YFLAT;        IMRED_FF
+		YMASK;        IMRED_MK
+		YRA;          RA_DEG
+		YDEC;         DEC_DEG
+
+	This config file is rather simple. There is no third column because those header keywords 
+	are supported by all Terapix software packages. We don't need any keyword remapping since 
+	Youpi don't need to generate any .ahead file.
+
+**Translation Table for WIRCAM**
+	Here is the ``wircam.conf`` file that adds support for WIRCAM image ingestion (and processing) 
+	into Youpi. It's almost the same as the ``megacam.conf`` file except for the ``YFLAT`` and ``YMASK`` 
+	source keyword mappings (second column) that will force Youpi to take the values from the ``FLATNAME`` 
+	and ``BPIXNAME`` FITS keywords, respectively::
+
+		#--------- Youpi Parameters for WIRCAM Instrument ------------
+
+		YRUN;         RUNID
+		YINSTRUMENT;  DETECTOR
+		YTELESCOP;    TELESCOP
+		YDETECTOR;    DETECTOR
+		YOBJECT;      OBJECT
+		YAIRMASS;     AIRMASS
+		YEXPTIME;     EXPTIME
+		YDATEOBS;     DATE-OBS
+		YEQUINOX;     EQUINOX
+		YFILTER;      FILTER
+		YFLAT;        FLATNAME
+		YMASK;        BPIXNAME
+		YRA;          RA_DEG
+		YDEC;         DEC_DEG
+
+**Translation Table for VIRCAM**
+	Now, let's have a look at the ``vircam.conf`` config file for supporting the VISTA instrument::
+
+		#--------- Youpi Parameters for VIRCAM Instrument ------------
+
+		YRUN;        HIERARCH ESO OBS PROG ID;      RUNID
+		YINSTRUMENT; "VISTA";                       INSTRUMENT
+		YTELESCOP;   TELESCOP
+		YDETECTOR;   "VISTA";                       DETECTOR
+		YOBJECT;     OBJECT
+		YAIRMASS;    HIERARCH ESO TEL AIRM START;   AIRMASS
+		YEXPTIME;    EXPTIME
+		YDATEOBS;    DATE-OBS
+		YEQUINOX;    EQUINOX
+		YFILTER;     HIERARCH ESO INS FILT1 NAME;   FILTER
+		YFLAT;       "flat.fits";                   IMRED_FF
+		YMASK;       "badpix.fits";                 IMRED_MK
+		YRA;         RA;                            RA_DEG
+		YDEC;        DEC;                           DEC_DEG
+
+	With this config file, Youpi is able to read the ESO FITS keywords in VISTA images (using the 
+	2nd column). The keyword mapping provided in the third column allows Youpi to generate ``.ahead`` 
+	files compatible with the low-level tools used for image processing.
+
+**Adding a new ITT file**
+	If you want to add support for a different FITS format header, just edit a new ITT file and save 
+	it under ``<instrument_name>.conf`` in the ``$YOUPI_INSTALL_DIR/terapix/lib/itt/conf/`` directory. 
+	Now run the ``checksetup`` command::
+
+		$ python manage.py checksetup
+
+	from the ``$YOUPI_INSTALL_DIR/terapix`` directory. Youpi will find your configuration file and 
+	update the database accordingly. That's it, the ITT config should be available in Youpi from the 
+	ingestion page.
+
 .. image:: /figures/ingestion.png
    :width: 800
    :scale: 90
 
-A FITS image is the most important entity in youpi.
-The ingestion process make your images their first entries in the pipeline.
- 
 Once your cluster path is defined in your configuration files, you can easily 
 browse your cluster to find out which directories contain FITS images from the 
 cluster path browser.
- 
 
 It is a real time tree view of your cluster architecture.
 Powerful and user friendly, here is a graphical way to navigate through folders and 
