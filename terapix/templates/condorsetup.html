@@ -90,7 +90,16 @@ function show_save_current_selection() {
 						resulting node selection will depend on the cluster's real-time status.</div> 
 						<div id="saved_pol_div" style="margin-bottom: 10px;"></div>	
 						<div id="policy_div"></div>						
-						
+					{% if not perms.youpi.add_condornodesel %}
+						<div class="perm_not_granted" style="margin-top: 10px;">
+							<label>You don't have permission to <i>add or edit</i> custom policies or selections</label>
+						</div>
+					{% endif %}
+					{% if not perms.youpi.delete_condornodesel %}
+						<div class="perm_not_granted" style="margin-top: 3px;">
+							<label>You don't have permission to <i>delete</i> custom policies or selections</label>
+						</div>
+					{% endif %}
 						<h1 style="margin-top: 20px; border-bottom: 1px solid lightgray; padding-bottom: 7px; margin-bottom: 20px; white-space: nowrap;">
 						Custom selections</h1>
 						<div class="tip" style="width: 80%;">Custom selections are made of <b>static nodes</b> selected among the available nodes showed in the 

@@ -357,12 +357,15 @@ function CondorPanel(container_id, varName) {
 		var c = confirm("Are you sure you want to delete the '" + name + "' selection?");
 		if (!c) return;
 
+		var cont = $(_instance_name + '_selection_log_div');
+
 		var r = new HttpRequest(
-			null,
+			cont,
 			null,	
 			function(resp) {
 				if (resp['Error']) {
-					var log = new Logger(document.getElementById(_instance_name + '_selection_log_div'));
+					cont.update();
+					var log = new Logger(cont);
 					log.msg_error(resp['Error']);
 					return;
 				}
@@ -375,6 +378,7 @@ function CondorPanel(container_id, varName) {
 			}
 		);
 		var post = 'Label=' + name;
+		r.setBusyMsg('Deleting selection');
 		r.send('/youpi/cluster/delCondorNodeSelection/', post);
 	}
 
@@ -391,12 +395,15 @@ function CondorPanel(container_id, varName) {
 		var c = confirm("Are you sure you want to delete the '" + name + "' policy?");
 		if (!c) return;
 
+		var cont = $(_instance_name + '_policy_log_div');
+
 		var r = new HttpRequest(
-			null,
+			cont,
 			null,	
 			function(resp) {
 				if (resp['Error']) {
-					var log = new Logger(document.getElementById(_instance_name + '_policy_log_div'));
+					cont.update();
+					var log = new Logger(cont);
 					log.msg_error(resp['Error']);
 					return;
 				}
@@ -409,6 +416,7 @@ function CondorPanel(container_id, varName) {
 			}
 		);
 		var post = 'Label=' + name;
+		r.setBusyMsg('Deleting policy');
 		r.send('/youpi/cluster/delCondorPolicy/', post);
 	}
 

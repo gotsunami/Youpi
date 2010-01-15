@@ -324,7 +324,7 @@ function ClusterPolicyWidget(container, varName) {
 		}
 
 		var r = new HttpRequest(
-			log,
+			$(_instance_name + '_save_log_div'),
 			null,	
 			function(resp) {
 				log.clear();
