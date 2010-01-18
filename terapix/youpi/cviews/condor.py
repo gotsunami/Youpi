@@ -176,6 +176,7 @@ def task_filter(request):
 		maxPerPage = int(request.POST['Limit'])
 		# page # to return
 		targetPage = int(request.POST['Page'])
+		tags = request.POST.getlist('Tag')
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
@@ -237,6 +238,21 @@ def task_filter(request):
 	nb_suc = nb_failed = 0
 	tasksIds = [t['id'] for t in tasksIds]
 
+	# Filter by tag
+	if tasksIds and tags:
+		tasksTags = []
+		q = """
+		SELECT t.id FROM youpi_processing_task AS t, youpi_rel_it AS r, youpi_rel_tagi AS ti, youpi_tag AS tag
+		WHERE tag.name in (%s)
+		AND tag.id = ti.tag_id
+		AND ti.image_id = r.image_id
+		AND r.task_id = t.id
+		AND t.id IN (%s)
+		""" % (','.join(["'%s'" % t for t in tags]), ','.join([str(t) for t in tasksIds]))
+		cur.execute(q)
+		tres = cur.fetchall()
+		tasksIds = [r[0] for r in tres]
+		
 	plugin = manager.getPluginByName(kindid)
 
 	# Plugins can optionally filter/alter the result set
