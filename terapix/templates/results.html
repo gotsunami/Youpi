@@ -158,6 +158,9 @@ function get_stats() {
 		{# Active users only #}
 		{% ifnotequal user act_user %}p.addFromSource('{{ act_user.username }}');{% endifnotequal %}
 	{% endfor %}
+	{% for tag in tags %}
+	p.addTag('{{ tag.name }}', '{{ tag.style }}');
+	{% endfor %}
 		p.render();
 	{% endif %}
 	});

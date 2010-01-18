@@ -276,9 +276,11 @@ def results(request):
 		if t.results_output_dir not in dirs:
 			dirs.append(t.results_output_dir)
 	active_users = User.objects.filter(is_active = True)
+	tags, filtered = read_proxy(request, Tag.objects.all().order_by('name'))
 
 	menu_id = 'results'
 	return render_to_response('results.html', {	
+						'tags'				: tags,
 						'users'				: active_users,
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
