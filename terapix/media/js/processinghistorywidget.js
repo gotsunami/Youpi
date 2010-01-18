@@ -205,7 +205,7 @@ function ProcessingHistoryWidget(container) {
 			});
 			if (k == 0) opt.setAttribute('selected', 'selected');
 			opt.setAttribute('value', _pluginInfos[k][0]);
-			opt.insert(_pluginInfos[k][1] + ' processings');
+			opt.insert(_pluginInfos[k][1]);
 			sel.insert(opt);
 		}
 		form.insert(sel);
