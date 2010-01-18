@@ -168,7 +168,8 @@ def dir_stats(request):
 
 def task_filter(request):
 	try:
-		owner = request.POST['Owner']
+		# May be a list of owners
+		owner = request.POST.getlist('Owner')
 		status = request.POST['Status']
 		kindid = request.POST['Kind']
 		# Max results per page
@@ -202,20 +203,33 @@ def task_filter(request):
 	"""
 	filtered = False
 	user_id = request.user.id
+	# Deep copy
+	dupowner = [name for name in owner]
 
-	if owner == 'all':
+	if 'all' in dupowner:
 		if anyStatus: cur.execute(q % (kindid, ''))
 		else: cur.execute(q % (kindid, "AND t.success = %d" % success))
 
-	elif owner == 'my':
-		if anyStatus: cur.execute(q % (kindid, "AND t.user_id=%d" % user_id))
-		else: cur.execute(q % (kindid, "AND t.user_id=%d AND t.success = %d" % (user_id, success)))
-
-	elif owner == 'others':
+	elif 'others' in dupowner:
 		if anyStatus: cur.execute(q % (kindid, "AND t.user_id != %d" % user_id))
 		else: cur.execute(q % (kindid, "AND t.user_id != %d AND t.success = %d" % (user_id, success)))
+
 	else:
-		cur.execute(q % (kindid, ''))
+		if 'my' in dupowner: Mine = True
+		else: Mine = False
+		for name in ('all', 'my', 'others'): 
+			try: dupowner.remove(name)
+			except: pass
+		# Check for multi-selections of active user names
+		userIds = User.objects.filter(username__in = dupowner).values_list('id', flat = True)
+		userStr = ','.join([str(id) for id in userIds])
+		if Mine: 
+			if len(userStr):
+				userStr += ',' + str(user_id)
+			else:
+				userStr = str(user_id)
+		if anyStatus: cur.execute(q % (kindid, 'AND t.user_id in (%s)' % userStr))
+		else: cur.execute(q % (kindid, "AND t.user_id in (%s) AND t.success = %d" % (userStr, success)))
 			
 	res = cur.fetchall()
 	tasksIds = [{'id': r[0]} for r in res]

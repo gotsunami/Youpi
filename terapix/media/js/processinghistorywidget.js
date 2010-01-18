@@ -170,7 +170,7 @@ function ProcessingHistoryWidget(container) {
 		label.insert('Show');
 		form.insert(label);
 
-		var sel = getSelect(_id + '_owner_select', _sel_owner_options);
+		var sel = getSelect(_id + '_owner_select', _sel_owner_options, 4);
 		form.insert(sel);
 
 		sel = getSelect(_id + '_status_select', _sel_status_options);
@@ -285,7 +285,10 @@ function ProcessingHistoryWidget(container) {
 		if (!pageNum || typeof pageNum != 'number')
 			pageNum = 1;
 	
-		var owner = ownerSel.options[ownerSel.selectedIndex].text;
+		var owner = new Array();
+	  	$A(ownerSel.options).each(function(opt) {
+			if (opt.selected) owner.push(opt.text);
+		});
 		var status = statusSel.options[statusSel.selectedIndex].text;
 		var kind = kindSel.options[kindSel.selectedIndex].value;
 	
@@ -471,6 +474,20 @@ function ProcessingHistoryWidget(container) {
 	 */ 
 	this.applyFilter = function(pageNum) {
 		_applyFilter(pageNum);
+	}
+
+	/*
+	 * Function: addFromSource
+	 * Add a 'from' source in the _sel_owner_options array
+	 *
+	 * Parameters:
+	 *  name - string: name to add
+	 *
+	 */ 
+	this.addFromSource = function(name) {
+		if (typeof name != 'string')
+			throw 'Name must be a string!'
+		_sel_owner_options.push(name);
 	}
 
 	/*

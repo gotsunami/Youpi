@@ -275,9 +275,11 @@ def results(request):
 	for t in ts:
 		if t.results_output_dir not in dirs:
 			dirs.append(t.results_output_dir)
+	active_users = User.objects.filter(is_active = True)
 
 	menu_id = 'results'
 	return render_to_response('results.html', {	
+						'users'				: active_users,
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
 						'outputDirs' 		: dirs,
