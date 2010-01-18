@@ -171,7 +171,6 @@ def task_filter(request):
 		owner = request.POST['Owner']
 		status = request.POST['Status']
 		kindid = request.POST['Kind']
-		filterText = request.POST['FilterText'].strip().lower()
 		# Max results per page
 		maxPerPage = int(request.POST['Limit'])
 		# page # to return
@@ -222,26 +221,7 @@ def task_filter(request):
 	tasksIds = [{'id': r[0]} for r in res]
 	res = []
 	nb_suc = nb_failed = 0
-	if filterText:
-		keepIds = []
-		for t in tasksIds:
-			rels = Rel_it.objects.filter(task__id = t['id'])
-			for r in rels:
-				if r.image.name.find(filterText) >= 0:
-					keepIds.append(t['id'])
-
-#			if (t.user.username.lower().find(filterText) >= 0 or
-#				t.user.first_name.lower().find(filterText) >= 0 or
-#				t.user.last_name.lower().find(filterText) >= 0 or
-#				t.kind.name.lower().find(filterText) >= 0 or
-#				t.hostname.lower().find(filterText) >= 0 or
-#				t.title.lower().find(filterText) >= 0 or
-#				("%s" % t.start_date).find(filterText) >= 0 or
-#				("%s" % t.end_date).find(filterText) >= 0):
-
-		tasksIds = keepIds
-	else:
-		tasksIds = [t['id'] for t in tasksIds]
+	tasksIds = [t['id'] for t in tasksIds]
 
 	plugin = manager.getPluginByName(kindid)
 

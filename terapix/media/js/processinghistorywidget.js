@@ -164,23 +164,7 @@ function ProcessingHistoryWidget(container) {
 		rtd.setAttribute('nowrap', 'nowrap');
 		rtd.setAttribute('colspan', '2');
 		var form = new Element('form', {id: _id + '_search_form'});
-		form.observe('submit', function(event) {
-			console.log('toto');
-			return true;
-		});
 		rtd.insert(form);
-
-		img = new Element('img');
-		img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/filter.png');
-		form.insert(img);
-		var input = new Element('input', {
-			id: _id + '_filter_text', 
-			type: 'text', 
-			title: 'Press Enter to filter tasks', 
-			size: '40'
-		});
-		form.insert(input);
-		form.insert(new Element('br'));
 
 		var label = new Element('label');
 		label.insert('Show');
@@ -221,7 +205,6 @@ function ProcessingHistoryWidget(container) {
 		var rbut = new Element('input', {type: 'button', value: 'Reset'});
 		rbut.observe('click', function(event) {
 			$(_id + '_search_form').reset();
-			$(_id + '_filter_text').focus();
 			_onKindChange($(_id + '_kind_select'));
 		});
 		bdiv.insert(rbut);
@@ -260,9 +243,6 @@ function ProcessingHistoryWidget(container) {
 
 		_container.insert(tab);
 		_onKindChange(sel);
-
-		// Set focus
-		$(_id + '_filter_text').focus();
 	}
 
 	function _onKindChange(sel) {
@@ -300,7 +280,6 @@ function ProcessingHistoryWidget(container) {
 			var ownerSel = $(_id + '_owner_select');
 			var statusSel = $(_id + '_status_select');
 			var kindSel = $(_id + '_kind_select');
-			var filter = $(_id + '_filter_text');
 		} catch(e) { return false; }
 
 		if (!pageNum || typeof pageNum != 'number')
@@ -309,7 +288,6 @@ function ProcessingHistoryWidget(container) {
 		var owner = ownerSel.options[ownerSel.selectedIndex].text;
 		var status = statusSel.options[statusSel.selectedIndex].text;
 		var kind = kindSel.options[kindSel.selectedIndex].value;
-		var filterText = filter.value;
 	
 		var container = $(_id + '_tasks_div');
 		var xhr = new HttpRequest(
@@ -456,10 +434,8 @@ function ProcessingHistoryWidget(container) {
 					stab.insert(str);
 					d.insert(stab);
 					tr.insert(td);
-	
 					tab.insert(tr);
 				}
-	
 				container.insert(tab);
 			}
 		);
@@ -470,8 +446,7 @@ function ProcessingHistoryWidget(container) {
 			Status: status, 
 			Kind: kind,
 			Limit: _maxPerPage,
-			Page: pageNum,
-			FilterText: filterText
+			Page: pageNum
 		});
 
 		// Add POST data info related to custom plugin search criteria, if any
