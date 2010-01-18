@@ -303,9 +303,11 @@ function ProcessingHistoryWidget(container) {
 
 		var tags = new Array();
 		var tagSel = $(_id + '_tags_select');
-	  	$A(tagSel.options).each(function(opt) {
-			if (opt.selected) tags.push(opt.text);
-		});
+		if (tagSel) {
+			$A(tagSel.options).each(function(opt) {
+				if (opt.selected) tags.push(opt.text);
+			});
+		}
 
 		var status = statusSel.options[statusSel.selectedIndex].text;
 		var kind = kindSel.options[kindSel.selectedIndex].value;
