@@ -240,17 +240,23 @@ def task_filter(request):
 
 	# Filter by tag
 	if tasksIds and tags:
-		tasksTags = []
-		q = """
-		SELECT t.id FROM youpi_processing_task AS t, youpi_rel_it AS r, youpi_rel_tagi AS ti, youpi_tag AS tag
-		WHERE tag.name in (%s)
-		AND tag.id = ti.tag_id
-		AND ti.image_id = r.image_id
-		AND r.task_id = t.id
-		AND t.id IN (%s)
-		""" % (','.join(["'%s'" % t for t in tags]), ','.join([str(t) for t in tasksIds]))
-		cur.execute(q)
-		tres = cur.fetchall()
+		tasksTags = tasksIds
+		for t in tags:
+			q = """
+			SELECT t.id FROM youpi_processing_task AS t, youpi_rel_it AS r, youpi_rel_tagi AS ti, youpi_tag AS tag
+			WHERE tag.name='%s'
+			AND tag.id = ti.tag_id
+			AND ti.image_id = r.image_id
+			AND r.task_id = t.id
+			AND t.id IN (%s)
+			""" % (t, ','.join([str(t) for t in tasksTags]))
+			cur.execute(q)
+			tres = cur.fetchall()
+			if tres:
+				tasksTags = [r[0] for r in tres]
+			else:
+				tasksIds = []
+				break
 		tasksIds = [r[0] for r in tres]
 		
 	plugin = manager.getPluginByName(kindid)
@@ -301,6 +307,7 @@ def task_filter(request):
 		res.append(tdata)
 
 	resp = {
+		'q' : q,
 		'filtered' : filtered,
 		'results' : res, 
 		'Stats' : {	
