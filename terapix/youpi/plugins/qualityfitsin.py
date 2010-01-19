@@ -369,7 +369,8 @@ class QualityFitsIn(ProcessingPlugin):
 					'QFitsInfo'			: [[i[0], str(i[1]), str(i[2])] for i in QFitsInfo],
 					'ResultsLog'		: qflog,
 					'ResultsOutputDir' 	: str(task.results_output_dir),
-					'QFitsHistory' 		: history
+					'QFitsHistory' 		: history,
+					'Tags'				: [[str(t.name), str(t.style)] for t in img.tags()],
 				}
 
 	
