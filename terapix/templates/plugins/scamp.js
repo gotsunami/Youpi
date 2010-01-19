@@ -370,7 +370,7 @@ var {{ plugin.id }} = {
 		// Add to cart button
 		var addc = new Element('img');
 		addc.setAttribute('style', 'cursor: pointer; float: right;');
-		addc.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.gif');
+		addc.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.png');
 		addc.setAttribute('onclick', "{{ plugin.id }}.do_addSelectionToCart();");
 		ldac_opt_div.appendChild(addc);
 			
@@ -926,7 +926,7 @@ var {{ plugin.id }} = {
 
 						delImg = new Element('img', {	id: uidscamp + '_del_saved_item_' + k,
 														'style': 'margin-right: 5px', 
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
 						}).hide();
 	
 						// Date
@@ -972,7 +972,7 @@ var {{ plugin.id }} = {
 						});
 						td.insert(delImg);
 
-						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
+						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
 						addImg.c_data = $H(res);
 						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);

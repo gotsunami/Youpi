@@ -345,7 +345,7 @@ var {{ plugin.id }} = {
 						tr = new Element('tr', {id: trid});
 						// Delete
 						delImg = new Element('img', {	id: uidskel + '_del_saved_item_' + k,	
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
 						}).setStyle({marginRight: '5px'}).hide();
 						delImg.c_data = {trid: trid, name: res.name};
 						delImg.observe('click', function() {
@@ -377,7 +377,7 @@ var {{ plugin.id }} = {
 						td.insert(delImg);
 
 						// Add to cart button
-						addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
+						addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
 						addImg.c_data = $H(res);
 						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);

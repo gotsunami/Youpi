@@ -77,7 +77,7 @@ function ProcessingCart(container)
 				itemsCount = resp.count;
 				var div = Builder.node('div', { id: 'shoppingCart',
 												className: 'nonempty' }, [
-								Builder.node('img', { src: '/media/themes/' + guistyle + '/img/misc/minicart.gif' }),
+								Builder.node('img', { src: '/media/themes/' + guistyle + '/img/misc/minicart.png' }),
 								_getArticlesCountMsg()
 						  ]);
 				div.observe('click', function(event) { location.href = '/youpi/cart/'; });

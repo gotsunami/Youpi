@@ -1058,7 +1058,7 @@ var ResultsHelpers = {
 			if (resp.currentUser.write) {
 				var delb = new Element('img', {
 					title: 'Click here to delete this processing',
-					src: '/media/themes/' + guistyle + '/img/misc/delete.gif'}
+					src: '/media/themes/' + guistyle + '/img/misc/delete.png'}
 				).addClassName('clickable');
 				delb.observe('click', function() {
 					boxes.confirm('Are you sure you want to delete this processing from the database?<br/><br/>' + 

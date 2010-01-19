@@ -863,7 +863,7 @@ var {{ plugin.id }} = {
 						tr = new Element('tr', {id: trid});
 						delImg = new Element('img', {	id: uidswarp + '_del_saved_item_' + k,
 														style: 'margin-right: 5px',
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif'
+														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
 						}).hide();
 
 						// Date
@@ -924,7 +924,7 @@ var {{ plugin.id }} = {
 						});
 						td.insert(delImg);
 
-						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
+						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
 						addImg.c_data = $H(res);
 						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);

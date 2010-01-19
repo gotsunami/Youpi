@@ -307,11 +307,11 @@ var {{ plugin.id }} = {
 						// Delete
 						td = new Element('td');
 						delImg.setAttribute('style', 'margin-right: 5px');
-						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.gif');
+						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png');
 						delImg.setAttribute('onclick', "{{ plugin.id }}.delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
 						td.insert(delImg.hide());
 
-						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.gif'});
+						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
 						addImg.c_data = $H(resp.result[k]);
 						addImg.observe('click', function() {
 							{{ plugin.id }}.addToCart(this.c_data);
