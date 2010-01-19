@@ -307,7 +307,6 @@ def task_filter(request):
 		res.append(tdata)
 
 	resp = {
-		'q' : q,
 		'filtered' : filtered,
 		'results' : res, 
 		'Stats' : {	
