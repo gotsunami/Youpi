@@ -199,18 +199,33 @@ class QualityFitsIn(ProcessingPlugin):
 		"""
 		Returns extra custom header for qfitsin items
 		"""
-		owner = request.POST['Owner']
-		if owner == 'all':
+		owner = request.POST.getlist('Owner')
+		if 'all' in owner:
 			qfs = Plugin_fitsin.objects.filter(task__success = True)
 			grades = FirstQEval.objects.values('fitsin').distinct()
-		elif owner == 'others':
+		elif 'others' in owner:
 			qfs = Plugin_fitsin.objects.exclude(task__user = request.user).filter(task__success = True)
 			grades = FirstQEval.objects.filter(fitsin__in = qfs).values('fitsin').distinct()
-		elif owner == 'my':
+		elif 'my' in owner:
 			qfs = Plugin_fitsin.objects.filter(task__user = request.user, task__success = True)
 			grades = FirstQEval.objects.filter(fitsin__in = qfs).values('fitsin').distinct()
+		else:
+			if 'my' in owner: Mine = True
+			else: Mine = False
+			for name in ('all', 'my', 'others'): 
+				try: owner.remove(name)
+				except: pass
+			# Check for multi-selections of active user names
+			userIds = User.objects.filter(username__in = owner).values_list('id', flat = True)
+			userIds = [int(id) for id in userIds]
+			if Mine: 
+				userIds.append(request.user.id)
+			qfs = Plugin_fitsin.objects.filter(task__user__id__in = userIds, task__success = True)
+			grades = FirstQEval.objects.filter(fitsin__in = qfs).values('fitsin').distinct()
+
 		all = qfs.count()
-		
+		if all: percent = len(grades)*100./all
+		else: percent = 0
 		return """
 			<table style="width: %s">
 				<tr>
@@ -219,7 +234,7 @@ class QualityFitsIn(ProcessingPlugin):
 				</tr>
 			</table>
 			<script type="text/javascript">new ProgressBar('ph_agraded_div', %.2f, {borderColor: 'gray', color: 'lightblue'});</script>
-		""" % ('100%', len(grades), all, len(grades)*100./all)
+		""" % ('100%', len(grades), all, percent)
 
 	def getTaskInfo(self, request):
 		"""
@@ -354,7 +369,8 @@ class QualityFitsIn(ProcessingPlugin):
 					'QFitsInfo'			: [[i[0], str(i[1]), str(i[2])] for i in QFitsInfo],
 					'ResultsLog'		: qflog,
 					'ResultsOutputDir' 	: str(task.results_output_dir),
-					'QFitsHistory' 		: history
+					'QFitsHistory' 		: history,
+					'Tags'				: [[str(t.name), str(t.style)] for t in img.tags()],
 				}
 
 	

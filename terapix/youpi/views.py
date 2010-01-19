@@ -123,6 +123,8 @@ def preferences(request):
 		['Can grade qualityFITSed images', 			'youpi.can_grade'],
 		['Can generate reports', 					'youpi.can_use_reporting'],
 		['Can run a software version check', 		'youpi.can_run_softvc'],
+		['Can add custom policy or selection', 		'youpi.add_condornodesel'],
+		['Can delete custom policy or selection', 	'youpi.delete_condornodesel'],
 	]
 	# Adds can_use_plugin_* permissions, generated on-the-fly by the checksetup script
 	perms = Permission.objects.filter(codename__startswith = 'can_use_plugin_')
@@ -273,9 +275,13 @@ def results(request):
 	for t in ts:
 		if t.results_output_dir not in dirs:
 			dirs.append(t.results_output_dir)
+	active_users = User.objects.filter(is_active = True)
+	tags, filtered = read_proxy(request, Tag.objects.all().order_by('name'))
 
 	menu_id = 'results'
 	return render_to_response('results.html', {	
+						'tags'				: tags,
+						'users'				: active_users,
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
 						'outputDirs' 		: dirs,
@@ -1116,6 +1122,12 @@ def save_condor_node_selection(request):
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
 
+	# First check for permission
+	if not request.user.has_perm('youpi.add_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to add custom selections",
+		}), mimetype = 'text/plain')
+
 	sels = CondorNodeSel.objects.filter(label = label, is_policy = False)
 	if sels:
 		return HttpResponse(str({'Error' : str("'%s' label is already used, please use another name." % label)}), 
@@ -1136,6 +1148,12 @@ def save_condor_policy(request):
 		serial = request.POST['Serial']
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
+
+	# First check for permission
+	if not request.user.has_perm('youpi.add_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to add custom policies",
+		}), mimetype = 'text/plain')
 
 	try:
 		sels = CondorNodeSel.objects.filter(label = label, is_policy = True)
@@ -1186,6 +1204,12 @@ def del_condor_node_selection(request):
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
 
+	# First check for permission
+	if not request.user.has_perm('youpi.delete_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to delete custom selections",
+		}), mimetype = 'text/plain')
+
 	profiles = SiteProfile.objects.all()
 	for p in profiles:
 		try:
@@ -1221,6 +1245,12 @@ def del_condor_policy(request):
 		label = request.POST['Label']
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
+
+	# First check for permission
+	if not request.user.has_perm('youpi.delete_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to delete custom policies",
+		}), mimetype = 'text/plain')
 
 	profiles = SiteProfile.objects.all()
 	for p in profiles:

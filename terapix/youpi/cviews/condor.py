@@ -168,14 +168,15 @@ def dir_stats(request):
 
 def task_filter(request):
 	try:
-		owner = request.POST['Owner']
+		# May be a list of owners
+		owner = request.POST.getlist('Owner')
 		status = request.POST['Status']
 		kindid = request.POST['Kind']
-		filterText = request.POST['FilterText'].strip().lower()
 		# Max results per page
 		maxPerPage = int(request.POST['Limit'])
 		# page # to return
 		targetPage = int(request.POST['Page'])
+		tags = request.POST.getlist('Tag')
 	except KeyError, e:
 		raise HttpResponseServerError('Bad parameters')
 
@@ -203,46 +204,61 @@ def task_filter(request):
 	"""
 	filtered = False
 	user_id = request.user.id
+	# Deep copy
+	dupowner = [name for name in owner]
 
-	if owner == 'all':
+	if 'all' in dupowner:
 		if anyStatus: cur.execute(q % (kindid, ''))
 		else: cur.execute(q % (kindid, "AND t.success = %d" % success))
 
-	elif owner == 'my':
-		if anyStatus: cur.execute(q % (kindid, "AND t.user_id=%d" % user_id))
-		else: cur.execute(q % (kindid, "AND t.user_id=%d AND t.success = %d" % (user_id, success)))
-
-	elif owner == 'others':
+	elif 'others' in dupowner:
 		if anyStatus: cur.execute(q % (kindid, "AND t.user_id != %d" % user_id))
 		else: cur.execute(q % (kindid, "AND t.user_id != %d AND t.success = %d" % (user_id, success)))
+
 	else:
-		cur.execute(q % (kindid, ''))
+		if 'my' in dupowner: Mine = True
+		else: Mine = False
+		for name in ('all', 'my', 'others'): 
+			try: dupowner.remove(name)
+			except: pass
+		# Check for multi-selections of active user names
+		userIds = User.objects.filter(username__in = dupowner).values_list('id', flat = True)
+		userStr = ','.join([str(id) for id in userIds])
+		if Mine: 
+			if len(userStr):
+				userStr += ',' + str(user_id)
+			else:
+				userStr = str(user_id)
+		if anyStatus: cur.execute(q % (kindid, 'AND t.user_id in (%s)' % userStr))
+		else: cur.execute(q % (kindid, "AND t.user_id in (%s) AND t.success = %d" % (userStr, success)))
 			
 	res = cur.fetchall()
 	tasksIds = [{'id': r[0]} for r in res]
 	res = []
 	nb_suc = nb_failed = 0
-	if filterText:
-		keepIds = []
-		for t in tasksIds:
-			rels = Rel_it.objects.filter(task__id = t['id'])
-			for r in rels:
-				if r.image.name.find(filterText) >= 0:
-					keepIds.append(t['id'])
+	tasksIds = [t['id'] for t in tasksIds]
 
-#			if (t.user.username.lower().find(filterText) >= 0 or
-#				t.user.first_name.lower().find(filterText) >= 0 or
-#				t.user.last_name.lower().find(filterText) >= 0 or
-#				t.kind.name.lower().find(filterText) >= 0 or
-#				t.hostname.lower().find(filterText) >= 0 or
-#				t.title.lower().find(filterText) >= 0 or
-#				("%s" % t.start_date).find(filterText) >= 0 or
-#				("%s" % t.end_date).find(filterText) >= 0):
-
-		tasksIds = keepIds
-	else:
-		tasksIds = [t['id'] for t in tasksIds]
-
+	# Filter by tag
+	if tasksIds and tags:
+		tasksTags = tasksIds
+		for t in tags:
+			q = """
+			SELECT t.id FROM youpi_processing_task AS t, youpi_rel_it AS r, youpi_rel_tagi AS ti, youpi_tag AS tag
+			WHERE tag.name='%s'
+			AND tag.id = ti.tag_id
+			AND ti.image_id = r.image_id
+			AND r.task_id = t.id
+			AND t.id IN (%s)
+			""" % (t, ','.join([str(t) for t in tasksTags]))
+			cur.execute(q)
+			tres = cur.fetchall()
+			if tres:
+				tasksTags = [r[0] for r in tres]
+			else:
+				tasksIds = []
+				break
+		tasksIds = [r[0] for r in tres]
+		
 	plugin = manager.getPluginByName(kindid)
 
 	# Plugins can optionally filter/alter the result set
@@ -291,6 +307,7 @@ def task_filter(request):
 		res.append(tdata)
 
 	resp = {
+		'q' : q,
 		'filtered' : filtered,
 		'results' : res, 
 		'Stats' : {	

@@ -245,6 +245,7 @@ div.historyResults {
 	border-top: 1px #5b80b2 solid; 
 	height: 400px; 
 	overflow: auto;
+	background: transparent url('../img/misc/expander-back.png') repeat-x;
 }
 
 div.xhrAnim {

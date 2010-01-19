@@ -47,12 +47,6 @@ function ProcessingHistoryWidget(container) {
 	 */ 
 	var _container;
 	/*
-	 * Var: _sel_owner_choices
-	 * Options titles for owner DOM select
-	 *
-	 */ 
-	var _sel_owner_options = ['all', 'my', 'others'];
-	/*
 	 * Var: _sel_status_choices
 	 * Options titles for status DOM select
 	 *
@@ -64,6 +58,18 @@ function ProcessingHistoryWidget(container) {
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 
+	/*
+	 * Var: _sel_tag_options
+	 * Available tags to select
+	 *
+	 */ 
+	var _sel_tag_options = new Array();
+	/*
+	 * Var: _sel_tag_options
+	 * Options titles for owner DOM select
+	 *
+	 */ 
+	var _sel_owner_options = ['all', 'my', 'others'];
 	/*
 	 * Var: _pluginInfos
 	 * Array or array of string describing plugins (used in combobox)
@@ -118,83 +124,27 @@ function ProcessingHistoryWidget(container) {
 		tr.insert(th);
 		tab.insert(tr);
 
-
 		// TR input text filtering
 		tr = new Element('tr');
 		td = new Element('td');
 		var rtab = new Element('table');
 		rtab.setAttribute('class', 'results-filter');
 		var rtr, rtd;
-		rtr = new Element('tr');
-		rtd = new Element('td');
-		rtr.insert(rtd);
-
-		rtd = new Element('td');
-		img = new Element('img');
-		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_success.gif');
-		var span = new Element('span', {id: _id + '_success_span'}).setStyle({marginRight: '10px'});
-		rtd.insert(img);
-		rtd.insert(span);
-		img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_error.gif'});
-		span = new Element('span');
-		span.setAttribute('id', _id + '_failed_span');
-		rtd.insert(img);
-		rtd.insert(span);
-
-		rtd.insert(' (');
-		span = new Element('span');
-		span.setAttribute('id', _id + '_total_span');
-		rtd.insert(span);
-		rtd.insert('/');
-		span = new Element('span');
-		span.setAttribute('id', _id + '_big_total_span');
-		rtd.insert(span);
-		rtd.insert(')');
-		rtr.insert(rtd);
-
-		rtab.insert(rtr);
 		td.insert(rtab);
 		tr.insert(td);
 		tab.insert(tr);
 
 		// TR combos filtering
 		rtr = new Element('tr');
-		rtd = new Element('td');
-		rtd.setAttribute('class', 'filter');
-		rtd.setAttribute('nowrap', 'nowrap');
-		rtd.setAttribute('colspan', '2');
+		rtd = new Element('td', {nowrap: 'nowrap', colspan: 2}).addClassName('filter');
 		var form = new Element('form', {id: _id + '_search_form'});
-		form.observe('submit', function(event) {
-			console.log('toto');
-			return true;
-		});
 		rtd.insert(form);
 
-		img = new Element('img');
-		img.setAttribute('src', '/media/themes/' + guistyle + '/img/16x16/filter.png');
-		form.insert(img);
-		var input = new Element('input', {
-			id: _id + '_filter_text', 
-			type: 'text', 
-			title: 'Press Enter to filter tasks', 
-			size: '40'
-		});
-		form.insert(input);
-		form.insert(new Element('br'));
-
-		var label = new Element('label');
-		label.insert('Show');
-		form.insert(label);
-
-		var sel = getSelect(_id + '_owner_select', _sel_owner_options);
-		form.insert(sel);
-
-		sel = getSelect(_id + '_status_select', _sel_status_options);
-		sel.options[sel.options.length-1].setAttribute('selected', 'selected');
-		form.insert(sel);
-
-		sel = new Element('select', {id: _id + '_kind_select'});
-		sel.observe('change', function(event) {
+		// Kind selection
+		var kdiv = new Element('div').addClassName('history_type');
+		var label = new Element('label').update('Type ');
+		ksel = new Element('select', {id: _id + '_kind_select'});
+		ksel.observe('change', function(event) {
 			_onKindChange(this);
 		});
 		for (var k=0; k < _pluginInfos.length; k++) {
@@ -205,23 +155,65 @@ function ProcessingHistoryWidget(container) {
 			});
 			if (k == 0) opt.setAttribute('selected', 'selected');
 			opt.setAttribute('value', _pluginInfos[k][0]);
-			opt.insert(_pluginInfos[k][1] + ' processings');
-			sel.insert(opt);
+			opt.insert(_pluginInfos[k][1]);
+			ksel.insert(opt);
 		}
-		form.insert(sel);
+		kdiv.insert(label).insert(ksel).insert(' processings');
+		form.insert(kdiv);
+
+		// Search criteria
+		var tdiv = new Element('div').addClassName('history_criteria');
+		label = new Element('label');
+		label.insert('Show');
+		tdiv.insert(label);
+
+		var sel = getSelect(_id + '_owner_select', _sel_owner_options, 4);
+		tdiv.insert(sel);
+
+		sel = getSelect(_id + '_status_select', _sel_status_options);
+		sel.options[sel.options.length-1].setAttribute('selected', 'selected');
+		tdiv.insert(sel);
+		label = new Element('label').update(' processings ');
+		tdiv.insert(label);
+
+		// Optional tags
+		if (_sel_tag_options.length) {
+			label.insert('w/images tagged ');
+			var tsel = new Element('select', {id: _id + '_tags_select', multiple: true, size: 6}); //getSelect(_id + '_tags_select', _sel_tag_options, 4);
+			var opt, chk;
+			$A(_sel_tag_options).each(function(tag) {
+				opt = new Element('option', {value: tag.label, style: tag.css}).addClassName('tagwidget').update(tag.label);
+				tsel.insert(opt);
+			});
+			tdiv.insert(tsel);
+		}
+		form.insert(tdiv);
 
 		// Plugin-specific div (might be used by plugins for custom filtering/sorting options)
-		var pdiv = new Element('div', {id: _id + '_plugin_custom_options_div'}).addClassName('plugin-filter');
+		var pdiv = new Element('div', {id: _id + '_plugin_custom_options_div'}).addClassName('plugin-filter').addClassName('history_plugin_opts');
 		form.insert(pdiv);
 
 		rtr.insert(rtd);
 		rtab.insert(rtr);
 
 		var bdiv = new Element('div', {id: _id + '_submit_div'}).addClassName('results-submit');
+		var sdiv = new Element('div', {id: _id + '_stats_div', style: 'float: left;'});
+		var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_success.gif'});
+		var span = new Element('span', {id: _id + '_success_span'}).setStyle({marginRight: '10px'});
+		sdiv.insert(img).insert(span);
+		img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_error.gif'});
+		span = new Element('span', {id: _id + '_failed_span'});
+		sdiv.insert(img).insert(span).insert(' (');
+		span = new Element('span', {id: _id + '_total_span'});
+		sdiv.insert(span).insert(' results per page out of ');
+		span = new Element('span', {id: _id + '_big_total_span'});
+		sdiv.insert(span).insert(')');
+		bdiv.insert(sdiv);
+		sdiv.hide();
+
 		var rbut = new Element('input', {type: 'button', value: 'Reset'});
 		rbut.observe('click', function(event) {
 			$(_id + '_search_form').reset();
-			$(_id + '_filter_text').focus();
 			_onKindChange($(_id + '_kind_select'));
 		});
 		bdiv.insert(rbut);
@@ -259,20 +251,19 @@ function ProcessingHistoryWidget(container) {
 		td.insert(rdiv);
 
 		_container.insert(tab);
-		_onKindChange(sel);
-
-		// Set focus
-		$(_id + '_filter_text').focus();
+		_onKindChange(ksel);
 	}
 
 	function _onKindChange(sel) {
 		// Display custom plugin filters, if any
+		var d = $(_id + '_plugin_custom_options_div')
 		try {
 			eval(sel.options[sel.selectedIndex].value + ".addProcessingResultsCustomOptions('" + _id + "_plugin_custom_options_div');");
+			d.show();
 		}
 		catch(e) {
 			// Empty container
-			$(_id + '_plugin_custom_options_div').update();
+			d.hide();
 		}
 	}
 
@@ -300,16 +291,26 @@ function ProcessingHistoryWidget(container) {
 			var ownerSel = $(_id + '_owner_select');
 			var statusSel = $(_id + '_status_select');
 			var kindSel = $(_id + '_kind_select');
-			var filter = $(_id + '_filter_text');
 		} catch(e) { return false; }
 
 		if (!pageNum || typeof pageNum != 'number')
 			pageNum = 1;
 	
-		var owner = ownerSel.options[ownerSel.selectedIndex].text;
+		var owner = new Array();
+	  	$A(ownerSel.options).each(function(opt) {
+			if (opt.selected) owner.push(opt.text);
+		});
+
+		var tags = new Array();
+		var tagSel = $(_id + '_tags_select');
+		if (tagSel) {
+			$A(tagSel.options).each(function(opt) {
+				if (opt.selected) tags.push(opt.text);
+			});
+		}
+
 		var status = statusSel.options[statusSel.selectedIndex].text;
 		var kind = kindSel.options[kindSel.selectedIndex].value;
-		var filterText = filter.value;
 	
 		var container = $(_id + '_tasks_div');
 		var xhr = new HttpRequest(
@@ -378,9 +379,9 @@ function ProcessingHistoryWidget(container) {
 				var spans = ['success', 'failed', 'total', 'big_total'];
 				for (var k=0; k < spans.length; k++) {
 					var node = $(_id + '_' + spans[k] + '_span');
-					node.innerHTML = '';
-					node.insert(resp['Stats']['nb_' + spans[k]]);
+					node.update(resp['Stats']['nb_' + spans[k]]);
 				}
+				$(_id + '_stats_div').appear();
 	
 				if (!len) {
 					tr = new Element('tr');	
@@ -456,10 +457,8 @@ function ProcessingHistoryWidget(container) {
 					stab.insert(str);
 					d.insert(stab);
 					tr.insert(td);
-	
 					tab.insert(tr);
 				}
-	
 				container.insert(tab);
 			}
 		);
@@ -471,7 +470,7 @@ function ProcessingHistoryWidget(container) {
 			Kind: kind,
 			Limit: _maxPerPage,
 			Page: pageNum,
-			FilterText: filterText
+			Tag: tags
 		});
 
 		// Add POST data info related to custom plugin search criteria, if any
@@ -496,6 +495,38 @@ function ProcessingHistoryWidget(container) {
 	 */ 
 	this.applyFilter = function(pageNum) {
 		_applyFilter(pageNum);
+	}
+
+	/*
+	 * Function: addFromSource
+	 * Add a 'from' source in the _sel_owner_options array
+	 *
+	 * Parameters:
+	 *  name - string: name to add
+	 *
+	 */ 
+	this.addFromSource = function(name) {
+		if (typeof name != 'string')
+			throw 'Name must be a string!'
+		_sel_owner_options.push(name);
+	}
+
+	/*
+	 * Function: addTag
+	 * Add a 'tag' source in the _sel_tag_options array
+	 *
+	 * Parameters:
+	 *  label - string: tag label
+	 *  style - string: CSS value [optional]
+	 *
+	 */ 
+	this.addTag = function(label, style) {
+		if (typeof label != 'string')
+			throw 'Name must be a string!'
+		if (style && typeof style != 'string')
+			throw 'Style must be a string!'
+
+		_sel_tag_options.push({label: label, css: style ? style : null});
 	}
 
 	/*

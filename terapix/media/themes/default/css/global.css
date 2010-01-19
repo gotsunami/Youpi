@@ -1633,3 +1633,21 @@ table.report_grading_stats tr.complete td.gradecomplete {
 #itt_select {
 	color: brown;
 }
+
+.history_type, .history_criteria, .history_plugin_opts {
+	-moz-border-radius: 5px;
+	margin-bottom: 3px;
+	padding: 2px;
+}
+.history_type {
+	background-color: #FFF4E5;
+	border: 1px solid #DBC8B0;
+}
+.history_criteria {
+	background-color: #E6F2F9;
+	border: 1px solid #B0CCDB;
+}
+.history_plugin_opts {
+	background-color: #F9EAE6;
+	border: 1px solid #D0B2AA;
+}

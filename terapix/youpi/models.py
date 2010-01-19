@@ -243,6 +243,22 @@ class Image(models.Model):
 	channel = models.ForeignKey(Channel, db_column='channel_id')
 	ingestion = models.ForeignKey('Ingestion',db_column='ingestion_id')
 	instrument = models.ForeignKey(Instrument, db_column = 'instrument_id')
+
+	def isTagged(self, tagname):
+		"""
+		Returns True if image is tagged with tagname. The search is 
+		case sensitive.
+		"""
+		rel = Rel_tagi.objects.filter(tag__name = tagname, image = self)
+		if rel: return True
+		return False
+
+	def tags(self):
+		"""
+		Returns a list of image tags, empty list if none found
+		"""
+		rel = Rel_tagi.objects.filter(image = self)
+		return [r.tag for r in rel]
 	
 	class Meta:
 		unique_together = ('name', 'checksum')
@@ -532,6 +548,9 @@ class Tag(models.Model):
 	# FKs constraints
 	user = models.ForeignKey(User)
 	group = models.ForeignKey(Group)
+
+	def __repr__(self):
+		return "<Tag: %s>" % self.name
 
 	class Meta:
 		permissions = (('can_edit_others', "Can edit others' tags"),)

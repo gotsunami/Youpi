@@ -18,8 +18,8 @@ Version 0.6
 
 **Improvements**:
 
-- Added support for generic FITS image ingestion using translation tables
-- Added `several global permissions`_ in order to be able to define more restrictive user accounts 
+- Added support for `generic FITS image ingestion`_ using translation tables (ITTs)
+- Added several `global permissions`_ in order to be able to define more restrictive user accounts 
 - QualityFITS plugin: added an option to force exiting a QFits job immediately if the flat image 
   is missing 
 - Current user permissions are available on the 'Preferences' page 
@@ -30,7 +30,8 @@ Version 0.6
 
 - Results page: fixed the 'already graded images' counter's value 
 
-.. _several global permissions: http://youpi.terapix.fr/docmat/commontasks.html#changing-permissions
+.. _generic FITS image ingestion: http://youpi.terapix.fr/docmat/using.html#generic-fits-image-ingestion
+.. _global permissions: http://youpi.terapix.fr/docmat/commontasks.html#changing-permissions
 
 **Release Notes**:
 

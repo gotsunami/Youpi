@@ -57,6 +57,14 @@ permission:
 	software version checks from the ``Active Monitoring`` page. Note that version checks expose all 
 	software versions of low-level tools used by Youpi on the cluster.
 
+**Add custom policies or selections**
+	Select the ``youpi | condor node sel | Can add condor node sel`` entry to allow users adding custom 
+	Condor policies or selections from the ``Condor Setup`` page.
+
+**Delete custom policies or selections**
+	Select the ``youpi | condor node sel | Can delete condor node sel`` entry to allow users deleting 
+	custom Condor policies or selections from the ``Condor Setup`` page.
+
 **Use the QualityFits plugin**
 	Select the ``youpi | site profile | Can use QualityFits plugin`` entry to allow users using the 
 	QualityFITS plugin. If granted, the plugin icon will appear on the ``Processing`` page.
