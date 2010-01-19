@@ -612,19 +612,21 @@ var {{ plugin.id }} = {
 		}
 
 		// Image tags
-		tr = new Element('tr');
-		td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
-		td.insert('Image Tags');
-		tr.insert(td);
-		tab2.insert(tr);
+		if (resp.Tags) {
+			tr = new Element('tr');
+			td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
+			td.insert('Image Tags');
+			tr.insert(td);
+			tab2.insert(tr);
 
-		tr = new Element('tr');
-		td = new Element('td').setStyle({padding: '8px'});
-		$A(resp.Tags).each(function(tag) {
-			td.insert(new Element('div', {style: 'float: left; ' + tag[1]}).addClassName('tagwidget').update(tag[0]));;
-		});
-		tr.insert(td);
-		tab2.insert(tr);
+			tr = new Element('tr');
+			td = new Element('td').setStyle({padding: '8px'});
+			$A(resp.Tags).each(function(tag) {
+				td.insert(new Element('div', {style: 'float: left; ' + tag[1]}).addClassName('tagwidget').update(tag[0]));;
+			});
+			tr.insert(td);
+			tab2.insert(tr);
+		}
 	
 		// Condor Job Logs
 		tr = new Element('tr');
