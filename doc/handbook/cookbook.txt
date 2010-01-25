@@ -89,15 +89,15 @@ In fact, let's say roughly that each option of your command line corresponds to 
 	.. warning:: understand that you don't target the file itself, you 've just permit to look inside a path
 	 			 and Youpi will match for the right name based on differents conventions:
 
-				 - **WEIGHT**: 0123456789.fits will be processed with the 0123456789_weight.fits weight 
-				   file, contained in the path you have choosen through this tab.
+					 - **WEIGHT**: 0123456789.fits will be processed with the 0123456789_weight.fits weight 
+					   file, contained in the path you have choosen through this tab.
 
-				 - **AHEAD**: 0123456789.fits needs the 0123456789.ahead file contained in the path you 
-				   have choosen.
+					 - **AHEAD**: 0123456789.fits needs the 0123456789.ahead file contained in the path you 
+					   have choosen.
 
-				 - **FLAT & MASK**: the name of the right flat and mask to use for processing, is 
-				   contained in the header of 0123456789.fits. Youpi will match the flat and mask 
-					header's name with files contained in your choosen path.
+					 - **FLAT & MASK**: the name of the right flat and mask to use for processing, is 
+					   contained in the header of 0123456789.fits. Youpi will match the flat and mask 
+					   header's name with files contained in your choosen path.
 
 **Select a configuration file**
 	If configuration files for such softwares as SCamp, Sextractor, etc ... have no secrets for you, you can:

@@ -23,15 +23,19 @@ Version 0.6
 - QualityFITS plugin: added an option to force exiting a QFits job immediately if the flat image 
   is missing 
 - Current user permissions are available on the 'Preferences' page 
+- Results page: added more search criteria; processing results can be searched by tags
+- Added new self-designed icon set
 - Added a keyboard shortcut for accessing the grading page 
 - New path tool script useful to display/alter important stored (DB) data paths 
 
 **Bug fixes**:
 
 - Results page: fixed the 'already graded images' counter's value 
+- `Many more...`_
 
 .. _generic FITS image ingestion: http://youpi.terapix.fr/docmat/using.html#generic-fits-image-ingestion
 .. _global permissions: http://youpi.terapix.fr/docmat/commontasks.html#changing-permissions
+.. _Many more...: https://youpi.terapix.fr/mercurial/youpi/trunk/shortlog
 
 **Release Notes**:
 
