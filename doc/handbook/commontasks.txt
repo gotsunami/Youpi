@@ -7,6 +7,8 @@ Managing Users And Groups
 
 *TBW*
 
+.. _global_permissions:
+
 Changing Permissions
 ====================
 

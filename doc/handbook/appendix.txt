@@ -14,27 +14,25 @@ ChangeLog
 Version 0.6
 -----------
 
-**Release Date**: *To Be Released*
+**Release Date**: January 28, 2010
 
 **Improvements**:
 
-- Added support for `generic FITS image ingestion`_ using translation tables (ITTs)
-- Added several `global permissions`_ in order to be able to define more restrictive user accounts 
+- Added support for :ref:`Generic FITS image ingestion <ingestion_section>` using translation tables (ITTs)
+- Added several :ref:`global permissions <global_permissions>` in order to be able to define more restrictive user accounts 
 - QualityFITS plugin: added an option to force exiting a QFits job immediately if the flat image 
   is missing 
-- Current user permissions are available on the 'Preferences' page 
-- Results page: added more search criteria; processing results can be searched by tags
-- Added new self-designed icon set
-- Added a keyboard shortcut for accessing the grading page 
-- New path tool script useful to display/alter important stored (DB) data paths 
+- Current user permissions are available on the "Preferences" page 
+- Results page: added more search criteria; processing results can be searched by *tags*
+- Added new self-designed icon set (GUI)
+- Added a keyboard shortcut (Alt+Shift+g) for accessing the image grading page from the results page
+- New path tool script useful to display/alter important data paths  stored in the database
 
 **Bug fixes**:
 
-- Results page: fixed the 'already graded images' counter's value 
-- `Many more...`_
+- Results page: fixed the "already graded images" counter's value 
+- Minor fixes
 
-.. _generic FITS image ingestion: http://youpi.terapix.fr/docmat/using.html#generic-fits-image-ingestion
-.. _global permissions: http://youpi.terapix.fr/docmat/commontasks.html#changing-permissions
 .. _Many more...: https://youpi.terapix.fr/mercurial/youpi/trunk/shortlog
 
 **Release Notes**:
@@ -57,7 +55,7 @@ If you have made a database backup, you can safely answer: ``yes``.
 Version 0.5.2
 -------------
 
-**Release Date**: 28 November 2009
+**Release Date**: November 28, 2009
 
 **Improvements**:
 
@@ -121,7 +119,7 @@ In order to upgrade from 0.5.1, please do the following:
 Version 0.5.1
 -------------
 
-**Release Date**: 30 September 2009
+**Release Date**: September 30, 2009
 
 First public release.
 
