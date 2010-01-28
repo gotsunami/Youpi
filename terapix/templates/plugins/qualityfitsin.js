@@ -588,7 +588,7 @@ var {{ plugin.id }} = {
 		{% endif %}
 			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').setStyle({width: '-moz-fit-content'}).update('<u>G</u>rade it now!');
 			nowdiv.insert(new Element('a', {href: '#', accesskey: 'g'}).setStyle({color: 'transparent'}));
-			nowdiv.writeAttribute('title', 'Click to grade this image on a separate page');
+			nowdiv.writeAttribute('title', 'Click to grade this image on a separate page (Alt+Shift+g)');
 			nowdiv.observe('click', function() {
 		{% if perms.youpi.can_grade %}
 			window.open("/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', '_blank');
