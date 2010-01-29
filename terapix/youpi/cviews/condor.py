@@ -619,6 +619,7 @@ def condor_ingestion(request):
 	# Find machine
 	clean_path = re.sub(settings.FILE_BROWSER_ROOT_DATA_PATH, '', path)
 	m = re.search(settings.INGESTION_HOST_PATTERN, clean_path)
+	machine = settings.INGESTION_DEFAULT_HOST
 	if m: 
 		try:
 			host = m.group(1)
@@ -629,8 +630,6 @@ def condor_ingestion(request):
 					break
 		except IndexError:
 			machine = settings.INGESTION_DEFAULT_HOST
-	else: 
-		machine = settings.INGESTION_DEFAULT_HOST
 
 	#
 	# Dictionnary that will be serialized with marshal module and passed
