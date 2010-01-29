@@ -1127,11 +1127,17 @@ function ImageSelector(container, options)
 			null,
 			// Custom handler for results
 			function(resp) {
-				var nb = resp['Total'];
+				var nb = resp.Total;
 				containerNode.update();
-				addImageQueryForm(containerNode, nb);
-				// Emit signal when widget is fully loaded
-				document.fire('imageSelector:loaded');
+				if (nb) {
+					addImageQueryForm(containerNode, nb);
+					// Emit signal when widget is fully loaded
+					document.fire('imageSelector:loaded');
+				}
+				else {
+					containerNode.update("No image ingested in the database. You should ");
+					containerNode.insert(new Element('a', {href: '/youpi/ingestion/'}).update('add some')).insert('.');
+				}
 			}
 		);
 
