@@ -612,7 +612,7 @@ var {{ plugin.id }} = {
 		}
 
 		// Image tags
-		if (resp.Tags) {
+		if (resp.Tags.length) {
 			tr = new Element('tr');
 			td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
 			td.insert('Image Tags');
