@@ -363,7 +363,9 @@ def soft_version_monitoring(request):
 @login_required
 @profile
 def show_ingestion_report(request, ingestionId):
-	ing = Ingestion.objects.filter(id = ingestionId)[0]
+	try: ing = Ingestion.objects.filter(id = ingestionId)[0]
+	except:
+		return HttpResponseNotFound('Ingestion report not found.')
 	report = ing.report
 	if report:
 		report = str(zlib.decompress(base64.decodestring(ing.report)))
