@@ -316,12 +316,6 @@ tr.scamp-result-entry-tn td:last-child {
 	vertical-align: top;
 }
 
-img.scamp-result-entry-tn {
-	margin-right: 2px; 
-	margin-bottom: 2px; 
-	cursor: pointer;
-}
-
 table.scamp-result-entry-params {
 	width: 100%;
 }
@@ -351,10 +345,10 @@ tr.qfits-result-entry-tn td {
 	text-align: left;
 }
 
-img.qfits-result-entry-tn {
+img.qfits-result-entry-tn,  img.scamp-result-entry-tn {
 	margin-right: 2px; 
 	margin-bottom: 2px; 
-	cursor: pointer;
+	cursor: url('../img/32x32/zoomin.cur'), pointer !important;
 }
 
 table.qfits-result-entry-grades {
