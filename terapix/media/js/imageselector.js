@@ -413,6 +413,8 @@ function ImageSelector(container, options)
 			if (!_options.get('dropzone')) return;
 
 			_tags.set(event.memo.name, true)
+			var d = $(id + '_dropzone_div');
+			if (d.select('div.title')) d.select('div.title')[0].hide();
 			$(id + '_dropzone_commit_div').appear();
 		});
 
@@ -422,6 +424,7 @@ function ImageSelector(container, options)
 
 			_tags.unset(event.memo);
 			_tags.keys().length ? $(id + '_dropzone_commit_div').appear() : $(id + '_dropzone_commit_div').fade();
+			if (!_tags.size()) $(id + '_dropzone_div').select('div.title')[0].appear();
 		});
 
 		document.observe('tagPanel:tagDeleted', function(event) {
@@ -2100,9 +2103,10 @@ function ImageSelector(container, options)
 		optdiv.insert(_getOptionsToolbar());
 
 		var dropdiv = $(id + '_dropzone_div');
-		dropdiv.update();
-		if (_options.get('dropzone'))
+		if (_options.get('dropzone')) {
+			dropdiv.update(new Element('div').addClassName('title').update('Drop tags here!'));
 			dropdiv.appear();
+		}
 
 		var tipdiv = $(id + '_mode_options_tip_div');
 		tipdiv.update();
@@ -2248,7 +2252,6 @@ function ImageSelector(container, options)
 
 		var dropdiv = new Element('div', {id: id + '_dropzone_div'});
 		dropdiv.addClassName('dropzone').addClassName('dropzoneEmbedded');
-		dropdiv.insert('Drag tag here');
 		td.insert(dropdiv.hide());
 
 		var comdiv = new Element('div', {id: id + '_dropzone_commit_div'});

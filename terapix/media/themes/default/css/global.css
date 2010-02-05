@@ -1412,6 +1412,18 @@ div.tags *, .dropzone * {
 	width: 100%;
 }
 
+.dropzone div.title {
+	vertical-align: middle;
+	color: lightgray;
+	font-size: 14px;
+	font-weight: bold;
+	font-style: italic;
+	width: 100%;
+	line-height: 15pt;
+	text-align: center;
+	padding-top: 25px;
+}
+
 .dropzoneEmbedded {
 	width: 75%;
 	min-height: 80px;
