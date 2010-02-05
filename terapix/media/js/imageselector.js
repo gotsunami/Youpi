@@ -505,6 +505,7 @@ function ImageSelector(container, options)
 
 													// Sets ImageInfoWidget events
 													_tableWidget.getRoot().select('.body td:first-child span.imageTag').each(function(span) {
+														span.writeAttribute('title', 'Click to display image information panel');
 														span.observe('click', function() {
 															// Since a click event (for the td) is catched by AdvancedTable, we have 
 															// to ensure that the row's state does not change

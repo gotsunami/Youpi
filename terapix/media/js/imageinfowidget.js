@@ -103,24 +103,17 @@ function ImageInfoWidget(container, dbid) {
 				order.each(function(key) {
 					tr = new Element('tr');
 					td = new Element('td');
-					if (key == 'checksum') {
-						td.writeAttribute('colspan', 2);
-						td.addClassName('checksum');
-						td.setStyle({fontWeight: 'normal'});
-						td.update(info.get(key));
-						tr.insert(td);
-					}
-					else {
-						td.update(key.capitalize());
-						tr.insert(td);
-						td = new Element('td');
-						td.update(info.get(key) ? info.get(key) : '-');
-						tr.insert(td);
-					}
+					td.update(key.capitalize());
+					tr.insert(td);
+					td = new Element('td');
+					if (key == 'checksum' || key == 'path') td.addClassName(key);
+					td.update(info.get(key) ? info.get(key) : '-');
+					tr.insert(td);
 					tab.insert(tr);
 				});
 
 				_body.update(tab);
+				if (!_root.visible()) _root.appear();
 			}
 		);
 
@@ -145,7 +138,10 @@ function ImageInfoWidget(container, dbid) {
 			return;
 		}
 
-		_root = new Element('div').addClassName('imageInfoWidget');
+		_root = new Element('div', {title: 'Click to close'}).addClassName('imageInfoWidget');
+		_root.observe('click', function() {
+			this.fade();
+		});
 		_body = new Element('div');
 		_root.insert(_body);
 		_container.insert(_root);

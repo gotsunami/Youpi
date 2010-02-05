@@ -1453,7 +1453,9 @@ div.tags *, .dropzone * {
 .imageInfoWidget * {
 	font-size: 9px;
 }
-
+.imageInfoWidget table {
+	width: 100%;
+}
 .imageInfoWidget table td {
 	vertical-align: middle;
 	padding: 2px;
@@ -1467,16 +1469,28 @@ div.tags *, .dropzone * {
 
 .imageInfoWidget {
 	-moz-border-radius: 5px;
+	border: 1px solid lightgray;
+	border-right: 2px solid #5E5E5E;
+	border-bottom: 2px solid #5E5E5E;
 	background-color: #e9f3ff;
 	padding: 10px;
-	width: 100%;
-	width: 75%;
-	margin: 10px;
+	position: absolute;
+	float: right;
+	right: 20px;
+	bottom: 0px;
+	width: 300px;
+	opacity: 0.9;
+	cursor: pointer;
 }
 
 .imageInfoWidget .checksum {
 	color: brown;
-	text-align: center;
+	font-family: typewriter;
+	font-weight: bold;
+}
+
+.imageInfoWidget .path {
+	font-family: typewriter;
 }
 
 .imageTag {
