@@ -76,9 +76,10 @@ def genImageDotHead(image_id):
 				v = v.isoformat()
 			val = "'%s'" % v
 
-		if itt[k].has_key('MAP'): key = itt[k]['MAP']
-		else: key = itt[k]['SRC']
-		hdudata[key] = val
+		if itt[k].has_key('MAP'): 
+			# Unmapped keyword are ignored since they are available in 
+			# the image's header
+			hdudata[itt[k]['MAP']] = val
 
 	return (hdudata, len(hdulist))
 
@@ -88,10 +89,11 @@ def main():
 		sys.exit(1)
 
 	data, lenght = genImageDotHead(int(sys.argv[1]))
-	for i in range(lenght):
-		for k, v in data.iteritems():
-			print "%s = %s" % (k, v)
-		print "END"
+	if len(data):
+		for i in range(lenght):
+			for k, v in data.iteritems():
+				print "%s = %s" % (k, v)
+			print "END"
 
 if __name__ == '__main__':
 	main()
