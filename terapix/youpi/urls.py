@@ -33,6 +33,7 @@ urlpatterns = patterns(
 	(r'^ingestion/imgCount/$', 'ingestion_img_count'),
 	(r'^ingestion/ittContent/$', 'get_itt_content'),
 	(r'^image/info/$', 'get_image_info'),
+	(r'^image/head/(.*?)/$', 'gen_image_header'),
 	(r'^img/(?P<image_name>.*?)/$', 'aff_img'),
 	(r'^processing/$', 'processing'),
 	(r'^processing/(.*?)/$', 'render_plugin'),

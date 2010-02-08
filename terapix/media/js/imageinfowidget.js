@@ -112,6 +112,15 @@ function ImageInfoWidget(container, dbid) {
 					tab.insert(tr);
 				});
 
+				// Link to .head file
+				tr = new Element('tr');
+				td = new Element('td').update('Dot Head file');
+				tr.insert(td);
+				var a = new Element('a', {href: '/youpi/image/head/' + resp.info.imgid + '/', target: '_blank'}).update('View .head file');
+				td = new Element('td').update(a);
+				tr.insert(td);
+				tab.insert(tr);
+
 				_body.update(tab);
 				if (!_root.visible()) _root.appear();
 			}

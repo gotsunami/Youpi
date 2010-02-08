@@ -1429,7 +1429,7 @@ def get_image_info(request):
 		vStatus = 'VALIDATED'
 	else:
 		vStatus = 'OBSERVED'
-
+	
 	data = {
 		'name'		: img.name + '.fits',
 		'path'		: img.path,
@@ -1448,9 +1448,35 @@ def get_image_info(request):
 		'ing start'	: str(img.ingestion.start_ingestion_date),
 		'ing end'	: str(img.ingestion.end_ingestion_date),
 		'ing by'	: img.ingestion.user.username,
+		'imgid'		: img.id,
 	}
 
 	return HttpResponse(json.encode({'info': data}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def gen_image_header(request, image_id):
+	"""
+	Generates image .ahead file
+	"""
+	from terapix.script import genimgdothead as dothead
+	try:
+		img = Image.objects.filter(id = image_id)[0]
+		dhead, numext = dothead.genImageDotHead(int(img.id))
+	except:
+		return HttpResponseBadRequest("Error: image not found")
+
+	menu_id = 'processing'
+	return render_to_response('imageinfo.html', {	
+		'selected_entry_id'	: menu_id, 
+		'title' 			: get_title_from_menu_id(menu_id),
+		'img'				: img,
+		'hdrdata'			: dhead,
+		'exts'				: range(numext),
+	}, 
+	context_instance = RequestContext(request))
+
+	return HttpResponse(json.encode({'info': headdata}), mimetype = 'text/plain')
 
 @login_required
 @profile
