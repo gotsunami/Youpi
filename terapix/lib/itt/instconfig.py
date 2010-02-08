@@ -17,6 +17,9 @@ class InstrumentConfig(object):
 	SEP = ';'
 
 	def __init__(self, filename):
+		"""
+		Sets instrument config filename to work on.
+		"""
 		self.__filename = filename
 
 	@property
