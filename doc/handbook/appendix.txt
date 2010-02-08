@@ -11,6 +11,32 @@ ChangeLog
 .. contents::
    :local:
 
+Version 0.6.1
+-------------
+
+**Release Date**: *To Be Released*
+
+**Improvements**:
+
+- Added support for automatic ``.head`` file generation to allow FITS image keywords overriding.
+
+**Bug fixes**:
+
+- Ingestion: fixed bug during target hostname resolution
+- Image selector: stops loading and displays a user-friendly message when no images available (no ingestions at all)
+- QualityFITS results: hide "Image tags" block when image has no tags
+
+**Release Notes**:
+
+In order to upgrade from 0.5.2 *or later*, please do the following:
+
+0. Make a **backup of your database**.
+
+1. The database structure has changed. Just tell Youpi to inspect your installation and upgrade the database if needed::
+
+	$ python manage.py checksetup
+
+
 Version 0.6
 -----------
 
