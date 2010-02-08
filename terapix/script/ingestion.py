@@ -390,7 +390,7 @@ def run_ingestion():
 
 		try:
 			h_runid = getFITSField(hdulist, 'YRUN', 'UNKNOWN')
-			h_insrument = getFITSField(hdulist, 'YINSTRUMENT')
+			h_instrument = getFITSField(hdulist, 'YINSTRUMENT')
 			h_telescop = getFITSField(hdulist, 'YTELESCOP')
 			h_detector = getFITSField(hdulist, 'YDETECTOR')
 			h_object = getFITSField(hdulist, 'YOBJECT')
