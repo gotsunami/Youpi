@@ -52,6 +52,7 @@ var _fileBrowserSettings = {
 			Logged in as <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>
 			{% block userlinks %}
 				| <a href="/youpi/admin/password_change/">{% trans 'Change password' %}</a>
+				| <a href="http://youpi.terapix.fr/doc/" target="_blank">{% trans 'Help' %}</a>
 				{% if user.is_staff %} | <a href="/youpi/admin/">Admin</a>{% endif %}
 				| <a href="/youpi/accounts/logout/">{% trans 'Log out' %}</a>
 			{% endblock %}
