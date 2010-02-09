@@ -207,6 +207,7 @@ html_theme_options = {
 	'footerbgcolor': '#270b2e',
 	'relbarbgcolor': '#515185',
 	#'codebgcolor': '#fee0c6',
+	'codebgcolor': '#f3f5f7',
 	'sidebarbgcolor': '#d1d7de',
 	'sidebartextcolor': '#000000',
 	'headtextcolor': '#111111',

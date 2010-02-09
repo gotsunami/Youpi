@@ -35,7 +35,7 @@ look for in the FITS image header during ingestion.
 	will be treated as comments; blank lines are ignored. Every line of data must be a list 
 	of 2 or 3 semicolon-separated fields of the form::
 
-		Youpi keyword; Keyword mapping in source image[; keyword mapping for .ahead]
+		Youpi keyword; Keyword mapping in source image[; keyword mapping for .head]
 
 	*Youpi Keyword*
 		The first column is an *internal* keyword required by Youpi and always starts with an 
@@ -50,10 +50,10 @@ look for in the FITS image header during ingestion.
 		The current keyword value will be read in the FITS header and linked to the internal Youpi 
 		keyword defined in the first column.
 
-	*Keyword Mapping for .ahead*
+	*Keyword Mapping for .head*
 		The third (optional) column must be an uppercase FITS header keyword that will be used to 
-		generate ``.ahead`` files. Use it if you want to map a source image FITS keyword to another 
-		keyword name. Generated ``.ahead`` files will be passed to all low-level tools during processing.
+		generate ``.head`` files. Use it if you want to map a source image FITS keyword to another 
+		keyword name. Generated ``.head`` files will be passed to all low-level tools during processing.
 
 **Translation Table for MEGACAM**
 	Here is the ``megacam.conf`` file that adds support for MEGACAM image ingestion (and processing) 
@@ -78,7 +78,7 @@ look for in the FITS image header during ingestion.
 
 	This config file is rather simple. There is no third column because those header keywords 
 	are supported by all Terapix software packages. We don't need any keyword remapping since 
-	Youpi don't need to generate any .ahead file.
+	Youpi don't need to generate any .head file.
 
 **Translation Table for WIRCAM**
 	Here is the ``wircam.conf`` file that adds support for WIRCAM image ingestion (and processing) 
@@ -118,13 +118,13 @@ look for in the FITS image header during ingestion.
 		YDATEOBS;    DATE-OBS
 		YEQUINOX;    EQUINOX
 		YFILTER;     HIERARCH ESO INS FILT1 NAME;   FILTER
-		YFLAT;       "flat.fits";                   IMRED_FF
+		YFLAT;       FLATCOR;                       IMRED_FF
 		YMASK;       "badpix.fits";                 IMRED_MK
 		YRA;         RA;                            RA_DEG
 		YDEC;        DEC;                           DEC_DEG
 
 	With this config file, Youpi is able to read the ESO FITS keywords in VISTA images (using the 
-	2nd column). The keyword mapping provided in the third column allows Youpi to generate ``.ahead`` 
+	2nd column). The keyword mapping provided in the third column allows Youpi to generate ``.head`` 
 	files compatible with the low-level tools used for image processing.
 
 **Adding a new ITT file**
@@ -137,6 +137,22 @@ look for in the FITS image header during ingestion.
 	from the ``$YOUPI_INSTALL_DIR/terapix`` directory. Youpi will find your configuration file and 
 	update the database accordingly. That's it, the ITT config should be available in Youpi from the 
 	ingestion page.
+
+.. _automatic_head_section:
+
+Automatic ``.head`` File Generation
+===================================
+
+.. versionadded:: 0.6.1
+
+As explained in the previous section, ingesting any FITS image is possible when using 
+appropriate translation tables (ITTs). Now, in order to be able to process those ingested 
+images, Youpi and the other low-level tools it relies on must be able to communicate 
+properly: low-level tools expect reading images with a mandatory set of FITS keywords 
+in them.
+
+Ingesting Images in Youpi
+=========================
 
 .. image:: /figures/ingestion.png
    :width: 800
