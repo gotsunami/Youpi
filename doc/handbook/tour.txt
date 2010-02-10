@@ -53,7 +53,9 @@ look for in the FITS image header during ingestion.
 	*Keyword Mapping for .head*
 		The third (optional) column must be an uppercase FITS header keyword that will be used to 
 		generate ``.head`` files. Use it if you want to map a source image FITS keyword to another 
-		keyword name. Generated ``.head`` files will be passed to all low-level tools during processing.
+		keyword name. Generated ``.head`` files will be :ref:`passed to all low-level tools <automatic_head_section>` 
+		during processing. This column is especially useful to make processing of mostly any FITS 
+		image possible using Youpi and the low-level tools it relies on.
 
 **Translation Table for MEGACAM**
 	Here is the ``megacam.conf`` file that adds support for MEGACAM image ingestion (and processing) 
@@ -103,6 +105,8 @@ look for in the FITS image header during ingestion.
 		YRA;          RA_DEG
 		YDEC;         DEC_DEG
 
+.. _vircam_itt:
+
 **Translation Table for VIRCAM**
 	Now, let's have a look at the ``vircam.conf`` config file for supporting the VISTA instrument::
 
@@ -149,7 +153,59 @@ As explained in the previous section, ingesting any FITS image is possible when 
 appropriate translation tables (ITTs). Now, in order to be able to process those ingested 
 images, Youpi and the other low-level tools it relies on must be able to communicate 
 properly: low-level tools expect reading images with a mandatory set of FITS keywords 
-in them.
+in their header.
+
+In order to be able to override or define new FITS keywords without modifying an image
+header (keeping the precious source image untouched), low-level tools support reading 
+external files with a ``.head`` extension. When processing an image, if a file with the 
+same base name and the ``.head`` extension is found in the same directory, then the 
+FITS keywords in this ``.head`` file will be used to add information to the original 
+image's header.
+
+Since Youpi's goal is to allow generic FITS image ingestion *and* processing, it comes 
+with support for automatic ``.head`` file generation. Before processing images, it will 
+generate ``.head`` files on-the-fly when needed. This is the purpose of the third 
+column of the ITT file where a new FITS keyword can be defined. It will then be used 
+during ``.head`` file generation along with the value of the keyword defined in the 
+second column. 
+
+Let's illustrate this feature with a concrete example applied to a set of FITS keywords. 
+Let's say that the ``v20091023_00238.fits`` file is a VISTA image whose header keywords 
+are among::
+
+	HIERARCH ESO INS FILT1 NAME = 'Y'
+	FLATCOR = 'Y_flat_20091016.fit[16].fits'
+	...
+
+The :ref:`translation table for the VIRCAM instrument <vircam_itt>` used for this ingestion
+has the following parameters::
+
+	YFILTER;     HIERARCH ESO INS FILT1 NAME;   FILTER
+	YFLAT;       FLATCOR;                       IMRED_FF
+	YMASK;       "badpix.fits";                 IMRED_MK
+	...
+
+During image processing, Youpi will generate a ``v20091023_00238.head`` file in the same 
+working directory as the source image with the following content::
+
+	FILTER = 'Y'
+	IMRED_FF = 'Y_flat_20091016.fit[16].fits'
+	IMRED_MK = 'badpix.fits'
+	...
+	END
+	(Repeated for all HDUs)
+
+Finally, the low-level tools will be able to process that image since all required keywords 
+are supplied.
+
+.. note:: Youpi will *not* generate any ``.head`` file if the ITT used for ingesting an 
+          image does not contain any keyword mapping definition (third column empty). Only 
+          lines with a keyword mapping definition will be parsed and added to the final 
+          ``.head`` file.  Also note that the set of FITS keywords is repeated for all 
+          extensions (Header Data Units). Finally, for ``Scamp`` processings, Youpi generates 
+          a ``.ahead`` (note the "a" before "head") file. This is because ``Scamp`` reads 
+          ``.ahead`` files as input and produces final ``.head`` files with photometric 
+          data.
 
 Ingesting Images in Youpi
 =========================
