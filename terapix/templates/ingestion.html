@@ -88,7 +88,7 @@ function updateContent(container, handler) {
 		}
 	);
 	var post = { Instrument: sel.options[sel.selectedIndex].value }
-	xhr.send('/youpi/ingestion/ittContent/', $H(post).toQueryString());
+	xhr.send('/youpi/ingestion/itt/content/', $H(post).toQueryString());
 }
 </script>
 {% endblock %}
@@ -132,6 +132,7 @@ function updateContent(container, handler) {
 														{% endfor %}
 														</select>
 														<input id="itt_view_button" type="button" value="Show"/>
+														<input id="itt_raw_button" type="button" value="Show ITT raw content"/>
 														<div id="itt_content_div"></div>
 													</td>
 												</tr>
@@ -244,6 +245,10 @@ function updateContent(container, handler) {
 					});
 				});
 			}
+		});
+		$('itt_raw_button').observe('click', function() {
+			var sel = $('itt_select');
+			window.open('/youpi/ingestion/itt/raw/' + sel.options[sel.selectedIndex].value + '/');
 		});
 		ingestionType({% if perms.youpi.can_submit_jobs %}true{% else %}false{% endif %});
 

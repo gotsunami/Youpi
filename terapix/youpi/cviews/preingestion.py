@@ -761,6 +761,8 @@ def processing_get_imgs_ids_from_release(request):
 
 	return HttpResponse(str({'fields' : ['id'], 'data' : data}))
 
+@login_required
+@profile
 def get_itt_content(request):
 	"""
 	Returns content of ingestion translation table
@@ -775,4 +777,21 @@ def get_itt_content(request):
 		return HttpResponseForbidden()
 
 	return HttpResponse(json.encode({'instrument': name, 'content': marshal.loads(zlib.decompress(base64.decodestring(inst[0].itt)))}))
+
+@login_required
+@profile
+def show_raw_itt_content(request, instname):
+	"""
+	Display raw ITT content
+	@param instname Instrument name
+	"""
+	inst = Instrument.objects.filter(name = instname)
+	if not inst: return HttpResponseForbidden("No result")
+
+	itt = os.path.join(settings.TRUNK, 'terapix', 'lib', 'itt', 'conf', inst[0].name.lower() + '.conf')
+	f = open(itt, 'r')
+	content = f.readlines()
+	f.close()
+
+	return HttpResponse(''.join(content), mimetype = 'text/plain')
 
