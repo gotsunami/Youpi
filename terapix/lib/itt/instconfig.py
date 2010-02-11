@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys
+import sys, re
 
 def debug(msg):
 	print msg
@@ -39,14 +39,20 @@ class InstrumentConfig(object):
 		required_kw = self.required_kw.split(' ')
 
 		# Table of mappings
-		map = {}
+		map = {'+COPY': []}
 		for line in content:
 			#
 			# Sanity checks
 			#
 			if line.find(self.SEP) == -1:
-				debug("Field separator must be a semi-colon, please check line:\n%s" % line)
-				sys.exit(1)
+				# Is is a +KEYWORD line?
+				li= line.strip()
+				if re.match('^\+\w+$', li):
+					map['+COPY'].append(li[1:])
+					continue
+				else:
+					debug("Field separator must be a semi-colon. No separator found. The line does not match +KEYWORD either.\nPlease check the line:\n%s" % line)
+					sys.exit(1)
 			data = line.split(';')
 			if len(data) > 3:
 				debug("Too many fields for this line (max is 3):\n%s" % line)
@@ -69,7 +75,6 @@ class InstrumentConfig(object):
 			if len(data) == 3: values['MAP'] = data[2]
 			# Add entry
 			map[data[0]] = values
-			# TODO: handle +KEYWORD on col 2
 
 		return map
 

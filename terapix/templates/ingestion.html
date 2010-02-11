@@ -53,6 +53,7 @@ function updateContent(container, handler) {
 			var tab = new Element('table').addClassName('itt_table');
 			var tr, td;
 			data.each(function(pair) {
+				if (pair.key == '+COPY') return;
 				tr = new Element('tr');
 				td = new Element('td').update(pair.key + ';');
 				tr.insert(td);
@@ -66,6 +67,19 @@ function updateContent(container, handler) {
 				td.update(vals.get('MAP'));
 				tr.insert(td);
 				tab.insert(tr);
+			});
+			// Add keywords copy at the end of table
+			data.each(function(pair) {
+				if (pair.key == '+COPY') {
+					pair.value.each(function(kw) {
+						tr = new Element('tr').addClassName('keyword_copy');
+						td = new Element('td').update('+' + kw);
+						tr.insert(td);
+						td = new Element('td', {colspan: 2}).update('Keyword copy');
+						tr.insert(td);
+						tab.insert(tr);
+					});
+				}
 			});
 			var content = new Element('pre').addClassName('itt_content');
 			content.update("--------- Youpi Parameters for the " + resp.instrument + " Instrument ------------").insert(tab);

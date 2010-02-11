@@ -1462,7 +1462,7 @@ def gen_image_header(request, image_id):
 	from terapix.script import genimgdothead as dothead
 	try:
 		img = Image.objects.filter(id = image_id)[0]
-		dhead, numext = dothead.genImageDotHead(int(img.id))
+		dhead, numext, missing = dothead.genImageDotHead(int(img.id))
 	except:
 		return HttpResponseBadRequest("Error: image not found")
 
@@ -1472,6 +1472,7 @@ def gen_image_header(request, image_id):
 		'title' 			: get_title_from_menu_id(menu_id),
 		'img'				: img,
 		'hdrdata'			: dhead,
+		'missing'			: missing,
 		'exts'				: range(numext),
 	}, 
 	context_instance = RequestContext(request))

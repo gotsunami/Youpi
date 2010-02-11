@@ -81,7 +81,22 @@ def genImageDotHead(image_id):
 			# the image's header
 			hdudata[itt[k]['MAP']] = val
 
-	return (hdudata, len(hdulist))
+	# Keyword copy feature (+KEYWORD)
+	if itt.has_key('+COPY'):
+		# List of missing keywords (not found in src image)
+		missing = []
+		for kw in itt['+COPY']:
+			data = None
+			# Search keyword in all extensions
+			for hdu in hdulist:
+				try: data = str(hdu.header[kw]).strip()
+				except KeyError:
+					# Keyword not found in this extension, continue
+					pass
+			if data: hdudata[kw] = data
+			else: missing.append(kw)
+
+	return (hdudata, len(hdulist), missing)
 
 def main():
 	if len(sys.argv) != 2:

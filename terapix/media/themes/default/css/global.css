@@ -1656,6 +1656,14 @@ table.report_grading_stats tr.complete td.gradecomplete {
 .itt_table td {
 	color: #65AC6A;
 }
+.itt_table tr.keyword_copy td:first-child {
+	color: #F18430;
+}
+.itt_table tr.keyword_copy td:last-child {
+	color: grey;
+	font-style: italic;
+}
+
 #itt_select {
 	color: brown;
 }
