@@ -486,7 +486,7 @@ class QualityFitsIn(ProcessingPlugin):
 
 		# Generate CSF
 		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
-		cluster.setTransferInputFiles([customrc])
+		cluster.setTransferInputFiles([customrc, os.path.join(settings.TRUNK, 'terapix', 'script', 'genimgdothead.py')])
 
 		# Check if already successful processings
 		process_images = []

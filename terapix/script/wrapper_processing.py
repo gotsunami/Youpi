@@ -459,10 +459,28 @@ def process(userData, kind_id, argv):
 
 	################### PRE-PROCESSING STUFF GOES HERE ########################################
 
+	# Automatic .head (or .ahead for Scamp) file generation
+	if kind == 'fitsin':
+		try:
+			from genimgdothead import genImageDotHead	
+			img_id = userData['ImgID']
+			data, lenght, missing = genImageDotHead(int(img_id))
+			imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
+			if len(data):
+				headname = imgName + '.head'
+				f = open(headname, 'w')
+				for i in range(lenght):
+					for k, v in data.iteritems():
+						f.write("%s = %s\n" % (k, v))
+					f.write("END\n")
+				f.close()
+				debug("Generated: %s" % headname)
+		except Exception, e:
+			debug("Error during automatic .head file generation: %s" % e)
 
+	# Other preprocessing stuff
 	if kind == 'sex':
 		img_id = userData['ImgID']
-
 		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
 		os.mkdir(imgName)
 		os.chmod(imgName, RWX_ALL)
