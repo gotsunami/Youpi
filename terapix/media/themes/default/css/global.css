@@ -1486,10 +1486,8 @@ div.tags *, .dropzone * {
 	border-bottom: 2px solid #5E5E5E;
 	background-color: #e9f3ff;
 	padding: 10px;
-	position: absolute;
+	position: relative;
 	float: right;
-	right: 20px;
-	bottom: 0px;
 	width: 300px;
 	opacity: 0.9;
 	cursor: pointer;
