@@ -464,17 +464,28 @@ def process(userData, kind_id, argv):
 
 	# Automatic .head (or .ahead for Scamp) file generation
 	if kind == 'fitsin':
+		#image name from commandline argv
+		splittedArgs = argv[len(argv) - 1].split('/')
+		nameFromDB = splittedArgs[len(splittedArgs) -1][:-5]
+		debug("nameFromDB: %s" % nameFromDB)
+		imgChecksum = g.execute("SELECT checksum  FROM youpi_image WHERE name='%s'" % nameFromDB)[0][0]
+		debug("imgChecksum: %s" % imgChecksum)
+		imgNames = g.execute("SELECT name FROM youpi_image WHERE checksum='%s'" % imgChecksum)[0]
+		debug("imgNames: %s" % imgNames)
+		litename = nameFromDB
+		for imgName in imgNames:
+			if len(imgName) < len(litename):
+				litename = imgName
+		
+		debug("litename: %s" % litename)
+		argv[len(argv) - 1] = argv[len(argv) -1].replace(nameFromDB,litename)
+		debug("NEWargv: %s" % argv)
+
 		if userData['HandleHeadOption']:
 			try:
 				from genimgdothead import genImageDotHead	
 				img_id = userData['ImgID']
 				data, lenght, missing = genImageDotHead(int(img_id))
-				checksum = g.execute("SELECT checksum, name FROM youpi_image WHERE id='%s'" % img_id)
-				imgNames = g.execute("SELECT name FROM youpi_image WHERE checksum='%s'" % checksum[0][0])[0]
-				litename = checksum[0][1]
-				for imgName in imgNames:
-					if len(imgName) < len(litename):
-						litename = imgName
 				if len(data):
 					headname = litename + '.head'
 					f = open(headname, 'w')
@@ -486,6 +497,11 @@ def process(userData, kind_id, argv):
 					debug("Generated: %s" % headname)
 			except Exception, e:
 				debug("Error during automatic .head file generation: %s" % e)
+
+			for a in argv:
+				if (a == '--head'):
+					argv[argv.index(a) + 1] = argv[argv.index(a) + 1].replace(nameFromDB, litename)
+
 
 	# Other preprocessing stuff
 	if kind == 'sex':
