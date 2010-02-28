@@ -734,6 +734,12 @@ var {{ plugin.id }} = {
 		tr.insert(new Element('td').update(resp.ExitIfFlatMissing ? 'yes' : 'no'));
 		tab2.insert(tr);
 	
+		// Handling of qf_ahead file
+		tr = new Element('tr');
+		tr.insert(new Element('td').update('Handling qf_ahead file option'));
+		tr.insert(new Element('td').update(resp.HandleHeadOption ? 'yes' : 'no'));
+		tab2.insert(tr);
+
 		// Flat
 		tr = new Element('tr');
 		td = new Element('td');
@@ -1067,6 +1073,7 @@ var {{ plugin.id }} = {
 						regPath: regPath,
 						resultsOutputDir: output_data_path,
 						exitIfFlatMissing: $(uidfitsin + '_exit_flat_option').checked ? 1:0,
+						handleHeadOption: $(uidfitsin + '_qf_head_option').checked ? 1:0,
 					}
 		};
 
@@ -1143,7 +1150,8 @@ var {{ plugin.id }} = {
 									regPath: proc[k]['Reg'],
 									taskId: proc[k]['TaskId'],
 									resultsOutputDir: proc[k]['ResultsOutputDir'],
-									exitIfFlatMissing: proc[k]['ExitIfFlatMissing']
+									exitIfFlatMissing: proc[k]['ExitIfFlatMissing'],
+									handleHeadOption: proc[k]['HandleHeadOption']
 								}
 					};
 		

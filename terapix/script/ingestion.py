@@ -360,7 +360,7 @@ def run_ingestion():
 			#
 			if fitsverify != 0:
 				# FITS file not compliant...
-				debug("\tiFitsverify: may have fitsverify problems and won't be ingested", WARNING)
+				debug("\tFitsverify: may have fitsverify problems and won't be ingested", WARNING)
 				process  = False
 			else:
 				debug("\tFitsverify: OK" )
@@ -409,7 +409,11 @@ def run_ingestion():
 			h_flat = getFITSField(hdulist, 'YFLAT')
 			if h_flat:
 				fl = h_flat.split('.fits')
-				h_flat = fl[0] + FITSEXT
+				if re.search("\.fit\[(\d+)\]", fl[0]):
+					h_flat = re.sub('\.fit\[(\d+)\]','', fl[0]) + FITSEXT
+				else:
+					h_flat = fl[0] + FITSEXT
+
 		except MissingKeywordError:
 			# Missing flat info don't halt image ingestion
 			debug("\tMissing flat information in header", WARNING)

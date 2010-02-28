@@ -98,9 +98,10 @@ def getJobClusterId(userData):
 	@returns cluster id string
 	"""
 
-	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_q -global -xml'))
+	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_q -global -xml -l'))
 	data = pipe.readlines()
 	pipe.close()
+	print 'data', data
 
 	# Condor returns several XML files as output... Output should
 	# then be filtered
@@ -108,7 +109,7 @@ def getJobClusterId(userData):
 	k = 0
 	idxs = []
 	for line in data:
-		if line.find('-- Schedd') == 0:
+		if line.find('version') != -1:
 			idxs.append(k)
 		k += 1
 
@@ -127,7 +128,6 @@ def getJobClusterId(userData):
 			for job in jNode:
 				jobData = {}
 				data = job.getElementsByTagName('a')
-
 				for a in data:
 					if a.getAttribute('n') == 'Env':
 						# Try to look for YOUPI_USER_DATA environment variable
@@ -142,6 +142,7 @@ def getJobClusterId(userData):
 
 							XMLUserData = marshal.loads(base64.decodestring(str(XMLUserData)))
 							try:
+								print 'userdata = ', userData['JobID'], 'XMLuserdata',  XMLUserData['JobID']
 								if userData['JobID'] == XMLUserData['JobID']:
 									# Job found
 									data = job.getElementsByTagName('a')
@@ -303,7 +304,8 @@ def task_start_log(userData, start, kind_id = None):
 
 	res = g.execute("SELECT dflt_group_id, dflt_mode FROM youpi_siteprofile WHERE user_id=%d" % int(user_id))
 	perms = {'group_id': res[0][0], 'mode': res[0][1]}
-	try:
+	#try:
+	if (1):
 		g.begin()
 		g.setTableName('youpi_processing_task')
 		g.insert(	user_id = int(user_id),
@@ -318,8 +320,8 @@ def task_start_log(userData, start, kind_id = None):
 					mode = perms['mode'],
 					success = 0 )
 		task_id = g.con.insert_id()
-	except Exception, e:
-		raise WrapperError, e
+	# except Exception, e:
+	#	raise WrapperError, e
 
 	# Fill this table only if the processing is image related
 	try:
@@ -365,6 +367,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
+							handleHeadOption = userData['HandleHeadOption'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
@@ -461,22 +464,28 @@ def process(userData, kind_id, argv):
 
 	# Automatic .head (or .ahead for Scamp) file generation
 	if kind == 'fitsin':
-		try:
-			from genimgdothead import genImageDotHead	
-			img_id = userData['ImgID']
-			data, lenght, missing = genImageDotHead(int(img_id))
-			imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
-			if len(data):
-				headname = imgName + '.head'
-				f = open(headname, 'w')
-				for i in range(lenght):
-					for k, v in data.iteritems():
-						f.write("%s = %s\n" % (k, v))
-					f.write("END\n")
-				f.close()
-				debug("Generated: %s" % headname)
-		except Exception, e:
-			debug("Error during automatic .head file generation: %s" % e)
+		if userData['HandleHeadOption']:
+			try:
+				from genimgdothead import genImageDotHead	
+				img_id = userData['ImgID']
+				data, lenght, missing = genImageDotHead(int(img_id))
+				checksum = g.execute("SELECT checksum, name FROM youpi_image WHERE id='%s'" % img_id)
+				imgNames = g.execute("SELECT name FROM youpi_image WHERE checksum='%s'" % checksum[0][0])[0]
+				litename = checksum[0][1]
+				for imgName in imgNames:
+					if len(imgName) < len(litename):
+						litename = imgName
+				if len(data):
+					headname = litename + '.head'
+					f = open(headname, 'w')
+					for i in range(lenght):
+						for k, v in data.iteritems():
+							f.write("%s = %s\n" % (k, v))
+						f.write("END\n")
+					f.close()
+					debug("Generated: %s" % headname)
+			except Exception, e:
+				debug("Error during automatic .head file generation: %s" % e)
 
 	# Other preprocessing stuff
 	if kind == 'sex':
@@ -552,6 +561,7 @@ def process(userData, kind_id, argv):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
+							handleHeadOption = userData['HandleHeadOption'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))

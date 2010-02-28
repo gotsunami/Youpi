@@ -78,6 +78,7 @@ class QualityFitsIn(ProcessingPlugin):
 			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 			exitIfFlatMissing = post['ExitIfFlatMissing']
+			handleHeadOption = post['HandleHeadOption']
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
 
@@ -95,6 +96,7 @@ class QualityFitsIn(ProcessingPlugin):
 				 'taskId'			: taskId,
 				 'resultsOutputDir' : resultsOutputDir, 
 				 'exitIfFlatMissing': exitIfFlatMissing, 
+				 'handleHeadOption' : handleHeadOption,
 				 'config' 			: config 
 		}
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
@@ -119,6 +121,8 @@ class QualityFitsIn(ProcessingPlugin):
 			data = marshal.loads(base64.decodestring(str(it.data)))
 			if not data.has_key('exitIfFlatMissing'):
 				data['exitIfFlatMissing'] = 0
+			if not data.has_key('handleHeadOption'):
+				data['handleHeadOption'] = 0
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
@@ -130,6 +134,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
 						'name' 				: str(it.name),
 						'exitIfFlatMissing' : int(data['exitIfFlatMissing']),
+						'handleHeadOption'  : int(data['handleHeadOption']),
 						'config' 			: str(data['config'])})
 
 		return res
@@ -289,6 +294,7 @@ class QualityFitsIn(ProcessingPlugin):
 							'Mask' 				: str(h_fits.mask),
 							'Reg' 				: str(h_fits.reg),
 							'ExitIfFlatMissing'	: h_fits.exitIfFlatMissing,
+							'HandleHeadOption'	: h_fits.handleHeadOption,
 							})
 
 		try:
@@ -356,6 +362,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(data.mask),
 					'Reg' 				: str(data.reg),
 					'ExitIfFlatMissing'	: data.exitIfFlatMissing,
+					'HandleHeadOption'	: data.handleHeadOption,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.qfconfig))),
 					'WWW' 				: str(data.www),
 					'ImgName' 			: str(img.name),
@@ -429,6 +436,7 @@ class QualityFitsIn(ProcessingPlugin):
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
 			exitIfFlatMissing = int(post['ExitIfFlatMissing'])
+			handleHeadOption = int(post['HandleHeadOption'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -480,6 +488,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(maskPath), 
 					'Reg' 				: str(regPath), 
 					'ExitIfFlatMissing'	: exitIfFlatMissing,
+					'HandleHeadOption'	: handleHeadOption,
 					'Config' 			: str(post['Config'])} 
 
 		step = 2 							# At least step seconds between two job start
@@ -577,7 +586,7 @@ class QualityFitsIn(ProcessingPlugin):
 				'encuserdata'		: encUserData, 
 				'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
 			}
-
+			
 			userData['Warnings'] = {}
 			userData['Warnings'][str(img.name) + '.fits'] = []
 
@@ -589,6 +598,9 @@ class QualityFitsIn(ProcessingPlugin):
 
 			if imgReg: image_args += " -P %s" % imgReg
 			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable reg file found')
+
+			if handleHeadOption : image_args += " --head %s" % img.name + '.head'
+		#	else: userData['Warnings'][str(img.name) + '.head'].append('No suitable qf_ahead file found')
 
 			if not len(userData['Warnings'][str(img.name) + '.fits']):
 				del userData['Warnings'][str(img.name) + '.fits']
@@ -763,6 +775,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'Mask' 				: str(fitsin.mask),
 						'Reg' 				: str(fitsin.reg),
 						'ExitIfFlatMissing'	: str(fitsin.exitIfFlatMissing),
+						'HandleHeadOption'	: str(fitsin.handleHeadOption),
 						'FitsinId' 			: int(fitsin.id) }
 
 		return { 'Processings' : [processings] }
