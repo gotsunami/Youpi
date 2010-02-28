@@ -467,19 +467,18 @@ def process(userData, kind_id, argv):
 		#image name from commandline argv
 		splittedArgs = argv[len(argv) - 1].split('/')
 		nameFromDB = splittedArgs[len(splittedArgs) -1][:-5]
-		debug("nameFromDB: %s" % nameFromDB)
+		debug("old argv: %s" % argv)
+		debug("image Name from Database : %s" % nameFromDB)
 		imgChecksum = g.execute("SELECT checksum  FROM youpi_image WHERE name='%s'" % nameFromDB)[0][0]
-		debug("imgChecksum: %s" % imgChecksum)
 		imgNames = g.execute("SELECT name FROM youpi_image WHERE checksum='%s'" % imgChecksum)[0]
-		debug("imgNames: %s" % imgNames)
+		debug("images with same checksum: %s" % imgNames)
 		litename = nameFromDB
 		for imgName in imgNames:
 			if len(imgName) < len(litename):
 				litename = imgName
 		
-		debug("litename: %s" % litename)
+		debug("Real image name : %s" % litename)
 		argv[len(argv) - 1] = argv[len(argv) -1].replace(nameFromDB,litename)
-		debug("NEWargv: %s" % argv)
 
 		if userData['HandleHeadOption']:
 			try:
@@ -502,6 +501,7 @@ def process(userData, kind_id, argv):
 				if (a == '--head'):
 					argv[argv.index(a) + 1] = argv[argv.index(a) + 1].replace(nameFromDB, litename)
 
+		debug("new argv: %s" % argv)
 
 	# Other preprocessing stuff
 	if kind == 'sex':
