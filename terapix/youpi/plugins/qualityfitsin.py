@@ -418,6 +418,7 @@ class QualityFitsIn(ProcessingPlugin):
 		file name.
 		"""
 
+		from terapix.script.genimgdothead import genImageDotHead
 		post = request.POST
 		try:
 			itemId = str(post['ItemId'])
@@ -550,6 +551,8 @@ class QualityFitsIn(ProcessingPlugin):
 				# No suitable reg file found
 				imgReg = None
 
+			# Stores real image name (as available on disk)
+			userData['RealImageName'] = self.getRealImageName(int(img.id))
 			#
 			# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
 			# They are later used by the wrapper script to get the name of error log file easily
@@ -591,9 +594,9 @@ class QualityFitsIn(ProcessingPlugin):
 			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable reg file found')
 
 			# Only add --head param if needed
-			hdata, lenght, missing = genImageDotHead(img.id)
+			hdata, lenght, missing = genImageDotHead(int(img.id))
 			if hdata:
-				image_args += " --head %s" % img.name + '.head'
+				image_args += " --head %s" % userData['RealImageName'] + '.head'
 
 			if not len(userData['Warnings'][str(img.name) + '.fits']):
 				del userData['Warnings'][str(img.name) + '.fits']

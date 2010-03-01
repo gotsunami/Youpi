@@ -317,7 +317,7 @@ def task_start_log(userData, start, kind_id = None):
 					mode = perms['mode'],
 					success = 0 )
 		task_id = g.con.insert_id()
-	 except Exception, e:
+	except Exception, e:
 		raise WrapperError, e
 
 	# Fill this table only if the processing is image related
@@ -460,33 +460,12 @@ def process(userData, kind_id, argv):
 
 	# Automatic .head (or .ahead for Scamp) file generation
 	if kind == 'fitsin':
-		#image name from commandline argv
-		splittedArgs = argv[len(argv) - 1].split('/')
-		nameFromDB = splittedArgs[len(splittedArgs) -1][:-5]
-		debug("Old argv: %s" % argv)
-		debug("image Name from Database : %s" % nameFromDB)
-		imgChecksum = g.execute("SELECT checksum  FROM youpi_image WHERE name='%s'" % nameFromDB)[0][0]
-		imgNames = g.execute("SELECT name FROM youpi_image WHERE checksum='%s'" % imgChecksum)[0]
-		debug("images with same checksum: %s" % imgNames)
-		litename = nameFromDB
-		for imgName in imgNames:
-			if len(imgName) < len(litename):
-				litename = imgName
-				break
-		
-		debug("Real image name : %s" % litename)
-		argv[len(argv) - 1] = argv[len(argv) -1].replace(nameFromDB,litename)
-		for a in argv:
-			if (a == '--head'):
-				argv[argv.index(a) + 1] = argv[argv.index(a) + 1].replace(nameFromDB, litename)
-		debug("New argv: %s" % argv)
-
 		try:
 			from genimgdothead import genImageDotHead	
 			img_id = userData['ImgID']
 			data, lenght, missing = genImageDotHead(int(img_id))
 			if len(data):
-				headname = litename + '.head'
+				headname = userData['RealImageName'] + '.head'
 				f = open(headname, 'w')
 				for i in range(lenght):
 					for k, v in data.iteritems():

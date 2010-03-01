@@ -84,6 +84,26 @@ class ProcessingPlugin(object):
 
 		return []
 
+	def getRealImageName(self, image_id):
+		"""
+		Returns real (physical) image name, as available on disk.
+		Handles cases for multiple image ingestions with same checksum.
+		"""
+		if type(image_id) != types.IntType:
+			raise TypeError, "image_id must be an integer"
+		from django.db import connection
+		cur = connection.cursor()
+		cur.execute("SELECT name FROM youpi_image WHERE checksum = (SELECT checksum FROM youpi_image WHERE id=%d);" % image_id)
+		imgNames = cur.fetchall()
+		if not imgNames:
+			raise PluginError, "No image with id: %d" % image_id
+		smallest = imgNames[0][0]
+		for name in imgNames:
+			if len(name) < len(smallest):
+				smallest = name
+				break
+		return smallest
+
 	def getConfigurationFilePath(self):
 		"""
 		Returns the pathname to configuration file used for this processing
