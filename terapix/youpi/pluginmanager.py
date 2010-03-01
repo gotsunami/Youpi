@@ -97,7 +97,7 @@ class ProcessingPlugin(object):
 		imgNames = cur.fetchall()
 		if not imgNames:
 			raise PluginError, "No image with id: %d" % image_id
-		smallest = imgNames[0][0]
+		smallest = imgNames[0]
 		for name in imgNames:
 			if len(name) < len(smallest):
 				smallest = name

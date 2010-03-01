@@ -514,7 +514,11 @@ class QualityFitsIn(ProcessingPlugin):
 
 		# One image per job queue
 		for img in process_images:
-			path = os.path.join(img.path, img.name + '.fits')
+
+			# Stores real image name (as available on disk)
+			userData['RealImageName'] = self.getRealImageName(int(img.id))
+
+			path = os.path.join(img.path, userData['RealImageName'][0] + '.fits')
 			# FLAT checks
 			if os.path.isdir(flatPath):
 				if img.flat:
@@ -551,8 +555,6 @@ class QualityFitsIn(ProcessingPlugin):
 				# No suitable reg file found
 				imgReg = None
 
-			# Stores real image name (as available on disk)
-			userData['RealImageName'] = self.getRealImageName(int(img.id))
 			#
 			# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
 			# They are later used by the wrapper script to get the name of error log file easily

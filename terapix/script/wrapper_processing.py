@@ -173,7 +173,8 @@ AND r.image_id=i.id;
 
 	# Log string that will be stored into DB at the end
 	log = '+' + '-' * 20 + (" QualityFITS XML parsing results for %s " % imgName) + '-' * 20 + "\n"
-
+	
+	#FIXME imgName is not the right image name to parse xml from Qfits
 	qfits_path = os.path.join(CLUSTER_OUTPUT_PATH, imgName, 'qualityFITS')
 	log += "From path: %s\n\n" % qfits_path
 
