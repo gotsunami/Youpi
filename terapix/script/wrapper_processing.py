@@ -101,7 +101,6 @@ def getJobClusterId(userData):
 	pipe = os.popen(os.path.join(CONDOR_BIN_PATH, 'condor_q -global -xml -l'))
 	data = pipe.readlines()
 	pipe.close()
-	print 'data', data
 
 	# Condor returns several XML files as output... Output should
 	# then be filtered
@@ -142,7 +141,6 @@ def getJobClusterId(userData):
 
 							XMLUserData = marshal.loads(base64.decodestring(str(XMLUserData)))
 							try:
-								print 'userdata = ', userData['JobID'], 'XMLuserdata',  XMLUserData['JobID']
 								if userData['JobID'] == XMLUserData['JobID']:
 									# Job found
 									data = job.getElementsByTagName('a')
@@ -304,8 +302,7 @@ def task_start_log(userData, start, kind_id = None):
 
 	res = g.execute("SELECT dflt_group_id, dflt_mode FROM youpi_siteprofile WHERE user_id=%d" % int(user_id))
 	perms = {'group_id': res[0][0], 'mode': res[0][1]}
-	#try:
-	if (1):
+	try:
 		g.begin()
 		g.setTableName('youpi_processing_task')
 		g.insert(	user_id = int(user_id),
@@ -320,8 +317,8 @@ def task_start_log(userData, start, kind_id = None):
 					mode = perms['mode'],
 					success = 0 )
 		task_id = g.con.insert_id()
-	# except Exception, e:
-	#	raise WrapperError, e
+	 except Exception, e:
+		raise WrapperError, e
 
 	# Fill this table only if the processing is image related
 	try:
@@ -367,7 +364,6 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
-							handleHeadOption = userData['HandleHeadOption'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
@@ -467,7 +463,7 @@ def process(userData, kind_id, argv):
 		#image name from commandline argv
 		splittedArgs = argv[len(argv) - 1].split('/')
 		nameFromDB = splittedArgs[len(splittedArgs) -1][:-5]
-		debug("old argv: %s" % argv)
+		debug("Old argv: %s" % argv)
 		debug("image Name from Database : %s" % nameFromDB)
 		imgChecksum = g.execute("SELECT checksum  FROM youpi_image WHERE name='%s'" % nameFromDB)[0][0]
 		imgNames = g.execute("SELECT name FROM youpi_image WHERE checksum='%s'" % imgChecksum)[0]
@@ -476,50 +472,31 @@ def process(userData, kind_id, argv):
 		for imgName in imgNames:
 			if len(imgName) < len(litename):
 				litename = imgName
+				break
 		
 		debug("Real image name : %s" % litename)
 		argv[len(argv) - 1] = argv[len(argv) -1].replace(nameFromDB,litename)
+		for a in argv:
+			if (a == '--head'):
+				argv[argv.index(a) + 1] = argv[argv.index(a) + 1].replace(nameFromDB, litename)
+		debug("New argv: %s" % argv)
 
-		if userData['HandleHeadOption']:
-			try:
-				from genimgdothead import genImageDotHead	
-				img_id = userData['ImgID']
-				data, lenght, missing = genImageDotHead(int(img_id))
-				if len(data):
-					headname = litename + '.head'
-					f = open(headname, 'w')
-					for i in range(lenght):
-						for k, v in data.iteritems():
-							f.write("%s = %s\n" % (k, v))
-						f.write("END\n")
-					f.close()
-					debug("Generated: %s" % headname)
-			except Exception, e:
-				debug("Error during automatic .head file generation: %s" % e)
+		try:
+			from genimgdothead import genImageDotHead	
+			img_id = userData['ImgID']
+			data, lenght, missing = genImageDotHead(int(img_id))
+			if len(data):
+				headname = litename + '.head'
+				f = open(headname, 'w')
+				for i in range(lenght):
+					for k, v in data.iteritems():
+						f.write("%s = %s\n" % (k, v))
+					f.write("END\n")
+				f.close()
+				debug("Generated: %s" % headname)
+		except Exception, e:
+			debug("Error during automatic .head file generation: %s" % e)
 
-			for a in argv:
-				if (a == '--head'):
-					argv[argv.index(a) + 1] = argv[argv.index(a) + 1].replace(nameFromDB, litename)
-
-		debug("new argv: %s" % argv)
-
-	# Other preprocessing stuff
-	if kind == 'sex':
-		img_id = userData['ImgID']
-		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
-		os.mkdir(imgName)
-		os.chmod(imgName, RWX_ALL)
-		os.system("mv sex-config* sex-param* *.conv *.nnw %s" %(imgName))
-		os.chdir(imgName)
-
-		# FIXME: remove this code that won't get executed  at all since the files are not yet
-		# transferred... (see Swarp plugin code for a fix)
-		fzs = glob.glob('*.fits.fz')
-		for fz in fzs:
-			debug("Sextractor Preprocessing: uncompressing %s" % fz)
-			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
-
-	elif kind == 'fitsin':
 		flatname = g.execute("SELECT flat FROM youpi_image WHERE id=%s" % userData['ImgID'])[0][0]
 		if userData['ExitIfFlatMissing']:
 			# Check for flat file
@@ -537,6 +514,21 @@ def process(userData, kind_id, argv):
 		else:
 			debug("No check for FLAT image %s existence (checkbox was unchecked)" % flatname)
 
+	# Other preprocessing stuff
+	elif kind == 'sex':
+		img_id = userData['ImgID']
+		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
+		os.mkdir(imgName)
+		os.chmod(imgName, RWX_ALL)
+		os.system("mv sex-config* sex-param* *.conv *.nnw %s" %(imgName))
+		os.chdir(imgName)
+
+		# FIXME: remove this code that won't get executed  at all since the files are not yet
+		# transferred... (see Swarp plugin code for a fix)
+		fzs = glob.glob('*.fits.fz')
+		for fz in fzs:
+			debug("Sextractor Preprocessing: uncompressing %s" % fz)
+			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
 
 	################### END OF PRE-PROCESSING  ################################################
 
@@ -577,7 +569,6 @@ def process(userData, kind_id, argv):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
-							handleHeadOption = userData['HandleHeadOption'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
