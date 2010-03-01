@@ -91,7 +91,7 @@ AND ru.id = ri.run_id
 		if itt[k].has_key('MAP'): 
 			# Unmapped keyword are ignored since they are available in 
 			# the image's header
-			hdudata[itt[k]['MAP']] = val
+			hdudata["%-8s" % itt[k]['MAP'][:8]] = val
 
 	missing = []
 	# Keyword copy feature (+KEYWORD)
@@ -105,7 +105,7 @@ AND ru.id = ri.run_id
 				except KeyError:
 					# Keyword not found in this extension, continue
 					pass
-			if data: hdudata[kw] = data
+			if data: hdudata["%-8s" % kw[:8]] = data
 			else: missing.append(kw)
 
 	return (hdudata, len(hdulist), missing)

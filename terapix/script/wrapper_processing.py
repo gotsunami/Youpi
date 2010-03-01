@@ -469,7 +469,7 @@ def process(userData, kind_id, argv):
 				f = open(headname, 'w')
 				for i in range(lenght):
 					for k, v in data.iteritems():
-						f.write("%s = %s\n" % (k, v))
+						f.write("%s= %s\n" % (k, v))
 					f.write("END\n")
 				f.close()
 				debug("Generated: %s" % headname)
