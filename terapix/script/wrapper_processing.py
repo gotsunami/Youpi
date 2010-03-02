@@ -173,8 +173,6 @@ AND r.image_id=i.id;
 
 	# Log string that will be stored into DB at the end
 	log = '+' + '-' * 20 + (" QualityFITS XML parsing results for %s " % imgName) + '-' * 20 + "\n"
-	
-	#FIXME imgName is not the right image name to parse xml from Qfits
 	qfits_path = os.path.join(CLUSTER_OUTPUT_PATH, imgName, 'qualityFITS')
 	log += "From path: %s\n\n" % qfits_path
 
@@ -495,14 +493,8 @@ def process(userData, kind_id, argv):
 			debug("No check for FLAT image %s existence (checkbox was unchecked)" % flatname)
 
 		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
-		if userData['RealImageName'][0] != str(imgName):
-			os.mkdir(imgName)
-			os.chdir(imgName)
-			os.mkdir('qualityFITS')
-			os.chmod('qualityFITS', RWX_ALL)
-			os.chdir('../')
-			os.chmod(imgName, RWX_ALL)
-
+		if userData['RealImageName'] != imgName:
+			os.makedirs(os.path.join(imgName, 'qualityFITS'), RWX_ALL)
 
 	# Other preprocessing stuff
 	elif kind == 'sex':
