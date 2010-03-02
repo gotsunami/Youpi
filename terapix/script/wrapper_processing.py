@@ -466,7 +466,7 @@ def process(userData, kind_id, argv):
 			img_id = userData['ImgID']
 			data, lenght, missing = genImageDotHead(int(img_id))
 			if len(data):
-				headname = userData['RealImageName'][0] + '.head'
+				headname = userData['RealImageName'] + '.head'
 				f = open(headname, 'w')
 				for i in range(lenght):
 					for k, v in data.iteritems():

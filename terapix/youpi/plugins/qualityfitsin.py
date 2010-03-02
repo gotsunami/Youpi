@@ -517,8 +517,7 @@ class QualityFitsIn(ProcessingPlugin):
 
 			# Stores real image name (as available on disk)
 			userData['RealImageName'] = self.getRealImageName(int(img.id))
-
-			path = os.path.join(img.path, userData['RealImageName'][0] + '.fits')
+			path = os.path.join(img.path, userData['RealImageName'] + '.fits')
 			# FLAT checks
 			if os.path.isdir(flatPath):
 				if img.flat:
