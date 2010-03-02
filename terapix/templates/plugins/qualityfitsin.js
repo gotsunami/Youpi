@@ -1066,7 +1066,9 @@ var {{ plugin.id }} = {
 						maskPath: mandpaths[1], 
 						regPath: regPath,
 						resultsOutputDir: output_data_path,
-						exitIfFlatMissing: $(uidfitsin + '_exit_flat_option').checked ? 1:0
+						exitIfFlatMissing: $(uidfitsin + '_exit_flat_option').checked ? 1:0,
+						flatNormMethod: $(uidfitsin + '_flatnorm_option').checked ? 
+							$(uidfitsin + '_flatnorm_select').options[$(uidfitsin + '_flatnorm_select').selectedIndex].value : ''
 					}
 		};
 
@@ -1143,7 +1145,8 @@ var {{ plugin.id }} = {
 									regPath: proc[k]['Reg'],
 									taskId: proc[k]['TaskId'],
 									resultsOutputDir: proc[k]['ResultsOutputDir'],
-									exitIfFlatMissing: proc[k]['ExitIfFlatMissing']
+									exitIfFlatMissing: proc[k]['ExitIfFlatMissing'],
+									flatNormMethod: proc[k]['FlatNormMethod']
 								}
 					};
 		

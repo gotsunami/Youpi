@@ -13,6 +13,10 @@
 					<td class="flatMissing">{% ifequal data.userData.exitIfFlatMissing 1 %}yes{% else %}no{% endifequal %}</td>
 				</tr>
 				<tr>
+					<td><span class="flatLetter">Flat normalization:</span></td>
+					<td class="flatMissing">{% if data.userData.flatNormMethod %}{{ data.userData.flatNormMethod }}{% else %}-{% endif %}</td>
+				</tr>
+				<tr>
 					<td><span class="flatLetter">Flat path:</span></td>
 					<td>{{ data.userData.flatPath }}</td>
 				</tr>
@@ -47,29 +51,6 @@
 				<p><img id="{{ plugin.id }}_{{ forloop.counter0 }}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.png" title="Submit processing to cluster"/> 
 				</p>
 			</div>
-			<!--
-				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.gif" title="Submit processing to cluster" 
-						onclick="{{ plugin.id }}.run(	'{{ plugin.id }}_{{ forloop.counter0 }}', 
-														'{{ data.userData.imgList }}', 
-														'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
-														'{{ data.userData.flatPath }}', 
-														'{{ data.userData.maskPath }}',
-														'{{ data.userData.regPath }}',
-														'{{ data.userData.config }}',
-														'{{ data.userData.resultsOutputDir }}',
-														'{{ data.userData.taskId }}');"/>
-				</p>
-			</div>
-			<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.gif" onclick="{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter0 }}', 
-				'{{ data.userData.imgList }}', 
-				'{{ plugin.itemPrefix }}{{ data.itemCounter }}', 
-				'{{ data.userData.flatPath }}', 
-				'{{ data.userData.maskPath }}',
-				'{{ data.userData.regPath }}',
-				'{{ data.userData.resultsOutputDir }}',
-				'{{ data.userData.config }}',
-				'{{ data.userData.taskId }}');"/>
-				-->
 			<img id="{{ plugin.id }}_{{ forloop.counter0 }}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.png"/>
 		</td>
 	</tr>

@@ -19,6 +19,21 @@
 				<input type="checkbox" checked="checked" id="{{ plugin.id }}_exit_flat_option"/>
 				<label style="padding-left: 2px;">Force QualityFits jobs to exit if flat image not found</label>
 			</div>
+			<div style="text-align: left; margin: auto; width: 80%; padding-top: 30px; vertical-align: center;">
+				<input type="checkbox" id="{{ plugin.id }}_flatnorm_option"/>
+				<label style="padding-left: 2px;">Single chip flat field normalization</label>
+				<div class="tip" style="width: -moz-fit-content;" id="{{ plugin.id }}_flatnorm_select_div">
+					<label>Computation method: </label>
+					<select id="{{ plugin.id }}_flatnorm_select">
+						<option value="MEDIAN">MEDIAN</option>
+						<!--
+						<option value="MODE">MODE</option>
+						-->
+						<option value="MEAN">MEAN</option>
+						<option value="MEDIANCLIP">MEDIANCLIP</option>
+					</select>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -51,4 +66,12 @@
 
 	// Now file browser can renders itself
 	fm_file_browser.render();
+
+	$('{{ plugin.id }}_flatnorm_select_div').hide();
+	$('{{ plugin.id }}_flatnorm_option').observe('click', function() {
+		if(this.checked)
+			$('{{ plugin.id }}_flatnorm_select_div').appear();
+		else
+			$('{{ plugin.id }}_flatnorm_select_div').fade();
+	});
 </script>

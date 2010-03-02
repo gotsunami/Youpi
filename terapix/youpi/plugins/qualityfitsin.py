@@ -78,6 +78,7 @@ class QualityFitsIn(ProcessingPlugin):
 			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 			exitIfFlatMissing = post['ExitIfFlatMissing']
+			flatNormMethod = post['FlatNormMethod']
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
 
@@ -95,6 +96,7 @@ class QualityFitsIn(ProcessingPlugin):
 				 'taskId'			: taskId,
 				 'resultsOutputDir' : resultsOutputDir, 
 				 'exitIfFlatMissing': exitIfFlatMissing, 
+				 'flatNormMethod'   : flatNormMethod,
 				 'config' 			: config 
 		}
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
@@ -119,6 +121,8 @@ class QualityFitsIn(ProcessingPlugin):
 			data = marshal.loads(base64.decodestring(str(it.data)))
 			if not data.has_key('exitIfFlatMissing'):
 				data['exitIfFlatMissing'] = 0
+			if not data.has_key('flatNormMethod'):
+				data['flatNormMethod'] = ''
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username' 			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
@@ -130,6 +134,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
 						'name' 				: str(it.name),
 						'exitIfFlatMissing' : int(data['exitIfFlatMissing']),
+						'flatNormMethod'    : str(data['flatNormMethod']),
 						'config' 			: str(data['config'])})
 
 		return res
@@ -289,6 +294,7 @@ class QualityFitsIn(ProcessingPlugin):
 							'Mask' 				: str(h_fits.mask),
 							'Reg' 				: str(h_fits.reg),
 							'ExitIfFlatMissing'	: h_fits.exitIfFlatMissing,
+							'FlatNormMethod'	: h_fits.flatNormMethod,
 							})
 
 		try:
@@ -356,6 +362,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(data.mask),
 					'Reg' 				: str(data.reg),
 					'ExitIfFlatMissing'	: data.exitIfFlatMissing,
+					'FlatNormMethod'	: data.flatNormMethod,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.qfconfig))),
 					'WWW' 				: str(data.www),
 					'ImgName' 			: str(img.name),
@@ -431,6 +438,7 @@ class QualityFitsIn(ProcessingPlugin):
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
 			exitIfFlatMissing = int(post['ExitIfFlatMissing'])
+			flatNormMethod = post['FlatNormMethod']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -482,6 +490,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(maskPath), 
 					'Reg' 				: str(regPath), 
 					'ExitIfFlatMissing'	: exitIfFlatMissing,
+					'FlatNormMethod'	: flatNormMethod,
 					'Config' 			: str(post['Config'])} 
 
 		step = 2 							# At least step seconds between two job start
@@ -782,6 +791,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'Mask' 				: str(fitsin.mask),
 						'Reg' 				: str(fitsin.reg),
 						'ExitIfFlatMissing'	: str(fitsin.exitIfFlatMissing),
+						'FlatNormMethod'	: str(fitsin.flatNormMethod),
 						'FitsinId' 			: int(fitsin.id) }
 
 		return { 'Processings' : [processings] }
