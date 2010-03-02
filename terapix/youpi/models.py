@@ -259,6 +259,23 @@ class Image(models.Model):
 		"""
 		rel = Rel_tagi.objects.filter(image = self)
 		return [r.tag for r in rel]
+
+	@property
+	def filename(self):
+		"""
+		Returns real (physical) image name, as available on disk.
+		Handles cases for multiple image ingestions with same checksum.
+		"""
+		from django.db import connection
+		cur = connection.cursor()
+		cur.execute("SELECT name FROM youpi_image WHERE checksum = (SELECT checksum FROM youpi_image WHERE id=%d);" % self.id)
+		imgNames = cur.fetchall()
+		smallest = imgNames[0][0]
+		for name in imgNames:
+			if len(name[0]) < len(smallest):
+				smallest = name[0]
+				break
+		return smallest
 	
 	class Meta:
 		unique_together = ('name', 'checksum')

@@ -514,10 +514,10 @@ class QualityFitsIn(ProcessingPlugin):
 
 		# One image per job queue
 		for img in process_images:
-
 			# Stores real image name (as available on disk)
-			userData['RealImageName'] = self.getRealImageName(int(img.id))
+			userData['RealImageName'] = str(img.filename)
 			path = os.path.join(img.path, userData['RealImageName'] + '.fits')
+
 			# FLAT checks
 			if os.path.isdir(flatPath):
 				if img.flat:
