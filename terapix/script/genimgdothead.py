@@ -119,17 +119,38 @@ def formatHeader(hdudata):
 		data["%-8s" % k[:8]] = v
 	return data
 
+def getRawHeader(hdudata, num_ext):
+	"""
+	Generate raw header data
+	k1      = val1
+	k2      = val2
+	...
+	kn      = valn
+	"""
+	if type(num_ext) != types.IntType:
+		raise TypeError, "num_ext must be an integer"
+	header = []
+	if num_ext > 1:
+		# Write n-1 extensions
+		for i in range(num_ext-1):
+			for k, v in hdudata.iteritems():
+				header.append("%s= %s" % (k, v))
+			header.append("END")
+	else:
+		for k, v in hdudata.iteritems():
+			header.append("%s= %s" % (k, v))
+		header.append("END")
+	return '\n'.join(header)
+
 def main():
 	if len(sys.argv) != 2:
 		print "Usage: %s image_db_id" % sys.argv[0]
 		sys.exit(1)
 
-	data, lenght, missing = genImageDotHead(int(sys.argv[1]))
+	data, length, missing = genImageDotHead(int(sys.argv[1]))
+	data = formatHeader(data)
 	if len(data):
-		for i in range(lenght):
-			for k, v in data.iteritems():
-				print "%s = %s" % (k, v)
-			print "END"
+		print getRawHeader(data, length)
 
 if __name__ == '__main__':
 	main()

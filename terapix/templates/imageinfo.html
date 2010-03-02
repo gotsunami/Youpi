@@ -19,7 +19,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	<div id="menuitem_sub_0">
 		<div class="prefs_condor">
 			<h1>Generated .head file for image {{ img.name }}</h1>
-			{% if hdrdata %}
+			{% if hasHeader %}
 				{% if missing %}
 				<div class="warning" style="width: -moz-fit-content;">
 					<p>Missing keywords (defined as +KEYWORD in the ITT but not found<br/>
@@ -29,11 +29,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				</div>
 				{% endif %}
 			<div style="width: 70%; padding-left: 15px; color: white; background-color: black; text-align: left; height: 500px; overflow: auto;">
-				<pre>
-			{% for j in exts %}{% for k, v in hdrdata.items %}
-{{ k }}= {{ v }}{% endfor %}
-END{% endfor %}
-				</pre>
+				<pre>{{ rawHeader }}</pre>
 			</div>
 			{% else %}
 			<div class="tip" style="width: -moz-fit-content;">

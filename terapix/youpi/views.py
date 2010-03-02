@@ -1466,15 +1466,20 @@ def gen_image_header(request, image_id):
 	except:
 		return HttpResponseBadRequest("Error: image not found")
 
-	dhead = genimgdothead.formatHeader(dhead)
+	hasHeader = False
+	if dhead:
+		dhead = genimgdothead.formatHeader(dhead)
+		rawHead = genimgdothead.getRawHeader(dhead, numext)
+		hasHeader = True
+
 	menu_id = 'processing'
 	return render_to_response('imageinfo.html', {	
 		'selected_entry_id'	: menu_id, 
 		'title' 			: get_title_from_menu_id(menu_id),
 		'img'				: img,
-		'hdrdata'			: dhead,
+		'rawHeader'			: rawHead,
+		'hasHeader'			: hasHeader,
 		'missing'			: missing,
-		'exts'				: range(numext),
 	}, 
 	context_instance = RequestContext(request))
 
