@@ -460,9 +460,10 @@ def process(userData, kind_id, argv):
 	# Automatic .head (or .ahead for Scamp) file generation
 	if kind == 'fitsin':
 		try:
-			from genimgdothead import genImageDotHead	
+			from genimgdothead import genImageDotHead, formatHeader	
 			img_id = userData['ImgID']
 			data, lenght, missing = genImageDotHead(int(img_id))
+			data = formatHeader(data)
 			if len(data):
 				headname = userData['RealImageName'] + '.head'
 				f = open(headname, 'w')

@@ -1459,13 +1459,14 @@ def gen_image_header(request, image_id):
 	"""
 	Generates image .ahead file
 	"""
-	from terapix.script import genimgdothead as dothead
+	from terapix.script import genimgdothead
 	try:
 		img = Image.objects.filter(id = image_id)[0]
-		dhead, numext, missing = dothead.genImageDotHead(int(img.id))
+		dhead, numext, missing = genimgdothead.genImageDotHead(int(img.id))
 	except:
 		return HttpResponseBadRequest("Error: image not found")
 
+	dhead = genimgdothead.formatHeader(dhead)
 	menu_id = 'processing'
 	return render_to_response('imageinfo.html', {	
 		'selected_entry_id'	: menu_id, 

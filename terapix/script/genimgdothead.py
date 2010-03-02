@@ -91,7 +91,7 @@ AND ru.id = ri.run_id
 		if itt[k].has_key('MAP'): 
 			# Unmapped keyword are ignored since they are available in 
 			# the image's header
-			hdudata["%-8s" % itt[k]['MAP'][:8]] = val
+			hdudata[itt[k]['MAP']] = val
 
 	missing = []
 	# Keyword copy feature (+KEYWORD)
@@ -105,10 +105,19 @@ AND ru.id = ri.run_id
 				except KeyError:
 					# Keyword not found in this extension, continue
 					pass
-			if data: hdudata["%-8s" % kw[:8]] = data
+			if data: hdudata[kw] = data
 			else: missing.append(kw)
 
 	return (hdudata, len(hdulist), missing)
+
+def formatHeader(hdudata):
+	"""
+	Format header keywords. FITS keywords are 8 chars max.
+	"""
+	data = {}
+	for k, v in hdudata.iteritems():
+		data["%-8s" % k[:8]] = v
+	return data
 
 def main():
 	if len(sys.argv) != 2:
