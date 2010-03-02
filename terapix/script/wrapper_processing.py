@@ -466,7 +466,7 @@ def process(userData, kind_id, argv):
 			img_id = userData['ImgID']
 			data, lenght, missing = genImageDotHead(int(img_id))
 			if len(data):
-				headname = userData['RealImageName'] + '.head'
+				headname = userData['RealImageName'][0] + '.head'
 				f = open(headname, 'w')
 				for i in range(lenght):
 					for k, v in data.iteritems():
@@ -493,6 +493,16 @@ def process(userData, kind_id, argv):
 				debug("Found FLAT file: %s" % flatFile)
 		else:
 			debug("No check for FLAT image %s existence (checkbox was unchecked)" % flatname)
+
+		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
+		if userData['RealImageName'][0] != str(imgName):
+			os.mkdir(imgName)
+			os.chdir(imgName)
+			os.mkdir('qualityFITS')
+			os.chmod('qualityFITS', RWX_ALL)
+			os.chdir('../')
+			os.chmod(imgName, RWX_ALL)
+
 
 	# Other preprocessing stuff
 	elif kind == 'sex':

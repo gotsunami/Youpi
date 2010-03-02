@@ -602,8 +602,18 @@ class QualityFitsIn(ProcessingPlugin):
 
 			if not len(userData['Warnings'][str(img.name) + '.fits']):
 				del userData['Warnings'][str(img.name) + '.fits']
+			
+			image_args += " -c %s" % os.path.basename(customrc)
+			
+			# Adding output directory options if the image is from multiple ingestion
+			# (same pysical image but different names)
+			# the real physical image is used for processing but the results will be contained in a
+			# different directory, to prevent confusion between instances
 
-			image_args += " -c %s %s" % (os.path.basename(customrc), path)
+			if userData['RealImageName'][0] != str(img.name):
+				image_args += " -o %s" % str(img.name) + '/qualityFITS'
+	
+			image_args += " %s" % path
 
 			# Finally, adds Condor queue
 			cluster.addQueue(
