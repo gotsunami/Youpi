@@ -359,6 +359,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.qfconfig))),
 					'WWW' 				: str(data.www),
 					'ImgName' 			: str(img.name),
+					'ImgFilename' 		: str(img.filename),
 					'ImgId'				: str(img.id),
 					'Log' 				: log,
 					'GradingCount' 		: gradingCounts,
@@ -608,9 +609,8 @@ class QualityFitsIn(ProcessingPlugin):
 			# (same pysical image but different names)
 			# the real physical image is used for processing but the results will be contained in a
 			# different directory, to prevent confusion between instances
-
-			if userData['RealImageName'][0] != str(img.name):
-				image_args += " -o %s" % str(img.name) + '/qualityFITS'
+			if userData['RealImageName'] != str(img.name):
+				image_args += " -o %s" % os.path.join(img.name, 'qualityFITS')
 	
 			image_args += " %s" % path
 

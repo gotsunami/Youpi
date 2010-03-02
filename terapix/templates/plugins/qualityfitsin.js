@@ -547,12 +547,12 @@ var {{ plugin.id }} = {
 			var tn, a;
 			for (var k=0; k < tns.length; k++) {
 				a = Builder.node('a', {
-					href: resp['WWW'] + resp['ImgName'] + '_' + tns[k] + '.png',
+					href: resp['WWW'] + resp['ImgFilename'] + '_' + tns[k] + '.png',
 					rel: 'lightbox[qfitsin]'
 				});
 	
 				tn = Builder.node('img', {
-					src: resp['WWW'] + 'tn/' + resp['ImgName'] + '_' + tns[k] + '_tn.png',
+					src: resp['WWW'] + 'tn/' + resp['ImgFilename'] + '_' + tns[k] + '_tn.png',
 					'class': 'qfits-result-entry-tn'
 				}).hide();
 				// Adds a cool fade-in effect
