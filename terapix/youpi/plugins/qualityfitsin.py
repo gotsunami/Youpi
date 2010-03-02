@@ -294,7 +294,7 @@ class QualityFitsIn(ProcessingPlugin):
 							'Mask' 				: str(h_fits.mask),
 							'Reg' 				: str(h_fits.reg),
 							'ExitIfFlatMissing'	: h_fits.exitIfFlatMissing,
-							'FlatNormMethod'	: h_fits.flatNormMethod,
+		# FIXME				'FlatNormMethod'	: h_fits.flatNormMethod,
 							})
 
 		try:
@@ -362,7 +362,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(data.mask),
 					'Reg' 				: str(data.reg),
 					'ExitIfFlatMissing'	: data.exitIfFlatMissing,
-					'FlatNormMethod'	: data.flatNormMethod,
+		#FIXME			'FlatNormMethod'	: data.flatNormMethod,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.qfconfig))),
 					'WWW' 				: str(data.www),
 					'ImgName' 			: str(img.name),
@@ -580,6 +580,11 @@ class QualityFitsIn(ProcessingPlugin):
 			# Mandatory for WP
 			userData['JobID'] = self.getUniqueCondorJobId()
 
+			# Automatic normalized flat generation
+			if flatNormMethod:
+				fnfile = "%s_norm_%s.fits" % (img.flat, flatNormMethod.lower())
+				userData['FlatNormFile'] = fnfile
+
 			# Base64 encoding + marshal serialization
 			# Will be passed as argument 1 to the wrapper script
 			try:
@@ -591,6 +596,9 @@ class QualityFitsIn(ProcessingPlugin):
 				'encuserdata'		: encUserData, 
 				'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
 			}
+
+			if flatNormMethod:
+				image_args += " --flatnorm %s" % fnfile
 			
 			userData['Warnings'] = {}
 			userData['Warnings'][str(img.name) + '.fits'] = []
@@ -608,7 +616,7 @@ class QualityFitsIn(ProcessingPlugin):
 			hdata, lenght, missing = genImageDotHead(int(img.id))
 			if hdata:
 				image_args += " --head %s" % userData['RealImageName'] + '.head'
-
+			
 			if not len(userData['Warnings'][str(img.name) + '.fits']):
 				del userData['Warnings'][str(img.name) + '.fits']
 			

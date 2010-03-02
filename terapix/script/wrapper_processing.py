@@ -432,6 +432,34 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 	
 	g.con.close()
 
+def normalize_val(data, stat):
+	"""
+	Per-chip flat field normalization (used by QualityFITS)
+	"""
+	try: import pyfits, numpy
+	except ImportError:
+		raise WrapperError, "Could not import pyfits or numpy librairies required by normalize_val()"
+
+	stat_val = 0
+	if stat == 'MEDIAN':
+		stat_val = numpy.median(data.flatten())
+
+	elif stat == 'MEAN':
+		stat_val = numpy.mean(data.flatten())
+	
+	elif stat == 'MEDIANCLIP':
+		flat = data.flatten()
+		# clip it
+		median = numpy.median(flat)
+		disp = numpy.std(flat)
+		min = median - disp
+		max = median + disp
+		flat3 = flat[numpy.where(flat>min)]
+		flat2 = flat3[numpy.where(flat3<max)]
+		stat_val = numpy.median(flat2)
+
+	return stat_val
+
 def process(userData, kind_id, argv):
 	"""
 	Execute system call then updates the database consequently.
@@ -457,58 +485,93 @@ def process(userData, kind_id, argv):
 
 	################### PRE-PROCESSING STUFF GOES HERE ########################################
 
-	# Automatic .head (or .ahead for Scamp) file generation
-	if kind == 'fitsin':
-		try:
-			from genimgdothead import genImageDotHead, formatHeader, getRawHeader
-			img_id = userData['ImgID']
-			data, length, missing = genImageDotHead(int(img_id))
-			if len(data):
-				data = formatHeader(data)
-				headname = userData['RealImageName'] + '.head'
-				f = open(headname, 'w')
-				f.write(getRawHeader(data, length))
-				f.close()
-				debug("Generated: %s" % headname)
-		except Exception, e:
-			debug("Error during automatic .head file generation: %s" % e)
+	try:
+		# Automatic .head (or .ahead for Scamp) file generation
+		if kind == 'fitsin':
+			try:
+				from genimgdothead import genImageDotHead, formatHeader, getRawHeader
+				img_id = userData['ImgID']
+				data, length, missing = genImageDotHead(int(img_id))
+				if len(data):
+					data = formatHeader(data)
+					headname = userData['RealImageName'] + '.head'
+					f = open(headname, 'w')
+					f.write(getRawHeader(data, length))
+					f.close()
+					debug("Generated: %s" % headname)
+			except Exception, e:
+				debug("Error during automatic .head file generation: %s" % e)
 
-		flatname = g.execute("SELECT flat FROM youpi_image WHERE id=%s" % userData['ImgID'])[0][0]
-		if userData['ExitIfFlatMissing']:
-			# Check for flat file
-			flatFile = os.path.join(userData['Flat'], flatname)
-			if not os.path.exists(flatFile):
-				exit_code = 1
-				success = 0
-				debug("Error: FLAT file %s has not been found (and you asked Youpi to halt in this case)" % flatFile)
-				debug("Exiting now...")
-				task_end_log(userData, g, storeLog, task_id, success, kind)
-				debug("Exited (code %d)" % exit_code)
-				sys.exit(exit_code)
+			flatname = g.execute("SELECT flat FROM youpi_image WHERE id=%s" % userData['ImgID'])[0][0]
+			if userData['ExitIfFlatMissing']:
+				# Check for flat file
+				flatFile = os.path.join(userData['Flat'], flatname)
+				if not os.path.exists(flatFile):
+					exit_code = 1
+					success = 0
+					raise WrapperError, "FLAT file %s has not been found (and you asked Youpi to halt in this case)" % flatFile
+				else:
+					debug("Found FLAT file: %s" % flatFile)
 			else:
-				debug("Found FLAT file: %s" % flatFile)
-		else:
-			debug("No check for FLAT image %s existence (checkbox was unchecked)" % flatname)
+				debug("No check for FLAT image %s existence (checkbox was unchecked)" % flatname)
 
-		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
-		if userData['RealImageName'] != imgName:
-			os.makedirs(os.path.join(imgName, 'qualityFITS'), RWX_ALL)
+			# Check if we need to generate a normalized flat field
+			if userData['FlatNormMethod']:
+				debug("Starting single ship flat field normalization (%s)" % userData['FlatNormMethod'])
+				try: 
+					import pyfits
+					pyim = pyfits.open(flatFile)
+					num_ext = len(pyim)                                                                                                                                                    
+					# Output normalized flat file
+					outflat = userData['FlatNormFile']
+					# Fonctionnement different si on traite un MEF ou pas                                                                                                               
+					if num_ext == 1:                                                                                                                                                       
+						norma_val = normalize_val(pyim[0].data, userData['FlatNormMethod'])                                                                                                                     
+						if norma_val == 0:
+							raise WrapperError, "Division by 0 after normalization. Please check that the image flat file is correct."
+						pyim[0].data /= norma_val                                                                                                                                        
+						pyim.writeto(outflat)                                                                                                                                            
+					else:                                                                                                                                                               
+						for iext0 in range(num_ext-1):                                                                                                                                      
+							iext = iext0 + 1                                                                                                                                                
+							norma_val = normalize_val(pyim[iext].data, userData['FlatNormMethod'])                                                                                                         
+							if norma_val == 0:
+								raise WrapperError, "Division by 0 after normalization. Please check that the image flat file is correct."
+							pyim[iext].data /= norma_val                                                                                                                             
+					pyim.writeto(outflat)                                                                                                                                            
+					pyim.close()
+					debug("Single ship flat field normalization done.")
+				except ImportError:
+					raise WrapperError, "Could not importthe Python pyfits library. Flat field normalization failed"
 
-	# Other preprocessing stuff
-	elif kind == 'sex':
-		img_id = userData['ImgID']
-		imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
-		os.mkdir(imgName)
-		os.chmod(imgName, RWX_ALL)
-		os.system("mv sex-config* sex-param* *.conv *.nnw %s" %(imgName))
-		os.chdir(imgName)
+			imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
+			if userData['RealImageName'] != imgName:
+				os.makedirs(os.path.join(imgName, 'qualityFITS'), RWX_ALL)
 
-		# FIXME: remove this code that won't get executed  at all since the files are not yet
-		# transferred... (see Swarp plugin code for a fix)
-		fzs = glob.glob('*.fits.fz')
-		for fz in fzs:
-			debug("Sextractor Preprocessing: uncompressing %s" % fz)
-			os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
+		# Other preprocessing stuff
+		elif kind == 'sex':
+			img_id = userData['ImgID']
+			imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
+			os.mkdir(imgName)
+			os.chmod(imgName, RWX_ALL)
+			os.system("mv sex-config* sex-param* *.conv *.nnw %s" %(imgName))
+			os.chdir(imgName)
+
+			# FIXME: remove this code that won't get executed  at all since the files are not yet
+			# transferred... (see Swarp plugin code for a fix)
+			fzs = glob.glob('*.fits.fz')
+			for fz in fzs:
+				debug("Sextractor Preprocessing: uncompressing %s" % fz)
+				os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
+
+	except WrapperError, e:
+		exit_code = 1
+		debug("Error during pre-processing stage")
+		debug("Error: %s" % e)
+		debug("Exiting...")
+		debug("Exited (code %d)" % exit_code)
+		task_end_log(userData, g, storeLog, task_id, success, kind)
+		sys.exit(exit_code)
 
 	################### END OF PRE-PROCESSING  ################################################
 
