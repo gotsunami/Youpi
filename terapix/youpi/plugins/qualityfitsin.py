@@ -294,7 +294,7 @@ class QualityFitsIn(ProcessingPlugin):
 							'Mask' 				: str(h_fits.mask),
 							'Reg' 				: str(h_fits.reg),
 							'ExitIfFlatMissing'	: h_fits.exitIfFlatMissing,
-		# FIXME				'FlatNormMethod'	: h_fits.flatNormMethod,
+							'FlatNormMethod'	: h_fits.flatNormMethod,
 							})
 
 		try:
@@ -362,7 +362,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(data.mask),
 					'Reg' 				: str(data.reg),
 					'ExitIfFlatMissing'	: data.exitIfFlatMissing,
-		#FIXME			'FlatNormMethod'	: data.flatNormMethod,
+					'FlatNormMethod'	: data.flatNormMethod,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.qfconfig))),
 					'WWW' 				: str(data.www),
 					'ImgName' 			: str(img.name),

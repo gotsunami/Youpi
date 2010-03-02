@@ -363,6 +363,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
+							flatNormMethod = userData['FlatNormMethod'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
@@ -540,7 +541,7 @@ def process(userData, kind_id, argv):
 							pyim[iext].data /= norma_val                                                                                                                             
 					pyim.writeto(outflat)                                                                                                                                            
 					pyim.close()
-					debug("Single ship flat field normalization done.")
+					debug("Single ship flat field normalization done")
 				except ImportError:
 					raise WrapperError, "Could not importthe Python pyfits library. Flat field normalization failed"
 
@@ -612,6 +613,7 @@ def process(userData, kind_id, argv):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
+							flatNormMethod = userData['FlatNormMethod'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))

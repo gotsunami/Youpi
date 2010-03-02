@@ -744,6 +744,17 @@ var {{ plugin.id }} = {
 		td.appendChild(document.createTextNode(resp['Flat']));
 		tr.appendChild(td);
 		tab2.appendChild(tr);
+		
+		// Flat normalized (?)
+		tr = new Element('tr');
+		td = new Element('td');
+		td.appendChild(document.createTextNode('Flat norm. mode:'));
+		tr.appendChild(td);
+	
+		td = new Element('td');
+		td.update(resp.FlatNormMethod ? resp.FlatNormMethod : '--');
+		tr.insert(td);
+		tab2.insert(tr);
 	
 		// Mask
 		tr = new Element('tr');
