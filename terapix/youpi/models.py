@@ -661,6 +661,7 @@ class SiteProfile(models.Model):
 			('can_view_results', "Can view processing results"),
 			('can_use_reporting', "Can generate reports"),
 			('can_run_softvc', "Can run a software version check"),
+			('can_change_custom_condor_req', "Can change custom Condor requirements"),
 		)
 
 class CondorNodeSel(models.Model):

@@ -125,6 +125,7 @@ def preferences(request):
 		['Can run a software version check', 		'youpi.can_run_softvc'],
 		['Can add custom policy or selection', 		'youpi.add_condornodesel'],
 		['Can delete custom policy or selection', 	'youpi.delete_condornodesel'],
+		['Can change custom Condor requirements', 	'youpi.can_change_custom_condor_req'],
 	]
 	# Adds can_use_plugin_* permissions, generated on-the-fly by the checksetup script
 	perms = Permission.objects.filter(codename__startswith = 'can_use_plugin_')
@@ -1184,6 +1185,9 @@ def save_condor_custom_reqstr(request):
 		reqstr = request.POST['Req']
 	except Exception, e:
 		return HttpResponseServerError('Incorrect POST data.')
+
+	if not request.user.has_perm('youpi.can_change_custom_condor_req'):
+		return HttpResponseForbidden("Sorry, you don't have permission save custom Condor requirements")
 
 	try:
 		p = request.user.get_profile()
