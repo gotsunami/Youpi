@@ -612,10 +612,10 @@ class QualityFitsIn(ProcessingPlugin):
 			if imgReg: image_args += " -P %s" % imgReg
 			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable reg file found')
 
-			# Only add --head param if needed
+			# Only add --ahead param if needed
 			hdata, lenght, missing = genImageDotHead(int(img.id))
 			if hdata:
-				image_args += " --head %s" % userData['RealImageName'] + '.head'
+				image_args += " --ahead %s" % userData['RealImageName'] + '.head'
 			
 			if not len(userData['Warnings'][str(img.name) + '.fits']):
 				del userData['Warnings'][str(img.name) + '.fits']
