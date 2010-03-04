@@ -233,8 +233,10 @@ function load_config() {
 		<div class="prefs_condor">
 			<h1>Active User Permissions</h1>
 			<p>You are logged in as user <b>{{ user.username }}</b>, member of group(s): 
+				<ul>
 			{% for group in user.groups.all %}
-			{{ group }}
+					<li>{{ group }}</li>
+				</ul>
 			{% endfor %}
 			</p>
 			<p>Here is the list of your permissions. In order to change any of them, please contact a Youpi administrator.</p>
