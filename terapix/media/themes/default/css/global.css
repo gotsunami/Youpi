@@ -1683,3 +1683,7 @@ table.report_grading_stats tr.complete td.gradecomplete {
 	background-color: #F9EAE6;
 	border: 1px solid #D0B2AA;
 }
+
+td.grade-comment {
+	font-weight: normal;
+}

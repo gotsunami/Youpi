@@ -263,7 +263,10 @@ class QualityFitsIn(ProcessingPlugin):
 		if evals:
 			gradingCounts = len(evals)
 			for ev in evals:
-				gradingList.append([str(ev.user.username), str(ev.grade)])
+				com = ev.custom_comment
+				if not com:
+					com = ev.comment.comment
+				gradingList.append([str(ev.user.username), str(ev.grade), str(com)])
 				
 		if task.error_log:
 			log = str(zlib.decompress(base64.decodestring(task.error_log)))

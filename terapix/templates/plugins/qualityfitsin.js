@@ -907,8 +907,13 @@ var {{ plugin.id }} = {
 				gdiv.insert(gtab);
 				for (var p=0; p < resp.Grades.length; p++) {
 					gtr = new Element('tr');
+					// Comment
+					gtd = new Element('td', {nowrap: 'nowrap'}).setStyle({paddingRight: '20px', color: '#808080'}).addClassName('grade-comment');
+					gtd.update(resp.Grades[p][2].truncate(40));
+					gtr.appendChild(gtd);
+					// Letter
 					gtd = new Element('td');
-					gtd.appendChild(document.createTextNode(resp['Grades'][p][1]));
+					gtd.update(resp.Grades[p][1]);
 					gtr.appendChild(gtd);
 
 					gtd = new Element('td');
