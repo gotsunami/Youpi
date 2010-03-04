@@ -476,6 +476,8 @@ var {{ plugin.id }} = {
 			container.update(resp.Error);
 			return;
 		}
+		container.removeClassName('perm_not_granted');
+
 		var d = new Element('div');
 		d.setAttribute('class', 'entryResult');
 		var tab = new Element('table');
