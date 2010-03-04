@@ -471,6 +471,11 @@ var {{ plugin.id }} = {
 		// currentReturnedData: global variable
 		var resp = currentReturnedData;
 		var container = $(container_id);
+		if (resp.Error) {
+			container.addClassName('perm_not_granted');
+			container.update(resp.Error);
+			return;
+		}
 		var d = new Element('div');
 		d.setAttribute('class', 'entryResult');
 		var tab = new Element('table');

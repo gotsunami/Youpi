@@ -251,7 +251,10 @@ class QualityFitsIn(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
-		task = Processing_task.objects.filter(id = taskid)[0]
+		task, filtered = read_proxy(request, Processing_task.objects.filter(id = taskid))
+		if not task:
+			return {'Error': str("Sorry, you don't have permission to see this result entry.")}
+
 		img = Rel_it.objects.filter(task__id = taskid)[0].image
 		data = Plugin_fitsin.objects.filter(task__id = taskid)[0]
 		# QFits processing history for that image
