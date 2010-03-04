@@ -44,3 +44,16 @@ div#lbranding {
 	background: url(/media/themes/default/img/misc/youpi_logo_small.png) center left no-repeat;
 	height: 100px;
 }
+
+.agent_warning {
+	margin-right: auto;
+	margin-left: auto;
+	padding: 30px;
+	background-color: white;
+	border: 2px solid black;
+	-moz-border-radius: 5px;
+	width: 280px;
+	margin-top: 20px;
+	color: brown;
+	text-align: justify;
+}

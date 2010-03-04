@@ -9,9 +9,19 @@
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 </head>
 {% load i18n %}
+{% load http_agent %}
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 
+{% if not request.META.HTTP_USER_AGENT|check_firefox %}
+<div class="agent_warning" id="agent_warning">
+	<p>Warning: you are not using the Firefox browser. To ensure the best possible experience 
+	with Youpi, using Firefox is highly recommanded.</p>
+	<div style="width: 100%; text-align: right;">
+		<a href="http://www.mozilla-europe.org/"><img src="/media/themes/default/img/misc/getfirefox.png"/></a>
+	</div>
+</div>
+{% endif %}
 <!-- Container -->
 <div id="container">
 
