@@ -215,6 +215,8 @@ function ProcessingHistoryWidget(container) {
 		rbut.observe('click', function(event) {
 			$(_id + '_search_form').reset();
 			_onKindChange($(_id + '_kind_select'));
+			var os = $(_id + '_owner_select');
+			os.options[0].selected = true;
 		});
 		bdiv.insert(rbut);
 		var bmit = new Element('input', {type: 'button', value: 'Start searching!'});
