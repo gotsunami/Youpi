@@ -18,15 +18,24 @@ Version 0.6.1
 
 **Improvements**:
 
+- QualityFITS plugin: added support for single chip flat normalization 
+- QualityFITS results: displays grade's comment next to grade letter
+- Added support for FITS keyword copying (+KEYWORD) in :ref:`ingestion translation tables (ITTs) <ingestion_section>`
 - Added support for :ref:`automatic .head file generation <automatic_head_section>` to allow 
-  FITS image header keywords overriding.
+  FITS image header keywords overriding
+- Added a ``can_change_custom_condor_req`` :ref:`global permission <global_permissions>` 
+  to prevent users modifying their custom Condor requirement string
 
 **Bug fixes**:
 
+- Better handling of processings with already ingested images
 - Ingestion: fixed bug during target hostname resolution
 - Image selector: stops loading and displays a user-friendly message when no images available 
   (no ingestions at all)
 - QualityFITS results: hide "Image tags" block when image has no tags
+- QualityFITS results: fixed permission issue. Non-authorized users cannot access restricted 
+  results anymore
+- Processing history results: fixed a *Server Error* issue when resetting the search form
 
 **Release Notes**:
 
@@ -39,6 +48,12 @@ In order to upgrade from 0.5.2 *or later*, please do the following:
 
 	$ python manage.py checksetup
 
+Everytime the database structure has to be updated, you will be prompted for confirmation::
+
+	Are you sure you want to execute the evolutions?
+	Type 'yes' to continue, or 'no' to cancel:
+
+If you have made a database backup, you can safely answer: ``yes``.
 
 Version 0.6
 -----------
