@@ -593,6 +593,13 @@ var {{ plugin.id }} = {
 	
 		var container = $(container_id);
 		var d = new Element('div');
+		if (resp.Error) {
+			container.addClassName('perm_not_granted');
+			container.update(resp.Error);
+			return;
+		}
+		container.removeClassName('perm_not_granted');
+
 		d.setAttribute('class', 'entryResult');
 		var tab = new Element('table');
 		tab.setAttribute('class', 'fileBrowser');

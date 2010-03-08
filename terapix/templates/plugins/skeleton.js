@@ -226,6 +226,13 @@ var {{ plugin.id }} = {
 		// See templates/results.html, function showDetails(...)
 		var resp = currentReturnedData;
 		var container = $(container_id);
+		if (resp.Error) {
+			container.addClassName('perm_not_granted');
+			container.update(resp.Error);
+			return;
+		}
+		container.removeClassName('perm_not_granted');
+
 		var d = new Element('div').addClassName('entryResult');
 		var tab = new Element('table').addClassName('fileBrowser').setStyle({width: '100%'});
 	

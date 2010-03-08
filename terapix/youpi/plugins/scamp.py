@@ -431,14 +431,12 @@ class Scamp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
-		try:
-			task = Processing_task.objects.filter(id = taskid)[0]
-		except:
-			# Out of range
-			return {'Error': 1}
+		task, filtered = read_proxy(request, Processing_task.objects.filter(id = taskid))
+		if not task:
+			return {'Error': str("Sorry, you don't have permission to see this result entry.")}
+		task = task[0]
 
 		data = Plugin_scamp.objects.filter(task__id = taskid)[0]
-
 		if task.error_log:
 			log = str(zlib.decompress(base64.decodestring(task.error_log)))
 		else:
