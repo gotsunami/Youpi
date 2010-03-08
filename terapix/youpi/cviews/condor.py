@@ -186,8 +186,6 @@ def task_filter(request):
 			'Error': "Sorry, you don't have permission to view processing results",
 		}), mimetype = 'text/plain')
 
-	lenAllTasks = Processing_task.objects.count()
-
 	anyStatus = False
 	if status == 'successful': success = 1
 	elif status == 'failed': success = 0
@@ -267,6 +265,8 @@ def task_filter(request):
 	except AttributeError:
 		# Not implemented
 		pass
+
+	lenAllTasks = len(tasksIds)
 
 	if len(tasksIds) > maxPerPage:
 		pageCount = len(tasksIds)/maxPerPage

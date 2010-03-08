@@ -204,9 +204,9 @@ function ProcessingHistoryWidget(container) {
 		img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_error.gif'});
 		span = new Element('span', {id: _id + '_failed_span'});
 		sdiv.insert(img).insert(span).insert(' (');
-		span = new Element('span', {id: _id + '_total_span'});
+		span = new Element('span', {id: _id + '_total_span'}).setStyle({margin: '0px'});
 		sdiv.insert(span).insert(' results per page out of ');
-		span = new Element('span', {id: _id + '_big_total_span'});
+		span = new Element('span', {id: _id + '_big_total_span'}).setStyle({margin: '0px'});
 		sdiv.insert(span).insert(')');
 		bdiv.insert(sdiv);
 		sdiv.hide();
