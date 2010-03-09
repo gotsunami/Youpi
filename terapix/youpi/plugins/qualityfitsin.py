@@ -1078,21 +1078,19 @@ class QualityFitsIn(ProcessingPlugin):
 			except Exception, e:
 				return HttpResponseRedirect('/youpi/reporting/')
 
-			usergrades = FirstQEval.objects.all().values('fitsin').distinct()
-			usergrades = [g['fitsin'] for g in usergrades]
-			fitsins = Plugin_fitsin.objects.filter(task__success = True).values('id')
+			fitsins = Plugin_fitsin.objects.filter(task__results_output_dir = outdir, task__success = True).values('id')
 			fitsinsIds = [g['id'] for g in fitsins]
-			nongraded = []
+			usergrades = FirstQEval.objects.filter(fitsin__in = fitsins).values('fitsin').distinct()
+			usergrades = [g['fitsin'] for g in usergrades]
+			# Keeps qfits for non graded images only
 			for ug in usergrades:
 				fitsinsIds.remove(ug)
-
-			trs = []
-			fitsins = Plugin_fitsin.objects.filter(id__in = fitsinsIds)[:50]
 			tasks = Plugin_fitsin.objects.filter(id__in = fitsinsIds).values('task')
 			tasksIds = [g['task'] for g in tasks]
+			tasks = Processing_task.objects.filter(id__in = tasksIds).order_by('-start_date')
 
+			trs = []
 			trs.append("<tr><th>%s</th></tr>" % outdir)
-			tasks = Processing_task.objects.filter(id__in = tasksIds, results_output_dir = outdir).order_by('-start_date')
 			for t in tasks[:50]:
 				rel = Rel_it.objects.filter(task = t)[0]
 				f = Plugin_fitsin.objects.filter(task = t)[0]
