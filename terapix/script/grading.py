@@ -80,29 +80,29 @@ def get_grades(res_output_dir = None):
 				tmp[imgName] = []
 			# Keep custom comment in priority, if any
 			if grades[0].custom_comment:
-				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].custom_comment))
+				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].custom_comment, grades[0].fitsin.id))
 			else:
 				# Keep predefined comment
-				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].comment.comment))
+				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].comment.comment, grades[0].fitsin.id))
 
 		# Now looks for a previous release grade
 		if r[1]:
 			if not tmp.has_key(imgName):
 				tmp[imgName] = []
 			# Add a fake datetime object to make sure this grade is the older one
-			tmp[imgName].append([r[1], datetime.datetime(datetime.MINYEAR, 1, 1), r[2]])
+			tmp[imgName].append([r[1], datetime.datetime(datetime.MINYEAR, 1, 1), r[2], r[0]])
 
 	# Now, only keep the latest grade for each image
 	res = []
 	for imgName, grades in tmp.iteritems():
 		if len(grades) == 1:
-			res.append((imgName, grades[0][0], grades[0][2]))
+			res.append((imgName, grades[0][0], grades[0][2], grades[0][3]))
 			continue
 		latest = grades[0]
 		for k in range(1, len(grades)):
 			if grades[k][1] > latest[1]:
 				latest = grades[k]
-		res.append((imgName, latest[0], latest[2]))
+		res.append((imgName, latest[0], latest[2], latest[3]))
 
 	# Sort by image name
 	res.sort(cmp = lambda x,y: cmp(x[0], y[0])) 

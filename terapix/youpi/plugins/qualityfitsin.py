@@ -935,8 +935,12 @@ class QualityFitsIn(ProcessingPlugin):
 		allgrades_opts = """Select output directory: <select name="allgrades_output_dir_select">%s</select>""" % \
 				'\n'.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs))
 
+		html_allgrades_opts = """Select output directory: <select name="html_allgrades_output_dir_select">%s</select>""" % \
+				'\n'.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs))
+
 		rdata = [
-			{'id': 'allgrades',		'title': 'List of all QualityFITS-in grades (CSV)', 'options': allgrades_opts},
+			{'id': 'allgrades',		'title': 'List of all QualityFITS grades, with comments (CSV)', 'options': allgrades_opts},
+			{'id': 'htmlallgrades',		'title': 'List of all QualityFITS grades, with comments (HTML)', 'options': html_allgrades_opts},
 			{'id': 'gradestats', 	'title': 'Grading statistics (HTML)'},
 			{'id': 'nongraded', 	'title': 'List of all non graded images (HTML)', 'options': nongopts},
 			{'id': 'onegrade', 		'title': 'List of all images with a selected grade (CSV)', 'options': oneopts},
@@ -968,7 +972,46 @@ class QualityFitsIn(ProcessingPlugin):
 				return HttpResponseRedirect('/youpi/reporting/')
 			from terapix.script.grading import get_grades
 			from terapix.reporting.csv import CSVReport
-			return HttpResponse(str(CSVReport(data = get_grades(outdir))), mimetype = 'text/plain')
+			res = get_grades(outdir)
+			# Removes fitsin id
+			res = [r[:3] for r in res]
+			return HttpResponse(str(CSVReport(data = res)), mimetype = 'text/plain')
+
+		elif reportId == 'htmlallgrades':
+			try:
+				outdir = post['html_allgrades_output_dir_select']
+			except Exception, e:
+				return HttpResponseRedirect('/youpi/reporting/')
+			from terapix.script.grading import get_grades
+			from terapix.reporting.csv import CSVReport
+			res = get_grades(outdir)
+
+			trs = []
+			for r in res:
+				trs.append(("""
+<tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');">
+	<td><a target="_blank" title="Click to view the QualityFITS page for image %s.fits" href="/youpi/grading/fitsin/%s">%s</a></td>
+	<td style="text-align: center;">%s</td>
+	<td>%s</td>
+</tr>""" % (r[0], r[3], r[0], r[1], r[2])))
+
+			# Fill in content
+			content = """
+<table>
+	<tr>
+		<th>Image name</th>
+		<th>Grade</th>
+		<th>Comment</th>
+	</tr>
+	%(rows)s
+</table>
+""" % {
+	'rows': '\n'.join(trs),
+}
+			return render_to_response('report.html', {	
+								'report_title' 		: self.__getReportName(reportId),
+								'report_content' 	: content, 
+			}, context_instance = RequestContext(request))
 
 		elif reportId == 'gradestats':
 			from django.db import connection
