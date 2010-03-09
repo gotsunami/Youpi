@@ -926,18 +926,21 @@ class QualityFitsIn(ProcessingPlugin):
 
 		outdirs = Processing_task.objects.filter(kind__name = self.id).values('results_output_dir').order_by('results_output_dir').distinct()
 		outdirs = [g['results_output_dir'] for g in outdirs]
-		nongopts = """Select output directory: <select name="output_dir_select">%s</select>""" % \
+		nongopts = """Select output directory: <select name="nongraded_output_dir_select">%s</select>""" % \
 				string.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs), '\n')
 
 		oneopts = """Select a grade: <select name="grade_select">%s</select>""" % \
 				string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[0]), GRADE_SET), '\n')
 
+		allgrades_opts = """Select output directory: <select name="allgrades_output_dir_select">%s</select>""" % \
+				'\n'.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs))
+
 		rdata = [
-			{'id': 'allgrades',		'title': 'List of all QualityFITS-in grades'},
-			{'id': 'gradestats', 	'title': 'Grading statistics'},
-			{'id': 'nongraded', 	'title': 'List of all non graded images', 'options': nongopts},
-			{'id': 'onegrade', 		'title': 'List of all images with a selected grade', 'options': oneopts},
-			{'id': 'piegrades', 	'title': 'Pie Chart of grades'},
+			{'id': 'allgrades',		'title': 'List of all QualityFITS-in grades (CSV)', 'options': allgrades_opts},
+			{'id': 'gradestats', 	'title': 'Grading statistics (HTML)'},
+			{'id': 'nongraded', 	'title': 'List of all non graded images (HTML)', 'options': nongopts},
+			{'id': 'onegrade', 		'title': 'List of all images with a selected grade (CSV)', 'options': oneopts},
+			{'id': 'piegrades', 	'title': 'Pie Chart of grades (HTML)'},
 		]
 		rdata.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
@@ -959,10 +962,13 @@ class QualityFitsIn(ProcessingPlugin):
 		post = request.POST
 
 		if reportId == 'allgrades':
+			try:
+				outdir = post['allgrades_output_dir_select']
+			except Exception, e:
+				return HttpResponseRedirect('/youpi/reporting/')
 			from terapix.script.grading import get_grades
 			from terapix.reporting.csv import CSVReport
-			res = get_grades()
-			return HttpResponse(str(CSVReport(data = get_grades())), mimetype = 'text/plain')
+			return HttpResponse(str(CSVReport(data = get_grades(outdir))), mimetype = 'text/plain')
 
 		elif reportId == 'gradestats':
 			from django.db import connection
@@ -1074,7 +1080,7 @@ class QualityFitsIn(ProcessingPlugin):
 
 		elif reportId == 'nongraded':
 			try:
-				outdir = post['output_dir_select']
+				outdir = post['nongraded_output_dir_select']
 			except Exception, e:
 				return HttpResponseRedirect('/youpi/reporting/')
 

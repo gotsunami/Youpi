@@ -46,7 +46,7 @@ def get_stats():
 
 	return stats
 
-def get_grades():
+def get_grades(res_output_dir = None):
 	"""
 	Returns all images grades in the database. Only the latest grade, when available, is returned for 
 	each image. Both user-defined and previous release grades are checked for grading information and 
@@ -56,13 +56,16 @@ def get_grades():
 	"""
 	from django.db import connection
 	cur = connection.cursor()
-	cur.execute("""
+	q = """
 		SELECT f.id, f.prevrelgrade, f.prevrelcomment, i.name 
 		FROM youpi_plugin_fitsin AS f, youpi_processing_task AS t, youpi_rel_it AS r, youpi_image AS i
 		WHERE f.task_id=t.id 
 		AND r.task_id=f.task_id
 		AND r.image_id = i.id
-		AND t.success=1""")
+		AND t.success=1"""
+	if res_output_dir:
+		q += """ AND t.results_output_dir="%s";""" % res_output_dir
+	cur.execute(q)
 	res = cur.fetchall()
 
 	tmp = {}
