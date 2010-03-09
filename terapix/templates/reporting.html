@@ -71,6 +71,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 						<label>You don't have permission to generate reports</label>
 					</div>
 				{% else %}
+					<input id="report_reset" type="button" value="Reset"/>	
 					<input id="report_submit" type="submit" value="Generate!"/>	
 				{% endif %}
 					<div class="report_options" id="loading_div"/>
@@ -94,6 +95,11 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			var grp = opt.up();
 			var type = grp != sel ? grp.id : 'global';
 			$('report_form').action = '/youpi/report/' + type + '/' + selvalue + '/';
+		});
+
+		$('report_reset').observe('click', function() {
+			$('report_form').reset();
+			$('reports_options').select('div[id]').each(function(div) { div.hide(); });
 		});
 	{% endif %}
 
