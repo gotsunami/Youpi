@@ -322,7 +322,7 @@ def task_filter(request):
 
 	# Looks for plugin extra data, if any
 	try:
-		extraHeader = plugin.getProcessingHistoryExtraHeader(request)
+		extraHeader = plugin.getProcessingHistoryExtraHeader(request, tasks)
 		if extraHeader: resp['ExtraHeader'] = extraHeader
 	except AttributeError:
 		# No method for extra header data

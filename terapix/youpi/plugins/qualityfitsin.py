@@ -200,34 +200,13 @@ class QualityFitsIn(ProcessingPlugin):
 
 		return ret
 
-	def getProcessingHistoryExtraHeader(self, request):
+	def getProcessingHistoryExtraHeader(self, request, tasks):
 		"""
-		Returns extra custom header for qfitsin items
+		Returns extra custom header for qfitsin items.
+		@params tasks tasks objects _after_ they have been filtered (critera)
 		"""
-		owner = request.POST.getlist('Owner')
-		if 'all' in owner:
-			qfs = Plugin_fitsin.objects.filter(task__success = True)
-			grades = FirstQEval.objects.values('fitsin').distinct()
-		elif 'others' in owner:
-			qfs = Plugin_fitsin.objects.exclude(task__user = request.user).filter(task__success = True)
-			grades = FirstQEval.objects.filter(fitsin__in = qfs).values('fitsin').distinct()
-		elif 'my' in owner:
-			qfs = Plugin_fitsin.objects.filter(task__user = request.user, task__success = True)
-			grades = FirstQEval.objects.filter(fitsin__in = qfs).values('fitsin').distinct()
-		else:
-			if 'my' in owner: Mine = True
-			else: Mine = False
-			for name in ('all', 'my', 'others'): 
-				try: owner.remove(name)
-				except: pass
-			# Check for multi-selections of active user names
-			userIds = User.objects.filter(username__in = owner).values_list('id', flat = True)
-			userIds = [int(id) for id in userIds]
-			if Mine: 
-				userIds.append(request.user.id)
-			qfs = Plugin_fitsin.objects.filter(task__user__id__in = userIds, task__success = True)
-			grades = FirstQEval.objects.filter(fitsin__in = qfs).values('fitsin').distinct()
-
+		qfs = Plugin_fitsin.objects.filter(task__in = tasks, task__success = True)
+		grades = FirstQEval.objects.filter(fitsin__in = qfs).values('fitsin').distinct()
 		all = qfs.count()
 		if all: percent = len(grades)*100./all
 		else: percent = 0
