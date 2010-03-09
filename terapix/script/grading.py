@@ -70,6 +70,7 @@ def get_grades(res_output_dir = None):
 
 	tmp = {}
 	for r in res:
+		# Latest grade
 		grades = FirstQEval.objects.filter(fitsin__id = r[0]).order_by('-date')
 		imgName = r[3]
 
@@ -77,7 +78,12 @@ def get_grades(res_output_dir = None):
 		if grades:
 			if not tmp.has_key(imgName):
 				tmp[imgName] = []
-			tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].comment.comment))
+			# Keep custom comment in priority, if any
+			if grades[0].custom_comment:
+				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].custom_comment))
+			else:
+				# Keep predefined comment
+				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].comment.comment))
 
 		# Now looks for a previous release grade
 		if r[1]:
