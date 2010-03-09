@@ -1087,10 +1087,14 @@ class QualityFitsIn(ProcessingPlugin):
 				fitsinsIds.remove(ug)
 			tasks = Plugin_fitsin.objects.filter(id__in = fitsinsIds).values('task')
 			tasksIds = [g['task'] for g in tasks]
-			tasks = Processing_task.objects.filter(id__in = tasksIds).order_by('-start_date')
+
+			# Check permissions
+			tasks, filtered = read_proxy(request, Processing_task.objects.filter(id__in = tasksIds).order_by('-start_date'))
 
 			trs = []
 			trs.append("<tr><th>%s</th></tr>" % outdir)
+			if filtered:
+				trs.append("""<tr><td><div class="perm_not_granted">You don't have permission to view the full results set. Some results have been filtered</div></td></tr>""")
 			for t in tasks[:50]:
 				rel = Rel_it.objects.filter(task = t)[0]
 				f = Plugin_fitsin.objects.filter(task = t)[0]
@@ -1102,7 +1106,7 @@ class QualityFitsIn(ProcessingPlugin):
 	<td>%s</td>
 </tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
 
-			if not tasks:
+			if not tasks and not filtered:
 				trs.append(("""<tr><td>All images in this directory have already been graded</td></tr>"""))
 
 			content = """
