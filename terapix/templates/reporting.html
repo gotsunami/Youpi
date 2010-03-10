@@ -43,8 +43,38 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 							{% endif %}
 						{% endfor %}
 					</select>
-					<div id="reports_options">
+				{# Descriptions #}
 				{# General #}
+					<div id="reports_descriptions">
+				{% for greport in reports %}
+					{% if greport.description %}
+						<div id="{{ greport.id }}_description">
+							<div class="report_description">
+								<div class="report_preview"><img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/reports/{{ greport.id }}_preview.png"/></div>
+								<p>Description:</p>
+								<div>{{ greport.description }}</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+				{# Plugins #}
+				{% for plugin in plugins %}
+					{% for report in plugin.reports %}
+						{% if report.description %}
+						<div id="{{ report.id }}_description">
+							<div class="report_description">
+								<div class="report_preview"><img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/reports/{{ report.id }}_preview.png"/></div>
+								<p>Description:</p>
+								<div>{{ report.description }}</div>
+							</div>
+						</div>
+						{% endif %}
+					{% endfor %}
+				{% endfor %}
+					</div>
+				{# Report options #}
+				{# General #}
+					<div id="reports_options">
 				{% for greport in reports %}
 					{% if greport.options %}
 					<div id="{{ greport.id }}_options" style="margin-top: 20px">
@@ -84,7 +114,16 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	var menu;
 	document.observe('dom:loaded', function() {
 		$('loading_div').hide();
+		$('report_submit').hide();
+		$('report_form').reset();
+
 		menu = new SubMenu('submenu', ['Reports']);
+
+		function hide_divs() {
+			['reports_options', 'reports_descriptions'].each(function(id) {
+					$(id).select('div[id]').each(function(div) { div.hide(); });
+			});
+		}
 	{% if perms.youpi.can_use_reporting %}
 		$('report_form').observe('submit', function() {
 			$('loading_div').update(getLoadingHTML('Please wait while generating report')).show();
@@ -99,20 +138,22 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 
 		$('report_reset').observe('click', function() {
 			$('report_form').reset();
-			$('reports_options').select('div[id]').each(function(div) { div.hide(); });
+			$('report_submit').hide()
+			// Hide divs
+			hide_divs();
 		});
 	{% endif %}
 
-		// Hide options div
-		$('reports_options').select('div[id]').each(function(div) { div.hide(); });
-
+		hide_divs();
 		$('report_select').observe('change', function() {
-			var sel = $('report_select');
-			var id = sel.options[sel.selectedIndex].value;
-			// Hide options div
-			$('reports_options').select('div[id]').each(function(div) { div.hide(); });
-			var divopt = $(id + '_options');
-			if (divopt) divopt.slideDown({duration: 0.2});
+			var id = this.options[this.selectedIndex].value;
+			this.selectedIndex == 0 ? $('report_submit').hide() : $('report_submit').show();
+			// Hide divs
+			hide_divs();
+			['description', 'options'].each(function(name) {
+				var divopt = $(id + '_' + name);
+				if (divopt) divopt.slideDown({duration: 0.2});
+			});
 		});
 	});
 </script>

@@ -296,13 +296,40 @@ def reporting(request):
 	"""
 	Page to generate reports.
 	"""
-	# Standard (non-plugin related) reports definition
+	# Global (non-plugin related) reports definition
 	selopts = """Select a processing type: <select name="kind_select">%s</select>""" % \
 			string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[1]), [(p.id, p.optionLabel) for p in manager.plugins]), '\n')
 	reports = [
-			{'id': 'imssavedselections',	'title': 'List of saved selections from image selector'},
-			{'id': 'procresults', 			'title': 'List of processing results', 'options': selopts},
+		{	'id': 'imssavedselections',	
+			'title': 'List of saved selections from the image selector (TXT)', 
+			'description': 'This report generates a list of all custom saved selections available in the image selector.',
+		},
+		{	'id': 'procresults', 
+			'title': 'List of processing results (CSV)', 
+			'options': selopts,
+			'description': 'This report generates a CSV file (plain text) with all processing results. Depending on the current state of ' + \
+				'the database, it may take some time to generate.',
+		},
 	]
+
+	# Sanity checks: looks for manfatory info
+	mandatory = ('id', 'title', 'description')
+	for r in reports:
+		for mand in mandatory:
+			if not r.has_key(mand):
+				raise ReportIncompleteDefinitionError, "Report has no %s set (required): %s" % (mand, r)
+	plugins = manager.plugins
+	for p in plugins:
+		try:
+			rdata = p.reports()
+			if not rdata: continue
+			for r in rdata:
+				for mand in mandatory:
+					if not r.has_key(mand):
+						raise ReportIncompleteDefinitionError, "Report has no %s set (required): %s" % (mand, r)
+		except AttributeError:
+			pass
+
 	reports.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
 	menu_id = 'reporting'

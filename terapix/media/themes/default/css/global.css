@@ -1616,6 +1616,31 @@ div.tags *, .dropzone * {
 	padding: 10px;
 }
 
+.report_description {
+	background-color: #eee;
+	-moz-border-radius: 5px;
+	width: 400px;
+	min-height: 128px;
+	padding: 10px;
+	text-align: justify;
+	margin-top: 15px;
+}
+
+.report_description p {
+	font-weight: bold;
+	color: brown;
+}
+
+#report_submit { font-weight: bold; }
+
+.report_description .report_preview {
+	float: left;
+	width: 128px;
+	height: 128px;
+	margin-right: 10px;
+	background: #000 url(../img/misc/preview_not_available.gif) no-repeat center center;
+}
+
 table.report_grading_stats tr.complete td {
 	color: green;
 }

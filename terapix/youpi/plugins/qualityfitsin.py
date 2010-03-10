@@ -939,12 +939,39 @@ class QualityFitsIn(ProcessingPlugin):
 				'\n'.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs))
 
 		rdata = [
-			{'id': 'allgrades',		'title': 'List of all QualityFITS grades, with comments (CSV)', 'options': allgrades_opts},
-			{'id': 'htmlallgrades',		'title': 'List of all QualityFITS grades, with comments (HTML)', 'options': html_allgrades_opts},
-			{'id': 'gradestats', 	'title': 'Grading statistics (HTML)'},
-			{'id': 'nongraded', 	'title': 'List of all non graded images (HTML)', 'options': nongopts},
-			{'id': 'onegrade', 		'title': 'List of all images with a selected grade (CSV)', 'options': oneopts},
-			{'id': 'piegrades', 	'title': 'Pie Chart of grades (HTML)'},
+			{	'id': 'allgrades',		
+				'title': 'List of all QualityFITS grades, with comments (CSV)', 
+				'options': allgrades_opts,
+				'description': 'This report generates a list of all QualityFITS grades, along with the image name and the grade comment. The ' + \
+					'output is a plain text file (CSV).',
+			},
+			{	'id': 'htmlallgrades',	
+				'title': 'List of all QualityFITS grades, with comments (HTML)', 
+				'options': html_allgrades_opts,
+				'description': 'This report generates a list of all QualityFITS grades, along with the image name and the grade comment. The ' + \
+					'content is formatted as HTML; the images name are clickable and linked to their respective QualityFITS result page.',
+			},
+			{	'id': 'gradestats', 
+				'title': 'Grading statistics (HTML)',
+				'description': 'This report generates a summary table displaying - per output directory - how many images are graded and not graded yet. ' + \
+					'Green lines indicate that all images (whose processing results belongs to a directory) are graded.',
+			},
+			{	'id': 'nongraded', 	
+				'title': 'List of all non graded images (HTML)', 
+				'options': nongopts,
+				'description': 'This report generates a table with all remaining non grading images. From there, the QualityFITS results page can be accessed ' + \
+					'and the image can then be graded. The report returns an empty list if all images have already been graded.'
+			},
+			{	'id': 'onegrade', 		
+				'title': 'List of all images with a selected grade (CSV)', 
+				'options': oneopts,
+				'description': 'This report generates a list all images with a specific grade. Fields in the CSV file are: image name, grade, image path, md5 checksum, ' + \
+					'grading date, grading user, predefined comment, custom comment.',
+			},
+			{	'id': 'piegrades', 	
+				'title': 'Pie Chart of grades (HTML)',
+				'description': 'This report generates a pie chart of all grades to get an estimation of grade relative proportions.',
+			},
 		]
 		rdata.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
