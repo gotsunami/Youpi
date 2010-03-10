@@ -89,8 +89,8 @@ div.note, div.tip, div.important, div.caution, div.warning {
 div.notify {
 	position: fixed;
 	z-index: 100;
-	top: 5px;
-	left: 300px;
+	top: 85px;
+	right: 10px;
 	padding: 5px;
 	background-color: #EF5A00;
 	border-right: 1px solid gray;
@@ -100,6 +100,7 @@ div.notify {
 
 div.notify div {
 	color: white;
+	font-weight: bold;
 	font-size: 10px;
 }
 
