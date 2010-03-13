@@ -15,6 +15,7 @@
 # Urls and patterns for Youpi
 #
 from django.conf.urls.defaults import *
+from django.conf import settings
 
 urlpatterns = patterns('terapix',
 	(r'^$', 		include('youpi.urls')), 

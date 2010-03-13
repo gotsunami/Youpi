@@ -124,6 +124,7 @@ TRUNK			= '/path/to/youpi/installation/dir/'			# FIXME
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 MANAGERS = ADMINS
+MAINTENANCE= False
 
 #
 # Site-wide plugin activation
@@ -257,6 +258,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
+	'terapix.middleware.MaintenanceModeMiddleware',
 )
 
 ROOT_URLCONF = 'terapix.urls'

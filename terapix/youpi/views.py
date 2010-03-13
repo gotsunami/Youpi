@@ -19,6 +19,7 @@ from django.contrib.auth import views
 from django.contrib.auth.models import * 
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.db import models
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect, HttpResponseBadRequest
 from django.db.models import get_models
@@ -1944,6 +1945,10 @@ def ims_import_selections(request):
 
 	return HttpResponse(json.encode({'result': res}))
 
-if __name__ == '__main__':
-	print 'Cannot be run from the command line.'
-	sys.exit(2)
+def maintenance(request):
+	"""
+	Renders maintenance template
+	"""
+	if hasattr(settings, 'MAINTENANCE') and not settings.MAINTENANCE:
+		return HttpResponseRedirect(reverse('terapix.youpi.views.index'))
+	return render_to_response('maintenance.html')

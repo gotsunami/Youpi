@@ -167,5 +167,8 @@ urlpatterns = patterns(
 	(r'^plot/sky/selections/$', 'plot_sky_selections'),
 
 	# API documentation
-    (r'^api/(.*)/$', 'browse_api')
+    (r'^api/(.*)/$', 'browse_api'),
+
+	# Maintenance
+    (r'^maintenance/$', 'maintenance'),
 )
