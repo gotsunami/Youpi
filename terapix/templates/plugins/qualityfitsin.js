@@ -439,6 +439,8 @@ var {{ plugin.id }} = {
 												'taskId' : taskId,
 												'idList' : '[[' + data.ImageId + ']]',
 												'flatPath' : data.Flat, 
+												'flatNormMethod' : data.FlatNormMethod, 
+												'exitIfFlatMissing' : data.ExitIfFlatMissing, 
 												'maskPath' : data.Mask, 
 												'regPath' : data.Reg,
 												'resultsOutputDir' : data.ResultsOutputDir

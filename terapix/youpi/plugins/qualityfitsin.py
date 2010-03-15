@@ -417,6 +417,7 @@ class QualityFitsIn(ProcessingPlugin):
 		try:
 			itemId = str(post['ItemId'])
 			flatPath = post['FlatPath']
+			flatNormMethod = post['FlatNormMethod']
 			maskPath = post['MaskPath']
 			taskId = post.get('TaskId', '')
 			regPath = post['RegPath']
@@ -424,7 +425,6 @@ class QualityFitsIn(ProcessingPlugin):
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
 			exitIfFlatMissing = int(post['ExitIfFlatMissing'])
-			flatNormMethod = post['FlatNormMethod']
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -681,6 +681,8 @@ class QualityFitsIn(ProcessingPlugin):
 
 		return {'ImageId' 			: int(img.id), 
 				'Flat' 				: str(data.flat),
+				'FlatNormMethod' 	: str(data.flatNormMethod),
+				'ExitIfFlatMissing' : str(data.exitIfFlatMissing),
 				'Mask' 				: str(data.mask),
 				'Reg' 				: str(data.reg),
 				'ResultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data.task.results_output_dir, data.task.user.username)),
