@@ -297,6 +297,8 @@ def reporting(request):
 	"""
 	Page to generate reports.
 	"""
+	from terapix.youpi.forms import ReportAdvancedImageForm
+
 	# Global (non-plugin related) reports definition
 	selopts = """Select a processing type: <select name="kind_select">%s</select>""" % \
 			string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[1]), [(p.id, p.optionLabel) for p in manager.plugins]), '\n')
@@ -310,6 +312,12 @@ def reporting(request):
 			'options': selopts,
 			'description': 'This report generates a CSV file (plain text) with all processing results. Depending on the current state of ' + \
 				'the database, it may take some time to generate.',
+		},
+		{	'id': 'advimgreport',	
+			'title': 'Advanced image report (HTML, PDF)',
+			'description': 'TODO',
+			'template' : 'reports/advanced-image-report-options.html',
+			'context': {'form' : ReportAdvancedImageForm()},
 		},
 	]
 
@@ -1050,6 +1058,19 @@ def get_global_report(request, reportId):
 			content.append(row)
 		if not content: return HttpResponse('No results found', mimetype = 'text/plain')
 		return HttpResponse(str(CSVReport(data = content)), mimetype = 'text/plain')
+
+	elif reportId == 'advimgreport':
+		from terapix.youpi.forms import ReportAdvancedImageForm
+		form = ReportAdvancedImageForm(post)
+		if form.is_valid(): 
+			airmass_min = post['airmass_min'] or None
+			raise TypeError, airmass_min
+			return render_to_response('report.html', {	
+								'report_title' 		: 'Advanced image report (HTML, PDF)',
+								'report_content' 	: str(request.POST), 
+			}, context_instance = RequestContext(request))
+		else:
+			return HttpResponse("Uncomplete form:" % form.errors)
 
 	return HttpResponseNotFound('Report not found.')
 

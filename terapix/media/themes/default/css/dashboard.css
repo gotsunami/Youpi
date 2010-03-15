@@ -656,3 +656,21 @@ div.ims_batch_log_div pre {
 .permlist .granted {
 	text-align: center;
 }
+
+.advimgreport {
+	width: 50%;
+}
+
+.advimgreport th {
+	text-align: left;
+}
+
+.advimgreport tr th, td {
+	border: none;
+}
+
+.advimgreport td {
+	font-style: italic;
+	color: gray;
+	font-size: 10px;
+}
