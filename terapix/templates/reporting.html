@@ -16,9 +16,6 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 {% endblock %}
 
 {% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
-{% block coltype %}colMS{% endblock %}
-{% block bodyclass %}dashboard{% endblock %}
-
 {% block content %}
 <div>
 	<div id="submenu">
@@ -95,6 +92,18 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					{% endfor %}
 				{% endfor %}
 					</div>
+				{# Report templates #}
+					<div id="reports_templates">
+				{% for report in reports %}
+					{% if report.template %}
+						<div id="{{ report.id }}_template" style="margin-top: 20px">
+							<div>
+								{% include  report.template %}
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+					</div>
 					<br/>
 				{% if not perms.youpi.can_use_reporting %}
 					<div class="perm_not_granted" style="margin-top: 20px; width: -moz-fit-content">
@@ -120,8 +129,8 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		menu = new SubMenu('submenu', ['Reports']);
 
 		function hide_divs() {
-			['reports_options', 'reports_descriptions'].each(function(id) {
-					$(id).select('div[id]').each(function(div) { div.hide(); });
+			['options', 'descriptions', 'templates'].each(function(id) {
+					$('reports_' + id).select('div[id]').each(function(div) { div.hide(); });
 			});
 		}
 	{% if perms.youpi.can_use_reporting %}
@@ -150,7 +159,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			this.selectedIndex == 0 ? $('report_submit').hide() : $('report_submit').show();
 			// Hide divs
 			hide_divs();
-			['description', 'options'].each(function(name) {
+			['description', 'options', 'template'].each(function(name) {
 				var divopt = $(id + '_' + name);
 				if (divopt) divopt.slideDown({duration: 0.2});
 			});
