@@ -674,3 +674,9 @@ div.ims_batch_log_div pre {
 	color: gray;
 	font-size: 10px;
 }
+
+.form_error {
+	color: red;
+	font-style: italic;
+	font-size: 12px;
+}

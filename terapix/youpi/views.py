@@ -1061,16 +1061,186 @@ def get_global_report(request, reportId):
 
 	elif reportId == 'advimgreport':
 		from terapix.youpi.forms import ReportAdvancedImageForm
+
 		form = ReportAdvancedImageForm(post)
 		if form.is_valid(): 
-			airmass_min = post['airmass_min'] or None
-			raise TypeError, airmass_min
+			# Builds query
+			tables = ['youpi_image AS i']
+			tquery = 'SELECT DISTINCT(i.id) FROM %s WHERE '
+			query = ''
+			updated = False
+			if post['date_obs_min']:
+				query += "dateobs >= '%s'" % post['date_obs_min']
+				updated = True
+			if post['date_obs_max']:
+				if not updated:
+					query += "dateobs <= '%s'" % post['date_obs_max']
+				else:
+					query += " AND dateobs <= '%s'" % post['date_obs_max']
+				updated = True
+			if post['exptime_min']:
+				if updated: query += " AND"
+				query += " exptime >= %s" % post['exptime_min']
+				updated = True
+			if post['exptime_max']:
+				if updated: query += " AND"
+				query += " exptime <= %s" % post['exptime_max']
+				updated = True
+			# TODO: radec, radius
+			if post['run_id'] and post['run_id'] != '-1':
+				tables.append('youpi_rel_ri AS ri')
+				if updated: query += " AND"
+				query += " ri.run_id = %s AND ri.image_id = i.id" % post['run_id']
+				updated = True
+			if post['flat']:
+				if updated: query += " AND"
+				query += ' flat LIKE \'%' + post['flat'] + '%\''
+				updated = True
+			if post['mask']:
+				if updated: query += " AND"
+				query += ' mask LIKE \'%' + post['mask'] + '%\''
+				updated = True
+			if post['object']:
+				if updated: query += " AND"
+				query += ' object LIKE \'%' + post['object'] + '%\''
+				updated = True
+			if post['airmass_min']:
+				if updated: query += " AND"
+				query += ' airmass >= %s' % post['airmass_min']
+				updated = True
+			if post['airmass_max']:
+				if updated: query += " AND"
+				query += ' airmass <= %s' % post['airmass_max']
+				updated = True
+			if post.has_key('tags'):
+				tables.append('youpi_rel_tagi AS tagi')
+				tagList =  post.getlist('tags')
+				if updated: query += " AND"
+				query += " tagi.image_id = i.id AND ("
+				for tagid in tagList:
+					query += ' tagi.tag_id = %s OR' % tagid
+				query = query[:-3] + ')'
+				updated = True
+			if post.has_key('instruments'):
+				tables.append('youpi_instrument AS inst')
+				instList =  post.getlist('instruments')
+				if updated: query += " AND"
+				query += " inst.id = i.instrument_id AND ("
+				for instid in instList:
+					query += ' inst.id = %s OR' % instid
+				query = query[:-3] + ')'
+				updated = True
+			if post.has_key('channels'):
+				tables.append('youpi_channel AS chan')
+				chanList =  post.getlist('channels')
+				if updated: query += " AND"
+				query += " chan.id = i.channel_id AND ("
+				for chanid in chanList:
+					query += ' chan.id = %s OR' % chanid
+				query = query[:-3] + ')'
+				updated = True
+			if post['elongation_min']:
+				tables.append('youpi_plugin_fitsin AS fitsin')
+				tables.append('youpi_processing_task AS task')
+				tables.append('youpi_rel_it AS relit')
+				if updated: query += " AND"
+				query += ' fitsin.psfelmin >= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['elongation_min']
+				updated = True
+			if post['elongation_max']:
+				if not post['elongation_min']:
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+				if updated: query += " AND"
+				query += ' fitsin.psfelmax <= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['elongation_max']
+				updated = True
+			if post['seeing_min']:
+				if not post['elongation_min'] and not post['elongation_max']:
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+				if updated: query += " AND"
+				query += ' fitsin.psffwhmmin >= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['seeing_min']
+				updated = True
+			if post['seeing_max']:
+				if not post['elongation_min'] and not post['elongation_max'] and not post['seeing_min']:
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+				if updated: query += " AND"
+				query += ' fitsin.psffwhmmax <= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['seeing_max']
+				updated = True
+			if post['sky_background_min']:
+				if not post['elongation_min'] and not post['elongation_max'] and not post['seeing_min'] and not post['seeing_max']:
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+				if updated: query += " AND"
+				query += ' fitsin.bkg >= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['sky_background_min']
+				updated = True
+			if post['sky_background_max']:
+				if not post['elongation_min'] and not post['elongation_max'] and not post['seeing_min'] and not post['seeing_max'] and not post['sky_background_min']:
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+				if updated: query += " AND"
+				query += ' fitsin.bkg <= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['sky_background_max']
+				updated = True
+			if post.has_key('grades'):
+				if not post['elongation_min'] and not post['elongation_max'] and not post['seeing_min'] and not post['seeing_max'] and not post['sky_background_min'] and not post['sky_background_max']:
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+				tables.append('youpi_firstqeval AS eval')
+				gList =  post.getlist('grades')
+				if updated: query += " AND"
+				query += ' fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id AND eval.fitsin_id = fitsin.id AND ('
+				for gid in gList:
+					query += " eval.grade = '%s' OR" % gid
+				query = query[:-3] + ')'
+				updated = True
+			if post['comment']:
+				if not post['elongation_min'] and not post['elongation_max'] and not post['seeing_min'] and not post['seeing_max'] and not post['sky_background_min'] and not post['sky_background_max']:
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+					if updated: query += " AND"
+					query += ' fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id AND eval.fitsin_id = fitsin.id AND '
+				if not post.has_key('grades'):
+					tables.append('youpi_firstqeval AS eval')
+				tables.append('youpi_firstqcomment AS fcom')
+				query += ' eval.comment_id = fcom.id AND '
+				query += ' (eval.custom_comment LIKE \'%' + post['comment'] + '%\' OR fcom.comment LIKE \'%' + post['comment'] + '%\')'
+				updated = True
+
+			tquery = tquery % ','.join(tables)
+			query = tquery + query + ';'
+
+			#raise TypeError, query
+			# Executes query
+			db = MySQLdb.connect(host = settings.DATABASE_HOST, user = settings.DATABASE_USER, passwd = settings.DATABASE_PASSWORD, db = settings.DATABASE_NAME)
+			cursor = db.cursor()
+			cursor.execute(query)
+			res = cursor.fetchall()
+			db.close()
+
+			#airmass_min = post['airmass_min'] or None
 			return render_to_response('report.html', {	
 								'report_title' 		: 'Advanced image report (HTML, PDF)',
-								'report_content' 	: str(request.POST), 
+								'report_content' 	: """<pre style="width: 400px; color: black;">%s</pre>""" % str(res),
 			}, context_instance = RequestContext(request))
 		else:
-			return HttpResponse("Uncomplete form:" % form.errors)
+			# Report errors in form
+			from django.template.loader import get_template
+			tmpl = get_template('reports/advanced-image-report-options.html')
+			tdata = tmpl.render(Context({'report': {'context': {'form': form}}}))
+
+			return render_to_response('report.html', {	
+								'report_title' 		: 'Advanced image report (HTML, PDF)',
+								'report_content' 	: tdata,
+								'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+								'after_extra_content'	: """<input id="report_submit" type="submit" value="Generate!"/></form>""",
+			}, context_instance = RequestContext(request))
 
 	return HttpResponseNotFound('Report not found.')
 

@@ -291,7 +291,7 @@ class QualityFitsIn(ProcessingPlugin):
 		ImgInfo = [	('Object', img.object),
 					('RunId', runName),
 					('Filter', img.channel.name),
-					('ExpTime', self.format(img.exptime, "%.1f")),
+					('ExpTime', self.format(img.exptime, "%.3f")),
 					('Ingestion Date', img.ingestion_date),
 					('Air Mass', self.format(img.airmass, "%.3f")),
 					('Phot_c (header)', img.photc_header),
