@@ -1064,9 +1064,13 @@ def get_global_report(request, reportId):
 
 		form = ReportAdvancedImageForm(post)
 		if form.is_valid(): 
+			from django.template.loader import get_template
+			tmpl = get_template('reports/advanced-image-report-options.html')
+			tdata = tmpl.render(Context({'report': {'context': {'form': form}}}))
+
 			# Builds query
 			tables = ['youpi_image AS i']
-			tquery = 'SELECT DISTINCT(i.id) FROM %s WHERE '
+			tquery = 'SELECT DISTINCT(i.id) FROM %s '
 			query = ''
 			updated = False
 			if post['date_obs_min']:
@@ -1214,20 +1218,215 @@ def get_global_report(request, reportId):
 				updated = True
 
 			tquery = tquery % ','.join(tables)
+			if updated: tquery += ' WHERE '
 			query = tquery + query + ';'
 
-			#raise TypeError, query
-			# Executes query
+			# If WHERE not in query, there will be too much results
+			if query.find('WHERE') == -1:
+				report_content = """
+<h3 style="margin-bottom: 20px; color: brown;">Waaaayyy too much results! Please fill in at least one search criterium.</h3>
+<input type="button" onclick="var d=this.next('div'); d.visible()?d.hide():d.show(); return false;" value="Toggle selected criteria"/>
+<div style="display: none;">
+	<div>
+		<input id="report_submit" type="submit" value="Generate!"/>
+		<div>%s</div>
+		<input id="report_submit" type="submit" value="Generate!"/>
+	</div>
+</div>
+</form>
+	""" % tdata
+				return render_to_response('report.html', {	
+									'report_title' 		: 'Advanced image report (HTML, PDF)',
+									'report_content' 	: report_content,
+									'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+				}, context_instance = RequestContext(request))
+
+
+				# First query: fetch image IDs
 			db = MySQLdb.connect(host = settings.DATABASE_HOST, user = settings.DATABASE_USER, passwd = settings.DATABASE_PASSWORD, db = settings.DATABASE_NAME)
 			cursor = db.cursor()
 			cursor.execute(query)
 			res = cursor.fetchall()
+			res = [str(r[0]) for r in res]
+
+			if not res:
+				# No result so far, exit now
+				report_content = """
+<h3 style="margin-bottom: 20px; color: brown;">No match.</h3>
+<input type="button" onclick="var d=this.next('div'); d.visible()?d.hide():d.show(); return false;" value="Toggle selected criteria"/>
+<div style="display: none;">
+	<div>
+		<input id="report_submit" type="submit" value="Generate!"/>
+		<div>%s</div>
+		<input id="report_submit" type="submit" value="Generate!"/>
+	</div>
+</div>
+</form>
+	""" % tdata
+				return render_to_response('report.html', {	
+									'report_title' 		: 'Advanced image report (HTML, PDF)',
+									'report_content' 	: report_content,
+									'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+				}, context_instance = RequestContext(request))
+			
+			# Builds a second query to gather all requested information
+			cols =  post.getlist('show_column_in_report')
+			tquery = 'SELECT %s FROM %s WHERE '
+			tables = ['youpi_image AS i']
+			fields = ['i.id AS img_id', 'i.name AS img_name']
+			query = ''
+			updated = False
+			fitsinTablesInUse = False
+			for col in cols:
+				if col == 'Image checksum':
+					fields.append('i.checksum')
+				elif col == 'Image path':
+					fields.append('i.path')
+				elif col == 'Date obs':
+					fields.append('i.dateobs')
+				elif col == 'Exptime':
+					fields.append('i.exptime')
+				# TODO: ra dec, radius
+				elif col == 'Run id':
+					tables.append('youpi_rel_ri AS ri')
+					tables.append('youpi_run AS run')
+					fields.append('run.name AS run_name')
+					if updated: query += " AND"
+					query += " ri.image_id = i.id AND run.id = ri.run_id"
+					updated = True
+				elif col == 'Flat':
+					fields.append('i.flat')
+				elif col == 'Mask':
+					fields.append('i.mask')
+				elif col == 'Object':
+					fields.append('i.object')
+				elif col == 'Airmass':
+					fields.append('i.airmass')
+				elif col == 'Instrument':
+					fields.append('inst.name AS instrument_name')
+					tables.append('youpi_instrument AS inst')
+					if updated: query += " AND"
+					query += " inst.id = i.instrument_id"
+					updated = True
+				elif col == 'Channel':
+					fields.append('chan.name AS channel_name')
+					tables.append('youpi_channel AS chan')
+					if updated: query += " AND"
+					query += " chan.id = i.channel_id"
+					updated = True
+				elif col == 'Elongation':
+					fields.append('fitsin.psfel AS elongation')
+					tables.append('youpi_plugin_fitsin AS fitsin')
+					tables.append('youpi_processing_task AS task')
+					tables.append('youpi_rel_it AS relit')
+					if updated: query += " AND"
+					query += ' fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id'
+					updated = True
+					# Mark fitsin related tables in use
+					fitsinTablesInUse = True
+				elif col == 'Seeing':
+					fields.append('fitsin.psffwhm AS seeing')
+					if not fitsinTablesInUse:
+						tables.append('youpi_plugin_fitsin AS fitsin')
+						tables.append('youpi_processing_task AS task')
+						tables.append('youpi_rel_it AS relit')
+						if updated: query += " AND"
+						query += ' fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id'
+						updated = True
+						fitsinTablesInUse = True
+				elif col == 'Sky background':
+					fields.append('fitsin.bkg AS sky_background')
+					if not fitsinTablesInUse:
+						tables.append('youpi_plugin_fitsin AS fitsin')
+						tables.append('youpi_processing_task AS task')
+						tables.append('youpi_rel_it AS relit')
+						if updated: query += " AND"
+						query += ' fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id'
+						updated = True
+						fitsinTablesInUse = True
+						
+			# Prepares second query
+			tquery = tquery % (', '.join(fields), ', '.join(tables))
+			query = tquery + query
+			if updated: query += ' AND'
+			query += " i.id IN (%s);" % ','.join(res)
+			cursor.execute(query)
+			res = cursor.fetchall()
 			db.close()
 
-			#airmass_min = post['airmass_min'] or None
+			# Final res list
+			f_res = []
+			for r in res:
+				f_res.append(list(r))
+
+			# Handle grades/comments
+			if 'Grade' in cols or 'Comment' in cols:
+				from terapix.script.grading import get_grades
+				grades = get_grades(idList = [r[0] for r in res])
+				# Dict with img id as a key
+				idGrades = {}
+				for g in grades:
+					idGrades[g[4]] = g[:-1]
+
+				# Merge grades with previous results
+				if 'Grade' in cols:
+					if 'Comment' in cols:
+						for r in f_res:
+							if idGrades.has_key(r[0]):
+								r.append(idGrades[r[0]][1])
+								r.append(idGrades[r[0]][2])
+					else:
+						for r in f_res:
+							if idGrades.has_key(r[0]):
+								r.append(idGrades[r[0]][1])
+				else:
+					for r in f_res:
+						if idGrades.has_key(r[0]):
+							r.append(idGrades[r[0]][2])
+
+			# Handle tags
+			if 'Tags' in cols:
+				imgs = Image.objects.filter(id__in = [r[0] for r in f_res])
+				tags = {}
+				for img in imgs:
+					tags[img.id] = [t.name for t in img.tags()]
+				# Merge grades with previous results
+				for r in f_res:
+					if tags.has_key(r[0]):
+						r.append(', '.join(tags[r[0]]))
+
+			res = f_res
+			report_content = """
+<h2>Matches: %d</h2>
+<input type="button" onclick="var d=this.next('div'); d.visible()?d.hide():d.show(); return false;" value="Toggle selected criteria"/>
+<div style="display: none;">
+	<div>
+		<input id="report_submit" type="submit" value="Generate!"/>
+		<div>%s</div>
+		<input id="report_submit" type="submit" value="Generate!"/>
+	</div>
+</div>
+<div style="color: black;">
+	<table style=""" % (len(res), tdata)
+			report_content += '"width: 100%;">'
+
+			for row in res:
+				report_content += "<tr>"
+				for c in row:
+					report_content += "<td>%s</td>" % c
+				report_content += "</tr>"
+
+			report_content += """
+	</table>
+</div>
+</form>
+"""
+
 			return render_to_response('report.html', {	
 								'report_title' 		: 'Advanced image report (HTML, PDF)',
-								'report_content' 	: """<pre style="width: 400px; color: black;">%s</pre>""" % str(res),
+								'report_content' 	: report_content,
+								'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+								'after_extra_content': '',
 			}, context_instance = RequestContext(request))
 		else:
 			# Report errors in form

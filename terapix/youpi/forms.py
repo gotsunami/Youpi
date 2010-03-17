@@ -17,7 +17,13 @@ class ReportAdvancedImageForm(forms.Form):
 	tag_choices.insert(0, (-1, ''))
 	grade_choices = list(GRADE_SET)
 	grade_choices.insert(0, (-1, ''))
+	columns = ('Image checksum', 'Image path', 'Date obs', 'Exptime', 'Ra Dec', 'Radius', 'Run id', 'Flat', 'Mask', 'Object', 'Airmass',
+			'Tags', 'Instrument', 'Channel', 'Elongation', 'Seeing', 'Sky background', 'Grade', 'Comment')
 
+	# Selected columns in final report
+	show_column_in_report = forms.MultipleChoiceField(choices = [(d, d) for d in columns], widget = forms.SelectMultiple(attrs = {'size': '6'}), 
+		help_text = 'Select colums to display in final report')
+	# Image related
 	date_obs_min = forms.DateTimeField(required = False, help_text = 'Format: YYYY-MM-DD[ HH:MM:SS]', input_formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d'])
 	date_obs_max = forms.DateTimeField(required = False, help_text = 'Format: YYYY-MM-DD[ HH:MM:SS]', input_formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d'])
 	exptime_min = forms.DecimalField(help_text = 'Format:  sec, max digits: 3 (Ex: 500.090)', required = False)
@@ -47,4 +53,4 @@ class ReportAdvancedImageForm(forms.Form):
 		forms.Form.__init__(self, data)
 		self.brks = ('Elongation max', 'Airmass max', 'Date obs max', 'Exptime max', 'Seeing max', 
 			'Radius', 'Run id', 'Sky background max', 'Mask', 'Object', 'Comment', 'Tags', 'Instruments',
-			'Channels', 'Show column report')
+			'Channels', 'Show column in report')

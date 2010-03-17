@@ -22,16 +22,4 @@
 		{% ifequal field.label brk %}<tr><td colspan="2"><hr/></td></tr>{% endifequal %}
 	{% endfor %}
 {% endfor %}
-	<tr>
-		<th><label for="id_show_in_report">Show column in report:</label></th>
-		<td>
-			<select size="6" multiple="multiple" name="show_in_report" id="id_show_in_report">
-			{% for field in report.context.form %}
-				<option selected="selected" value="{{ field.label }}">{{ field.label }}</option>
-			{% endfor %}
-			</select>
-			<br/>Select all colums to display in the final report
-		</td>
-	</tr>
-	<tr><td colspan="2"><hr/></td></tr>
 </table>
