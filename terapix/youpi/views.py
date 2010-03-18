@@ -1425,7 +1425,6 @@ def get_global_report(request, reportId):
 			return render_to_response('report.html', {	
 								'report_title' 		: 'Advanced image report (HTML, PDF)',
 								'report_content' 	: report_content,
-								#'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
 								'before_extra_content'	: """<form action="/youpi/report/generating/global/%s/" id="report_form" method="post">""" % reportId,
 								'after_extra_content': '',
 			}, context_instance = RequestContext(request))
