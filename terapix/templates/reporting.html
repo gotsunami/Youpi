@@ -135,14 +135,13 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		}
 	{% if perms.youpi.can_use_reporting %}
 		$('report_form').observe('submit', function() {
-			$('loading_div').update(getLoadingHTML('Please wait while generating report')).show();
 			var sel = $('report_select');
 			var opt = sel.options[sel.selectedIndex];
 			var selvalue = opt.value;
 			if (selvalue == '0') return false;
 			var grp = opt.up();
 			var type = grp != sel ? grp.id : 'global';
-			$('report_form').action = '/youpi/report/' + type + '/' + selvalue + '/';
+			$('report_form').action = '/youpi/report/generating/' + type + '/' + selvalue + '/';
 		});
 
 		$('report_reset').observe('click', function() {

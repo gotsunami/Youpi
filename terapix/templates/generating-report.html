@@ -1,0 +1,41 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+<!-- Menu handling -->
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
+<script type="text/javascript" src="/media/js/menu.js"></script>
+<script type="text/javascript">
+var guistyle = '{{ user.get_profile.guistyle }}';
+</script>
+{% endblock %}
+
+{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
+
+{% block content %}
+<div>
+	<div id="submenu">
+		<div style="margin-left: 30px;" id="menuitem_sub_0">
+			<div style="margin-top: 150px; margin-bottom: 100px;width: 350px; padding: 30px; border: 2px solid #5B80B2; -moz-border-radius: 5px; margin-left: auto; margin-right: auto; vertical-align: top;">
+				<div style="float: left; padding-right: 20px;">
+					<img style="vertical-align: top;" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/running_clock.gif"/>
+				</div>
+				<div style="color: #5B80B2; font-size: 16px; font-weight: bold;">Generating report, please wait...</div>
+			</div>
+			{# form #}
+			<form id="report-form" method="post" action="{{ target }}">
+			{% for k,v in params.items %}
+				<input type="hidden" name="{{ k }}" value="{{ v }}"/>
+			{% endfor %}
+			</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	var menu;
+	document.observe('dom:loaded', function() {
+		menu = new SubMenu('submenu', ['HTML Report']);
+		$('report-form').submit();
+	});
+</script>
+{% endblock %}

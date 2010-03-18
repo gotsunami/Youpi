@@ -1425,7 +1425,8 @@ def get_global_report(request, reportId):
 			return render_to_response('report.html', {	
 								'report_title' 		: 'Advanced image report (HTML, PDF)',
 								'report_content' 	: report_content,
-								'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+								#'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+								'before_extra_content'	: """<form action="/youpi/report/generating/global/%s/" id="report_form" method="post">""" % reportId,
 								'after_extra_content': '',
 			}, context_instance = RequestContext(request))
 		else:
@@ -1442,6 +1443,16 @@ def get_global_report(request, reportId):
 			}, context_instance = RequestContext(request))
 
 	return HttpResponseNotFound('Report not found.')
+
+def generating_report(request, pluginId, reportId):
+	"""
+	Renders intermediate template with a convenient 'Generating report...' message
+	while building the report.
+	"""
+	return render_to_response('generating-report.html', {	
+						'params'	: request.POST,
+						'target'	: '/youpi/report/' + pluginId + '/' + reportId + '/',
+	}, context_instance = RequestContext(request))
 
 def get_report(request, pluginId, reportId):
 	"""

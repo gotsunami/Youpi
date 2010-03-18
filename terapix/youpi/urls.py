@@ -65,6 +65,7 @@ urlpatterns = patterns(
 	(r'^monitoring/softwares/$', 'soft_version_monitoring'),
 	(r'^condor/cancel/$', 'job_cancel'),
 	(r'^condor/setup/$', 'condor_setup'),
+	(r'^report/generating/(.*?)/(.*?)/$', 'generating_report'),
 	(r'^report/(.*?)/(.*?)/$', 'get_report'),
 	(r'^reporting/$', 'reporting'),
 	(r'^results/$', 'results'),
