@@ -35,7 +35,6 @@ urlpatterns = patterns(
 	(r'^ingestion/itt/raw/(.*?)/$', 'views.show_raw_itt_content'),
 	(r'^image/info/$', 'views.get_image_info'),
 	(r'^image/head/(.*?)/$', 'views.gen_image_header'),
-	(r'^img/(?P<image_name>.*?)/$', 'views.aff_img'),
 	(r'^processing/$', 'views.processing'),
 	(r'^processing/(.*?)/$', 'views.render_plugin'),
 
@@ -95,7 +94,6 @@ urlpatterns = patterns(
 
 	# Sandbox for testing django form processing
 #	(r'^sandbox/$', 'test_form'),
-#	(r'^js/$', 'test_js'),
 
 	# AJAX dynamic folder populate
 	(r'^populate/(.*?)/(.*?)/(.*)/$', 'views.open_populate'),

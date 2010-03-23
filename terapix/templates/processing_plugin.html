@@ -2,17 +2,10 @@
 {% load i18n %}
 {% load compressed %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/tafelTree/css/tree.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/windows/themes/default.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/windows/themes/alphacube.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
+{% compressed_css 'procplugin' %}
 {% compressed_js 'procplugin' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';

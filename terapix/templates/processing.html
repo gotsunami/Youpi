@@ -2,14 +2,11 @@
 {% load i18n %}
 {% load compressed %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
+{% compressed_css 'processing' %}
 {% compressed_js 'processing' %}
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/tafelTree/css/tree.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 

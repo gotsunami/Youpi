@@ -3,9 +3,6 @@
 {% load compressed %}
 
 {% block extrahead %}
-{% compressed_js 'singleresult' %}
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript">
 // Overwrites default lightbox2 options
 window.LightboxOptions = {
@@ -15,6 +12,8 @@ window.LightboxOptions = {
 	fileBottomNavCloseImage: '/media/js/3rdParty/lightbox2/images/closelabel.gif'
 };
 </script>
+{% compressed_css 'singleresult' %}
+{% compressed_js 'singleresult' %}
 <script type="text/javascript">
 var currentReturnedData = null;
 var guistyle = '{{ user.get_profile.guistyle }}';
@@ -25,11 +24,8 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
-{% block branding %}{% endblock %}
-{% block breadcrumbs %}{% endblock %}
 
 {% block content %}
 <div id="submenu">

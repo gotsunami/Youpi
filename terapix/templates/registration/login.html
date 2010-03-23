@@ -1,7 +1,12 @@
 {% extends "registration/base_login.html" %}
 {% load i18n %}
+{% load compressed %}
 
-{% block stylesheet %}/media/themes/default/css/login.css{% endblock %} 
+{% block extrahead %}
+{% compressed_css 'login' %}
+{% compressed_js 'default' %}
+{% endblock %}
+
 {% block bodyclass %}login{% endblock %}
 {% block content_title %}{% endblock %}
 {% block breadcrumbs %}{% endblock %}

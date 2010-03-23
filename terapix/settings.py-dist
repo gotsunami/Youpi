@@ -284,13 +284,13 @@ AUTH_PROFILE_MODULE = 'youpi.siteprofile'
 # django-compress app setup
 # 
 COMPRESS_VERSION = True
-COMPRESS_CSS = {}
+COMPRESS_CSS_FILTERS = ['compress.filters.yui.YUICompressorFilter']
+COMPRESS_JS_FILTERS = COMPRESS_CSS_FILTERS
 
 COMMON_JS = [
 	'js/3rdParty/scriptaculous/prototype.js', 
 	'js/3rdParty/scriptaculous/scriptaculous.js', 
 	'js/3rdParty/scriptaculous/builder.js',
-	'js/3rdParty/scriptaculous/builder.js', 
 	'js/3rdParty/scriptaculous/effects.js', 
 	'js/3rdParty/scriptaculous/dragdrop.js', 
 	'js/processingcart.js', 
@@ -403,6 +403,7 @@ SINGLERESULT_JS.extend([
 ])
 
 COMPRESS_JS = {
+	'default'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/default.r?-min.js' },
 	'home'			: { 'source_filenames': HOME_JS, 'output_filename': 'js/home.r?-min.js' },
 	'ingestion'		: { 'source_filenames': INGESTION_JS, 'output_filename': 'js/ingestion.r?-min.js' },
 	'tags'			: { 'source_filenames': TAGS_JS, 'output_filename': 'js/tags.r?-min.js' },
@@ -421,6 +422,98 @@ COMPRESS_JS = {
 	'imageinfo'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/imageinfo.r?-min.js' },
 	'singleresult'	: { 'source_filenames': SINGLERESULT_JS, 'output_filename': 'js/singleres.r?-min.js' },
 	'softsv'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/softsv.r?-min.js' },
+}
+
+#
+DEFAULT_CSS = [
+	'themes/default/css/dashboard.css', 
+	'themes/default/css/layout.css', 
+	'themes/default/css/global.css', 
+	'themes/default/css/patch-iewin.css', 
+	'themes/default/css/menu.css',
+]
+#
+ING_CSS = DEFAULT_CSS[:]
+ING_CSS.extend([
+	'themes/default/css/history.css', 
+	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css', 
+	'js/3rdParty/tafelTree/css/tree.css', 
+	'themes/default/css/tooltip.css',
+])
+#
+TAGS_CSS = DEFAULT_CSS[:]
+TAGS_CSS.extend([
+	'js/3rdParty/lightbox2/css/lightbox.css',
+	'js/3rdParty/modalbox/modalbox.css',
+	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css',
+])
+#
+PROCESSING_CSS = DEFAULT_CSS[:]
+PROCESSING_CSS.extend([
+	'js/3rdParty/tafelTree/css/tree.css',
+	'themes/default/css/tooltip.css',
+])
+#
+PROCPLUGIN_CSS = DEFAULT_CSS[:]
+PROCPLUGIN_CSS.extend([
+	'js/3rdParty/tafelTree/css/tree.css',
+	'themes/default/css/tooltip.css',
+	'js/3rdParty/modalbox/modalbox.css',
+	'js/3rdParty/windows/themes/default.css',
+	'js/3rdParty/windows/themes/alphacube.css',
+	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css',
+])
+#
+RESULTS_CSS = DEFAULT_CSS[:]
+RESULTS_CSS.extend([
+	'js/3rdParty/lightbox2/css/lightbox.css',
+	'js/3rdParty/modalbox/modalbox.css',
+])
+#
+CART_CSS = DEFAULT_CSS[:]
+CART_CSS.extend([
+	'themes/default/css/history.css',
+	'js/3rdParty/modalbox/modalbox.css',
+	'themes/default/css/accordion.css',
+])
+#
+CONDOR_CSS = DEFAULT_CSS[:]
+CONDOR_CSS.extend([
+	'themes/default/css/tooltip.css',
+	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css',
+])
+#
+PREF_CSS = DEFAULT_CSS[:]
+PREF_CSS.extend([
+	'themes/default/css/history.css',
+	'js/3rdParty/modalbox/modalbox.css',
+])
+#
+SINGLERES_CSS = DEFAULT_CSS[:]
+SINGLERES_CSS.extend([
+	'js/3rdParty/lightbox2/css/lightbox.css',
+])
+#
+LOGIN_CSS = DEFAULT_CSS[:]
+LOGIN_CSS.extend([
+	'themes/default/css/login.css',
+])
+
+COMPRESS_CSS = {
+	'default'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/default.r?-min.css' },
+	'ingestion'		: { 'source_filenames': ING_CSS, 'output_filename': 'themes/default/css/ingestion.r?-min.css' },
+	'tags'			: { 'source_filenames': TAGS_CSS, 'output_filename': 'themes/default/css/tags.r?-min.css' },
+	'processing'	: { 'source_filenames': PROCESSING_CSS, 'output_filename': 'themes/default/css/processing.r?-min.css' },
+	'procplugin'	: { 'source_filenames': PROCPLUGIN_CSS, 'output_filename': 'themes/default/css/procplugin.r?-min.css' },
+	'monitoring'	: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/monitoring.r?-min.css' },
+	'results'		: { 'source_filenames': RESULTS_CSS, 'output_filename': 'themes/default/css/results.r?-min.css' },
+	'reporting'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/reporting.r?-min.css' },
+	'report'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/report.r?-min.css' },
+	'cart'			: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/cart.r?-min.css' },
+	'condor'		: { 'source_filenames': CONDOR_CSS, 'output_filename': 'themes/default/css/condor.r?-min.css' },
+	'preferences'	: { 'source_filenames': PREF_CSS, 'output_filename': 'themes/default/css/prefs.r?-min.css' },
+	'singleresult'	: { 'source_filenames': SINGLERES_CSS, 'output_filename': 'themes/default/css/singleres.r?-min.css' },
+	'login'			: { 'source_filenames': LOGIN_CSS, 'output_filename': 'themes/default/css/login.r?-min.css' },
 }
 
 # Override all FIXME sections with your values.

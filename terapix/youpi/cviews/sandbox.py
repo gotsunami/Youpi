@@ -31,8 +31,3 @@ def test_form(request):
 	html = t.render(Context({'form' : myform}))
 
 	return HttpResponse(html)
-
-
-def test_js(request):
-	hosts = condor_status()
-	return render_to_response('testjs.html', {'condor_hosts': hosts })

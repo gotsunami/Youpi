@@ -1,7 +1,7 @@
 {% load compressed %}
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css"/>
+		{% compressed_css 'default' %}
 		{% compressed_js 'gradepanel' %}
 		<script type="text/javascript">
 			var guistyle = '{{ user.get_profile.guistyle }}';

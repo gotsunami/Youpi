@@ -4,17 +4,11 @@
 
 {% block extrahead %}
 {% compressed_js 'tags' %}
-
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
+{% compressed_css 'tags' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 </script>
 {% endblock %}
-
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 

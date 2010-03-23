@@ -401,22 +401,6 @@ def browse_api(request, type):
 	# Redirect to API doc
 	return HttpResponseRedirect('http://clix.iap.fr:8001/' + path)
 
-def aff_img(request,image_name):
-	"""
-	Displays (popup) an image image_name.
-	This is a callback function (as defined in django's urls.py file).
-	"""
-
-	db = MySQLdb.connect(host = settings.DATABASE_HOST, user = settings.DATABASE_USER, passwd = settings.DATABASE_PASSWORD, db = settings.DATABASE_NAME)
-	cursor = db.cursor()
-	cursor.execute("SELECT * FROM youpi_image where name='%s'" % image_name)
-	list_param = []
-	for rows in cursor.fetchall():
-		list_param.append({'rows':rows})
-	db.close()
-
-	return render_to_response('popup.htm', {'names': rows})
-
 def open_populate(request, behaviour, tv_name, path):
 	"""
 	This function returns a list of JSON objects to generate a dynamic Ajax treeview.

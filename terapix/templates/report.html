@@ -7,14 +7,13 @@
 <script type="text/javascript" src="/media/js/3rdParty/flotr/lib/excanvas.js"></script>
 <script type="text/javascript" src="/media/js/3rdParty/flotr/lib/base64.js"></script>
 <![endif]-->
+{% compressed_css 'report' %}
 {% compressed_js 'report' %}
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 

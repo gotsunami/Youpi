@@ -3,10 +3,9 @@
 {% load compressed %}
 
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
+{% compressed_css 'monitoring' %}
 {% compressed_js 'monitoring' %}
 <script type="text/javascript">
-
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';
 {% if perms.youpi.can_monitor_jobs %}
@@ -234,7 +233,6 @@ function cancelAllJobs(what) {
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 

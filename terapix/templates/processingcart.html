@@ -2,14 +2,10 @@
 {% load i18n %}
 {% load compressed %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/history.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/accordion.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
+{% compressed_css 'cart' %}
 {% compressed_js 'cart' %}
 <script type="text/javascript">
 // Global vars

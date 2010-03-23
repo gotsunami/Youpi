@@ -3,11 +3,6 @@
 {% load compressed %}
 
 {% block extrahead %}
-{% compressed_js 'results' %}
-
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <script type="text/javascript">
 // Overwrites default lightbox2 options
 window.LightboxOptions = {
@@ -17,6 +12,8 @@ window.LightboxOptions = {
 	fileBottomNavCloseImage: '/media/js/3rdParty/lightbox2/images/closelabel.gif'
 };
 </script>
+{% compressed_css 'results' %}
+{% compressed_js 'results' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 var currentReturnedData = null;
@@ -60,7 +57,6 @@ function get_stats() {
 </script>
 {% endblock %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 

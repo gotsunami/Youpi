@@ -3,14 +3,12 @@
 {% load compressed %}
 
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
+{% compressed_css 'reporting' %}
 {% compressed_js 'reporting' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 </script>
 {% endblock %}
-
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block content %}
 <div>
 	<div id="submenu">

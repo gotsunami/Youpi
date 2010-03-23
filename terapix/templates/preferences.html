@@ -2,15 +2,11 @@
 {% load i18n %}
 {% load compressed %}
 
-{% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/history.css"></script>
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
+{% compressed_css 'preferences' %}
 {% compressed_js 'preferences' %}
-
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 

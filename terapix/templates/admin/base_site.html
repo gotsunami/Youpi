@@ -1,8 +1,12 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block title %}{{ title }} | {% trans 'Youpi site admin' %}{% endblock %}
-{% block extrahead %}<link rel="stylesheet" type="text/css" href="/media/themes/default/css/login.css" />{% endblock %}
+{% block extrahead %}
+{% compressed_css 'login' %}
+{% compressed_js 'default' %}
+{% endblock %}
 
 {% block branding %}
 	<div style="font-weight: bold; font-size: 9px; color: brown; position: absolute; right: 5px; top: 88px;">Administration control panel</div>
