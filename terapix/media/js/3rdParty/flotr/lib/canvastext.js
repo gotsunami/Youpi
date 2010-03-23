@@ -354,11 +354,11 @@ var CanvasText = {
           
       if (c.diacritic) {
         var dia = CanvasText.diacritics[c.diacritic];
-        var char = CanvasText.letter(c.letter);
+        var mchar = CanvasText.letter(c.letter);
 
         CanvasText.drawPoints(ctx, dia.points, x, y - (c.letter.toUpperCase() == c.letter ? 3 : 0), mag, offset);
-        points = char.points;
-        width = char.width;
+        points = mchar.points;
+        width = mchar.width;
       }
 
       CanvasText.drawPoints(ctx, points, x, y, mag, offset);
