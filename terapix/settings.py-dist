@@ -426,10 +426,9 @@ COMPRESS_JS = {
 
 #
 DEFAULT_CSS = [
+	'themes/default/css/global.css', 
 	'themes/default/css/dashboard.css', 
 	'themes/default/css/layout.css', 
-	'themes/default/css/global.css', 
-	'themes/default/css/patch-iewin.css', 
 	'themes/default/css/menu.css',
 ]
 #
@@ -509,7 +508,7 @@ COMPRESS_CSS = {
 	'results'		: { 'source_filenames': RESULTS_CSS, 'output_filename': 'themes/default/css/results.r?-min.css' },
 	'reporting'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/reporting.r?-min.css' },
 	'report'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/report.r?-min.css' },
-	'cart'			: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/cart.r?-min.css' },
+	'cart'			: { 'source_filenames': CART_CSS, 'output_filename': 'themes/default/css/cart.r?-min.css' },
 	'condor'		: { 'source_filenames': CONDOR_CSS, 'output_filename': 'themes/default/css/condor.r?-min.css' },
 	'preferences'	: { 'source_filenames': PREF_CSS, 'output_filename': 'themes/default/css/prefs.r?-min.css' },
 	'singleresult'	: { 'source_filenames': SINGLERES_CSS, 'output_filename': 'themes/default/css/singleres.r?-min.css' },

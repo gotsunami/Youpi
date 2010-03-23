@@ -663,7 +663,7 @@ div.ims_batch_log_div pre {
 	text-align: left;
 }
 
-.advimgreport tr th, td {
+.advimgreport th, td {
 	border: none;
 }
 
