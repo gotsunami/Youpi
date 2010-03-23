@@ -196,6 +196,10 @@ function PathSelectorWidget(container, pluginId)
 						sel.observe('change', function() {
 							_onPathChange(this.pathChange.prefix, this.pathChange.selid);
 						});
+						
+						//This line permit to choose the last option added to the relative select box
+						sel.options[sel.selectedIndex = sel.options.length - 1].value;
+
 						if (_extra.selected)
 							sel.options[1].writeAttribute({selected: 'selected'});
 						div.insert(sel);
