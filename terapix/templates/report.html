@@ -38,3 +38,5 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	});
 </script>
 {% endblock %}
+
+{% block body_end %}{{ body_end|safe }}{% endblock %}

@@ -137,6 +137,7 @@ def get_global_report(request, reportId):
 			from django.template.loader import get_template
 			tmpl = get_template('reports/advanced-image-report-options.html')
 			tdata = tmpl.render(Context({'report': {'context': {'form': form}}}))
+			report_columns = post.getlist('show_column_in_report')
 
 			# Builds query
 			tables = ['youpi_image AS i']
@@ -477,26 +478,47 @@ def get_global_report(request, reportId):
 	</div>
 </div>
 <div style="color: black;">
-	<table style=""" % (len(res), tdata)
-			report_content += '"width: 100%;">'
-
-			for row in res:
-				report_content += "<tr>"
-				for c in row:
-					report_content += "<td>%s</td>" % c
-				report_content += "</tr>"
-
-			report_content += """
-	</table>
+	<div style="width: %s;" id="rtable"></div>
 </div>
 </form>
+"""	% (len(res), tdata, '98%')
+
+			body_end = """
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load('visualization', '1', {packages:['table']});
+	google.setOnLoadCallback(drawTable);
+	function drawTable() {
+		var data = new google.visualization.DataTable();"""
+
+			body_end += """
+		data.addColumn('string', 'Image Name');"""
+			for k in range(len(report_columns)):
+				body_end += """
+		data.addColumn('string', '%s');""" % report_columns[k]
+			body_end += """
+		data.addRows(%d);""" % len(res)
+
+			for row in range(len(res)):
+				body_end += """
+		data.setCell(%d, 0, '<a target="_blank" href="%s">%s</a>');""" % (row, reverse('terapix.youpi.views.gen_image_header', args=[res[row][0]]), res[row][1])
+				for col in range(len(res[row]))[2:]:
+					body_end += """
+		data.setCell(%d, %d, '%s');""" % (row, col-1, res[row][col])
+
+			body_end += """
+		var table = new google.visualization.Table($('rtable'));
+		table.draw(data, {showRowNumber: true, allowHtml: true});
+	}
+</script>
 """
 
 			return render_to_response('report.html', {	
 								'report_title' 		: 'Advanced image report (HTML, PDF)',
 								'report_content' 	: report_content,
 								'before_extra_content'	: """<form action="/youpi/report/generating/global/%s/" id="report_form" method="post">""" % reportId,
-								'after_extra_content': '',
+								# Use Google chart table API
+								'body_end': body_end,
 			}, context_instance = RequestContext(request))
 		else:
 			# Report errors in form
@@ -519,7 +541,8 @@ def generating_report(request, pluginId, reportId):
 	while building the report.
 	"""
 	return render_to_response('generating-report.html', {	
-						'params'	: request.POST,
+						# list() to keep multiple values
+						'params'	: request.POST.lists(),
 						'target'	: '/youpi/report/' + pluginId + '/' + reportId + '/',
 	}, context_instance = RequestContext(request))
 

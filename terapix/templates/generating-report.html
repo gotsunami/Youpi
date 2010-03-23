@@ -22,8 +22,10 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			</div>
 			{# form #}
 			<form id="report-form" method="post" action="{{ target }}">
-			{% for k,v in params.items %}
-				<input type="hidden" name="{{ k }}" value="{{ v }}"/>
+			{% for k,v in params %}
+				{% for m in v %}
+				<input type="hidden" name="{{ k }}" value="{{ m }}"/>
+				{% endfor %}
 			{% endfor %}
 			</form>
 		</div>
