@@ -109,7 +109,7 @@ LANGUAGE_CODE 		= 'en-us'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL 			= 'http://hostname/path'					# FIXME
+MEDIA_URL 			= '/media/'
 # Path to your Youpi installation
 TRUNK			= '/path/to/youpi/installation/dir/'			# FIXME
 
@@ -271,6 +271,7 @@ INSTALLED_APPS = (
 	'django.contrib.sessions',
 	'django.contrib.sites',
 	'django.contrib.admin',
+	'terapix.compress',
 	'terapix.django_evolution',
 	'terapix.youpi',
 )
@@ -278,6 +279,149 @@ INSTALLED_APPS = (
 SESSION_SAVE_EVERY_REQUEST = True
 
 AUTH_PROFILE_MODULE = 'youpi.siteprofile'
+
+# 
+# django-compress app setup
+# 
+COMPRESS_VERSION = True
+COMPRESS_CSS = {}
+
+COMMON_JS = [
+	'js/3rdParty/scriptaculous/prototype.js', 
+	'js/3rdParty/scriptaculous/scriptaculous.js', 
+	'js/3rdParty/scriptaculous/builder.js',
+	'js/3rdParty/scriptaculous/builder.js', 
+	'js/3rdParty/scriptaculous/effects.js', 
+	'js/3rdParty/scriptaculous/dragdrop.js', 
+	'js/processingcart.js', 
+	'js/common.js', 
+	'js/xhr.js',
+	'js/menu.js',
+]
+#
+HOME_JS = COMMON_JS[:]
+HOME_JS.extend(['js/progressbar.js', 'js/sqlform.js'])
+#
+INGESTION_JS = COMMON_JS[:]
+INGESTION_JS.extend([
+	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js', 
+	'js/3rdParty/tafelTree/Tree.js', 
+	'js/tooltip.js', 
+	'js/ingestion.js', 
+	'js/filebrowser.js',
+])
+#
+TAGS_JS = COMMON_JS[:]
+TAGS_JS.extend([
+	'js/stylepicker.js', 
+	'js/tagwidget.js', 
+	'js/tagpanel.js', 
+	'js/imageinfowidget.js', 
+	'js/imageselector.js', 
+	'js/pageswitcher.js', 
+	'js/advancedtable.js',
+	'js/3rdParty/lightbox2/lightbox.js', 
+	'js/3rdParty/modalbox/modalbox.js', 
+	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js',
+])
+#
+PROCESSING_JS = COMMON_JS[:]
+PROCESSING_JS.extend(['js/3rdParty/tafelTree/Tree.js'])
+#
+PROCPLUGIN_JS = COMMON_JS[:]
+PROCPLUGIN_JS.extend([
+	'js/3rdParty/tafelTree/Tree.js',
+	'js/3rdParty/modalbox/modalbox.js',
+	'js/progressbar.js',
+	'js/sqlform.js',
+	'js/imageinfowidget.js',
+	'js/imageselector.js',
+	'js/filebrowser.js',
+	'js/3rdParty/windows/js/window.js',
+	'js/lightfilebrowser.js',
+	'js/configfilewidget.js',
+	'js/pathselectorwidget.js',
+	'js/pageswitcher.js',
+	'js/advancedtable.js',
+	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js',
+])
+#
+RESULTS_JS = COMMON_JS[:]
+RESULTS_JS.extend([
+	'js/gradingwidget.js',
+	'js/processinghistorywidget.js',
+	'js/pageswitcher.js',
+	'js/3rdParty/lightbox2/lightbox.js',
+	'js/3rdParty/modalbox/modalbox.js',
+	'js/progressbar.js',
+])
+#
+REPORTING_JS = COMMON_JS[:]
+REPORTING_JS.extend([
+	'js/gradingwidget.js',
+	'js/processinghistorywidget.js',
+	'js/progressbar.js',
+])
+#
+CART_JS = COMMON_JS[:]
+CART_JS.extend([
+	'js/3rdParty/modalbox/modalbox.js',
+	'js/condorpanel.js',
+	'js/accordion.js',
+])
+#
+CONDOR_JS = COMMON_JS[:]
+CONDOR_JS.extend([
+	'js/advancedtable.js',
+	'js/condorpanel.js',
+	'js/clusterpolicywidget.js',
+	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js',
+])
+#
+PREF_JS = COMMON_JS[:]
+PREF_JS.extend([
+	'js/condorpanel.js',
+	'js/3rdParty/modalbox/modalbox.js',
+])
+#
+REPORT_JS = COMMON_JS[:]
+REPORT_JS.extend([
+	'js/3rdParty/flotr/lib/canvas2image.js',
+	'js/3rdParty/flotr/lib/canvastext.js',
+	'js/3rdParty/flotr/flotr-0.2.0-alpha.js',
+])
+#
+GRADEPANEL_JS = COMMON_JS[:]
+GRADEPANEL_JS.extend([
+	'js/gradingwidget.js',
+])
+#
+SINGLERESULT_JS = COMMON_JS[:]
+SINGLERESULT_JS.extend([
+	'js/gradingwidget.js',
+	'js/3rdParty/lightbox2/lightbox.js',
+])
+
+COMPRESS_JS = {
+	'home'			: { 'source_filenames': HOME_JS, 'output_filename': 'js/home.r?-min.js' },
+	'ingestion'		: { 'source_filenames': INGESTION_JS, 'output_filename': 'js/ingestion.r?-min.js' },
+	'tags'			: { 'source_filenames': TAGS_JS, 'output_filename': 'js/tags.r?-min.js' },
+	'processing'	: { 'source_filenames': PROCESSING_JS, 'output_filename': 'js/processing.r?-min.js' },
+	'procplugin'	: { 'source_filenames': PROCPLUGIN_JS, 'output_filename': 'js/procplugin.r?-min.js' },
+	'monitoring'	: { 'source_filenames': COMMON_JS, 'output_filename': 'js/monitoring.r?-min.js' },
+	'results'		: { 'source_filenames': RESULTS_JS, 'output_filename': 'js/results.r?-min.js' },
+	'reporting'		: { 'source_filenames': REPORTING_JS, 'output_filename': 'js/reporting.r?-min.js' },
+	'cart'			: { 'source_filenames': CART_JS, 'output_filename': 'js/cart.r?-min.js' },
+	'condor'		: { 'source_filenames': CONDOR_JS, 'output_filename': 'js/condor.r?-min.js' },
+	'preferences'	: { 'source_filenames': PREF_JS, 'output_filename': 'js/pref.r?-min.js' },
+	'doc'			: { 'source_filenames': COMMON_JS, 'output_filename': 'js/doc.r?-min.js' },
+	'genreport'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/genreport.r?-min.js' },
+	'report'		: { 'source_filenames': REPORT_JS, 'output_filename': 'js/report.r?-min.js' },
+	'gradepanel'	: { 'source_filenames': GRADEPANEL_JS, 'output_filename': 'js/gradepanel.r?-min.js' },
+	'imageinfo'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/imageinfo.r?-min.js' },
+	'singleresult'	: { 'source_filenames': SINGLERESULT_JS, 'output_filename': 'js/singleres.r?-min.js' },
+	'softsv'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/softsv.r?-min.js' },
+}
 
 # Override all FIXME sections with your values.
 # This file can be empty

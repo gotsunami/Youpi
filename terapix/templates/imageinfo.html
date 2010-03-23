@@ -1,10 +1,11 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block extrahead %}
 <!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<script type="text/javascript" src="/media/js/menu.js"></script>
+{% compressed_js 'imageinfo' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 </script>

@@ -1,13 +1,12 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 {% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
-<script type="text/javascript" src="/media/js/menu.js"></script>
-<script type="text/javascript" src="/media/js/progressbar.js"></script>
-<script type="text/javascript" src="/media/js/sqlform.js"></script>
+{% compressed_js 'home' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 

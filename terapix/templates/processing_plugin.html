@@ -1,5 +1,6 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
@@ -7,33 +8,12 @@
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/tafelTree/css/tree.css"/>
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
-
-<!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<script type="text/javascript" src="/media/js/menu.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/modalbox/modalbox.js"></script>
-
-<script type="text/javascript" src="/media/js/progressbar.js"></script>
-<script type="text/javascript" src="/media/js/sqlform.js"></script>
-<script type="text/javascript" src="/media/js/imageinfowidget.js"></script>
-<script type="text/javascript" src="/media/js/imageselector.js"></script>
-<script type="text/javascript" src="/media/js/filebrowser.js"></script>
-
-<script type="text/javascript" src="/media/js/3rdParty/windows/js/window.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/windows/themes/default.css"/>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/windows/themes/alphacube.css"/>
-
-<script type="text/javascript" src="/media/js/lightfilebrowser.js"></script>
-<script type="text/javascript" src="/media/js/configfilewidget.js"></script>
-<script type="text/javascript" src="/media/js/pathselectorwidget.js"></script>
-<script type="text/javascript" src="/media/js/pageswitcher.js"></script>
-<script type="text/javascript" src="/media/js/advancedtable.js"></script>
-
-<!-- Auto-completion code -->
-<script type="text/javascript" src="/media/js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
+{% compressed_js 'procplugin' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 

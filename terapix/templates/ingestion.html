@@ -1,31 +1,17 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/history.css"></script>
-
-<!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
-<script type="text/javascript" src="/media/js/menu.js"></script>
-
-<!-- Auto-completion code -->
-<script type="text/javascript" src="/media/js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
-
-<!-- Javascript treeview -->
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/tafelTree/css/tree.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/tafelTree/Tree.js"></script>
-
-<!-- Tooltip code -->
-<script type="text/javascript" src="/media/js/tooltip.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"></script>
-
-<!-- Ingestion-related Javascript code -->
-<script type="text/javascript" src="/media/js/ingestion.js"></script>
-<script type="text/javascript" src="/media/js/filebrowser.js"></script>
+{% compressed_js 'ingestion' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 var gready = true;

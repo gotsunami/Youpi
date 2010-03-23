@@ -1,22 +1,15 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/tooltip.css"/>
-<script type="text/javascript" src="/media/js/advancedtable.js"></script>
-<script type="text/javascript" src="/media/js/condorpanel.js"></script>
-<script type="text/javascript" src="/media/js/clusterpolicywidget.js"></script>
-
-<!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<script type="text/javascript" src="/media/js/menu.js"></script>
-
-<!-- Auto-completion code -->
-<script type="text/javascript" src="/media/js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
+{% compressed_js 'condor' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 var sb;

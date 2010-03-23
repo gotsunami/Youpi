@@ -1,20 +1,16 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block stylesheet %}/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css{% endblock %}
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/history.css"/>
-
-<!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/accordion.css"/>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/modalbox/modalbox.js"></script>
-<script type="text/javascript" src="/media/js/menu.js"></script>
-<script type="text/javascript" src="/media/js/condorpanel.js"></script>
-<script type="text/javascript" src="/media/js/accordion.js"></script>
+{% compressed_js 'cart' %}
 <script type="text/javascript">
 // Global vars
 var guistyle = '{{ user.get_profile.guistyle }}';

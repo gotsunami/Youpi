@@ -1,14 +1,10 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block extrahead %}
-<!-- Javascript treeview -->
-<script type="text/javascript" src="/media/js/common.js"></script>
-<script type="text/javascript" src="/media/js/xhr.js"></script>
-
-<!-- Menu handling -->
+{% compressed_js 'softsv' %}
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
-<script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript">
 
 var guistyle = '{{ user.get_profile.guistyle }}';

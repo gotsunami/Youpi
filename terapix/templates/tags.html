@@ -1,27 +1,14 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block extrahead %}
-<script type="text/javascript" src="/media/js/stylepicker.js"></script>
-<script type="text/javascript" src="/media/js/tagwidget.js"></script>
-<script type="text/javascript" src="/media/js/tagpanel.js"></script>
-<script type="text/javascript" src="/media/js/imageinfowidget.js"></script>
-<script type="text/javascript" src="/media/js/imageselector.js"></script>
-<script type="text/javascript" src="/media/js/pageswitcher.js"></script>
-<script type="text/javascript" src="/media/js/advancedtable.js"></script>
+{% compressed_js 'tags' %}
 
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/lightbox2/lightbox.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/modalbox/modalbox.js"></script>
-
-<!-- Auto-completion code -->
-<script type="text/javascript" src="/media/js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js"></script>
 <link rel="stylesheet" type="text/css" href="/media/js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css"></script>
-
-<!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 </script>

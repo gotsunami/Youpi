@@ -1,9 +1,8 @@
+{% load compressed %}
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/dashboard.css"/>
-		<script type="text/javascript" src="/media/js/3rdParty/scriptaculous/prototype.js"></script>
-		<script type="text/javascript" src="/media/js/xhr.js"></script>
-		<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
+		{% compressed_js 'gradepanel' %}
 		<script type="text/javascript">
 			var guistyle = '{{ user.get_profile.guistyle }}';
 		</script>

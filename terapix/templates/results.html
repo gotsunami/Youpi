@@ -1,12 +1,13 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block extrahead %}
-<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
-<script type="text/javascript" src="/media/js/processinghistorywidget.js"></script>
-<script type="text/javascript" src="/media/js/progressbar.js"></script>
-<script type="text/javascript" src="/media/js/pageswitcher.js"></script>
+{% compressed_js 'results' %}
 
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
 <script type="text/javascript">
 // Overwrites default lightbox2 options
 window.LightboxOptions = {
@@ -16,14 +17,6 @@ window.LightboxOptions = {
 	fileBottomNavCloseImage: '/media/js/3rdParty/lightbox2/images/closelabel.gif'
 };
 </script>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/lightbox2/lightbox.js"></script>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/modalbox/modalbox.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/modalbox/modalbox.js"></script>
-
-<!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 var currentReturnedData = null;

@@ -1,15 +1,10 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block extrahead %}
-<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
-<script type="text/javascript" src="/media/js/processinghistorywidget.js"></script>
-<script type="text/javascript" src="/media/js/progressbar.js"></script>
-
-
-<!-- Menu handling -->
 <link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"/>
-<script type="text/javascript" src="/media/js/menu.js"></script>
+{% compressed_js 'reporting' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 </script>

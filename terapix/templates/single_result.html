@@ -1,11 +1,11 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block extrahead %}
-<!-- Javascript treeview -->
-<script type="text/javascript" src="/media/js/common.js"></script>
-<script type="text/javascript" src="/media/js/xhr.js"></script>
-<script type="text/javascript" src="/media/js/gradingwidget.js"></script>
+{% compressed_js 'singleresult' %}
+<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
+<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
 <script type="text/javascript">
 // Overwrites default lightbox2 options
 window.LightboxOptions = {
@@ -15,12 +15,6 @@ window.LightboxOptions = {
 	fileBottomNavCloseImage: '/media/js/3rdParty/lightbox2/images/closelabel.gif'
 };
 </script>
-<link rel="stylesheet" type="text/css" href="/media/js/3rdParty/lightbox2/css/lightbox.css"/>
-<script type="text/javascript" src="/media/js/3rdParty/lightbox2/lightbox.js"></script>
-
-<!-- Menu handling -->
-<link rel="stylesheet" type="text/css" href="/media/themes/{{ user.get_profile.guistyle }}/css/menu.css"></script>
-<script type="text/javascript" src="/media/js/menu.js"></script>
 <script type="text/javascript">
 var currentReturnedData = null;
 var guistyle = '{{ user.get_profile.guistyle }}';
