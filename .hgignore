@@ -3,6 +3,8 @@ syntax: glob
 
 *.pyc
 *~
+*-min.css
+*-min.js
 deploy/django.wsgi
 deploy/youpi.conf
 doc/handbook/build
