@@ -1382,6 +1382,7 @@ def gen_image_header(request, image_id):
 		return HttpResponseBadRequest("Error: image not found")
 
 	hasHeader = False
+	rawHead = ''
 	if dhead:
 		dhead = genimgdothead.formatHeader(dhead)
 		rawHead = genimgdothead.getRawHeader(dhead, numext)
