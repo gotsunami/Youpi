@@ -514,6 +514,9 @@ COMPRESS_CSS = {
 	'singleresult'	: { 'source_filenames': SINGLERES_CSS, 'output_filename': 'themes/default/css/singleres.r?-min.css' },
 	'login'			: { 'source_filenames': LOGIN_CSS, 'output_filename': 'themes/default/css/login.r?-min.css' },
 }
+# 
+# End of django-compress app setup
+# 
 
 # Override all FIXME sections with your values.
 # This file can be empty

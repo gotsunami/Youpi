@@ -25,6 +25,14 @@ Version 0.6.1
   FITS image header keywords overriding
 - Added a ``can_change_custom_condor_req`` :ref:`global permission <global_permissions>` 
   to prevent users modifying their custom Condor requirement string
+- New report "List of all QualityFITS grades, with comments (HTML)"
+- New report "Advanced image report"
+- Added report description and thumbnail preview to reporting module
+- New ``MAINTENANCE`` mode for maintenance operations
+- Various performance improvements in production environment (by combining static Javascript and CSS 
+  files into single files and `minifying`_ their content)
+
+.. _minifying: http://en.wikipedia.org/wiki/Minify
 
 **Bug fixes**:
 
@@ -35,11 +43,72 @@ Version 0.6.1
 - QualityFITS results: hide "Image tags" block when image has no tags
 - QualityFITS results: fixed permission issue. Non-authorized users cannot access restricted 
   results anymore
-- Processing history results: fixed a *Server Error* issue when resetting the search form
+- QualityFITS results: fixed counter value for already graded images
+- QualityFITS: fixed "list of all non graded images" report
+- QualityFITS: fixed broken "reprocess" button on the results page
+- Grading script: fixed custom comment issue
+- Processing history results: fixed a ``Server Error`` issue when resetting the search form
+- Path selector widget: fixed automatic path selection
+- Minor fixes
 
 **Release Notes**:
 
-In order to upgrade from 0.5.2 *or later*, please do the following:
+In order to **upgrade from 0.6**, please do the following:
+
+1. Edit the site's ``settings.py`` file and copy the following content from ``settings.py-dist`` 
+   that comes with the source distribution::
+
+	MEDIA_URL = '/media/'
+
+2. Youpi uses the ``django-compress`` 3rd party application to support combining static files 
+   (with minification). Just locate the ``INSTALLED_APPS`` variable in the ``setting.py`` and 
+   add the following entry just after the line ``'django.contrib.admin',``::
+
+	'terapix.compress',
+
+3. Using ``settings.py-dist``, copy all the lines from::
+
+	# 
+	# django-compress app setup
+	# 
+	COMPRESS_VERSION = True
+	COMPRESS_CSS_FILTERS = ['compress.filters.yui.YUICompressorFilter']
+	COMPRESS_JS_FILTERS = COMPRESS_CSS_FILTERS
+	...
+
+   to::
+
+	...
+	# 
+	# End of django-compress app setup
+	# 
+	
+   in your ``settings.py`` file.
+
+4. CSS and Javascript file minification is accomplished  using Yahoo's `YUI Java compressor`_. In order 
+   to use it with Youpi, make sure that Java is installed on your system and download the YUI compressor tool. 
+   Then, add the following line to your ``settings.py`` file or (preferred) ``local_conf.py``, replacing the 
+   absolute path to the JAR archive accordingly::
+
+	COMPRESS_YUI_BINARY = "java -jar /path/to/yuicompressor-2.x.x.jar"
+
+   .. note:: If, for any reason, you don't want to use the YUI compressor or Java at all, you can safely 
+             disable the ``terapix.compress`` application by adding a ``COMPRESS = False`` line in your 
+             settings file. This setting will disable minification.
+
+   .. note:: We recommand using minification techniques when deploying the application in a production environment.
+             Although the included `django-compress`_ module works without using the YUI compressor (using its own 
+             internal tools), the YUI compressor will generally give better results.
+
+   .. _YUI Java compressor: http://developer.yahoo.com/yui/compressor/
+   .. _django-compress: http://code.google.com/p/django-compress/
+
+5. *(This step is optional)* Now that everything is set up, you can generate the minified static 
+   files from the command line (otherwise they get generated automatically on-the-fly)::
+
+	python manage.py synccompress
+
+In order to **upgrade from 0.5.2** *or later*, please do the following:
 
 0. Make a **backup of your database**.
 
