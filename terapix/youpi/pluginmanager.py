@@ -427,9 +427,7 @@ class ProcessingPlugin(object):
 				m = MiscData.objects.filter(key = k, user = request.user)[0]
 				data = marshal.loads(base64.decodestring(str(m.data)))
 				paths[str(k)] = data
-				#paths[str(k)].sort()
-				#No need to sort we need to know the last added to take the right one
-				paths[str(k)]
+				paths[str(k)].sort()
 			except:
 				paths[str(k)] = []
 

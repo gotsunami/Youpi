@@ -154,11 +154,11 @@ function PathSelectorWidget(container, pluginId)
 	 * Loads stored data paths into the combobox
 	 *
 	 * Parameters:
-	 *  afterLoadingHandler - function: custom handler to execute (NOT YET IMPLEMENTED)
+	 *  afterLoadingHandler - function: custom handler to execute
 	 *
 	 */ 
 	function _loadExistingPaths(afterLoadingHandler) {
-		var handler = afterLoadingHandler ? afterLoadingHandler : null;
+		var handler = typeof afterLoadingHandler == 'function' ? afterLoadingHandler : null;
 		var r = new HttpRequest(
 			null,
 			null,
@@ -197,9 +197,6 @@ function PathSelectorWidget(container, pluginId)
 							_onPathChange(this.pathChange.prefix, this.pathChange.selid);
 						});
 						
-						//This line permit to choose the last option added to the relative select box
-						sel.options[sel.selectedIndex = sel.options.length - 1].value;
-
 						if (_extra.selected)
 							sel.options[1].writeAttribute({selected: 'selected'});
 						div.insert(sel);
@@ -216,6 +213,7 @@ function PathSelectorWidget(container, pluginId)
 						_onPathChange(prefix, sel ? sel.id : null);
 					}
 				}
+				if (handler) handler();
 			}
 		);
 
@@ -267,7 +265,14 @@ function PathSelectorWidget(container, pluginId)
 			// Custom handler for results
 			function(resp) {
 				// Refresh data
-				_loadExistingPaths();
+				_loadExistingPaths(function() {
+					// Choose the lastest option added to the relative select box
+					var sel = $(plugin_id + '_' + prefix + '_select');
+					$A(sel.options).each(function(opt, k) {
+						if (opt.value == path)
+							sel.selectedIndex = k;
+					});
+				});
 			}
 		);
 	
