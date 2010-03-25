@@ -29,8 +29,8 @@ Version 0.6.1
 - New report "Advanced image report"
 - Added report description and thumbnail preview to reporting module
 - New ``MAINTENANCE`` mode for maintenance operations
-- Various performance improvements in production environment (by combining static Javascript and CSS 
-  files into single files and `minifying`_ their content)
+- Various :ref:`performance improvements in production environment <improve_performance>` (by 
+  combining static Javascript and CSS files into single files and `minifying`_ their content)
 
 .. _minifying: http://en.wikipedia.org/wiki/Minify
 
@@ -55,37 +55,26 @@ Version 0.6.1
 
 In order to **upgrade from 0.6**, please do the following:
 
-1. Edit the site's ``settings.py`` file and copy the following content from ``settings.py-dist`` 
-   that comes with the source distribution::
+1. A third file ``youpi/conf/settings.py`` is now taken into account for Youpi's configuration. Most of 
+   the content of the ``settings.py-dist`` that comes with the distribution has been moved to the new 
+   configuration file. The best way (not the fastest) to upgrade your ``settings.py`` file for this new 
+   release is to make a backup of it and copy the content of the latest ``settings.py-dist``::
 
-	MEDIA_URL = '/media/'
+	$ cp settings.py settings.py.orig
+	$ cp settings.dist-orig settings.py
 
-2. Youpi uses the ``django-compress`` 3rd party application to support combining static files 
-   (with minification). Just locate the ``INSTALLED_APPS`` variable in the ``setting.py`` and 
-   add the following entry just after the line ``'django.contrib.admin',``::
+   Now, just replace the ``FIXME`` directives in your newly created ``settings.py`` with the working values 
+   available in your ``settings.py.orig``.
 
-	'terapix.compress',
+   .. note:: Although this can be a tedious task, it is the more secure way to ensure your ``settings.py`` 
+             file is up-to-date with the latest ``settings.py-dist`` file provided in the source distribution.
+             Future upgrades will be easier since all core parts of the configuration have moved to the 
+             ``youpi/conf/settings.py`` file. Any new change will be directly committed to the file without 
+             requiring anymore admin action on application upgrade.
 
-3. Using ``settings.py-dist``, copy all the lines from::
+.. _relnotes_yui:
 
-	# 
-	# django-compress app setup
-	# 
-	COMPRESS_VERSION = True
-	COMPRESS_CSS_FILTERS = ['compress.filters.yui.YUICompressorFilter']
-	COMPRESS_JS_FILTERS = COMPRESS_CSS_FILTERS
-	...
-
-   to::
-
-	...
-	# 
-	# End of django-compress app setup
-	# 
-	
-   in your ``settings.py`` file.
-
-4. CSS and Javascript file minification is accomplished  using Yahoo's `YUI Java compressor`_. In order 
+2. CSS and Javascript file minification is accomplished  using Yahoo's `YUI Java compressor`_. In order 
    to use it with Youpi, make sure that Java is installed on your system and download the YUI compressor tool. 
    Then, add the following line to your ``settings.py`` file or (preferred) ``local_conf.py``, replacing the 
    absolute path to the JAR archive accordingly::
@@ -96,17 +85,17 @@ In order to **upgrade from 0.6**, please do the following:
              disable the ``terapix.compress`` application by adding a ``COMPRESS = False`` line in your 
              settings file. This setting will disable minification.
 
-   .. note:: We recommand using minification techniques when deploying the application in a production environment.
+   .. note:: We recommand using minification techniques when :ref:`deploying the application in a production environment <improve_performance>`.
              Although the included `django-compress`_ module works without using the YUI compressor (using its own 
              internal tools), the YUI compressor will generally give better results.
 
    .. _YUI Java compressor: http://developer.yahoo.com/yui/compressor/
    .. _django-compress: http://code.google.com/p/django-compress/
 
-5. *(This step is optional)* Now that everything is set up, you can generate the minified static 
+3. *(This step is optional)* Now that everything is set up, you can generate the minified static 
    files from the command line (otherwise they get generated automatically on-the-fly)::
 
-	python manage.py synccompress
+	$ python manage.py synccompress
 
 In order to **upgrade from 0.5.2** *or later*, please do the following:
 

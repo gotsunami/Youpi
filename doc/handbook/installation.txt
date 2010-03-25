@@ -479,6 +479,15 @@ to check:
 
 		TRUNK = '/home/user/youpi'
 
+``COMPRESS_YUI_BINARY``
+	.. versionadded:: 0.6.1
+
+	The command line to use Yahoo's `YUI Java compressor`_ to minify static CSS and Javascript files.
+	Please note that this parameter is not required but is highly recommanded if you want to 
+	:ref:`increase the application's performance in production <improve_performance>`.
+
+	.. _YUI Java compressor: http://developer.yahoo.com/yui/compressor/
+
 That's it. You are done with the basic configuration variables. The remaining of the 
 ``settings.py`` file can be left untouched.
 
@@ -576,6 +585,79 @@ Testing Your Installation
 At this point, you are ready to run Youpi. Just point your browser to the web server running 
 Youpi, say ``http://myhost/youpi/``. The login page should appear. If not, you may start checking 
 your server's logs and reread all the configuration steps in this chapter.
+
+.. _improve_performance:
+
+Improving performance in a production environment
+=================================================
+
+.. versionadded:: 0.6.1
+
+This version comes with new features regarding performance improvement when Youpi is 
+deployed on a production server (See the :ref:`ChangeLog <changelog>`). Before that, a lot of 
+HTTP requests were made every time a page was loaded. Many pages required that the browser issued more 
+than 30(!) HTTP requests in order to download all the required content to render the page!
+
+Even if browser caching is enabled (default), those 30+ HTTP queries will continue to be sent 
+to the server(!) on every page reload. The browser will then receive a "304 Not Modified" HTTP 
+response for all cached content.
+
+Big performance improvements can be made with the following techniques:
+
+*Make fewer HTTP requests*
+
+	It's possible by combining all Javascript scripts used on the page into a single JS file. The 
+	same applies for CSS stylesheets. Moreover, with minified versions, page loading can be very fast.
+	Youpi includes tools to generate static files combination and minification in a fully automatic 
+	way.
+
+	In order to generate those files, make sure you have set the ``COMPRESS_YUI_BINARY`` variable correctly 
+	(as explained in the :ref:`Release Notes <relnotes_yui>`) in your ``settings.py`` (or ``local_conf.py``) 
+	file and that the ``COMPRESS`` variable is undefined or set to ``True``. If everything looks good, you 
+	can generate the files from the command line::
+
+	$ python manage.py synccompress --force
+
+	Those newly generated static files will be used automatically by Django when rendering templates.
+
+*Add Expires headers*
+
+	A first-time visit to a page may require several HTTP requests to load all the
+	components. By using Expires headers these components *become cacheable*, which
+	avoids unnecessary HTTP requests on subsequent page views. Assuming that Apache's ``mod_expires`` 
+	module is available (which is generally the case) and that the directory holding Youpi's 
+	static files is ``/var/www/youpi/terapix/media``, you can add the following directives to your 
+	Apache configuration file::
+
+		<Directory "/var/www/youpi/terapix/media">
+			# "Far future expire" technique
+			ExpiresActive on
+			ExpiresDefault "access plus 1 week"
+		</Directory>
+
+	.. note:: You may want to set up a different ``ExpiresDefault`` value, but one week before cache 
+              expiration should be just fine.
+
+*Compress static components with gzip*
+
+	Compression reduces response times by reducing the size of the HTTP response.
+	Apache's ``mod_deflate`` compression generally reduces the response size by about 70%!
+	Assuming that Apache's ``mod_deflate`` module is available (which is generally the case) and that 
+	the directory holding Youpi's static files is ``/var/www/youpi/terapix/media``, you can add the 
+	following directives to your Apache configuration file::
+
+		<Directory "/var/www/youpi/terapix/media">
+			# Enables on-the-fly compression
+			SetOutputFilter DEFLATE
+			BrowserMatch ^Mozilla/4 gzip-only-text/html
+			BrowserMatch ^Mozilla/4\.0[678] no-gzip
+			BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+			SetEnvIfNoCase Request_URI \
+			\.(?:gif|jpe?g|png|swf|pdf|t?gz|zip|bz2|rar)$ no-gzip dont-vary
+		</Directory>
+
+	.. note:: Note that Django templates (dynamic content) are already gzip'ed in Youpi using the 
+              ``django.middleware.gzip.GZipMiddleware`` middleware.
 
 Upgrading to New Releases
 =========================

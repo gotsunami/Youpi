@@ -6,6 +6,10 @@ import os, os.path
 
 APP_URL_PREFIX  = '/youpi'
 AUP				= APP_URL_PREFIX 	# For short
+# URL that handles the media served from MEDIA_ROOT. Make sure to use a
+# trailing slash if there is a path component (optional in other cases).
+# Examples: "http://media.lawrence.com", "http://example.com/media/"
+MEDIA_URL 			= '/media/'
 
 #
 IMS_MAX_PER_PAGE	= 50
