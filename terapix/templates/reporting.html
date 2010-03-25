@@ -33,6 +33,12 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 							{% endif %}
 						{% endfor %}
 					</select>
+				{% if perms.youpi.can_use_reporting %}
+					<div class="report_menu">
+						<input class="report_reset" type="button" value="Reset"/>	
+						<input class="report_submit" type="submit" value="Generate!"/>	
+					</div>
+				{% endif %}
 				{# Descriptions #}
 				{# General #}
 					<div id="reports_descriptions">
@@ -97,14 +103,15 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					{% endif %}
 				{% endfor %}
 					</div>
-					<br/>
 				{% if not perms.youpi.can_use_reporting %}
 					<div class="perm_not_granted" style="margin-top: 20px; width: -moz-fit-content">
 						<label>You don't have permission to generate reports</label>
 					</div>
 				{% else %}
-					<input id="report_reset" type="button" value="Reset"/>	
-					<input id="report_submit" type="submit" value="Generate!"/>	
+					<div class="report_menu">
+						<input class="report_reset" type="button" value="Reset"/>	
+						<input class="report_submit" type="submit" value="Generate!"/>	
+					</div>
 				{% endif %}
 					<div class="report_options" id="loading_div"/>
 				</form>
@@ -115,8 +122,9 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 <script type="text/javascript">
 	var menu;
 	document.observe('dom:loaded', function() {
+		var report_menu = $$('.report_menu');
+		report_menu.invoke('hide');
 		$('loading_div').hide();
-		$('report_submit').hide();
 		$('report_form').reset();
 
 		menu = new SubMenu('submenu', ['Reports']);
@@ -137,18 +145,22 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			$('report_form').action = '/youpi/report/generating/' + type + '/' + selvalue + '/';
 		});
 
-		$('report_reset').observe('click', function() {
-			$('report_form').reset();
-			$('report_submit').hide()
-			// Hide divs
-			hide_divs();
+		$$('.report_reset').each(function(r) {
+			r.observe('click', function() {
+				$('report_form').reset();
+				report_menu.invoke('hide');
+				// Hide divs
+				hide_divs();
+			});
 		});
 	{% endif %}
 
 		hide_divs();
 		$('report_select').observe('change', function() {
 			var id = this.options[this.selectedIndex].value;
-			this.selectedIndex == 0 ? $('report_submit').hide() : $('report_submit').show();
+	{% if perms.youpi.can_use_reporting %}
+			this.selectedIndex == 0 ? report_menu.invoke('hide') : report_menu.invoke('show');
+	{% endif %}
 			// Hide divs
 			hide_divs();
 			['description', 'options', 'template'].each(function(name) {

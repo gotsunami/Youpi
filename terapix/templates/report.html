@@ -11,6 +11,12 @@
 {% compressed_js 'report' %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
+var report_menu_entries = $A();
+function report_menu_insert(title, handler) {
+	if (typeof title != 'string') throw 'Title must be a string';
+	if (typeof handler != 'function') throw 'Handler must be a function';
+	report_menu_entries.push([title, handler]);
+}
 </script>
 {% endblock %}
 
@@ -23,10 +29,15 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 		<div style="margin-left: 30px;" id="menuitem_sub_0">
 			<div class="themes">
 				<h1>{{ report_title }}</h1>
-				<div style="margin-bottom: 20px"><a href="/youpi/reporting/">Select another report</a></div>
+				<div style="margin-bottom: 20px;" class="report_menu">
+					<input class="new_report report_submit" type="button" value="Select another report"/>	
+				</div>
 				<div>{{ before_extra_content|safe }}</div>
 				<div>{{ report_content|safe }}</div>
 				<div>{{ after_extra_content|safe }}</div>
+				<div class="report_menu">
+					<input class="new_report report_submit" type="button" value="Select another report"/>	
+				</div>
 			</div>
 		</div>
 	</div>
@@ -35,6 +46,17 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 	var menu;
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['HTML Report']);
+		$$('.new_report')[0].observe('click', function() {
+			location.href= '{% url terapix.youpi.cviews.reporting.reporting %}';
+		});
+		// Looks for optional menu entries
+		report_menu_entries.each(function(entry) {
+			$$('.report_menu').each(function(menubar) {
+				var but = new Element('input', {type: 'button', value: entry[0]});
+				but.observe('click', entry[1]);
+				menubar.insert(but);
+			})
+		});
 	});
 </script>
 {% endblock %}

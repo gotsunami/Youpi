@@ -47,7 +47,8 @@ def reporting(request):
 		},
 		{	'id': 'advimgreport',	
 			'title': 'Advanced image report (HTML, PDF)',
-			'description': 'TODO',
+			'description': 'This report generates a criteria-based list of ingested images. The result set can be exported to the image selector ' + \
+				'for processing the image selection. A PDF report can be generated too.',
 			'template' : 'reports/advanced-image-report-options.html',
 			'context': {'form' : ReportAdvancedImageForm()},
 		},
@@ -169,23 +170,23 @@ def get_global_report(request, reportId):
 				updated = True
 			if post['flat']:
 				if updated: query += " AND"
-				query += ' flat LIKE \'%' + post['flat'] + '%\''
+				query += ' i.flat LIKE \'%' + post['flat'] + '%\''
 				updated = True
 			if post['mask']:
 				if updated: query += " AND"
-				query += ' mask LIKE \'%' + post['mask'] + '%\''
+				query += ' i.mask LIKE \'%' + post['mask'] + '%\''
 				updated = True
 			if post['object']:
 				if updated: query += " AND"
-				query += ' object LIKE \'%' + post['object'] + '%\''
+				query += ' i.object LIKE \'%' + post['object'] + '%\''
 				updated = True
 			if post['airmass_min']:
 				if updated: query += " AND"
-				query += ' airmass >= %s' % post['airmass_min']
+				query += ' i.airmass >= %s' % post['airmass_min']
 				updated = True
 			if post['airmass_max']:
 				if updated: query += " AND"
-				query += ' airmass <= %s' % post['airmass_max']
+				query += ' i.airmass <= %s' % post['airmass_max']
 				updated = True
 			if post.has_key('tags'):
 				tables.append('youpi_rel_tagi AS tagi')
@@ -296,13 +297,12 @@ def get_global_report(request, reportId):
 			if query.find('WHERE') == -1:
 				report_content = """
 <h3 style="margin-bottom: 20px; color: brown;">Waaaayyy too much results! Please fill in at least one search criterium.</h3>
-<input type="button" onclick="var d=this.next('div'); d.visible()?d.hide():d.show(); return false;" value="Toggle selected criteria"/>
-<div style="display: none;">
-	<div>
-		<input id="report_submit" type="submit" value="Generate!"/>
-		<div>%s</div>
-		<input id="report_submit" type="submit" value="Generate!"/>
-	</div>
+<script type="text/javascript">
+	report_menu_insert('Toggle selected criteria', function() {var d=$('criteria'); d.visible()?d.hide():d.show();});
+	report_menu_insert('Generate!', function() {d=$('report_form').submit();});
+</script>
+<div id="criteria" style="display: none;">
+	<div>%s</div>
 </div>
 </form>
 	""" % tdata
@@ -313,7 +313,7 @@ def get_global_report(request, reportId):
 				}, context_instance = RequestContext(request))
 
 
-				# First query: fetch image IDs
+			# First query: fetch image IDs
 			db = MySQLdb.connect(host = settings.DATABASE_HOST, user = settings.DATABASE_USER, passwd = settings.DATABASE_PASSWORD, db = settings.DATABASE_NAME)
 			cursor = db.cursor()
 			cursor.execute(query)
@@ -324,13 +324,12 @@ def get_global_report(request, reportId):
 				# No result so far, exit now
 				report_content = """
 <h3 style="margin-bottom: 20px; color: brown;">No match.</h3>
-<input type="button" onclick="var d=this.next('div'); d.visible()?d.hide():d.show(); return false;" value="Toggle selected criteria"/>
-<div style="display: none;">
-	<div>
-		<input id="report_submit" type="submit" value="Generate!"/>
-		<div>%s</div>
-		<input id="report_submit" type="submit" value="Generate!"/>
-	</div>
+<script type="text/javascript">
+	report_menu_insert('Toggle selected criteria', function() {var d=$('criteria'); d.visible()?d.hide():d.show();});
+	report_menu_insert('Generate!', function() {d=$('report_form').submit();});
+</script>
+<div id="criteria" style="display: none;">
+	<div>%s</div>
 </div>
 </form>
 	""" % tdata
@@ -469,15 +468,14 @@ def get_global_report(request, reportId):
 			res = f_res
 			report_content = """
 <h2>Matches: %d</h2>
-<input type="button" onclick="var d=this.next('div'); d.visible()?d.hide():d.show(); return false;" value="Toggle selected criteria"/>
-<div style="display: none;">
-	<div>
-		<input id="report_submit" type="submit" value="Generate!"/>
-		<div>%s</div>
-		<input id="report_submit" type="submit" value="Generate!"/>
-	</div>
+<script type="text/javascript">
+	report_menu_insert('Toggle selected criteria', function() {var d=$('criteria'); d.visible()?d.hide():d.show();});
+	report_menu_insert('Generate!', function() {d=$('report_form').submit();});
+</script>
+<div id="criteria" style="display: none;">
+	<div>%s</div>
 </div>
-<div style="color: black;">
+<div style="padding-top: 10px; color: black;">
 	<div style="width: %s;" id="rtable"></div>
 </div>
 </form>

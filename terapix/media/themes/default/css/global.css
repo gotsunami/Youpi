@@ -1631,7 +1631,7 @@ div.tags *, .dropzone * {
 	color: brown;
 }
 
-#report_submit { font-weight: bold; }
+.report_submit { font-weight: bold; }
 
 .report_description .report_preview {
 	float: left;
@@ -1711,4 +1711,13 @@ table.report_grading_stats tr.complete td.gradecomplete {
 
 td.grade-comment {
 	font-weight: normal;
+}
+
+.report_menu {
+	width: 50%;
+	width: -moz-fit-content;	
+	padding: 5px;
+	-moz-border-radius: 5px;
+	background-color: #E6F2F9;
+	margin-top: 15px;
 }
