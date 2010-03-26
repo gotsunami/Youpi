@@ -236,6 +236,7 @@ REPORT_JS.extend([
 	'js/3rdParty/flotr/lib/canvas2image.js',
 	'js/3rdParty/flotr/lib/canvastext.js',
 	'js/3rdParty/flotr/flotr-0.2.0-alpha.js',
+	'js/3rdParty/modalbox/modalbox.js',
 ])
 #
 GRADEPANEL_JS = COMMON_JS[:]
@@ -344,6 +345,11 @@ LOGIN_CSS = DEFAULT_CSS[:]
 LOGIN_CSS.extend([
 	'themes/default/css/login.css',
 ])
+#
+REPORT_CSS = DEFAULT_CSS[:]
+REPORT_CSS.extend([
+	'js/3rdParty/modalbox/modalbox.css',
+])
 
 COMPRESS_CSS = {
 	'default'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/default.r?-min.css' },
@@ -354,7 +360,7 @@ COMPRESS_CSS = {
 	'monitoring'	: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/monitoring.r?-min.css' },
 	'results'		: { 'source_filenames': RESULTS_CSS, 'output_filename': 'themes/default/css/results.r?-min.css' },
 	'reporting'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/reporting.r?-min.css' },
-	'report'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/report.r?-min.css' },
+	'report'		: { 'source_filenames': REPORT_CSS, 'output_filename': 'themes/default/css/report.r?-min.css' },
 	'cart'			: { 'source_filenames': CART_CSS, 'output_filename': 'themes/default/css/cart.r?-min.css' },
 	'condor'		: { 'source_filenames': CONDOR_CSS, 'output_filename': 'themes/default/css/condor.r?-min.css' },
 	'preferences'	: { 'source_filenames': PREF_CSS, 'output_filename': 'themes/default/css/prefs.r?-min.css' },

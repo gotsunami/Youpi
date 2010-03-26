@@ -47,18 +47,13 @@ function show_plugin_info() {
 </script>
 {% endblock %}
 
-<!-- Main body -->
 {% block content %}
-
 <div align="center">
-
 	{% include plugin.template %}
-
 	<script type="text/javascript">
 		document.observe('dom:loaded', function() {
 			show_plugin_info.defer();
 		});
 	</script>
 </div>
-
 {% endblock %}

@@ -942,7 +942,6 @@ def ims_get_image_list_from_file(request):
 	"""
 	Parse content of fileName and returns an image selection
 	"""
-
 	try:
 		fileName = request.POST['Filename']
 		onTheFly = json.decode(request.POST['OnTheFly'])
@@ -956,7 +955,6 @@ def ims_get_image_list_from_file(request):
 		f.close()
 	except Exception, e:
 		errMsg = "%s" % e
-
 
 	basename = fileName[:fileName.rfind('.')]
 	lines = [li[:-1] for li in lines]

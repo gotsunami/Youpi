@@ -466,11 +466,21 @@ def get_global_report(request, reportId):
 						r.append(', '.join(tags[r[0]]))
 
 			res = f_res
+			import terapix.script.wrapper_processing as wrapper
+			selName = "%s-%s-%s" % (reportId, request.user.username, wrapper.getNowDateTime())
 			report_content = """
 <h2>Matches: %d</h2>
 <script type="text/javascript">
 	report_menu_insert('Toggle selected criteria', function() {var d=$('criteria'); d.visible()?d.hide():d.show();});
 	report_menu_insert('Generate!', function() {d=$('report_form').submit();});
+	report_menu_insert('Save as image selection', function() {
+		boxes.confirm("<p>This will save the current result set as an image selection for the image selector.</p><p>You will be able to " +
+			"load this selection later with the 'Saved selection' criterium in the image selector.</p><p>Proceed?</p>", function() {
+			var r = new HttpRequest(null,null,function() {Notifier.notify('New image selection saved under "%s"');});
+			var post = {IdList: '%s', Name: '%s'};
+			r.send('%s', $H(post).toQueryString());
+		});
+	});
 </script>
 <div id="criteria" style="display: none;">
 	<div>%s</div>
@@ -479,7 +489,9 @@ def get_global_report(request, reportId):
 	<div style="width: %s;" id="rtable"></div>
 </div>
 </form>
-"""	% (len(res), tdata, '98%')
+"""	% (len(res), selName, "[[%s]]" % ','.join([str(r[0]) for r in res]), selName,
+	reverse('terapix.youpi.views.processing_save_image_selection'), tdata, '98%'
+)
 
 			body_end = """
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
