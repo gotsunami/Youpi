@@ -464,6 +464,9 @@ def get_global_report(request, reportId):
 				for r in f_res:
 					if tags.has_key(r[0]):
 						r.append(', '.join(tags[r[0]]))
+				# Make the 'Tags' column be the last in report_columns
+				report_columns = [col for col in cols if col != 'Tags']
+				report_columns.append('Tags')
 
 			res = f_res
 			import terapix.script.wrapper_processing as wrapper
