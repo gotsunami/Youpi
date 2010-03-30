@@ -3,8 +3,9 @@
 
 {% if report.context.form.errors %}
 <div class="warning" style="width: 30%;">
-	The data you provided do not meet the fields requirements. Please check the data format.
+	The data you provided do not meet the search form requirements. Please see the error message(s) below.
 </div>
+{% if report.context.form.non_field_errors %}{{ report.context.form.non_field_errors }}{% endif %}
 {% endif %}
 <table class="advimgreport">
 {% for field in report.context.form %}

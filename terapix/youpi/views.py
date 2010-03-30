@@ -826,9 +826,12 @@ def batch_view_selection(request):
 
 	return HttpResponse(str({'name' : str(sel['name']), 'data' : [[str(img.name), str(img.path)] for img in imgs]}), mimetype = 'text/plain')
 
-def get_circle_from_multipolygon(alpha_center, delta_center, radius, p):
+def get_circle_from_multipolygon(alpha_center, delta_center, radius, p = 16):
 	"""
 	Returns a MySQL MULTIPOLYGON object describing a circle with a resolution of p points.
+	@param alpha_center right ascension in degrees
+	@param delta_center declination in degrees
+	@param radius angular degree in degrees
 	"""
 
 	# Computing selection circle based (p points)

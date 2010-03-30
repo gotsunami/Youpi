@@ -162,7 +162,6 @@ def get_global_report(request, reportId):
 				if updated: query += " AND"
 				query += " exptime <= %s" % post['exptime_max']
 				updated = True
-			# TODO: radec, radius
 			if post['run_id'] and post['run_id'] != '-1':
 				tables.append('youpi_rel_ri AS ri')
 				if updated: query += " AND"
@@ -294,7 +293,7 @@ def get_global_report(request, reportId):
 			query = tquery + query + ';'
 
 			# If WHERE not in query, there will be too much results
-			if query.find('WHERE') == -1:
+			if query.find('WHERE') == -1 and not post['right_ascension_RA']:
 				report_content = """
 <h3 style="margin-bottom: 20px; color: brown;">Waaaayyy too much results! Please fill in at least one search criterium.</h3>
 <script type="text/javascript">
@@ -318,7 +317,17 @@ def get_global_report(request, reportId):
 			cursor = db.cursor()
 			cursor.execute(query)
 			res = cursor.fetchall()
-			res = [str(r[0]) for r in res]
+
+			# Check if a specified zone is targeted
+			if post['right_ascension_RA'] and post['declination_DEC'] and post['radius']:
+				ids = [r[0] for r in res]
+				from terapix.youpi.views import get_circle_from_multipolygon
+				# Get image subset from defined polygon
+				imgs = Image.objects.filter(centerfield__contained = get_circle_from_multipolygon(
+					form.cleaned_data['right_ascension_RA'], 
+					form.cleaned_data['declination_DEC'], 
+					form.cleaned_data['radius']), id__in = ids)
+				res = [(img.id,) for img in imgs]
 
 			if not res:
 				# No result so far, exit now
@@ -340,6 +349,7 @@ def get_global_report(request, reportId):
 				}, context_instance = RequestContext(request))
 			
 			# Builds a second query to gather all requested information
+			res = [str(r[0]) for r in res]
 			cols =  post.getlist('show_column_in_report')
 			tquery = 'SELECT %s FROM %s WHERE '
 			tables = ['youpi_image AS i']
@@ -356,7 +366,10 @@ def get_global_report(request, reportId):
 					fields.append('i.dateobs')
 				elif col == 'Exptime':
 					fields.append('i.exptime')
-				# TODO: ra dec, radius
+				elif col == 'Right ascension (RA)':
+					fields.append('i.alpha')
+				elif col == 'Declination (DEC)':
+					fields.append('i.delta')
 				elif col == 'Run id':
 					tables.append('youpi_rel_ri AS ri')
 					tables.append('youpi_run AS run')
@@ -538,12 +551,18 @@ def get_global_report(request, reportId):
 			from django.template.loader import get_template
 			tmpl = get_template('reports/advanced-image-report-options.html')
 			tdata = tmpl.render(Context({'report': {'context': {'form': form}}}))
+			report_content = """
+<script type="text/javascript">
+	report_menu_insert('Generate!', function() {d=$('report_form').submit();});
+</script>
+<div id="criteria">
+	<div>%s</div>
+</div>""" % tdata
 
 			return render_to_response('report.html', {	
 								'report_title' 		: 'Advanced image report (HTML, PDF)',
-								'report_content' 	: tdata,
+								'report_content' 	: report_content,
 								'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
-								'after_extra_content'	: """<input id="report_submit" type="submit" value="Generate!"/></form>""",
 			}, context_instance = RequestContext(request))
 
 	return HttpResponseNotFound('Report not found.')

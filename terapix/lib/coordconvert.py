@@ -49,6 +49,7 @@ class Delta(object):
 			ds = 60.*abs(60.*(delta-dd)-dm)
 		return "%c%02d:%02d:%04.1f" % (sign, dd, dm, ds)
 
+	@staticmethod
 	def sex_to_deg(dms, sep = ':'):
 		"""
 		Converts dd:dm:ds.xxx delta coordinates to degrees
