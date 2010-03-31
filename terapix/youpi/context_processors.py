@@ -25,23 +25,23 @@ def appmenu(request):
 	Returns context variables for Youpi's release system (Application menu).
 	"""
 	from django.conf import settings
-	AUP = settings.AUP
-	
-	app_menu = {'normal' : ( 	
-					{'title' : 'Home', 				'id' : 'home', 			'href' : AUP},
-					{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : AUP + '/ingestion/'},
-					{'title' : 'Tags', 				'id' : 'tags',			'href' : AUP + '/tags/'},
-					{'title' : 'Processing', 		'id' : 'processing', 	'href' : AUP + '/processing/'},
-					{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : AUP + '/monitoring/'},
-					{'title' : 'Results',			'id' : 'results',	 	'href' : AUP + '/results/'},
-					{'title' : 'Reporting',			'id' : 'reporting',	 	'href' : AUP + '/reporting/'},
-				),
-				'apart' : ( 	
-					# Display order is inverted
-					{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : AUP + '/preferences/'},
-					{'title' : 'Condor Setup', 		'id' : 'condorsetup', 	'href' : AUP + '/condor/setup/'},
-					{'title' : 'Processing Cart',	'id' : 'processingcart','href' : AUP + '/cart/'},
-				)
+	from django.core.urlresolvers import reverse
+	app_menu = {
+		'normal' : ( 	
+			{'title' : 'Home', 				'id' : 'home', 			'href' : reverse('terapix.youpi.views.index')},
+			{'title' : 'Ingestion', 		'id' : 'ing', 			'href' : reverse('terapix.youpi.views.ing')},
+			{'title' : 'Tags', 				'id' : 'tags',			'href' : reverse('terapix.youpi.views.tags')},
+			{'title' : 'Processing', 		'id' : 'processing', 	'href' : reverse('terapix.youpi.views.processing')},
+			{'title' : 'Active Monitoring', 'id' : 'monitoring', 	'href' : reverse('terapix.youpi.views.monitoring')},
+			{'title' : 'Results',			'id' : 'results',	 	'href' : reverse('terapix.youpi.views.results')},
+			{'title' : 'Reporting',			'id' : 'reporting',	 	'href' : reverse('terapix.youpi.cviews.reporting.reporting')},
+		),
+		'apart' : ( 	
+			# Display order is inverted
+			{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : reverse('terapix.youpi.views.preferences')},
+			{'title' : 'Condor Setup', 		'id' : 'condorsetup', 	'href' : reverse('terapix.youpi.views.condor_setup')},
+			{'title' : 'Processing Cart',	'id' : 'processingcart','href' : reverse('terapix.youpi.views.cart_view')},
+		)
 	}
 	return {'menu': app_menu}
 
