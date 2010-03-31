@@ -55,7 +55,7 @@ Version 0.6.1
 
 In order to **upgrade from 0.6**, please do the following:
 
-1. A third file ``youpi/conf/settings.py`` is now taken into account for Youpi's configuration. Most of 
+1. A third file ``private_conf.py`` is now taken into account for Youpi's configuration. Most of 
    the content of the ``settings.py-dist`` that comes with the distribution has been moved to the new 
    configuration file. The best way (not the fastest) to upgrade your ``settings.py`` file for this new 
    release is to make a backup of it and copy the content of the latest ``settings.py-dist``::
@@ -69,7 +69,7 @@ In order to **upgrade from 0.6**, please do the following:
    .. note:: Although this can be a tedious task, it is the more secure way to ensure your ``settings.py`` 
              file is up-to-date with the latest ``settings.py-dist`` file provided in the source distribution.
              Future upgrades will be easier since all core parts of the configuration have moved to the 
-             ``youpi/conf/settings.py`` file. Any new change will be directly committed to the file without 
+             ``private_conf.py`` file. Any new change will be directly committed to the file without 
              requiring anymore admin action on application upgrade.
 
 .. _relnotes_yui:

@@ -153,8 +153,8 @@ CONDOR_LOG_DIR	= '/tmp'
 DATABASE_ENGINE 	= 'mysql' 
 DATABASE_OPTIONS 	= {"init_command": "SET storage_engine=INNODB"}
 
-# Local Youpi settings that should not be modified by users
-from youpi.conf.settings import *
+# Private Youpi settings that should not be modified by users
+from private_conf import *
 
 # Override variable for local site (optional)
 try: from local_conf import *

@@ -210,7 +210,7 @@ class YoupiCondorCSF(CondorCSF):
 		Adds Youpi required files such as local_conf.py, settings.py, DBGeneric.py and NOP
 		"""
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
-		for file in ('local_conf.py', 'settings.py', os.path.join('script', 'DBGeneric.py'), 'NOP'): 
+		for file in ('local_conf.py', 'settings.py', 'private_conf.py', os.path.join('script', 'DBGeneric.py'), 'NOP'): 
 			files.append(os.path.join(submit_file_path, file))
 
 		super(YoupiCondorCSF, self).setTransferInputFiles(files)

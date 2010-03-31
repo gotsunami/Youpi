@@ -509,6 +509,8 @@ def get_global_report(request, reportId):
 	reverse('terapix.youpi.views.processing_save_image_selection'), tdata, '98%'
 )
 
+			# Columns type in final report
+			tnumbers = ('Right ascension (RA)', 'Declination (DEC)')
 			body_end = """
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
