@@ -121,8 +121,8 @@ class ReportAdvancedImageForm(forms.Form):
 	elongation_max = forms.DecimalField(required = False)
 	seeing_min = forms.DecimalField(help_text = 'Format:  arcsec', required = False)
 	seeing_max = forms.DecimalField(help_text = 'Format:  arcsec', required = False)
-	sky_background_min = forms.CharField(max_length=100, help_text = 'Format: mag.sE-2', required = False)
-	sky_background_max = forms.CharField(max_length=100, help_text = 'Format: mag.sE-2', required = False)
+	sky_background_min = forms.DecimalField(help_text = 'Format: mag.sE-2', required = False)
+	sky_background_max = forms.DecimalField(help_text = 'Format: mag.sE-2', required = False)
 	grades = forms.MultipleChoiceField(choices = grade_choices, required = False)
 	comment = forms.CharField(max_length=100, required = False, help_text = 'Grade comment (can be a regexp)')
 
