@@ -108,7 +108,7 @@ def getJobClusterId(userData):
 	k = 0
 	idxs = []
 	for line in data:
-		if line.find('version') != -1:
+		if line.find('<?xml version="1.0"?>') != -1:
 			idxs.append(k)
 		k += 1
 
