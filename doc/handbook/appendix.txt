@@ -57,11 +57,11 @@ In order to **upgrade from 0.6**, please do the following:
 
 1. A third file ``private_conf.py`` is now taken into account for Youpi's configuration. Most of 
    the content of the ``settings.py-dist`` that comes with the distribution has been moved to the new 
-   configuration file. The best way (not the fastest) to upgrade your ``settings.py`` file for this new 
+   configuration file. The best (not the fastest) way to upgrade your ``settings.py`` file for this new 
    release is to make a backup of it and copy the content of the latest ``settings.py-dist``::
 
 	$ cp settings.py settings.py.orig
-	$ cp settings.dist-orig settings.py
+	$ cp settings.py-dist settings.py
 
    Now, just replace the ``FIXME`` directives in your newly created ``settings.py`` with the working values 
    available in your ``settings.py.orig``.
