@@ -138,7 +138,7 @@ required if you perform a `cluster installation`_:
 Software package     Supported version                          Description
 ==================== ========================================== ===========
 `Firefox`_           **2.0** and later                          We fully support this web browser at the moment. Safari is reported to be working and IE is not supported.
-|python|_            **2.5.x**; 2.6 and later **not supported** General-purpose high-level programming language
+|python|_            **2.5.x** or **2.6.x** only                General-purpose high-level programming language
 `Apache`_            **2.x**                                    Apache HTTP server project
 `Apache mod_wsgi`_   **2.3** and later                          Apache module which can host any Python application 
                                                                 which supports the Python `WSGI`_ interface interpreter 
