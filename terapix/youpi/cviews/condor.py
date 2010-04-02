@@ -678,7 +678,7 @@ arguments               = "%(args)s"
 
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
-transfer_input_files    = %(project_root)s/local_conf.py, %(project_root)s/settings.py, %(script)s/DBGeneric.py, %(project_root)s/NOP
+transfer_input_files    = %(project_root)s/local_conf.py, %(project_root)s/settings.py, %(project_root)s/private_conf.py, %(script)s/DBGeneric.py, %(project_root)s/NOP
 initialdir				= %(script)s
 transfer_output_files   = NOP
 # Logs
