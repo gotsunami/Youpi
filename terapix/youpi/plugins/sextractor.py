@@ -306,8 +306,8 @@ class Sextractor(ProcessingPlugin):
 		#Dual Mode check
 
 		if dualMode == '1':
-			imgdual = Image.objects.filter(id = dualImage)
-			path2 = os.path.join(imgdual[0].path, imgdual[0].name + '.fits')
+			imgdual = Image.objects.filter(id = dualImage)[0]
+			path2 = os.path.join(imgdual.path, imgdual.filename + '.fits')
 			userData['DualImage'] =	str(path2)
 
 		step = 0 							# At least step seconds between two job start
@@ -329,43 +329,48 @@ class Sextractor(ProcessingPlugin):
 		#
 		userData['StartupDelay'] = step
 		userData['Warnings'] = {}
+	
+	
 
 		# One image per job
 		for img in images:
-			path = os.path.join(img.path, img.name + '.fits')
+			# Stores real image name (as available on disk)
+			userData['RealImageName'] = str(img.filename)
+
+			path = os.path.join(img.path, userData['RealImageName'] + '.fits')
 
 			# WEIGHT checks
 			if weightPath:
 				if os.path.isdir(weightPath):
-					weight = os.path.join(weightPath, img.name + '_weight.fits')
+					weight = os.path.join(weightPath, userData['RealImageName'] + '_weight.fits')
 				elif os.path.isfile(weightPath):
 					weight = weightPath
 
 			# flag checks
 			if flagPath:
 				if os.path.isdir(flagPath):
-					flag = os.path.join(flagPath, img.name + '_flag.fits')
+					flag = os.path.join(flagPath, userData['RealImageName'] + '_flag.fits')
 				elif os.path.isfile(flagPath):
 					flag = flagPath
 			
 			# PSF checks
 			if psfPath:
 				if os.path.isdir(psfPath):
-					psf = os.path.join(psfPath, img.name + '.psf')
+					psf = os.path.join(psfPath, userData['RealImageName'] + '.psf')
 				elif os.path.isfile(psfPath):
 					psf = psfPath
 
 			# Dual WEIGHT checks
 			if dualWeightPath:
 				if os.path.isdir(dualWeightPath):
-					dualWeight = os.path.join(dualWeightPath, imgdual[0].name + '_weight.fits')
+					dualWeight = os.path.join(dualWeightPath, imgdual.filename + '_weight.fits')
 				elif os.path.isfile(dualWeightPath):
 					dualWeight = dualWeightPath
 
 			# Dual flag checks
 			if dualFlagPath:
 				if os.path.isdir(dualFlagPath):
-					dualFlag = os.path.join(dualFlagPath, img.name + '_flag.fits')
+					dualFlag = os.path.join(dualFlagPath, imgdual.filename + '_flag.fits')
 				elif os.path.isfile(dualFlagPath):
 					dualFlag = dualFlagPath
 
@@ -474,7 +479,8 @@ class Sextractor(ProcessingPlugin):
 				}),
 				queue_env = {
 					'USERNAME'				: request.user.username,
-					'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + userData['ResultsOutputDir'] + '/',
+					#TPX_CONDOR_UPLOAD_URL needs img.name + '/' at the end to create one directory by image name
+					'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + userData['ResultsOutputDir'] + img.name + '/',
 					'YOUPI_USER_DATA'		: encUserData,
 				}
 			)
@@ -557,7 +563,7 @@ class Sextractor(ProcessingPlugin):
 					'Param' 				: str(zlib.decompress(base64.decodestring(data.param))),
 					'Previews'				: thumbs,
 					'HasThumbnails'			: data.thumbnails,
-					'FITSImages'			: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
+					'FITSImages'			: [str(os.path.join(img.path, img.filename + '.fits')) for img in imgs],
 					'ClusterId'				: str(task.clusterId),
 					'History'				: history,
 					'Log' 					: err_log,
