@@ -543,7 +543,7 @@ def process(userData, kind_id, argv):
 					pyim.close()
 					debug("Single ship flat field normalization done")
 				except ImportError:
-					raise WrapperError, "Could not importthe Python pyfits library. Flat field normalization failed"
+					raise WrapperError, "Could not import the Python pyfits library. Flat field normalization failed"
 
 			imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
 			if userData['RealImageName'] != imgName:
@@ -713,7 +713,8 @@ def process(userData, kind_id, argv):
 							www = os.path.join(	WWW_SEX_PREFIX, 
 												username, 
 												userData['Kind'], 
-												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:]) + '/',
+												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
+												imgName + '/'),
 							thumbnails = convert,
 				)
 				sex_id = g.con.insert_id()
