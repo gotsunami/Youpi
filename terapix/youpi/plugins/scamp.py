@@ -232,12 +232,12 @@ class Scamp(ProcessingPlugin):
 		ldac_files = self.getLDACPathsFromImageSelection(request, idList)
 		ldac_files = [dat[1] for dat in ldac_files]
 
-		# .ahead files support
-		ahead_files = string.join([os.path.join(aheadPath, img.name + '.ahead') for img in images], ', ')
+		# .ahead files support with real image filename on disks
+		ahead_files = string.join([os.path.join(aheadPath, img.filename + '.ahead') for img in images], ', ')
 
 		# Scamp file containing a list of images to process (one per line)
 		catalogFile = "scamp-cataloglist-%s.rc" % time.time()
-		catalogPaths = [img.name + '.ldac' for img in images]
+		catalogPaths = [img.filename + '.ldac' for img in images]
 		scif = open(os.path.join('/tmp/', catalogFile), 'w')
 		scif.write(string.join(catalogPaths, '\n'))
 		scif.close()
@@ -366,14 +366,15 @@ class Scamp(ProcessingPlugin):
 				#missing.append(str(img.name))
 				ldacMissing = True
 
-			if not os.path.exists(os.path.join(aheadPath, img.name + '.ahead')):
+			if not os.path.exists(os.path.join(aheadPath, img.filename + '.ahead')):
 				aheadMissing = True
 
 			if ldacMissing or aheadMissing:
+				#info variable keeps name in database(not the real filename on disks)
 				info = [str(img.name)]
 				miss = []
-				if ldacMissing: miss.append(str(img.name) + '.ldac')
-				if aheadMissing: miss.append(str(img.name) + '.ahead')
+				if ldacMissing: miss.append(str(img.filename) + '.ldac')
+				if aheadMissing: miss.append(str(img.filename) + '.ahead')
 				info.append(miss)
 				missing.append(info)
 
@@ -406,7 +407,12 @@ class Scamp(ProcessingPlugin):
 
 		for task in tasks:
 			img = Rel_it.objects.filter(task = task)[0].image
-			ldac_files.append([int(img.id), str(os.path.join(task.results_output_dir, img.name, 'qualityFITS', img.name + '.ldac'))])
+			
+			# Same as qualityfits.py img.name image database name is used, to distinguish 
+			# multiple instance of the same image in database, but we use the real image filename
+			# to get real ldac filename on disks
+			
+			ldac_files.append([int(img.id), str(os.path.join(task.results_output_dir, img.name, 'qualityFITS', img.filename + '.ldac'))])
 
 		return ldac_files
 
