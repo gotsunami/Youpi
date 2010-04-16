@@ -168,7 +168,7 @@ class Swarp(ProcessingPlugin):
 		# Swarp file containing a list of images to process (one per line)
 		images = Image.objects.filter(id__in = idList)
 		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % time.time())
-		imgPaths = [img.name + '.fits' for img in images]
+		imgPaths = [img.filename + '.fits' for img in images]
 		swif = open(swarpImgsFile, 'w')
 		swif.write(string.join(imgPaths, '\n'))
 		swif.close()
@@ -211,12 +211,12 @@ class Swarp(ProcessingPlugin):
 			weight_files = self.getWeightPathsFromImageSelection(request, idList)
 			weight_files = string.join([dat[1] for dat in weight_files], ', ')
 		else:
-			weight_files = string.join([os.path.join(weightPath, img.name + '_weight.fits') for img in images], ', ')
+			weight_files = string.join([os.path.join(weightPath, img.filename + '_weight.fits') for img in images], ', ')
 
 		# .head files support
 		head_files = os.path.join(submit_file_path, 'NOP')
 		if len(headDataPath):
-			head_files = string.join([os.path.join(headDataPath, img.name + '.head') for img in images], ', ')
+			head_files = string.join([os.path.join(headDataPath, img.filename + '.head') for img in images], ', ')
 			userData['HeadPath'] =  str(headDataPath)
 			userData['UseHeadFiles'] =  1
 
@@ -225,7 +225,7 @@ class Swarp(ProcessingPlugin):
 		tf = open(os.path.join('/tmp/', transferFile), 'w')
 		tf.write(weight_files.replace(', ', '\n'))			# Weights	
 		tf.write('\n' + head_files.replace(', ', '\n'))		# Heads
-		tf.write('\n' + string.join([os.path.join(img.path, img.name + '.fits') for img in images], '\n')) # Images
+		tf.write('\n' + string.join([os.path.join(img.path, img.filename + '.fits') for img in images], '\n')) # Images
 		tf.close()
 
 		#
@@ -356,7 +356,7 @@ sys.exit(exit_code)
 		for img in imgList:
 			rels = Rel_it.objects.filter(image = img)
 			if not rels:
-				missing.extend([str(os.path.join(img.path, img.name + '.fits'))])
+				missing.extend([str(os.path.join(img.path, img.filename + '.fits'))])
 				continue
 
 			relTaskIds = [rel.task.id for rel in rels]
@@ -367,7 +367,7 @@ sys.exit(exit_code)
 													success = True).order_by('-end_date')
 
 			if not tasks:
-				missing.append(str(os.path.join(img.path, img.name + '.fits')))
+				missing.append(str(os.path.join(img.path, img.filename + '.fits')))
 				continue
 
 			tasksIds.append(int(tasks[0].id))
@@ -435,7 +435,12 @@ sys.exit(exit_code)
 
 		for task in tasks:
 			img = Rel_it.objects.filter(task = task)[0].image
-			weight_files.append([int(img.id), str(os.path.join(task.results_output_dir, img.name, 'qualityFITS', img.name + 
+	
+			# Same as qualityfits.py img.name image database name is used, to distinguish 
+			# multiple instance of the same image in database, but we use the real image filename
+			# to get real weight filename on disks
+
+			weight_files.append([int(img.id), str(os.path.join(task.results_output_dir, img.name, 'qualityFITS', img.filename + 
 				'_weight.fits.fz'))])
 
 		return weight_files
@@ -526,7 +531,7 @@ sys.exit(exit_code)
 					'Previews'			: thumbs,
 					'ClusterId'			: str(task.clusterId),
 					'HasThumbnails'		: data.thumbnails,
-					'FITSImages'		: [str(os.path.join(img.path, img.name + '.fits')) for img in imgs],
+					'FITSImages'		: [str(os.path.join(img.path, img.filename + '.fits')) for img in imgs],
 					'History'			: history,
 					'Log' 				: err_log,
 					'WeightPath'		: str(data.weightPath),
