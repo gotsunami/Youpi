@@ -68,6 +68,8 @@ transfer_input_files    = %(transfer)s
 		@param caption a short word that will be appended to the final file name
 		@return Path to a non existing file
 		"""
+		if type(caption) != types.StringType:
+			raise TypeError, caption
 		return "%s/CONDOR-%s-%s.csf" % (settings.CONDOR_LOG_DIR, str(caption), time.time())
 
 	@staticmethod
@@ -78,7 +80,9 @@ transfer_input_files    = %(transfer)s
 		@return Dictionnary with paths to Condor log files
 		"""
 
-		pattern = os.path.join(settings.CONDOR_LOG_DIR, str(caption).upper() + '.%s.$(Cluster).$(Process)')
+		if type(caption) != types.StringType:
+			raise TypeError, caption
+		pattern = os.path.join(settings.CONDOR_LOG_DIR, caption.upper() + '.%s.$(Cluster).$(Process)')
 
 		return {
 			'log'	: pattern % "log",
@@ -90,13 +94,20 @@ transfer_input_files    = %(transfer)s
 		Cluster.__init__(self)
 
 		for attribute in self.attrs:
-			self.__dict__[attribute] = None
+			self.__dict__[attribute] = ''
 
 		if desc:
-			self._desc = str(desc)
+			if type(desc) != types.StringType:
+				raise TypeError, "desc parameter must be a string"
+			self._desc = desc
+
 		self.__dict__['_queues'] = []
+		self.data = {}
 
 	def updateData(self):
+		"""
+		Updates data dictionary to be used when rendering the CSF's content
+		"""
 		self.data = {
 			'description'	: self._desc, 
 			'exec'			: self._executable, 
@@ -110,7 +121,9 @@ transfer_input_files    = %(transfer)s
 			if queue.has_key('env'): queues_csf += "environment = %s\n" % '; '.join(['%s=%s' % (k.upper(), v) for k,v in queue['env'].iteritems()])
 			queues_csf += 'queue\n\n'
 
+		# Adds queues related information
 		self.data.update(queues = queues_csf)
+		# Adds log filenames
 		self.data.update(self.getLogFilenames('job'))
 
 	def __repr__(self):
@@ -121,17 +134,24 @@ transfer_input_files    = %(transfer)s
 		Queues a Condor job, with optional arguments queue_args and queue_env environment.
 		@param queue_args string of any argument that must be passed to the executable
 		@param queue_env dictionary of variables used to define environment variables
+		@return dictionary of data associated with the newly created queue
 		"""
 		if queue_args and (type(queue_args) != types.StringType):
 			raise TypeError, 'queue_args must be a string'
 
-		if queue_env and (type(queue_env) != types.DictType):
-			raise TypeError, 'queue_env must be a dictionary'
+		if queue_env:
+			if (type(queue_env) != types.DictType):
+				raise TypeError, 'queue_env must be a dictionary'
+			for k,v in queue_env.iteritems():
+				if type(k) != types.StringType or type(v) != types.StringType:
+					raise TypeError, 'Environment arguments keys and values must be strings'
 
 		queue_data = {}
 		if queue_args: queue_data['args'] = queue_args
 		if queue_env: queue_data['env'] = queue_env
 		self._queues.append(queue_data)
+
+		return queue_data
 
 	def removeQueue(self, idx):
 		"""
