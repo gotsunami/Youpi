@@ -19,7 +19,7 @@ import os, os.path
 import sys, time, string
 import marshal, base64, zlib
 import socket
-import re, shutil
+import re, shutil, types
 #
 sys.path.insert(0, '..')
 from settings import *
@@ -43,6 +43,9 @@ def process(userData):
 	"""
 	Try to get software versions.
 	"""
+
+	if userData and type(userData) != types.DictType:
+		raise TypeError, "process arg must be a dictionnary"
 
 	user_id = userData['UserID']
 	node = userData['Node']

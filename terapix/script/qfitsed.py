@@ -33,6 +33,11 @@ except ImportError:
 	sys.exit(1)
 
 def get_images():
+	"""
+	Get successfull Qfitsed images by user
+
+	@return a list of tuple
+	"""
 	from django.db import connection
 	cur = connection.cursor()
 	cur.execute("""
@@ -50,6 +55,11 @@ def get_images():
 	return res
 
 def get_grades():
+	"""
+	Get all grades from a specific successfull QFits
+
+	@return a list of tuple
+	"""
 	from django.db import connection
 	cur = connection.cursor()
 	cur.execute("""
