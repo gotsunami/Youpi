@@ -16,7 +16,7 @@ Grades all Qualityfits-in processings. Can output a list of all grades in the
 database.
 """
 
-import sys, os, string, curses, os.path
+import sys, os, string, curses, os.path, types
 import datetime, time
 from optparse import OptionParser
 from terminal import *
@@ -34,6 +34,12 @@ except ImportError:
 	sys.exit(1)
 
 def get_stats():
+	"""
+	Returns statistics information of QFITS processing status from user's defined output directory	
+
+	@return a list of tuples 
+	"""
+
 	total = Plugin_fitsin.objects.filter(task__success = True).count()
 	usergrades = FirstQEval.objects.all().values('fitsin').distinct()
 	prevrelgrades = Plugin_fitsin.objects.exclude(prevrelgrade = '').filter(task__success = True).count()
@@ -54,6 +60,13 @@ def get_grades(res_output_dir = None, idList = None):
 
 	@return a list of tuples [(image name, grade, comment), ...]
 	"""
+	
+	if res_output_dir and type(res_output_dir) != types.StringType:
+		raise TypeError, "res_output_dir must be a string"
+
+	if idList and type(idList) != types.ListType:
+		raise TypeError, "idList must be a list of id [id1, id2,...]"
+
 	from django.db import connection
 	cur = connection.cursor()
 	q = """
@@ -130,6 +143,11 @@ def delete_grades(simulate, verbose = False):
 		print "Done"
 
 def get_proportions():
+	"""
+	Get the proportion of each grade for all images ingested and graded in Youpi
+
+	@return a list of tuple
+	"""
 	from django.db import connection
 	cur = connection.cursor()
 	q1 = "select grade, count(grade) from youpi_firstqeval group by grade"
