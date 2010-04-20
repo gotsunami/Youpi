@@ -14,6 +14,7 @@
 # vim: set ts=4
 
 from django.conf import settings
+from django.http import HttpRequest
 import django.http
 #
 from terapix.lib.cluster import Cluster
@@ -197,11 +198,27 @@ class YoupiCondorCSF(CondorCSF):
 	"""
 	def __init__(self, request, pluginId, desc = None):
 		CondorCSF.__init__(self, desc)
-		self.request = request
-		self.id = pluginId
+		if not isinstance(request, HttpRequest):
+			raise TypeError, "request must be an HttpRequest object"
+		if type(pluginId) != types.StringType:
+			raise TypeError, 'pluginId must be a string'
+
+		self.__request = request
+		self.__id = pluginId
 		self.setExecutable(os.path.join(settings.TRUNK, 'terapix', 'script', 'wrapper_processing.py'))
 
+	@property
+	def request(self):
+		return self.__request
+
+	@property
+	def id(self):
+		return self.__id
+
 	def getSubmissionFileContent(self):
+		"""
+		Fully override parent definition
+		"""
 		if not self._transfer_input_files:
 			# Add at least required files
 			self.setTransferInputFiles([])
@@ -218,7 +235,7 @@ class YoupiCondorCSF(CondorCSF):
 			'requirements'	: self.getRequirementString(),
 			'more' : "initialdir = %s\nnotify_user = %s" % (os.path.join(settings.TRUNK, 'terapix', 'script'), settings.CONDOR_NOTIFY_USER)
 		})
-		self.data.update(self.getLogFilenames(self.id))
+		self.data.update(self.getLogFilenames(self.__id))
 
 		return self._csfHeader % self.data
 
@@ -229,6 +246,8 @@ class YoupiCondorCSF(CondorCSF):
 		"""
 		Adds Youpi required files such as local_conf.py, settings.py, DBGeneric.py and NOP
 		"""
+		if type(files) != types.ListType:
+			raise TypeError, "Must be a list of path to files to transfer"
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 		for file in ('local_conf.py', 'settings.py', 'private_conf.py', os.path.join('script', 'DBGeneric.py'), 'NOP'): 
 			files.append(os.path.join(submit_file_path, file))
@@ -239,7 +258,7 @@ class YoupiCondorCSF(CondorCSF):
 		"""
 		Realtime and powerful Condor requirement string generation
 		"""
-		post = self.request.POST
+		post = self.__request.POST
 		try:
 			condorSetup = post['CondorSetup']
 		except Exception, e:
@@ -248,18 +267,18 @@ class YoupiCondorCSF(CondorCSF):
 		vms = get_condor_status()
 
 		if condorSetup == 'default':
-			dflt_setup = marshal.loads(base64.decodestring(self.request.user.get_profile().dflt_condor_setup))
+			dflt_setup = marshal.loads(base64.decodestring(self.__request.user.get_profile().dflt_condor_setup))
 			# Check Behaviour: policy or selection
-			if not dflt_setup.has_key(self.id):
-				raise CondorError, "No default Condor setup found for '%s' plugin (id: %s)." % (self._desc, self.id)
+			if not dflt_setup.has_key(self.__id):
+				raise CondorError, "No default Condor setup found for '%s' plugin (id: %s)." % (self._desc, self.__id)
 
-			db = dflt_setup[self.id]['DB']
+			db = dflt_setup[self.__id]['DB']
 			if db == 'policy':
-				pol = CondorNodeSel.objects.filter(label = dflt_setup[self.id]['DP'], is_policy = True)[0]
+				pol = CondorNodeSel.objects.filter(label = dflt_setup[self.__id]['DP'], is_policy = True)[0]
 				req = get_requirement_string(pol.nodeselection, vms)
 			else:
 				# Default behaviour is 'selection'
-				req = get_requirement_string_from_selection(dflt_setup[self.id]['DS'])
+				req = get_requirement_string_from_selection(dflt_setup[self.__id]['DS'])
 
 		elif condorSetup == 'custom':
 			try:
@@ -279,7 +298,7 @@ class YoupiCondorCSF(CondorCSF):
 				req = get_requirement_string_from_selection(c_selection)
 
 		# Add any custom Condor requirements, if any
-		custom_req = self.request.user.get_profile().custom_condor_req
+		custom_req = self.__request.user.get_profile().custom_condor_req
 		if custom_req: req = "%s && (%s))" % (req[:-1], custom_req)
 
 		return req
@@ -292,6 +311,8 @@ def get_condor_status():
 
 	short_host_name may be one of 'mix3', 'mix4' etc.
 	state is one of 'Idle' or 'Running'.
+
+	@return list of cluster nodes (vms)
 	"""
 
 	pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_status -xml'))
@@ -314,13 +335,20 @@ def get_condor_status():
 				status = a.firstChild.firstChild.nodeValue
 				vms[cur][1] = str(status)
 				cur += 1
-
 	return vms
 
 def get_requirement_string(params, vms):
 	"""
 	Returns Condor's requirement string for a *POLICY*
+	For params, allowed criteria are among: MEM, DSK, HST, SLT
+
+	@params string of params like 'MEM,G,1,G'
+	@params list vms available cluster nodes
 	"""
+	if type(params) != types.StringType:
+		raise TypeError, "params must be a string"
+	if type(vms) != types.ListType:
+		raise TypeError, "vms must be a list"
 
 	# De-serialization mappings
 	cdeserial = {
@@ -334,9 +362,29 @@ def get_requirement_string(params, vms):
 		'T'	: 1024 * 1024
 	}
 
-	# Sanitize
+	# Check params validity
 	params = params.replace('*', '.*')
 	params = params.split('#')
+	for p in params:
+		d = p.split(',')
+		if len(d) != 4:
+			# Wrong format
+			raise ValueError, "Malformed parameter: '%s'" % p
+		if d[0] not in ('MEM', 'DSK', 'HST', 'SLT'):
+			raise ValueError, "Invalid parameter name: '%s'. Must be one of MEM, DSK, HST or SLT" % d[0]
+		if d[1] not in cdeserial:
+			raise ValueError, "Invalid comparator letter: '%s'" % d[1]
+		if d[3] not in sdeserial:
+			raise ValueError, "Invalid unit letter: '%s'" % d[3]
+
+	# vms must be a list of lists
+	for vm in vms:
+		if type(vm) != types.ListType:
+			raise TypeError, "Invalid node info. Should be a list, not '%s'" % vm
+		for i in vm:
+			if type(i) != types.StringType:
+				raise TypeError, "'%s' must be a string, not %s" % (i, type(i))
+
 	nodes = [vm[0] for vm in vms]
 
 	crit = {}
@@ -418,6 +466,9 @@ def get_requirement_string_from_selection(selName):
 	Returns Condor's requirement string for a *SELECTION*
 	@param selName - string: name of node selection
 	"""
+	if type(selName) != types.StringType:
+		raise TypeError, 'selName must be a String'
+
 	try:
 		sel = CondorNodeSel.objects.filter(label = selName, is_policy = False)[0]
 	except IndexError:

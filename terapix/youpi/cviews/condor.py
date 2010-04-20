@@ -805,7 +805,6 @@ def compute_requirement_string(request):
 		raise HttpResponseServerError('Bad parameters')
 
 	vms = get_condor_status()
-	req = get_requirement_string(params, vms)
-
+	req = get_requirement_string(str(params), vms)
 	return HttpResponse(str({'ReqString': str(req)}), mimetype = 'text/plain')
 
