@@ -22,25 +22,6 @@ def showPart(title):
 	"""
 	print "%s %s %s" % ('-' * 11, title, '-' * 10)
 
-class TestDB(unittest.TestCase):
-	def __init__(self, methodName='runTest'):
-		unittest.TestCase.__init__(self, methodName)
-		showPart('MYSQL')
-
-		db = DB(host = DATABASE_HOST,
-				user = DATABASE_USER,
-				passwd = DATABASE_PASSWORD,
-				db = DATABASE_NAME)
-		self.g = DBGeneric(db.con)
-
-	def setUp(self):
-		pass
-
-	def testSetupDB(self):
-		"Setting up test db"
-		self.g.execute("drop database if exists test");
-		self.g.execute("create database test");
-
 class TestIngestion(unittest.TestCase):
 	showPart('INGESTION')
 	def setUp(self):
