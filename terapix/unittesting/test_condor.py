@@ -17,12 +17,14 @@ Tests for the built-in Condor library
 
 import unittest, types
 from terapix.lib.cluster import condor
+#
+from django.http import HttpRequest
+from django.http import QueryDict
 
 class CondorCSFTest(unittest.TestCase):
 	"""
 	Tests the CondorCSF class
 	"""
-
 	def setUp(self):
 		self.csf = condor.CondorCSF()
 
@@ -99,13 +101,79 @@ class YoupiCondorCSFTest(unittest.TestCase):
 	"""
 	Tests the YoupiCondorCSF class
 	"""
-
 	def setUp(self):
-		#selbf.csf = condor.YoupiCondorCSF()
-		pass
+		self.request = HttpRequest()
+		# TODO: fix this. getRequirementString() is complex and needs info in DB
+		# This hack is used to test the getSubmissionFileContent function
+		class LightYoupiCondorCSF(condor.YoupiCondorCSF):
+			def getRequirementString(self):
+				return 'req'
+		self.csf = LightYoupiCondorCSF(self.request, 'id')
 
 	def test_init(self):
+		self.assertRaises(TypeError, condor.YoupiCondorCSF, 'a', 'id')
+		self.assertRaises(TypeError, condor.YoupiCondorCSF, self.request, 1)
+		self.assertTrue(self.csf.id == 'id')
+		self.assertTrue(self.csf.request == self.request)
+	
+	def test_getSubmissionFileContent(self):
+		content = self.csf.getSubmissionFileContent()
+		self.assertTrue(type(content) == types.StringType)
+		# Those keys must have non-empty values
+		for k in ('more', 'requirements'):
+			self.assertTrue(type(self.csf.data[k]) == types.StringType)
+			self.assertTrue(len(self.csf.data[k]) > 0)
+
+	def test_setTransferInputFiles(self):
+		for k in ({}, 'a', lambda x: x, 1, object()):
+			self.assertRaises(TypeError, self.csf.setTransferInputFiles, k)
+
+	def test_getRequirementString(self):
+		"""
+		Fake test for the moment
+		"""
+		self.assertTrue(type(self.csf.getRequirementString()) == types.StringType)
+
+class FunctionTest(unittest.TestCase):
+	"""
+	Misc functions tests in this module
+	"""
+	def setUp(self):
 		pass
+
+	def test_get_condor_status(self):
+		stat = condor.get_condor_status()
+		self.assertTrue(type(stat) == types.ListType)
+		for vm in stat:
+			self.assertTrue(len(vm) == 2)
+			self.assertTrue(type(vm[0]) == types.StringType)
+			self.assertTrue(type(vm[1]) == types.StringType)
+
+	def test_get_requirement_string(self):
+		for k in ({}, lambda x: x, 1, object()):
+			self.assertRaises(TypeError, condor.get_requirement_string, k, [])
+		for k in ('', {}, lambda x: x, 1, object()):
+			self.assertRaises(TypeError, condor.get_requirement_string, '', k)
+
+		self.assertRaises(ValueError, condor.get_requirement_string, 'MEM,G,1;G', [])		# Wrong ';'
+		self.assertRaises(ValueError, condor.get_requirement_string, 'BADKEY,G,1,G', [])	# Wrong 'BADKEY'
+		self.assertRaises(ValueError, condor.get_requirement_string, 'MEM,g,1,G', [])		# Wrong 'g'
+		self.assertRaises(ValueError, condor.get_requirement_string, 'MEM,G,1,t', [])		# Wrong 't'
+
+		# vms must be a list of lists
+		self.assertRaises(TypeError, condor.get_requirement_string, 'MEM,G,1,T', ['node1', 'Idle'])
+		self.assertRaises(TypeError, condor.get_requirement_string, 'MEM,G,1,T', [[1, 'Idle']])
+
+		# Output
+		req = condor.get_requirement_string('MEM,G,1,G', [])
+		self.assertTrue(type(req) == types.StringType)
+		self.assertTrue(req.startswith('Requirements = ('))
+		self.assertTrue(req.endswith(')'))
+
+	def test_get_requirement_string_from_selection(self):
+		for k in ({}, lambda x: x, 1, object()):
+			self.assertRaises(TypeError, condor.get_requirement_string_from_selection, k)
+
 
 if __name__ == '__main__':
 	unittest.main()
