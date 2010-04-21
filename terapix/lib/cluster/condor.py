@@ -144,8 +144,8 @@ transfer_input_files    = %(transfer)s
 			if (type(queue_env) != types.DictType):
 				raise TypeError, 'queue_env must be a dictionary'
 			for k,v in queue_env.iteritems():
-				if type(k) != types.StringType or type(v) != types.StringType:
-					raise TypeError, 'Environment arguments keys and values must be strings'
+				if (type(k) != types.StringType and type(k) != types.UnicodeType) or (type(v) != types.StringType and type(v) != types.UnicodeType):
+					raise TypeError, 'Environment arguments keys and values must be strings:' + str(type(k)) + str(type(v))
 
 		queue_data = {}
 		if queue_args: queue_data['args'] = queue_args
@@ -513,6 +513,10 @@ class CondorQueue(object):
 			if type(classAds) != types.DictType:
 				raise TypeError, "classAds parameter must be a dictionary"
 			self.__dict__['classAds'] = classAds
+
+			for ad in ('JobStatus', 'JobStartDate'):
+				if not classAds.has_key(ad):
+					raise ValueError, "Missing %s key in the classAds" % ad
 
 			for k, v in classAds.iteritems():
 				self.__dict__[k] = v

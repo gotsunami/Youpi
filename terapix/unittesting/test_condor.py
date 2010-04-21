@@ -15,8 +15,8 @@
 Tests for the built-in Condor library
 """
 
-import unittest, types
-import base64, marshal
+import unittest, types, time
+import base64, marshal, sys
 #
 from terapix.lib.cluster import condor
 from terapix.youpi.models import CondorNodeSel
@@ -97,7 +97,7 @@ class CondorCSFTest(unittest.TestCase):
 			self.assertRaises(TypeError, self.csf.setExecutable, k)
 
 	def test_setTransferInputFiles(self):
-		for k in ({}, 'a', lambda x: x, 1, object()):
+		for k in ({'k': 0}, 'a', lambda x: x, 1, object()):
 			self.assertRaises(TypeError, self.csf.setTransferInputFiles, k)
 		self.assertRaises(TypeError, self.csf.setTransferInputFiles, [1, 'a'])
 
@@ -130,7 +130,7 @@ class YoupiCondorCSFTest(unittest.TestCase):
 			self.assertTrue(len(self.csf.data[k]) > 0)
 
 	def test_setTransferInputFiles(self):
-		for k in ({}, 'a', lambda x: x, 1, object()):
+		for k in ({'k': 0}, 'a', lambda x: x, 1, object()):
 			self.assertRaises(TypeError, self.csf.setTransferInputFiles, k)
 
 	def test_getRequirementString(self):
@@ -157,9 +157,9 @@ class CondorMiscFunctionTest(TestCase):
 			self.assertTrue(type(vm[1]) == types.StringType)
 
 	def test_get_requirement_string(self):
-		for k in ({}, lambda x: x, 1, object()):
+		for k in ({'k': 0}, lambda x: x, 1, object()):
 			self.assertRaises(TypeError, condor.get_requirement_string, k, [])
-		for k in ('', {}, lambda x: x, 1, object()):
+		for k in ('', {'k': 0}, lambda x: x, 1, object()):
 			self.assertRaises(TypeError, condor.get_requirement_string, '', k)
 
 		self.assertRaises(ValueError, condor.get_requirement_string, 'MEM,G,1;G', [])		# Wrong ';'
@@ -178,7 +178,7 @@ class CondorMiscFunctionTest(TestCase):
 		self.assertTrue(req.endswith(')'))
 
 	def test_get_requirement_string_from_selection(self):
-		for k in ({}, lambda x: x, 1, object()):
+		for k in ({'k': 0}, lambda x: x, 1, object()):
 			self.assertRaises(TypeError, condor.get_requirement_string_from_selection, k)
 		self.assertRaises(condor.CondorError, condor.get_requirement_string_from_selection, '__nofound__')
 
@@ -191,6 +191,81 @@ class CondorMiscFunctionTest(TestCase):
 		self.assertTrue(req.endswith('))'))
 		self.assertTrue(req == 'Requirements = ((Name == "slot1@node1" || Name == "slot2@node1"))')
 
+class CondorQueueTest(unittest.TestCase):
+	"""
+	Tests the CondorQueue class
+	"""
+	def setUp(self):
+		pass
+
+	def test_init(self):
+		for k in ({'k': 0}, lambda x: x, 1, object()):
+			self.assertRaises(TypeError, condor.CondorQueue, envPath = k)
+		for k in ('a', {'k': 0}, lambda x: x, 1, object()):
+			self.assertRaises(TypeError, condor.CondorQueue, globalPool = k)
+
+	def test_getJobs(self):
+		jobs = condor.CondorQueue().getJobs()
+		self.assertTrue(type(jobs) == types.TupleType)
+		self.assertTrue(len(jobs) == 2)
+		self.assertTrue(type(jobs[0]) == types.TupleType)
+		self.assertTrue(type(jobs[1]) == types.IntType)
+
+	def test_removeJobs(self):
+		for k in ({'k': 0}, lambda x: x, 1, object()):
+			self.assertRaises(TypeError, condor.CondorQueue().removeJob, k)
+
+class CondorJobTest(unittest.TestCase):
+	"""
+	Tests the CondorJob class
+	"""
+	def setUp(self):
+		# Creates a dummy running job (jobstatus = 2)
+		self.classAds = {'a': 1, 'b': 2, 'JobStatus': 2, 'JobStartDate': time.time()}
+		self.j = condor.CondorQueue.CondorJob(self.classAds)
+
+	def test_init(self):
+		# Keep a ref to CondorJob class
+		job = condor.CondorQueue.CondorJob
+		for k in ("0", lambda x: x, 1, object()):
+			self.assertRaises(TypeError, job, k)
+		self.assertRaises(ValueError, job, {'a': 1, 'b': 2})
+
+		for k, v in self.classAds.iteritems():
+			self.assertTrue(self.j.__dict__[k] == v)
+
+	def test_isRunning(self):
+		self.assertTrue(type(self.j.isRunning()) == types.BooleanType)
+
+	def test_getJobDuration(self):
+		import re
+		d = self.j.getJobDuration()
+		self.assertTrue(type(d) == types.StringType)
+		self.assertTrue(re.match(r'^\d{2}:\d{2}:\d{2}$', d))
+
+class YoupiCondorQueueTest(unittest.TestCase):
+	"""
+	Tests the YoupiCondorQueue class
+	"""
+	def setUp(self):
+		pass
+	
+	def test_getJobs(self):
+		jobs = condor.YoupiCondorQueue().getJobs()
+		self.assertTrue(type(jobs) == types.TupleType)
+		self.assertTrue(len(jobs) == 2)
+		self.assertTrue(type(jobs[0]) == types.TupleType)
+		self.assertTrue(type(jobs[1]) == types.IntType)
+		jobs, count = jobs
+		for j in jobs:
+			self.assertTrue(hasattr(j, 'UserData'), 'Missing required userData attribute')
+
 
 if __name__ == '__main__':
-	unittest.main()
+	if len(sys.argv) == 2: 
+		try: unittest.main(defaultTest = sys.argv[1])
+		except AttributeError:
+			print "Error. No test with that name: %s" % sys.argv[1]
+	else: 
+		unittest.main()
+
