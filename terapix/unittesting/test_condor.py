@@ -16,10 +16,15 @@ Tests for the built-in Condor library
 """
 
 import unittest, types
-from terapix.lib.cluster import condor
+import base64, marshal
 #
+from terapix.lib.cluster import condor
+from terapix.youpi.models import CondorNodeSel
+#
+from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.http import QueryDict
+from django.test import TestCase
 
 class CondorCSFTest(unittest.TestCase):
 	"""
@@ -134,10 +139,12 @@ class YoupiCondorCSFTest(unittest.TestCase):
 		"""
 		self.assertTrue(type(self.csf.getRequirementString()) == types.StringType)
 
-class FunctionTest(unittest.TestCase):
+class CondorMiscFunctionTest(TestCase):
 	"""
 	Misc functions tests in this module
 	"""
+	fixtures = ['test_user']
+
 	def setUp(self):
 		pass
 
@@ -173,6 +180,16 @@ class FunctionTest(unittest.TestCase):
 	def test_get_requirement_string_from_selection(self):
 		for k in ({}, lambda x: x, 1, object()):
 			self.assertRaises(TypeError, condor.get_requirement_string_from_selection, k)
+		self.assertRaises(condor.CondorError, condor.get_requirement_string_from_selection, '__nofound__')
+
+		sel = CondorNodeSel.objects.create(user = User.objects.all()[0], label = 'test', is_policy = False)
+		sel.nodeselection = base64.encodestring(marshal.dumps(['slot1@node1', 'slot2@node1'])).replace('\n', '')
+		sel.save()
+		req = condor.get_requirement_string_from_selection('test')
+		self.assertTrue(type(req) == types.StringType)
+		self.assertTrue(req.startswith('Requirements = (('))
+		self.assertTrue(req.endswith('))'))
+		self.assertTrue(req == 'Requirements = ((Name == "slot1@node1" || Name == "slot2@node1"))')
 
 
 if __name__ == '__main__':

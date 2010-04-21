@@ -23,7 +23,6 @@ def showPart(title):
 	print "%s %s %s" % ('-' * 11, title, '-' * 10)
 
 class TestIngestion(unittest.TestCase):
-	showPart('INGESTION')
 	def setUp(self):
 		pass
 

@@ -478,7 +478,7 @@ def get_requirement_string_from_selection(selName):
 	req = 'Requirements = (('
 	for host in hosts:
 		req += """Name == "%s" || """ % host
-	req = req[:-3] + '))'
+	req = req[:-4] + '))'
 
 	return req
 
