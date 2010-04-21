@@ -16,3 +16,4 @@ from terapix.unittesting.test_views import *
 from terapix.unittesting.test_grading_script import *
 from terapix.unittesting.test_condor import *
 from terapix.unittesting.test_software_version_check import *
+from terapix.unittesting.test_coordconvert import *
