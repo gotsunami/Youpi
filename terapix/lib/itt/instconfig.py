@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, re
+import sys, re, types
 
 def debug(msg):
 	print msg
@@ -8,7 +8,7 @@ def debug(msg):
 class InstrumentConfig(object):
 	"""
 	Provides several facilities for dealing with Youpi instrument 
-	configuration files.
+	configuration files (terapix/lib/itt/*.conf)
 	"""
 	# Required Youpi keywords
 	required_kw = 'YRUN YINSTRUMENT YTELESCOP YDETECTOR YOBJECT ' + \
@@ -20,6 +20,8 @@ class InstrumentConfig(object):
 		"""
 		Sets instrument config filename to work on.
 		"""
+		if type(filename) != types.StringType:
+			raise TypeError, "filename must be a string"
 		self.__filename = filename
 
 	@property
@@ -51,12 +53,10 @@ class InstrumentConfig(object):
 					map['+COPY'].append(li[1:])
 					continue
 				else:
-					debug("Field separator must be a semi-colon. No separator found. The line does not match +KEYWORD either.\nPlease check the line:\n%s" % line)
-					sys.exit(1)
-			data = line.split(';')
+					raise ValueError, "Field separator must be a semi-colon. No separator found. The line does not match +KEYWORD either.\nPlease check the line:\n%s" % line
+			data = line.split(self.SEP)
 			if len(data) > 3:
-				debug("Too many fields for this line (max is 3):\n%s" % line)
-				sys.exit(1)
+				raise ValueError, "Too many fields for this line (max is 3): %s" % line
 			# Stripping content
 			data = [col.strip() for col in data]
 			# Converting keywords (not starting by double quote) to uppercase
@@ -67,8 +67,7 @@ class InstrumentConfig(object):
 			# First column must be either a required keyword or an empty value (in this case
 			# second column must start with a '+'
 			if data[0] not in required_kw and len(data[0]):
-				debug("Error: '%s' is not among authorized keywords. Check line:\n%s" % (data[0], line))
-				sys.exit(1)
+				raise ValueError, "Error: '%s' is not among authorized keywords. Check line: %s" % (data[0], line)
 			
 			values = {'SRC': data[1]}
 			# Check for optional 3rd column
