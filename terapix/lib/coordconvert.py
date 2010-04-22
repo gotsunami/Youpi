@@ -14,7 +14,7 @@ class Alpha(object):
 		Converts degrees to hh:mm:ss.xxx alpha coordinates
 		"""
 		if ((type(alpha) != types.FloatType) and (type(alpha) != types.IntType)):
-			raise TypeError, "Alpha must be a number"
+			raise TypeError, "Alpha must be a number (integer or float)"
 		
 		if ((alpha >= 360.) or (alpha < 0.)):
 			raise ValueError, "Alpha must be float between 0. and 360." 
@@ -42,7 +42,13 @@ class Alpha(object):
 
 		k = re.match(r'^(\d{2})\:(\d{2})\:(\d{2}\.\d{2})$', hms)
 		if k:
-			pass
+			if (int(k.group(1)) != types.IntType) and ((int(k.group(1)) >= 24) or (int(k.group(1)) < 0)):
+				raise ValueError, "hh must be 2 digits hours value (integer)"
+			if (int(k.group(2)) != types.IntType) and ((int(k.group(2)) >= 60) or (int(k.group(2)) < 0)):
+				raise ValueError, "mm must be 2 digits minutes value (integer)"
+			if (float(k.group(3)) != types.FloatType) and ((float(k.group(3)) >= 60.) or (float(k.group(3)) < 0.)):
+				raise ValueError, "ss must be 5 digits second with 2 digits after dot (float)"
+
 		else:
 			raise ValueError, "hms must be formated as xx:xx:xx.xx"
 		
@@ -61,6 +67,12 @@ class Delta(object):
 		"""
 		Converts degrees to dd:dm:ds.x delta coordinates 
 		"""
+		if ((type(delta) != types.FloatType) and (type(delta) != types.IntType)):
+			raise TypeError, "Delta must be a number (integer or float)"
+		
+		if ((delta >= 90.) or (delta <= -90.)):
+			raise ValueError, "Delta must be float between -90. and 90." 
+
 		sign = '+'
 		if delta < 0.: sign = '-'
 		delta = abs(delta)
@@ -76,6 +88,27 @@ class Delta(object):
 		"""
 		Converts dd:dm:ds.xxx delta coordinates to degrees
 		"""
+		if (type(dms) != types.StringType):
+			raise TypeError, "dms must be a string"
+
+		if (type(sep) != types.StringType):
+			raise TypeError, "Separator must be a string"
+
+		if sep != ':':
+			raise ValueError, "Separator of date format must be colon ':'"
+
+		k = re.match(r'^[\+|\-](\d{2})\:(\d{2})\:(\d{2}\.\d)$', dms)
+		if k:
+			if (int(k.group(1)) != types.IntType) and ((int(k.group(1)) >= 24) or (int(k.group(1)) < 0)):
+				raise ValueError, "hh must be 2 digits hours value (integer)"
+			if (int(k.group(2)) != types.IntType) and ((int(k.group(2)) >= 60) or (int(k.group(2)) < 0)):
+				raise ValueError, "mm must be 2 digits minutes value (integer)"
+			if (float(k.group(3)) != types.FloatType) and ((float(k.group(3)) >= 60.) or (float(k.group(3)) < 0.)):
+				raise ValueError, "ss must be 5 digits second with 2 digits after dot (float)"
+
+		else:
+			raise ValueError, "dms must be formated as [+|-]xx:xx:xx.x"
+
 		sign = 1.
 		if dms[0] == '-': sign = -1.
 		dms = dms.split(sep)
