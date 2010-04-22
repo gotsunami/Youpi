@@ -15,6 +15,7 @@ Set of functions to deal with authentication within Youpi.
 """
 
 from django.db import models
+from django.http import HttpRequest
 #
 import re
 from terapix.exceptions import *
@@ -31,21 +32,18 @@ class Permissions:
 		self.mode = mode
 
 		# Various sanity checks
-		try: mode = int(mode)
-		except ValueError:
-			raise PermissionsConvertError, 'Input permissions must be an integer (3 octal digits)'
-
-		mode = str(mode)
-		if len(mode) != 3:
-			raise PermissionsConvertError, 'Input permissions must have exactly 3 octal digits'
+		try:
+			if not re.match(r'^\d{3}$', mode):
+				raise TypeError
+		except TypeError:
+			raise TypeError,  'mode must be a string of exactly 3 octal digits'
 
 		bits = [int(b) for b in re.findall(r'\d', mode)]
 		if True in [m > 6 for m in bits]:
-			raise PermissionsConvertError, 'Mode bit must not be greater than 6'
+			raise ValueError, 'Mode bit must be lower than 6'
 
-		
 		if False in [m in bits_range for m in bits]:
-			raise PermissionsConvertError, 'Mode bit must be one of 0, 2, 4, 6'
+			raise ValueError, 'Mode bit must be one of 0, 2, 4 or 6'
 
 		self.user.read = self.user.write = False
 		self.group.read = self.group.write = False
@@ -74,9 +72,9 @@ class Permissions:
 		Permissions instance to JSON conversion
 		"""
 		return {
-			'user' : {'read': int(self.user.read), 'write': int(self.user.write)}, 
-			'group' : {'read': int(self.group.read), 'write': int(self.group.write)}, 
-			'others' : {'read': int(self.others.read), 'write': int(self.others.write)}
+			'user' 		: {'read': int(self.user.read), 'write': int(self.user.write)}, 
+			'group' 	: {'read': int(self.group.read), 'write': int(self.group.write)}, 
+			'others' 	: {'read': int(self.others.read), 'write': int(self.others.write)}
 		}
 
 	def toOctal(self):
@@ -139,10 +137,17 @@ def read_proxy(request, results):
 	Write instead:
 	tags, filtered = read_proxy(request, Tag.objects.all())
 
+	Note that this function can only be applied to models that support Youpi 
+	permissions, i.e with a 'mode', 'user' and 'group'  attributes. The PermissionsError 
+	will be raised for models without permission support.
+
 	@param request Django request instance
 	@param results Django's query QuerySet
 	@return A tuple (subset, filtered)
 	"""
+
+	if not isinstance(request, HttpRequest):
+		raise TypeError, "request must be an HttpRequest object"
 
 	if type(results) != models.query.QuerySet:
 		raise TypeError, 'Result set must be a Django QuerySet'
