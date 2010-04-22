@@ -25,6 +25,5 @@ class PluginManagerError(PluginError): pass
 class DebugError(Exception): pass
 #
 class PermissionsError(Exception): pass
-class PermissionsConvertError(PermissionsError): pass
 #
 class ReportIncompleteDefinitionError(Exception): pass

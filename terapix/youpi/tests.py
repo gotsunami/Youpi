@@ -18,3 +18,4 @@ from terapix.unittesting.test_condor import *
 from terapix.unittesting.test_instconfig import *
 from terapix.unittesting.test_software_version_check import *
 from terapix.unittesting.test_coordconvert import *
+from terapix.unittesting.test_auth import *

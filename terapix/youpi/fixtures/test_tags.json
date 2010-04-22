@@ -1,0 +1,32 @@
+[
+	{
+		"model": "youpi.tag",
+		"pk": 1,
+		"fields": {
+			"name": "tag1",
+			"user": "1",
+			"group": "1",
+			"mode": "640"
+		}
+	},
+	{
+		"model": "youpi.tag",
+		"pk": 2,
+		"fields": {
+			"name": "tag2",
+			"user": "1",
+			"group": "1",
+			"mode": "440"
+		}
+	},
+	{
+		"model": "youpi.tag",
+		"pk": 3,
+		"fields": {
+			"name": "tag3",
+			"user": "1",
+			"group": "1",
+			"mode": "444"
+		}
+	}
+]
