@@ -97,7 +97,27 @@ class AuthMiscFunctionTest(TestCase):
 		self.assertRaises(PermissionsError, read_proxy, self.request, Instrument.objects.all())
 
 		# Output
+		# Tests 'user' perm bit with 'user1'
 		data, filtered = read_proxy(self.request, tags)
+		self.assertFalse(filtered)
+		self.assertTrue(len(data) == tags.count())
+
+		# Tests 'group' perm bit with 'user2'
+		u = self.request.user
+		self.request.user = User.objects.filter(username = 'user2')[0]
+		data, filtered = read_proxy(self.request, tags)
+		self.assertTrue(filtered)
+		self.assertTrue(len(data) == 2) # tag4 matches (440) (group bit); tag3 matches (others bit)
+		for i in range(2):
+			self.assertTrue(data[i].name in ('tag3', 'tag4'))
+
+		# Tests 'others' perm bit with 'user3'
+		self.request.user = User.objects.filter(username = 'user3')[0]
+		data, filtered = read_proxy(self.request, tags)
+		self.assertTrue(filtered)
+		self.assertTrue(len(data) == 1) # Only tag3 matches (444)
+		self.assertTrue(data[0].name == 'tag3')
+		self.request = u
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2: 
