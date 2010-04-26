@@ -12,15 +12,17 @@
 ##############################################################################
 
 import unittest, types, random
-from django.test.client import Client
+import os.path
+#
+from django.conf import settings
+#
 from terapix.exceptions import *
 from terapix.script import grading
-from django.conf import settings
 
 class TestGradingScript(unittest.TestCase):
 	def setUp(self):
-		self.client = Client()
-		self.res_output_dir = settings.PROCESSING_OUTPUT + 'fitsin/'
+		# FIXME: do not hardcode 'fitsin' (plugin id)
+		self.res_output_dir = os.path.join(settings.PROCESSING_OUTPUT, 'fitsin')
 
 	def test_get_stats(self):
 		g = grading.get_stats()
@@ -29,7 +31,6 @@ class TestGradingScript(unittest.TestCase):
 			self.assertTrue(type(gi) == types.TupleType)
 
 	def test_get_grades(self):
-	
 		self.minilist = [random.randint(1, 15000)]
 		self.maxilist = []
 		for k in range(0,10):
@@ -56,7 +57,5 @@ class TestGradingScript(unittest.TestCase):
 			self.assertTrue(type(gi) == types.TupleType)
 
 
-
 if __name__ == '__main__':
 	unittest.main()
-
