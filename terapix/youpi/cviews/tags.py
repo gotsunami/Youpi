@@ -15,7 +15,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound, HttpRequest
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 #
