@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Youpi JsUnit Test Runner</title>
+<script language="JavaScript" type="text/javascript" src="/media/js/3rdParty/jsunit/app/jsUnitCore.js"></script>
+<script language="JavaScript" type="text/javascript" src="/media/js/3rdParty/jsunit/app/jsUnitTestManager.js"></script>
+<script language="JavaScript" type="text/javascript" src="/media/js/3rdParty/jsunit/app/BaseUiManager.js"></script>
+<script language="JavaScript" type="text/javascript" src="/media/js/3rdParty/jsunit/app/ClassicUiManager.js"></script>
+<script language="JavaScript" type="text/javascript" src="/media/js/3rdParty/jsunit/app/ModernUiManager.js"></script>
+<script language="JavaScript" type="text/javascript" src="/media/js/3rdParty/jsunit/app/jsUnitParams.js"></script>
+<script language="JavaScript" type="text/javascript" src="/media/js/3rdParty/jsunit/app/jsUnitTracer.js"></script>
+<script language="JavaScript" type="text/javascript">
+
+    var params = new JsUnit.Params(document.location.search);
+    var testManager;
+    var tracer;
+
+    function resetTestManager() {
+        testManager = new JsUnitTestManager(params);
+        tracer = new JsUnitTracer(testManager, params);
+    }
+
+    resetTestManager();
+
+    function onLoadHandler() {
+        testManager.onLoad();
+        testManager.maybeRun();
+    }
+
+    function startTests() {
+        testManager.kickOffTests();
+    }
+
+    function stopTests() {
+        testManager.abort();
+        resetTestManager();
+        testManager.onLoad();
+    }
+
+    //var uiFrameUrl = testManager.getUiFrameUrl();
+    var uiFrameUrl = '/media/js/3rdParty/jsunit/app/main-frame.html';
+
+    document.open();
+    document.write(
+            '<frameset id="testRunnerFrameset" rows="*,0,0,0" border="0" onload="onLoadHandler()">' + "\n" +
+            '    <frame frameborder="0" name="mainFrame" src="' + uiFrameUrl + '">' + "\n" +
+            '    <frame frameborder="0" name="mainResults" src="/media/js/3rdParty/jsunit/app/main-results.html">' + "\n" +
+            '    <frame frameborder="0" name="documentLoader" src="/media/js/3rdParty/jsunit/app/main-loader.html">' + "\n" +
+            '    <frame frameborder="0" name="testContainer" src="/media/js/3rdParty/jsunit/app/testContainer.html">' + "\n" +
+            '    <noframes>' + "\n" +
+            '        <body>' + "\n" +
+            '        <p>Sorry, JsUnit requires support for frames.</p>' + "\n" +
+            '        </body>' + "\n" +
+            '    </noframes>' + "\n" +
+            '</frameset>'
+    );
+    document.close();
+
+</script>
+</head>
+
+<body>
+<noscript>Sorry, JsUnit requires JavaScript.</noscript>
+</body>
+
+</html>

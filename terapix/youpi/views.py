@@ -1821,3 +1821,22 @@ def maintenance(request):
 	if hasattr(settings, 'MAINTENANCE') and not settings.MAINTENANCE:
 		return HttpResponseRedirect(reverse('terapix.youpi.views.index'))
 	return render_to_response('maintenance.html')
+
+def main_test_runner(request):
+	"""
+	Youpi's JSUnit test runner.
+	"""
+	return render_to_response('unittesting/testRunner.html', context_instance = RequestContext(request))
+
+def main_test_suite(request):
+	"""
+	Youpi's JSUnit test suite.
+	"""
+	return render_to_response('unittesting/test_suite.html', context_instance = RequestContext(request))
+
+def get_test(request, name):
+	"""
+	Gets Youpi's JSUnit test by name.
+	"""
+	return render_to_response("unittesting/tests/%s.html" % name, context_instance = RequestContext(request))
+

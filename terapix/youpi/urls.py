@@ -17,6 +17,7 @@
 
 from django.contrib.auth.views import login
 from terapix.youpi.views import logout
+from django.conf import settings
 from django.conf.urls.defaults import *
 from django.contrib import admin
 
@@ -173,3 +174,10 @@ urlpatterns = patterns(
 	(r'^report/(.*?)/(.*?)/$', 'cviews.reporting.get_report'),
 	(r'^reporting/$', 'cviews.reporting.reporting'),
 )
+
+if settings.DEBUG:
+	urlpatterns += patterns('terapix.youpi.views',
+		(r'^test/$', 'main_test_runner'),
+		(r'^test/suite/$', 'main_test_suite'),
+		(r'^test/get/(.*?)/$', 'get_test'),
+	)

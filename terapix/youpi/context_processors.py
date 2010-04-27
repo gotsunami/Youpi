@@ -20,11 +20,12 @@ They are referenced from the setting TEMPLATE_CONTEXT_PROCESSORS and used by
 RequestContext.
 """
 
+import django.conf
+
 def appmenu(request):
 	"""
 	Returns context variables for Youpi's release system (Application menu).
 	"""
-	from django.conf import settings
 	from django.core.urlresolvers import reverse
 	app_menu = {
 		'normal' : ( 	
@@ -36,21 +37,23 @@ def appmenu(request):
 			{'title' : 'Results',			'id' : 'results',	 	'href' : reverse('terapix.youpi.views.results')},
 			{'title' : 'Reporting',			'id' : 'reporting',	 	'href' : reverse('terapix.youpi.cviews.reporting.reporting')},
 		),
-		'apart' : ( 	
+		'apart' : [ 	
 			# Display order is inverted
 			{'title' : 'Preferences', 		'id' : 'preferences', 	'href' : reverse('terapix.youpi.views.preferences')},
 			{'title' : 'Condor Setup', 		'id' : 'condorsetup', 	'href' : reverse('terapix.youpi.views.condor_setup')},
 			{'title' : 'Processing Cart',	'id' : 'processingcart','href' : reverse('terapix.youpi.views.cart_view')},
-		)
+		]
 	}
+	if django.conf.settings.DEBUG:
+		app_menu['apart'].insert(0, {'title' : 'Unit Testing', 'id' : 'unittesting', 'href' : reverse('terapix.youpi.views.main_test_runner') + '?testpage=/youpi/test/suite/'})
+
 	return {'menu': app_menu}
 
 def settings(request):
 	"""
 	Returns a reference to application settings
 	"""
-	from django.conf import settings
-	return {'settings': settings}
+	return {'settings': django.conf.settings}
 
 def version(request):
 	"""Return version information if available."""
