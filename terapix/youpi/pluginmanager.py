@@ -564,6 +564,9 @@ class PluginManager(object):
 		"""
 		Returns plugin object by internal name if found or None.
 		"""
+		if type(iname) != types.StringType:
+			raise TypeError, "iname must be a string"
+
 		for p in self.plugins:
 			if p.id == iname:
 				return p
