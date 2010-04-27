@@ -15,11 +15,6 @@ import unittest
 from django.test.client import Client
 from terapix.exceptions import *
 
-def showPart(title):
-	"""
-	Display title to stdout
-	"""
-	print "%s %s %s" % ('-' * 11, title, '-' * 10)
 
 #class FakePlugin(ProcessingPlugin):
 #	def __init__(self):
@@ -52,4 +47,9 @@ class Test_processing_plugin(unittest.TestCase):
 
 if __name__ == '__main__':
 	unittest.main()
-
+	if len(sys.argv) == 2:
+		try: unittest.main(defaultTest = sys.argv[1])
+		except AttributeError:
+			print "Error. No test with that name: %s" % sys.argv[1]
+	else:
+		unittest.main()
