@@ -43,20 +43,31 @@ class TagsTest(TestCase):
 		self.assertTrue(type(ftags), types.DictType)
 		for k in ['tags', 'filtered']:
 			self.assertTrue(ftags.has_key(k))
-			self.assertTrue(type(ftags['tags']),types.ListType)
-			self.assertTrue(type(ftags['filtered']),types.BooleanType)
+			self.assertEquals(type(ftags['tags']),types.ListType)
+			self.assertEquals(type(ftags['filtered']),types.BooleanType)
 
 		if ftags['tags'][0]:
-			self.assertTrue(type(ftags['tags'][0]), types.DictType)
+			self.assertEquals(type(ftags['tags'][0]), types.DictType)
 			for i in ['name', 'style', 'comment', 'username', 'date']:
 				self.assertTrue(ftags['tags'][0].has_key(i))
-				self.assertTrue(type(ftags['tags'][0][i]), types.DictType)
+				self.assertEquals(type(ftags['tags'][0][i]), types.StringType)
 	
 	def test_get_tag_info(self):
 		self.client.login(username='user1', password='youpi')
-		response = self.client.post(reverse('terapix.youpi.cviews.tags.fetch_tags'))
-		ftags = json.decode(response.content)
-		self.assertTrue(type(ftags), types.DictType)
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.get_tag_info'), {'Name': 'tag1'})
+ 		ftags = json.decode(response.content)
+ 		self.assertEquals(type(ftags), types.DictType)
+ 		self.assertTrue(ftags.has_key('info'))
+		self.assertEquals(type(ftags['info']), types.DictType)
+		for i in ['name', 'style', 'comment', 'username', 'date']:
+			self.assertTrue(ftags['info'].has_key(i))
+			self.assertEquals(type(ftags['info'][i]), types.StringType)
+		
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.get_tag_info'), {'Name': 'toto'})
+ 		ftags = json.decode(response.content)
+ 		self.assertEquals(type(ftags), types.DictType)
+ 		self.assertTrue(ftags.has_key('info'))
+		self.assertEquals(len(ftags['info']), 0)
 
 
 if __name__ == '__main__':

@@ -35,10 +35,10 @@ class AlphaTest(unittest.TestCase):
 		# Output
 		g = cv.Alpha.deg_to_sex(245.34)
 		k = re.match(r'^(\d{2})\:(\d{2})\:(\d{2}\.\d{2})$',g)
-		self.assertTrue(type(k.group()), types.StringType)
-		self.assertTrue(int(k.group(1)),types.IntType)
-		self.assertTrue(int(k.group(2)),types.IntType)
-		self.assertTrue(float(k.group(3)),types.FloatType)
+		self.assertEquals(type(k.group()), types.StringType)
+		self.assertEquals(int(k.group(1)),types.IntType)
+		self.assertEquals(int(k.group(2)),types.IntType)
+		self.assertEquals(float(k.group(3)),types.FloatType)
 
 	def test_sex_to_deg(self):
 		for k in (lambda x: x, 3, object()):
@@ -58,7 +58,7 @@ class AlphaTest(unittest.TestCase):
 
 		# Output
 		g = cv.Alpha.sex_to_deg('13:20:00.00')
-		self.assertTrue(g, types.FloatType)
+		self.assertEquals(g, types.FloatType)
 
 class DeltaTest(unittest.TestCase):
 	"""
@@ -76,10 +76,10 @@ class DeltaTest(unittest.TestCase):
 		# Output
 		g = cv.Delta.deg_to_sex(45.234)
 		k = re.match(r'^[\+|\-](\d{2})\:(\d{2})\:(\d{2}\.\d)$',g)
-		self.assertTrue(type(k.group()), types.StringType)
-		self.assertTrue(int(k.group(1)),types.IntType)
-		self.assertTrue(int(k.group(2)),types.IntType)
-		self.assertTrue(float(k.group(3)),types.FloatType)
+		self.assertEquals(type(k.group()), types.StringType)
+		self.assertEquals(int(k.group(1)),types.IntType)
+		self.assertEquals(int(k.group(2)),types.IntType)
+		self.assertEquals(float(k.group(3)),types.FloatType)
 
 	def test_sex_to_deg(self):
 		for k in (lambda x: x, 3, object()):
@@ -99,7 +99,7 @@ class DeltaTest(unittest.TestCase):
 
 		# Output
 		g = cv.Delta.sex_to_deg('-13:20:00.0')
-		self.assertTrue(g, types.FloatType)
+		self.assertEquals(g, types.FloatType)
 
 
 if __name__ == '__main__':
