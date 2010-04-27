@@ -219,8 +219,8 @@ class Image(models.Model):
 	centerfield = models.PointField(spatial_index = False)
 	objects = models.GeoManager()
 	path = models.CharField(max_length = 255,blank=True,null=True,help_text="path of image")
-	alpha = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text= " Right ascension of field center [deg]")
-	delta = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text= " Declination of field center [deg]")
+	alpha = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text= "Right ascension of field center [deg]")
+	delta = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text= "Declination of field center [deg]")
 	astromaccuracy = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text="")
 	equinox = models.DecimalField(max_digits = 16,decimal_places = 8,null=True,blank=True,help_text="equinox of celestial coordinate system")
 	object = models.CharField(max_length = 80,blank=True,null=True,help_text="name of observed object")
@@ -238,6 +238,7 @@ class Image(models.Model):
 	mask = models.CharField(max_length = 200,blank=True,null=True,help_text="associated mask image")
 	reg = models.CharField(max_length = 200,blank=True,null=True,help_text="associated region (polygon) image")
 	is_validated = models.NullBooleanField('Validation status', default=False)
+	pixelscale = models.DecimalField(max_digits = 16,decimal_places = 8, null=True, blank=True, help_text= "Image pixel scale")
 
 	# FKs constraints
 	channel = models.ForeignKey(Channel, db_column='channel_id')
