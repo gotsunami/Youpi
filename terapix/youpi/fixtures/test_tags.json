@@ -28,5 +28,15 @@
 			"group": "1",
 			"mode": "444"
 		}
+	},
+	{
+		"model": "youpi.tag",
+		"pk": 4,
+		"fields": {
+			"name": "tag4",
+			"user": "1",
+			"group": "2",
+			"mode": "460"
+		}
 	}
 ]

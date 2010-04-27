@@ -193,14 +193,24 @@ def write_proxy(request, model, delete = False):
 	Write instead:
 	write_proxy(request, tag) or write_proxy(request, tag, delete = True)
 
+	Note that this function can only be applied to models that support Youpi 
+	permissions, i.e with a 'mode', 'user' and 'group'  attributes. The PermissionsError 
+	will be raised for models without permission support.
+
 	@param request Django request instance
 	@param model Django model
 	@param delete Delete action (instead of save/update) when true [default: False]
 	@return boolean: True if data successfully written
 	"""
 
+	if not isinstance(request, HttpRequest):
+		raise TypeError, "request must be an HttpRequest object"
+
 	if not isinstance(model, models.Model):
 		raise TypeError, 'model parameter must a Django Model'
+
+	if type(delete) != BooleanType:
+		raise TypeError, 'delete must be a boolean'
 
 	try:
 		m = model.mode

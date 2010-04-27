@@ -1,23 +1,58 @@
 [
 	{
+		"model": "auth.group",
+		"pk": 1,
+		"fields": {
+			"name": "group1"
+		}
+	},
+	{
+		"model": "auth.group",
+		"pk": 2,
+		"fields": {
+			"name": "group2"
+		}
+	},
+	{
 		"model": "auth.user",
 		"pk": 1,
 		"fields": {
-			"username": "youpi",
+			"username": "user1",
 			"is_active": 1,
 			"is_superuser": 1,
 			"is_staff": 1,
 			"groups": [],
 			"user_permissions": [],
-			"password": "youpi",
-			"email": "youpi@tests.terapix.fr"
+			"password": "sha1$505a7$ee821e211e520e87b6aa402bd543d112ec7de471",
+			"email": "user1@tests.terapix.fr"
 		}
 	},
 	{
-		"model": "auth.group",
-		"pk": 1,
+		"model": "auth.user",
+		"pk": 2,
 		"fields": {
-			"name": "youpi"
+			"username": "user2",
+			"is_active": 1,
+			"is_superuser": 1,
+			"is_staff": 1,
+			"groups": [2],
+			"user_permissions": [],
+			"password": "sha1$505a7$ee821e211e520e87b6aa402bd543d112ec7de471",
+			"email": "user2@tests.terapix.fr"
+		}
+	},
+	{
+		"model": "auth.user",
+		"pk": 3,
+		"fields": {
+			"username": "user3",
+			"is_active": 1,
+			"is_superuser": 1,
+			"is_staff": 1,
+			"groups": [],
+			"user_permissions": [],
+			"password": "sha1$505a7$ee821e211e520e87b6aa402bd543d112ec7de471",
+			"email": "user3@tests.terapix.fr"
 		}
 	}
 ]

@@ -16,6 +16,34 @@ from django.test.client import Client
 from terapix.exceptions import *
 
 
+#class FakePlugin(ProcessingPlugin):
+#	def __init__(self):
+#		ProcessingPlugin.__init__(self)
+#
+#	def main(self):
+#		return 'my result'
+
+class Test_processing_plugin(unittest.TestCase):
+	def setUp(self):
+		self.client = Client()
+
+	def testBadInputKeys(self):
+		# No POST data
+		#self.assertRaises(PostDataError, self.client.post, '/youpi/process/plugin/', {})
+		#self.assertRaises(PostDataError, self.client.post, '/youpi/process/plugin/', {'Plugi': 'name'})
+		pass
+
+	def testBadPluginName(self):
+		#self.assertRaises(PluginManagerError, self.client.post, '/youpi/process/plugin/', {'Plugin': '_bad_name_', 'Method': 'process'})
+		pass
+
+	def testBadMethodCall(self):
+		#self.assertRaises(PluginEvalError, self.client.post, '/youpi/process/plugin/', {'Plugin': 'skel', 'Method': 'badmethodcall'})
+		pass
+
+#	def testReturnData(self):
+#		# return HttpResponse(str({'result' : res}), mimetype = 'text/plain')
+#		self.assertRaises(PluginEvalError, self.client.post, '/youpi/process/plugin/', {'Plugin': 'skel', 'Method': 'badmethodcall'})
 
 if __name__ == '__main__':
 	unittest.main()

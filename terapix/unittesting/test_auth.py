@@ -83,21 +83,73 @@ class AuthMiscFunctionTest(TestCase):
 		# Build a suitable request for the *_proxy() functions
 		self.request = HttpRequest()
 		self.request.user = User.objects.all()[0]
-
-	def test_read_proxy(self):
-		tags = Tag.objects.all()
 		inst = Instrument.objects.create(name = 'test')
 		inst.save()
 
+	def test_read_proxy(self):
+		tags = Tag.objects.all()
 		for k in ({'k': 0}, lambda x: x, 1, object()):
 			self.assertRaises(TypeError, read_proxy, k, 1)
 			self.assertRaises(TypeError, read_proxy, self.request, k)
 
-		# Instrument models don't support permissions
+		# Instrument models does not support permissions
 		self.assertRaises(PermissionsError, read_proxy, self.request, Instrument.objects.all())
 
 		# Output
+		# Tests 'user' perm bit with 'user1'
 		data, filtered = read_proxy(self.request, tags)
+		self.assertTrue(type(data) == types.ListType)
+		self.assertTrue(type(filtered) == types.BooleanType)
+		self.assertFalse(filtered)
+		self.assertTrue(len(data) == tags.count())
+
+		# Tests 'group' perm bit with 'user2'
+		u = self.request.user
+		self.request.user = User.objects.filter(username = 'user2')[0]
+		data, filtered = read_proxy(self.request, tags)
+		self.assertTrue(filtered)
+		self.assertTrue(len(data) == 2) # tag4 matches (460) (group bit); tag3 matches (others bit)
+		for i in range(2):
+			self.assertTrue(data[i].name in ('tag3', 'tag4'))
+
+		# Tests 'others' perm bit with 'user3'
+		self.request.user = User.objects.filter(username = 'user3')[0]
+		data, filtered = read_proxy(self.request, tags)
+		self.assertTrue(filtered)
+		self.assertTrue(len(data) == 1) # Only tag3 matches (444)
+		self.assertTrue(data[0].name == 'tag3')
+		self.request = u
+
+	def test_write_proxy(self):
+		tags = Tag.objects.all()
+		for k in ({'k': 0}, lambda x: x, 1, object()):
+			self.assertRaises(TypeError, write_proxy, k, 1)
+			self.assertRaises(TypeError, write_proxy, self.request, k)
+			self.assertRaises(TypeError, write_proxy, self.request, tags[0], k)
+
+		# Instrument models does not support permissions
+		self.assertRaises(PermissionsError, write_proxy, self.request, Instrument.objects.all()[0])
+
+		# Output
+		# Tests 'user' perm bit with 'user1'
+		tags = []
+		for i in range(4):
+			tags.append(Tag.objects.filter(name = "tag%d" % (i+1))[0])
+		success = write_proxy(self.request, tags[0])
+		self.assertTrue(type(success) == types.BooleanType)
+		self.assertTrue(success)
+
+		# Tests 'group' perm bit with 'user2'
+		u = self.request.user
+		self.request.user = User.objects.filter(username = 'user2')[0]
+		success = write_proxy(self.request, tags[3])
+		self.assertTrue(success)
+
+		# Tests 'others' perm bit with 'user3'
+		self.request.user = User.objects.filter(username = 'user3')[0]
+		success = write_proxy(self.request, tags[1])
+		self.assertFalse(success)
+		self.request = u
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2: 
