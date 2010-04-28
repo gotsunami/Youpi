@@ -35,56 +35,65 @@ except ImportError:
 	print 'Please run this command from the terapix subdirectory.'
 	sys.exit(1)
 
-cur = connection.cursor()
-
-images = Image.objects.all()
-for im in images:
-	absimgpath = os.path.join(im.path,im.filename+'.fits')
-	try:
-		hdulist = pyfits.open(absimgpath)
+def get_pixel_scale(imgpath):
+	try: hdulist = pyfits.open(imgpath)
 	except IOError:
-		print "the %s image, which the location from database to %s doesn't exists, skipping image seeing adjustment..." % (im.filename,im.path)
-		continue
+		raise IOError, "The image %s could not be found at %s. Skipped." % (im.filename, im.path)
+
 	pixelscale = 0
-
 	if len(hdulist):
-
 		for i in range(1, len(hdulist)):
 			cd11, cd12, cd21, cd22 = hdulist[i].header['CD1_1'], hdulist[i].header['CD1_2'], hdulist[i].header['CD2_1'], hdulist[i].header['CD2_2']
 			pixelscale += math.sqrt(math.fabs(cd11*cd22 - cd12*cd21))*3600
-
 		pixelscale = pixelscale/(len(hdulist) - 1)
-		q = """
-				SELECT psffwhm, psffwhmmin, psffwhmmax FROM youpi_image AS i 
-				INNER JOIN youpi_rel_it AS it ON i.id = it.image_id 
-				INNER JOIN youpi_processing_task AS t ON t.id = it.task_id 
-				INNER JOIN youpi_plugin_fitsin AS f ON f.task_id = t.id 
-				WHERE i.name=\'%s\';
-	
-			""" % (im.name)
-
-		cur.execute(q)
-		res = cur.fetchall()
-
-		if res:
-			print "pixel scale mean for %s : %s, with current seeing in pixel : %s, right seeing average value : %s" % (absimgpath, pixelscale,res[0][0],pixelscale*float(res[0][0]))
-			u = """
-					UPDATE youpi_plugin_fitsin 
-					INNER JOIN youpi_processing_task ON youpi_plugin_fitsin.task_id = youpi_processing_task.id 
-					INNER JOIN youpi_rel_it ON youpi_processing_task.id = youpi_rel_it.task_id 
-					INNER JOIN youpi_image ON youpi_rel_it.image_id = youpi_image.id 
-					SET psffwhm = \'%s\', psffwhmmin = \'%s\', psffwhmmax = \'%s\' 
-					WHERE youpi_image.name=\'%s\';
-	
-			""" % (round(pixelscale*float(res[0][0]),8),round(pixelscale*float(res[0][1]),8),round(pixelscale*float(res[0][2]),8), im.name)
-			
-			cur.execute(u)
-			connection._commit()
-		else:
-			print "No seeing already updated in data base for image %s" % absimgpath
-
 	else:
-		print "No MEF file, by extension seeing not found (maybe the image is a STACK), skipping..."
-		continue
+		hdulist.close()
+		raise ValueError, "No MEF file found in %s (maybe a stack?). Skipped" % imgpath
 
-connection.close()
+	hdulist.close()
+	return pixelscale
+
+def main():
+	cur = connection.cursor()
+	images = Image.objects.filter(pixelscale = None)
+	print "Images to process: %d" % len(images)
+	k = 0
+	for im in images:
+		absimgpath = os.path.join(im.path, im.filename + '.fits')
+		im.pixelscale = str(get_pixel_scale(absimgpath))
+		im.save()
+		sys.stdout.flush()
+		k += 1
+		print k
+
+#			q = """
+#					SELECT psffwhm, psffwhmmin, psffwhmmax FROM youpi_image AS i 
+#					INNER JOIN youpi_rel_it AS it ON i.id = it.image_id 
+#					INNER JOIN youpi_processing_task AS t ON t.id = it.task_id 
+#					INNER JOIN youpi_plugin_fitsin AS f ON f.task_id = t.id 
+#					WHERE i.name=\'%s\';
+#		
+#				""" % (im.name)
+#
+#			cur.execute(q)
+#			res = cur.fetchall()
+#
+#			if res:
+#				print "pixel scale mean for %s : %s, with current seeing in pixel : %s, right seeing average value : %s" % (absimgpath, pixelscale,res[0][0],pixelscale*float(res[0][0]))
+#				u = """
+#						UPDATE youpi_plugin_fitsin 
+#						INNER JOIN youpi_processing_task ON youpi_plugin_fitsin.task_id = youpi_processing_task.id 
+#						INNER JOIN youpi_rel_it ON youpi_processing_task.id = youpi_rel_it.task_id 
+#						INNER JOIN youpi_image ON youpi_rel_it.image_id = youpi_image.id 
+#						SET psffwhm = \'%s\', psffwhmmin = \'%s\', psffwhmmax = \'%s\' 
+#						WHERE youpi_image.name=\'%s\';
+#				""" % (round(pixelscale*float(res[0][0]), 8), round(pixelscale*float(res[0][1]),8), round(pixelscale*float(res[0][2]),8), im.name)
+#				
+#				cur.execute(u)
+#				connection._commit()
+#			else:
+#				print "No seeing already updated in data base for image %s" % absimgpath
+	connection.close()
+
+if __name__ == '__main__':
+	main()
