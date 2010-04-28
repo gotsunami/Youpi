@@ -15,6 +15,7 @@
 
 from django.conf import settings
 from django.contrib.sessions.models import Session
+from django.http import HttpRequest
 #
 import glob, sys, types, re, os, string, os.path
 import marshal, base64, time
@@ -34,6 +35,8 @@ class ProcessingPlugin(object):
 	Base processing plugin class.
 	"""
 	def __init__(self):
+		# id must be overwritten in sub classes
+		self.id = 'processingplugin'
 		self.shortName = 'My short name here'
 		self.optionLabel = 'My option label'
 		# Default HTML template
@@ -67,6 +70,11 @@ class ProcessingPlugin(object):
 		@param keyword word search in content
 		@returns keyword's value or False
 		"""
+		if type(content) != types.ListType:
+			raise TypeError, "content must be a list of strings"
+		if type(keyword) != types.StringType:
+			raise TypeError, "keyword must be a string"
+
 		for line in content:
 			if line.find(keyword) != -1:
 				if line[-1] == '\n': line = line[:-1]
@@ -99,13 +107,21 @@ class ProcessingPlugin(object):
 		Builds a default output path for the user if oldPath is None.
 		If oldPath (a path to a previously processed item) is a string, then attempts to 
 		replace the old login name with the name of the current request owner.
-		@param oldPath Old output path used for process an item
+		@param oldPath Old output path used for processing an item
 		@param oldUserName Old owner of the processing
 		@return The full output directory path
 		"""
+		if not isinstance(request, HttpRequest):
+			raise TypeError, "request must be an HttpRequest Django instance"
+		if oldPath and type(oldPath) != types.StringType:
+			raise TypeError, "oldPath must be a string"
+		if oldUserName and (type(oldUserName) != types.StringType and type(oldUserName) != types.UnicodeType):
+			raise TypeError, "oldUserName must be a string"
+		if oldPath and not oldUserName:
+			raise TypeError, "oldUserName must be supplied along with oldPath"
 
-		if not oldPath: return os.path.join(settings.PROCESSING_OUTPUT, request.user.username, self.id)
-		return oldPath.replace(oldUserName, request.user.username)
+		if oldPath: return oldPath.replace(oldUserName, request.user.username)
+		return os.path.join(settings.PROCESSING_OUTPUT, request.user.username, self.id)
 
 	def getConfigFileContent(self, request):
 		post = request.POST
