@@ -93,7 +93,7 @@ class DeltaTest(unittest.TestCase):
 
 		# Output
 		g = cv.Delta.sex_to_deg('-13:20:00.0')
-		self.assertEquals(g, types.FloatType)
+		self.assertEquals(type(g), types.FloatType)
 
 
 if __name__ == '__main__':
