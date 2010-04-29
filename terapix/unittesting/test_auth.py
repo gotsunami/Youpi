@@ -77,7 +77,7 @@ class AuthMiscFunctionTest(TestCase):
 	"""
 	Misc functions tests in auth module
 	"""
-	fixtures = ['test_user', 'test_tags']
+	fixtures = ['test_user', 'test_ingestion', 'test_instrument', 'test_channel', 'test_image', 'test_tag']
 
 	def setUp(self):
 		# Build a suitable request for the *_proxy() functions
