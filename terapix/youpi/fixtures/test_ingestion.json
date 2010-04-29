@@ -1,0 +1,49 @@
+[
+	{
+		"model": "youpi.ingestion",
+		"pk": 1,
+		"fields": {
+			"label": "ing1",
+			"user": "1",
+			"group": "1",
+			"start_ingestion_date": "2008-09-24 10:43:22",
+			"end_ingestion_date": "2008-09-24 14:49:16",
+			"email": "semah@iap.fr",
+			"check_fitsverify": "1",
+			"check_multiple_ingestion": "1",
+			"exit_code": "1"
+		}	
+	},
+	{
+		"model": "youpi.ingestion",
+		"pk": 2,
+		"fields": {
+			"label": "ing2",
+			"user": "1",
+			"group": "1",
+			"start_ingestion_date": "2008-09-24 10:43:22",
+			"end_ingestion_date": "2008-09-24 14:49:16",
+			"email": "semah@iap.fr",
+			"check_fitsverify": "1",
+			"check_multiple_ingestion": "1",
+			"exit_code": "1"
+		}
+	},
+	{
+		"model": "youpi.ingestion",
+		"pk": 3,
+		"fields": {
+			"label": "ing3",
+			"user": "2",
+			"group": "2",
+			"start_ingestion_date": "2008-09-24 10:43:22",
+			"end_ingestion_date": "2008-09-24 14:49:16",
+			"email": "semah@iap.fr",
+			"check_fitsverify": "1",
+			"check_multiple_ingestion": "1",
+			"exit_code": "1"
+		}
+	}
+
+
+]

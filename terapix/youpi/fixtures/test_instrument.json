@@ -1,0 +1,23 @@
+[
+	{
+		"model": "youpi.instrument",
+		"pk": 1,
+		"fields": {
+			"name": "MEGACAM"
+		}
+	},
+	{
+		"model": "youpi.instrument",
+		"pk": 2,
+		"fields": {
+			"name": "WIRCAM"
+		}
+	},
+	{
+		"model": "youpi.instrument",
+		"pk": 3,
+		"fields": {
+			"name": "VIRCAM"
+		}
+	}
+]

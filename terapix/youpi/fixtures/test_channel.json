@@ -1,0 +1,44 @@
+[
+	{
+		"model": "youpi.channel",
+		"pk": 1,
+		"fields": {
+			"name": "u",
+			"instrument": "1"
+		}
+	},
+	{
+		"model": "youpi.channel",
+		"pk": 2,
+		"fields": {
+			"name": "g",
+			"instrument": "1"
+		}
+	},
+	{
+		"model": "youpi.channel",
+		"pk": 3,
+		"fields": {
+			"name": "r",
+			"instrument": "1"
+		}
+	},
+	{
+		"model": "youpi.channel",
+		"pk": 4,
+		"fields": {
+			"name": "k",
+			"instrument": "2"
+		}
+	},
+	{
+		"model": "youpi.channel",
+		"pk": 5,
+		"fields": {
+			"name": "y",
+			"instrument": "2"
+		}
+	}
+
+
+]

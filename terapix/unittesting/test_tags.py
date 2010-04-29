@@ -27,7 +27,7 @@ class TagsTest(TestCase):
 	Tests tag module
 	"""
 
-	fixtures = ['test_user', 'test_tags']
+	fixtures = ['test_user', 'test_ingestion', 'test_instrument', 'test_channel', 'test_image', 'test_tag']
 
 	def setUp(self):
 		self.client = Client()
@@ -69,6 +69,14 @@ class TagsTest(TestCase):
  		self.assertTrue(ftags.has_key('info'))
 		self.assertEquals(len(ftags['info']), 0)
 
+	def test_get_images_from_tags(self):
+		self.client.login(username='user1', password='youpi')
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.get_images_from_tags'), {'Tags': '[\'tag1\']'})
+		tagList = json.decode(response.content)
+		self.assertEquals(type(tagList),types.DictType)
+		for t in ['fields', 'data', 'hidden']:
+			self.assertTrue(tagList.has_key(t))
+			self.assertEquals(type(tagList[t]),types.ListType)
 
 if __name__ == '__main__':
 	unittest.main()

@@ -38,5 +38,37 @@
 			"group": "2",
 			"mode": "460"
 		}
+	},
+	{
+		"model": "youpi.rel_tagi",
+		"pk": 1,
+		"fields": {
+			"image": "1",
+			"tag": "1"
+		}
+	},
+	{
+		"model": "youpi.rel_tagi",
+		"pk": 2,
+		"fields": {
+			"image": "2",
+			"tag": "1"
+		}
+	},
+	{
+		"model": "youpi.rel_tagi",
+		"pk": 3,
+		"fields": {
+			"image": "3",
+			"tag": "1"
+		}
+	},
+	{
+		"model": "youpi.rel_tagi",
+		"pk": 4,
+		"fields": {
+			"image": "4",
+			"tag": "2"
+		}
 	}
 ]

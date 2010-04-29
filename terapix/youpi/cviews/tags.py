@@ -78,6 +78,7 @@ def get_images_from_tags(request):
 	"""
 	Returns list of matching images ids (formatted for Image Selector)
 	"""
+	# FIXME: not used?
 
 	try:
 		tags = eval(request.POST['Tags'])
@@ -103,7 +104,7 @@ def get_images_from_tags(request):
 		if keep:
 			idList.append([str(id)])
 
-	return HttpResponse(str({'fields': ['id'], 'data': idList, 'hidden': ['']}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'fields': ['id'], 'data': idList, 'hidden': ['']}), mimetype = 'text/plain')
 
 @login_required
 @profile
