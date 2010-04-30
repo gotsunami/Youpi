@@ -21,6 +21,7 @@ import os, os.path
 import sys, time, string
 import marshal, base64, zlib
 import xml.dom.minidom as dom
+import xml
 import socket, shutil, re, glob
 #
 sys.path.insert(0, '..')
@@ -159,17 +160,65 @@ def getJobClusterId(userData):
 
 	return "%s.%s" % (jobData['ClusterId'], jobData['ProcId'])
 
+def parse_psfex_xml(file_path, field_names):
+	"""
+	Parses a psfex.xml file (VOTable)
+
+	@param file_path path to the XML file
+	@param field_names tuple of fields names to look for
+	@return a tuple of (dictionary, tuple of fields not found).
+	Ex: ({'FWHM_Min': {'idx': 1, 'value': u'2.7587'}, ...}, ('Chi2_Min', 'Chi2_Max'))
+	"""
+	doc = dom.parse(file_path)
+	tables = doc.getElementsByTagName('TABLE')
+	# Main table
+	tableNode = None
+	for t in tables:
+		if not t.hasAttribute('ID'): continue
+		if t.getAttribute('ID') == 'PSF_Fields':
+			tableNode = t
+
+	if not tableNode:
+		raise xml.dom.NotFoundErr, "No TABLE element with attribute ID=PSF_Fields found in the current document"
+
+	# First looks for position idx of fields element
+	fields = tableNode.getElementsByTagName('FIELD')
+	fieldMap = {}
+	fieldNotFound = []
+	k = 0
+	for f in fields:
+		for fname in field_names:
+			if f.getAttribute('name') == fname:
+				fieldMap[fname] = {'idx': k}
+		k += 1
+	# Keep a trace of missing fields
+	for f in field_names:
+		if f not in fieldMap.keys():
+			fieldNotFound.append(f)
+
+	# Not look for matching values
+	try: tableData = tableNode.getElementsByTagName('TABLEDATA')[0]
+	except: raise xml.dom.NotFoundErr, "No TABLEDATA element found. Maybe the file is corrupted."
+
+	row = tableData.getElementsByTagName('TR')[0]
+	dataCols = row.getElementsByTagName('TD')
+	for field, v in fieldMap.iteritems():
+		fieldMap[field]['value'] = dataCols[v['idx']].firstChild.nodeValue
+
+	return fieldMap, tuple(fieldNotFound)
+
 def ingestQFitsInResults(fitsinId, g):
 	"""
 	Stores results from QFits-in outputs.
 	"""
+	from common import get_pixel_scale
 
-	imgName = g.execute("""
-SELECT i.name FROM youpi_rel_it AS r, youpi_image AS i, youpi_plugin_fitsin AS f 
+	imgName, imgPath, pixelscale, imgId = g.execute("""
+SELECT i.name, i.path, i.pixelscale, i.id FROM youpi_rel_it AS r, youpi_image AS i, youpi_plugin_fitsin AS f 
 WHERE r.task_id=f.task_id 
 AND f.id=%s 
 AND r.image_id=i.id;
-""" % fitsinId)[0][0]
+""" % fitsinId)[0]
 
 	# Log string that will be stored into DB at the end
 	log = '+' + '-' * 20 + (" QualityFITS XML parsing results for %s " % imgName) + '-' * 20 + "\n"
@@ -186,29 +235,64 @@ AND r.image_id=i.id;
 								'ATTR_name' : 'name',
 								'ATTR_values': (('AstromOffset_Reference', 	'astoffra'), 
 												('AstromSigma_Reference', 	'astoffde')) },
-				'psfex.xml' : {	'XML_elem'	: 'PARAM',
-								'ATTR_name' : 'name',
-								'ATTR_values': (('FWHM_Min', 			'psffwhmmin'),
-												('FWHM_Mean', 			'psffwhm'),
-												('FWHM_Max', 			'psffwhmmax'),
-												('Elongation_Min', 		'psfelmin'),
-												('Elongation_Mean', 	'psfel'),
-												('Elongation_Max', 		'psfelmax'),
-												('Chi2_Min', 			'psfchi2min'),
-												('Chi2_Mean', 			'psfchi2'),
-												('Chi2_Max', 			'psfchi2max'),
-												('Residuals_Min', 		'psfresimin'),
-												('Residuals_Mean', 		'psfresi'),
-												('Residuals_Max', 		'psfresimax'),
-												('Asymetry_Min', 		'psfasymmin'),
-												('Asymetry_Mean', 		'psfasym'),
-												('Asymetry_Max', 		'psfasymmax'),
-												('NStars_Accepted_Min', 'nstarsmin'),
-												('NStars_Accepted_Mean','nstars'),
-												('NStars_Accepted_Max', 'nstarsmax')) },
 				# Different file format
 				'accept.xml' : { 'Mbkg' : 'bkg'}
 			}
+
+	# Parses psfex.xml data
+	# DB fields mapping
+	psfexKeywords = {
+		'FWHM_Min': 			'psffwhmmin',
+		'FWHM_Mean': 			'psffwhm',
+		'FWHM_Max':				'psffwhmmax',
+		'Elongation_Min':		'psfelmin',
+		'Elongation_Mean':		'psfel',
+		'Elongation_Max':		'psfelmax',
+		'Chi2_Min':				'psfchi2min',
+		'Chi2_Mean':			'psfchi2',
+		'Chi2_Max':				'psfchi2max',
+		'Residuals_Min':		'psfresimin',
+		'Residuals_Mean':		'psfresi',
+		'Residuals_Max':		'psfresimax',
+		'Asymetry_Min':			'psfasymmin',
+		'Asymetry_Mean':		'psfasym',
+		'Asymetry_Max':			'psfasymmax',
+		'NStars_Accepted_Min':	'nstarsmin',
+		'NStars_Accepted_Mean':	'nstars',
+		'NStars_Accepted_Max':	'nstarsmax', 
+	}
+	psfexFieldNames = (
+		'FWHM_Min', 'FWHM_Mean', 'FWHM_Max', 'Elongation_Min', 'Elongation_Mean', 
+		'Elongation_Max', 'Chi2_Min', 'Chi2_Mean', 'Chi2_Max', 'Residuals_Min',
+		'Residuals_Mean', 'Residuals_Max', 'Asymetry_Min', 'Asymetry_Mean',
+		'Asymetry_Max', 'NStars_Accepted_Min', 'NStars_Accepted_Mean', 
+		'NStars_Accepted_Max',
+	)
+	psfexData, missingFields = parse_psfex_xml(os.path.join(qfits_path, 'psfex.xml'), psfexFieldNames)
+	for miss in missingFields:
+		log += "[%s] %s: no value found\n" % ('psfex.xml', miss)
+	for k, v in psfexData.iteritems():
+		fxdata[psfexKeywords[k]] = v['value']
+
+	realImgName = userData['RealImageName']
+	if not pixelscale:
+		ps = round(get_pixel_scale(os.path.join(imgPath, realImgName + '.fits')), 8)
+		log += "[info] Image's pixel scale not found in DB (computing now)\n"
+		# Stores the pixel scale value into the DB
+		try:
+			g.setTableName('youpi_image')
+			g.update(	pixelscale = ps,
+						wheres = {'id': imgId} )
+			log += "[info] Pixel scale: %.8f\n" % ps
+		except Exception, e:
+			raise WrapperError, e
+	else:
+		ps = float(pixelscale)
+		log += "[info] Used a pixel scale of %.8f to compute image seeing in arcsec\n" % ps
+
+	# Converts PSF values from pixels to arcsec
+	for psfk in ('FWHM_Min', 'FWHM_Mean', 'FWHM_Max'):
+		fxdata[psfexKeywords[psfk]] = round(ps * float(fxdata[psfexKeywords[psfk]]), 8)
 
 	for file, rules in keywords.iteritems():
 		try:
