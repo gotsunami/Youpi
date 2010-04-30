@@ -160,6 +160,44 @@ def getJobClusterId(userData):
 
 	return "%s.%s" % (jobData['ClusterId'], jobData['ProcId'])
 
+def parse_psfex_old_xml(file_path, field_names):
+	"""
+	Parses old psfex.xml file (non VOTable)
+
+	@param file_path path to the XML file
+	@param field_names tuple of fields names to look for
+	@return a tuple of (dictionary, tuple of fields not found).
+	Ex: ({'FWHM_Min': {'idx': 1, 'value': u'2.7587'}, ...}, ('Chi2_Min', 'Chi2_Max'))
+	"""
+	doc = dom.parse(file_path)
+	tables = doc.getElementsByTagName('TABLE')
+	# Main table
+	tableNode = None
+	for t in tables:
+		if not t.hasAttribute('ID'): continue
+		if t.getAttribute('ID') == 'PSF':
+			tableNode = t
+
+	if not tableNode:
+		raise xml.dom.NotFoundErr, "No TABLE element with attribute ID=PSF found in the current XML document"
+
+	# First looks for position idx of fields element
+	fields = tableNode.getElementsByTagName('PARAM')
+	fieldMap = {}
+	fieldNotFound = []
+	k = 0
+	for f in fields:
+		for fname in field_names:
+			if f.getAttribute('name') == fname:
+				fieldMap[fname] = {'idx': k, 'value': f.getAttribute('value')}
+		k += 1
+	# Keep a trace of missing fields
+	for f in field_names:
+		if f not in fieldMap.keys():
+			fieldNotFound.append(f)
+
+	return fieldMap, tuple(fieldNotFound)
+
 def parse_psfex_xml(file_path, field_names):
 	"""
 	Parses a psfex.xml file (VOTable)
@@ -179,7 +217,7 @@ def parse_psfex_xml(file_path, field_names):
 			tableNode = t
 
 	if not tableNode:
-		raise xml.dom.NotFoundErr, "No TABLE element with attribute ID=PSF_Fields found in the current document"
+		raise xml.dom.NotFoundErr, "No TABLE element with attribute ID=PSF_Fields found in the current XML document"
 
 	# First looks for position idx of fields element
 	fields = tableNode.getElementsByTagName('FIELD')
@@ -207,9 +245,17 @@ def parse_psfex_xml(file_path, field_names):
 
 	return fieldMap, tuple(fieldNotFound)
 
-def ingestQFitsInResults(fitsinId, g):
+def ingestQFitsInResults(cluster_output_path, userData, fitsinId, g):
 	"""
-	Stores results from QFits-in outputs.
+	Stores results from QFits-in outputs. Most function arguments are also available 
+	globally but this function may be accessed by external scripts, so it's actually 
+	better to pass data as function arguments.
+
+	@param cluster_output_path path to job output on the cluster, e.g. os.path.join(settings.PROCESSING_OUTPUT, 
+	username, userData['Kind'])
+	@param userData user data send to the wrapper at the beginning of the job
+	@param fitsinId QFits job DB id
+	@param g DBGeneric instance to issue query
 	"""
 	from common import get_pixel_scale
 
@@ -222,7 +268,7 @@ AND r.image_id=i.id;
 
 	# Log string that will be stored into DB at the end
 	log = '+' + '-' * 20 + (" QualityFITS XML parsing results for %s " % imgName) + '-' * 20 + "\n"
-	qfits_path = os.path.join(CLUSTER_OUTPUT_PATH, imgName, 'qualityFITS')
+	qfits_path = os.path.join(cluster_output_path, imgName, 'qualityFITS')
 	log += "From path: %s\n\n" % qfits_path
 
 	# Final XML data to store into DB
@@ -268,13 +314,22 @@ AND r.image_id=i.id;
 		'Asymetry_Max', 'NStars_Accepted_Min', 'NStars_Accepted_Mean', 
 		'NStars_Accepted_Max',
 	)
-	psfexData, missingFields = parse_psfex_xml(os.path.join(qfits_path, 'psfex.xml'), psfexFieldNames)
+
+	psfex_file = os.path.join(qfits_path, 'psfex.xml')
+	try:
+		psfexData, missingFields = parse_psfex_xml(psfex_file, psfexFieldNames)
+	except xml.dom.NotFoundErr, e:
+		# Most probably an old XML format from an old version of psfex
+		# Reparsing using the old method
+		psfexData, missingFields = parse_psfex_old_xml(psfex_file, psfexFieldNames)
+
 	for miss in missingFields:
 		log += "[%s] %s: no value found\n" % ('psfex.xml', miss)
 	for k, v in psfexData.iteritems():
 		fxdata[psfexKeywords[k]] = v['value']
 
 	realImgName = userData['RealImageName']
+	# Checks whether to compute image pixel scale
 	if not pixelscale:
 		ps = round(get_pixel_scale(os.path.join(imgPath, realImgName + '.fits')), 8)
 		log += "[info] Image's pixel scale not found in DB (computing now)\n"
@@ -361,8 +416,7 @@ AND r.image_id=i.id;
 	except Exception, e:
 		raise WrapperError, e
 
-	# For debugging purpose
-	debug(log)
+	return log
 
 def task_start_log(userData, start, kind_id = None):
 	
@@ -713,7 +767,7 @@ def process(userData, kind_id, argv):
 				fitsin_id = g.con.insert_id()
 	
 				# Now results ingestion takes place
-				ingestQFitsInResults(fitsin_id, g)
+				ingestQFitsInResults(userData['ResultsOutputDir'], userData, fitsin_id, g)
 			except Exception, e:
 				raise WrapperError, e
 
