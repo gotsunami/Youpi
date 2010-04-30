@@ -20,5 +20,26 @@ def get_title_from_menu_id(menuId):
 		for m in p:
 			if m['id'] == menuId:
 				return m['title']
-
 	return None
+
+def get_pixel_scale(imgpath):
+	import pyfits, math
+	# Do not put this function in the wrapper processing script 
+	# because it is used by the ingestion script on the cluster too.
+	try: hdulist = pyfits.open(imgpath)
+	except IOError:
+		raise IOError, "The image could not be found at %s. Skipped." % imgpath
+
+	pixelscale = 0.
+	if len(hdulist):
+		for i in range(1, len(hdulist)):
+			cd11, cd12, cd21, cd22 = hdulist[i].header['CD1_1'], hdulist[i].header['CD1_2'], hdulist[i].header['CD2_1'], hdulist[i].header['CD2_2']
+			pixelscale += math.sqrt(math.fabs(cd11*cd22 - cd12*cd21))*3600
+		pixelscale = pixelscale/(len(hdulist) - 1)
+	else:
+		hdulist.close()
+		raise ValueError, "No MEF file found in %s (maybe a stack?). Skipped" % imgpath
+
+	hdulist.close()
+	return pixelscale
+
