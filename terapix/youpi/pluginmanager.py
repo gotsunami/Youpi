@@ -113,7 +113,7 @@ class ProcessingPlugin(object):
 		"""
 		if not isinstance(request, HttpRequest):
 			raise TypeError, "request must be an HttpRequest Django instance"
-		if oldPath and type(oldPath) != types.StringType:
+		if oldPath and (type(oldPath) != types.StringType and type(oldPath) != types.UnicodeType):
 			raise TypeError, "oldPath must be a string"
 		if oldUserName and (type(oldUserName) != types.StringType and type(oldUserName) != types.UnicodeType):
 			raise TypeError, "oldUserName must be a string"
