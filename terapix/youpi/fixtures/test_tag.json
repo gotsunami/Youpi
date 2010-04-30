@@ -6,7 +6,8 @@
 			"name": "tag1",
 			"user": "1",
 			"group": "1",
-			"mode": "640"
+			"mode": "640",
+			"style": "background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;"
 		}
 	},
 	{

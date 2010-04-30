@@ -78,6 +78,35 @@ class TagsTest(TestCase):
 			self.assertTrue(tagList.has_key(t))
 			self.assertEquals(type(tagList[t]),types.ListType)
 
+	def test_save_tag(self):
+		self.client.login(username='user1', password='youpi')
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.save_tag'), {'Name': 'tag5', 'Comment': '', 'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'})
+		save = json.decode(response.content)
+		self.assertEquals(type(save), types.DictType)
+		self.assertTrue(save.has_key('saved'))
+		self.assertEquals(type(save['saved']), types.StringType)
+
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.save_tag'), {'Name': 'tag1', 'Comment': '', 'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'})
+		error = json.decode(response.content)
+		self.assertEquals(type(error), types.DictType)
+		self.assertTrue(error.has_key('Error'))
+		self.assertEquals(type(error['Error']), types.StringType)
+
+		#FIXME function needs one more test to be done for a user with no add_tag permissions, need new fixtures for this
+
+	def test_update_tag(self):
+		self.client.login(username='user1', password='youpi')
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.update_tag'), {'Name': 'tag-toto', 'NameOrig': 'tag1', 'Comment': '', 'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'})
+		update = json.decode(response.content)
+		self.assertEquals(type(update),types.DictType)
+		for i in ['updated', 'oldname']:
+			self.assertTrue(update.has_key(i))
+			self.assertEquals(type(update[i]), types.StringType)
+		
+		self.assertTrue(update.has_key('success'))
+		self.assertEquals(type(update['success']), types.BooleanType)
+
+
 if __name__ == '__main__':
 	unittest.main()
 	if len(sys.argv) == 2:

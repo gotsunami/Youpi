@@ -122,6 +122,7 @@ def save_tag(request):
 		return HttpResponseForbidden()
 
 	# First check for permission
+
 	if not request.user.has_perm('youpi.add_tag'):
 		return HttpResponse(json.encode({
 			'Error': "Sorry, you don't have permission to add tags",
@@ -132,9 +133,9 @@ def save_tag(request):
 		tag = Tag(name = name, user = request.user, comment = comment, style = style, mode = profile.dflt_mode, group = profile.dflt_group)
 		tag.save()
 	except Exception, e:
-		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
+		return HttpResponse(json.encode({'Error' : str(e)}), mimetype = 'text/plain')
 
-	return HttpResponse(str({'saved' : str(name)}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'saved' : str(name)}), mimetype = 'text/plain')
 
 @login_required
 @profile
