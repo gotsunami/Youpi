@@ -20,38 +20,22 @@ import sys, os, string, curses, os.path
 import marshal, base64, types, re
 import datetime, time
 from optparse import OptionParser
-from terminal import *
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'terapix.settings'
 if '..' not in sys.path:
 	sys.path.insert(0, '..')
 
 try:
-	from django.db import IntegrityError
 	from decimal import getcontext
-	from django.conf import settings
 	from terapix.youpi.models import *
-	from django.db import connection
-except ImportError:
+	from terapix.lib.common import get_pixel_scale
+	#
+	from django.conf import settings
+	from django.db import IntegrityError, connection
+except ImportError, e:
+	raise ImportError, e
 	print 'Please run this command from the terapix subdirectory.'
 	sys.exit(1)
-
-def get_pixel_scale(imgpath):
-	try: hdulist = pyfits.open(imgpath)
-	except IOError:
-		raise IOError, "The image %s could not be found at %s. Skipped." % (im.filename, im.path)
-
-	pixelscale = 0
-	if len(hdulist):
-		for i in range(1, len(hdulist)):
-			cd11, cd12, cd21, cd22 = hdulist[i].header['CD1_1'], hdulist[i].header['CD1_2'], hdulist[i].header['CD2_1'], hdulist[i].header['CD2_2']
-			pixelscale += math.sqrt(math.fabs(cd11*cd22 - cd12*cd21))*3600
-		pixelscale = pixelscale/(len(hdulist) - 1)
-	else:
-		hdulist.close()
-		raise ValueError, "No MEF file found in %s (maybe a stack?). Skipped" % imgpath
-
-	hdulist.close()
-	return pixelscale
 
 def main():
 	cur = connection.cursor()
@@ -96,4 +80,25 @@ def main():
 	connection.close()
 
 if __name__ == '__main__':
-	main()
+	#main()
+	import wrapper_processing as wp
+	psfexFieldNames = (
+		'FWHM_Min', 'FWHM_Mean', 'FWHM_Max', 'Elongation_Min', 'Elongation_Mean', 
+		'Elongation_Max', 'Chi2_Min', 'Chi2_Mean', 'Chi2_Max', 'Residuals_Min',
+		'Residuals_Mean', 'Residuals_Max', 'Asymetry_Min', 'Asymetry_Mean',
+		'Asymetry_Max', 'NStars_Accepted_Min', 'NStars_Accepted_Mean', 
+		'NStars_Accepted_Max', 
+	)
+#	print wp.parse_psfex_xml('/tmp/psfex.xml', psfexFieldNames)
+
+	from DBGeneric import DB, DBGeneric
+	db = DB(host = settings.DATABASE_HOST,
+			user = settings.DATABASE_USER,
+			passwd = settings.DATABASE_PASSWORD,
+			db = settings.DATABASE_NAME)
+	g = DBGeneric(db.con)
+	wp.ingestQFitsInResults(35824, g)
+	g.con.commit()
+	db.close()
+
+
