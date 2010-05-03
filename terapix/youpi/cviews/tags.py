@@ -191,7 +191,7 @@ def tag_mark_images(request, createTag = False, idList = None, tagnames = None):
 	@param idList list of images to tag (optional)
 	@param tags list of tag names (optional)
 	"""
-
+	print createTag
 	try:
 		tagnames = eval(request.POST['Tags'])
 		idList = eval(request.POST['IdList'])[0]
