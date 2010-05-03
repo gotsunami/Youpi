@@ -21,3 +21,4 @@ from terapix.unittesting.test_coordconvert import *
 from terapix.unittesting.test_auth import *
 from terapix.unittesting.test_tags import *
 from terapix.unittesting.test_pluginmanager import *
+from terapix.unittesting.test_lib_common import *

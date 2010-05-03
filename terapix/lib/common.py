@@ -11,7 +11,7 @@
 #
 ##############################################################################
 
-import os.path
+import os.path, types
 
 def get_title_from_menu_id(menuId):
 	from youpi.context_processors import appmenu
@@ -23,6 +23,14 @@ def get_title_from_menu_id(menuId):
 	return None
 
 def get_pixel_scale(imgpath):
+	"""
+	Computes an image's pixel scale
+
+	@param imgpath full path to the image on the filesystem
+	@returns a computes image pixel scale value (float)
+	"""
+	if type(imgpath) != types.StringType:
+		raise TypeError, "imgpath must be a string"
 	import pyfits, math
 	# Do not put this function in the wrapper processing script 
 	# because it is used by the ingestion script on the cluster too.
