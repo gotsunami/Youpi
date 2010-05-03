@@ -235,7 +235,7 @@ def get_global_report(request, reportId):
 					tables.append('youpi_processing_task AS task')
 					tables.append('youpi_rel_it AS relit')
 				if updated: query += " AND"
-				query += ' fitsin.psffwhmmin >= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['seeing_min']
+				query += ' fitsin.psffwhm >= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['seeing_min']
 				updated = True
 			if post['seeing_max']:
 				if not post['elongation_min'] and not post['elongation_max'] and not post['seeing_min']:
@@ -243,7 +243,7 @@ def get_global_report(request, reportId):
 					tables.append('youpi_processing_task AS task')
 					tables.append('youpi_rel_it AS relit')
 				if updated: query += " AND"
-				query += ' fitsin.psffwhmmax <= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['seeing_max']
+				query += ' fitsin.psffwhm <= %s AND fitsin.task_id = task.id AND relit.task_id = task.id AND relit.image_id = i.id' % post['seeing_max']
 				updated = True
 			if post['sky_background_min']:
 				if not post['elongation_min'] and not post['elongation_max'] and not post['seeing_min'] and not post['seeing_max']:
@@ -290,7 +290,7 @@ def get_global_report(request, reportId):
 
 			tquery = tquery % ','.join(tables)
 			if updated: tquery += ' WHERE '
-			query = tquery + query + ';'
+			query = tquery + query + ' AND task.success=1;'
 
 			# If WHERE not in query, there will be too much results
 			if query.find('WHERE') == -1 and not post['right_ascension_RA']:
@@ -432,10 +432,32 @@ def get_global_report(request, reportId):
 			tquery = tquery % (', '.join(fields), ', '.join(tables))
 			query = tquery + query
 			if updated: query += ' AND'
-			query += " i.id IN (%s);" % ','.join(res)
+			if query.find('youpi_processing_task') > 0:
+				query += " i.id IN (%s) AND task.success=1;" % ','.join(res)
+			else:
+				query += " i.id IN (%s);" % ','.join(res)
 			cursor.execute(query)
 			res = cursor.fetchall()
 			db.close()
+
+			# Too much results?
+			if len(res) > 1500:
+				report_content = """
+<h3 style="margin-bottom: 20px; color: brown;">Waaaayyy too much results (>1500)! For performance reasons, please refine your selection criteria.</h3>
+<script type="text/javascript">
+	report_menu_insert('Toggle selected criteria', function() {var d=$('criteria'); d.visible()?d.hide():d.show();});
+	report_menu_insert('Generate!', function() {d=$('report_form').submit();});
+</script>
+<div id="criteria" style="display: none;">
+	<div>%s</div>
+</div>
+</form>
+	""" % tdata
+				return render_to_response('report.html', {	
+									'report_title' 		: 'Advanced image report (HTML, PDF)',
+									'report_content' 	: report_content,
+									'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+				}, context_instance = RequestContext(request))
 
 			# Final res list
 			f_res = []
