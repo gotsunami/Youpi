@@ -63,9 +63,18 @@ def updatePixelScale(g):
 		filename = im.filename
 		absimgpath = os.path.join(im.path, filename + '.fits')
 		if not SIMULATE:
-			im.pixelscale = str(get_pixel_scale(absimgpath))
-			im.save()
-		vout = " Image %05d/%d %s (%s), pixel scale: %s" % (done+1, total, im.name, im.filename, im.pixelscale)
+			try:
+				im.pixelscale = str(get_pixel_scale(absimgpath))
+				im.save()
+			except IOError, e:
+				print "[Error] %s" %e
+				continue
+			except ValueError, e:
+				print "[Error] %s" %e
+				continue
+
+		ps = im.pixelscale
+		vout = " Image %05d/%d %s (%s), pixel scale: %s" % (done+1, total, im.name, im.filename, ps)
 		if VERBOSE:
 			print '-' * 2 + vout + '-' * 30
 		else:

@@ -26,7 +26,7 @@ def get_pixel_scale(imgpath):
 	import pyfits, math
 	# Do not put this function in the wrapper processing script 
 	# because it is used by the ingestion script on the cluster too.
-	try: hdulist = pyfits.open(imgpath)
+	try: hdulist = pyfits.open(imgpath)[1:]
 	except IOError:
 		raise IOError, "The image could not be found at %s. Skipped." % imgpath
 
