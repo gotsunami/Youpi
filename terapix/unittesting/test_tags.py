@@ -80,13 +80,23 @@ class TagsTest(TestCase):
 
 	def test_save_tag(self):
 		self.client.login(username='user1', password='youpi')
-		response = self.client.post(reverse('terapix.youpi.cviews.tags.save_tag'), {'Name': 'tag5', 'Comment': '', 'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'})
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.save_tag'), {
+		'Name': 'tag5',
+		'Comment': '',
+		'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'
+		})
+
 		save = json.decode(response.content)
 		self.assertEquals(type(save), types.DictType)
 		self.assertTrue(save.has_key('saved'))
 		self.assertEquals(type(save['saved']), types.StringType)
 
-		response = self.client.post(reverse('terapix.youpi.cviews.tags.save_tag'), {'Name': 'tag1', 'Comment': '', 'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'})
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.save_tag'), {
+		'Name': 'tag1',
+		'Comment': '',
+		'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'
+		})
+
 		error = json.decode(response.content)
 		self.assertEquals(type(error), types.DictType)
 		self.assertTrue(error.has_key('Error'))
@@ -96,7 +106,12 @@ class TagsTest(TestCase):
 
 	def test_update_tag(self):
 		self.client.login(username='user1', password='youpi')
-		response = self.client.post(reverse('terapix.youpi.cviews.tags.update_tag'), {'Name': 'tag-toto', 'NameOrig': 'tag1', 'Comment': '', 'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'})
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.update_tag'), {
+		'Name': 'tag-toto', 
+		'NameOrig': 'tag1', 
+		'Comment': '', 
+		'Style': 'background-color: rgb(64, 150, 238); color:white; border:medium none -moz-use-text-color;'
+		})
 		update = json.decode(response.content)
 		self.assertEquals(type(update),types.DictType)
 		for i in ['updated', 'oldname']:
@@ -106,6 +121,28 @@ class TagsTest(TestCase):
 		self.assertTrue(update.has_key('success'))
 		self.assertEquals(type(update['success']), types.BooleanType)
 
+	def test_delete_tag(self):
+		self.client.login(username='user1', password='youpi')
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.delete_tag'), {'Name': 'tag1'})
+		dtags = json.decode(response.content)
+		self.assertTrue(type(dtags), types.DictType)
+		for k in ['success', 'deleted']:
+			self.assertTrue(dtags.has_key(k))
+			self.assertEquals(type(dtags['deleted']),types.StringType)
+			self.assertEquals(type(dtags['success']),types.BooleanType)
+
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.delete_tag'), {'Name': 'toto'})
+		dtags = response.content
+		self.assertEquals(type(dtags), types.StringType)
+
+	def test_tag_mark_images(self):
+		self.client.login(username='user1', password='youpi')
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.tag_mark_images'),{
+		'Tags': '[\'toto\']',
+		'IdList': '[\'1\',\'2\',\'3\']'
+		})
+		
+		self.assertEquals(type(response.content), types.StringType)
 
 if __name__ == '__main__':
 	unittest.main()
