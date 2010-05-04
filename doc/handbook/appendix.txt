@@ -31,12 +31,15 @@ Version 0.6.1
 - New ``MAINTENANCE`` mode for maintenance operations
 - Various :ref:`performance improvements in production environment <improve_performance>` (by 
   combining static Javascript and CSS files into single files and `minifying`_ their content)
+- New command line tool ``script/changeseeing.py`` to compute and store images pixel scale and 
+  reprocess all QualityFITS XML output results. Please see the :ref:`Release Notes <script_changeseeing>` 
+  for more information.
 
 .. _minifying: http://en.wikipedia.org/wiki/Minify
 
 **Bug fixes**:
 
-- Better handling of processings with already ingested images
+- Processings will not fail anymore when working with re-ingested images
 - Ingestion: fixed bug during target hostname resolution
 - Image selector: stops loading and displays a user-friendly message when no images available 
   (no ingestions at all)
@@ -46,6 +49,7 @@ Version 0.6.1
 - QualityFITS results: fixed counter value for already graded images
 - QualityFITS: fixed "list of all non graded images" report
 - QualityFITS: fixed broken "reprocess" button on the results page
+- QualityFITS: fixed psfex's XML output parsing
 - Grading script: fixed custom comment issue
 - Processing history results: fixed a ``Server Error`` issue when resetting the search form
 - Path selector widget: fixed automatic path selection
@@ -96,6 +100,24 @@ In order to **upgrade from 0.6**, please do the following:
    files from the command line (otherwise they get generated automatically on-the-fly)::
 
 	$ python manage.py synccompress
+
+.. _script_changeseeing:
+
+4. *(This step is optional)* The database structure has been altered for this release. You may want to 
+   compute images pixel scale values or reprocess all QualityFITS XML results using the 
+   ``script/changeseeing.py`` script. Try a::
+
+	$ python script/changeseeing.py -p -v
+
+   to compute all images pixel scale, then:: 
+
+	$ python script/changeseeing.py -q -v
+
+   to reingest all successful QualityFITS XML results. Other options are available through 
+   the ``changeseeing.py -h`` command.
+
+   .. note:: Those two commands may take a long time to complete depending on the amount of 
+             information stored in your database.
 
 In order to **upgrade from 0.5.2** *or later*, please do the following:
 
