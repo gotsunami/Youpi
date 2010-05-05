@@ -389,39 +389,22 @@ function results_showDetails(pname, id, fullpage) {
  * to add output directory support to your plugin.
  *
  */
-function plugin_enableOutputDirectory(div_id, data_path) {
-	var div = document.getElementById(div_id);
-	var p = document.createElement('p');
-	p.setAttribute('style', 'margin-top: 30px; font-size: 12px;');
-	p.appendChild(document.createTextNode('By default, all data produced will be stored into '));
-	var tt = document.createElement('tt');
-	tt.setAttribute('style', 'color: green');
-	tt.appendChild(document.createTextNode(data_path));
-	p.appendChild(tt);
-	p.appendChild(document.createTextNode('.'));
-	div.appendChild(p);
-	
-	p = document.createElement('p');
-	p.setAttribute('style', 'margin-top: 30px; font-size: 12px; font-weight: bold;');
-	p.appendChild(document.createTextNode('For convenience, you can append a custom directory suffix that will be used to save output data '));
-	var u = document.createElement('u');
-	u.appendChild(document.createTextNode('for this cart item only'));
-	p.appendChild(u);
-	p.appendChild(document.createTextNode(':'));
-	p.appendChild(document.createElement('br'));
-	var d = document.createElement('div');
-	d.setAttribute('style', 'width: 60%; background-color: lightgray; padding: 10px; margin-top: 10px;');
-	var tt = document.createElement('tt');
-	tt.appendChild(document.createTextNode(data_path));
-	var input = document.createElement('input');
-	input.setAttribute('id', 'output_path_input');
-	input.setAttribute('type', 'text');
-	input.setAttribute('size', '20');
-	tt.appendChild(input);
-	d.appendChild(tt);
-	d.appendChild(document.createTextNode('/'));
-	p.appendChild(d);
-	div.appendChild(p);
+function plugin_enableOutputDirectory(div_id, data_path, random_seed) {
+	var div = $(div_id);
+	var p = new Element('p').setStyle({marginTop: '30px', fontSize: '12px'});
+	p.update('By default, all data produced will be stored into ').insert(
+		new Element('tt').setStyle({color: 'green'}).update(data_path + random_seed + '/')
+	).insert('.');
+	div.insert(p);
+
+	p = new Element('p').setStyle({marginTop: '30px', fontSize: '12px', fontWeight: 'bold'});
+	p.update('For convenience, you can change the directory suffix that will be used to save output data ');
+	p.insert(new Element('u').update('for this cart item only')).insert(':').insert(new Element('br'));
+	var d = new Element('div').setStyle({width: '60%', backgroundColor: 'lightgray', padding: '10px', marginTop: '10px'});
+	var input = new Element('input', {id: 'output_path_input', type: 'text', size: '20', value: random_seed});
+	d.update(new Element('tt').update(data_path).insert(input).insert('/'));
+	p.insert(d);
+	div.insert(p);
 }
 
 /*

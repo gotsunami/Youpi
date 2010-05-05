@@ -43,7 +43,7 @@
 	fm_file_browser.setRootDataPath(_fileBrowserSettings.rootDataPath);
 
 	// Enable user output custom directory
-	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+	plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/', '{{ random_seed }}');
 
 	var selector = new PathSelectorWidget('selector_div', '{{ plugin.id }}');
 	selector.addPath('WEIGHT data', 'weights', {

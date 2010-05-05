@@ -35,7 +35,7 @@
 		{{ plugin.id }}.selectImages();
 
 		// Enable user output custom directory
-		plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+		plugin_enableOutputDirectory('menuitem_sub_3', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/', '{{ random_seed }}');
 
 	});
 

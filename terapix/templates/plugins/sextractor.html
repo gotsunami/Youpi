@@ -98,7 +98,7 @@
 	fm_file_browser.setRootDataPath(_fileBrowserSettings.rootDataPath);
 
 	// Enable user output custom directory
-	plugin_enableOutputDirectory('menuitem_sub_4', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/');
+	plugin_enableOutputDirectory('menuitem_sub_4', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/', '{{ random_seed }}');
 		
 	var selector1 = new PathSelectorWidget('selector1_div', '{{ plugin.id }}');
 	selector1.addPath('FLAG data', 'flags');
