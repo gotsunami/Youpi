@@ -1159,6 +1159,12 @@ div.toplevelmenu div.user {
 	background-color: inherit;
 }
 
+div.toplevelmenu div.user span {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+
 /***** condor setup prefs ******/
 
 div.condor_setup {

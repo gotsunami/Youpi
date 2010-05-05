@@ -1769,4 +1769,21 @@ document.observe('permissions:updated', function(event) {
 	c.update(get_permissions(event.memo.target, event.memo.key, event.memo.handler, event.memo.misc /* misc data parameter */));
 });
 
+document.observe('dom:loaded', function() {
+	// Common to every page: the user login name can be clicked in order to display
+	// current user/group/mode permissions
+	$$('div.toplevelmenu div.user span')[0].observe('click', function() {
+		var r = new HttpRequest(
+				null,
+				null,	
+				// Handle results
+				function(resp) {
+					Notifier.notify('Permissions: ' + resp.username + '/' + resp.default_group + ' @ ' + resp.perms_octal, 6);
+				}
+		);
+
+		r.send('/youpi/permissions/default/');
+	});
+});
+
 var box_file_browser;

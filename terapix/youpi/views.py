@@ -1675,10 +1675,13 @@ def get_user_default_permissions(request):
 	"""
 
 	p = request.user.get_profile()
+	perms = Permissions(p.dflt_mode)
 
-	return HttpResponse(str({
-		'perms'	: Permissions(p.dflt_mode).toJSON(),
+	return HttpResponse(json.encode({
+		'perms'			: perms.toJSON(),
 		'default_group'	: str(p.dflt_group),
+		'perms_octal'	: perms.toOctal(),
+		'username'		: request.user.username,
 	}), mimetype = 'text/plain')
 
 @login_required
