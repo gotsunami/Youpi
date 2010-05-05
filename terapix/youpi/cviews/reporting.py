@@ -290,7 +290,10 @@ def get_global_report(request, reportId):
 
 			tquery = tquery % ','.join(tables)
 			if updated: tquery += ' WHERE '
-			query = tquery + query + ' AND task.success=1;'
+			if query.find('youpi_processing_task') > 0:
+				query = tquery + query + ' AND task.success=1;'
+			else:
+				query = tquery + query
 
 			# If WHERE not in query, there will be too much results
 			if query.find('WHERE') == -1 and not post['right_ascension_RA']:
@@ -310,7 +313,6 @@ def get_global_report(request, reportId):
 									'report_content' 	: report_content,
 									'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
 				}, context_instance = RequestContext(request))
-
 
 			# First query: fetch image IDs
 			db = MySQLdb.connect(host = settings.DATABASE_HOST, user = settings.DATABASE_USER, passwd = settings.DATABASE_PASSWORD, db = settings.DATABASE_NAME)
