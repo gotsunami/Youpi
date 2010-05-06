@@ -144,6 +144,15 @@ class TagsTest(TestCase):
 		
 		self.assertEquals(type(response.content), types.StringType)
 
+	def test_tag_unmark_images(self):
+		self.client.login(username='user1', password='youpi')
+		response = self.client.post(reverse('terapix.youpi.cviews.tags.tag_unmark_images'),{
+		'Tags': '[\'tag1\']',
+		'IdList': '[\'1\',\'2\']'
+		})
+		print response.content
+		self.assertEquals(type(response.content), types.StringType) 
+
 if __name__ == '__main__':
 	unittest.main()
 	if len(sys.argv) == 2:
