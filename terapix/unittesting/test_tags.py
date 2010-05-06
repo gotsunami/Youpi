@@ -150,7 +150,6 @@ class TagsTest(TestCase):
 		'Tags': '[\'tag1\']',
 		'IdList': '[\'1\',\'2\']'
 		})
-		print response.content
 		self.assertEquals(type(response.content), types.StringType) 
 
 if __name__ == '__main__':
