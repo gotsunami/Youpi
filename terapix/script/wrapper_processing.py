@@ -347,7 +347,7 @@ AND r.image_id=i.id;
 
 	# Converts PSF values from pixels to arcsec
 	for psfk in ('FWHM_Min', 'FWHM_Mean', 'FWHM_Max'):
-		fxdata[psfexKeywords[psfk]] = round(ps * float(fxdata[psfexKeywords[psfk]]), 8)
+		fxdata[psfexKeywords[psfk]] = round(ps * float(fxdata[psfexKeywords[psfk]]), 3)
 
 	for file, rules in keywords.iteritems():
 		try:
