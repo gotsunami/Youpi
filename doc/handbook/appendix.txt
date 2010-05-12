@@ -14,11 +14,14 @@ ChangeLog
 Version 0.6.1
 -------------
 
-**Release Date**: *To Be Released*
+**Release Date**: May 12, 2010
 
 **Improvements**:
 
-- QualityFITS plugin: added support for single chip flat normalization 
+- QualityFITS plugin: added support for "single chip flat normalization", which allows to compute a new 
+  normalisation based on independant chips. This is required to select the bad pixels from each chip in 
+  a consistant way. **Important**: please note that this feature requires to use `QualityFITS 1.13.12` or 
+  higher.
 - QualityFITS results: displays grade's comment next to grade letter
 - Added support for FITS keyword copying (+KEYWORD) in :ref:`ingestion translation tables (ITTs) <ingestion_section>`
 - Added support for :ref:`automatic .head file generation <automatic_head_section>` to allow 
@@ -33,7 +36,12 @@ Version 0.6.1
   combining static Javascript and CSS files into single files and `minifying`_ their content)
 - New command line tool ``script/changeseeing.py`` to compute and store images pixel scale and 
   reprocess all QualityFITS XML output results. Please see the :ref:`Release Notes <script_changeseeing>` 
-  for more information.
+  for more information
+- Clicking on your username (top-left corner) will popup information related to your active 
+  permission attributes
+- Data output directory: plugins append a random 8-chars string at the end of the data path to 
+  prevent results to be overridden by mistake
+- Post-processing: remote files not needed anymore at the end of processings are deleted
 
 .. _minifying: http://en.wikipedia.org/wiki/Minify
 
@@ -55,9 +63,14 @@ Version 0.6.1
 - Path selector widget: fixed automatic path selection
 - Minor fixes
 
+.. warning:: Please note that `QualityFITS 1.13.12` or higher is required for this release to 
+            work properly.
+
 **Release Notes**:
 
 In order to **upgrade from 0.6**, please do the following:
+
+0. Make a **backup of your database**.
 
 1. A third file ``private_conf.py`` is now taken into account for Youpi's configuration. Most of 
    the content of the ``settings.py-dist`` that comes with the distribution has been moved to the new 
@@ -78,7 +91,20 @@ In order to **upgrade from 0.6**, please do the following:
 
 .. _relnotes_yui:
 
-2. CSS and Javascript file minification is accomplished  using Yahoo's `YUI Java compressor`_. In order 
+2. The database structure has changed. Just tell Youpi to inspect your installation and upgrade 
+   the database if needed::
+
+	$ python manage.py checksetup
+
+   Everytime the database structure has to be updated, you will be prompted for confirmation::
+
+		Are you sure you want to execute the evolutions?
+		Type 'yes' to continue, or 'no' to cancel:
+
+   If you have made a database backup, you can safely answer: ``yes``.
+
+
+3. CSS and Javascript file minification is accomplished  using Yahoo's `YUI Java compressor`_. In order 
    to use it with Youpi, make sure that Java is installed on your system and download the YUI compressor tool. 
    Then, add the following line to your ``settings.py`` file or (preferred) ``local_conf.py``, replacing the 
    absolute path to the JAR archive accordingly::
@@ -96,14 +122,14 @@ In order to **upgrade from 0.6**, please do the following:
    .. _YUI Java compressor: http://developer.yahoo.com/yui/compressor/
    .. _django-compress: http://code.google.com/p/django-compress/
 
-3. *(This step is optional)* Now that everything is set up, you can generate the minified static 
+4. *(This step is optional)* Now that everything is set up, you can generate the minified static 
    files from the command line (otherwise they get generated automatically on-the-fly)::
 
 	$ python manage.py synccompress
 
 .. _script_changeseeing:
 
-4. *(This step is optional)* The database structure has been altered for this release. You may want to 
+5. *(This step is optional)* The database structure has been altered for this release. You may want to 
    compute images pixel scale values or reprocess all QualityFITS XML results using the 
    ``script/changeseeing.py`` script. Try a::
 
@@ -118,22 +144,6 @@ In order to **upgrade from 0.6**, please do the following:
 
    .. note:: Those two commands may take a long time to complete depending on the amount of 
              information stored in your database.
-
-In order to **upgrade from 0.5.2** *or later*, please do the following:
-
-0. Make a **backup of your database**.
-
-1. The database structure has changed. Just tell Youpi to inspect your installation and upgrade 
-   the database if needed::
-
-	$ python manage.py checksetup
-
-Everytime the database structure has to be updated, you will be prompted for confirmation::
-
-	Are you sure you want to execute the evolutions?
-	Type 'yes' to continue, or 'no' to cancel:
-
-If you have made a database backup, you can safely answer: ``yes``.
 
 Version 0.6
 -----------
