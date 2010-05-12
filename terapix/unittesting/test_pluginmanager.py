@@ -95,6 +95,17 @@ class ProcessingPluginTest(unittest.TestCase):
 		res = self.plugin.getUserResultsOutputDir(req, '/my/path/olduser/', 'olduser')
 		self.assertEquals(res, '/my/path/user/')
 
+	def test_setDefaultCleanupFiles(self):
+		for k in ([1], lambda x: x, 1, object()):
+			self.assertRaises(TypeError, self.plugin.setDefaultCleanupFiles, k)
+
+		ud = self.plugin.setDefaultCleanupFiles({})
+		self.assertEquals(type(ud), types.DictType)
+		self.assertTrue(ud.has_key('RemoveFiles'))
+		self.assertEquals(type(ud['RemoveFiles']), types.ListType)
+		for pattern in ud['RemoveFiles']:
+			self.assertEquals(type(pattern), types.StringType)
+
 	def test_getConfigFileContent(self):
 		pass
 
