@@ -228,6 +228,9 @@ class Scamp(ProcessingPlugin):
 					'StartupDelay'		: step,
 		} 
 
+		# Set up default files to delete after processing
+		self.setDefaultCleanupFiles(userData)
+
 		# Keep data path only
 		ldac_files = self.getLDACPathsFromImageSelection(request, idList)
 		ldac_files = [dat[1] for dat in ldac_files]

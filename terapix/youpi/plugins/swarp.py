@@ -192,6 +192,9 @@ class Swarp(ProcessingPlugin):
 					'StartupDelay'		: step,
 		} 
 
+		# Set up default files to delete after processing
+		self.setDefaultCleanupFiles(userData)
+
 		#
 		# Write userdata.conf which olds the remaining information needed by the wrapper processing script
 		# This file must only holds a serialized Python dictionary which will be merged by the WP script with 

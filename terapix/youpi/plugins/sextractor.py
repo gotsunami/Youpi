@@ -302,6 +302,9 @@ class Sextractor(ProcessingPlugin):
 					'DualWeight' 			: str(dualWeightPath), 
 					'DualFlag'	 			: str(dualFlagPath), 
 				} 
+
+		# Set up default files to delete after processing
+		self.setDefaultCleanupFiles(userData)
 	
 		#Dual Mode check
 

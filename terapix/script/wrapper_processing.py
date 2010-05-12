@@ -996,6 +996,23 @@ def process(userData, kind_id, argv):
 			success = 1
 
 
+	# Clean up some files before the results get transferred back by condor_transfer.
+	if not userData.has_key('RemoveFiles'):
+		debug('[Warning] no clean up files policy found: will not clean directory content')
+	else:
+		debug("Cleaning up files matching: %s" % ', '.join(userData['RemoveFiles']))
+		# Get filenames based on patterns
+		files = []
+		for pat in userData['RemoveFiles']:
+			files.extend(glob.glob(pat))
+		for file in files:
+			try: os.remove(os.path.join(userData['ResultsOutputDir'], file))
+			except Exception, e:
+				debug("[Warning] Could not remove file: %s (%s)" % (file, e))
+		debug("Removed the following files: %s" % ', '.join(files))
+
+
+
 	################### END OF POST-PROCESSING  ################################################
 
 

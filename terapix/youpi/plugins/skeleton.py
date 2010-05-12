@@ -113,6 +113,9 @@ class Skeleton(ProcessingPlugin):
 					'ResultsOutputDir'	: str(resultsOutputDir)											# Mandatory for WP
 				} 
 
+		# Set up default files to delete after processing
+		self.setDefaultCleanupFiles(userData)
+
 		#
 		# Generate CSF
 		#

@@ -479,6 +479,9 @@ class QualityFitsIn(ProcessingPlugin):
 					'FlatNormMethod'	: flatNormMethod,
 					'Config' 			: str(post['Config'])} 
 
+		# Set up default files to delete after processing
+		self.setDefaultCleanupFiles(userData)
+
 		step = 2 							# At least step seconds between two job start
 
 		# Generate CSF

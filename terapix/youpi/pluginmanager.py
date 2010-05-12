@@ -50,6 +50,21 @@ class ProcessingPlugin(object):
 		# Used to generate rather unique item ID in processing cart
 		self.itemCounter = 0
 
+	def setDefaultCleanupFiles(self, userData):
+		"""
+		Adds a RemoveFiles key in the userData dictionary, which is a list of files 
+		to be deleted at the end of processing.
+
+		@param userData dictionary of input data passed to the 
+		wrapper processing at runtime
+		@returns userData
+		"""
+		if type(userData) != types.DictType:
+			raise TypeError, "userData must be a dictionary"
+
+		userData['RemoveFiles'] = ['*.py', '*.conf', '*.rc', '*.pyc', '*.exe', 'NOP']
+		return userData
+
 	def getUniqueCondorJobId(self):
 		"""
 		Builds a unique Condor job Id string. Can be passed to the wrapper_processing script on 
