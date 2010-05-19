@@ -45,7 +45,7 @@ function report_menu_insert(title, handler) {
 <script type="text/javascript">
 	var menu;
 	document.observe('dom:loaded', function() {
-		menu = new SubMenu('submenu', ['HTML Report']);
+		menu = new SubMenu('submenu', ['Report']);
 		$$('.new_report')[0].observe('click', function() {
 			location.href= '{% url terapix.youpi.cviews.reporting.reporting %}';
 		});

@@ -1,4 +1,5 @@
 # vim: set ts=4
+
 from django.conf import settings
 from django.contrib.auth.models import * 
 from django.contrib.auth.decorators import login_required
@@ -18,8 +19,9 @@ import MySQLdb
 import re, string
 import os, os.path, sys
 from types import *
-# Custom views
+#
 from terapix.exceptions import *
+from terapix.reporting import ReportFormat , global_reports
 from terapix.youpi.cviews import *
 from terapix.youpi.pluginmanager import PluginManagerError
 
@@ -31,35 +33,12 @@ def reporting(request):
 	"""
 	from terapix.youpi.forms import ReportAdvancedImageForm
 
-	# Global (non-plugin related) reports definition
-	selopts = """Select a processing type: <select name="kind_select">%s</select>""" % \
-			string.join(map(lambda x: """<option value="%s">%s</option>""" % (x[0], x[1]), [(p.id, p.optionLabel) for p in manager.plugins]), '\n')
-	reports = [
-		{	'id': 'imssavedselections',	
-			'title': 'List of saved selections from the image selector (TXT)', 
-			'description': 'This report generates a list of all custom saved selections available in the image selector.',
-		},
-		{	'id': 'procresults', 
-			'title': 'List of processing results (CSV)', 
-			'options': selopts,
-			'description': 'This report generates a CSV file (plain text) with all processing results. Depending on the current state of ' + \
-				'the database, it may take some time to generate.',
-		},
-		{	'id': 'advimgreport',	
-			'title': 'Advanced image report (HTML, PDF)',
-			'description': 'This report generates a criteria-based list of ingested images. The result set can be exported to the image selector ' + \
-				'for processing the image selection. A PDF report can be generated too.',
-			'template' : 'reports/advanced-image-report-options.html',
-			'context': {'form' : ReportAdvancedImageForm()},
-		},
-	]
-
 	# Sanity checks: looks for manfatory info
-	mandatory = ('id', 'title', 'description')
-	for r in reports:
+	mandatory = ('id', 'title', 'description', 'formats')
+	for r in global_reports:
 		for mand in mandatory:
 			if not r.has_key(mand):
-				raise ReportIncompleteDefinitionError, "Report has no %s set (required): %s" % (mand, r)
+				raise ReportIncompleteDefinitionError, "Report '%s' has no '%s' set (required)" % (r['title'], mand)
 	plugins = manager.plugins
 	for p in plugins:
 		try:
@@ -68,44 +47,82 @@ def reporting(request):
 			for r in rdata:
 				for mand in mandatory:
 					if not r.has_key(mand):
-						raise ReportIncompleteDefinitionError, "Report has no %s set (required): %s" % (mand, r)
+						raise ReportIncompleteDefinitionError, "Report '%s' has no '%s' set (required)" % (r['title'], mand)
 		except AttributeError:
 			pass
 
-	reports.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
+	global_reports.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
 	menu_id = 'reporting'
 	return render_to_response('reporting.html', {	
 						# Global reports
-						'reports'			: reports,
+						'reports'			: global_reports,
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
 						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
 					context_instance = RequestContext(request))
 
-def get_global_report(request, reportId):
+@login_required
+def get_global_report(request, reportId, format):
 	"""
 	Generates a global report.
 	@param reportId report Id
+	@param format report's output format
 	"""
 	post = request.POST
+	if format not in ReportFormat.formats():
+		raise ValueError, "unsupported report output format: " + format
+
+	ext = format.lower()
+	fname = "%s-%s.%s" % (request.user.username, reportId, ext)
+
 	if reportId == 'imssavedselections':
-		from terapix.reporting.csv import CSVReport
+		title = 'List of saved selections from the image selector'
 		sels = ImageSelections.objects.all().order_by('date')
-		content = []
-		k = 1
-		for s in sels:
-			content.append((k, s.name))
-			k += 1
-		if not content: return HttpResponse('No saved selections found', mimetype = 'text/plain')
-		return HttpResponse(str(CSVReport(data = content, separator = '\t')), mimetype = 'text/plain')
+		if not sels: 
+			return render_to_response('report.html', {	
+				'report_title' 		: title,
+				'report_content' 	: "No saved selections found.",
+			}, context_instance = RequestContext(request))
+
+		if format != ReportFormat.HTML:
+			fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+
+			if format == ReportFormat.CSV:
+				import csv
+				writer = csv.writer(fout)
+				k = 1
+				for s in sels:
+					writer.writerow([k, s.name])
+					k += 1
+			elif format == ReportFormat.TXT:
+				for s in sels:
+					fout.write(s.name + '\n')
+			elif format == ReportFormat.PDF:
+				for s in sels:
+					fout.write(s.name + '\n')
+
+			fout.close()
+			return render_to_response('report.html', {	
+								'report_title' 		: title,
+								'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+									(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+			}, context_instance = RequestContext(request))
+		else:
+			content = []
+			for s in sels:
+				content.append(s.name)
+			return render_to_response('report.html', {	
+								'report_title' 		: title,
+								'report_content' 	: '<br/>'.join(content),
+			}, context_instance = RequestContext(request))
 
 	elif reportId == 'procresults':
+		title = 'List of processing results'
 		try: kind = post['kind_select']
 		except Exception, e:
 			return HttpResponseRedirect('/youpi/reporting/')
-		from terapix.reporting.csv import CSVReport
 		from django.db import connection
 		import time
 		cur = connection.cursor()
@@ -120,6 +137,12 @@ def get_global_report(request, reportId):
 		""" % kind
 		cur.execute(q)
 		res = cur.fetchall()
+		if not res: 
+			return render_to_response('report.html', {	
+				'report_title' 		: title,
+				'report_content' 	: "No results found.",
+			}, context_instance = RequestContext(request))
+
 		content = []
 		for r in res:
 			status = 'F' # Failed
@@ -127,13 +150,42 @@ def get_global_report(request, reportId):
 			row = [status]
 			row.extend(r[1:])
 			content.append(row)
-		if not content: return HttpResponse('No results found', mimetype = 'text/plain')
-		return HttpResponse(str(CSVReport(data = content)), mimetype = 'text/plain')
+
+		if format != ReportFormat.HTML:
+			fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+
+			if format == ReportFormat.CSV:
+				import csv
+				writer = csv.writer(fout)
+				for row in content:
+					writer.writerow(row)
+			elif format == ReportFormat.TXT:
+				for row in content:
+					for c in row:
+						fout.write(str(c) + ' ')
+					fout.write('\n')
+			elif format == ReportFormat.PDF:
+				for row in content:
+					fout.write(str(row) + '\n')
+
+			fout.close()
+			return render_to_response('report.html', {	
+								'report_title' 		: title,
+								'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+									(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+			}, context_instance = RequestContext(request))
+		else:
+			# HTML
+			return render_to_response('report.html', {	
+								'report_title' 		: title,
+								'report_content' 	: '<br/>'.join([' '.join(str(r)) for r in content]),
+			}, context_instance = RequestContext(request))
 
 	elif reportId == 'advimgreport':
 		from terapix.youpi.forms import ReportAdvancedImageForm
-
 		form = ReportAdvancedImageForm(post)
+		title = 'Advanced image report'
+
 		if form.is_valid(): 
 			from django.template.loader import get_template
 			tmpl = get_template('reports/advanced-image-report-options.html')
@@ -309,9 +361,9 @@ def get_global_report(request, reportId):
 </form>
 	""" % tdata
 				return render_to_response('report.html', {	
-									'report_title' 		: 'Advanced image report (HTML, PDF)',
+									'report_title' 		: title,
 									'report_content' 	: report_content,
-									'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+									'before_extra_content'	: """<form action="/youpi/report/global/%s/%s/" id="report_form" method="post">""" % (reportId, format),
 				}, context_instance = RequestContext(request))
 
 			# First query: fetch image IDs
@@ -345,9 +397,9 @@ def get_global_report(request, reportId):
 </form>
 	""" % tdata
 				return render_to_response('report.html', {	
-									'report_title' 		: 'Advanced image report (HTML, PDF)',
+									'report_title' 		: title,
 									'report_content' 	: report_content,
-									'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+									'before_extra_content'	: """<form action="/youpi/report/global/%s/%s/" id="report_form" method="post">""" % (reportId, format),
 				}, context_instance = RequestContext(request))
 			
 			# Builds a second query to gather all requested information
@@ -456,9 +508,9 @@ def get_global_report(request, reportId):
 </form>
 	""" % tdata
 				return render_to_response('report.html', {	
-									'report_title' 		: 'Advanced image report (HTML, PDF)',
+									'report_title' 		: title,
 									'report_content' 	: report_content,
-									'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+									'before_extra_content'	: """<form action="/youpi/report/global/%s/%s/" id="report_form" method="post">""" % (reportId, format),
 				}, context_instance = RequestContext(request))
 
 			# Final res list
@@ -506,6 +558,27 @@ def get_global_report(request, reportId):
 				report_columns.append('Tags')
 
 			res = f_res
+
+			if format != ReportFormat.HTML:
+				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+				if format == ReportFormat.CSV:
+					import csv
+					writer = csv.writer(fout)
+					for row in range(len(res)):
+						writer.writerow(res[row])
+				elif format == ReportFormat.TXT:
+					for row in range(len(res)):
+						fout.write(' '.join([str(s) for s in res[row]]) + '\n')
+				elif format == ReportFormat.PDF:
+					for row in range(len(res)):
+						fout.write(' '.join([str(s) for s in res[row]]) + '\n')
+				fout.close()
+				return render_to_response('report.html', {	
+									'report_title' 		: title,
+									'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+										(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+				}, context_instance = RequestContext(request))
+
 			import terapix.script.wrapper_processing as wrapper
 			selName = "%s-%s-%s" % (reportId, request.user.username, wrapper.getNowDateTime())
 			report_content = """
@@ -566,9 +639,9 @@ def get_global_report(request, reportId):
 """
 
 			return render_to_response('report.html', {	
-								'report_title' 		: 'Advanced image report (HTML, PDF)',
+								'report_title' 		: title,
 								'report_content' 	: report_content,
-								'before_extra_content'	: """<form action="/youpi/report/generating/global/%s/" id="report_form" method="post">""" % reportId,
+								'before_extra_content'	: """<form action="/youpi/report/generating/global/%s/%s/" id="report_form" method="post">""" % (reportId, format),
 								# Use Google chart table API
 								'body_end': body_end,
 			}, context_instance = RequestContext(request))
@@ -586,9 +659,9 @@ def get_global_report(request, reportId):
 </div>""" % tdata
 
 			return render_to_response('report.html', {	
-								'report_title' 		: 'Advanced image report (HTML, PDF)',
+								'report_title' 		: title,
 								'report_content' 	: report_content,
-								'before_extra_content'	: """<form action="/youpi/report/global/%s/" id="report_form" method="post">""" % reportId,
+								'before_extra_content'	: """<form action="/youpi/report/global/%s/%s/" id="report_form" method="post">""" % (reportId, format),
 			}, context_instance = RequestContext(request))
 
 	return HttpResponseNotFound('Report not found.')
@@ -604,9 +677,12 @@ def generating_report(request, pluginId, reportId):
 						'target'	: '/youpi/report/' + pluginId + '/' + reportId + '/',
 	}, context_instance = RequestContext(request))
 
-def get_report(request, pluginId, reportId):
+def get_report(request, pluginId, reportId, format):
 	"""
 	Generate a report
+	@param pluginId plugin's id or global
+	@param reportId report's unique id
+	@param format report's output format
 	"""
 	if not request.user.has_perm('youpi.can_use_reporting'):
 		return HttpResponseForbidden("Sorry, you don't have permission to generate reports")
@@ -615,10 +691,10 @@ def get_report(request, pluginId, reportId):
 	except PluginManagerError:
 		# May be a global report (not plugin related)
 		if pluginId == 'global':
-			return get_global_report(request, reportId)
+			return get_global_report(request, reportId, format)
 		else:
 			# Not found
 			return HttpResponseNotFound()
 
-	return plugObj.getReport(request, reportId)
+	return plugObj.getReport(request, reportId, format)
 

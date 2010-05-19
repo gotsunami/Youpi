@@ -171,7 +171,7 @@ urlpatterns = patterns(
 
 	# Reporting
 	(r'^report/generating/(.*?)/(.*?)/$', 'cviews.reporting.generating_report'),
-	(r'^report/(.*?)/(.*?)/$', 'cviews.reporting.get_report'),
+	(r'^report/(.*?)/(.*?)/(.*?)/$', 'cviews.reporting.get_report'),
 	(r'^reporting/$', 'cviews.reporting.reporting'),
 )
 

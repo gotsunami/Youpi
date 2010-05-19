@@ -19,16 +19,18 @@ import marshal, base64, zlib
 from types import *
 from sets import Set
 #
+from terapix.reporting import ReportFormat 
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
-from django.conf import settings
 from terapix.youpi.auth import read_proxy
 import terapix.lib.cluster.condor as condor
 #
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response 
 from django.template import RequestContext
+#
 
 class QualityFitsIn(ProcessingPlugin):
 	"""
@@ -952,33 +954,39 @@ class QualityFitsIn(ProcessingPlugin):
 				'options': allgrades_opts,
 				'description': 'This report generates a list of all QualityFITS grades, along with the image name and the grade comment. The ' + \
 					'output is a plain text file (CSV).',
+				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
 			},
 			{	'id': 'htmlallgrades',	
 				'title': 'List of all QualityFITS grades, with comments (HTML)', 
 				'options': html_allgrades_opts,
 				'description': 'This report generates a list of all QualityFITS grades, along with the image name and the grade comment. The ' + \
 					'content is formatted as HTML; the images name are clickable and linked to their respective QualityFITS result page.',
+				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
 			},
 			{	'id': 'gradestats', 
 				'title': 'Grading statistics (HTML)',
 				'description': 'This report generates a summary table displaying - per output directory - how many images are graded and not graded yet. ' + \
 					'Green lines indicate that all images (whose processing results belongs to a directory) are graded.',
+				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
 			},
 			{	'id': 'nongraded', 	
 				'title': 'List of all non graded images (HTML)', 
 				'options': nongopts,
 				'description': 'This report generates a table with all remaining non grading images. From there, the QualityFITS results page can be accessed ' + \
-					'and the image can then be graded. The report returns an empty list if all images have already been graded.'
+					'and the image can then be graded. The report returns an empty list if all images have already been graded.',
+				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
 			},
 			{	'id': 'onegrade', 		
 				'title': 'List of all images with a selected grade (CSV)', 
 				'options': oneopts,
 				'description': 'This report generates a list all images with a specific grade. Fields in the CSV file are: image name, grade, image path, md5 checksum, ' + \
 					'grading date, grading user, predefined comment, custom comment.',
+				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
 			},
 			{	'id': 'piegrades', 	
 				'title': 'Pie Chart of grades (HTML)',
 				'description': 'This report generates a pie chart of all grades to get an estimation of grade relative proportions.',
+				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
 			},
 		]
 		rdata.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
@@ -993,10 +1001,11 @@ class QualityFitsIn(ProcessingPlugin):
 			if r['id'] == reportId:
 				return r['title']
 
-	def getReport(self, request, reportId):
+	def getReport(self, request, reportId, format):
 		"""
 		Generates a report.
 		@param reportId report Id as returned by the reports() function
+		@param format report's output format
 		"""
 		post = request.POST
 

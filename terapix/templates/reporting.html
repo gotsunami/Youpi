@@ -36,7 +36,10 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				{% if perms.youpi.can_use_reporting %}
 					<div class="report_menu">
 						<input class="report_reset" type="button" value="Reset"/>	
-						<input class="report_submit" type="submit" value="Generate!"/>	
+						<input class="report_format" type="button" value="CSV"/>	
+						<input class="report_format" type="button" value="TXT"/>	
+						<input class="report_format" type="button" value="PDF"/>	
+						<input class="report_format report_submit" type="button" value="HTML"/>	
 					</div>
 				{% endif %}
 				{# Descriptions #}
@@ -97,7 +100,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					{% if report.template %}
 						<div id="{{ report.id }}_template" style="margin-top: 20px">
 							<div>
-								{% include  report.template %}
+								{% include report.template %}
 							</div>
 						</div>
 					{% endif %}
@@ -110,7 +113,10 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				{% else %}
 					<div class="report_menu">
 						<input class="report_reset" type="button" value="Reset"/>	
-						<input class="report_submit" type="submit" value="Generate!"/>	
+						<input class="report_format" type="button" value="CSV"/>	
+						<input class="report_format" type="button" value="TXT"/>	
+						<input class="report_format" type="button" value="PDF"/>	
+						<input class="report_format report_submit" type="button" value="HTML"/>	
 					</div>
 				{% endif %}
 					<div class="report_options" id="loading_div"/>
@@ -135,14 +141,18 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 			});
 		}
 	{% if perms.youpi.can_use_reporting %}
-		$('report_form').observe('submit', function() {
-			var sel = $('report_select');
-			var opt = sel.options[sel.selectedIndex];
-			var selvalue = opt.value;
-			if (selvalue == '0') return false;
-			var grp = opt.up();
-			var type = grp != sel ? grp.id : 'global';
-			$('report_form').action = '/youpi/report/generating/' + type + '/' + selvalue + '/';
+		$$('.report_format').each(function(r) {
+			r.observe('click', function() {
+				var sel = $('report_select');
+				var opt = sel.options[sel.selectedIndex];
+				var selvalue = opt.value;
+				if (selvalue == '0') return false;
+				var grp = opt.up();
+				var type = grp != sel ? grp.id : 'global';
+				format = this.readAttribute('value');
+				$('report_form').action = '/youpi/report/generating/' + type + '/' + selvalue + '/' + format + '/';
+				$('report_form').submit();
+			});
 		});
 
 		$$('.report_reset').each(function(r) {

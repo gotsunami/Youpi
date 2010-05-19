@@ -678,3 +678,19 @@ div.ims_batch_log_div pre {
 	font-style: italic;
 	font-size: 12px;
 }
+
+.report-download {
+	padding: 20px;
+	background: #F0F8FF url('../img/48x48/dld-file.png') no-repeat 20px center;
+	padding-left: 60px;
+	width: -moz-fit-content;
+	-moz-border-radius: 5px;
+}
+
+.report-download a {
+	font-size: 14px;
+}
+
+.report-download a:hover {
+	text-decoration: underline;
+}

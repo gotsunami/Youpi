@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
+# Copyright (c) 2008-2010 Terapix Youpi development team. All Rights Reserved.
 #                    Mathias Monnerville <monnerville@iap.fr>
 #                    Gregory Semah <semah@iap.fr>
 #
@@ -15,16 +15,17 @@
 Classes to generate CSV reports
 """
 
-from types import ListType, TupleType
-import string
+from django.conf import settings
+import types
+import string, os.path
 
-class CSVReport:
+class CSVReport(object):
 	def __init__(self, data = [], separator = ';'):
-		if type(data) != ListType and type(data) != TupleType:
+		if type(data) != types.ListType and type(data) != types.TupleType:
 			raise TypeError, "data must be a list or tuple"
 
 		# Explicit cast
-		if type(data) == TupleType:
+		if type(data) == types.TupleType:
 			data = list(data)
 
 		self.data = data
