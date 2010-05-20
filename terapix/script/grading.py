@@ -61,7 +61,7 @@ def get_grades(res_output_dir = None, idList = None):
 	@return a list of tuples [(image name, grade, comment), ...]
 	"""
 	
-	if res_output_dir and type(res_output_dir) != types.StringType:
+	if res_output_dir and type(res_output_dir) != types.StringType and type(res_output_dir) != types.UnicodeType:
 		raise TypeError, "res_output_dir must be a string"
 
 	if idList and type(idList) != types.ListType:
