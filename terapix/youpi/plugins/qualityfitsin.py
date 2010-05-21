@@ -19,7 +19,7 @@ import marshal, base64, zlib
 from types import *
 from sets import Set
 #
-from terapix.reporting import ReportFormat 
+from terapix.reporting import ReportFormat , get_report_data
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
@@ -911,17 +911,6 @@ class QualityFitsIn(ProcessingPlugin):
 
 		return 'Job cancelled'
 
-#	def getResultEntryDescription(self, task):
-#		"""
-#		Returns custom result entry description for a task.
-#		task: django object
-#
-#		returned value: HTML tags allowed
-#		"""
-#
-#		img = Rel_it.objects.filter(task = task)[0].image
-#		return "%s of image <b>%s</b>" % (self.optionLabel, img.name)
-
 	def getResultEntryDescription(self, data):
 		"""
 		returned value: HTML tags allowed
@@ -945,61 +934,42 @@ class QualityFitsIn(ProcessingPlugin):
 		allgrades_opts = """Select output directory: <select name="allgrades_output_dir_select">%s</select>""" % \
 				'\n'.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs))
 
-		html_allgrades_opts = """Select output directory: <select name="html_allgrades_output_dir_select">%s</select>""" % \
-				'\n'.join(map(lambda x: """<option value="%s">%s</option>""" % (x, x), outdirs))
-
 		rdata = [
 			{	'id': 'allgrades',		
-				'title': 'List of all QualityFITS grades, with comments (CSV)', 
+				'title': 'List of all QualityFITS grades, with comments', 
 				'options': allgrades_opts,
-				'description': 'This report generates a list of all QualityFITS grades, along with the image name and the grade comment. The ' + \
-					'output is a plain text file (CSV).',
-				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
-			},
-			{	'id': 'htmlallgrades',	
-				'title': 'List of all QualityFITS grades, with comments (HTML)', 
-				'options': html_allgrades_opts,
-				'description': 'This report generates a list of all QualityFITS grades, along with the image name and the grade comment. The ' + \
-					'content is formatted as HTML; the images name are clickable and linked to their respective QualityFITS result page.',
-				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+				'description': 'This report generates a list of all QualityFITS grades, along with the image name and the grade comment.',
+				'formats': (ReportFormat.CSV, ReportFormat.HTML),
 			},
 			{	'id': 'gradestats', 
-				'title': 'Grading statistics (HTML)',
+				'title': 'Grading statistics',
 				'description': 'This report generates a summary table displaying - per output directory - how many images are graded and not graded yet. ' + \
 					'Green lines indicate that all images (whose processing results belongs to a directory) are graded.',
-				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+				'formats': (ReportFormat.CSV, ReportFormat.HTML),
 			},
 			{	'id': 'nongraded', 	
-				'title': 'List of all non graded images (HTML)', 
+				'title': 'List of all non graded images', 
 				'options': nongopts,
 				'description': 'This report generates a table with all remaining non grading images. From there, the QualityFITS results page can be accessed ' + \
 					'and the image can then be graded. The report returns an empty list if all images have already been graded.',
-				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+				'formats': (ReportFormat.CSV, ReportFormat.HTML),
 			},
 			{	'id': 'onegrade', 		
-				'title': 'List of all images with a selected grade (CSV)', 
+				'title': 'List of all images with a selected grade', 
 				'options': oneopts,
-				'description': 'This report generates a list all images with a specific grade. Fields in the CSV file are: image name, grade, image path, md5 checksum, ' + \
+				'description': 'This report generates a list all images with a specific grade. Available fields are: image name, grade, image path, md5 checksum, ' + \
 					'grading date, grading user, predefined comment, custom comment.',
-				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+				'formats': (ReportFormat.CSV, ReportFormat.HTML),
 			},
 			{	'id': 'piegrades', 	
-				'title': 'Pie Chart of grades (HTML)',
+				'title': 'Pie Chart of grades',
 				'description': 'This report generates a pie chart of all grades to get an estimation of grade relative proportions.',
-				'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+				'formats': (ReportFormat.CSV, ReportFormat.HTML),
 			},
 		]
 		rdata.sort(cmp=lambda x,y: cmp(x['title'], y['title']))
 
 		return rdata
-
-	def __getReportName(self, reportId):
-		"""
-		Returns report name
-		"""
-		for r in self.reports():
-			if r['id'] == reportId:
-				return r['title']
 
 	def getReport(self, request, reportId, format):
 		"""
@@ -1008,39 +978,47 @@ class QualityFitsIn(ProcessingPlugin):
 		@param format report's output format
 		"""
 		post = request.POST
+		ext = format.lower()
+		fname = "%s-%s.%s" % (request.user.username, reportId, ext)
+		title = get_report_data(self.reports(), reportId)['title']
 
 		if reportId == 'allgrades':
-			try:
-				outdir = post['allgrades_output_dir_select']
+			try: outdir = post['allgrades_output_dir_select']
 			except Exception, e:
 				return HttpResponseRedirect('/youpi/reporting/')
 			from terapix.script.grading import get_grades
-			from terapix.reporting.csv import CSVReport
-			res = get_grades(outdir)
-			# Removes fitsin id
-			res = [r[:3] for r in res]
-			return HttpResponse(str(CSVReport(data = res)), mimetype = 'text/plain')
-
-		elif reportId == 'htmlallgrades':
-			try:
-				outdir = post['html_allgrades_output_dir_select']
-			except Exception, e:
-				return HttpResponseRedirect('/youpi/reporting/')
-			from terapix.script.grading import get_grades
-			from terapix.reporting.csv import CSVReport
 			res = get_grades(outdir)
 
-			trs = []
-			for r in res:
-				trs.append(("""
+			if format != ReportFormat.HTML:
+				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+				if format == ReportFormat.CSV:
+					import csv
+					writer = csv.writer(fout)
+					for r in res:
+						writer.writerow(r[:3])
+				elif format == ReportFormat.PDF:
+					for r in res:
+						fout.write(' '.join(r[:3]) + '\n')
+
+				fout.close()
+				return render_to_response('report.html', {	
+					'report_title' 		: title,
+					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+				}, context_instance = RequestContext(request))
+			else:
+				# HTML rendering
+				trs = []
+				for r in res:
+					trs.append(("""
 <tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');">
 	<td><a target="_blank" title="Click to view the QualityFITS page for image %s.fits" href="/youpi/grading/fitsin/%s">%s</a></td>
 	<td style="text-align: center;">%s</td>
 	<td>%s</td>
 </tr>""" % (r[0], r[3], r[0], r[1], r[2])))
 
-			# Fill in content
-			content = """
+				# Fill in content
+				content = """
 <table>
 	<tr>
 		<th>Image name</th>
@@ -1050,12 +1028,12 @@ class QualityFitsIn(ProcessingPlugin):
 	%(rows)s
 </table>
 """ % {
-	'rows': '\n'.join(trs),
-}
-			return render_to_response('report.html', {	
-								'report_title' 		: self.__getReportName(reportId),
-								'report_content' 	: content, 
-			}, context_instance = RequestContext(request))
+		'rows': '\n'.join(trs),
+	}
+				return render_to_response('report.html', {	
+									'report_title' 		: title,
+									'report_content' 	: content, 
+				}, context_instance = RequestContext(request))
 
 		elif reportId == 'gradestats':
 			from django.db import connection
@@ -1064,32 +1042,51 @@ class QualityFitsIn(ProcessingPlugin):
 			trs = []
 			k = 0
 			totalgraded = totalnongraded = totalprocessings = 0
-			for path in paths:
-				k += 1
-				fitsins = Plugin_fitsin.objects.filter(task__success = True, task__results_output_dir = path).values_list('id', flat = True)
-				# Only one grade even for processings graded multiple times by different users 
-				q = """SELECT COUNT(*) FROM youpi_firstqeval WHERE fitsin_id IN (%s) GROUP BY fitsin_id""" % string.join([str(f) for f in fitsins], ',')
-				cur.execute(q)
-				res = cur.fetchall()
-				ugrades = len(res)
+			if format != ReportFormat.HTML:
+				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+				if format == ReportFormat.CSV:
+					# FIXME
+					import csv
+					writer = csv.writer(fout)
+					fout.write('TODO\n')
+				elif format == ReportFormat.PDF:
+					# FIXME
+					fout.write('TODO\n')
 
-				graded = ugrades
-				nongraded = len(fitsins) - graded
-				total = graded + nongraded
-				totalgraded += graded
-				totalnongraded += nongraded
-				totalprocessings += total
+				fout.close()
+				return render_to_response('report.html', {	
+					'report_title' 		: title,
+					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+				}, context_instance = RequestContext(request))
+			else:
+				# HTML rendering
+				for path in paths:
+					k += 1
+					fitsins = Plugin_fitsin.objects.filter(task__success = True, task__results_output_dir = path).values_list('id', flat = True)
+					# Only one grade even for processings graded multiple times by different users 
+					q = """SELECT COUNT(*) FROM youpi_firstqeval WHERE fitsin_id IN (%s) GROUP BY fitsin_id""" % string.join([str(f) for f in fitsins], ',')
+					cur.execute(q)
+					res = cur.fetchall()
+					ugrades = len(res)
 
-				style = 'text-align: right;'
-				gstyle = trstyle = gradecls = ''
-				if graded == 0: gstyle = 'color: red;'
-				elif graded < total: gstyle = 'color: orange; font-weight: bold;'
-				else: 
-					gstyle = 'color: green;'
-					trstyle = 'complete'
-					gradecls = 'gradecomplete'
+					graded = ugrades
+					nongraded = len(fitsins) - graded
+					total = graded + nongraded
+					totalgraded += graded
+					totalnongraded += nongraded
+					totalprocessings += total
+					# Styling
+					style = 'text-align: right;'
+					gstyle = trstyle = gradecls = ''
+					if graded == 0: gstyle = 'color: red;'
+					elif graded < total: gstyle = 'color: orange; font-weight: bold;'
+					else: 
+						gstyle = 'color: green;'
+						trstyle = 'complete'
+						gradecls = 'gradecomplete'
 
-				trs.append(("""
+					trs.append(("""
 <tr class="%(trstyle)s">
 	<td>%(idx)s</td>
 	<td class="file">%(path)s</td>
@@ -1110,7 +1107,7 @@ class QualityFitsIn(ProcessingPlugin):
 	'percent' 	: graded*100./total,
 }))
 
-			content = """
+				content = """
 <table class="report_grading_stats">
 	<tr>
 		<th></th>
@@ -1145,10 +1142,10 @@ class QualityFitsIn(ProcessingPlugin):
 	'totalnongraded'	: totalnongraded,
 	'totalprocessings'	: totalprocessings,
 }
-			return render_to_response('report.html', {	
-								'report_title' 		: self.__getReportName(reportId),
-								'report_content' 	: content, 
-			}, context_instance = RequestContext(request))
+				return render_to_response('report.html', {	
+									'report_title' 		: title,
+									'report_content' 	: content, 
+				}, context_instance = RequestContext(request))
 
 		elif reportId == 'onegrade':
 			from terapix.reporting.csv import CSVReport
@@ -1158,12 +1155,35 @@ class QualityFitsIn(ProcessingPlugin):
 				return HttpResponseRedirect('/youpi/reporting/')
 
 			usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
-			content = []
-			for g in usergrades:
-				rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
-				content.append((rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
-			if not usergrades: return HttpResponse('No images are graded ' + grade, mimetype = 'text/plain')
-			return HttpResponse(str(CSVReport(data = content)), mimetype = 'text/plain')
+			if format != ReportFormat.HTML:
+				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+				if format == ReportFormat.CSV:
+					import csv
+					writer = csv.writer(fout)
+					for g in usergrades:
+						rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
+						writer.writerow((rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
+				elif format == ReportFormat.PDF:
+					# FIXME
+					fout.write('TODO\n')
+
+				fout.close()
+				return render_to_response('report.html', {	
+					'report_title' 		: title,
+					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+				}, context_instance = RequestContext(request))
+			else:
+				# FIXME: use Google's HTML table
+				# HTML rendering
+				content = []
+				for g in usergrades:
+					rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
+					content.append(( rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
+				return render_to_response('report.html', {	
+					'report_title' 		: title,
+					'report_content' 	: '<br/>'.join([str(s) for s in content]),
+				}, context_instance = RequestContext(request))
 
 		elif reportId == 'nongraded':
 			try:
@@ -1184,14 +1204,42 @@ class QualityFitsIn(ProcessingPlugin):
 			# Check permissions
 			tasks, filtered = read_proxy(request, Processing_task.objects.filter(id__in = tasksIds).order_by('-start_date'))
 
-			trs = []
-			trs.append("<tr><th>%s</th></tr>" % outdir)
-			if filtered:
-				trs.append("""<tr><td><div class="perm_not_granted">You don't have permission to view the full results set. Some results have been filtered</div></td></tr>""")
-			for t in tasks[:50]:
-				rel = Rel_it.objects.filter(task = t)[0]
-				f = Plugin_fitsin.objects.filter(task = t)[0]
-				trs.append(("""
+			if format != ReportFormat.HTML:
+				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+				if format == ReportFormat.CSV:
+					import csv
+					writer = csv.writer(fout)
+					if filtered:
+						writer.writerow(("# You don't have permission to view the full results set. Some results have been filtered.",))
+					for t in tasks:
+						rel = Rel_it.objects.filter(task = t)[0]
+						f = Plugin_fitsin.objects.filter(task = t)[0]
+						writer.writerow((rel.image.name, t.start_date, t.user.username, t.hostname))
+					if not tasks and not filtered:
+						writer.writerow(("All images in this directory have already been graded",))
+					writer.writerow(("Not graded: %d" % len(fitsinsIds),))
+
+				elif format == ReportFormat.PDF:
+					# FIXME
+					fout.write('TODO\n')
+
+				fout.close()
+				return render_to_response('report.html', {	
+					'report_title' 		: title,
+					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+				}, context_instance = RequestContext(request))
+			else:
+				# FIXME: use Google's HTML table
+				# HTML rendering
+				trs = []
+				trs.append("<tr><th>%s</th></tr>" % outdir)
+				if filtered:
+					trs.append("""<tr><td><div class="perm_not_granted">You don't have permission to view the full results set. Some results have been filtered</div></td></tr>""")
+				for t in tasks[:50]:
+					rel = Rel_it.objects.filter(task = t)[0]
+					f = Plugin_fitsin.objects.filter(task = t)[0]
+					trs.append(("""
 <tr onclick="this.writeAttribute('style', 'background-color: lightgreen;');">
 	<td><a target="_blank" href="/youpi/grading/fitsin/%s">%s</a></td>
 	<td>%s</td>
@@ -1199,10 +1247,10 @@ class QualityFitsIn(ProcessingPlugin):
 	<td>%s</td>
 </tr>""" % (f.id, rel.image.name, t.start_date, t.user.username, t.hostname)))
 
-			if not tasks and not filtered:
-				trs.append(("""<tr><td>All images in this directory have already been graded</td></tr>"""))
+				if not tasks and not filtered:
+					trs.append(("""<tr><td>All images in this directory have already been graded</td></tr>"""))
 
-			content = """
+				content = """
 <div style="margin-bottom: 10px">Not graded: %(remaining)d images</div>
 <table>
 	%(rows)s
@@ -1212,10 +1260,10 @@ class QualityFitsIn(ProcessingPlugin):
 	'rows': string.join(trs, '\n'),
 }
 
-			return render_to_response('report.html', {	
-								'report_title' 		: self.__getReportName(reportId),
-								'report_content' 	: content, 
-			}, context_instance = RequestContext(request))
+				return render_to_response('report.html', {	
+									'report_title' 		: title,
+									'report_content' 	: content, 
+				}, context_instance = RequestContext(request))
 
 		elif reportId == 'piegrades':
 			from terapix.script.grading import get_proportions
@@ -1223,11 +1271,30 @@ class QualityFitsIn(ProcessingPlugin):
 			sum = 0
 			for d in data:
 				sum += d[1]
-			if not sum:
-				js = "No grades at all."
+			if format != ReportFormat.HTML:
+				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
+				if format == ReportFormat.CSV:
+					import csv
+					writer = csv.writer(fout)
+					for d in data:
+						writer.writerow(d)
+				elif format == ReportFormat.PDF:
+					# FIXME
+					fout.write('TODO\n')
+
+				fout.close()
+				return render_to_response('report.html', {	
+					'report_title' 		: title,
+					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+				}, context_instance = RequestContext(request))
 			else:
-				# Get grading statistics
-				js = """
+				# HTML rendering
+				if not sum:
+					js = "No grades at all."
+				else:
+					# Get grading statistics
+					js = """
 <div id="imgcontainer" style="width:600px;height:300px;"></div>
 <script type="text/javascript">
 function draw_pie() {
@@ -1264,16 +1331,16 @@ function draw_pie() {
 }
 draw_pie();
 </script>
-""" % {
+	""" % {
 	'ga': data[0][1], 
 	'gb': data[1][1], 
 	'gc': data[2][1], 
 	'gd': data[3][1], 
 }
-			return render_to_response('report.html', {	
-								'report_title' 		: self.__getReportName(reportId),
-								'report_content' 	: js, 
-			}, context_instance = RequestContext(request))
+				return render_to_response('report.html', {	
+									'report_title' 		: title,
+									'report_content' 	: js, 
+				}, context_instance = RequestContext(request))
 
 		
 		return HttpResponseNotFound('Report not found.')

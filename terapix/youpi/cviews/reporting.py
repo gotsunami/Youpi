@@ -21,7 +21,7 @@ import os, os.path, sys
 from types import *
 #
 from terapix.exceptions import *
-from terapix.reporting import ReportFormat , global_reports
+from terapix.reporting import ReportFormat , global_reports, get_report_data
 from terapix.youpi.cviews import *
 from terapix.youpi.pluginmanager import PluginManagerError
 
@@ -76,9 +76,9 @@ def get_global_report(request, reportId, format):
 
 	ext = format.lower()
 	fname = "%s-%s.%s" % (request.user.username, reportId, ext)
+	title = get_report_data(global_reports, reportId)['title']
 
 	if reportId == 'imssavedselections':
-		title = 'List of saved selections from the image selector'
 		sels = ImageSelections.objects.all().order_by('date')
 		if not sels: 
 			return render_to_response('report.html', {	
@@ -96,30 +96,26 @@ def get_global_report(request, reportId, format):
 				for s in sels:
 					writer.writerow([k, s.name])
 					k += 1
-			elif format == ReportFormat.TXT:
-				for s in sels:
-					fout.write(s.name + '\n')
 			elif format == ReportFormat.PDF:
 				for s in sels:
 					fout.write(s.name + '\n')
 
 			fout.close()
 			return render_to_response('report.html', {	
-								'report_title' 		: title,
-								'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-									(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+				'report_title' 		: title,
+				'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
+					(os.path.join('/media', settings.MEDIA_TMP, fname), format),
 			}, context_instance = RequestContext(request))
 		else:
 			content = []
 			for s in sels:
 				content.append(s.name)
 			return render_to_response('report.html', {	
-								'report_title' 		: title,
-								'report_content' 	: '<br/>'.join(content),
+				'report_title' 		: title,
+				'report_content' 	: '<br/>'.join(content),
 			}, context_instance = RequestContext(request))
 
 	elif reportId == 'procresults':
-		title = 'List of processing results'
 		try: kind = post['kind_select']
 		except Exception, e:
 			return HttpResponseRedirect('/youpi/reporting/')
@@ -159,11 +155,6 @@ def get_global_report(request, reportId, format):
 				writer = csv.writer(fout)
 				for row in content:
 					writer.writerow(row)
-			elif format == ReportFormat.TXT:
-				for row in content:
-					for c in row:
-						fout.write(str(c) + ' ')
-					fout.write('\n')
 			elif format == ReportFormat.PDF:
 				for row in content:
 					fout.write(str(row) + '\n')
@@ -184,7 +175,6 @@ def get_global_report(request, reportId, format):
 	elif reportId == 'advimgreport':
 		from terapix.youpi.forms import ReportAdvancedImageForm
 		form = ReportAdvancedImageForm(post)
-		title = 'Advanced image report'
 
 		if form.is_valid(): 
 			from django.template.loader import get_template
@@ -566,9 +556,6 @@ def get_global_report(request, reportId, format):
 					writer = csv.writer(fout)
 					for row in range(len(res)):
 						writer.writerow(res[row])
-				elif format == ReportFormat.TXT:
-					for row in range(len(res)):
-						fout.write(' '.join([str(s) for s in res[row]]) + '\n')
 				elif format == ReportFormat.PDF:
 					for row in range(len(res)):
 						fout.write(' '.join([str(s) for s in res[row]]) + '\n')
