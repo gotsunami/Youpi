@@ -156,8 +156,9 @@ def get_global_report(request, reportId, format):
 				for row in content:
 					writer.writerow(row)
 			elif format == ReportFormat.PDF:
-				for row in content:
-					fout.write(str(row) + '\n')
+				from terapix.reporting.pdf import PDFReport
+				r = PDFReport(fout, name = title, user = request.user, landscape = True)
+				r.save()
 
 			fout.close()
 			return render_to_response('report.html', {	
