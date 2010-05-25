@@ -864,16 +864,20 @@ function getQueryString(hash, strip) {
  *
  */
 var Notifier = {
+	notify: function (msg, timeout) {
+		Informer.info(msg);
+	},
 	/*
 	 * Function: notify
-	 * Static popup message
+	 * Static popup message. This is a native function, which can be used instead of the 
+	 * 3rdParty Q lib.
 	 *
 	 * Parameters:
 	 *  msg - string: message to display
 	 *  timeout - float: time in seconds before message timeout
 	 * 
 	 */
-	notify: function (msg, timeout) {
+	notify2: function (msg, timeout) {
 		if (typeof msg != 'string')
 			throw 'msg must be a string';
 
@@ -1785,5 +1789,20 @@ document.observe('dom:loaded', function() {
 		r.send('/youpi/permissions/default/');
 	});
 });
+
+document.observe('q:loaded', function() {
+	Q.set({ 
+		fontSize: "10px",
+		image_path: "/media/js/3rdParty/Q/images/q"
+	});
+	Informer = new Q.Informer({holderStyle: { 
+		marginTop: '66px',
+		position: "fixed", 
+		right: "10px", 
+		top: "10px", 
+		width: "250px", 
+		zIndex: 100001
+	}});//{life: {warning: timeout/1000}});
+}); 
 
 var box_file_browser;

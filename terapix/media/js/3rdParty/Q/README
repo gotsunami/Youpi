@@ -1,0 +1,35 @@
+= Q.js v0.0.7.3
+
+Qutensil - Javascript Toolset for Prototype
+
+== Description
+
+Q.js is a toolset built on the prototype.js and scriptaculous libraries.
+It features a growl-like user messaging system, color picker (based on raphael),
+slider, textarea, tagging system, tooltip system, draggable window and 
+alert / confirm / prompt windowing system. All of this can be styled from
+inside the Q.Base class.
+
+Check http://qutensil.com for demos and usage details.
+
+== Licenses
+
+Q.js 0.0.7.3 - http://qutensil.com
+
+Copyright (c) 2010 Boys Abroad (Wout Fierens - wout@boysabroad.com)
+
+Both commercial and non-commercial domains are allowed to use Q.js under a Creative Commons by-nd License.
+http://creativecommons.org/licenses/by-nd/3.0/
+
+== Donate
+
+Please donate to support development.
+
+== Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

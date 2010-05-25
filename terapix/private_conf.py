@@ -140,6 +140,8 @@ COMMON_JS = [
 	'js/3rdParty/scriptaculous/builder.js',
 	'js/3rdParty/scriptaculous/effects.js', 
 	'js/3rdParty/scriptaculous/dragdrop.js', 
+	'js/3rdParty/Q/q.js', 
+	'js/3rdParty/Q/q.informer.js', 
 	'js/processingcart.js', 
 	'js/common.js', 
 	'js/xhr.js',
