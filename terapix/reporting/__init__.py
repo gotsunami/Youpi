@@ -4,10 +4,18 @@ class ReportFormat(object):
 	"""
 	Available report formats
 	"""
-	CSV, PDF, TXT, HTML = ('CSV', 'PDF', 'TXT', 'HTML')
+	CSV, PDF, HTML, LATEX, PS, TARBALL = ('CSV', 'PDF', 'HTML', 'LaTeX', 'Postscript', 'Tarball',)
+
 	@staticmethod
 	def formats():
-		return (ReportFormat.CSV, ReportFormat.PDF, ReportFormat.TXT, ReportFormat.HTML)
+		return map(lambda x: {'name': x[0], 'ext': x[1]}, (
+			(ReportFormat.CSV, 'csv'),
+			(ReportFormat.HTML,'html'),
+			(ReportFormat.LATEX, 'tex'),
+			(ReportFormat.PS, 'ps'),
+			(ReportFormat.PDF, 'pdf'),
+			(ReportFormat.TARBALL, 'tar.gz'),
+		))
 
 def get_report_data(reports, id):
 	"""

@@ -35,10 +35,10 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					</select>
 				{% if perms.youpi.can_use_reporting %}
 					<div class="report_menu">
-						<input class="report_reset" type="button" value="Reset"/>	
-						<input class="report_format" type="button" value="CSV"/>	
-						<input class="report_format" type="button" value="PDF"/>	
-						<input class="report_format report_submit" type="button" value="HTML"/>	
+						<input class="report_reset report_submit" type="button" value="Reset"/>	
+					{% for format in report_formats %}
+						<input class="report_format" type="button" value="{{ format.name }}"/>	
+					{% endfor %}
 					</div>
 				{% endif %}
 				{# Descriptions #}
@@ -111,10 +111,10 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					</div>
 				{% else %}
 					<div class="report_menu">
-						<input class="report_reset" type="button" value="Reset"/>	
-						<input class="report_format" type="button" value="CSV"/>	
-						<input class="report_format" type="button" value="PDF"/>	
-						<input class="report_format report_submit" type="button" value="HTML"/>	
+						<input class="report_reset report_submit" type="button" value="Reset"/>	
+					{% for format in report_formats %}
+						<input class="report_format" type="button" value="{{ format.name }}"/>	
+					{% endfor %}
 					</div>
 				{% endif %}
 					<div class="report_options" id="loading_div"/>

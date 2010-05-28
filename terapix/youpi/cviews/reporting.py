@@ -34,14 +34,14 @@ global_reports = [
 	{	'id': 'imssavedselections',	
 		'title': 'List of saved selections from the image selector', 
 		'description': 'This report generates a list of all custom saved selections available in the image selector.',
-		'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+		'formats': (ReportFormat.CSV, ReportFormat.LATEX, ReportFormat.HTML),
 	},
 	{	'id': 'procresults', 
 		'title': 'List of processing results', 
 		'options': selopts,
 		'description': 'This report generates a CSV file (plain text) with all processing results. Depending on the current state of ' + \
 			'the database, it may take some time to generate.',
-		'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+		'formats': (ReportFormat.CSV, ReportFormat.LATEX, ReportFormat.HTML),
 	},
 	{	'id': 'advimgreport',	
 		'title': 'Advanced image report',
@@ -49,7 +49,7 @@ global_reports = [
 			'for processing the image selection. A PDF report can be generated too.',
 		'template' : 'reports/advanced-image-report-options.html',
 		'context': {'form' : ReportAdvancedImageForm()},
-		'formats': (ReportFormat.CSV, ReportFormat.TXT, ReportFormat.HTML),
+		'formats': (ReportFormat.CSV, ReportFormat.LATEX, ReportFormat.HTML),
 	},
 ]
 
@@ -88,6 +88,7 @@ def reporting(request):
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
 						'title' 			: get_title_from_menu_id(menu_id),
+						'report_formats'	: ReportFormat.formats(),
 					}, 
 					context_instance = RequestContext(request))
 
@@ -99,10 +100,16 @@ def get_global_report(request, reportId, format):
 	@param format report's output format
 	"""
 	post = request.POST
-	if format not in ReportFormat.formats():
+	# Supported report output formats
+	formats = ReportFormat.formats()
+	if format not in [f['name'] for f in formats]:
 		raise ValueError, "unsupported report output format: " + format
 
-	ext = format.lower()
+	ext = ''
+	for f in formats:
+		if f['name'] == format:
+			ext = f['ext'].lower()
+			break
 	fname = "%s-%s.%s" % (request.user.username, reportId, ext)
 	title = get_report_data(global_reports, reportId)['title']
 
