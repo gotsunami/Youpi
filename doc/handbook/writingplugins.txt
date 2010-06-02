@@ -100,7 +100,7 @@ appropriate descriptions by replacing the actual ``<p>`` HTML elements with::
 	<p>This is a system job</p>        # in system_item_cart.html
 
 Also update your ``system.js`` file by renaming the global variable ``uidskel`` (located at the 
-top of the file) with ``uidsystem``::
+top of the file) with ``uidsystem`` and replace all occurences of ``uidskel`` with ``uidsystem``::
 
 	/* global */
 	var uidsystem = '{{ plugin.id }}';
