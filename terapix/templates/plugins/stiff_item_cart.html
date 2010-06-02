@@ -1,0 +1,41 @@
+{# Item cart Stiff template #}
+
+<table class="cleantd">
+	<tr>
+		<td style="width: 100%; padding: 3px">
+			<p>This is a <b>Stiff job</b>
+			<table class="plugin_small">
+				<tr>
+					<td><span class="confLetter">Results output dir:</span> {{ data.userData.resultsOutputDir }}</td>
+				</tr>
+			</table>
+		</td>
+		<td style="text-align: center; vertical-align: middle">
+			{# Implement the _run() function so that an item can be process on the cluster #}
+			{# pluginId_forloop.counter is the tr element's id needed to remove the item from the cart once submitted #}
+			<div class="submitItem">
+				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
+				<p><img id="{{ plugin.id }}_{{ forloop.counter0 }}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.png" title="Submit processing to cluster" />
+			</div>
+			<img id="{{ plugin.id }}_{{ forloop.counter0 }}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.png"/>
+		</td>
+	</tr>
+</table>
+
+<script type="text/javascript">
+	document.observe('dom:loaded', function() {
+		$('{{ plugin.id }}_{{ forloop.counter0 }}_run').observe('click', function() {
+			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
+			boxes.confirm('Are you sure you want to submit this item to the cluster?', function() {
+				{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
+			});
+		});
+
+		$('{{ plugin.id }}_{{ forloop.counter0 }}_save').observe('click', function() {
+			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
+			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
+		});
+	});
+</script>
