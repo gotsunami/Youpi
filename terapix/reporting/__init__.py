@@ -11,10 +11,10 @@ class ReportFormat(object):
 		return map(lambda x: {'name': x[0], 'ext': x[1]}, (
 			(ReportFormat.CSV, 'csv'),
 			(ReportFormat.HTML,'html'),
-			(ReportFormat.LATEX, 'tex'),
-			(ReportFormat.PS, 'ps'),
-			(ReportFormat.PDF, 'pdf'),
-			(ReportFormat.TARBALL, 'tar.gz'),
+#			(ReportFormat.LATEX, 'tex'),
+#			(ReportFormat.PS, 'ps'),
+#			(ReportFormat.PDF, 'pdf'),
+#			(ReportFormat.TARBALL, 'tar.gz'),
 		))
 
 def get_report_data(reports, id):

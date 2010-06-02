@@ -51,3 +51,28 @@ def get_pixel_scale(imgpath):
 	hdulist.close()
 	return pixelscale
 
+class Template(object):
+	"""
+	Almost similar to the builtin string#Template class but substitution patterns 
+	can be specified using {before,after}_pattern.
+	@param content template string
+	@param before_pattern string to use as part of the pattern to recognize (start)
+	@param after_pattern string to use as part of the pattern to recognize (end)
+	"""
+	def __init__(self, content, before_pattern = '##', after_pattern = '##'):
+		self.__content = content
+		self.__bpat = before_pattern
+		self.__apat = after_pattern
+
+	@property
+	def initial_content(self):
+		"""
+		Returns original content
+		"""
+		return self.__content
+
+	def substitute(self, **kwords):
+		content = self.__content
+		for k, v in kwords.iteritems():
+			content = content.replace("%s%s%s" % (self.__bpat, k, self.__apat), v)
+		return content

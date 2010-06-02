@@ -1,0 +1,58 @@
+\documentclass[11pt,titlepage]{article}
+\usepackage{longtable,lscape}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{amsfonts}   % Math extensions
+\usepackage[dvipdfm,colorlinks]{hyperref}
+\def \rms {{\it rms}\ }
+\def \etal {{\it et al.}\ }
+\def\vec#1{\mbox{\boldmath $\displaystyle#1$}}
+\def\vecs#1{\mbox{\boldmath $\scriptstyle#1$}}
+\def\oper#1{\mbox{\large\bf #1}}
+\def\dvol#1#2{d\hspace{1pt}^{#1}\hspace{-2pt}#2}
+\newlength{\jacobwidth}
+\def\jacob#1#2#3{\settowidth{\jacobwidth}{$_{#3}$}
+	\left(\frac{d#1}{d#2}\right)_{_{\!\!#3}}\hspace{-\jacobwidth}}
+\def\jacobs#1#2#3{\settowidth{\jacobwidth}{$_{#3}$}
+	\left(\frac{\partial#1}{\partial#2}\right)_{_{\!\!#3}}\hspace{-\jacobwidth}}
+\def\parhead#1#2#3{#1\>#2\>\`#3\\}
+\def\parlist#1{\smallskip \hspace{10mm} \begin{minipage}{150mm}#1\end{minipage}\\}
+\def\pararg#1#2{\>#1\>\begin{minipage}[t]{83mm}#2\end{minipage}\\}
+\newenvironment{pitemize}{
+\begin{itemize}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{itemize}}
+
+\parskip=2mm
+\parindent=0mm
+\textheight=240mm
+\textwidth=160mm
+\oddsidemargin=0mm
+\evensidemargin=8mm
+\topmargin=-10mm
+\itemsep=-1mm
+\topsep=0mm
+\renewcommand{\floatpagefraction}{0.7}
+\begin{document}
+\title{
+\vspace{-3cm}
+{\LARGE Youpi Processing Report}\\
+{\Large ##reportName##}\\
+{\small ##generated##}}
+\date{\today\\\vspace{1cm}
+%\centerline{
+%\fbox{\includegraphics[width=12cm]{fig/front.eps}}
+%}
+}
+\author{ \Large Terapix/Institut d'Astrophysique de Paris}
+\maketitle
+\newpage
+\pagestyle{empty}
+\setcounter{page}{0}
+{\ }
+\pagestyle{plain}
+\pagenumbering{roman}
+%\tableofcontents
+\pagenumbering{arabic}

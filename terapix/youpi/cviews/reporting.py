@@ -190,9 +190,22 @@ def get_global_report(request, reportId, format):
 				writer = csv.writer(fout)
 				for row in content:
 					writer.writerow(row)
+			elif format == ReportFormat.LATEX:
+				from terapix.reporting.latex import LaTeXReport
+				r = LaTeXReport(fout, name = title, user = request.user, landscape = True)
+				r.addRawContent("Yeahhhh")
+				data = []
+				for row in content:
+					data.append(["%s\\\\\n%s on %s (job %s)\\\\\nBy %s on %s\\\\\n%s" % (row[1], row[0], row[4], row[5], row[3], row[2], row[6])])
+				r.addTable(
+					header = ['Job Details'], 
+					data = data,
+					caption = title
+				)
+				r.save()
 			elif format == ReportFormat.PDF:
-				from terapix.reporting.pdf import PDFReport
-				r = PDFReport(fout, name = title, user = request.user, landscape = True)
+				from terapix.reporting.latex import LaTeXReport
+				r = LaTeXReport(fout, name = title, user = request.user, landscape = True)
 				r.save()
 
 			fout.close()
