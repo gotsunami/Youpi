@@ -66,47 +66,86 @@ class Stiff(ProcessingPlugin):
 		2. Executes condor_submit on that file
 		3. Returns info related to ClusterId and number of jobs submitted
 		"""
-		post = request.POST
+		try:
+			idList = eval(request.POST['IdList'])	# List of lists
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
 
 		cluster_ids = []
 		error = condorError = '' 
+		k = 1
 
 		try:
-			csfPath = self.__getCondorSubmissionFile(request)
-			pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
-			data = pipe.readlines()
-			pipe.close()
-			cluster_ids.append(self.getClusterId(data))
+			for imgList in idList:
+				if not len(imgList):
+					continue
+				csfPath = self.__getCondorSubmissionFile(request, idList)
+				pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
+				data = pipe.readlines()
+				pipe.close()
+				cluster_ids.append(self.getClusterId(data))
+				k += 1
 		except CondorSubmitError, e:
 			condorError = str(e)
 		except Exception, e:
-			error = "Error while processing item: %s" % e
+				error = "Error while processing list #%d: %s" % (k, e)
 
 		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
-	def __getCondorSubmissionFile(self, request):
+	def __getCondorSubmissionFile(self, request, idList):
 		"""
 		Generates a suitable Condor submission file for processing self.command jobs on the cluster.
 		"""
 
 		post = request.POST
 		try:
-			#
-			# Retreive your POST data here
-			#
-			resultsOutputDir = post['ResultsOutputDir']
 			itemId = str(post['ItemId'])
+			config = post['Config']
+			taskId = post.get('TaskId', '')
+			resultsOutputDir = post['ResultsOutputDir']
+			reprocessValid = int(post['ReprocessValid'])
 		except Exception, e:
 				raise PluginError, "POST argument error. Unable to process data: %s" % e
 
+		#
+		# Config file selection and storage.
+		#
+		# Rules: 	if taskId has a value, then the config file content is retreived
+		# 			from the existing Stiff processing. Otherwise, the config file content
+		#			is fetched by name from the ConfigFile objects.
+		#
+		# 			Selected config file content is finally saved to a regular file.
+		#
+		try:
+			if len(taskId):
+				config = Plugin_stiff.objects.filter(task__id = int(taskId))[0]
+				content = str(zlib.decompress(base64.decodestring(config.config)))
+			else:
+				config = ConfigFile.objects.filter(kind__name__exact = self.id, name = config)[0]
+				content = config.content
+		except IndexError:
+			# Config file not found, maybe one is trying to process data from a saved item 
+			# with a delete configuration file
+			raise PluginError, "The configuration file you want to use for this processing has not been found " + \
+				"in the database... Are you trying to process data with a config file that has been deleted?"
+		except Exception, e:
+			raise PluginError, "Unable to use a suitable config file: %s" % e
+
 		now = time.time()
+
+		# Swarp config file
+		customrc = self.getConfigurationFilePath()
+		strc = open(customrc, 'w')
+		strc.write(content)
+		strc.close()
+
 		# Condor submission file
 		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 		csf = open(csfPath, 'w')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		# At least those 3 keys
-		userData = {'Descr' 			: str("%s trying %s" % (self.optionLabel, self.command)),		# Mandatory for Active Monitoring Interface (AMI)
+		userData = {'Descr' 			: '',															# Mandatory for Active Monitoring Interface (AMI)
 					'Kind'	 			: self.id,														# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),											# Mandatory for AMI, WP
 					'ItemID' 			: itemId, 
@@ -120,16 +159,56 @@ class Stiff(ProcessingPlugin):
 		# Generate CSF
 		#
 		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
+		cluster.setTransferInputFiles([customrc, 
+			os.path.join(settings.TRUNK, 'terapix', 'lib', 'common.py'),
+		])
 
-		# Real command to perform here
-		args = ''
-		for x in range(self.jobCount):
+		images = Image.objects.filter(id__in = idList)
+		# One image per job queue
+		for img in images:
+			# Stores real image name (as available on disk)
+			userData['RealImageName'] = str(img.filename)
+			path = os.path.join(img.path, userData['RealImageName'] + '.fits')
+
+			#
+			# $(Cluster) and $(Process) variables are substituted by Condor at CSF generation time
+			# They are later used by the wrapper script to get the name of error log file easily
+			#
+			userData['ImgID'] = str(img.id)
+			userData['Descr'] = str("%s of %s" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
 			# Mandatory for WP
 			userData['JobID'] = self.getUniqueCondorJobId()
-			encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+
+			# Base64 encoding + marshal serialization
+			# Will be passed as argument 1 to the wrapper script
+			try:
+				encUserData = base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+			except ValueError:
+				raise ValueError, userData
+
+			image_args = "%(encuserdata)s %(condor_transfer)s /usr/local/bin/qualityFITS -vv" % {
+				'encuserdata'		: encUserData, 
+				'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+			}
+
+			image_args += " -c %s" % os.path.basename(customrc)
+			
+			# Adding output directory options if the image is from multiple ingestion
+			# (same pysical image but different names)
+			# the real physical image is used for processing but the results will be contained in a
+			# different directory, to prevent confusion between instances
+			if userData['RealImageName'] != str(img.name):
+				image_args += " -o %s" % os.path.join(img.name, 'qualityFITS')
+	
+			image_args += " %s" % path
+
+			# Finally, adds Condor queue
 			cluster.addQueue(
-				queue_args = str("%(data)s %(command)s" % {'data': encUserData, 'command': self.command,}),
-				queue_env = {'YOUPI_USER_DATA': encUserData,}
+				queue_args = str(image_args), 
+				queue_env = {
+					'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + resultsOutputDir, 
+					'YOUPI_USER_DATA'		: base64.encodestring(marshal.dumps(userData)).replace('\n', '')
+				}
 			)
 
 		cluster.write(csfPath)

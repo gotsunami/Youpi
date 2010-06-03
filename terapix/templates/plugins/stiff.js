@@ -39,24 +39,38 @@ var {{ plugin.id }} = {
 	 *
 	 */
 	addSelectionToCart: function() {
+		sels = this.ims.getListsOfSelections();
+		
 		// Do your sanity checks here
 		var msg = 'One Stiff-related job has been added to the cart. This is a DEMO plugin: it does nothing useful.';
 	
-		// Custom output directory
+		// Gets custom output directory
+		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
 		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidstiff + '/';
+		if (custom_dir) output_data_path += custom_dir + '/';
+	
+		// Get config file
+		var cSel = $(uidstiff + '_config_name_select');
+		var config = cSel.options[cSel.selectedIndex].text;
 	
 		// Set mandatory structures
 		var p_data = {	
 			plugin_name : uidstiff,
-			userData : {resultsOutputDir: output_data_path}
+			userData : {
+				resultsOutputDir: output_data_path,
+				config: config, 
+				idList: sels
+			}
 		};
 	
 		// Add entry into the processing cart
+		var total = this.ims.getImagesCount();
 		s_cart.addProcessing(	
 			p_data,
 			// Custom handler
 			function() {
-				document.fire('notifier:notify', msg);
+				document.fire('notifier:notify', 'The current image selection (' + total + ' ' + 
+					(total > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
 			}
 		);
 	},
@@ -96,7 +110,7 @@ var {{ plugin.id }} = {
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
 
-		r.send('/youpi/process/plugin/', opts.toQueryString());
+		r.send('{% url terapix.youpi.views.processing_plugin %}', opts.toQueryString());
 	},
 
 	/*
@@ -488,5 +502,37 @@ var {{ plugin.id }} = {
 		{{ plugin.id }}.ims = new ImageSelector(uidstiff + '_results_div');
 		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
 		
-	}
+	},
+
+	/*
+	 * Function displayImageCount
+	 * Renders list of images to be processed as a summary (used in the processing cart plugin rendering)
+	 *
+	 * Parameters:
+	 *  idList - array of arrays of idLists
+	 *
+	 */
+	displayImageCount: function(idList, container_id) {
+		var container = $(container_id);
+		var idList = eval(idList);
+		var c = 0;
+		var txt;
+		idList.length > 1 ? txt = 'Batch' : txt = 'Single';
+		var selDiv = new Element('div', {'class': 'selectionModeTitle'}).update(txt + ' selection mode:');
+		container.insert(selDiv);
+
+		selDiv = new Element('div', {'class': 'listsOfSelections'});
+
+		for (var k=0; k < idList.length; k++) {
+			c = idList[k].toString().split(',').length;
+			if (idList.length > 1)
+				txt = 'Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '');
+			else
+				txt = c + ' image' + (c > 1 ? 's' : '');
+
+			selDiv.update(txt);
+			selDiv.insert(new Element('br'));
+		}
+		container.insert(selDiv);
+	},
 };
