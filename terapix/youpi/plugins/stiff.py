@@ -44,8 +44,8 @@ class Stiff(ProcessingPlugin):
 		ProcessingPlugin.__init__(self)
 
 		self.id = 'stiff'
-		self.optionLabel = 'FITS to TIFF image conversion'
-		self.description = 'Stiff'
+		self.optionLabel = 'Stiff'
+		self.description = 'FITS to TIFF image conversion'
 		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'STIFF'

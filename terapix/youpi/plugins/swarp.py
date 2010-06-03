@@ -37,8 +37,8 @@ class Swarp(ProcessingPlugin):
 		ProcessingPlugin.__init__(self)
 
 		self.id = 'swarp'
-		self.optionLabel = 'Image stacking'
-		self.description = 'Swarp'
+		self.optionLabel = 'Swarp'
+		self.description = 'Image stacking'
 		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SWARP'

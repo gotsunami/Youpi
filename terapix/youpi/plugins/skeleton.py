@@ -44,8 +44,8 @@ class Skeleton(ProcessingPlugin):
 		ProcessingPlugin.__init__(self)
 
 		self.id = 'skel'
-		self.optionLabel = 'Skeleton (DEMO)'
-		self.description = 'Skeleton DEMO processing'
+		self.optionLabel = 'Skeleton'
+		self.description = 'Skeleton (Tutorial only)'
 		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SKEL'

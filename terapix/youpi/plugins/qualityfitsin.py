@@ -51,8 +51,8 @@ class QualityFitsIn(ProcessingPlugin):
 		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)
 		#
 		self.id = 'fitsin'
-		self.optionLabel = 'First Quality Evaluation'
-		self.description = 'QualityFits'
+		self.optionLabel = 'QualityFits'
+		self.description = 'First Quality Evaluation'
 		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'QF'

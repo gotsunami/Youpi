@@ -601,11 +601,11 @@ div.processing_menu_entry:hover {
 }
 
 div.processing_menu_entry span.desc {
-	font-weight: bold;
+	font-style: italic;
 }
 
 div.processing_menu_entry span.label {
-	font-style: italic;
+	font-weight: bold;
 }
 
 table.plugin_menu {

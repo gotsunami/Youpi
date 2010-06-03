@@ -42,8 +42,8 @@ class Sextractor(ProcessingPlugin):
 		# REQUIRED members (see doc/writing_plugins/writing_plugins.pdf)
 		#
 		self.id = 'sex'
-		self.optionLabel = 'Sources extractor'
-		self.description = 'Sextractor'
+		self.optionLabel = 'Sextractor'
+		self.description = 'Sources extractor'
 		# Item prefix in processing cart. This should be short string since
 		# the item ID can be prefixed by a user-defined string
 		self.itemPrefix = 'SEX'

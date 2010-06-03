@@ -2,8 +2,6 @@
 {% load i18n %}
 {% load compressed %}
 
-{% block coltype %}colMS{% endblock %}
-{% block bodyclass %}dashboard{% endblock %}
 {% block extrahead %}
 {% compressed_css 'processing' %}
 {% compressed_js 'processing' %}
@@ -50,7 +48,7 @@ plugin_data[{{ forloop.counter0 }}] = ['{{ plugin.id }}', '{{ plugin.description
 		var desc = new Element('span').addClassName('desc').update(plugin[1]);
 		var label = new Element('span').addClassName('label').update(plugin[2]);
 
-		tdiv.insert(desc).insert(new Element('br')).insert(label);
+		tdiv.insert(label).insert(new Element('br')).insert(desc);
 
 		pdiv.insert(img).insert(tdiv);
 		td.insert(pdiv);
