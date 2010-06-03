@@ -25,6 +25,13 @@ var uidstiff = '{{ plugin.id }}';
 
 var {{ plugin.id }} = {
 	/*
+	 * Variable: ims
+	 * 
+	 * <ImageSelector> instance
+	 *
+	 */
+	ims: null,
+	/*
 	 * Function: addSelectionToCart
 	 * Add the current selection to cart.
 	 * Since this is a demo plugin, no real selection has been made. It's just adding the output data 
@@ -460,5 +467,26 @@ var {{ plugin.id }} = {
 					window.location.reload();
 				}
 		);
+	},
+
+	/*
+	 * Function: selectImages
+	 * Add an image selector widget
+	 *
+	 */ 
+	selectImages: function() {
+		var root = $('menuitem_sub_0');
+		root.writeAttribute('align', 'center');
+		// Container of the ImageSelector widget
+		var div = new Element('div', {id: uidstiff + '_results_div', align: 'center'}).setStyle({width: '90%'});
+		root.insert(div);
+
+		/*
+		this.ims = new ImageSelector(uidstiff + '_results_div');
+		this.ims.setTableWidget(new AdvancedTable());
+		*/
+		{{ plugin.id }}.ims = new ImageSelector(uidstiff + '_results_div');
+		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
+		
 	}
 };
