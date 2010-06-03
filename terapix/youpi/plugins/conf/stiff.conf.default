@@ -1,0 +1,51 @@
+# Default configuration file for STIFF 2.1.2
+# EB 2010-02-10
+#
+OUTFILE_NAME           stiff.tif       # Name of the output file
+IMAGE_TYPE             AUTO            # Output image format: AUTO, TIFF,
+                                       # or TIFF-PYRAMID
+BITS_PER_CHANNEL       8               # 8 or 16
+BIGTIFF_TYPE           AUTO            # Use BigTIFF? NEVER,ALWAYS or AUTO
+COMPRESSION_TYPE       LZW             # NONE,LZW,JPEG,DEFLATE or ADOBE-DEFLATE
+COMPRESSION_QUALITY    90              # JPEG compression quality (%)
+TILE_SIZE              256             # TIFF tile-size
+PYRAMID_MINSIZE        256             # Minimum plane size in TIFF pyramid
+BINNING                1               # Binning factor for the data
+FLIP_TYPE              NONE            # NONE, or flip about X, Y or XY
+ 
+#------------------------------- Dynamic range ------------------------------
+ 
+SKY_TYPE               AUTO            # Sky-level: "AUTO" or "MANUAL"
+SKY_LEVEL              0.0             # Background level for each image
+MIN_TYPE               GREYLEVEL       # Min-level: "QUANTILE", "MANUAL"
+                                       # or "GREYLEVEL"
+MIN_LEVEL              0.001           # Minimum value, quantile or grey level
+MAX_TYPE               QUANTILE        # Max-level: "QUANTILE" or "MANUAL"
+MAX_LEVEL              0.995           # Maximum value or quantile
+SATUR_LEVEL            40000.0         # FITS data saturation level(s)
+GAMMA_TYPE             POWER-LAW       # Gamma correction: POWER-LAW, SRGB or
+                                       # REC.709
+GAMMA                  2.2             # Display gamma
+GAMMA_FAC              1.0             # Luminance gamma correction factor
+COLOUR_SAT             1.0             # Colour saturation (0.0 = B&W)
+NEGATIVE               N               # Make negative of the image
+ 
+#------------------------------ Memory management -----------------------------
+
+VMEM_DIR               .               # Directory path for swap files
+VMEM_MAX               1048576         # Maximum amount of virtual memory (MB)
+MEM_MAX                1024            # Maximum amount of usable RAM (MB)
+
+#------------------------------ Miscellaneous ---------------------------------
+ 
+VERBOSE_TYPE           NORMAL          # QUIET, NORMAL or FULL
+COPY_HEADER            N               # Copy FITS header to description field?
+DESCRIPTION            "STIFF image"   # Image content description
+COPYRIGHT              AstrOmatic.net  # Copyright notice
+WRITE_XML              Y               # Write XML file (Y/N)?
+XML_NAME               stiff.xml       # Filename for XML output
+XSL_URL                file:///usr/share/stiff/stiff.xsl
+                                       # Filename for XSL style-sheet
+NTHREADS               0               # Number of simultaneous threads for
+                                       # the SMP version of STIFF
+                                       # 0 = automatic
