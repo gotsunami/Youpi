@@ -345,7 +345,7 @@ def get_requirement_string(params, vms):
 	@params string of params like 'MEM,G,1,G'
 	@params list vms available cluster nodes
 	"""
-	if type(params) != types.StringType:
+	if type(params) != types.StringType and type(params) != types.UnicodeType:
 		raise TypeError, "params must be a string"
 	if type(vms) != types.ListType:
 		raise TypeError, "vms must be a list"
