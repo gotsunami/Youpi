@@ -177,7 +177,7 @@ if len(hdulist) > 1:
 else:
 	os.rename(imgName + '.fits', tmpImage)
 debug("Running Stiff on previous stack")
-os.system("%s -c %s -OUTFILE_NAME %s.tif %s" % (CMD_STIFF, '""" + customrc + """', imgName, tmpImage))
+os.system("%s -c %s -OUTFILE_NAME %s.tif %s 2>&1" % (CMD_STIFF, '""" + os.path.basename(customrc) + """', imgName, tmpImage))
 debug("Stiff complete")
 """
 
