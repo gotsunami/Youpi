@@ -34,6 +34,7 @@ CONDOR_BIN_PATH = findPath('condor_q')
 CMD_SCAMP			= 'scamp'
 CMD_SWARP			= 'swarp'
 CMD_SEX				= 'sex'
+CMD_STIFF			= 'stiff'
 SOFTS = (	('Condor', 		os.path.join(CONDOR_BIN_PATH, 'condor'), 		# command
 							'-v',							# argument to version version information 
 							'Version: (.*?) \w'),			# RegExp to retreive version number only

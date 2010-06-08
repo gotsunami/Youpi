@@ -687,7 +687,6 @@ def process(userData, kind_id, argv):
 			if userData['RealImageName'] != imgName:
 				os.makedirs(os.path.join(imgName, 'qualityFITS'), RWX_ALL)
 
-		# Other preprocessing stuff
 		elif kind == 'sex':
 			img_id = userData['ImgID']
 			imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
@@ -729,6 +728,7 @@ def process(userData, kind_id, argv):
 
 
 	debug("Beginning post-processing operations")
+
 	# QualityFITS-In processing
 	if kind == 'fitsin':
 		if exit_code == 0:

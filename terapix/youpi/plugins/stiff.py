@@ -13,20 +13,9 @@
 
 # vim: set ts=4
 
-#
-# Mandatory data members
-#
-# def __getCondorSubmissionFile(self, request)		: generates a suitable Condor submission file
-# def getResultEntryDescription(self, task)			: returns custom result entry description for a task.
-# def getSavedItems(self, request)					: returns a user's saved items for this plugin 
-# def getTaskInfo(self, request)					: returns information about a finished processing task. Used on the results page.
-# def process(self, request)						: generates and submits a Condor submission file (CSF)
-# def reprocessAllFailedProcessings(self, request)	: returns parameters to allow reprocessing of failed processings
-# def saveCartItem(self, request)					: save cart item's custom data to DB
-#
-
 import sys, os.path, re, time, string
 import marshal, base64, zlib
+from stat import *
 #
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
@@ -79,7 +68,7 @@ class Stiff(ProcessingPlugin):
 			for imgList in idList:
 				if not len(imgList):
 					continue
-				csfPath = self.__getCondorSubmissionFile(request, idList)
+				csfPath = self.__getCondorSubmissionFile(request, imgList)
 				pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_submit %s 2>&1" % csfPath))
 				data = pipe.readlines()
 				pipe.close()
@@ -149,11 +138,53 @@ class Stiff(ProcessingPlugin):
 					'Kind'	 			: self.id,														# Mandatory for AMI, Wrapper Processing (WP)
 					'UserID' 			: str(request.user.id),											# Mandatory for AMI, WP
 					'ItemID' 			: itemId, 
+					'ConfigFile' 		: customrc, 
 					'ResultsOutputDir'	: str(resultsOutputDir)											# Mandatory for WP
 				} 
 
 		# Set up default files to delete after processing
 		self.setDefaultCleanupFiles(userData)
+		# Also remove *.fits and *.xml
+		userData['RemoveFiles'].extend(['*.fits', '*.xml'])
+
+		#
+		# Pre-processing script runned by condor_transfer.pl
+		#
+		preProcFile = os.path.join('/tmp/', "%s-preprocessing-%s.py" % (self.id, time.time()))
+		pf = open(preProcFile, 'w')
+		pcontent = """#!/usr/bin/env python
+
+# AUTOMATICALLY GENERATED SCRIPT. DO NOT EDIT
+
+import os, glob, sys, time, pyfits
+from settings import *
+
+def debug(msg):
+	print "[YWP@%s] %s" % ("%02d:%02d:%02d" % time.localtime(time.time())[3:6], msg)
+	sys.stdout.flush()
+
+# PRE-PROCESSING stuff go there
+
+imgName = glob.glob('*.fits')[0][:-5]
+tmpImage = "%s-ok.fits" % imgName
+hdulist = pyfits.open(imgName + '.fits')
+hdulist.close()
+# Is it a MEF? 
+if len(hdulist) > 1:
+	debug("MEF detected. Swarping")
+	os.system("%s -IMAGEOUT_NAME %s %s.fits 2>&1" % (CMD_SWARP, tmpImage, imgName))
+	debug("Swarp complete")
+else:
+	os.rename(imgName + '.fits', tmpImage)
+debug("Running Stiff on previous stack")
+os.system("%s -c %s -OUTFILE_NAME %s.tif %s" % (CMD_STIFF, '""" + customrc + """', imgName, tmpImage))
+debug("Stiff complete")
+"""
+
+		pf.write(pcontent)
+		pf.close()
+		RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO 
+		os.chmod(preProcFile, RWX_ALL)
 
 		#
 		# Generate CSF
@@ -161,6 +192,7 @@ class Stiff(ProcessingPlugin):
 		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([customrc, 
 			os.path.join(settings.TRUNK, 'terapix', 'lib', 'common.py'),
+			preProcFile,
 		])
 
 		images = Image.objects.filter(id__in = idList)
@@ -186,21 +218,12 @@ class Stiff(ProcessingPlugin):
 			except ValueError:
 				raise ValueError, userData
 
-			image_args = "%(encuserdata)s %(condor_transfer)s /usr/local/bin/qualityFITS -vv" % {
+			image_args = "%(encuserdata)s %(condor_transfer)s -l %(image)s -- ./%(preprocscript)s" % {
+				'image': path,
 				'encuserdata'		: encUserData, 
 				'condor_transfer'	: "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
+				'preprocscript'		: os.path.basename(preProcFile),
 			}
-
-			image_args += " -c %s" % os.path.basename(customrc)
-			
-			# Adding output directory options if the image is from multiple ingestion
-			# (same pysical image but different names)
-			# the real physical image is used for processing but the results will be contained in a
-			# different directory, to prevent confusion between instances
-			if userData['RealImageName'] != str(img.name):
-				image_args += " -o %s" % os.path.join(img.name, 'qualityFITS')
-	
-			image_args += " %s" % path
 
 			# Finally, adds Condor queue
 			cluster.addQueue(
