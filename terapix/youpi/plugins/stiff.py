@@ -287,10 +287,12 @@ debug("Stiff complete")
 
 		post = request.POST
 		try:
+			idList = eval(post['IdList'])
 			itemID = str(post['ItemId'])
 			resultsOutputDir = post['ResultsOutputDir']
+			config = post['Config']
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
 
 		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
 		if items:
@@ -299,8 +301,11 @@ debug("Stiff complete")
 			itemName = "%s-%d" % (itemID, len(items)+1)
 
 		# Custom data
-		data = { 'Descr' : "Runs %d %s commands on the cluster" % (self.jobCount, self.command),
-				 'resultsOutputDir' : resultsOutputDir }
+		data = { 
+			'resultsOutputDir'	: resultsOutputDir,
+			'idList' 			: idList, 
+			'config' 			: config,
+		}
 		sdata = base64.encodestring(marshal.dumps(data)).replace('\n', '')
 
 		profile = request.user.get_profile()
@@ -326,10 +331,15 @@ debug("Stiff complete")
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
-			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
-						'username'			: str(it.user.username),
-						'descr' 			: str(data['Descr']),
-						'itemId' 			: str(it.id), 
-						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request)),
-						'name' 				: str(it.name) })
+			res.append({
+				'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
+				'username'			: str(it.user.username),
+				'idList' 			: str(data['idList']), 
+				'itemId' 			: str(it.id), 
+				'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request)),
+				'name' 				: str(it.name),
+				'config' 			: str(data['config']),
+			})
+
 		return res
+

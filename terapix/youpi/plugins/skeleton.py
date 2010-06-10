@@ -188,7 +188,7 @@ class Skeleton(ProcessingPlugin):
 			itemID = str(post['ItemId'])
 			resultsOutputDir = post['ResultsOutputDir']
 		except Exception, e:
-			raise PluginError, "POST argument error. Unable to process data."
+			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
 
 		items = CartItem.objects.filter(kind__name__exact = self.id).order_by('-date')
 		if items:

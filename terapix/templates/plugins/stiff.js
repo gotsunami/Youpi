@@ -345,8 +345,9 @@ var {{ plugin.id }} = {
 					var tr, th;
 
 					tr = new Element('tr');
-					var header = $A(['Date', 'Permissions', 'Name', 'Description', 'Action']);
-					header.each(function(elem) {
+					//var header = $A(['Date', 'Permissions', 'Name', 'Description', 'Action']);
+					var headers = $A(['Date', 'Permissions', 'Name', '# images', 'Config', 'Action']);
+					headers.each(function(elem) {
 						tr.insert(new Element('th').update(elem));
 					});
 					table.insert(tr);
@@ -354,6 +355,7 @@ var {{ plugin.id }} = {
 					var delImg, trid;
 					var tabi, tabitr, tabitd;
 					resp.result.each(function(res, k) {
+						idLists = res.idList.evalJSON();
 						trid = uidstiff + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
 						// Delete
@@ -381,8 +383,19 @@ var {{ plugin.id }} = {
 						td = new Element('td').addClassName('name').update(res.name);
 						tr.insert(td);
 	
-						// Description
-						td = new Element('td').update(res.descr);
+						// Images count
+						td = new Element('td', {'class': 'imgCount'});
+						var sp = new Element('span', {'style': 'font-weight: bold; text-decoration: underline;'});
+						sp.update(idLists.length > 1 ? 'Batch' : 'Single');
+						td.insert(sp).insert(new Element('br'));
+
+						idLists.each(function(idList) {
+							td.insert(idList.length).insert(new Element('br'));
+						});
+						tr.insert(td);
+
+						// Config
+						td = new Element('td', {'class': 'config'}).update(res.config);
 						tr.insert(td);
 						
 						// Insert delete button
