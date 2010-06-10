@@ -207,7 +207,7 @@ debug("Stiff complete")
 			# They are later used by the wrapper script to get the name of error log file easily
 			#
 			userData['ImgID'] = str(img.id)
-			userData['Descr'] = str("%s of %s" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
+			userData['Descr'] = str("%s of image %s" % (self.optionLabel, img.name))		# Mandatory for Active Monitoring Interface (AMI)
 			# Mandatory for WP
 			userData['JobID'] = self.getUniqueCondorJobId()
 
@@ -336,7 +336,7 @@ debug("Stiff complete")
 				'username'			: str(it.user.username),
 				'idList' 			: str(data['idList']), 
 				'itemId' 			: str(it.id), 
-				'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request)),
+				'resultsOutputDir' 	: str(data['resultsOutputDir']),
 				'name' 				: str(it.name),
 				'config' 			: str(data['config']),
 			})
