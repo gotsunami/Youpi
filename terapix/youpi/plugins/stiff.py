@@ -252,12 +252,28 @@ debug("Stiff complete")
 		if not task:
 			return {'Error': str("Sorry, you don't have permission to see this result entry.")}
 		task = task[0]
+		img = Rel_it.objects.get(task__id = taskid).image
+
+		# Jobs History
+		stiff_history = Rel_it.objects.filter(image__id = img.id, task__kind__name = self.id).order_by('-id')
+		history = []
+		for h in stiff_history:
+			history.append({
+				'User' 		: str(h.task.user.username),
+				'Success' 	: h.task.success,
+				'Start' 	: str(h.task.start_date),
+				'Duration' 	: str(h.task.end_date-h.task.start_date),
+				'Hostname' 	: str(h.task.hostname),
+				'TaskId'	: str(h.task.id),
+			})
 
 		# Error log content
 		if task.error_log:
 			err_log = str(zlib.decompress(base64.decodestring(task.error_log)))
 		else:
 			err_log = ''
+
+		#config = zlib.decompress(base64.decodestring(data.config))
 
 		return {	'TaskId'	: str(taskid),
 					'Title' 	: str("%s" % self.description),
@@ -267,7 +283,13 @@ debug("Stiff complete")
 					'Start' 	: str(task.start_date),
 					'End' 		: str(task.end_date),
 					'Duration' 	: str(task.end_date-task.start_date),
-					'Log' 		: err_log
+					'Log' 		: err_log,
+					'Tags'		: [[str(t.name), str(t.style)] for t in img.tags()],
+					'History'	: history,
+					'ImgName' 	: str(img.name),
+					'ImgPath' 	: str(img.path),
+					'ResultsOutputDir' 	: str(task.results_output_dir),
+		#			'Config' 			: str(config),
 			}
 
 	def getResultEntryDescription(self, task):

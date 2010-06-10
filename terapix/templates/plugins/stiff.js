@@ -303,17 +303,127 @@ var {{ plugin.id }} = {
 		
 		// Permissions
 		tr = new Element('tr');
-		td = new Element('td').setStyle({padding: '0px'});
+		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
 		td.update(ResultsHelpers.getPermissionsEntry(resp.TaskId));
 		tr.insert(td);
 		tab2.insert(tr);
+		
+		// Image tags
+		if (resp.Tags.length) {
+			tr = new Element('tr');
+			td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
+			td.insert('Image Tags');
+			tr.insert(td);
+			tab2.insert(tr);
+
+			tr = new Element('tr');
+			td = new Element('td', {colspan: 2}).setStyle({padding: '8px'});
+			$A(resp.Tags).each(function(tag) {
+				td.insert(new Element('div', {style: 'float: left; ' + tag[1]}).addClassName('tagwidget').update(tag[0]));;
+			});
+			tr.insert(td);
+			tab2.insert(tr);
+		}
 
 		// Condor Job Logs
 		tr = new Element('tr');
-		td = new Element('td').setStyle({padding: '0px'});
+		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
 		td.update(ResultsHelpers.getCondorJobLogsEntry(resp.ClusterId, resp.TaskId));
 		tr.insert(td);
 		tab2.insert(tr);
+		
+		// Processing history
+		// Header title
+		var hist = resp.History;
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2, 'class': 'qfits-result-header-title'});
+		td.insert('Stiff processing history (' + hist.length + ')');
+		tr.insert(td);
+		tab2.insert(tr);
+
+		tr = new Element('tr');
+		td = new Element('td', {colspan: '2'});
+		htab = new Element('table', {'class': 'qfits-result-history'});
+		td.insert(htab);
+		tr.insert(td);
+		tab2.insert(tr);
+	
+		hist.each(function(task) {
+			tr = new Element('tr');
+			// Emphasis of current history entry
+			if (resp.TaskId == task.TaskId)
+				tr.setAttribute('class', 'history-current');
+	
+			// Icon
+			td = new Element('td');
+			var src = task.Success ? 'success' : 'error';
+			var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'});
+			td.insert(img);
+			tr.insert(td);
+	
+			// Date-time, duration
+			td = new Element('td');
+			var a = new Element('a', {href: '/youpi/results/' + uidswarp + '/' + task.TaskId + '/'});
+			a.insert(task.Start + ' (' + task.Duration + ')');
+			td.insert(a);
+			tr.insert(td);
+	
+			// Hostname
+			tr.insert(new Element('td').update(task.Hostname));
+	
+			// User
+			tr.insert(new Element('td').update(task.User));
+	
+			// Reprocess option
+			td = new Element('td', {'class': 'reprocess'});
+			img = new Element('img', {
+				onclick: uidswarp + ".reprocessStack('" + task.TaskId + "');",
+				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
+			});
+			td.insert(img);
+			tr.insert(td);
+	
+			htab.insert(tr);
+		});
+			
+		// Stiff run parameters
+		tr = new Element('tr'); 
+		td = new Element('td', {colspan: '2'}).addClassName('qfits-result-header-title');
+		td.update('Stiff run parameters');
+		tr.insert(td);
+		tab2.insert(tr);
+
+		// Image
+		tr = new Element('tr');
+		td = new Element('td').update('Image:');
+		tr.insert(td);
+		td = new Element('td').update(resp.ImgPath + resp.ImgName + '.fits');
+		tr.insert(td);
+		tab2.insert(tr);
+		
+		// Output directory
+		tr = new Element('tr');
+		td = new Element('td', {nowrap: 'nowrap'}).update('Results output dir:');
+		tr.insert(td);
+		td = new Element('td').update(resp.ResultsOutputDir);
+		tr.insert(td);
+		tab2.insert(tr);
+		
+		// Config file
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2});
+		if (resp.Success) td.writeAttribute('style', 'border-bottom: 2px #5b80b2 solid');
+		var cdiv = new Element('div', {
+			id: 'config-' + resp.TaskId,
+			'class': 'config_file'
+		});
+		var pre = new Element('pre').insert(resp.Config);
+		cdiv.insert(pre);
+		tr.insert(td);
+		tab2.insert(tr);
+
+		var confbox = new DropdownBox(td, 'Toggle Stiff config file view');
+		$(confbox.getContentNode()).insert(cdiv);
 	
 		d.insert(tab);
 		container.insert(d);
