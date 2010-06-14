@@ -363,7 +363,7 @@ var {{ plugin.id }} = {
 	
 			// Date-time, duration
 			td = new Element('td');
-			var a = new Element('a', {href: '/youpi/results/' + uidswarp + '/' + task.TaskId + '/'});
+			var a = new Element('a', {href: '/youpi/results/' + uidstiff + '/' + task.TaskId + '/'});
 			a.insert(task.Start + ' (' + task.Duration + ')');
 			td.insert(a);
 			tr.insert(td);
@@ -377,7 +377,7 @@ var {{ plugin.id }} = {
 			// Reprocess option
 			td = new Element('td', {'class': 'reprocess'});
 			img = new Element('img', {
-				onclick: uidswarp + ".reprocessStack('" + task.TaskId + "');",
+				onclick: uidstiff + ".reprocessImage('" + task.TaskId + "');",
 				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
 			});
 			td.insert(img);
@@ -657,5 +657,49 @@ var {{ plugin.id }} = {
 			selDiv.insert(new Element('br'));
 		}
 		container.insert(selDiv);
+	},
+
+	/*
+	 * Function: reprocessImage
+	 * Schedule a Stiff job for reprocessing
+	 *
+	 * Parameters:
+	 *	taskId - string: DB task ID
+	 *
+	 */ 
+	reprocessImage: function(taskId) {
+		var r = new HttpRequest(
+				null,
+				null,	
+				// Custom handler for results
+				function(resp) {
+					data = resp.result;
+					p_data = {	
+						plugin_name : uidstiff,
+						userData : { 	
+							'config' : 'The one used for the last processing',
+							'taskId' : taskId,
+							'idList' : data.idList,
+							'resultsOutputDir' : data.resultsOutputDir
+						}
+					};
+	
+					s_cart.addProcessing(
+							p_data,
+							// Custom handler
+							function() {
+								document.fire('notifier:notify', 'The current image has been scheduled for reprocessing. ' +
+									'An item has been added to the processing cart.');
+							}
+					);
+				}
+		);
+
+		var post = {
+			Plugin: uidstiff,
+			Method: 'getReprocessingParams',
+			TaskId: taskId
+		};
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 };

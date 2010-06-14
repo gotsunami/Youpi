@@ -177,7 +177,7 @@ if len(hdulist) > 1:
 else:
 	os.rename(imgName + '.fits', tmpImage)
 debug("Running Stiff on previous stack")
-os.system("%s -c %s -OUTFILE_NAME %s.tif %s 2>&1" % (CMD_STIFF, '""" + os.path.basename(customrc) + """', imgName, tmpImage))
+os.system("%s -c %s -OUTFILE_NAME %s.tif -COMPRESSION_TYPE JPEG -IMAGE_TYPE TIFF-PYRAMID %s 2>&1" % (CMD_STIFF, '""" + os.path.basename(customrc) + """', imgName, tmpImage))
 debug("Stiff complete")
 """
 
@@ -253,6 +253,7 @@ debug("Stiff complete")
 			return {'Error': str("Sorry, you don't have permission to see this result entry.")}
 		task = task[0]
 		img = Rel_it.objects.get(task__id = taskid).image
+		data = Plugin_stiff.objects.get(task__id = taskid)
 
 		# Jobs History
 		stiff_history = Rel_it.objects.filter(image__id = img.id, task__kind__name = self.id).order_by('-id')
@@ -273,7 +274,7 @@ debug("Stiff complete")
 		else:
 			err_log = ''
 
-		#config = zlib.decompress(base64.decodestring(data.config))
+		config = zlib.decompress(base64.decodestring(data.config))
 
 		return {	'TaskId'	: str(taskid),
 					'Title' 	: str("%s" % self.description),
@@ -289,7 +290,7 @@ debug("Stiff complete")
 					'ImgName' 	: str(img.name),
 					'ImgPath' 	: str(img.path),
 					'ResultsOutputDir' 	: str(task.results_output_dir),
-		#			'Config' 			: str(config),
+					'Config' 			: str(config),
 			}
 
 	def getResultEntryDescription(self, task):
@@ -364,4 +365,23 @@ debug("Stiff complete")
 			})
 
 		return res
+
+	def getReprocessingParams(self, request):
+		"""
+		Returns all information for reprocessing a stiff job
+		"""
+		try:
+			taskId = request.POST['TaskId']
+		except KeyError, e:
+			raise PluginError, 'Bad parameters'
+
+		data = Plugin_stiff.objects.get(task__id = int(taskId))
+		rels = Rel_it.objects.filter(task__id = int(taskId))
+		# Must be a list of list
+		idList = [[int(r.image.id) for r in rels]]
+
+		return {
+				'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data.task.results_output_dir, data.task.user.username)),
+				'idList'			: str(idList), 
+		}
 
