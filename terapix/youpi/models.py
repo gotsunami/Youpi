@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
+# Copyright (c) 2008-2010 Terapix Youpi development team. All Rights Reserved.
 #                    Mathias Monnerville <monnerville@iap.fr>
 #                    Gregory Semah <semah@iap.fr>
 #
@@ -327,6 +327,20 @@ class Plugin_scamp(models.Model):
 	
 	class Meta:
 		verbose_name = "SCAMP plugin"
+
+	def __unicode__(self):
+		return self.name
+
+class Plugin_stiff(models.Model):
+	# Serialized data (base64 encoding over zlib compression)
+	config = models.TextField(null = True)
+	# Results log
+	log = models.TextField(null = True)
+	# FKs constraints
+	task = models.ForeignKey(Processing_task, db_column = 'task_id')
+	
+	class Meta:
+		verbose_name = "STIFF plugin"
 
 	def __unicode__(self):
 		return self.name

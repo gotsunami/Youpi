@@ -559,6 +559,15 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 			except Exception, e:
 				raise WrapperError, e
 
+		elif kind == 'stiff':
+			try:
+				g.setTableName('youpi_plugin_stiff')
+				g.insert(	task_id = int(task_id),
+							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+				)
+			except Exception, e:
+				raise WrapperError, e
+
 	try:
 		g.setTableName('youpi_processing_task')
 		g.update(	end_date = getNowDateTime(time.time()),
@@ -770,6 +779,17 @@ def process(userData, kind_id, argv):
 				ingestQFitsInResults(userData['ResultsOutputDir'], userData, fitsin_id, g)
 			except Exception, e:
 				raise WrapperError, e
+
+	elif kind == 'stiff':
+		if exit_code == 0:
+			success = 1
+		try:
+			g.setTableName('youpi_plugin_stiff')
+			g.insert(	task_id = int(task_id),
+						config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
+			)
+		except Exception, e:
+			raise WrapperError, e
 
 	elif kind == 'scamp':
 		if exit_code == 0:
