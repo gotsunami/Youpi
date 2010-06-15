@@ -11,6 +11,47 @@ ChangeLog
 .. contents::
    :local:
 
+Version 0.6.2
+-------------
+
+**Release Date**: *To Be Released*
+
+**Improvements**:
+
+- New Stiff plugin
+
+**Bug fixes**:
+
+- ...
+
+**Release Notes**:
+
+In order to upgrade from 0.6.1, please do the following:
+
+1. This version *no more includes* the code of the ``django-evolution`` application. At the time of this 
+   writing, the ``django-evolution`` project distributes `official releases`_, so there is no need to include 
+   its code into Youpi's source tree anymore. Please install the official ``django-evolution`` release on 
+   your server::
+
+	$ sudo easy_install -U django_evolution
+
+2. You may want to restart (or reload) your webserver.
+
+3. Make a **backup of your database**.
+
+4. The database structure has changed. Just tell Youpi to inspect your installation and upgrade the database::
+
+	$ python manage.py checksetup
+
+Everytime the database structure has to be updated, you will be prompted for confirmation::
+
+	Are you sure you want to execute the evolutions?
+	Type 'yes' to continue, or 'no' to cancel:
+
+If you have made a database backup, you can safely answer: ``yes``.
+
+.. _official releases: http://code.google.com/p/django-evolution/
+
 Version 0.6.1
 -------------
 
