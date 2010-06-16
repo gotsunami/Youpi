@@ -301,13 +301,29 @@ var {{ plugin.id }} = {
 			tab2.insert(tr);
 		}
 		
+		// View Image
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2}).addClassName('qfits-result-header-title');
+		td.insert('View Image In Browser');
+		tr.insert(td);
+		tab2.insert(tr);
+
+		tr = new Element('tr');
+		td = new Element('td').setStyle({padding: '8px'});
+		td.update(new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/stiff-pyramid.png'}));
+		tr.insert(td);
+		td = new Element('td').setStyle({padding: '8px'});
+		td.update(new Element('a', {href: '/youpi/image/view/' + resp.TaskId + '/'}).update('Click to see image'));
+		tr.insert(td);
+		tab2.insert(tr);
+		
 		// Permissions
 		tr = new Element('tr');
 		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
 		td.update(ResultsHelpers.getPermissionsEntry(resp.TaskId));
 		tr.insert(td);
 		tab2.insert(tr);
-		
+
 		// Image tags
 		if (resp.Tags.length) {
 			tr = new Element('tr');

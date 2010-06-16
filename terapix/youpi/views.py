@@ -1359,6 +1359,24 @@ def get_image_info(request):
 
 @login_required
 @profile
+def view_image(request, taskId):
+	"""
+	View image in browser using iipimage
+	"""
+	try:
+		task = Processing_task.objects.get(id = int(taskId))
+	except Exception, e:
+		raise 
+
+	image = Rel_it.objects.get(task = task).image
+	return render_to_response('iipimageviewer.html', {	
+		'directory': task.results_output_dir,
+		'fullpath': os.path.join(task.results_output_dir, image.filename + '.tif'),
+	}, 
+	context_instance = RequestContext(request))
+
+@login_required
+@profile
 def gen_image_header(request, image_id):
 	"""
 	Generates image .ahead file
