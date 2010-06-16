@@ -24,7 +24,7 @@
 	var images = '{{ fullpath }}';
 
     // Copyright or information message
-    var credit = '&copy; copyright or information message';
+	var credit = '&copy; Copyright <a target="_blank" href="http://terapix.iap.fr">Terapix</a><br/>Processed with <a target="_blank" href="http://youpi.terapix.fr">Youpi</a>';
 
     // Create our viewer object - note: must assign this to the 'iip' variable.
     // See documentation for more details of options
@@ -34,7 +34,8 @@
 		credit: credit, 
 		zoom: 1,
 		render: 'random',
-		showNavButtons: true
+		showNavButtons: true,
+		imgPrefix: '/media/js/3rdParty/iipmooviewer/'
     });
   </script>
  </head>

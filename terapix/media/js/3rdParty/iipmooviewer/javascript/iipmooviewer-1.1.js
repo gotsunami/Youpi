@@ -46,6 +46,7 @@
               render: tile rendering style - 'spiral' for a spiral from the centre or
                       'random' for a rendering of tiles in a random order
 	      scale: pixels per mm
+		  imgPrefix: prefix to add to icon images
 
    Note: The new class instance must be assigned to the global variable "iip" in this version.
        : Requires mootools version 1.2 <http://www.mootools.net>
@@ -165,6 +166,7 @@ var IIP = new Class({
               render: tile rendering style - 'spiral' for a spiral from the centre or
                       'random' for a rendering of tiles in a random order (default)
               showNavButtons: whether to show navigation buttons: true (default) or false 
+			imgPrefix: prefix to add to icon images
 	      scale: pixels per mm
    */
     initialize: function( main_id, options ) {
@@ -174,6 +176,8 @@ var IIP = new Class({
     this.server = options['server'] || '/fcgi-bin/iipsrv.fcgi';
 
     this.render = options['render'] || 'random';
+
+	this.imgPrefix = options['imgPrefix'] || '';
 
     this.images = new Array(options['image'].length);
     options['image'] || alert( 'Image location not set in IIP constructor options');
@@ -703,11 +707,11 @@ var IIP = new Class({
 
     // Add our logo and a tooltip explaining how to use the viewer
     new Element( 'a', {href: 'http://iipimage.sourceforge.net', id:'logo'} ).injectInside(this.source);
-    new Element('img', {src: 'images/iip.32x32.png', id: 'info', styles: { opacity: 0.8 } } ).injectInside('logo');
+    new Element('img', {src: this.imgPrefix + 'images/iip.32x32.png', id: 'info', styles: { opacity: 0.8 } } ).injectInside('logo');
 
     // Fix IE7 PNG transparency problem
     if( Browser.Engine.trident5 ){
-      $('info').setStyle( 'filter', 'progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true,src="images/iip.32x32.png",sizingMethod=scale)' );
+      $('info').setStyle( 'filter', 'progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true,src="' + this.imgPrefix + 'images/iip.32x32.png",sizingMethod=scale)' );
     }
 
     new Tips( '#info, #toolbar', {
@@ -717,7 +721,7 @@ var IIP = new Class({
 	  onShow: function(t){ t.setStyle('opacity',0); t.fade(0.7); },
 	  onHide: function(t){ t.fade(0); }
     });
-    $('info').store('tip:text', '<h2><img src="images/iip.32x32.png"/>IIPMooViewer</h2>IIPImage High Resolution Ajax Image Viewer<ul><li>To navigate within image:<ul><li>drag image within main window or</li><li>drag zone within the navigation window</li><li>click an area within navigation window</li></ul><li>To zoom in:<ul><li>double click with the mouse or</li><li>use the mouse scroll wheel or</li><li>or simply press the "+" key</li></ul><li>To zoom out:<ul><li>shift double click with the mouse or</li><li>use the mouse wheel or</li><li>press the "-" key</li></ul></li><li>To move the navigation window:<ul><li>drag navigation window toolbar</li></ul><li>To show / hide navigation buttons:</li><ul><li>double click navigation window toolbar</li></ul></ul>Written by Ruven Pillay<br/>For more information visit http://iipimage.sf.net');
+    $('info').store('tip:text', '<h2><img src="' + this.imgPrefix + 'images/iip.32x32.png"/>IIPMooViewer</h2>IIPImage High Resolution Ajax Image Viewer<ul><li>To navigate within image:<ul><li>drag image within main window or</li><li>drag zone within the navigation window</li><li>click an area within navigation window</li></ul><li>To zoom in:<ul><li>double click with the mouse or</li><li>use the mouse scroll wheel or</li><li>or simply press the "+" key</li></ul><li>To zoom out:<ul><li>shift double click with the mouse or</li><li>use the mouse wheel or</li><li>press the "-" key</li></ul></li><li>To move the navigation window:<ul><li>drag navigation window toolbar</li></ul><li>To show / hide navigation buttons:</li><ul><li>double click navigation window toolbar</li></ul></ul>Written by Ruven Pillay<br/>For more information visit http://iipimage.sf.net');
 
 
     // Add some info
@@ -819,7 +823,7 @@ var IIP = new Class({
     // Create our nav buttons
     var navbuttons = new Element('div', {
 	id: 'navbuttons',
-	html: '<img id="shiftLeft" src="images/left.png"/><img id="shiftUp" src="images/up.png"/><img id="shiftRight" src="images/right.png"/><br/><img id="shiftDown" src="images/down.png"/><br/><img id="zoomIn" src="images/zoomIn.png"/><img id="zoomOut" src="images/zoomOut.png"/><img id="reset" src="images/reset.png"/>'
+	html: '<img id="shiftLeft" src="' + this.imgPrefix + 'images/left.png"/><img id="shiftUp" src="' + this.imgPrefix + 'images/up.png"/><img id="shiftRight" src="' + this.imgPrefix + 'images/right.png"/><br/><img id="shiftDown" src="' + this.imgPrefix + 'images/down.png"/><br/><img id="zoomIn" src="' + this.imgPrefix + 'images/zoomIn.png"/><img id="zoomOut" src="' + this.imgPrefix + 'images/zoomOut.png"/><img id="reset" src="' + this.imgPrefix + 'images/reset.png"/>'
     });
     navbuttons.injectInside(navcontainer);
     navbuttons.set('slide', {duration: 300, transition: Fx.Transitions.Quad.easeInOut, mode:'vertical'});
