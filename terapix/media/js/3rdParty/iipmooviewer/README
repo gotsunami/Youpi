@@ -1,0 +1,37 @@
+IIPMooViewer - Ajax Viewer for IIPImage - Version 1.1
+
+You first must have a working version of the IIPImage server running. 
+See http://iipimage.sourceforge.net for details.
+
+Create a pyramidal tiled TIFF image using VIPS (http://vips.sf.net) or 
+imagemagick.
+
+Then use and modify the path and image names in the example HTML page 
+provided - iiipmooviewer.html to create a working client :-)
+
+You must include the mootools and iipmooviewer header files, as well as 
+the iip.css stylesheet. For further details see the HTML file included. 
+You will find included both uncompressed and compressed versions of the
+javascript and css files made using YUIcompressor.
+
+
+Options to the IIP class constructor:
+(The only obligatory option is the "image" variable)
+
+image: The full path to the image. On Windows as on other systems this 
+       should be a UNIX style path such as "/path/to/image.tif"
+
+server: The address of the IIPImage server. [default : "/fcgi-bin/iipsrv.fcgi"]
+
+credit: a credit, copyright or information to be shown on the image itself
+
+zoom: the initial zoom level on start-up
+
+render: the way in which tiles are rendered. Either `random' where the 
+        tiles are fetched and rendered randomly or 'spiral' where the 
+        tiles are rendered from the center outwards [default : 'random']
+
+showNavButtons: whether to show the navigation buttons on start up: true 
+        or false [default : true]
+
+scale: pixels per mm

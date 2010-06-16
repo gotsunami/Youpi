@@ -1,0 +1,66 @@
+09/09/2008: Release of version 1.1
+
+20/08/2008:
+	- Added hook for click event to enable applications such as multispectral
+	  visualization.
+
+16/08/2008:
+	- CSS fixes, cleanups and minor javascript improvements.
+
+06/08/2008:
+	- Added transparent PNG fix from http://www.twinhelix.com/css/iepngfix/
+	- Added new navigation / zoom buttons
+
+28/07/2008:
+	- Added scale display
+
+21/07/2008:
+	- Added toolbar and draggability to the navigation window
+	- Fixed fading in problem on the main IIPImage tooltip
+
+20/07/2008:
+	- Fixed problem with IE7 and dragging of the main image! Had to
+	  set the default handler of the IE-only startdrag event to return
+	  false :)
+
+19/07/2008:
+	- Cleanups to use the mootools 1.2 tween and morph properties of elements
+	  instead of creating separate FX instances.
+	- Also changed element creation and property setting to a more 1.2 style
+	- Changed TargetDrag class to extend Drag rather than Drag.Move
+
+14/07/2008:
+	- Added progress bar showing tiles remaining to be loaded (Contributed by
+	  Simone Fona of Net7).
+	- Added ability to render tiles in random order or in a spiral from the
+	  centre (Contributed by Simone Fona of Net7).
+
+13/06/2008:
+	- Updated mootools to version 1.2 final!
+
+26/04/2008:
+	- Added multi-layer and blending capabilities. The image option passed
+	  to the IIP constructor can either be a string or an array of images.
+
+24/04/2008:
+	- Added option for the initial zoom level
+
+21/01/2008:
+	- Updated mootools to version 1.2b2!
+
+22/01/2008
+	- Fixed tile offset caused by rounding error. The image sizes are now 
+          calculated by counting down from the max resolution rather than by simply 
+          multiplying up and down.
+
+10/08/2007:
+	- Fixed problem with IE when the view is changed midway during tile download. 
+          The list of tiles is
+	  not deleted by IE even though the image elements have been destroyed.  
+          Solved by setting the tiles
+	  to an already downloaded image before destroying.
+	- Window can now be embedded into any size div anywhere on the page. However, 
+          it's positioning must
+	  be absolute.
+
+31/05/2007:  Initial release of version 1.0!
