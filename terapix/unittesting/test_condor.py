@@ -146,7 +146,15 @@ class CondorMiscFunctionTest(TestCase):
 	fixtures = ['test_user']
 
 	def setUp(self):
-		pass
+		# Build a fake rule for some tests
+		nodesel = [u'slot1@mix18.clic.iap.fr', u'slot2@mix18.clic.iap.fr']
+		sel = CondorNodeSel.objects.create(
+			user = User.objects.all()[0], 
+			label = '12@mix18', 
+			is_policy = False,
+			nodeselection = base64.encodestring(marshal.dumps(nodesel))
+		)
+		sel.save()
 
 	def test_get_condor_status(self):
 		stat = condor.get_condor_status()
@@ -164,12 +172,13 @@ class CondorMiscFunctionTest(TestCase):
 
 		self.assertRaises(ValueError, condor.get_requirement_string, 'MEM,G,1;G', [])		# Wrong ';'
 		self.assertRaises(ValueError, condor.get_requirement_string, 'BADKEY,G,1,G', [])	# Wrong 'BADKEY'
-		self.assertRaises(ValueError, condor.get_requirement_string, 'MEM,g,1,G', [])		# Wrong 'g'
+		self.assertRaises(KeyError, condor.get_requirement_string, 'MEM,g,1,G', [])		# Wrong 'g'
 		self.assertRaises(ValueError, condor.get_requirement_string, 'MEM,G,1,t', [])		# Wrong 't'
 
 		# vms must be a list of lists
 		self.assertRaises(TypeError, condor.get_requirement_string, 'MEM,G,1,T', ['node1', 'Idle'])
 		self.assertRaises(TypeError, condor.get_requirement_string, 'MEM,G,1,T', [[1, 'Idle']])
+		condor.get_requirement_string('SLT,B,12@mix18', [])
 
 		# Output
 		req = condor.get_requirement_string('MEM,G,1,G', [])

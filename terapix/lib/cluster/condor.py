@@ -367,14 +367,12 @@ def get_requirement_string(params, vms):
 	params = params.split('#')
 	for p in params:
 		d = p.split(',')
-		if len(d) != 4:
+		if len(d) > 4:
 			# Wrong format
 			raise ValueError, "Malformed parameter: '%s'" % p
 		if d[0] not in ('MEM', 'DSK', 'HST', 'SLT'):
 			raise ValueError, "Invalid parameter name: '%s'. Must be one of MEM, DSK, HST or SLT" % d[0]
-		if d[1] not in cdeserial:
-			raise ValueError, "Invalid comparator letter: '%s'" % d[1]
-		if d[3] not in sdeserial:
+		if len(d) == 4 and d[3] not in sdeserial:
 			raise ValueError, "Invalid unit letter: '%s'" % d[3]
 
 	# vms must be a list of lists
