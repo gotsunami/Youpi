@@ -18,11 +18,19 @@ Version 0.6.2
 
 **Improvements**:
 
-- New Stiff plugin
+- New `STIFF` plugin: `STIFF`_ is a program that converts scientific `FITS`  images to the more popular `TIFF` 
+  format for illustration purposes. It is already used by the `Swarp` and `Sextractor` plugins but was not 
+  available as an independant plugin. Using the `STIFF` plugin allows to generate `TIFF` images of single 
+  images or stacks of images ingested with Youpi. Moreover, the final image is viewable directly in the browser 
+  using the `IIPImage`_ open source streaming client-server system which enables web-based viewing and zooming of 
+  ultra high-resolution images.
+
+.. _STIFF: http://www.astromatic.net/software/stiff
+.. _IIPImage: http://iipimage.sourceforge.net/
 
 **Bug fixes**:
 
-- ...
+- Fixed a Condor requirement string parsing error 
 
 **Release Notes**:
 
@@ -30,16 +38,19 @@ In order to upgrade from 0.6.1, please do the following:
 
 1. This version *no more includes* the code of the ``django-evolution`` application. At the time of this 
    writing, the ``django-evolution`` project distributes `official releases`_, so there is no need to include 
-   its code into Youpi's source tree anymore. Please install the official ``django-evolution`` release on 
+   it into Youpi's source tree anymore. Please install the official ``django-evolution`` release on 
    your server::
 
 	$ sudo easy_install -U django_evolution
 
-2. You may want to restart (or reload) your webserver.
+   Before restarting (or reloading) your webserver, please check that you don't have any ``django_evolution`` 
+   directory in your ``$YOUPI_INSTALL_DIR/terapix`` installation directory. If it's there, just delete it since 
+   it will prevent Django from importing the external, site-wide installation of the ``django_evolution`` 
+   application correctly.
 
-3. Make a **backup of your database**.
+2. Make a **backup of your database**.
 
-4. The database structure has changed. Just tell Youpi to inspect your installation and upgrade the database::
+3. The database structure has changed. Just tell Youpi to inspect your installation and upgrade the database::
 
 	$ python manage.py checksetup
 
