@@ -5,4 +5,5 @@ SEQUENCE = [
 	'qfits_add_flatnorm_method', 
 	'image_pixelscale', 
 	'qfits_seeing_decimal',
+	'qfits_add_mask', 
 ]

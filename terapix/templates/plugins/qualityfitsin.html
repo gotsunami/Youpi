@@ -19,7 +19,11 @@
 				<input type="checkbox" checked="checked" id="{{ plugin.id }}_exit_flat_option"/>
 				<label style="padding-left: 2px;">Force QualityFits jobs to exit if flat image not found</label>
 			</div>
-			<div style="text-align: left; margin: auto; width: 80%; padding-top: 30px; vertical-align: center;">
+			<div style="text-align: left; margin: auto; width: 80%; padding-top: 10px; vertical-align: center;">
+				<input type="checkbox" checked="checked" id="{{ plugin.id }}_exit_mask_option"/>
+				<label style="padding-left: 2px;">Force QualityFits jobs to exit if mask image not found</label>
+			</div>
+			<div style="text-align: left; margin: auto; width: 80%; padding-top: 10px; vertical-align: center;">
 				<input type="checkbox" id="{{ plugin.id }}_flatnorm_option"/>
 				<label style="padding-left: 2px;">Single chip flat field normalization</label>
 				<div class="tip" style="width: -moz-fit-content;" id="{{ plugin.id }}_flatnorm_select_div">

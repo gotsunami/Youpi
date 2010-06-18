@@ -13,6 +13,10 @@
 					<td class="flatMissing">{% ifequal data.userData.exitIfFlatMissing 1 %}yes{% else %}no{% endifequal %}</td>
 				</tr>
 				<tr>
+					<td><span class="flatLetter">Exit if mask image missing:</span></td>
+					<td class="flatMissing">{% ifequal data.userData.exitIfMaskMissing 1 %}yes{% else %}no{% endifequal %}</td>
+				</tr>
+				<tr>
 					<td><span class="flatLetter">Flat normalization:</span></td>
 					<td class="flatMissing">{% if data.userData.flatNormMethod %}{{ data.userData.flatNormMethod }}{% else %}-{% endif %}</td>
 				</tr>

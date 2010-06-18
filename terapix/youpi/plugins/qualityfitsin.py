@@ -80,6 +80,7 @@ class QualityFitsIn(ProcessingPlugin):
 			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 			exitIfFlatMissing = post['ExitIfFlatMissing']
+			exitIfMaskMissing = post['ExitIfMaskMissing']
 			flatNormMethod = post['FlatNormMethod']
 		except Exception, e:
 			raise PluginError, ("POST argument error. Unable to process data: %s" % e)
@@ -98,6 +99,7 @@ class QualityFitsIn(ProcessingPlugin):
 				 'taskId'			: taskId,
 				 'resultsOutputDir' : resultsOutputDir, 
 				 'exitIfFlatMissing': exitIfFlatMissing, 
+				 'exitIfMaskMissing': exitIfMaskMissing, 
 				 'flatNormMethod'   : flatNormMethod,
 				 'config' 			: config 
 		}
@@ -121,8 +123,9 @@ class QualityFitsIn(ProcessingPlugin):
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
-			if not data.has_key('exitIfFlatMissing'):
-				data['exitIfFlatMissing'] = 0
+			for m in ('exitIfFlatMissing', 'exitIfMaskMissing'):
+				if not data.has_key(m):
+					data[m] = 1
 			if not data.has_key('flatNormMethod'):
 				data['flatNormMethod'] = ''
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
@@ -136,6 +139,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
 						'name' 				: str(it.name),
 						'exitIfFlatMissing' : int(data['exitIfFlatMissing']),
+						'exitIfMaskMissing' : int(data['exitIfMaskMissing']),
 						'flatNormMethod'    : str(data['flatNormMethod']),
 						'config' 			: str(data['config'])})
 
@@ -282,6 +286,7 @@ class QualityFitsIn(ProcessingPlugin):
 							'Mask' 				: str(h_fits.mask),
 							'Reg' 				: str(h_fits.reg),
 							'ExitIfFlatMissing'	: h_fits.exitIfFlatMissing,
+							'ExitIfMaskMissing'	: h_fits.exitIfMaskMissing,
 							'FlatNormMethod'	: h_fits.flatNormMethod,
 							})
 
@@ -350,6 +355,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(data.mask),
 					'Reg' 				: str(data.reg),
 					'ExitIfFlatMissing'	: data.exitIfFlatMissing,
+					'ExitIfMaskMissing'	: data.exitIfMaskMissing,
 					'FlatNormMethod'	: data.flatNormMethod,
 					'Config' 			: str(zlib.decompress(base64.decodestring(data.qfconfig))),
 					'WWW' 				: str(data.www),
@@ -427,6 +433,7 @@ class QualityFitsIn(ProcessingPlugin):
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
 			exitIfFlatMissing = int(post['ExitIfFlatMissing'])
+			exitIfMaskMissing = int(post['ExitIfMaskMissing'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -478,6 +485,7 @@ class QualityFitsIn(ProcessingPlugin):
 					'Mask' 				: str(maskPath), 
 					'Reg' 				: str(regPath), 
 					'ExitIfFlatMissing'	: exitIfFlatMissing,
+					'ExitIfMaskMissing'	: exitIfMaskMissing,
 					'FlatNormMethod'	: flatNormMethod,
 					'Config' 			: str(post['Config'])} 
 
@@ -594,25 +602,10 @@ class QualityFitsIn(ProcessingPlugin):
 			if flatNormMethod:
 				image_args += " --flatnorm %s" % fnfile
 			
-			userData['Warnings'] = {}
-			userData['Warnings'][str(img.name) + '.fits'] = []
-
-			if imgFlat: image_args += " -F %s" % imgFlat
-			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable flat data found')
-
-			if imgMask: image_args += " -M %s" % imgMask
-			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable mask data found')
-
-			if imgReg: image_args += " -P %s" % imgReg
-			else: userData['Warnings'][str(img.name) + '.fits'].append('No suitable reg file found')
-
 			# Only add --ahead param if needed
 			hdata, lenght, missing = genImageDotHead(int(img.id))
 			if hdata:
 				image_args += " --ahead %s" % userData['RealImageName'] + '.head'
-			
-			if not len(userData['Warnings'][str(img.name) + '.fits']):
-				del userData['Warnings'][str(img.name) + '.fits']
 			
 			image_args += " -c %s" % os.path.basename(customrc)
 			
@@ -691,6 +684,7 @@ class QualityFitsIn(ProcessingPlugin):
 				'Flat' 				: str(data.flat),
 				'FlatNormMethod' 	: str(data.flatNormMethod),
 				'ExitIfFlatMissing' : str(data.exitIfFlatMissing),
+				'ExitIfMaskMissing' : str(data.exitIfMaskMissing),
 				'Mask' 				: str(data.mask),
 				'Reg' 				: str(data.reg),
 				'ResultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data.task.results_output_dir, data.task.user.username)),
@@ -795,6 +789,7 @@ class QualityFitsIn(ProcessingPlugin):
 						'Mask' 				: str(fitsin.mask),
 						'Reg' 				: str(fitsin.reg),
 						'ExitIfFlatMissing'	: str(fitsin.exitIfFlatMissing),
+						'ExitIfMaskMissing'	: str(fitsin.exitIfMaskMissing),
 						'FlatNormMethod'	: str(fitsin.flatNormMethod),
 						'FitsinId' 			: int(fitsin.id) }
 

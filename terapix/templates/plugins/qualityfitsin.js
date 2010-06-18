@@ -1092,6 +1092,7 @@ var {{ plugin.id }} = {
 						regPath: regPath,
 						resultsOutputDir: output_data_path,
 						exitIfFlatMissing: $(uidfitsin + '_exit_flat_option').checked ? 1:0,
+						exitIfMaskMissing: $(uidfitsin + '_exit_mask_option').checked ? 1:0,
 						flatNormMethod: $(uidfitsin + '_flatnorm_option').checked ? 
 							$(uidfitsin + '_flatnorm_select').options[$(uidfitsin + '_flatnorm_select').selectedIndex].value : ''
 					}

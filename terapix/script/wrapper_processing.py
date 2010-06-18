@@ -501,6 +501,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
+							exitIfMaskMissing = userData['ExitIfMaskMissing'],
 							flatNormMethod = userData['FlatNormMethod'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
@@ -636,6 +637,42 @@ def process(userData, kind_id, argv):
 	try:
 		# Automatic .head (or .ahead for Scamp) file generation
 		if kind == 'fitsin':
+			#
+			# First, checks out if we have halt conditions (forced exit)
+			#
+			filenames = g.execute("SELECT flat,mask,reg FROM youpi_image WHERE id=%s" % userData['ImgID'])[0]
+			# Handles new QFits argument regarding flat, mask and reg files to use
+			qfits_args = []
+			filechecks = [('Flat', '-F'), ('Mask', '-M'), ('Reg', '-P')]
+			for j in range(3):
+				if filenames[j]:
+					filepath = os.path.join(userData[filechecks[j][0]], filenames[j])
+					if userData[filechecks[j][0]]:
+						qfits_args.append("%s %s" % (filechecks[j][1], filepath))
+					else:
+						debug("Warning: no %s path supplied from Youpi. Will not use %s with QFits." % filechecks[j])
+
+			fm = ('Flat', 'Mask')
+			for j in range(len(fm)):
+				if userData["ExitIf%sMissing" % fm[j]] and filenames[j] != None:
+					# Check for flat/mask file
+					fmFile = os.path.join(userData[fm[j]], filenames[j])
+					if not os.path.exists(fmFile):
+						exit_code = 1
+						success = 0
+						raise WrapperError, "%s file %s has not been found (and you asked Youpi to halt in this case)" % (fm[j].upper(), fmFile)
+					else:
+						debug("Check: found %s file: %s" % (fm[j].upper(), fmFile))
+				else:
+					debug("No check performed for %s file existence" % fm[j].upper())
+
+			#
+			# Checks are over
+			#
+			# Rewrite QFits CLI arguments. They will be appended to the CLI before running the job
+			for qarg in qfits_args:
+				argv.insert(len(argv)-1, qarg)
+
 			try:
 				from genimgdothead import genImageDotHead, formatHeader, getRawHeader
 				img_id = userData['ImgID']
@@ -649,19 +686,6 @@ def process(userData, kind_id, argv):
 					debug("Generated: %s" % headname)
 			except Exception, e:
 				debug("Error during automatic .head file generation: %s" % e)
-
-			flatname = g.execute("SELECT flat FROM youpi_image WHERE id=%s" % userData['ImgID'])[0][0]
-			if userData['ExitIfFlatMissing']:
-				# Check for flat file
-				flatFile = os.path.join(userData['Flat'], flatname)
-				if not os.path.exists(flatFile):
-					exit_code = 1
-					success = 0
-					raise WrapperError, "FLAT file %s has not been found (and you asked Youpi to halt in this case)" % flatFile
-				else:
-					debug("Found FLAT file: %s" % flatFile)
-			else:
-				debug("No check for FLAT image %s existence (checkbox was unchecked)" % flatname)
 
 			# Check if we need to generate a normalized flat field
 			if userData['FlatNormMethod']:
@@ -724,7 +748,7 @@ def process(userData, kind_id, argv):
 
 
 	# Execute process, waiting for completion
-	cmd_line = string.join(argv, ' ')
+	cmd_line = ' '.join(argv)
 	debug("Executing command line: %s\n" % cmd_line)
 	try:
 		exit_code = os.system(cmd_line)
@@ -760,6 +784,7 @@ def process(userData, kind_id, argv):
 							mask = userData['Mask'],
 							reg = userData['Reg'],
 							exitIfFlatMissing = userData['ExitIfFlatMissing'],
+							exitIfMaskMissing = userData['ExitIfMaskMissing'],
 							flatNormMethod = userData['FlatNormMethod'],
 							#
 							# QF config file serialization: base64 encoding over zlib compression
