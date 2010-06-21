@@ -178,7 +178,7 @@ FITSIn Plugin
 	Maximum PSF asymmetry, Minimum number of PSF stars, Average number of PSF stars, Maximum 
 	number of PSF stars, Median background, Background RMS, Saturation level, Flat Path, Mask 
 	Path, Region Path, QualityFITS Config, Results Ingestion Log, HTTP Url, Previous Release 
-	Grade, Previous Release Comment, Exit If Flat Missing, Flat Norm Method)
+	Grade, Previous Release Comment, Exit If Flat Missing, Flat Norm Method, Exit If Mask Missing)
 
 FITSOut Plugin
 	FITSOut Plugin (*FITSOut Id*, Processing Task Id)
@@ -244,6 +244,9 @@ SWARP Plugin
 	HTTP Url, Thumbnails, Weight Path, Use QFITS Weights, Head Path, Use Head 
 	Files)
 
+STIFF Plugin
+	STIFF Plugin (*STIFF Id*, Processing Task Id, Config, Results Ingestion Log) 
+
 Tag
 	Tag (*Tag Id*, Django User Id, Django Group Id, Mode, Name, Style, Date, 
 	Comment)
@@ -282,6 +285,8 @@ Processing Task            ``youpi_processing_task``  ``Processing_task``
 Run                        ``youpi_run``              ``Run``
 Run-Image Relation         ``youpi_rel_ri``           ``Rel_ri``
 SCAMP Plugin               ``youpi_plugin_scamp``     ``Plugin_scamp``
+STIFF Plugin               ``youpi_plugin_stiff``     ``Plugin_stiff``
+SWARP Plugin               ``youpi_plugin_swarp``     ``Plugin_swarp``
 Site Profile               ``youpi_siteprofile``      ``SiteProfile``
 Survey                     ``youpi_survey``           ``Survey``
 Survey-Instrument Relation ``youpi_rel_si``           ``Rel_si``

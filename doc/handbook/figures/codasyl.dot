@@ -23,6 +23,7 @@ digraph codasyl {
 	plugfitsin [label="FITSin Plugin"];
 	plugfitsout [label="FITSout Plugin"];
 	plugscamp [label="SCAMP Plugin"];
+	plugstiff [label="STIFF Plugin"];
 	plugswarp [label="SWARP Plugin"];
 	plugother [label="Other Plugin", style=dotted];
 	user [label="Django User", style=dashed, color=green];
@@ -49,6 +50,7 @@ digraph codasyl {
 	task -> plugfitsin;
 	task -> plugfitsout;
 	task -> plugscamp;
+	task -> plugstiff;
 	task -> plugswarp;
 	task -> plugother[style=dotted];
 	Run -> relri;
