@@ -108,10 +108,6 @@ function getSavedItemsStats() {
 						});
 					}
 				});
-
-				var pattern = 'plugin_menuitem_sub_';
-				var pid = $$('div[id^=' + pattern + ']')[0].readAttribute('id').sub(pattern, '');
-				eval(pid + '.showSavedItems()');	
 			}
 	);
 
@@ -271,7 +267,6 @@ document.observe('dom:loaded', function() {
 			eval(pid + '.showSavedItems()');	
 		}
 	});
-	sc_accordion.open(0);
 });
 
 // A processing cart item has just been removed
@@ -357,7 +352,7 @@ document.observe('processingCart:itemRemoved', function() {
 		<div style="display: none" class="cartSavedItems" align="center" id="menuitem_sub_1">
 			{# Saved items #}
 			<p class="title">
-				Please select a type of processing in order to display relevant saved items:
+				Please select a type of processing by clicking on its name in order to display its saved items:
 			</p>
 			<div id="accordion" style="width: 70%; margin: auto;">
 			{% for plugin in plugins %}
