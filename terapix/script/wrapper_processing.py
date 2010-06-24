@@ -688,6 +688,7 @@ def process(userData, kind_id, argv):
 				debug("Error during automatic .head file generation: %s" % e)
 
 			# Check if we need to generate a normalized flat field
+			flatFile = os.path.join(userData['Flat'], filenames[0])
 			if userData['FlatNormMethod']:
 				debug("Starting single ship flat field normalization (%s)" % userData['FlatNormMethod'])
 				try: 
@@ -696,7 +697,7 @@ def process(userData, kind_id, argv):
 					num_ext = len(pyim)                                                                                                                                                    
 					# Output normalized flat file
 					outflat = userData['FlatNormFile']
-					# Fonctionnement different si on traite un MEF ou pas                                                                                                               
+					# Is it a MEF?
 					if num_ext == 1:                                                                                                                                                       
 						norma_val = normalize_val(pyim[0].data, userData['FlatNormMethod'])                                                                                                                     
 						if norma_val == 0:
