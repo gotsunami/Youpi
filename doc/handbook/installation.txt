@@ -190,6 +190,10 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
                                                                 image
 `Stiff`_             **1.12** and later                         Converts scientific FITS images to the more popular 
                                                                 TIFF format for illustration purposes
+`IIPImage`_          **0.9.8** and later                        .. versionadded:: 0.6.2
+
+                                                                Open Source light-weight streaming client-server system for the web-based viewing and 
+                                                                zooming of ultra high-resolution images
 ==================== ========================================== ===========
 
 .. _Firefox: http://www.mozilla.com/firefox/
@@ -220,6 +224,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
 .. _Swarp: http://astromatic.iap.fr/software/swarp
 .. _Sextractor: http://astromatic.iap.fr/software/sextractor
 .. _Stiff: http://astromatic.iap.fr/software/stiff
+.. _IIPImage: http://iipimage.sourceforge.net/
 
 
 Installation
@@ -570,6 +575,34 @@ The ``--apache`` option will generate a ``$YOUPI_INSTALL_DIR/deploy/youpi.conf``
 file ready to use with your Apache web server. You can either copy this file to your web server's
 configuration files directory or copy its contents to your ``httpd.conf`` file.
 
+.. versionadded:: 0.6.2
+
+Version 0.6.2 comes with a new `STIFF` plugin, which is enabled by default. In order to be able to 
+view the resulting images in your browser, the `IIPImage server`_ must be installed and your web server's
+configuration has to be updated accordingly. You may use the following sample (if you're using Apache) 
+providing that your `IIPImage` `FCGI` server script has been installed in the ``/usr/local/fcgi-bin/`` 
+directory::
+
+	ScriptAlias /fcgi-bin/ "/usr/local/fcgi-bin/"
+	DefaultInitEnv LOGFILE "/tmp/iipsrv.log"
+	# Define the idle timeout as unlimited and the number of
+	# processes we want
+	IdleTimeout -1
+	DefaultMaxClassProcessCount 1
+
+	<Directory "/usr/local/fcgi-bin/">
+		AllowOverride None
+		Options None
+		Order allow,deny
+		Allow from all
+		# Set the module handler
+		AddHandler fcgid-script .fcgi
+	</Directory>
+
+.. note:: The key point here is that the ``/fcgi-bin/`` alias name must not be changed. The `IIPImage`'s
+          client component embedded in Youpi will try to access the `IIPImage` server at the 
+          ``/fcgi-bin/iipsrv.fcgi`` path.
+
 Now just reload Apache before testing your installation::
 
 	$ sudo /etc/init.d/apache2 reload
@@ -577,6 +610,7 @@ Now just reload Apache before testing your installation::
 Congratulations! The configuration step is over :)
 
 .. _Web Server Gateway Interface: http://wsgi.org/wsgi/What_is_WSGI
+.. _IIPImage server: http://iipimage.sourceforge.net/documentation/server/
 
 
 Testing Your Installation

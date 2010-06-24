@@ -24,10 +24,10 @@ Version 0.6.2
   `TIFF` images of single images or stacks of images ingested with Youpi. Moreover, the final image 
   is viewable directly in the browser using the `IIPImage`_ open source streaming client-server system 
   which enables web-based viewing and zooming of ultra high-resolution images.
-- QualityFITS plugin: added an option to force exiting immediately if the mask image is missing 
-- QualityFITS plugin: checks for missing flat, mask or reg files are more efficient and are made at 
-  the wrapper processing script level. If a QualityFITS job is configured to halt on missing file, it 
-  will halt at the very beginning, without actually running the QualityFITS command itself. The job 
+- `QualityFITS` plugin: added an option to force exiting immediately if the mask image is missing 
+- `QualityFITS` plugin: checks for missing flat, mask or reg files are more efficient and are made at 
+  the wrapper processing script level. If a `QualityFITS` job is configured to halt on missing file, it 
+  will halt at the very beginning, without actually running the `QualityFITS` command itself. The job 
   will fail immediately.
 
 .. _STIFF: http://www.astromatic.net/software/stiff
@@ -76,11 +76,11 @@ Version 0.6.1
 
 **Improvements**:
 
-- QualityFITS plugin: added support for "single chip flat normalization", which allows to compute a new 
+- `QualityFITS plugin`: added support for "single chip flat normalization", which allows to compute a new 
   normalisation based on independant chips. This is required to select the bad pixels from each chip in 
   a consistant way. **Important**: please note that this feature requires to use `QualityFITS 1.13.12` or 
   higher.
-- QualityFITS results: displays grade's comment next to grade letter
+- `QualityFITS` results: displays grade's comment next to grade letter
 - Added support for FITS keyword copying (+KEYWORD) in :ref:`ingestion translation tables (ITTs) <ingestion_section>`
 - Added support for :ref:`automatic .head file generation <automatic_head_section>` to allow 
   FITS image header keywords overriding
@@ -93,7 +93,7 @@ Version 0.6.1
 - Various :ref:`performance improvements in production environment <improve_performance>` (by 
   combining static Javascript and CSS files into single files and `minifying`_ their content)
 - New command line tool ``script/changeseeing.py`` to compute and store images pixel scale and 
-  reprocess all QualityFITS XML output results. Please see the :ref:`Release Notes <script_changeseeing>` 
+  reprocess all `QualityFITS` XML output results. Please see the :ref:`Release Notes <script_changeseeing>` 
   for more information
 - Clicking on your username (top-left corner) will popup information related to your active 
   permission attributes
@@ -109,13 +109,13 @@ Version 0.6.1
 - Ingestion: fixed bug during target hostname resolution
 - Image selector: stops loading and displays a user-friendly message when no images available 
   (no ingestions at all)
-- QualityFITS results: hide "Image tags" block when image has no tags
-- QualityFITS results: fixed permission issue. Non-authorized users cannot access restricted 
+- `QualityFITS` results: hide "Image tags" block when image has no tags
+- `QualityFITS` results: fixed permission issue. Non-authorized users cannot access restricted 
   results anymore
-- QualityFITS results: fixed counter value for already graded images
-- QualityFITS: fixed "list of all non graded images" report
-- QualityFITS: fixed broken "reprocess" button on the results page
-- QualityFITS: fixed psfex's XML output parsing
+- `QualityFITS` results: fixed counter value for already graded images
+- `QualityFITS`: fixed "list of all non graded images" report
+- `QualityFITS`: fixed broken "reprocess" button on the results page
+- `QualityFITS`: fixed psfex's XML output parsing
 - Grading script: fixed custom comment issue
 - Processing history results: fixed a ``Server Error`` issue when resetting the search form
 - Path selector widget: fixed automatic path selection
@@ -212,7 +212,7 @@ Version 0.6
 
 - Added support for :ref:`Generic FITS image ingestion <ingestion_section>` using translation tables (ITTs)
 - Added several :ref:`global permissions <global_permissions>` in order to be able to define more restrictive user accounts 
-- QualityFITS plugin: added an option to force exiting a QFits job immediately if the flat image 
+- `QualityFITS` plugin: added an option to force exiting a QFits job immediately if the flat image 
   is missing 
 - Current user permissions are available on the "Preferences" page 
 - Results page: added more search criteria; processing results can be searched by *tags*
@@ -261,8 +261,8 @@ Version 0.5.2
 
 - Fixed processing cart issues (session related)
 - Fixed the "Software version check" feature
-- Swarp plugin: fixed final stack ingestion issues; fixed bug preventing swarp item cluster submission
-- Sextractor plugin: fixed bad weight image name in dual image mode; fixed a data path issue
+- `Swarp` plugin: fixed final stack ingestion issues; fixed bug preventing swarp item cluster submission
+- `Sextractor` plugin: fixed bad weight image name in dual image mode; fixed a data path issue
 - All plugins: fixed bad XSL stylesheet URI handling
 
 **Release Notes**:
