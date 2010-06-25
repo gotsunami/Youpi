@@ -19,7 +19,14 @@ function ingestion_history() {
 	 * Arg 3: path to server-side script for async Ajax query
 	 *
 	 */
-	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/youpi/history/ingestion/');
+	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/youpi/history/ingestion/', null, function(resp) {
+		$$('.history td:last-child').each(function(node, k) {
+			node.up().insert(new Element('td')
+				.update(get_permissions_from_data(resp.data[k].perms, 'ingestion', resp.data[k].id))
+				.addClassName('ingestion-perms')
+			);
+		});
+	});
 }
 {% endif %}
 

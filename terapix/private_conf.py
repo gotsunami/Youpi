@@ -154,6 +154,7 @@ HOME_JS.extend(['js/progressbar.js', 'js/sqlform.js'])
 #
 INGESTION_JS = COMMON_JS[:]
 INGESTION_JS.extend([
+	'js/3rdParty/modalbox/modalbox.js', 
 	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js', 
 	'js/3rdParty/tafelTree/Tree.js', 
 	'js/tooltip.js', 
@@ -285,6 +286,7 @@ DEFAULT_CSS = [
 #
 ING_CSS = DEFAULT_CSS[:]
 ING_CSS.extend([
+	'js/3rdParty/modalbox/modalbox.css',
 	'themes/default/css/history.css', 
 	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css', 
 	'js/3rdParty/tafelTree/css/tree.css', 

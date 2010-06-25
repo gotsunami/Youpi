@@ -197,7 +197,7 @@ function getDOMTableFromResults(json_results, style)
 			var n;
 			switch (data[1]) {
 				case 'str':
-					n =	document.createTextNode(data[0]);
+					n =	data[0];
 					break;
 				case 'check':
 					var n = document.createElement('img');
@@ -217,7 +217,7 @@ function getDOMTableFromResults(json_results, style)
 				default:
 					break;
 			}
-			td.appendChild(n);
+			td.insert(n);
 			tr.appendChild(td);
 		}
 
@@ -317,10 +317,11 @@ function ResultTable(style) {
  *             json = {'data' : [list of json objects], 'header' : [list of header fields]}
  *
  */
-function queryUrlDisplayAsTable(container_id, select_limit_id, post_url, style)
+function queryUrlDisplayAsTable(container_id, select_limit_id, post_url, style, handler)
 {
 	var container = document.getElementById(container_id);
 	var sel = document.getElementById(select_limit_id);
+	var handler = typeof handler == 'function' ? handler : null;
 	var limit;
 
 	sel ? limit = sel.options[sel.selectedIndex].value : limit = 0;
@@ -336,7 +337,8 @@ function queryUrlDisplayAsTable(container_id, select_limit_id, post_url, style)
 				return;
 			}
 			container.update();
-			container.appendChild(getDOMTableFromResults(resp, style));
+			container.insert(getDOMTableFromResults(resp, style));
+			if (handler) handler(resp);
 		}
 	);
 
@@ -1466,6 +1468,51 @@ var boxes = {
 		});
 	}
 };
+
+/*
+ * Function: get_permissions_from_data
+ * Same as get_permissions() but with no XHR query. Data is passed instead.
+ *
+ * Parameters:
+ *  data - object: must have the following members: 
+ *   {isOwner: bool, mode: str, groupname: str, username: str, perms: object, groups: array}
+ *  target - string: entity
+ *  key - string
+ *  misc - any: misc data passed to handler [optional]
+ *
+ *  Note that target and key are only used to set new permissions
+ *
+ * Returns:
+ *  container DOM element
+ *
+ */ 
+function get_permissions_from_data(data, target, key, handler, misc) {
+	var handler = typeof(handler) == 'function' ? handler : null;
+	var uid = 'user_permissions_div_' + Math.floor(Math.random() * 999999);
+	var container = new Element('div', {id: uid});
+	var r = data.evalJSON(sanitize = true);
+	container.update(r.username).insert('/').insert(r.groupname);
+	container.insert('  ').insert(r.mode);
+	if (r.isOwner) {
+		container.insert(' (');
+		var a = new Element('a', {href: '#'}).update('Change');
+		a.observe('click', function() {
+			boxes.permissions(
+				uid,
+				handler,
+				target, 
+				String(key), 
+				r.perms, 
+				{username: r.username, groupname: r.groupname, groups: r.groups},
+				misc
+			);
+		});
+		container.insert(a).insert(')');
+	}
+	if (handler) handler(r, misc);
+
+	return container;
+}
 
 /*
  * Function: get_permissions

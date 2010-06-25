@@ -694,3 +694,9 @@ div.ims_batch_log_div pre {
 .report-download a:hover {
 	text-decoration: underline;
 }
+
+.ingestion-perms div {
+	text-align: left;
+	color: gray;
+
+}

@@ -554,6 +554,8 @@ def open_populate_generic(request, patterns, fb_name, path):
 
 	return HttpResponse(str(json), mimetype = 'text/plain')
 
+@login_required
+@profile
 def history_ingestion(request):
 	"""
 	Return a JSON object with data related to ingestions' history
@@ -576,10 +578,12 @@ def history_ingestion(request):
 			'Error': "Sorry, you don't have permission to view ingestion logs",
 		}), mimetype = 'text/plain')
 
-	res = Ingestion.objects.all().order_by('-start_ingestion_date')
-
 	if limit > 0:
-		res = res[:limit]
+		rset = Ingestion.objects.all().order_by('-start_ingestion_date')[:limit]
+	else:
+		rset = Ingestion.objects.all().order_by('-start_ingestion_date')
+
+	res, filtered = read_proxy(request, rset)
 
 	#
 	# We build a standard header that can be used for table's header.
@@ -590,25 +594,40 @@ def history_ingestion(request):
 
 	data = []
 	for ing in res:
-			#
-			# Unicode strings have to be converted to basic strings with str()
-			# in order to get a valid JSON object.
-			# Each header[j] is a list of (display value, type[, value2]).
-			# type allows client-side code to known how to display the value.
-			#
-			data.append({	header[0] 	: [str(ing.start_ingestion_date), 'str'],
-							header[1] 	: [str(ing.end_ingestion_date-ing.start_ingestion_date), 'str'],
-							header[2] 	: [str(ing.label), 'str'],
-							header[3] 	: [str(ing.user.username), 'str'],
-							header[4]	: [ing.check_fitsverify, 'check'],
-							header[5] 	: [ing.is_validated, 'check'],
-							header[6]	: [ing.check_multiple_ingestion, 'check'],
-							header[7]	: [ing.exit_code, 'exit'],
-							header[8]	: ['View log', 'link', str(settings.AUP + "/history/ingestion/report/%d/" % ing.id)]
-			})
+		# Current user permissions
+		isOwner = ing.user == request.user
+		groups = [g.name for g in request.user.groups.all()]
+		cuser_write = False
+		perms = Permissions(ing.mode)
+
+		if (isOwner and perms.user.write) or \
+			(ing.group.name in groups and perms.group.write) or \
+			perms.others.write:
+			cuser_write = True
+
+		#
+		# Unicode strings have to be converted to basic strings with str()
+		# in order to get a valid JSON object.
+		# Each header[j] is a list of (display value, type[, value2]).
+		# type allows client-side code to known how to display the value.
+		#
+		data.append({	
+			header[0]: [str(ing.start_ingestion_date), 'str'],
+			header[1]: [str(ing.end_ingestion_date-ing.start_ingestion_date), 'str'],
+			header[2]: [str(ing.label), 'str'],
+			header[3]: [str(ing.user.username), 'str'],
+			header[4]: [ing.check_fitsverify, 'check'],
+			header[5]: [ing.is_validated, 'check'],
+			header[6]: [ing.check_multiple_ingestion, 'check'],
+			header[7]: [ing.exit_code, 'exit'],
+			header[8]: ['View log', 'link', str(settings.AUP + "/history/ingestion/report/%d/" % ing.id)],
+			# Give user permissions for this ingestion
+			'perms': get_entity_permissions(request, target = 'ingestion', key = int(ing.id)),
+			'id': int(ing.id),
+		})
 
 	# Be aware that JS code WILL search for data and header keys
-	json = { 'data' : data, 'header' : header }
+	json = {'data': data, 'header': header}
 
 	# Return a JSON object
 	return HttpResponse(str(json), mimetype = 'text/plain')
@@ -1535,9 +1554,7 @@ def show_condor_log_file(request, kind, taskId):
 
 	return HttpResponse(str(data), mimetype = 'text/plain')
 
-@login_required
-@profile
-def get_permissions(request):
+def get_entity_permissions(request, target, key):
 	"""
 	Returns permissions for a given entity.
 	The return value is a JSON object like:
@@ -1545,17 +1562,12 @@ def get_permissions(request):
 	{'user' : {'read': true, 'write': true},
 	 'group': {'read': true, 'write': false},
 	 'others': {'read': false, 'write': false}}
+
+	Note that this is NOT a Django view. See get_permissions() instead.
+
+	@param target Target entity to query
+	@param key Used to identify an entity element
 	"""
-
-	post = request.POST
-	try:
-		# Target entity
-		target = post['Target']
-		# Unique key to identify an element in table
-		key = post['Key']
-	except Exception, e:
-		raise PluginError, "POST argument error. Unable to process data."
-
 	ent = None
 	if target == 'tag':
 		tag = Tag.objects.filter(name = key)[0]
@@ -1576,6 +1588,8 @@ def get_permissions(request):
 	elif target == 'profile':
 		prof = SiteProfile.objects.filter(user = request.user)[0]
 		ent = prof
+	elif target == 'ingestion':
+		ent = Ingestion.objects.filter(id = key)[0]
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
@@ -1600,7 +1614,7 @@ def get_permissions(request):
 		perms.others.write:
 		cuser_write = True
 
-	return HttpResponse(json.encode({
+	return json.encode({
 		'mode'			: str(perms), 
 		'perms'			: perms.toJSON(), 
 		'isOwner'		: isOwner,
@@ -1608,7 +1622,25 @@ def get_permissions(request):
 		'groupname'		: ent.group.name,
 		'groups'		: groups,
 		'currentUser' 	: {'read': cuser_read, 'write': cuser_write},
-	}), mimetype = 'text/plain')
+	})
+
+@login_required
+@profile
+def get_permissions(request):
+	"""
+	Returns permissions for a given entity. See get_entry_permissions().
+	"""
+
+	post = request.POST
+	try:
+		# Target entity
+		target = post['Target']
+		# Unique key to identify an element in table
+		key = post['Key']
+	except Exception, e:
+		raise PluginError, "POST argument error. Unable to process data."
+
+	return HttpResponse(get_entity_permissions(request, target, key), mimetype = 'text/plain')
 
 @login_required
 @profile
@@ -1668,6 +1700,8 @@ def set_permissions(request):
 	elif target == 'profile':
 		prof = SiteProfile.objects.filter(user = request.user)[0]
 		ent = prof
+	elif target == 'ingestion':
+		ent = Ingestion.objects.filter(id = key)[0]
 	else:
 		raise PermissionsError, "Permissions for target %s not supported" % target
 
