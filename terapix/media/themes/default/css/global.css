@@ -1,7 +1,7 @@
 body { margin:0; padding:0; font-size:12px; font-family:"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif; color:#000; background:#FFFFFF; }
 
 /* LINKS */
-a:link, a:visited { color: #5b80b2; text-decoration:none; }
+a:link, a:visited { color: #0336ad; text-decoration: underline; }
 a:hover { color: #036; }
 a img { border:none; }
 
@@ -537,6 +537,12 @@ table.shoppingCart div.submitItem {
 	border: 1px solid lightgray; 
 	padding: 15px; 
 	-moz-border-radius: 5px;
+}
+
+.ing-success {
+	background: transparent url('../img/admin/icon_success.gif') no-repeat 5px center;
+	padding-left: 25px;
+	text-align: left;
 }
 
 table.savedItems {
@@ -1726,4 +1732,21 @@ td.grade-comment {
 	-moz-border-radius: 5px;
 	background-color: #E6F2F9;
 	margin-top: 15px;
+}
+
+.ingoptname {
+	text-align: right;
+}
+
+.ingopt-on, .ingopt-off {
+	width: 20px;
+	height; 20px;
+}
+
+.ingopt-on {
+	background: transparent url('../img/misc/checkbox_on.gif') no-repeat center center;
+}
+
+.ingopt-off {
+	background: transparent url('../img/misc/checkbox_off.gif') no-repeat center center;
 }

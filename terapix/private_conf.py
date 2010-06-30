@@ -160,6 +160,7 @@ INGESTION_JS.extend([
 	'js/tooltip.js', 
 	'js/ingestion.js', 
 	'js/filebrowser.js',
+	'js/accordion.js',
 ])
 #
 TAGS_JS = COMMON_JS[:]
@@ -291,6 +292,7 @@ ING_CSS.extend([
 	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css', 
 	'js/3rdParty/tafelTree/css/tree.css', 
 	'themes/default/css/tooltip.css',
+	'themes/default/css/accordion.css',
 ])
 #
 TAGS_CSS = DEFAULT_CSS[:]

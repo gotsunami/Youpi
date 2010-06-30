@@ -28,6 +28,7 @@ from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 #
 from terapix.lib.common import *
+from terapix.lib import pretty
 from terapix.youpi.models import *
 from terapix.youpi.auth import Permissions
 from terapix.script.preingestion import preingest_table
@@ -612,7 +613,7 @@ def history_ingestion(request):
 		# type allows client-side code to known how to display the value.
 		#
 		data.append({	
-			header[0]: [str(ing.start_ingestion_date), 'str'],
+			header[0]: [str(pretty.date(ing.start_ingestion_date)) + ' (' + str(ing.start_ingestion_date) + ')', 'str'],
 			header[1]: [str(ing.end_ingestion_date-ing.start_ingestion_date), 'str'],
 			header[2]: [str(ing.label), 'str'],
 			header[3]: [str(ing.user.username), 'str'],
@@ -624,6 +625,7 @@ def history_ingestion(request):
 			# Give user permissions for this ingestion
 			'perms': get_entity_permissions(request, target = 'ingestion', key = int(ing.id)),
 			'id': int(ing.id),
+			'imgcount': int(Image.objects.filter(ingestion = ing).count()),
 		})
 
 	# Be aware that JS code WILL search for data and header keys

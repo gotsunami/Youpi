@@ -13,20 +13,69 @@ var gready = true;
 
 {% if perms.youpi.can_view_ing_logs %}
 function ingestion_history() {
-	/*
-	 * Arg 1: container id
-	 * Arg 2: select id (for limiting results)
-	 * Arg 3: path to server-side script for async Ajax query
-	 *
-	 */
-	queryUrlDisplayAsTable('div_result', 'select_history_limit', '/youpi/history/ingestion/', null, function(resp) {
-		$$('.history td:last-child').each(function(node, k) {
-			node.up().insert(new Element('td')
-				.update(get_permissions_from_data(resp.data[k].perms, 'ingestion', resp.data[k].id))
-				.addClassName('ingestion-perms')
-			);
-		});
+	var sc_accordion = new Accordion('accordion', {
+		duration: 0.5
 	});
+	sc_accordion.open(0);
+
+	$('history_count').update('Last ' + $('select_history_limit').value + ' results');
+	var tr, td;
+	var root = $('ingestion_content');
+	var r = new HttpRequest(
+		null,
+		null,	
+		// Custom handler for results
+		function(resp) {
+			var table = new Element('table', {'class': 'savedItems'});
+			tr = new Element('tr');
+			var headers = $A(['Status', 'Permissions', 'Options']);
+			headers.each(function(header) {
+				tr.insert(new Element('th').update(header));
+			});
+			table.insert(tr);
+			resp.data.each(function(entry) {
+				tr = new Element('tr');
+				// First col
+				td = new Element('td')
+					.addClassName('ing-' + (entry.exit[0] == 0 ? 'success' : 'failure'))
+					.update(new Element('b').insert(entry.ID[0]))
+					.insert(' by ')
+					.insert(new Element('i').update(entry.user[0]))
+					.insert(' (' + entry.imgcount + ')')
+					.insert(' - ' + entry.duration[0])
+					.insert(new Element('div').setStyle({paddingTop: '4px'}).insert(entry.start[0]))
+					.insert(new Element('div').setStyle({paddingTop: '4px'})
+						.insert(new Element('br'))
+						.insert(new Element('a', {'href': '#'}).update('Delete'))
+						.insert(' - ')
+						.insert(new Element('a', {'href': entry.log[2], 'target': '_blank'}).update('Log'))
+					);
+				tr.insert(td);
+				// Permissions
+				td = new Element('td')
+					.update(get_permissions_from_data(entry.perms, 'ingestion', entry.id))
+					.addClassName('ingestion-perms')
+				tr.insert(td);
+				// Options
+				var opts = new Element('table');
+				var otr, otd;
+				$A(['fitsverified', 'multiple', 'validated']).each(function(opt) {
+					otr = new Element('tr');
+					otd = new Element('td').addClassName('ingoptname').setStyle({border: 0}).update(opt);
+					otr.insert(otd);
+					otd = new Element('td').addClassName('ingopt-' + (entry[opt][0] == 0 ? 'off' : 'on')).setStyle({border: 0});
+					otr.insert(otd);
+					opts.insert(otr);
+				});
+				td = new Element('td').update(opts);
+				tr.insert(td);
+				table.insert(tr);
+			});
+			root.update(table);
+		}
+	);
+	var post = {limit: $('select_history_limit').value};
+	r.send('/youpi/history/ingestion/', $H(post).toQueryString());
 }
 {% endif %}
 
@@ -198,6 +247,17 @@ function updateContent(container, handler) {
 			</tr>
 		</table>
 		<div align="center" id="div_result"></div>
+		<div id="accordion" style="width: 80%; margin: auto;">
+			<h1 class="vertical_accordion_toggle">
+				<img src="/media/themes/{{ user.get_profile.guistyle }}/img/16x16/{{ plugin.id }}.png"/>
+				<span style="font-weight: bold;">History of ingestions</span> - <span id="history_count"/>
+			</h1>
+			<div class="vertical_accordion_content">
+				<div>
+					<div class="ontent" align="center" id="ingestion_content"></div>
+				</div>
+			</div>
+		</div>
 	{% endif %}
 	</div>
 </div>

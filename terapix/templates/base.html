@@ -57,19 +57,9 @@ var _fileBrowserSettings = {
 			</script>
         {% endif %}
 		<ul class="smart_tabnav">
-		{% for entry in menu.normal %}
-			{% ifequal entry.id selected_entry_id %}
-			<li class="enabled"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
-			{% else %}
-			<li class="disabled"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
-			{% endifequal %}
+		{% for entry in menu.normal %}{% ifequal entry.id selected_entry_id %}<li class="enabled"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>{% else %}<li class="disabled"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>{% endifequal %}
 		{% endfor %}
-		{% for entry in menu.apart %}
-			{% ifequal entry.id selected_entry_id %}
-			<li class="enabled_apart"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
-			{% else %}
-			<li class="disabled_apart"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>
-			{% endifequal %}
+		{% for entry in menu.apart %}{% ifequal entry.id selected_entry_id %}<li class="enabled_apart"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>{% else %}<li class="disabled_apart"><a href="{{ entry.href }}" id="{{ entry.id }}">{{ entry.title }}</a></li>{% endifequal %}
 		{% endfor %}
 		</ul>
 </div>
