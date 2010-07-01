@@ -545,6 +545,15 @@ table.shoppingCart div.submitItem {
 	text-align: left;
 }
 
+.ing-success span[id] {
+	font-weight: bold;
+}
+
+.ing-success .editor_ok_link {
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
 table.savedItems {
 	width: 100%;
 }

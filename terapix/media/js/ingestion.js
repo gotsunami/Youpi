@@ -373,7 +373,7 @@ function submitIngestion(ingestionId) {
 function ingestion_history() {
 	var sc_accordion = new Accordion('accordion', {
 		duration: 0.5,
-		clickable: false,
+		clickable: false
 	});
 	sc_accordion.open(0);
 
@@ -396,6 +396,7 @@ function ingestion_history() {
 				tr = new Element('tr');
 				// First col
 				var actions = new Element('div').setStyle({paddingTop: '4px'});
+				// User permissions bundle
 				perms = entry.perms.evalJSON(sanitize = true);
 				if (perms.currentUser.write) {
 					var dela = new Element('a', {'href': '#'}).update('Delete');
@@ -426,9 +427,29 @@ function ingestion_history() {
 				// Log div
 				actions.insert(new Element('div', {'id': 'ilog-' + entry.id}));
 
+				var name = new Element('span', {id: 'ingname-' + entry.id}).update(entry.ID[0]);
+				if (perms.currentUser.write) {
+					new Ajax.InPlaceEditor(name, '/youpi/ingestion/rename/' + entry.id + '/', {
+						okControl: 'link',
+						okText: 'save',
+						onComplete: function(transport, element) {
+							var d = $('ilog-' + entry.id);
+							d.update();
+							if (transport) {
+								var resp = transport.responseText.evalJSON(sanitize = true);
+								if (resp.error) {
+									element.update(resp.old);
+									var log = new Logger(d);
+									log.msg_error(resp.error);
+								}
+							}
+							new Effect.Highlight(element, {startcolor: this.options.highlightColor});
+						}
+					});
+				}
 				td = new Element('td')
 					.addClassName('ing-' + (entry.exit[0] == 0 ? 'success' : 'failure'))
-					.update(new Element('b').insert(entry.ID[0]))
+					.update(name)
 					.insert(' by ')
 					.insert(new Element('i').update(entry.user[0]))
 					.insert(' (' + entry.imgcount + ')')

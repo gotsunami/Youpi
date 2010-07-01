@@ -157,6 +157,7 @@ INGESTION_JS.extend([
 	'js/3rdParty/modalbox/modalbox.js', 
 	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js', 
 	'js/3rdParty/tafelTree/Tree.js', 
+	'js/3rdParty/scriptaculous/controls.js', 
 	'js/tooltip.js', 
 	'js/ingestion.js', 
 	'js/filebrowser.js',

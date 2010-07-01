@@ -27,6 +27,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
 from django.db.models import get_models
+from django.db import IntegrityError
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 from django.contrib.auth.models import User
@@ -87,6 +88,36 @@ def delete_ingestion(request, ing_id):
 		# Images have never been processed, the ingestion can safely be deleted
 		ing.delete()	
 	return HttpResponse(json.encode({'success': True}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def rename_ingestion(request, ing_id):
+	"""
+	Rename ingestion (regarding permissions)
+	"""
+	name = request.POST.get('value', None)
+	if not name:
+		# Fails silently
+		return HttpResponse(str(ing.name), mimetype = 'text/plain')
+
+	try:
+		ing = Ingestion.objects.get(id = ing_id)
+	except:
+		return HttpResponse(json.encode({'error': "This ingestion has not been found"}), mimetype = 'text/plain')
+
+	perms = terapix.youpi.views.get_entity_permissions(request, target = 'ingestion', key = int(ing.id))
+	if not perms['currentUser']['write']:
+		return HttpResponse(json.encode({'error': "You don't have permission to delete this ingestion"}), mimetype = 'text/plain')
+
+	orig = ing.label
+	try:
+		ing.label = name
+		ing.save()
+	except IntegrityError:
+		# Name not available
+		return HttpResponse(json.encode({'old': orig, 'error': "An ingestion named <b>%s</b> already exists.<br/>Cannot rename ingestion." % name}), mimetype = 'text/plain')
+
+	return HttpResponse(str(name), mimetype = 'text/plain')
 
 @login_required
 @profile
