@@ -16,9 +16,10 @@ var Accordion = Class.create({
 				content: 'vertical_accordion_content'
 			},
 			direction: 'vertical',
-			openHandler: null, // On open custom handler
-			closeHandler: null, // On close custom handler
-			duration: 0.6, // Animation duration
+			openHandler: null, 		// On open custom handler
+			closeHandler: null, 	// On close custom handler
+			duration: 0.6, 			// Animation duration
+			clickable: true, 		// Are headers clickable?
 			slideDelay: 0
 		});
 		if (typeof opts == 'object') this.opts.update(opts);
@@ -26,10 +27,12 @@ var Accordion = Class.create({
 		// Animation setup
 		this.headers = $$('#' + container + ' .' + this.opts.get('className').toggle);
 		this.headers.each(function(node) {
-			node.observe('click', function(event) {
-				// Open element; 'this' context is bound to the class, so we must use Event#findElement() to retrieve current element
-				this._open(event.findElement());
-			}.bind(this));
+			if (this.opts.get('clickable')) {
+				node.observe('click', function(event) {
+					// Open element; 'this' context is bound to the class, so we must use Event#findElement() to retrieve current element
+					this._open(event.findElement());
+				}.bind(this));
+			}
 		}.bind(this));
 		// Default: hide all content
 		$$('.' + this.opts.get('className').content).each(function(e) { e.hide(); });
@@ -136,9 +139,11 @@ var Accordion = Class.create({
 	enable: function(idx) {
 		if (!this.isDisabled(idx)) return;
 		this.headers[idx].removeClassName('accordion_disabled');
-		this.headers[idx].observe('click', function(event) {
-			// Open element
-			this._open(event.findElement());
-		}.bind(this));
+		if (this.opts.get('clickable')) {
+			this.headers[idx].observe('click', function(event) {
+				// Open element
+				this._open(event.findElement());
+			}.bind(this));
+		}
 	}
 });
