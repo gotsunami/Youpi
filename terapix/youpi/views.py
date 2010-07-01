@@ -623,16 +623,16 @@ def history_ingestion(request):
 			header[7]: [ing.exit_code, 'exit'],
 			header[8]: ['View log', 'link', str(settings.AUP + "/history/ingestion/report/%d/" % ing.id)],
 			# Give user permissions for this ingestion
-			'perms': get_entity_permissions(request, target = 'ingestion', key = int(ing.id)),
+			'perms': json.encode(get_entity_permissions(request, target = 'ingestion', key = int(ing.id))),
 			'id': int(ing.id),
 			'imgcount': int(Image.objects.filter(ingestion = ing).count()),
 		})
 
 	# Be aware that JS code WILL search for data and header keys
-	json = {'data': data, 'header': header}
+	out = {'data': data, 'header': header}
 
 	# Return a JSON object
-	return HttpResponse(str(json), mimetype = 'text/plain')
+	return HttpResponse(str(out), mimetype = 'text/plain')
 
 def remap(idList):
 	"""
@@ -1616,7 +1616,7 @@ def get_entity_permissions(request, target, key):
 		perms.others.write:
 		cuser_write = True
 
-	return json.encode({
+	return {
 		'mode'			: str(perms), 
 		'perms'			: perms.toJSON(), 
 		'isOwner'		: isOwner,
@@ -1624,7 +1624,7 @@ def get_entity_permissions(request, target, key):
 		'groupname'		: ent.group.name,
 		'groups'		: groups,
 		'currentUser' 	: {'read': cuser_read, 'write': cuser_write},
-	})
+	}
 
 @login_required
 @profile
@@ -1642,7 +1642,7 @@ def get_permissions(request):
 	except Exception, e:
 		raise PluginError, "POST argument error. Unable to process data."
 
-	return HttpResponse(get_entity_permissions(request, target, key), mimetype = 'text/plain')
+	return HttpResponse(json.encode(get_entity_permissions(request, target, key)), mimetype = 'text/plain')
 
 @login_required
 @profile

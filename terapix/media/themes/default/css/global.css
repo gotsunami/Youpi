@@ -540,7 +540,7 @@ table.shoppingCart div.submitItem {
 }
 
 .ing-success {
-	background: transparent url('../img/admin/icon_success.gif') no-repeat 5px center;
+	background: transparent url('../img/admin/icon_success.gif') no-repeat 5px 3px;
 	padding-left: 25px;
 	text-align: left;
 }

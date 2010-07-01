@@ -30,6 +30,7 @@ urlpatterns = patterns(
 	# Callback functions depending on urls matches
 	(r'^$', 'views.index'),
 	(r'^ingestion/$', 'views.ing'),
+	(r'^ingestion/delete/(.*?)/$', 'cviews.condor.delete_ingestion'),
 	(r'^ingestion/ingestion2/$', 'views.condor_ingestion'),
 	(r'^ingestion/imgCount/$', 'views.ingestion_img_count'),
 	(r'^ingestion/itt/content/$', 'views.get_itt_content'),

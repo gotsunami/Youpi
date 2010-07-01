@@ -364,3 +364,150 @@ function submitIngestion(ingestionId) {
 	xhr.setBusyMsg('Preparing ingestion of ' + path);
 	xhr.send('/youpi/ingestion/ingestion2/', $H(post).toQueryString());
 }
+
+/*
+ * Function: ingestion_history
+ * Makes an AJAX query to get ingestion history information
+ *
+ */ 
+function ingestion_history() {
+	var sc_accordion = new Accordion('accordion', {
+		duration: 0.5,
+		clickable: false,
+	});
+	sc_accordion.open(0);
+
+	$('history_count').update('Last ' + $('select_history_limit').value + ' results');
+	var tr, td;
+	var root = $('ingestion_content');
+	var r = new HttpRequest(
+		null,
+		null,	
+		// Custom handler for results
+		function(resp) {
+			var table = new Element('table', {'class': 'savedItems'});
+			tr = new Element('tr');
+			var headers = $A(['Status', 'Permissions', 'Options']);
+			headers.each(function(header) {
+				tr.insert(new Element('th').update(header));
+			});
+			table.insert(tr);
+			resp.data.each(function(entry) {
+				tr = new Element('tr');
+				// First col
+				var actions = new Element('div').setStyle({paddingTop: '4px'});
+				perms = entry.perms.evalJSON(sanitize = true);
+				if (perms.currentUser.write) {
+					var dela = new Element('a', {'href': '#'}).update('Delete');
+					dela.observe('click', function() {
+						boxes.confirm("Are you sure you want to delete ingestion <b>" + entry.ID[0] + "</b>?", function() {
+							var dr = new HttpRequest(
+								null,
+								null,	
+								function(resp) {
+									if (resp.error) {
+										var d = $('ilog-' + entry.id);
+										d.update();
+										var log = new Logger(d);
+										log.msg_error(resp.error);
+										return;
+									}
+									// Remove the line
+									dela.up('tr').remove();
+									Notifier.notify('Ingestion ' + entry.ID[0] + ' has been deleted.');
+								}
+							);
+							dr.send('/youpi/ingestion/delete/' + entry.id + '/');
+						}, "Confirm Deletion");
+					});
+					actions.insert(dela).insert(' - ');
+				}
+				actions.insert(new Element('a', {'href': entry.log[2], 'target': '_blank'}).update('Log'))
+				// Log div
+				actions.insert(new Element('div', {'id': 'ilog-' + entry.id}));
+
+				td = new Element('td')
+					.addClassName('ing-' + (entry.exit[0] == 0 ? 'success' : 'failure'))
+					.update(new Element('b').insert(entry.ID[0]))
+					.insert(' by ')
+					.insert(new Element('i').update(entry.user[0]))
+					.insert(' (' + entry.imgcount + ')')
+					.insert(' - ' + entry.duration[0])
+					.insert(new Element('div').setStyle({paddingTop: '4px'}).insert(entry.start[0]))
+					.insert(actions);
+				tr.insert(td);
+				// Permissions
+				td = new Element('td')
+					.update(get_permissions_from_data(entry.perms, 'ingestion', entry.id))
+					.addClassName('ingestion-perms')
+				tr.insert(td);
+				// Options
+				var opts = new Element('table');
+				var otr, otd;
+				$A(['fitsverified', 'multiple', 'validated']).each(function(opt) {
+					otr = new Element('tr');
+					otd = new Element('td').addClassName('ingoptname').setStyle({border: 0}).update(opt);
+					otr.insert(otd);
+					otd = new Element('td').addClassName('ingopt-' + (entry[opt][0] == 0 ? 'off' : 'on')).setStyle({border: 0});
+					otr.insert(otd);
+					opts.insert(otr);
+				});
+				td = new Element('td').update(opts);
+				tr.insert(td);
+				table.insert(tr);
+			});
+			root.update(table);
+		}
+	);
+	var post = {limit: $('select_history_limit').value};
+	r.send('/youpi/history/ingestion/', $H(post).toQueryString());
+}
+
+function updateContent(container, handler) {
+	var handler = typeof handler == 'function' ? handler : null;
+	var sel = $('itt_select');
+	var xhr = new HttpRequest(
+		null, // Use default error handler
+		null, // Custom handler for results
+		function(resp) {
+			var data = $H(resp.content);
+			var tab = new Element('table').addClassName('itt_table');
+			var tr, td;
+			data.each(function(pair) {
+				if (pair.key == '+COPY') return;
+				tr = new Element('tr');
+				td = new Element('td').update(pair.key + ';');
+				tr.insert(td);
+				var vals = $H(pair.value);
+				// Second col (mandatory)
+				td = new Element('td');
+				td.update(vals.get('SRC') + ';');
+				tr.insert(td);
+				// Third col (optional)
+				td = new Element('td');
+				td.update(vals.get('MAP'));
+				tr.insert(td);
+				tab.insert(tr);
+			});
+			// Add keywords copy at the end of table
+			data.each(function(pair) {
+				if (pair.key == '+COPY') {
+					pair.value.each(function(kw) {
+						tr = new Element('tr').addClassName('keyword_copy');
+						td = new Element('td').update('+' + kw);
+						tr.insert(td);
+						td = new Element('td', {colspan: 2}).update('Keyword copy');
+						tr.insert(td);
+						tab.insert(tr);
+					});
+				}
+			});
+			var content = new Element('pre').addClassName('itt_content');
+			content.update("--------- Youpi Parameters for the " + resp.instrument + " Instrument ------------").insert(tab);
+			container.update(content);
+			if (handler) handler();
+		}
+	);
+	var post = { Instrument: sel.options[sel.selectedIndex].value }
+	xhr.send('/youpi/ingestion/itt/content/', $H(post).toQueryString());
+}

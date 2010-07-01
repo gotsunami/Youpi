@@ -40,6 +40,7 @@ from terapix.exceptions import *
 #
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
+import terapix.youpi
 
 def condor_status(request):
 	return HttpResponse(str({'results' : get_condor_status()}), mimetype = 'text/plain')
@@ -50,7 +51,6 @@ def ingestion_img_count(request):
 	"""
 	Returns number of ingested images
 	"""
-
 	try:
 		releaseId = request.POST.get('ReleaseId', None)
 	except KeyError, e:
@@ -62,6 +62,31 @@ def ingestion_img_count(request):
 		q = Image.objects.all().count()
 
 	return HttpResponse(str({'Total' : int(q)}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def delete_ingestion(request, ing_id):
+	"""
+	Delete ingestion (regarding permissions)
+	"""
+	try:
+		ing = Ingestion.objects.get(id = ing_id)
+	except:
+		return HttpResponse(json.encode({'error': "This ingestion has not been found"}), mimetype = 'text/plain')
+
+	perms = terapix.youpi.views.get_entity_permissions(request, target = 'ingestion', key = int(ing.id))
+	if not perms['currentUser']['write']:
+		return HttpResponse(json.encode({'error': "You don't have permission to delete this ingestion"}), mimetype = 'text/plain')
+
+	imgs = Image.objects.filter(ingestion = ing)
+	rels = Rel_it.objects.filter(image__in = imgs)
+	if rels:
+		# Processed images, do not delete this ingestion
+		return HttpResponse(json.encode({'error': "Some of those ingested images have been processed.<br/>This ingestion can't be deleted."}), mimetype = 'text/plain')
+	else:
+		# Images have never been processed, the ingestion can safely be deleted
+		ing.delete()	
+	return HttpResponse(json.encode({'success': True}), mimetype = 'text/plain')
 
 @login_required
 @profile
