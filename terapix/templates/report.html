@@ -46,8 +46,10 @@ function report_menu_insert(title, handler) {
 	var menu;
 	document.observe('dom:loaded', function() {
 		menu = new SubMenu('submenu', ['Report']);
-		$$('.new_report')[0].observe('click', function() {
-			location.href= '{% url terapix.youpi.cviews.reporting.reporting %}';
+		$$('.new_report').each(function(d) {
+			d.observe('click', function() {
+				location.href= '{% url terapix.youpi.cviews.reporting.reporting %}';
+			});
 		});
 		// Looks for optional menu entries
 		report_menu_entries.each(function(entry) {
