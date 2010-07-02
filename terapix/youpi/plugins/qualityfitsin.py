@@ -1014,6 +1014,7 @@ class QualityFitsIn(ProcessingPlugin):
 
 				# Fill in content
 				content = """
+<div style="margin-bottom: 10px">Graded images: %(graded)d</div>
 <table>
 	<tr>
 		<th>Image name</th>
@@ -1024,6 +1025,7 @@ class QualityFitsIn(ProcessingPlugin):
 </table>
 """ % {
 		'rows': '\n'.join(trs),
+		'graded': len(res),
 	}
 				return render_to_response('report.html', {	
 									'report_title' 		: title,
