@@ -999,7 +999,7 @@ class QualityFitsIn(ProcessingPlugin):
 				return render_to_response('report.html', {	
 					'report_title' 		: title,
 					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+						(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 			else:
 				# HTML rendering
@@ -1054,7 +1054,7 @@ class QualityFitsIn(ProcessingPlugin):
 				return render_to_response('report.html', {	
 					'report_title' 		: title,
 					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+						(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 			else:
 				# HTML rendering
@@ -1168,7 +1168,7 @@ class QualityFitsIn(ProcessingPlugin):
 				return render_to_response('report.html', {	
 					'report_title' 		: title,
 					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+						(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 			else:
 				# FIXME: use Google's HTML table
@@ -1224,7 +1224,7 @@ class QualityFitsIn(ProcessingPlugin):
 				return render_to_response('report.html', {	
 					'report_title' 		: title,
 					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+						(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 			else:
 				# FIXME: use Google's HTML table
@@ -1283,7 +1283,7 @@ class QualityFitsIn(ProcessingPlugin):
 				return render_to_response('report.html', {	
 					'report_title' 		: title,
 					'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-						(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+						(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 			else:
 				# HTML rendering
