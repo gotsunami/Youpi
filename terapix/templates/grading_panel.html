@@ -14,7 +14,7 @@
 					<td>
 						<div style="padding: 0px;">
 							<u>Previous Release Grade</u>:<br/>
-							<div style="overflow: auto; height: 60px; margin-top: 1px;">
+							<div style="overflow: auto; margin-top: 1px;">
 								{% for i in prev_releaseinfo %}
 									{% if not i.prevrelgrade %}
 								<font color="red"><p>No Grade.</p></font>
@@ -37,11 +37,12 @@
 					<td nowrap="nowrap">
 						<div style="padding: 0px;">
 							<u>Grading history{% if evals %} ({{ evals.count }}){% endif %}</u>:<br/>
-							<div style="width: 100%; overflow: auto; height: 60px; margin-top: 1px;">
+							<div style="width: 100%; overflow: auto; margin-top: 1px;">
 							{% if evals %}
 								<table class="result_panel_history">
 								{% for ev in evals %}
 									<tr>
+										<td>{{ ev.grade }}</td>
 										<td nowrap="nowrap">
 											<div id="grade_div_{{ forloop.counter }}"></div>
 											<script type="text/javascript">
@@ -51,9 +52,10 @@
 												gradwid.setCharGrade('{{ ev.grade }}');
 											</script>
 										</td>
-										<td class="char">{{ ev.grade }}</td>
-										<td class="date">{{ ev.date }}</td>	
-										<td class="user">{{ ev.user.username }}</td>
+										<td class="user">by {{ ev.user.username }}</td>
+									</tr>
+									<tr>
+										<td class="comment" colspan="3" class="date">{{ ev.date }} - {% if ev.custom_comment %}{{ ev.custom_comment }}{% else %}{% ifequal ev.comment.comment "---" %}No comment{% else %}{{ ev.comment.comment }}{% endifequal %}{% endif %}</td>
 									</tr>
 								{% endfor %}
 								</table>
@@ -63,15 +65,14 @@
 							</div>
 						</div>
 					</td>
-					<td>
+					<td class="user_grading">
 						<div style="padding: 0px; width: 300px">
-							<u>Your grade</u>
 							{% if userGrade %} 
 								{% if perms.youpi.can_grade %}
-								(<a href="/youpi/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a>)
+								<span>You might want to <a href="/youpi/grading/cancel/{{ pluginId }}/{{ fitsId }}/">Cancel your grade</a></span>
 								{% endif %}
-							{% endif %}:<br/>
-							<div id="current_grade_div" style="margin-top: 10px;"></div>
+							{% endif %}<br/>
+							<div id="current_grade_div" class="user_grade_widget"></div>
 							<script type="text/javascript">
 								var mygrade = new GradingWidget('current_grade_div');
 								{% if not perms.youpi.can_grade %}
@@ -109,33 +110,41 @@
 										+ '&FitsId={{ fitsId }}'
 										+ '&PredefinedCommentId=' + prCommentId
 										+ '&CustomComment=' + customComment;
+									r.setCustomAnimatedImage(null);
+									r.setBusyMsg('Saving grade...');
 									r.send('/youpi/process/plugin/', post);
 								});
 							</script>
 						</div>
-					</td>
-					<td>
 						<div style="padding: 0px;">
-							<u>Your comment</u>:
+							<div>Optional comment:</div>
 							<div style="margin-top: 5px">
-								Predefined: 
-								<select id="predefined_comment_select" onchange="if (mygrade.isGraded()) mygrade.showCommitButton();">
-								{% for c in comments %}
-									{% ifequal userPCommentId c.id %}
-									<option value="{{ c.id }}" selected="selected">{{ c.comment }}</option>
-									{% else %}
-									<option value="{{ c.id }}">{{ c.comment }}</option>
-									{% endifequal %}
-								{% endfor %}
-								</select>
-							</div>
-							<div style="margin-top: 5px">
-								Custom: 
-								{% if customComment %}
-								<input type="text" size="70" value="{{ customComment }}" onkeydown="if (mygrade.isGraded()) mygrade.showCommitButton();" id="custom_comment_input"/>
-								{% else %}
-								<input type="text" size="70" onkeydown="if(mygrade.isGraded()) mygrade.showCommitButton();" id="custom_comment_input"/>
-								{% endif %}
+								<table class="grading_comments">
+									<tr>
+										<td>Predefined:</td>
+										<td>
+											<select id="predefined_comment_select" onchange="if (mygrade.isGraded()) mygrade.showCommitButton();">
+											{% for c in comments %}
+												{% ifequal userPCommentId c.id %}
+												<option value="{{ c.id }}" selected="selected">{{ c.comment }}</option>
+												{% else %}
+												<option value="{{ c.id }}">{{ c.comment }}</option>
+												{% endifequal %}
+											{% endfor %}
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td>Custom:</td>
+										<td>
+											{% if customComment %}
+											<input type="text" size="70" value="{{ customComment }}" onkeydown="if (mygrade.isGraded()) mygrade.showCommitButton();" id="custom_comment_input"/>
+											{% else %}
+											<input type="text" size="70" onkeydown="if(mygrade.isGraded()) mygrade.showCommitButton();" id="custom_comment_input"/>
+											{% endif %}
+										</td>
+									</tr>
+								</table>
 							</div>
 						</div>
 					</td>

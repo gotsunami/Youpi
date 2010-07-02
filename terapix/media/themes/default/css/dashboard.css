@@ -413,7 +413,7 @@ body {
 }
 div.result_panel_main {
 	width: 100%; 
-	height: 97px; 
+	height: 143px; 
 	border-bottom: 2px solid #ff982a;
 }
 div.result_panel_grade_label {
@@ -448,12 +448,45 @@ table.result_panel_history td {
 	margin: 0px;
 }
 
+table.result_panel_history td.comment {
+	text-align: left;
+	color: gray;
+}
+
+table.result_panel td.user_grading {
+	border-left: 7px solid #ff982a;
+	background-color: #fedd72;
+}
+
+table.result_panel .user_grade_widget {
+	background-color: white; 
+	margin-top: 5px;
+	margin-bottom: 5px;
+	-moz-border-radius: 5px;
+	width: 100px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	position: absolute;
+	right: 5px;
+	top: 5px;
+}
+
+table.result_panel {
+	width: 100%;
+	height: 143px;
+}
+
+table.result_panel table.grading_comments td:first-child {
+	color: black;
+	font-weight: bold;
+	vertical-align: middle;
+	text-align: right;
+}
+
 table.result_panel_history td.char {
 	padding-left: 3px;
 	padding-right: 3px;
-	border: 1px solid red;
-	color: white;
-	background-color: red;
+	color: black;
 	font-weight: bold;
 }
 table.result_panel_history td.date {
