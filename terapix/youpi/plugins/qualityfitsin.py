@@ -192,7 +192,7 @@ class QualityFitsIn(ProcessingPlugin):
 		"""
 		Returns latest grade (if any) for this processing task
 		"""
-		grades = FirstQEval.objects.filter(fitsin__task__id = taskId).order_by('date')
+		grades = FirstQEval.objects.filter(fitsin__task__id = taskId).order_by('-date')
 
 		ret = False
 		if grades:
