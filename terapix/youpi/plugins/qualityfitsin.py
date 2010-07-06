@@ -27,6 +27,7 @@ from terapix.youpi.auth import read_proxy
 import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response 
 from django.template import RequestContext
@@ -1145,13 +1146,30 @@ class QualityFitsIn(ProcessingPlugin):
 				}, context_instance = RequestContext(request))
 
 		elif reportId == 'onegrade':
-			from terapix.reporting.csv import CSVReport
 			try:
 				grade = post['grade_select']
 			except Exception, e:
 				return HttpResponseRedirect('/youpi/reporting/')
 
+			from terapix.reporting.csv import CSVReport
+			from django.db import connection
+			cur = connection.cursor()
+
+			# Only last grade per image is selected
+			# FIXME: More speed needed
+			s = time.time()
 			usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
+			lastgrades = []
+			for ug in usergrades:
+				# Other grades for that qfits job?
+				jobgrades = FirstQEval.objects.filter(fitsin = ug.fitsin).order_by('-date')
+				if len(jobgrades) > 1:
+					if jobgrades[0].grade == grade:
+						lastgrades.append(ug)
+				else:
+					lastgrades.append(ug)
+			usergrades = lastgrades
+
 			if format != ReportFormat.HTML:
 				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
 				if format == ReportFormat.CSV:
@@ -1171,15 +1189,57 @@ class QualityFitsIn(ProcessingPlugin):
 						(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 			else:
-				# FIXME: use Google's HTML table
 				# HTML rendering
-				content = []
+				res = []
 				for g in usergrades:
 					rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
-					content.append(( rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
+					res.append((rel.image.id, rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
+
+				# Content
+				report_content = """
+<h2>Matches: %d</h2>
+<div style="padding-top: 10px; color: black;">
+	<div style="width: %s;" id="rtable"></div>
+</div>
+</form>
+"""	% (len(usergrades), '98%')
+
+				# Table
+				report_columns = ['Image Name', 'Grade', 'Image Path', 'Checksum', 'Grading Date', 'Graded by', 'Comment', 'Custom comment',]
+				body_end = """
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load('visualization', '1', {packages: ['table']});
+	google.setOnLoadCallback(drawTable);
+	function drawTable() {
+		var data = new google.visualization.DataTable();"""
+
+				for k in range(len(report_columns)):
+					body_end += "data.addColumn('string', '%s');" % report_columns[k]
+				body_end += "data.addRows(%d);" % len(res)
+
+				for row in range(len(res)):
+					body_end += """
+		data.setCell(%d, 0, '<a target="_blank" href="%s">%s</a>');""" % (row, reverse('terapix.youpi.views.gen_image_header', args=[res[row][0]]), res[row][1])
+		#data.setCell(%d, %d, 's', {style: 'font-weight: bold; text-align: center;'});""" % (row, 1)
+					body_end += """
+		data.setCell(%d, %d, '%s', '%s', {style: 'font-weight: bold; text-align: center;'});""" % (row, 1, res[row][2], res[row][2])
+					for col in range(len(res[row]))[3:]:
+						body_end += """
+		data.setCell(%d, %d, '%s');""" % (row, col-1, res[row][col])
+
+				body_end += """
+		var table = new google.visualization.Table($('rtable'));
+		table.draw(data, {showRowNumber: true, allowHtml: true});
+	}
+</script>
+"""
+
 				return render_to_response('report.html', {	
 					'report_title' 		: title,
-					'report_content' 	: '<br/>'.join([str(s) for s in content]),
+					'report_content' 	: report_content,
+					# Use Google chart table API
+					'body_end'			: body_end,
 				}, context_instance = RequestContext(request))
 
 		elif reportId == 'nongraded':
