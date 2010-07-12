@@ -625,7 +625,6 @@ def process(userData, kind_id, argv):
 			user = DATABASE_USER,
 			passwd = DATABASE_PASSWORD,
 			db = DATABASE_NAME)
-
 	g = DBGeneric(db.con)
 
 	start = getNowDateTime(time.time())
@@ -744,6 +743,11 @@ def process(userData, kind_id, argv):
 		debug("Exited (code %d)" % exit_code)
 		task_end_log(userData, g, storeLog, task_id, success, kind)
 		sys.exit(exit_code)
+	
+	# Closes the connection before running potentially (very) long jobs to prevent 
+	# errors due to MySQL Idle deconnection (Server has gone away, wait_timeout)
+	g.con.commit()
+	g.con.close()
 
 	################### END OF PRE-PROCESSING  ################################################
 
@@ -760,6 +764,14 @@ def process(userData, kind_id, argv):
 
 	################### POST-PROCESSING STUFF GOES HERE ########################################
 
+
+	# Reopen DB connection
+	del db
+	db = DB(host = DATABASE_HOST,
+			user = DATABASE_USER,
+			passwd = DATABASE_PASSWORD,
+			db = DATABASE_NAME)
+	g = DBGeneric(db.con)
 
 	debug("Beginning post-processing operations")
 
