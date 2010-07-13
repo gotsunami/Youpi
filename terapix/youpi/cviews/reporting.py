@@ -16,7 +16,7 @@ from terapix.youpi.auth import Permissions
 from terapix.script.DBGeneric import *
 #
 import MySQLdb
-import re, string
+import re, string, time
 import os, os.path, sys
 from types import *
 #
@@ -114,6 +114,7 @@ def get_global_report(request, reportId, format):
 	title = get_report_data(global_reports, reportId)['title']
 
 	if reportId == 'imssavedselections':
+		import time
 		sels = ImageSelections.objects.all().order_by('date')
 		if not sels: 
 			return render_to_response('report.html', {	
@@ -139,7 +140,7 @@ def get_global_report(request, reportId, format):
 			return render_to_response('report.html', {	
 				'report_title' 		: title,
 				'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-					(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+					(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 			}, context_instance = RequestContext(request))
 		else:
 			content = []
@@ -212,7 +213,7 @@ def get_global_report(request, reportId, format):
 			return render_to_response('report.html', {	
 								'report_title' 		: title,
 								'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-									(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+									(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 			}, context_instance = RequestContext(request))
 		else:
 			# HTML
@@ -599,6 +600,7 @@ def get_global_report(request, reportId, format):
 			res = f_res
 
 			if format != ReportFormat.HTML:
+				import time
 				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
 				if format == ReportFormat.CSV:
 					import csv
@@ -612,7 +614,7 @@ def get_global_report(request, reportId, format):
 				return render_to_response('report.html', {	
 									'report_title' 		: title,
 									'report_content' 	: "<div class=\"report-download\"><a href=\"%s\">Download %s file report</a></div>" % 
-										(os.path.join('/media', settings.MEDIA_TMP, fname), format),
+										(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 
 			import terapix.script.wrapper_processing as wrapper
