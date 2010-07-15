@@ -1157,7 +1157,6 @@ class QualityFitsIn(ProcessingPlugin):
 
 			# Only last grade per image is selected
 			# FIXME: More speed needed
-			s = time.time()
 			usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
 			lastgrades = []
 			for ug in usergrades:
@@ -1193,7 +1192,7 @@ class QualityFitsIn(ProcessingPlugin):
 				res = []
 				for g in usergrades:
 					rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
-					res.append((rel.image.id, rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment))
+					res.append((rel.image.id, rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment, g.fitsin.task.id))
 
 				# Content
 				report_content = """
@@ -1223,8 +1222,9 @@ class QualityFitsIn(ProcessingPlugin):
 		data.setCell(%d, 0, '<a target="_blank" href="%s">%s</a>');""" % (row, reverse('terapix.youpi.views.gen_image_header', args=[res[row][0]]), res[row][1])
 		#data.setCell(%d, %d, 's', {style: 'font-weight: bold; text-align: center;'});""" % (row, 1)
 					body_end += """
-		data.setCell(%d, %d, '%s', '%s', {style: 'font-weight: bold; text-align: center;'});""" % (row, 1, res[row][2], res[row][2])
-					for col in range(len(res[row]))[3:]:
+		data.setCell(%d, %d, '%s', '<a target="_blank" href="%s">%s</a>', {style: 'font-weight: bold; text-align: center;'});""" % (
+				row, 1, res[row][2], reverse('terapix.youpi.views.single_result', args=[self.id, res[row][9]]), res[row][2])
+					for col in range(len(res[row])-1)[3:]:
 						body_end += """
 		data.setCell(%d, %d, '%s');""" % (row, col-1, res[row][col])
 
