@@ -16,6 +16,7 @@
 import sys, os.path, re, time, string, re
 import xml.dom.minidom as dom
 import marshal, base64, zlib
+import cjson as json
 from types import *
 from sets import Set
 #
@@ -1157,7 +1158,30 @@ class QualityFitsIn(ProcessingPlugin):
 
 			# Only last grade per image is selected
 			# FIXME: More speed needed
-			usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
+			count = FirstQEval.objects.filter(grade = grade).count()
+			if format != ReportFormat.HTML:
+				usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')
+			else:
+				# HTML only
+				try:
+					# Page to display
+					nextPage = int(post['page'])
+				except Exception, e:
+					nextPage = 1
+				# Max results per page
+				limit = 100
+				# Computes total pages
+				pageCount = 1
+				if count  > limit:
+					pageCount = count / limit
+					if count % limit > 0:
+						pageCount += 1
+			
+				# Selects res subset according to NextPage and limit
+				if nextPage > pageCount:
+					nextPage = pageCount
+				usergrades = FirstQEval.objects.filter(grade = grade).order_by('-date')[(nextPage-1)*limit:limit*nextPage]
+
 			lastgrades = []
 			for ug in usergrades:
 				# Other grades for that qfits job?
@@ -1168,6 +1192,22 @@ class QualityFitsIn(ProcessingPlugin):
 				else:
 					lastgrades.append(ug)
 			usergrades = lastgrades
+
+			res = []
+			for g in usergrades:
+				rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
+				res.append([str(rel.image.id), str(rel.image.name), str(g.grade), str(rel.image.path), str(rel.image.checksum), str(g.date), str(g.user), str(g.comment.comment), str(g.custom_comment), str(g.fitsin.task.id)])
+
+			if format == ReportFormat.HTML and post.get('page'):
+				# AJAX query, return results now
+				report_columns = ['Image Name', 'Grade', 'Image Path', 'Checksum', 'Grading Date', 'Graded by', 'Comment', 'Custom comment',]
+
+				return HttpResponse(json.encode({
+					'page': nextPage, 
+					'nbrows': len(usergrades), 
+					'total': pageCount, 
+					'report': {'header': report_columns, 'data': res}
+				}), mimetype = 'text/plain')
 
 			if format != ReportFormat.HTML:
 				fout = open(os.path.join(settings.MEDIA_ROOT, settings.MEDIA_TMP, fname), 'w')
@@ -1188,52 +1228,76 @@ class QualityFitsIn(ProcessingPlugin):
 						(os.path.join('/media', settings.MEDIA_TMP, fname + "?%s" % time.time()), format),
 				}, context_instance = RequestContext(request))
 			else:
-				# HTML rendering
-				res = []
-				for g in usergrades:
-					rel = Rel_it.objects.filter(task = g.fitsin.task)[0]
-					res.append((rel.image.id, rel.image.name, g.grade, rel.image.path, rel.image.checksum, g.date, g.user, g.comment.comment, g.custom_comment, g.fitsin.task.id))
-
+				# HTML rendering, no page supplied (defaults to page 1)
 				# Content
 				report_content = """
-<h2>Matches: %d</h2>
+<h2>Matches: <span id="matches"></span></h2>
 <div style="padding-top: 10px; color: black;">
-	<div style="width: %s;" id="rtable"></div>
+	<div style="float: left;" id="pagination"></div>
+	<div style="padding-top: 10px;" id="loading"></div>
+	<div style="clear: both; width: %s;" id="rtable"></div>
 </div>
 </form>
-"""	% (len(usergrades), '98%')
+"""	% ('98%')
 
 				# Table
-				report_columns = ['Image Name', 'Grade', 'Image Path', 'Checksum', 'Grading Date', 'Graded by', 'Comment', 'Custom comment',]
 				body_end = """
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
+	// Google table
 	google.load('visualization', '1', {packages: ['table']});
+	var table;
+
+	function onegrade_loadpage(page) {
+		var r = new HttpRequest(
+			$('loading'),
+			null,   
+			// Custom handler for results
+			function(r) {
+				$('loading').update();
+				// Updates switcher widget
+				ps.render(r.page, r.total);
+				$('matches').update(r.nbrows);
+
+				var data = new google.visualization.DataTable();
+				r.report.header.each(function(header) {
+					data.addColumn('string', header);
+				});
+				data.addRows(r.nbrows);
+				
+				r.report.data.each(function(row, k) {
+					$A(row).each(function(content, j) {
+						if (j == 0)
+							data.setCell(k, j, '<a target="_blank" href="/youpi/image/head/' + content + '/">' + row[j+1] + '</a>');
+						else if (j == 2)
+							data.setCell(k, j-1, content, '<a target="_blank" href="/youpi/results/fitsin/' + row[9] + '/">' + content + '</a>', {style: 'font-weight: bold; text-align: center;'});
+						else if (j > 2 && j < 9) {
+							data.setCell(k, j-1, row[j]);
+						}
+					});
+				});
+				table.draw(data, {showRowNumber: true, allowHtml: true});
+			}
+		);
+
+		// Adds various options
+		var opts = {page: page, grade_select: '%s'};
+		r.send('/youpi/report/fitsin/onegrade/HTML/', $H(opts).toQueryString());
+	}
+
+	// Page switcher
+	var ps = new PageSwitcher('pagination', function(page) {
+		onegrade_loadpage(page);
+	});
+	ps.render(%d, %d);
+
 	google.setOnLoadCallback(drawTable);
 	function drawTable() {
-		var data = new google.visualization.DataTable();"""
-
-				for k in range(len(report_columns)):
-					body_end += "data.addColumn('string', '%s');" % report_columns[k]
-				body_end += "data.addRows(%d);" % len(res)
-
-				for row in range(len(res)):
-					body_end += """
-		data.setCell(%d, 0, '<a target="_blank" href="%s">%s</a>');""" % (row, reverse('terapix.youpi.views.gen_image_header', args=[res[row][0]]), res[row][1])
-		#data.setCell(%d, %d, 's', {style: 'font-weight: bold; text-align: center;'});""" % (row, 1)
-					body_end += """
-		data.setCell(%d, %d, '%s', '<a target="_blank" href="%s">%s</a>', {style: 'font-weight: bold; text-align: center;'});""" % (
-				row, 1, res[row][2], reverse('terapix.youpi.views.single_result', args=[self.id, res[row][9]]), res[row][2])
-					for col in range(len(res[row])-1)[3:]:
-						body_end += """
-		data.setCell(%d, %d, '%s');""" % (row, col-1, res[row][col])
-
-				body_end += """
-		var table = new google.visualization.Table($('rtable'));
-		table.draw(data, {showRowNumber: true, allowHtml: true});
+		table = new google.visualization.Table($('rtable'));
+		onegrade_loadpage(1);
 	}
 </script>
-"""
+""" % (grade, nextPage, pageCount)
 
 				return render_to_response('report.html', {	
 					'report_title' 		: title,
@@ -1401,3 +1465,4 @@ draw_pie();
 
 		
 		return HttpResponseNotFound('Report not found.')
+

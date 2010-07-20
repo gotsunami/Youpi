@@ -243,6 +243,7 @@ REPORT_JS.extend([
 	'js/3rdParty/flotr/lib/canvastext.js',
 	'js/3rdParty/flotr/flotr-0.2.0-alpha.js',
 	'js/3rdParty/modalbox/modalbox.js',
+	'js/pageswitcher.js',
 ])
 #
 GRADEPANEL_JS = COMMON_JS[:]
