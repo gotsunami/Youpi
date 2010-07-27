@@ -18,6 +18,12 @@ Version 0.6.2
 
 **Improvements**:
 
+- `QualityFITS`'s report "*List of all images with a selected grade*" can display the QFits result 
+  page by clicking on the grade next no the image name. This report also comes with a pagination 
+  system to speed up SQL queries by returning smaller result sets (using AJAX). 
+- Redesigned the `ingestion history` panel; ingestions can be renamed and deleted, access rights to 
+  ingestions can be changed using the permissions system.
+- `QualityFITS` grading page: added available user comments; redesigned the grading interface.
 - New `STIFF` plugin: `STIFF`_ is a program that converts scientific `FITS`  images to the more 
   popular `TIFF` format for illustration purposes. It is already used by the `Swarp` and `Sextractor` 
   plugins but was not available as an independant plugin. The `STIFF` plugin allows to generate 
@@ -35,6 +41,7 @@ Version 0.6.2
 
 **Bug fixes**:
 
+- Reports: fixed file caching issue when downloading report.
 - Fixed a Condor requirement string parsing error for custom policies built upon custom selections 
   of nodes.
 
