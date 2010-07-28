@@ -64,14 +64,14 @@ function PathSelectorWidget(container, pluginId)
 	var tr_mandatory = new Array();
 	/*
 	 * Var: _extra
-	 * Object of options for extra entry
-	 * : _extra = {title: null, selected: false, help: null};
+	 * Array of objects of options for extra entry information
+	 * : _extra = [{title: null, selected: false, help: null}, ...];
 	 *
 	 * See Also:
 	 *  <addPath>
 	 *
 	 */ 
-	var _extra = {title: null, selected: false, help: null};
+	var _extra = new Array();
 
 	// Group: Functions
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -167,12 +167,14 @@ function PathSelectorWidget(container, pluginId)
 				var img, sel = null;
 
 				for (var k=0; k < tr_prefix.length; k++) {
+					// Current extra data
+					var extra = _extra[k];
 					var prefix = tr_prefix[k];
 					var div = $(plugin_id + '_' + prefix + '_div');
 					var msg_div;
 					div.update();
 
-					if (resp.result[prefix].length == 0 && !_extra.title) {
+					if (resp.result[prefix].length == 0 && !extra.title) {
 						msg_div = $(plugin_id + '_' + prefix + '_msg_div');
 						msg_div.innerHTML = '';
 						div.setAttribute('class', 'noFlagWeight');
@@ -180,8 +182,8 @@ function PathSelectorWidget(container, pluginId)
 					}
 					else {
 						// Insert element to the beginning
-						if (_extra.title)
-							resp.result[prefix].unshift(_extra.title);
+						if (extra.title)
+							resp.result[prefix].unshift(extra.title);
 						resp.result[prefix].unshift(NO_SELECTION);
 
 						if(tr_mandatory[k]) {
@@ -197,7 +199,7 @@ function PathSelectorWidget(container, pluginId)
 							_onPathChange(this.pathChange.prefix, this.pathChange.selid);
 						});
 						
-						if (_extra.selected)
+						if (extra.selected)
 							sel.options[1].writeAttribute({selected: 'selected'});
 						div.insert(sel);
 						img = new Element('img', {
@@ -332,6 +334,9 @@ function PathSelectorWidget(container, pluginId)
 		var sel = $(selid);
 		var txt = sel.options[sel.selectedIndex].text;
 		var d;
+		// Current row to get position in _extra array
+		var idx = sel.up('tr').previousSiblings().length;
+		var extra = _extra[idx];
 	
 		var msg = prefix.toUpperCase();
 		msg_div.setAttribute('class', 'lightTip');
@@ -340,41 +345,32 @@ function PathSelectorWidget(container, pluginId)
 			// No selection (default)
 			msg_div.update('Please make a selection below:');
 		}
-		else if (txt[txt.length-1] != '/' && !_extra.title) {
+		else if (txt[txt.length-1] != '/' && !extra.title) {
 			// This is a file
 			msg_div.update('This following file will <strong>overwrite</strong> paths to ' + msg + ' data. This ' + msg + ' file will be used for all images in the selection:');
 		}
-		else if (txt == _extra.title) {
-			msg_div.update(_extra.help + ':');
+		else if (txt == extra.title) {
+			msg_div.update(extra.help + ':');
 		}
 		else {
 			// This is a directory
-			msg_div.update(' files will be searched in the following directory:');
+			msg_div.update(' Files will be searched in the following directory:');
 		}
-	}
-
-	/*
-	 * Function: hasExtra
-	 * Returns true is an extra path option has been defined with <addPath>
-	 *
-	 * Returns:
-	 *  boolean
-	 *
-	 */
-	this.hasExtra = function() {
-		return _extra.title ? true : false;
 	}
 
 	/*
 	 * Function: getExtra
 	 * Returns extra option value for a path entry (See <addPath> for more info)
 	 *
+	 * Parameters:
+	 *  idx - integer: index of data path box
+	 *
 	 * Returns:
-	 *  <_extra>: object
+	 *  <_extra>: object at position idx or null if index out of bounds
 	 *
 	 */
-	this.getExtra = function() {
-		return _extra;
+	this.getExtra = function(idx) {
+		return _extra[idx];
 	}
 
 	/*
@@ -411,24 +407,27 @@ function PathSelectorWidget(container, pluginId)
 	 *  _prefix_ variable must be one word (no spaces allowed).
 	 *
 	 * See Also:
-	 *  <hasExtra>, <getExtra>
+	 *  <getExtra>
 	 *
 	 */ 
 	this.addPath = function(title, prefix, options) {
 		if (typeof options != 'object')
 			options = {mandatory: false};
 
+		var local_extra;
 		var mandatory = typeof options.mandatory == 'boolean' ? options.mandatory : false;
 
 		if (typeof options.extra == 'object') {
 			if (typeof options.extra.title != 'string')
-				console.error('extra object does not have its title property set (required)');
+				throw 'extra object does not have its title property set (required)';
 
 			if (typeof options.extra.help != 'string')
-				console.error("'extra object does not have its 'help' property set (required)");
+				throw "'extra object does not have its 'help' property set (required)";
 			
-			_extra = options.extra;
+			local_extra = options.extra;
 		}
+		else
+			local_extra = {title: null, selected: false, help: null};
 
 		var tr, th, td;
 		tr = new Element('tr');
@@ -444,6 +443,7 @@ function PathSelectorWidget(container, pluginId)
 		tr_paths.push(tr);
 		tr_prefix.push(prefix);
 		tr_mandatory.push(mandatory);
+		_extra.push(local_extra);
 	}
 
 	/*

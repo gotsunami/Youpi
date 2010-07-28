@@ -73,7 +73,7 @@ var {{ plugin.id }} = {
 		var weightPath = '';
 		var path = wSel.options[wSel.selectedIndex].text;
 		if (path != selector.getNoSelectionPattern()) {
-			weightPath = (path == selector.getExtra().title) ? 'QFits-generated weight maps' : path;
+			weightPath = (path == selector.getExtra(0).title) ? 'QFits-generated weight maps' : path;
 		}
 
 		var total = {{ plugin.id }}.ims.getImagesCount();
@@ -96,7 +96,7 @@ var {{ plugin.id }} = {
 		c.insert(pre);
 		var log = new Logger(pre);
 
-		if (path == selector.getExtra().title) {
+		if (path == selector.getExtra(0).title) {
 			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
 			var sName = {{ plugin.id }}.ims.getSavedSelectionUsed() ? "<span class=\"saved_selection_used\">" + {{ plugin.id }}.ims.getSavedSelectionUsed() + "</span>" : "";
 			log.msg_status("Using output data path '" + output_data_path + "'");
