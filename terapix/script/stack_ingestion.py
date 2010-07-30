@@ -91,7 +91,7 @@ def getFITSheader(fitsObj, fitsfile):
 	except Exception, e:
 			fitsObj.close()
 			debug("Erro while processing header of %s: %s" % (fitsfile, e), FATAL)
-			sys.exit(1)
+			raise
 
 	return h1
 
@@ -151,8 +151,9 @@ def run_stack_ingestion(g, stackFile, user_id):
 
 	# Check for ingestion label
 	ing_label = 'Stack ' + os.path.basename(fitsNoExt)
-	res = g.execute("""select label from youpi_ingestion where label = "%s";""" % ing_label)
-	if res: ing_label += '_1'
+	res = g.execute("""select label from youpi_ingestion where label like "%s" order by end_ingestion_date desc;""" % (ing_label + '%'))
+	if res: 
+		ing_label = res[0][0] + '_1'
 
 	g.setTableName('youpi_ingestion')
 	g.insert(	start_ingestion_date = getNowDateTime(duration_stime),
@@ -210,8 +211,8 @@ def run_stack_ingestion(g, stackFile, user_id):
 			instrument_id = val[0]
 
 	if instrument_id < 0:
-		debug("Matching instrument '%s' not found in DB. Image ingestion skipped." % detector, WARNING)
-		sys.exit(1)
+		msg = "Matching instrument '%s' not found in DB. Image ingestion skipped." % detector
+		raise ValueError, msg
 
 	# CHANNEL DATABASE INGESTION
 	res = g.execute("""select name from youpi_channel where name="%s";""" % channel)
