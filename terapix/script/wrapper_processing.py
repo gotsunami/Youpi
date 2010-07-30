@@ -533,14 +533,15 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 				g.setTableName('youpi_plugin_swarp')
 				g.insert(	task_id = int(task_id),
 							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
-							useQFITSWeights = userData['UseQFITSWeights'],
+							useAutoQFITSWeights = userData['UseAutoQFITSWeights'],
+							useAutoScampHeads = userData['UseAutoScampHeads'],
 							www = os.path.join(	WWW_SWARP_PREFIX, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
 							thumbnails = 0,
 							headPath = userData['HeadPath'],
-							useHeadFiles = userData['UseHeadFiles']
+							weightPath = userData['WeightPath'],
 				)
 			except Exception, e:
 				raise WrapperError, e
@@ -1017,10 +1018,10 @@ def process(userData, kind_id, argv):
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
+							useAutoQFITSWeights = userData['UseAutoQFITSWeights'],
+							useAutoScampHeads = userData['UseAutoScampHeads'],
 							weightPath = userData['WeightPath'],
-							useQFITSWeights = userData['UseQFITSWeights'],
 							headPath = userData['HeadPath'],
-							useHeadFiles = userData['UseHeadFiles'],
 							thumbnails = convert
 				)
 				swarp_id = g.con.insert_id()

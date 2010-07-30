@@ -55,6 +55,15 @@
 								'qualityFITS</b>'
 						}
 	});
+	selector.addPath('HEAD data', 'heads', {
+						mandatory: true, 
+						extra: {
+							title: 'Use Scamp-generated HEAD files', 
+							selected: true,
+							help: 'This option will handle HEAD files selection automatically, using for each image HEAD files from <b>your last successful ' + 
+								'Scamp</b>'
+						}
+	});
 	selector.setFileBrowser(fm_file_browser);
 	selector.render();
 

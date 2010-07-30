@@ -229,15 +229,12 @@ table.info td {
 }
 
 table.info td.label {
-	color: white;
 	text-align: center;
-	background-color: #5b80b2;
-	border: none;
+	font-weight: bold;
 }
 
-table.info td.file {
+table.info td.file, table.info td.label {
 	border: none;
-	background-color: transparent;
 }
 
 table.info td.warning {

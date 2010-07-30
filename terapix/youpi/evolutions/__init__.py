@@ -6,4 +6,6 @@ SEQUENCE = [
 	'image_pixelscale', 
 	'qfits_seeing_decimal',
 	'qfits_add_mask', 
+	'swarp_head',
+	'swarp_weight_rename',
 ]

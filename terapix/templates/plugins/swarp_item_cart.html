@@ -10,8 +10,14 @@
 			<table class="plugin_small">
 				{% if data.userData.weightPath %}
 				<tr>
-					<td><span class="regLetter">Weight:</span></td>
+					<td><span class="regLetter">Weight maps:</span></td>
 					<td>{{ data.userData.weightPath }}</td>
+				</tr>
+				{% endif %}
+				{% if data.userData.headPath %}
+				<tr>
+					<td><span class="regLetter">Head files:</span></td>
+					<td>{{ data.userData.headPath }}</td>
 				</tr>
 				{% endif %}
 				<tr>

@@ -352,10 +352,10 @@ class Plugin_swarp(models.Model):
 	log = models.TextField(null = True)
 	www = models.CharField(max_length = 255, blank = True, null = True, help_text = "HTTP URL to Swarp output HTML data")
 	thumbnails = models.NullBooleanField('Has image thumbnails', default = False)
+	useAutoQFITSWeights = models.NullBooleanField('True if QFITS weight maps have been used', default = False)
+	useAutoScampHeads = models.NullBooleanField('True if Scamp head files have been used', default = False)
 	weightPath = models.CharField(max_length = 255, null = True, help_text = "Path to weight images")
-	useQFITSWeights = models.NullBooleanField('True if QFITS weight maps have been used', default = False)
 	headPath = models.CharField(max_length = 255, null = True, help_text = "Path to .head files")
-	useHeadFiles = models.NullBooleanField('True if .head files have been used', default = False)
 
 	# FKs constraints
 	task = models.ForeignKey(Processing_task, db_column = 'task_id')

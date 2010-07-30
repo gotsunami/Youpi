@@ -121,11 +121,13 @@ class Swarp(ProcessingPlugin):
 		try:
 			itemId = str(post['ItemId'])
 			weightPath = post['WeightPath']
+			headPath = post['HeadPath']
 			config = post['Config']
 			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
 			reprocessValid = int(post['ReprocessValid'])
-			useQFITSWeights = int(post['UseQFITSWeights'])
+			useAutoQFITSWeights = int(post['UseAutoQFITSWeights'])
+			useAutoScampHeads = int(post['UseAutoScampHeads'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
 
@@ -184,9 +186,9 @@ class Swarp(ProcessingPlugin):
 					'SubmissionFile'	: csfPath, 
 					'ConfigFile' 		: customrc, 
 					'WeightPath'		: str(weightPath), 
-					'UseQFITSWeights'	: int(useQFITSWeights),
-					'HeadPath'			: 'No .head files used',		# Default value
-					'UseHeadFiles'		: 0,							# Default value
+					'HeadPath'			: str(headPath),
+					'UseAutoQFITSWeights'	: int(useAutoQFITSWeights),
+					'UseAutoScampHeads'		: int(useAutoScampHeads),
 					'Descr'				: "%s of %d FITS images, %s" % (self.optionLabel, len(images), str(xmlRootName)),	# Mandatory for AMI
 					'JobID' 			: self.getUniqueCondorJobId(),
 					'StartupDelay'		: step,
@@ -210,7 +212,7 @@ class Swarp(ProcessingPlugin):
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
 
 		# Weight maps support
-		if useQFITSWeights:
+		if useAutoQFITSWeights:
 			weight_files = self.getWeightPathsFromImageSelection(request, idList)
 			weight_files = string.join([dat[1] for dat in weight_files], ', ')
 		else:
@@ -218,10 +220,14 @@ class Swarp(ProcessingPlugin):
 
 		# .head files support
 		head_files = os.path.join(submit_file_path, 'NOP')
-		if len(headDataPath):
-			head_files = string.join([os.path.join(headDataPath, img.filename + '.head') for img in images], ', ')
-			userData['HeadPath'] =  str(headDataPath)
-			userData['UseHeadFiles'] =  1
+		if useAutoScampHeads:
+			if len(headDataPath):
+				head_files = string.join([os.path.join(headDataPath, img.filename + '.head') for img in images], ', ')
+				userData['HeadPath'] =  str(headDataPath)
+		else:
+			# Custom path to Scamp head files provided
+			head_files = string.join([os.path.join(headPath, img.filename + '.head') for img in images], ', ')
+			userData['HeadPath'] =  str(headPath)
 
 		# List of all input files to be transferred (for -l option of condor_transfer.pl)
 		transferFile = "swarp-transfer-%s.rc" % time.time()
@@ -292,7 +298,9 @@ for fz in fzs:
 # Finally run swarp
 """
 		pcontent += """
-exit_code = os.system("%(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>&1")
+command = "%(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>&1"
+debug("Executing: " + command)
+exit_code = os.system(command)
 sys.exit(exit_code)
 """ % {
 	'swarp'			: settings.CMD_SWARP,
@@ -442,7 +450,6 @@ sys.exit(exit_code)
 			# Same as qualityfits.py img.name image database name is used, to distinguish 
 			# multiple instance of the same image in database, but we use the real image filename
 			# to get real weight filename on disks
-
 			weight_files.append([int(img.id), str(os.path.join(task.results_output_dir, img.name, 'qualityFITS', img.filename + 
 				'_weight.fits.fz'))])
 
@@ -538,9 +545,10 @@ sys.exit(exit_code)
 					'History'			: history,
 					'Log' 				: err_log,
 					'WeightPath'		: str(data.weightPath),
-					'UseQFITSWeights'	: int(data.useQFITSWeights),
 					'HeadPath'			: str(data.headPath),
-					'UseHeadFiles'		: int(data.useHeadFiles),
+					'UseAutoQFITSWeights'	: int(data.useAutoQFITSWeights),
+					'UseAutoScampHeads'		: int(data.useAutoScampHeads),
+					'HeadPath'			: str(data.headPath),
 		}
 
 	def getReprocessingParams(self, request):
@@ -560,9 +568,11 @@ sys.exit(exit_code)
 
 		return {
 				'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data.task.results_output_dir, data.task.user.username)),
-				'useQFITSWeights'	: str(data.useQFITSWeights),
+				'useAutoQFITSWeights'	: str(data.useAutoQFITSWeights),
+				'useAutoScampHeads'		: str(data.useAutoScampHeads),
 				'idList'			: str(idList), 
 				'weightPath'		: str(data.weightPath), 
+				'headPath'			: str(data.headPath), 
 				'headDataPaths'		: str(data.headPath),
 		}
 
@@ -586,10 +596,12 @@ sys.exit(exit_code)
 			idList = eval(post['IdList'])
 			itemID = str(post['ItemId'])
 			weightPath = post['WeightPath']
+			headPath = post['HeadPath']
 			config = post['Config']
 			taskId = post.get('TaskId', '')
 			resultsOutputDir = post['ResultsOutputDir']
-			useQFITSWeights = int(post['UseQFITSWeights'])
+			useAutoQFITSWeights = int(post['UseAutoQFITSWeights'])
+			useAutoScampHeads = int(post['UseAutoScampHeads'])
 			headDataPaths = post['HeadDataPaths'].split(',')
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data: %s" % e
@@ -603,8 +615,10 @@ sys.exit(exit_code)
 		# Custom data
 		data = { 'idList' 			: idList, 
 				 'weightPath' 		: weightPath, 
+				 'headPath' 		: headPath, 
 				 'resultsOutputDir' : resultsOutputDir, 
-				 'useQFITSWeights' 	: useQFITSWeights,
+				 'useAutoQFITSWeights' 	: useAutoQFITSWeights,
+				 'useAutoScampHeads' 	: useAutoScampHeads,
 				 'headDataPaths' 	: headDataPaths,
 				 'taskId'			: taskId,
 				 'config' 			: config }
@@ -634,14 +648,23 @@ sys.exit(exit_code)
 		res = []
 		for it in items:
 			data = marshal.loads(base64.decodestring(str(it.data)))
+			# Set default values for items without this information
+			if not data.has_key('headPath'):
+				data['headPath'] = 'AUTO'
+			if not data.has_key('useAutoScampHeads'):
+				data['useAutoScampHeads'] = 1
+			if not data.has_key('useAutoQFITSWeights'):
+				data['useAutoQFITSWeights'] = 1
 			res.append({'date' 				: "%s %s" % (it.date.date(), it.date.time()), 
 						'username'			: str(it.user.username),
 						'idList' 			: str(data['idList']), 
 						'taskId' 			: str(data['taskId']), 
 						'itemId' 			: str(it.id), 
 						'weightPath' 		: str(data['weightPath']), 
+						'headPath' 			: str(data['headPath']), 
 						'resultsOutputDir' 	: str(self.getUserResultsOutputDir(request, data['resultsOutputDir'], it.user.username)),
-				 		'useQFITSWeights' 	: str(data['useQFITSWeights']),
+				 		'useAutoQFITSWeights' 	: str(data['useAutoQFITSWeights']),
+				 		'useAutoScampHeads' 	: str(data['useAutoScampHeads']),
 						'name' 				: str(it.name),
 						'headDataPaths'		: string.join([str(p) for p in data['headDataPaths']], ','),
 						'config' 			: str(data['config'])})
