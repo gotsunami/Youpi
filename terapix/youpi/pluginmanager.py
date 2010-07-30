@@ -171,7 +171,7 @@ class ProcessingPlugin(object):
 		dfltconfig = ConfigFile.objects.filter(kind__name__exact = self.id, name = 'default', type__name = type)
 		res = [{'name': 'default', 'type': str(type)}]
 
-		configs, filtered = read_proxy(request, ConfigFile.objects.filter(kind__name__exact = self.id, type__name = type))
+		configs = ConfigFile.objects.filter(kind__name__exact = self.id, type__name = type)
 		for config in configs:
 			if config.name != 'default':
 				res.append({'name': str(config.name), 'type': str(config.type.name)})
