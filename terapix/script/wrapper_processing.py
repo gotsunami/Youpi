@@ -998,7 +998,7 @@ def process(userData, kind_id, argv):
 					debug("Renamed %s to %s in %s" % (imgout, finalStackName, userData['ResultsOutputDir']))
 
 			except Exception, e:
-				debug("Could not ingest final stack image. Error: %s" % e)
+				debug("[Error] Could not ingest final stack image: %s" % e)
 				success = 0
 				exit_code = 1
 
@@ -1037,17 +1037,25 @@ def process(userData, kind_id, argv):
 				pass
 
 			# Gets image name
-			imgout = getConfigValue(configContent, 'IMAGEOUT_NAME')
-			if imgout:
-				# Converts produced FITS image into PNG format
-				tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
-				os.system("%s %s -OUTFILE_NAME %s -BINNING 40 2>/dev/null" % (CMD_STIFF, imgout, tiff))
-				os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'swarp.png')))
-				if HAS_CONVERT:
-					debug("Creating image thumbnails")
-					os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png')))
-			else:
-				debug("[Warning] IMAGEOUT_NAME keyword not found in configuration file")
+			if exit_code == 0:
+				imgout = getConfigValue(configContent, 'IMAGEOUT_NAME')
+				if imgout:
+					debug("Converting FITS image into a PNG bitmap")
+					# Converts produced FITS image into PNG format
+					tiff = os.path.join(userData['ResultsOutputDir'], 'swarp.tif')
+					cmd1 = "%s %s -OUTFILE_NAME %s -BINNING 40 2>/dev/null" % (CMD_STIFF, os.path.join(userData['ResultsOutputDir'], imgout), tiff)
+					debug(cmd1)
+					os.system(cmd1)
+					cmd2 = "%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], 'swarp.png'))
+					debug(cmd2)
+					os.system(cmd2)
+					if HAS_CONVERT:
+						debug("Creating image thumbnails")
+						cmd3 = "%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'], 'tn_swarp.png'))
+						debug(cmd3)
+						os.system(cmd3)
+				else:
+					debug("[Warning] IMAGEOUT_NAME keyword not found in configuration file")
 
 	else:
 		# Default: success is set to that task_end_log marks the job as successful
