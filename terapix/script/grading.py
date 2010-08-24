@@ -52,6 +52,15 @@ def get_stats():
 
 	return stats
 
+def get_grades_with_tag(tag):
+	from django.db import connection
+	cur = connection.cursor()
+	q = """SELECT image_id FROM youpi_rel_tagi AS tagi, youpi_tag AS t WHERE tagi.tag_id=t.id AND t.name='%s'""" % tag
+	cur.execute(q)
+	res = cur.fetchall()
+	imgList = [r[0] for r in res]
+	return get_grades(idList = imgList)
+
 def get_grades(res_output_dir = None, idList = None):
 	"""
 	Returns all images grades in the database. Only the latest grade, when available, is returned for 
@@ -413,6 +422,13 @@ def main():
 			action = 'store_true', 
 			help = 'List available grades in DB'
 	)
+	parser.add_option('-k', '--list-with-tag', 
+			default = False, 
+			action = 'store', 
+			type = 'string',
+			dest = 'tag',
+			help = 'List available grades in DB with a given tag'
+	)
 	parser.add_option('-o', '--output', 
 			default = False, 
 			help = 'Ouput directory'
@@ -485,6 +501,9 @@ def main():
 		elif options.list_only:
 			from terapix.reporting.csv import CSVReport
 			print CSVReport(data = get_grades())
+		elif options.tag:
+			from terapix.reporting.csv import CSVReport
+			print CSVReport(data = get_grades_with_tag(options.tag))
 		elif options.filename:
 			ingest_grades(options.filename, options.simulate, options.user, verbose = options.verbose)
 		elif options.delete:
