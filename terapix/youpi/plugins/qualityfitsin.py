@@ -271,7 +271,12 @@ class QualityFitsIn(ProcessingPlugin):
 
 		history = []
 		for h in qfhistory:
-			h_fits = Plugin_fitsin.objects.filter(task__id = h.task.id)[0]
+			try:
+				h_fits = Plugin_fitsin.objects.filter(task__id = h.task.id)[0]
+			except:
+				# Not a valid history
+				continue
+
 			h_evals = FirstQEval.objects.filter(fitsin__task__id = h.task.id).order_by('-date')
 			h_gcount = 0
 			if h_evals:
