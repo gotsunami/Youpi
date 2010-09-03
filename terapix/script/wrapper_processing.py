@@ -1193,7 +1193,12 @@ if __name__ == '__main__':
 		else:
 			debug("[Error] %s: %s" % (code, msg))
 			sys.exit(1)
-
 	except IndexError, e:
 		debug("[Error] %s" % e)
+		sys.exit(1)
+	except Exception, e:
+		error_msg = "Unhandled job exception: \n%s" % e
+		start = getNowDateTime(time.time())
+		imgName, task_id, g = task_start_log(userData, start)
+		task_end_log(userData, g, error_msg, task_id, 0, userData['Kind'])
 		sys.exit(1)
