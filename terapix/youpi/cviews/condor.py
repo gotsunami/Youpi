@@ -815,6 +815,11 @@ def delete_processing_task(request):
 		if data: data.delete()
 		task.delete()
 		success = True
+	except IndexError:
+		# Associated data not available (should be)
+		for r in rels: r.delete()
+		task.delete()
+		success = True
 	except Exception, e:
 		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
 
