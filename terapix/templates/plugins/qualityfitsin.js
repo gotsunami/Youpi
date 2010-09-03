@@ -580,6 +580,12 @@ var {{ plugin.id }} = {
 		td.update(ResultsHelpers.getPermissionsEntry(resp.TaskId));
 		tr.insert(td);
 		tab2.insert(tr);
+		if (resp.PartialInfo) {
+			// Outputs minimal set of information and a deletion link (depending on user permissions)
+			d.appendChild(tab);
+			container.insert(d);
+			return;
+		}
 		
 		// Image grading
 		if (resp.Success) {

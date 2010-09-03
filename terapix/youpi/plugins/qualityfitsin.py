@@ -244,7 +244,22 @@ class QualityFitsIn(ProcessingPlugin):
 		task = task[0]
 
 		img = Rel_it.objects.filter(task__id = taskid)[0].image
-		data = Plugin_fitsin.objects.filter(task__id = taskid)[0]
+		try:
+			data = Plugin_fitsin.objects.filter(task__id = taskid)[0]
+		except:
+			# No QFits data available (old WP bug)
+			return {	'TaskId'			: str(taskid),
+						'Title' 			: str("%s - %s.fits" % (self.description, img.name)),
+						'User' 				: str(task.user.username),
+						'Hostname'			: str(task.hostname),
+						'ClusterId'			: str(task.clusterId),
+						'Success' 			: task.success,
+						'Start' 			: str(task.start_date),
+						'End' 				: str(task.end_date),
+						'Duration' 			: str(task.end_date-task.start_date),
+						'PartialInfo'		: 1, # QFits job failed with old issue in WP
+			}
+
 		# QFits processing history for that image
 		qfhistory = Rel_it.objects.filter(image__id = img.id, task__kind__name = self.id).order_by('-id')
 		evals = FirstQEval.objects.filter(fitsin__task__id = taskid).order_by('-date')
