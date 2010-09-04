@@ -546,8 +546,8 @@ sys.exit(exit_code)
 					'Log' 				: err_log,
 					'WeightPath'		: str(data.weightPath),
 					'HeadPath'			: str(data.headPath),
-					'UseAutoQFITSWeights'	: int(data.useAutoQFITSWeights),
-					'UseAutoScampHeads'		: int(data.useAutoScampHeads),
+					'UseAutoQFITSWeights'	: data.useAutoQFITSWeights,
+					'UseAutoScampHeads'		: data.useAutoScampHeads,
 					'HeadPath'			: str(data.headPath),
 		}
 
