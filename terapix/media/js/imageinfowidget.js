@@ -116,7 +116,7 @@ function ImageInfoWidget(container, dbid) {
 				tr = new Element('tr');
 				td = new Element('td').update('Dot Head file');
 				tr.insert(td);
-				var a = new Element('a', {href: '/youpi/image/head/' + resp.info.imgid + '/', target: '_blank'}).update('View .head file');
+				var a = new Element('a', {href: '/youpi/image/info/' + resp.info.imgid + '/', target: '_blank'}).update('View .head file');
 				td = new Element('td').update(a);
 				tr.insert(td);
 				tab.insert(tr);

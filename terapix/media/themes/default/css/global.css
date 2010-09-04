@@ -1511,13 +1511,17 @@ div.tags *, .dropzone * {
 	cursor: pointer;
 }
 
-.imageInfoWidget .checksum {
+.img_name {
+	color: green;
+}
+
+.checksum {
 	color: brown;
 	font-family: typewriter;
 	font-weight: bold;
 }
 
-.imageInfoWidget .path {
+.path {
 	font-family: typewriter;
 }
 
@@ -1755,4 +1759,29 @@ td.grade-comment {
 
 .ingopt-off {
 	background: transparent url('../img/misc/checkbox_off.gif') no-repeat center center;
+}
+
+.img_details td:first-child {
+	font-weight: bold;
+}
+
+.img_details tr.sep td {
+	border-bottom: 1px dashed lightgray;
+}
+
+.img_rel_hist {
+	padding: 0px;
+}
+
+.img_rel_hist td {
+	vertical-align: middle;
+	border-bottom: 1px dashed lightgray;
+}
+
+.img_rel_hist tr.terror td {
+	color: red;
+}
+
+.img_rel_hist tr.tsuccess td {
+	color: green;
 }

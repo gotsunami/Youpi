@@ -15,10 +15,39 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 {% block bodyclass %}dashboard{% endblock %}
 
 {% block content %}
+<!--
+img.forder = (
+'name', 'path', 'alpha', 'delta', 'exptime', 'checksum', 'flat', 'mask', 'reg',
+'status', 'instrument', 'run', 'channel', 'ingestion', 'ing start', 'ing end',
+'ing by', 'imgid',
+)
+-->
 <div id="submenu">
 	<div id="menuitem_sub_0">
-		<div class="prefs_condor">
-			<h1>Generated .head file for image {{ img.name }}</h1>
+		<div style="float: left; width: 40%;" class="prefs_condor">
+			<h1>Details</h1>
+			{% with img.info as i %}
+			<table class="img_details">
+				<tr><td>Status</td><td>{{ i.status }}</td></tr>
+				<tr><td>Name</td><td class="img_name">{{ i.name }}</td></tr>
+				<tr><td>Checksum</td><td class="checksum">{{ i.checksum }}</td></tr>
+				<tr class="sep"><td>Path</td><td class="path">{{ i.path }}</td></tr>
+				<tr><td>Instrument</td><td>{{ i.instrument }}</td></tr>
+				<tr><td>Run</td><td>{{ i.run }}</td></tr>
+				<tr><td>Alpha</td><td>{{ i.alpha }}</td></tr>
+				<tr class="sep"><td>Delta</td><td>{{ i.exptime }}</td></tr>
+				<tr><td>Flat</td><td class="path">{% if i.flat %}{{ i.flat }}{% else %}-{% endif %}</td></tr>
+				<tr><td>Mask</td><td class="path">{% if i.mask %}{{ i.mask }}{% else %}-{% endif %}</td></tr>
+				<tr class="sep"><td>Reg</td><td class="path">{% if i.reg %}{{ i.reg }}{% else %}-{% endif %}</td></tr>
+				<tr><td>Ingestion</td><td>{{ i.ingestion }}</td></tr>
+				<tr><td>Ingestion start</td><td>{{ img.ingestion.start_ingestion_date }}</td></tr>
+				<tr><td>Ingestion end</td><td>{{ img.ingestion.end_ingestion_date }}</td></tr>
+				<tr><td>Ingestion owner</td><td>{{ img.ingestion.user.username }}</td></tr>
+			</table>
+			{% endwith %}
+		</div>
+		<div style="float: right; width: 50%;" class="prefs_condor">
+			<h1>Generated .head file</h1>
 			{% if hasHeader %}
 				{% if missing %}
 				<div class="warning" style="width: -moz-fit-content;">
@@ -28,7 +57,7 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 					</p>
 				</div>
 				{% endif %}
-			<div style="width: 70%; padding-left: 15px; color: white; background-color: black; text-align: left; height: 500px; overflow: auto;">
+			<div style="width: 90%; padding-left: 15px; color: white; background-color: black; text-align: left; height: 500px; overflow: auto;">
 				<pre>{{ rawHeader }}</pre>
 			</div>
 			{% else %}
@@ -37,6 +66,20 @@ var guistyle = '{{ user.get_profile.guistyle }}';
 				Youpi does not need to generate a .head file for this image to be processed successfully.</p>
 			</div>
 			{% endif %}
+		</div>
+		<div style="clear: both; padding-top: 30px;" class="prefs_condor">
+			<h1>Image Processing History</h1>
+			<table class="img_rel_hist">
+			{% for r in img.related %}
+			<tr class="{% if r.task.success %}tsuccess{% else %}terror{% endif %}">
+					<td><img src="/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_{% if r.task.success %}success{% else %}error{% endif %}.gif"/></td>
+					<td><a target="_blank" href="{% url terapix.youpi.views.single_result r.task.kind.name r.task.id %}">{{ r.task.title }}</a></td>
+					<td>Started on {{ r.task.start_date|date:"r" }}</td>
+					<td>on <tt>{{ r.task.hostname }}</tt> (job #{{ r.task.clusterId }})</td>
+					<td>by <i>{{ r.task.user.username }}</i></td>
+				</tr>
+			{% endfor %}
+			</table>
 		</div>
 	</div>
 </div>

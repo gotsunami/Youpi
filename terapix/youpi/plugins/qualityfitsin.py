@@ -1288,7 +1288,7 @@ class QualityFitsIn(ProcessingPlugin):
 				r.report.data.each(function(row, k) {
 					$A(row).each(function(content, j) {
 						if (j == 0)
-							data.setCell(k, j, '<a target="_blank" href="/youpi/image/head/' + content + '/">' + row[j+1] + '</a>');
+							data.setCell(k, j, '<a target="_blank" href="/youpi/image/info/' + content + '/">' + row[j+1] + '</a>');
 						else if (j == 2)
 							data.setCell(k, j-1, content, '<a target="_blank" href="/youpi/results/fitsin/' + row[9] + '/">' + content + '</a>', {style: 'font-weight: bold; text-align: center;'});
 						else if (j > 2 && j < 9) {

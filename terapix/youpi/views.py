@@ -1336,22 +1336,11 @@ def pref_load_condor_config(request):
 
 	return HttpResponse(str({'config': str(data)}), mimetype = 'text/plain')
 
-@login_required
-@profile
-def get_image_info(request):
+def get_image_info_raw(id):
 	"""
 	Returns information about image
 	"""
-
-	try:
-		id = request.POST['Id']
-	except Exception, e:
-		return HttpResponseBadRequest('Incorrect POST data')
-
-	try:
-		img = Image.objects.filter(id = int(id))[0]
-	except Exception, e:
-		return HttpResponse(str({'Error': "%s" % e}), mimetype = 'text/plain')
+	img = Image.objects.filter(id = int(id))[0]
 
 	try: runName = Rel_ri.objects.filter(image = img)[0].run.name
 	except: runName = None
@@ -1361,7 +1350,7 @@ def get_image_info(request):
 	else:
 		vStatus = 'OBSERVED'
 	
-	data = {
+	return {
 		'name'		: img.name + '.fits',
 		'path'		: img.path,
 		'alpha'		: str(img.alpha),
@@ -1381,6 +1370,22 @@ def get_image_info(request):
 		'ing by'	: img.ingestion.user.username,
 		'imgid'		: img.id,
 	}
+
+@login_required
+@profile
+def get_image_info(request):
+	"""
+	Returns information about image
+	"""
+	try:
+		id = request.POST['Id']
+	except:
+		return HttpResponseBadRequest('Incorrect POST data: %s' % e)
+	
+	try:
+		data = get_image_info_raw(id)
+	except Exception, e:
+		return HttpResponse(str({'Error': "%s" % e}), mimetype = 'text/plain')
 
 	return HttpResponse(json.encode({'info': data}), mimetype = 'text/plain')
 
@@ -1422,6 +1427,9 @@ def gen_image_header(request, image_id):
 		rawHead = genimgdothead.getRawHeader(dhead, numext)
 		hasHeader = True
 
+	# Extra data
+	img.info = get_image_info_raw(image_id)
+	img.related = Rel_it.objects.filter(image = img).order_by('-id')
 	menu_id = 'processing'
 	return render_to_response('imageinfo.html', {	
 		'selected_entry_id'	: menu_id, 

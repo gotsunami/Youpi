@@ -37,8 +37,8 @@ urlpatterns = patterns(
 	(r'^ingestion/itt/raw/(.*?)/$', 'views.show_raw_itt_content'),
 	(r'^ingestion/rename/(.*?)/$', 'cviews.condor.rename_ingestion'),
 	(r'^image/info/$', 'views.get_image_info'),
+	(r'^image/info/(.*?)/$', 'views.gen_image_header'),
 	(r'^image/view/(.*?)/$', 'views.view_image'),
-	(r'^image/head/(.*?)/$', 'views.gen_image_header'),
 	(r'^processing/$', 'views.processing'),
 	(r'^processing/(.*?)/$', 'views.render_plugin'),
 
