@@ -461,6 +461,22 @@ var {{ plugin.id }} = {
 		var post = 'Plugin={{ plugin.id }}&Method=getReprocessingParams&TaskId=' + taskId;
 		r.send('/youpi/process/plugin/', post);
 	},
+
+	/*
+	 * Adds condor job logs to table tr element
+	 *
+	 * Parameters:
+	 *  table - string or element: HTML table element
+	 *  resp - object: data
+	 */
+	addCondorJobLogs: function(table, resp) {
+		var table = $(table);
+		tr = new Element('tr');
+		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
+		td.update(ResultsHelpers.getCondorJobLogsEntry(resp.ClusterId, resp.TaskId));
+		tr.insert(td);
+		table.insert(tr);
+	},
 	
 	/*
 	 * Displays custom result information for qfits processing. 'resp' contains 
@@ -581,6 +597,8 @@ var {{ plugin.id }} = {
 		tr.insert(td);
 		tab2.insert(tr);
 		if (resp.PartialInfo) {
+			// Condor Job Logs
+			this.addCondorJobLogs(tab2, resp);
 			// Outputs minimal set of information and a deletion link (depending on user permissions)
 			d.appendChild(tab);
 			container.insert(d);
@@ -644,11 +662,7 @@ var {{ plugin.id }} = {
 		}
 	
 		// Condor Job Logs
-		tr = new Element('tr');
-		td = new Element('td', {colspan: 2}).setStyle({padding: '0px'});
-		td.update(ResultsHelpers.getCondorJobLogsEntry(resp.ClusterId, resp.TaskId));
-		tr.insert(td);
-		tab2.insert(tr);
+		this.addCondorJobLogs(tab2, resp);
 
 		// QFits-in processing history
 		// Header title
