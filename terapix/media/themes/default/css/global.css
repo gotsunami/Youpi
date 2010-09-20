@@ -1785,3 +1785,19 @@ td.grade-comment {
 .img_rel_hist tr.tsuccess td {
 	color: green;
 }
+
+.swarp_active_mode {
+	color: green;
+}
+
+.swarp_mode {
+	border: 1px solid #ED9600;
+	background-color: #FFE9C4;
+	-moz-border-radius: 5px;
+	padding: 5px;
+	width: -moz-fit-content;	
+	z-index: 100;
+	position: absolute;
+	top: 150px;
+	left: 30px;
+}

@@ -21,6 +21,20 @@ var uidswarp = '{{ plugin.id }}';
 
 var {{ plugin.id }} = {
 	/*
+	 * Variable: mode
+	 * 
+	 * Available Swarp modes: manual (default) or automatic
+	 *
+	 */
+	mode: {MANUAL: 1, AUTOMATIC: 2},
+	/*
+	 * Variable: curMode
+	 * 
+	 * Current Swarp mode (in use)
+	 *
+	 */
+	curMode: null,
+	/*
 	 * Variable: ims
 	 * 
 	 * <ImageSelector> instance
@@ -1097,14 +1111,92 @@ var {{ plugin.id }} = {
 		);
 	},
 
-	selectImages: function() {
+	/*
+	 * Function: getSavedSelections
+	 * Gets a list of saved selections
+	 *
+	 * Parameters:
+	 *	handler - function: custum handler called with result data as parameter
+	 *
+	 */ 
+	getSavedSelections: function(container, handler) {
+		var r = new HttpRequest(
+				container,
+				null,	
+				// Custom handler for results
+				function(resp) {
+					var data = resp.data;
+					if (typeof handler == 'function')
+						handler(data);
+				}
+		);
+		r.send('/youpi/ims/collection/savedselections/');
+	},
+
+	refreshSwarpMode: function(root) {
+		if(this.curMode == null)
+			throw "Swarp current running mode not set";
+		var root = $(root);
+		var d = new Element('div').addClassName('swarp_mode').update('Swarp mode: ');
+		var m, a;
+		var caption = ' (change to ';
+		if (this.curMode == this.mode.MANUAL) {
+			m = new Element('span').addClassName('swarp_active_mode').update('Manual');
+			a = new Element('a', {href: '#'}).update('Automatic');
+			a.observe('click', function() {
+				this.curMode = this.mode.AUTOMATIC;
+				this.refreshSwarpMode(root);
+			}.bind(this));
+			d.insert(m).insert(caption).insert(a).insert(')');
+			$(uidswarp + '_results_div').show();
+			$(uidswarp + '_automatic_div').hide();
+		}
+		else {
+			// Automatic
+			m = new Element('a', {href: '#'}).update('Manual');
+			m.observe('click', function() {
+				this.curMode = this.mode.MANUAL;
+				this.refreshSwarpMode(root);
+			}.bind(this));
+			a = new Element('span').addClassName('swarp_active_mode').update('Automatic');
+			d.insert(a).insert(caption).insert(m).insert(')');
+			$(uidswarp + '_results_div').hide();
+			var ad = $(uidswarp + '_automatic_div').show();
+			if (ad.empty()) {
+				this.getSavedSelections(ad, function(data) {
+					var s = new Element('select');
+					data.each(function(sel) {
+						s.insert(new Element('option').update(sel));
+					});
+					ad.update(s);
+				});
+
+			}	
+		}
+		root.update(d);
+		menu.activate(0);
+	},
+
+	/*
+	 * More initialization
+	 */
+	init: function() {
 		var root = $('menuitem_sub_0');
 		root.writeAttribute('align', 'center');
-		// Container of the ImageSelector widget
+		// Container for the ImageSelector widget
 		var div = new Element('div', {id: uidswarp + '_results_div', align: 'center'}).setStyle({width: '90%'});
 		root.insert(div);
+		// Container for the ImageSelector widget
+		div = new Element('div', {id: uidswarp + '_automatic_div'}).setStyle({width: '90%'}).hide();
+		root.insert(div);
 
-		{{ plugin.id }}.ims = new ImageSelector(uidswarp + '_results_div');
-		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
+		this.ims = new ImageSelector(uidswarp + '_results_div');
+		this.ims.setTableWidget(new AdvancedTable());
+
+		this.curMode = this.mode.MANUAL;
+		var d = new Element('div', {id: uidswarp + '_mode_div'});
+		//$$('#menuitem_sub_0 div')[0].insert(d);
+		$$('#content div')[0].insert(d);
+		this.refreshSwarpMode(d);
 	}
 };
