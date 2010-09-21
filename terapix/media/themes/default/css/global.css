@@ -1801,3 +1801,15 @@ td.grade-comment {
 	top: 150px;
 	left: 30px;
 }
+
+#sel_count_div {
+	color: gray;
+	font-size: 16px;
+	text-align: left;
+	width: 90%;
+}
+
+#submit_automatic_sels {
+	text-align: left;
+	width: 90%;
+}

@@ -1112,6 +1112,15 @@ var {{ plugin.id }} = {
 	},
 
 	/*
+	 * Function: autoProcessSelections
+	 * Auto-process selections of images
+	 *
+	 */ 
+	autoProcessSelections: function() {
+		console.log('AUTORUN');
+	},
+
+	/*
 	 * Function: getSavedSelections
 	 * Gets a list of saved selections
 	 *
@@ -1133,6 +1142,10 @@ var {{ plugin.id }} = {
 		r.send('/youpi/ims/collection/savedselections/');
 	},
 
+	/*
+	 * Handles Swarp's current working mode changes
+	 *
+	 */
 	refreshSwarpMode: function(root) {
 		if(this.curMode == null)
 			throw "Swarp current running mode not set";
@@ -1148,8 +1161,10 @@ var {{ plugin.id }} = {
 				this.refreshSwarpMode(root);
 			}.bind(this));
 			d.insert(m).insert(caption).insert(a).insert(')');
-			$(uidswarp + '_results_div').show();
+			[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)].invoke('show');
 			$(uidswarp + '_automatic_div').hide();
+			// Change menu entry caption
+			menu.getEntry(0).select('a')[0].update('Select images');
 		}
 		else {
 			// Automatic
@@ -1160,17 +1175,32 @@ var {{ plugin.id }} = {
 			}.bind(this));
 			a = new Element('span').addClassName('swarp_active_mode').update('Automatic');
 			d.insert(a).insert(caption).insert(m).insert(')');
-			$(uidswarp + '_results_div').hide();
+			// Hide/show panels
+			[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)].invoke('hide');
 			var ad = $(uidswarp + '_automatic_div').show();
-			if (ad.empty()) {
-				this.getSavedSelections(ad, function(data) {
-					var s = new Element('select');
-					data.each(function(sel) {
-						s.insert(new Element('option').update(sel));
-					});
-					ad.update(s);
-				});
+			// Change menu entry caption
+			menu.getEntry(0).select('a')[0].update('Select selections');
 
+			var auto = $(uidswarp + '_automatic_sels').show();
+			if (auto.empty()) {
+				$('process_sels_submit').observe('click', function() {
+					this.autoProcessSelections();
+				}.bind(this));
+				this.getSavedSelections(auto, function(data) {
+					var s = new Element('select', {id: uidswarp + '_sels_select', size: 25, multiple: 'multiple'}).setStyle({width: '90%'});
+					data.each(function(sel, k) {
+						s.insert(new Element('option', {value: sel}).update(new Element('span').update(k+1).addClassName('option_num')).insert(' ' + sel));
+					});
+					s.observe('change', function() {
+						var sel = new Array();
+						$A(this.options).each(function(opt) {
+							if (opt.selected) sel.push(opt.value);
+						});
+						$('sel_count_div').update('Selected ' + sel.length + ' out of ' + this.options.length);
+					});
+					auto.update(s);
+					$('process_sels_submit').update('Process selections');
+				});
 			}	
 		}
 		root.update(d);
@@ -1187,8 +1217,9 @@ var {{ plugin.id }} = {
 		var div = new Element('div', {id: uidswarp + '_results_div', align: 'center'}).setStyle({width: '90%'});
 		root.insert(div);
 		// Container for the ImageSelector widget
-		div = new Element('div', {id: uidswarp + '_automatic_div'}).setStyle({width: '90%'}).hide();
-		root.insert(div);
+//		div = new Element('div', {id: uidswarp + '_automatic_div'}).setStyle({width: '90%'}).hide();
+//		root.insert(div);
+		$(uidswarp + '_automatic_div').hide();
 
 		this.ims = new ImageSelector(uidswarp + '_results_div');
 		this.ims.setTableWidget(new AdvancedTable());
