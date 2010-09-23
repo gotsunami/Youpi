@@ -629,7 +629,6 @@ def process(userData, kind_id, argv):
 	g = DBGeneric(db.con)
 
 	start = getNowDateTime(time.time())
-	(imgName, task_id, g) = task_start_log(userData, start, kind_id)
 
 
 	################### PRE-PROCESSING STUFF GOES HERE ########################################
@@ -742,12 +741,12 @@ def process(userData, kind_id, argv):
 		debug("Error: %s" % e)
 		debug("Exiting...")
 		debug("Exited (code %d)" % exit_code)
+		(imgName, task_id, g) = task_start_log(userData, start, kind_id)
 		task_end_log(userData, g, storeLog, task_id, success, kind)
 		sys.exit(exit_code)
 	
 	# Closes the connection before running potentially (very) long jobs to prevent 
 	# errors due to MySQL Idle deconnection (Server has gone away, wait_timeout)
-	g.con.commit()
 	g.con.close()
 
 	################### END OF PRE-PROCESSING  ################################################
@@ -767,12 +766,12 @@ def process(userData, kind_id, argv):
 
 
 	# Reopen DB connection
-	del db
 	db = DB(host = DATABASE_HOST,
 			user = DATABASE_USER,
 			passwd = DATABASE_PASSWORD,
 			db = DATABASE_NAME)
 	g = DBGeneric(db.con)
+	(imgName, task_id, g) = task_start_log(userData, start, kind_id)
 
 	debug("Beginning post-processing operations")
 
