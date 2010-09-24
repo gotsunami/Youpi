@@ -19,6 +19,12 @@
  */
 var uidswarp = '{{ plugin.id }}';
 
+// Defines various exceptions
+var Exception = {
+	WEIGHT_NOT_FOUND: 2000,
+	HEAD_NOT_FOUND: 2001
+};
+
 var {{ plugin.id }} = {
 	/*
 	 * Variable: mode
@@ -35,6 +41,21 @@ var {{ plugin.id }} = {
 	 */
 	curMode: null,
 	/*
+	 * Variable: autoProgressBar
+	 * 
+	 * Progress bar widget for automatic processing of selections
+	 *
+	 */
+	autoProgressBar: null,
+	/*
+	 * Variable: autoSelections
+	 * 
+	 * Current selections in auto mode (array of 1 array of selections) for backward 
+	 * compatibility with the <checkForQFITSData> function.
+	 *
+	 */
+	autoSelections: new Array(),
+	/*
 	 * Variable: ims
 	 * 
 	 * <ImageSelector> instance
@@ -50,7 +71,7 @@ var {{ plugin.id }} = {
 	headDataPaths: new Array(),
 	/*
 	 * Variable: curSelectionIdx
-	 * Used by <checkForQFITSData>
+	 * Used by <checkForQFITSData> to mark the current selection
 	 *
 	 */
 	curSelectionIdx: 0,
@@ -270,11 +291,20 @@ var {{ plugin.id }} = {
 		var handler = typeof handler == 'function' ? handler : null;
 		var div = new Element('div');
 		var log = new Logger(div);
-		var sels = {{ plugin.id }}.ims.getListsOfSelections();
-		var total = {{ plugin.id }}.ims.getImagesCount();
+		var sels, total;
+		var selArr;
 
-		var selArr = eval(sels);
-		var idList = selArr[{{ plugin.id }}.curSelectionIdx];
+		if (this.curMode == this.mode.MANUAL) {
+			sels = this.ims.getListsOfSelections();
+			total = this.ims.getImagesCount();
+			selArr = eval(sels);
+		}
+		else {
+			selArr = this.autoSelections;
+		}
+
+		//var selArr = eval(sels);
+		var idList = selArr[this.curSelectionIdx];
 	
 		div.setStyle({textAlign: 'left'});
 		container.insert(div);
@@ -338,7 +368,7 @@ var {{ plugin.id }} = {
 
 	/*
 	 * Function: checkForScampData
-	 * Check if every images in that selection has associated WEIGHT maps data
+	 * Check if every images in that selection has associated .head file
 	 *
 	 * Parameters:
 	 *  container - DOM element: DOM block container
@@ -1111,13 +1141,102 @@ var {{ plugin.id }} = {
 		);
 	},
 
+	getHeadPath: function() {
+		var hSel = $(uidswarp + '_heads_select');
+		var headPath;
+		var path = hSel.options[hSel.selectedIndex].text;
+		if (path != selector.getNoSelectionPattern()) {
+			headPath = (path == selector.getExtra(1).title) ? 'AUTO' : path;
+		}
+		else {
+			menu.activate(1);
+			alert("Invalid data path selected for HEAD data.");
+			hSel.up().up().pulsate();
+			throw Exception.HEAD_NOT_FOUND
+		}
+		return headPath;
+	},
+
+	getWeightPath: function() {
+		var wSel = $(uidswarp + '_weights_select');
+		var weightPath;
+		var path = wSel.options[wSel.selectedIndex].text;
+		if (path != selector.getNoSelectionPattern()) {
+			weightPath = (path == selector.getExtra(0).title) ? 'AUTO' : path;
+		}
+		else {
+			menu.activate(1);
+			alert("Invalid data path selected for WEIGHT data.");
+			wSel.up().up().pulsate();
+			throw Exception.WEIGHT_NOT_FOUND
+		}
+		return weightPath;
+	},
+
 	/*
 	 * Function: autoProcessSelections
 	 * Auto-process selections of images
 	 *
 	 */ 
 	autoProcessSelections: function() {
-		console.log('AUTORUN');
+		// Custom output directory
+		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidswarp + '/';
+	
+		// Set mandatory structures
+		var p_data = {	plugin_name : uidswarp, 
+						userData : {resultsOutputDir: output_data_path}
+		};
+
+		// Finds head and weight paths
+		var headPath, weightPath;
+		try {
+			headPath = this.getHeadPath();
+			weightPath = this.getWeightPath();
+		}
+		catch(err) {
+			return;
+		}
+		// Gets custom output directory
+		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
+		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidswarp + '/';
+
+		if (custom_dir)
+			output_data_path += custom_dir + '/';
+
+		var r = new HttpRequest(
+			null,
+			null,	
+			// Custom handler for results
+			function(resp) {
+				res = resp.result;
+				// Adds entry to processing cart
+				res.resultsOutputDir = output_data_path;
+				console.log(res);
+				this.do_addSelectionToCart(res);
+				// Prepares recursive call
+				this.curSelectionIdx++;
+				if (this.curSelectionIdx < this.autoSelections[0].length) {
+					this.autoProcessSelections();
+				}
+				else {
+					// All selections processed
+					this.autoProgressBar.setPourcentage(100);
+					$('submit_automatic_sels').show();
+					$('automatic_pb_div').hide();
+				}
+			}.bind(this)
+		);
+
+		this.autoProgressBar.setPourcentage((this.curSelectionIdx/this.autoSelections[0].length)*100);
+		var post = {
+			Plugin: uidswarp,
+			Method: 'autoProcessSelection',
+			SelName: this.autoSelections[0][this.curSelectionIdx],
+			HeadPath: headPath,
+			WeightPath: weightPath
+		};
+		// Send HTTP POST request
+		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
 	/*
@@ -1184,6 +1303,20 @@ var {{ plugin.id }} = {
 			var auto = $(uidswarp + '_automatic_sels').show();
 			if (auto.empty()) {
 				$('process_sels_submit').observe('click', function() {
+					if (this.autoSelections.length == 0) return;
+					this.curSelectionIdx = 0;
+					if (!this.autoProgressBar) {
+						this.autoProgressBar = new ProgressBar('automatic_pb_div', 0, {
+							animate: false,
+							color: '#ffe9c4',
+							borderColor: '#ed9600',
+							width: $('swarp_sels_select').getWidth(),
+							height: 24,
+							captionClassName: 'swarp_caption'
+						});
+					}
+					$('submit_automatic_sels').hide();
+					$('automatic_pb_div').show();
 					this.autoProcessSelections();
 				}.bind(this));
 				this.getSavedSelections(auto, function(data) {
@@ -1197,6 +1330,7 @@ var {{ plugin.id }} = {
 							if (opt.selected) sel.push(opt.value);
 						});
 						$('sel_count_div').update('Selected ' + sel.length + ' out of ' + this.options.length);
+						document.fire('SwarpAuto:newSelection', sel); 
 					});
 					auto.update(s);
 					$('process_sels_submit').update('Process selections');
@@ -1217,8 +1351,6 @@ var {{ plugin.id }} = {
 		var div = new Element('div', {id: uidswarp + '_results_div', align: 'center'}).setStyle({width: '90%'});
 		root.insert(div);
 		// Container for the ImageSelector widget
-//		div = new Element('div', {id: uidswarp + '_automatic_div'}).setStyle({width: '90%'}).hide();
-//		root.insert(div);
 		$(uidswarp + '_automatic_div').hide();
 
 		this.ims = new ImageSelector(uidswarp + '_results_div');
@@ -1226,8 +1358,13 @@ var {{ plugin.id }} = {
 
 		this.curMode = this.mode.MANUAL;
 		var d = new Element('div', {id: uidswarp + '_mode_div'});
-		//$$('#menuitem_sub_0 div')[0].insert(d);
+
 		$$('#content div')[0].insert(d);
 		this.refreshSwarpMode(d);
+		
+		// Connects to custom signal
+		document.observe('SwarpAuto:newSelection', function(event) {
+			this.autoSelections = new Array(event.memo);
+		}.bind(this));
 	}
 };

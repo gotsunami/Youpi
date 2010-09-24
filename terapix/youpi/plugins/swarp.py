@@ -16,6 +16,7 @@
 import os, sys, os.path, re, time, string
 import marshal, base64, zlib
 from stat import *
+import cjson as json
 #
 import terapix.lib.cluster.condor as condor
 from terapix.youpi.pluginmanager import ProcessingPlugin
@@ -372,7 +373,7 @@ sys.exit(exit_code)
 
 			relTaskIds = [rel.task.id for rel in rels]
 
-			# Valid task is only the lastest successful qfits-in of current logged-in user
+			# Valid task is only the latest successful qfits-in of current logged-in user
 			tasks = Processing_task.objects.filter(	id__in = relTaskIds, 
 													kind__name__exact = 'fitsin',
 													success = True).order_by('-end_date')
@@ -390,7 +391,6 @@ sys.exit(exit_code)
 		Check if the image selection matches a successful Scamp involving the same image selection.
 		@return List of Scamp processings, if any
 		"""
-
 		post = request.POST
 		if imgList:
 			idList = imgList
@@ -403,7 +403,10 @@ sys.exit(exit_code)
 		from django.db import connection
 		cur = connection.cursor()
 
-		idList = string.join(idList, ',')
+		try:
+			idList = string.join(idList, ',')
+		except TypeError:
+			idList = ','.join([str(id) for id in idList])
 		mTasks = []
 		cur.execute("""
 		SELECT r.task_id, COUNT(r.image_id) FROM youpi_rel_it AS r, youpi_processing_task AS t, youpi_processing_kind AS k 
@@ -415,7 +418,6 @@ sys.exit(exit_code)
 		ORDER BY t.start_date desc
 		""" % idList)
 		res = cur.fetchall()
-
 		if res:
 			for r in res:
 				mTasks.append(Processing_task.objects.filter(id = r[0])[0])
@@ -454,6 +456,90 @@ sys.exit(exit_code)
 				'_weight.fits.fz'))])
 
 		return weight_files
+
+	def autoProcessSelection(self, request):
+		"""
+		Looks for mandatory data for being able to process an image selection with Swarp 
+		automatically. Checks are performed in the following order:
+		1. Gets the list of images for that selection
+		2. Looks for a config file with the name of this selections and use it if found. If not, uses 
+		   the default config file for the job. Emits a warning.
+		3. Handles WeightPath variable:
+		    AUTO: checks for QFits data (looks for weight maps for every image). Emits a warning for 
+			      missing weight maps
+			CUSTOM PATH: don't check for weight maps at all
+		4. Handles HeadPath variable:
+		    AUTO: checks for Scamp data. If there are more that 1 scamp for that selection of images, takes
+			      the latest one (emits a warning).
+			CUSTOM PATH: don't check for Scamp .head files at all
+		@return a dictionary
+		"""
+
+		post = request.POST
+		try:
+			selName = request.POST['SelName']
+			weightPath = request.POST['WeightPath']
+			headPath = request.POST['HeadPath']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
+		warnings = []
+		# 1. List of images matching that selection
+		try:
+			sel = ImageSelections.objects.filter(name = selName)[0]
+		except Exception, e:
+			raise PluginError, 'Bad selection name: ' + selName
+		idList = marshal.loads(base64.decodestring(sel.data))[0]
+
+		# 2. Looks for a config file matching the selection name
+		config = ConfigFile.objects.filter(name = selName, type__name = 'config')
+		if not config:
+			config = 'default'
+			warnings.append("Config file %s not found, using default" % selName)
+		else:
+			config = selName
+
+		# 3. Handles weight path
+		if weightPath == 'AUTO':
+			useAutoQFITSWeights = 1
+			qfdata = self.checkForQFITSData(request, idList)
+		else:
+			useAutoQFITSWeights = 0
+			qfdata = None
+
+		# 4. Handles head path
+		if headPath == 'AUTO':
+			useAutoScampHeads = 1
+			scampdata = self.checkForScampData(request, idList)
+			if scampdata.has_key('Tasks'):
+				# Keep the latest Scamp only
+				scampdata = {'Tasks': scampdata['Tasks'][0]}
+				headDataPath = scampdata['Tasks'][4]
+			else:
+				# Has warnings
+				warnings.append(scampdata['Warning'])
+				del scampdata['Warning']
+				headDataPath = '' # Empty data path
+		else:
+			scampdata = None
+			useAutoScampHeads = 0
+
+		# The following result set will be used on the client side to add an item in 
+		# the processing cart
+		res = {
+			'selName'				: selName,
+			'weightPath'			: weightPath,
+			'headPath'				: headPath,
+			'idList'				: str([[int(id) for id in idList]]), # Must be a list of one list of integers (not long)
+			'config'				: config,
+			'warning'				: warnings,
+			'qfitsdata'				: qfdata,
+			'scampdata'				: scampdata,
+			'useAutoQFITSWeights'	: useAutoQFITSWeights,
+			'useAutoScampHeads'		: useAutoScampHeads,
+			'headDataPaths'			: headDataPath, 
+		}
+		return res
 
 	def getTaskInfo(self, request):
 		"""
