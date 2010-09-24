@@ -29,6 +29,9 @@
  *  borderColor - string: box border color
  *  caption - boolean: display caption [default: true]
  *  animate - boolean: use animation to render [default: true]
+ *  width - integer: progress bar's width
+ *  height - integer: progress bar's height
+ *  captionClassName - string: CSS class name for caption title
  *
  */
 function ProgressBar(container, percent, options) {
@@ -55,27 +58,18 @@ function ProgressBar(container, percent, options) {
 
 
 	/*
-	 * Var: _width
-	 * Progress bar's width
-	 *
-	 */
-	var _width = 100;
-	/*
-	 * Var: _height
-	 * Progress bar's height
-	 *
-	 */
-	var _height = 9;
-	/*
 	 * Var: _options
-	 * Options
+	 * Default options
 	 *
 	 */
 	var _options = $H({
 		color: 'green',
 		borderColor: 'green',
 		caption: true,
-		animate: true
+		animate: true,
+		width: 100,
+		height: 9,
+		captionClassName: 'caption'
 	});
 
 
@@ -144,8 +138,8 @@ function ProgressBar(container, percent, options) {
 		_container.update();
 		_container.addClassName('youpi_progressBar');
 		_container.setStyle({
-			height: _height + 'px', 
-			width: _width + 'px', 
+			height: _options.get('height') + 'px',
+			width: _options.get('width') + 'px',
 			borderColor: _options.get('borderColor')
 		});
 
@@ -153,13 +147,15 @@ function ProgressBar(container, percent, options) {
 		d.setStyle({
 			left: '0px',
 			width: '0px',
-			height: _height + 'px', 
+			height: _options.get('height') + 'px',
 			backgroundColor: _options.get('color')
 		});
 
 		// Caption div
 		if (_options.get('caption')) {
-			var cd = new Element('div').addClassName('caption');
+			var cd = new Element('div')
+				.setStyle({lineHeight: _options.get('height') + 'px'})
+				.addClassName(_options.get('captionClassName'));
 			cd.update((Math.round(_percent*10)/10) + '%');
 		}
 
@@ -167,13 +163,13 @@ function ProgressBar(container, percent, options) {
 
 		if (_options.get('animate')) {
 			new Effect.Morph(d, {
-				style: { width: (_percent * _width / 100) + 'px' },
+				style: { width: (_percent * _options.get('width') / 100) + 'px' },
 				duration: 2.0
 			});
 		}
 		else {
 			d.setStyle({
-				width: (_percent * _width / 100) + 'px'
+				width: (_percent * _options.get('width') / 100) + 'px'
 			});
 		}
 	}
