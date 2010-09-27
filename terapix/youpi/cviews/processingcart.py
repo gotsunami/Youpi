@@ -64,6 +64,32 @@ def cart_add_item(request):
 	# Add data
 	if not request.session['cart']['plugins'].has_key(plugin):
 		request.session['cart']['plugins'][plugin] = []
+	else:
+		# Do not add items twice
+		# First remove the results output dir value which is subject to change on 
+		# page refresh (random suffix)
+		outdir = None
+		kw = 'resultsOutputDir'
+		if userData.has_key(kw):
+			outdir = userData[kw]
+		del userData[kw]
+		for item in  request.session['cart']['plugins'][plugin]:
+			ioutdir = None
+			if item['userData'].has_key(kw):
+				ioutdir = item['userData'][kw]
+				del item['userData'][kw]
+			if item['userData'] == userData:
+				# Restore item's path
+				if ioutdir:
+					item['userData'][kw] = ioutdir
+				return HttpResponse(json.encode({'warning': 'Item already existing in the processing cart.'}))
+			else:
+				# Restore item's path
+				if ioutdir:
+					item['userData'][kw] = ioutdir
+		# New item: restore output directory
+		if outdir:
+			userData[kw] = outdir
 
 	plugObj = manager.getPluginByName(plugin)
 	# Useful to get a rather unique item ID in the processing cart

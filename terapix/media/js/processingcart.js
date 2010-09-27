@@ -15,17 +15,15 @@
  * Class: ProcessingCart
  * Basic processing cart implementation
  *
- * File:
- *
- *  processingcart.js
- *
- * Dependencies:
- *
- *  scritptaculous.js
+ * External Dependencies:
+ *  prototype.js - Enhanced Javascript library
+ *  scriptaculous.js - Visual effects library
  *
  * Constructor Parameters:
+ *  container - string or DOM: name of parent DOM block container
  *
- * container - string or DOM: name of parent DOM block container
+ * Signals:
+ *  processingCart:itemAlreadyExisting - signal emitted when the same item definition is already available in the processing cart
  *
  */
 function ProcessingCart(container)
@@ -106,7 +104,7 @@ function ProcessingCart(container)
 	 * Adds an item to the processing cart
 	 *
 	 * Parameters:
-	 *  obj - object: arbitrary object
+	 *  obj - object: object with custom user data
 	 *  handler - function: custom function to execute after an item has been added
 	 *
 	 * Note:
@@ -117,6 +115,10 @@ function ProcessingCart(container)
 	 *
 	 */ 
 	this.addProcessing = function(obj, handler) {
+		var handler = typeof handler == 'function' ? handler : null;
+		if (!obj.plugin_name || !obj.userData)
+			throw "Missing object attributes plugin_name or userData";
+
 		var xhr = new HttpRequest(
 			null,
 			null,
@@ -126,7 +128,11 @@ function ProcessingCart(container)
 					null,
 					null,
 					function(resp) {
-						var nb = resp['data'].length;
+						if (resp.warning) {
+							document.fire('processingCart:itemAlreadyExisting', resp.warning);
+							return;
+						}
+						var nb = resp.data.length;
 						_render();
 						// Call custom handler
 						if (handler) handler();
