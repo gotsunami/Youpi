@@ -48,6 +48,13 @@ var {{ plugin.id }} = {
 	 */
 	autoProgressBar: null,
 	/*
+	 * Variable: autoCurSelectionImageCount
+	 * 
+	 * Image count in current image selection being processed in automatic mode
+	 *
+	 */
+	autoCurSelectionImageCount: 0,
+	/*
 	 * Variable: autoSelections
 	 * 
 	 * Current selections in auto mode (array of 1 array of selections) for backward 
@@ -261,20 +268,21 @@ var {{ plugin.id }} = {
 	 *
 	 */
 	do_addSelectionToCart: function(data) {
-		var total = {{ plugin.id }}.ims.getImagesCount();
+		var total = this.curMode == this.mode.MANUAL ? this.ims.getImagesCount() : this.autoCurSelectionImageCount;
 
 		// Add to the processing cart
-		p_data = {	plugin_name	: uidswarp,
-					userData 	: data
+		p_data = {	
+			plugin_name	: uidswarp,
+			userData 	: data
 		};
 	
 		// Add entry into the processing cart
-		s_cart.addProcessing(	p_data,
-								// Custom handler
-								function() {
-									document.fire('notifier:notify', 'The current image selection (' + total + ' ' + 
-										(total > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
-								}
+		s_cart.addProcessing(p_data,
+			// Custom handler
+			function() {
+				document.fire('notifier:notify', 'The current image selection (' + total + ' ' + 
+					(total > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
+			}
 		);
 	},
 
@@ -1211,7 +1219,10 @@ var {{ plugin.id }} = {
 				res = resp.result;
 				// Adds entry to processing cart
 				res.resultsOutputDir = output_data_path;
-				console.log(res);
+				if (res.warning.length > 0 || res.qfitsdata.missingQFITS.length > 0) {
+					console.log(res);
+				}
+				this.autoCurSelectionImageCount = res.imgCount;
 				this.do_addSelectionToCart(res);
 				// Prepares recursive call
 				this.curSelectionIdx++;

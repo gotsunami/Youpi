@@ -538,6 +538,7 @@ sys.exit(exit_code)
 			'useAutoQFITSWeights'	: useAutoQFITSWeights,
 			'useAutoScampHeads'		: useAutoScampHeads,
 			'headDataPaths'			: headDataPath, 
+			'imgCount'				: len(idList),
 		}
 		return res
 
