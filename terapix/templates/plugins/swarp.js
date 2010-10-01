@@ -265,9 +265,11 @@ var {{ plugin.id }} = {
 	 *
 	 * Parameters:
 	 *  data - object: user data to be saved
+	 *  notify - boolean: Sends notification message after an item has been added to the PC [default: true]
 	 *
 	 */
-	do_addSelectionToCart: function(data) {
+	do_addSelectionToCart: function(data, notify) {
+		var notify = typeof notify == 'boolean' ? notify : true;
 		var total = this.curMode == this.mode.MANUAL ? this.ims.getImagesCount() : this.autoCurSelectionImageCount;
 
 		// Add to the processing cart
@@ -280,8 +282,10 @@ var {{ plugin.id }} = {
 		s_cart.addProcessing(p_data,
 			// Custom handler
 			function() {
-				document.fire('notifier:notify', 'The current image selection (' + total + ' ' + 
-					(total > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
+				if (notify) {
+					document.fire('notifier:notify', 'The current image selection (' + total + ' ' + 
+						(total > 1 ? 'images' : 'image') + ') has been\nadded to the cart.');
+				}
 			}
 		);
 	},
@@ -1223,7 +1227,8 @@ var {{ plugin.id }} = {
 					console.log(res);
 				}
 				this.autoCurSelectionImageCount = res.imgCount;
-				this.do_addSelectionToCart(res);
+				// Do not send notification
+				this.do_addSelectionToCart(res, false);
 				// Prepares recursive call
 				this.curSelectionIdx++;
 				if (this.curSelectionIdx < this.autoSelections[0].length) {
@@ -1234,6 +1239,8 @@ var {{ plugin.id }} = {
 					this.autoProgressBar.setPourcentage(100);
 					$('submit_automatic_sels').show();
 					$('automatic_pb_div').hide();
+					// Send final notification message
+					document.fire('notifier:notify', 'The selection has been added to the processing cart');
 				}
 			}.bind(this)
 		);
