@@ -502,7 +502,7 @@ table.condorPanelBox div.list {
 }
 
 table.shoppingCart * {
-	padding-top: 5px;
+	padding: 0px;
 }
 
 table.shoppingCart th {
@@ -513,13 +513,11 @@ table.shoppingCart th {
 table.shoppingCart th:first-child {
 	text-align: left;
 	background-color: lightblue;
-	-moz-border-radius-topleft: 5px;
 }
 
 table.shoppingCart th:last-child {
 	text-align: left;
 	background-color: lightblue;
-	-moz-border-radius-topright: 5px;
 }
 
 table.shoppingCart td {

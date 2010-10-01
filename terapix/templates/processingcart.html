@@ -307,7 +307,7 @@ document.observe('processingCart:itemRemoved', function() {
 			<div id="master_condor_log_div"></div>
 			{% for plugin in cart_plugins %}
 				{% if plugin.hasItemsInCart %}
-			<table width="50%" class="shoppingCart">
+			<table class="shoppingCart">
 				<tr>
 					<th>
 						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/runall.png" onclick="{{ plugin.id }}.runAll()"/>
@@ -318,16 +318,24 @@ document.observe('processingCart:itemRemoved', function() {
 						{# Invoke custom template rendering #}
 				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
 					<td style="text-align: right">
-						<p style="text-align: right; font-size: 80%">Item <b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> added on {{ data.date }}</p>
+						<p style="text-align: right; font-size: 80%"><b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> - {{ data.date }}</p>
 						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png" onclick="boxes.confirm('Are you sure you want to delete this item from the processing cart?', function() {removeItemFromCart('{{ plugin.id }}_{{ forloop.counter0 }}');});"/>
 						<div class="sc_item_numbering">{{ forloop.counter }}</div>
 					</td>
-					<td width="100%" colspan="2">
+					<td colspan="2">
 						<div id="{{ plugin.id }}_options_div_{{ forloop.counter }}"></div>
 						<script type="text/javascript">
 							show_runtime_options('{{ plugin.id }}', '{{ plugin.id }}_options_div_{{ forloop.counter }}');
 						</script>
 						{% include plugin.itemCartTemplate %}
+					</td>
+					<td style="text-align: center; vertical-align: middle">
+						<div class="submitItem">
+							<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
+							<p><img id="{{ plugin.id }}_{{ forloop.counter0 }}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.png" title="Submit processing to cluster"/> 
+							</p>
+						</div>
+						<img id="{{ plugin.id }}_{{ forloop.counter0 }}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.png"/>
 					</td>
 				</tr>
 					{% endfor %}
