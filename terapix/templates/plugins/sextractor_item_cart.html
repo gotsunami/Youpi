@@ -75,16 +75,9 @@
 
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
-		$('{{ plugin.id }}_{{ forloop.counter0 }}_run').observe('click', function() {
-			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
-			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
-			{{ plugin.id }}.run('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
-		});
-
-		$('{{ plugin.id }}_{{ forloop.counter0 }}_save').observe('click', function() {
-			var userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
-			userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
-			{{ plugin.id }}.saveItemForLater('{{ plugin.id }}_{{ forloop.counter0 }}', capitalizeHashKeys(userData));
-		});
+		var trid = '{{ plugin.id }}_{{ forloop.counter0 }}';
+		youpi_pc_meta[trid] = {};
+		youpi_pc_meta[trid].userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+		youpi_pc_meta[trid].userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
 	});
 </script>

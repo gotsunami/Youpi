@@ -130,6 +130,30 @@ def cart_delete_item(request):
 
 	return HttpResponse(str({'data' : 'done'}), mimetype = 'text/plain')
 
+def cart_delete_items(request):
+	"""
+	Deletes arbitrary number of items depending on input data
+	"""
+	if 'cart' not in request.session:
+		# Maybe url has been called directly, which is NOT good
+		return HttpResponseServerError()
+
+	data = request.POST
+	deleted = 0
+	for plugin, idxList in data.lists():
+		if request.session['cart']['plugins'].has_key(plugin):
+			idxList = [int(idx) for idx in idxList]
+			idxList.sort(reverse = True)
+			for idx in idxList:
+				del request.session['cart']['plugins'][plugin][idx]
+				if len(request.session['cart']['plugins'][plugin]) == 0:
+					del request.session['cart']['plugins'][plugin]
+				deleted += 1
+		else:
+			raise ValueError, "No plugin named " + plugin
+
+	return HttpResponse(json.encode({'deleted' : deleted}), mimetype = 'text/plain')
+
 def cart_items_count(request):
 	"""
 	Count items into cart

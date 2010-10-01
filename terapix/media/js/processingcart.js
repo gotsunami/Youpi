@@ -206,9 +206,511 @@ function ProcessingCart(container)
 	 *
 	 */ 
 	this.deleteAllPluginItems = function(plugin_name, handler) {
-		this.deletePluginItem(plugin_name, true, handler);
+		this.deletePluginItem(plugin_name, handler, true);
+	}
+
+	/*
+	 * Parameters:
+	 *  data - object: of the form {plugin_name1: [0..n], plugin_name2: [0..n], ..., plugin_nameN: [0..n]}
+	 *  handler - function: custom function to execute after all items have been deleted
+	 *
+	 */
+	this.deleteItems = function(data, handler) {
+		var handler = typeof handler == 'function' ? handler : null;
+		var xhr = new HttpRequest(
+			null,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				var nb = resp.deleted;
+				_render();
+				if (handler) handler(nb);
+			}
+		);
+		xhr.send('/youpi/cart/delitems/', $H(data).toQueryString());
 	}
 
 	// Main entry point
 	_render();
+}
+
+/*
+ * Misc functions used by the processing cart
+ *
+ */
+
+/*
+ * Function: real_delete_items
+ * Deletes a selection of items from the processing cart
+ *
+ * Parameters:
+ *  count - integer: number of items to delete
+ *  data - object: items grouped by plugin name
+ *  removeEntries - boolean: whether to delete node entries after items are deleted
+ *                           from the current user session [default: true]
+ *
+ */ 
+function real_delete_items(count, data, removeEntries) {
+	var removeEntries = typeof removeEntries == 'boolean' ? removeEntries : true;
+	s_cart.deleteItems(data.toObject(), function(deleted) {
+		data.each(function(p) {
+			var trs = $$("tr[id^='" + p.key + "']");
+			var table = trs[0].up('table.shoppingCart');
+			p.value.each(function(idx) {
+				var trNode = trs[idx];
+				trNode.remove();
+			});
+			// Recomputes trs after row deletion to check if empty parent
+			// table has to be deleted too
+			if (removeEntries) {
+				trs = $$("tr[id^='" + p.key + "']");
+				if (trs.length == 0)
+					table.remove();
+			}
+		});
+		// Send signal once done
+		document.fire('processingCart:itemRemoved', deleted);
+	});
+}
+
+/*
+ * Function: do_delete_items
+ * Asks for confirmation before calling <real_delete_items>()
+ *
+ * Parameters:
+ *  count - integer: number of items to delete
+ *  data - object: items grouped by plugin name
+ *
+ */ 
+function do_delete_items(count, data) {
+	boxes.confirm('Are you sure you want to delete this item selection (' + count + ' item' + (count > 1 ? 's':'') + ') from the processing cart?', 
+		function() {
+			real_delete_items(count, data);
+		}
+	);
+}
+
+// Global meta data namespace for active items
+var youpi_pc_meta = {};
+
+/*
+ * Function: real_save_items
+ * Saves a selection of items from the processing cart to permanent DB storage
+ *
+ * Parameters:
+ *  data - object: items grouped by plugin name
+ *
+ */ 
+function real_save_items(data) {
+	var opts = new Hash();
+	var key = data.keys()[youpi_pc_meta.action_cur_key_idx];
+	var trid = key + '_' + data.get(key)[youpi_pc_meta.action_cur_value_idx];
+	var trNode = $(trid);
+	// Sets metadata
+	opts.set('Plugin', key);
+	opts.set('Method', 'saveCartItem');
+	opts.update(youpi_pc_meta[trid].userData);
+	//var runopts = get_runtime_options(trid);
+	var r = new HttpRequest(
+		null,
+		null,	
+		// Custom handler for results
+		function(resp) {
+			$('master_condor_log_div').update();
+			if (youpi_pc_meta.action_cur_value_idx < data.get(key).length-1)
+				youpi_pc_meta.action_cur_value_idx++;
+			else {
+				youpi_pc_meta.action_cur_value_idx = 0;
+				if (youpi_pc_meta.action_cur_key_idx < data.keys().length)
+					youpi_pc_meta.action_cur_key_idx++;
+
+			}
+			if (youpi_pc_meta.action_cur_key_idx < data.keys().length) {
+				youpi_pc_meta.action_pb_value++;
+				youpi_pc_meta.progressBar.setPourcentage((youpi_pc_meta.action_pb_value/youpi_pc_meta.action_pb_total)*100);
+				real_save_items(data);
+			}
+			else {
+				// All items are saved
+				youpi_pc_meta.progressBar.setPourcentage(100);
+				$('cart_pbar_div').fade({delay: 5.0});
+				document.fire('notifier:notify', 'Items saved successfully');
+				// Remove saved items from the pc
+				real_delete_items(youpi_pc_meta.action_pb_total, data);
+			}
+		}
+	);
+	r.send('/youpi/process/plugin/', capitalizeHashKeys(opts).toQueryString());
+}
+
+/*
+ * Function: do_save_items
+ * Asks for confirmation first then call <real_save_items>()
+ *
+ * Parameters:
+ *  count - integer: number of items to save
+ *  data - object: items grouped by plugin name
+ *
+ */ 
+function do_save_items(count, data) {
+	boxes.confirm('Are you sure you want to save this item selection (' + count + ' item' + (count > 1 ? 's':'') + ') for later use?', 
+		function() { 
+			// Some init before calling the real stuff
+			// Current key pos for saving in data.keys()
+			youpi_pc_meta.action_cur_key_idx = 0;
+			// Current position of item for that key
+			youpi_pc_meta.action_cur_value_idx = 0;
+			// For the progress bar
+			youpi_pc_meta.action_pb_value = 0;
+			youpi_pc_meta.action_pb_total = count;
+			$('cart_pbar_div').appear();
+			// Real stuff
+			real_save_items(data); 
+		}
+	);
+}
+
+/*
+ * Function: real_run_items
+ * Send a selection of items to the cluster
+ *
+ * Parameters:
+ *  data - object: items grouped by plugin name
+ *
+ */ 
+function real_run_items(data) {
+	var opts = new Hash();
+	var key = data.keys()[youpi_pc_meta.action_cur_key_idx];
+	var trid = key + '_' + data.get(key)[youpi_pc_meta.action_cur_value_idx];
+	var trNode = $(trid);
+	var runopts = get_runtime_options(trid);
+
+	// Sets metadata
+	opts.set('Plugin', key);
+	opts.set('Method', 'process');
+	opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
+	opts.update(youpi_pc_meta[trid].userData);
+	opts = opts.merge(runopts.clusterPolicy.toQueryParams());
+
+	var r = new HttpRequest(
+		null,
+		null,	
+		// Custom handler for results
+		function(resp) {
+			var jobid = '100';
+			var success = true;
+			$('master_condor_log_div').update();
+			if (youpi_pc_meta.action_cur_value_idx < data.get(key).length-1)
+				youpi_pc_meta.action_cur_value_idx++;
+			else {
+				youpi_pc_meta.action_cur_value_idx = 0;
+				if (youpi_pc_meta.action_cur_key_idx < data.keys().length)
+					youpi_pc_meta.action_cur_key_idx++;
+
+			}
+			if (youpi_pc_meta.action_cur_key_idx < data.keys().length) {
+				// More items to process
+				// Hide check boxes, replace with job ID
+				/*
+				if (success) {
+					trNode.select('input.item_select_input')[0].remove();
+					trNode.addClassName('job_sent_success');
+					//real_delete_items(youpi_pc_meta.action_pb_total, data, false);
+				}
+				else {
+					trNode.addClassName('job_sent_failure');
+				}
+				*/
+
+				youpi_pc_meta.action_pb_value++;
+				youpi_pc_meta.progressBar.setPourcentage((youpi_pc_meta.action_pb_value/youpi_pc_meta.action_pb_total)*100);
+				real_run_items(data);
+			}
+			else {
+				// All items are sent
+				youpi_pc_meta.progressBar.setPourcentage(100);
+				$('cart_pbar_div').fade({delay: 5.0});
+				real_delete_items(youpi_pc_meta.action_pb_total, data);
+			}
+		}
+	);
+	r.send('/youpi/process/plugin/', capitalizeHashKeys(opts).toQueryString());
+}
+
+/*
+ * Function: do_run_items
+ * Asks for confirmation first then call <real_run_items>()
+ *
+ * Parameters:
+ *  count - integer: number of items to run
+ *  data - object: items grouped by plugin name
+ *
+ */ 
+function do_run_items(count, data) {
+	boxes.confirm('Are you sure you want to run this item selection (' + count + ' item' + (count > 1 ? 's':'') + ') on the cluster?', 
+		function() { 
+			// Some init before calling the real stuff
+			// Current key pos for saving in data.keys()
+			youpi_pc_meta.action_cur_key_idx = 0;
+			// Current position of item for that key
+			youpi_pc_meta.action_cur_value_idx = 0;
+			// For the progress bar
+			youpi_pc_meta.action_pb_value = 0;
+			youpi_pc_meta.action_pb_total = count;
+			$('cart_pbar_div').appear();
+			// Real stuff
+			real_run_items(data); 
+		}
+	);
+}
+
+/*
+ * Function: find_checked_items
+ * Find checked inputs widgets in the processing cart
+ *
+ * Returns:
+ *  data - hash: collection of checked items: {plugin_name1: [i0, ..., in], ..., plugin_nameN: [i0, ..., in]}
+ *
+ */ 
+function find_checked_items() {
+	var cursel = new Array();
+	var checks = $$('table.shoppingCart input.item_select_input');
+	checks.each(function(check) {
+		if (check.checked)
+			cursel.push(check);
+	});
+	var count = cursel.length;
+	if (count == 0) 
+		return null;
+	// Builds input list of items to be deleted
+	var data = new Hash();
+	cursel.each(function(check) {
+		var trid = check.up('tr').getAttribute('id');
+		var pluginName = trid.sub(/_\d+$/, '');
+		// -1 for the row header
+		var idx = check.up('tr').previousSiblings().length-1;
+		if (!data.get(pluginName))
+			data.set(pluginName, new Array());
+		data.get(pluginName).push(idx);
+	});
+	return data;
+}
+
+/*
+ * Function: count_checked_items
+ * Computes number of checked items from a collection of checked items
+ *
+ * Parameters:
+ *  data - object: items grouped by plugin name
+ *
+ * Returns:
+ *  count - integer: number of items in the collection
+ *
+ */ 
+function count_checked_items(data) {
+	var count = 0;
+	data.keys().each(function(key) {
+		count += data.get(key).length;
+	});
+	return count;
+}
+
+/*
+ * Function: toggle_node_policy_radio
+ *
+ * Parameters:
+ *  FIXME
+ *
+ */ 
+function toggle_node_policy_radio(def_id, cus_id, cus_div_id) {
+	var def = $(def_id);
+	var cus = $(cus_id);
+	var cusdiv = $(cus_div_id);
+	cus.checked ? cusdiv.setStyle({paddingLeft: '20px'}).appear() : cusdiv.fade();
+}
+
+/*
+ * Function: cart_select_all_items
+ *
+ * Parameters:
+ *  FIXME
+ *
+ */ 
+function cart_select_all_items(selectall) {
+	var selectall = typeof selectall == 'boolean' ? selectall : true;
+	$$('table.shoppingCart input.item_select_input').each(function(check) {
+		check.checked = selectall;
+	});
+}
+
+// A processing cart item has just been removed
+document.observe('processingCart:itemRemoved', function(event) {
+	// Is the processing cart empty?
+	var container = menu.getContentNodeForCurrentEntry();
+	if (!container.select('table.shoppingCart').length) {
+		container.update();
+		var d = new Element('div', {id: 'emptycart_div'}).setStyle({marginTop: '70px', padding: '5px'}).hide();
+		d.update(new Element('h1').update('Your cart is currently empty'));
+		container.insert(d);
+		d.appear();
+	}
+
+	var msg = 'Item removed from the processing cart';
+	if (typeof event.memo == 'number') msg = event.memo + ' item' + (event.memo > 1 ? 's':'') + ' removed from the processing cart';
+	document.fire('notifier:notify', msg);
+});
+
+/*
+ * Function: get_runtime_options
+ * Returns per-item runtime options
+ *
+ * Called by used by {plugin}_run() functions
+ *
+ * Parameters:
+ *  prefix_id - string: TR id that identifies a SC item uniquely
+ *
+ * Data Format:
+ *  {reprocessValid: bool, itemPrefix: string, clusterPolicy: POST string}
+ *
+ * Returns:
+ *  JSON object as described in Data Format
+ *
+ */ 
+function get_runtime_options(prefix_id) {
+	var options = {
+		reprocessValid: false,
+		itemPrefix: '',
+		clusterPolicy: ''
+	};
+
+	options.reprocessValid = !document.getElementById(prefix_id + '_reprocess_successful_checkbox').checked;
+	options.itemPrefix = document.getElementById(prefix_id + '_prefix_name_input').value.replace(/ /g, '');
+
+	var post = "CondorSetup=";
+	use_custom_config = document.getElementById(prefix_id + '_custom_radio').checked;
+	// Add POST parameters depending on selected runtime options
+	if (!use_custom_config) {
+		// Use default Condor setup configuration
+		post += "default";
+	}
+	else {
+		// Use specified policy or selection
+		var sel = document.getElementById(prefix_id + '_node_select');
+		post += "custom";
+		var opt = sel.options[sel.selectedIndex];
+		if (opt.id.search(/pol_opt/) != -1)
+			post += "&Policy=";
+		else
+			post += "&Selection=";
+		post += opt.value;
+	}
+
+	options.clusterPolicy = post;
+	return options;
+}
+
+function getSavedItemsStats() {
+	var r = new HttpRequest(
+			null,
+			null,	
+			// Custom handler for results
+			function(resp) {
+				var st = $H(resp.stats);
+				st.keys().each(function(uid) {
+					var total = st.get(uid);
+					$('plugin_' + uid + '_saved_count').update(total > 0 ? total + ' item' + (total > 1 ? 's' : '') : 'No item');
+					// Disable panel when no saved items in it
+					if (total == 0) {
+						var panel = $('plugin_' + uid + '_saved_count').up(sc_accordion.headers[0]);
+						sc_accordion.headers.each(function(head, k) {
+							if (head == panel) {
+								sc_accordion.disable(k);
+								throw $break;
+							}
+						});
+					}
+				});
+			}
+	);
+
+	r.send('/youpi/cart/savedItemsStats/');
+}
+
+/*
+ * Removes one item from the processing cart
+ */
+function removeItemFromCart(trid, force) {
+	var silent = typeof force == 'boolean' ? force : false;
+	var trNode = $(trid);
+	var pluginName = trid.sub(/_\d+$/, '');
+	var idx = trNode.previousSiblings().length - 1;
+
+	// Ask for item deletion
+	s_cart.deletePluginItem(
+		{'plugin_name' : pluginName, 'idx' : idx},
+		// Custom handler called when item deletion is complete
+		function() {
+			var table = trNode.up('table.shoppingCart');
+			// Number of items left for that plugin
+			var left = table.select('tr[id]').length;
+			var n = left == 1 ? table : trNode;
+
+			n.fade({ 
+				afterFinish: function() { 
+					n.remove(); 
+					document.fire('processingCart:itemRemoved');
+				}
+			});
+		}
+	);
+}
+
+function update_condor_submission_log(resp, silent) {
+	var silent = typeof silent == 'boolean' ? silent : false;
+	var logdiv = document.getElementById('master_condor_log_div');
+	var r = resp['result'];
+	var log = new Logger(logdiv);
+	log.clear();
+
+	if (r['Error']) {
+		log.msg_error(r['Error']);
+		return false;
+	}
+	else if (r.NoData) {
+		log.msg_ok(r.NoData);
+		return false;
+	}
+
+	if (r['CondorError']) {
+		var d = document.createElement('div');
+		d.setAttribute('style', 'width: 50%;');
+		d.setAttribute('class', 'warning');
+		d.appendChild(document.createTextNode('Condor has returned a runtime error:'));
+		var d2 = document.createElement('div');
+		var pre = document.createElement('pre');
+		pre.setAttribute('style', 'color: red; overflow: auto; text-align: left;');
+		pre.appendChild(document.createTextNode(r['CondorError']));
+		var tipd = document.createElement('div');
+		tipd.innerHTML = 'If this is a parsing error in your Condor submission file, maybe ' +
+			'the requirements you are using cause the error. In this case, you should have a look at the ' + 
+			"<a href=\"/youpi/condor/setup/\">Condor Setup</a> page, check the <b>policies</b> and <b>selection" +
+			'</b> your are using for this item submission.';
+
+		d2.appendChild(pre);
+		d.appendChild(d2);
+		d.appendChild(tipd);
+		logdiv.appendChild(d);
+		return false;
+	}
+
+	if (!silent) {
+		log.msg_ok('Done. Jobs successfully sent to the cluster.');
+		var i = eval(r['ClusterIds']);
+		for (var k=0; k < i.length; k++) {
+			log.msg_ok(i[k]['count'] + ' job(s) submitted to cluster ' + i[k]['clusterId']);
+		}
+	}
+
+	return true;
 }

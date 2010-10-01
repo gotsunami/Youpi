@@ -1853,3 +1853,45 @@ document.observe('q:loaded', function() {
 }); 
 
 var box_file_browser;
+
+/*
+ * Turns on multichecking capabilities for a selection of checkboxes
+ */
+var youpi = {
+	multi_nodes_selection:  null
+};
+
+function enable_multi_checking(nodes) {
+	youpi.multi_nodes_selection = nodes;
+	nodes.invoke('observe', 'click', handle_multi_checking);
+	nodes.each(function(node) {node.checked = false;});
+}
+
+function handle_multi_checking() {
+	var nodes = youpi.multi_nodes_selection;
+	if (window.shiftPressed) {
+		// Shift + Mouse click
+		// Finds first and last positions
+		var first = 0, last = 0;
+		nodes.each(function(check, k) {
+			if (check == window.lastCheckItem) first = k;
+			else if (check == this) last = k;
+		}.bind(this));
+		if (last < first) {
+			var tmp = first;
+			first = last;
+			last = tmp;
+		}
+		// Finds related checkboxes
+		nodes.each(function(check, k) {
+			if (k > first && k <= last) {
+				check.checked = window.lastCheckItem.checked;
+			}
+		});
+	}
+	else {
+		// Saves last button check state
+		window.lastCheckItem = this;
+	}
+}
+

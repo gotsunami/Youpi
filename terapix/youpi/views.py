@@ -1660,6 +1660,14 @@ def get_permissions(request):
 
 @login_required
 @profile
+def ping(request):
+	"""
+	Ping. Return HTTP 200 response.
+	"""
+	return HttpResponse(json.encode('pong'), mimetype = 'text/plain')
+
+@login_required
+@profile
 def set_permissions(request):
 	"""
 	Sets permissions for a given entity.

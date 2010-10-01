@@ -501,8 +501,8 @@ table.condorPanelBox div.list {
 	margin-bottom: 5px;
 }
 
-table.shoppingCart * {
-	padding: 0px;
+table.shoppingCart {
+	width: 100%;
 }
 
 table.shoppingCart th {
@@ -510,18 +510,13 @@ table.shoppingCart th {
 	background-color: lightblue;
 }
 
-table.shoppingCart th:first-child {
+table.shoppingCart th:first-child, table.shoppingCart th:last-child {
 	text-align: left;
-	background-color: lightblue;
-}
-
-table.shoppingCart th:last-child {
-	text-align: left;
-	background-color: lightblue;
+	background-color: #e3e3e3;
 }
 
 table.shoppingCart td {
-	border-bottom: solid black 1px;
+	border-bottom: 1px dashed lightgray;
 }
 table.shoppingCart img {
 	cursor: pointer;
@@ -532,6 +527,14 @@ table.shoppingCart div.submitItem {
 	border: 1px solid lightgray; 
 	padding: 15px; 
 	-moz-border-radius: 5px;
+}
+
+table.shoppingCart tr.job_sent_success td {
+	color: green;
+}
+
+table.shoppingCart tr.job_sent_failure td {
+	color: red;
 }
 
 .ing-success {
@@ -1816,4 +1819,26 @@ td.grade-comment {
 #submit_automatic_sels {
 	text-align: left;
 	width: 90%;
+}
+
+#cart_menu_div {
+	text-align: left;
+	padding: 5px;
+	background-color: #cfcfcf;
+}
+
+#cart_menu_div img {
+	cursor: pointer;
+}
+
+#master_condor_log_div {
+	line-height: 30px;
+	float: left;
+	margin-left: 20px;
+}
+
+#cart_pbar_div {
+	float: left;
+	margin-left: 20px;
+	margin-top: 4px;
 }

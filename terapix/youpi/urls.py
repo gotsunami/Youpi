@@ -130,6 +130,7 @@ urlpatterns = patterns(
 	(r'^cart/cookiecheck/$', 'views.cart_cookie_check'),
 	(r'^cart/additem/$', 'views.cart_add_item'),
 	(r'^cart/delitem/$', 'views.cart_delete_item'),
+	(r'^cart/delitems/$', 'views.cart_delete_items'),
 	(r'^cart/itemsCount/$', 'views.cart_items_count'),
 	(r'^cart/savedItemsStats/$', 'views.cart_saved_items_stats'),
 
@@ -183,4 +184,5 @@ if settings.DEBUG:
 		(r'^test/$', 'main_test_runner'),
 		(r'^test/suite/$', 'main_test_suite'),
 		(r'^test/get/(.*?)/$', 'get_test'),
+		(r'^ping/$', 'ping'),
 	)

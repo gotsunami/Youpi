@@ -221,6 +221,7 @@ CART_JS.extend([
 	'js/3rdParty/modalbox/modalbox.js',
 	'js/condorpanel.js',
 	'js/accordion.js',
+	'js/progressbar.js',
 ])
 #
 CONDOR_JS = COMMON_JS[:]
