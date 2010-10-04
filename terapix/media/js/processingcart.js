@@ -582,34 +582,7 @@ function get_runtime_options() {
 		itemPrefix: '',
 		clusterPolicy: ''
 	};
-
-	/*
-	options.reprocessValid = !document.getElementById(prefix_id + '_reprocess_successful_checkbox').checked;
-	options.itemPrefix = document.getElementById(prefix_id + '_prefix_name_input').value.replace(/ /g, '');
-
-	var post = "CondorSetup=";
-	use_custom_config = document.getElementById(prefix_id + '_custom_radio').checked;
-	// Add POST parameters depending on selected runtime options
-	if (!use_custom_config) {
-		// Use default Condor setup configuration
-		post += "default";
-	}
-	else {
-		// Use specified policy or selection
-		var sel = document.getElementById(prefix_id + '_node_select');
-		post += "custom";
-		var opt = sel.options[sel.selectedIndex];
-		if (opt.id.search(/pol_opt/) != -1)
-			post += "&Policy=";
-		else
-			post += "&Selection=";
-		post += opt.value;
-	}
-
-	options.clusterPolicy = post;
-	*/
 	options.reprocessValid = !$('reprocess_successful_checkbox').checked;
-	console.log($('reprocess_successful_checkbox'));
 	options.itemPrefix = $('prefix_name_input').value.strip();
 	var post = "CondorSetup=";
 	if ($('node_policy_default').checked) {
