@@ -153,6 +153,14 @@ document.observe('dom:loaded', function() {
 					</td>
 					<td colspan="2">
 						{% include plugin.itemCartTemplate %}
+<script type="text/javascript">
+	document.observe('dom:loaded', function() {
+		var trid = '{{ plugin.id }}_{{ forloop.counter0 }}';
+		youpi_pc_meta[trid] = {};
+		youpi_pc_meta[trid].userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+		youpi_pc_meta[trid].userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
+	});
+</script>
 					</td>
 				</tr>
 					{% endfor %}
