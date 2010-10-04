@@ -1835,6 +1835,29 @@ td.grade-comment {
 	background-color: #cfcfcf;
 }
 
+#cart_menu_div ul {
+	margin: 0px;
+	padding: 0px;
+	height: 30px;
+}
+
+#cart_menu_div ul li {
+	float: left;
+	list-style: none;
+	text-align: center;
+	padding: 5px;
+	margin-right: 7px;
+	-moz-border-radius: 5px;
+	background-color: brown;
+	color: white;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+#cart_menu_div ul li:hover {
+	background-color: #ff6600;
+}
+
 #cart_menu_div img {
 	cursor: pointer;
 }
