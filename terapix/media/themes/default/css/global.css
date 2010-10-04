@@ -1282,6 +1282,10 @@ table.cluster_policy td:last-child * {
 	margin-right: 5px;
 }
 
+div.cart_item_policy {
+	height: 10px;
+}
+
 div.cart_item_policy div:first-child {
 	font-weight: bold;
 	margin-bottom: 5px;
@@ -1302,10 +1306,14 @@ div.cart_item_policy select  {
 	font-size: 9px;
 }
 
-div.cart_item_policy select option.header {
+div.cart_item_policy option.header {
 	color: black;
 	font-weight: bold;
 	background-color: lightblue;
+}
+
+#node_select {
+	width: 100%;
 }
 
 div.cart_item_policy select option.policy, div.cart_item_policy select option.selection {
@@ -1842,3 +1850,17 @@ td.grade-comment {
 	margin-left: 20px;
 	margin-top: 4px;
 }
+
+.q-content {
+	padding-top: 10px;
+	font-size: 11px;
+}
+
+.q-content div > div {
+	padding-bottom: 5px;
+}
+
+#ro_policy_div > label {
+	font-weight: bold;
+}
+

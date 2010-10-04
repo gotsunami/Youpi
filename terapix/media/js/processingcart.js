@@ -311,7 +311,6 @@ function real_save_items(data) {
 	opts.set('Plugin', key);
 	opts.set('Method', 'saveCartItem');
 	opts.update(youpi_pc_meta[trid].userData);
-	//var runopts = get_runtime_options(trid);
 	var r = new HttpRequest(
 		null,
 		null,	
@@ -384,7 +383,7 @@ function real_run_items(data) {
 	var key = data.keys()[youpi_pc_meta.action_cur_key_idx];
 	var trid = key + '_' + data.get(key)[youpi_pc_meta.action_cur_value_idx];
 	var trNode = $(trid);
-	var runopts = get_runtime_options(trid);
+	var runopts = get_runtime_options();
 
 	// Sets metadata
 	opts.set('Plugin', key);
@@ -577,13 +576,14 @@ document.observe('processingCart:itemRemoved', function(event) {
  *  JSON object as described in Data Format
  *
  */ 
-function get_runtime_options(prefix_id) {
+function get_runtime_options() {
 	var options = {
 		reprocessValid: false,
 		itemPrefix: '',
 		clusterPolicy: ''
 	};
 
+	/*
 	options.reprocessValid = !document.getElementById(prefix_id + '_reprocess_successful_checkbox').checked;
 	options.itemPrefix = document.getElementById(prefix_id + '_prefix_name_input').value.replace(/ /g, '');
 
@@ -606,6 +606,26 @@ function get_runtime_options(prefix_id) {
 		post += opt.value;
 	}
 
+	options.clusterPolicy = post;
+	*/
+	options.reprocessValid = !$('reprocess_successful_checkbox').checked;
+	console.log($('reprocess_successful_checkbox'));
+	options.itemPrefix = $('prefix_name_input').value.strip();
+	var post = "CondorSetup=";
+	if ($('node_policy_default').checked) {
+		// Use default Condor setup configuration
+		post += "default";
+	}
+	else {
+		post += "custom";
+		var sel = $('node_select');
+		var opt = sel.options[sel.selectedIndex];
+		if (opt.hasClassName('policy'))
+			post += "&Policy=";
+		else
+			post += "&Selection=";
+		post += opt.value;
+	}
 	options.clusterPolicy = post;
 	return options;
 }

@@ -218,6 +218,8 @@ REPORTING_JS.extend([
 #
 CART_JS = COMMON_JS[:]
 CART_JS.extend([
+	'js/3rdParty/Q/q.js', 
+	'js/3rdParty/Q/q.window.js',
 	'js/3rdParty/modalbox/modalbox.js',
 	'js/condorpanel.js',
 	'js/accordion.js',

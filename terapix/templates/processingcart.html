@@ -17,75 +17,53 @@ var {{ plugin.id }}_drop_box;
 var {{ plugin.id }}_item_counter = 0;
 {% endfor %}
 
-function show_runtime_options(pid, container_id) {
-	eval(pid + "_drop_box = new DropdownBox(container_id, 'Runtime Options');");
-	var r = eval(pid + '_drop_box.getContentNode();');
-	// Base id
-	var id = pid + '_' + eval(pid + '_item_counter');
-	
-	// Checkbox
-	var da = Builder.node('div', { className: 'rndBox', style: 'margin-left: 0px;' }, [
-		Builder.node('input', { id: id + '_reprocess_successful_checkbox',
-								type: 'checkbox',
-								checked: true }),
-		Builder.node('label', 'Do not reprocess already successful processings')
-	]);
-	r.appendChild(da);
+function build_runtime_options() {
+	var root = new Element('div', {id: 'ro_content'});
+	var norepro = new Element('div').insert(new Element('input', {id: 'reprocess_successful_checkbox', type: 'checkbox', checked: 'checked'}))
+		.insert(new Element('label').update('Do not reprocess already successful processings'));
+	var item = new Element('div').insert(new Element('label').update('Item prefix name')).insert(new Element('input', {id: 'prefix_name_input', type: 'text'}));
+	var idefault = new Element('input', {id: 'node_policy_default', type: 'radio', checked: 'checked', name: 'policy'});
+	var icustom = new Element('input', {id: 'node_policy_custom', type: 'radio', name: 'policy'});
 
-	// Item prefix name
-	da = Builder.node('div', { className: 'rndBox', style: 'margin-left: 0px;' }, [
-		Builder.node('label', 'Item prefix name'),
-		Builder.node('input', { id: id + '_prefix_name_input',
-								type: 'text' })
-	]);
-	r.appendChild(da);
+	var custom_sel = new Element('select', {id: 'node_select'}).hide();
+	custom_sel.insert(new Element('option', {disabled: true}).addClassName('header').update("Policies"));
+	youpi_pc_meta.saved_policies.each(function(pol) {
+		var opt = new Element('option', {value: pol}).addClassName('policy').update(pol);
+		custom_sel.insert(opt);
+	});
+	custom_sel.insert(new Element('option', {disabled: true}).addClassName('header').update("Selections"));
+	youpi_pc_meta.saved_selections.each(function(sel) {
+		var opt = new Element('option', {value: sel}).addClassName('selection').update(sel);
+		custom_sel.insert(opt);
+	});
 
-	// Cluster policy
-	da = Builder.node('div', { className: 'cart_item_policy rndBox', style: 'margin-left: 0px;' }, [
-		Builder.node('div', 'Cluster node policy'),
-		Builder.node('div', [
-			Builder.node('input', { id: id + '_default_radio',
-									onclick: "toggle_node_policy_radio(this.id,'" + id + '_custom_radio' + 
-												"','" + id + '_custom_div' + "');",
-									type: 'radio',
-									checked: true,
-									name: id + '_node_policy' }),
-			Builder.node('label', 'Use your default Condor setup configuration')
-		]),
-		Builder.node('div', [
-			Builder.node('input', { id: id + '_custom_radio',
-									onclick: "toggle_node_policy_radio('" + id + '_default_radio' + "',this.id,'" + 
-												id + '_custom_div' + "');",
-									type: 'radio',
-									name: id + '_node_policy' }),
-			Builder.node('label', 'Select a custom configuration for this processing')
-		]),
-		Builder.node('div', { id: id + '_custom_div', style: 'display: none;' }, [
-			Builder.node('label', 'Select a policy or selection: '),
-			Builder.node('select', { id: id + '_node_select' }, [
-				Builder.node('option', { className: 'header', disabled: true }, 'Policies'),
-	{% for pol in policies %}
-				Builder.node('option', {className: 'policy', 
-										id: id + '_pol_opt_{{ forloop.counter0 }}',
-										{% if forloop.first %}selected: true{% endif %}}, 
-										'{{ pol.label }}'),
-	{% endfor %}
-				Builder.node('option', { className: 'header', disabled: true }, 'Selections'),
-	{% for sel in selections %}
-				Builder.node('option', { className: 'selection', id: id + '_sel_opt_{{ forloop.counter0 }}' }, '{{ sel.label }}'),
-	{% endfor %}
-			])
-		])
-	]);
+	var policy = new Element('div', {id: 'ro_policy_div'}).update(new Element('label').update('Cluster node policy'))
+		.insert(new Element('div')
+			.insert(idefault)
+			.insert(new Element('label').update('Use your default Condor setup configuration')))
+		.insert(new Element('div')
+			.insert(icustom)
+			.insert(new Element('label').update('Select a custom configuration for this processing'))
+			.insert(new Element('div').addClassName('cart_item_policy').update(custom_sel)));
+	root.update(norepro).insert(item).insert(policy);
 
-	r.appendChild(da);
-	eval(pid + '_item_counter++');
+	idefault.observe('click', function() {
+		$('node_select').hide();
+	});
+	icustom.observe('click', function() {
+		$('node_select').show();
+	});
+
+	return root;
 }
 
 {# Load custom plugin's javascript code if available #}
 {% for plugin in plugins %}
 	{% include plugin.jsSource %}
 {% endfor %}
+
+youpi_pc_meta.saved_policies=[{% for pol in policies %}'{{ pol.label }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+youpi_pc_meta.saved_selections=[{% for sel in selections %}'{{ sel.label }}'{% if not forloop.last %},{% endif %}{% endfor %}];
 
 /*
  * Slots
@@ -124,6 +102,13 @@ document.observe('dom:loaded', function() {
 			check.checked = !check.checked;
 		});
 	});
+
+	new Q.Window({
+		id: 'ro_Q',
+		trigger: "runtime_options",
+		title: "Runtime Options",
+		text: build_runtime_options()
+	}); 
 
 	enable_multi_checking($$('table.shoppingCart input.item_select_input'));
 	youpi_pc_meta.progressBar = new ProgressBar('cart_pbar_div', 0, {
@@ -166,16 +151,6 @@ document.observe('dom:loaded', function() {
 <!-- Main body -->
 {% block content %}
 
-{% comment %}
-	<td style="text-align: center; vertical-align: middle">
-		<div class="submitItem">
-			<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
-			<p><img id="{{ plugin.id }}_{{ forloop.counter0 }}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.png" title="Submit processing to cluster"/> 
-			</p>
-		</div>
-		<img id="{{ plugin.id }}_{{ forloop.counter0 }}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.png"/>
-	</td>
-{% endcomment %}
 <div align="center">
 <div style="text-align: center;">
 	<div id="submenu">
@@ -195,6 +170,7 @@ document.observe('dom:loaded', function() {
 					<img id="delete_selection_img" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png"/>
 					<img id="save_selection_img" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.png"/>
 					<img id="run_selection_img" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.png"/>
+					<a id="runtime_options" href="#">Runtime Options</a>
 				</div>
 				<div id="master_condor_log_div"></div>
 				<div id="cart_pbar_div"></div>
@@ -214,10 +190,6 @@ document.observe('dom:loaded', function() {
 						<div class="sc_item_numbering">{{ forloop.counter }}</div>
 					</td>
 					<td colspan="2">
-						<div id="{{ plugin.id }}_options_div_{{ forloop.counter }}"></div>
-						<script type="text/javascript">
-							show_runtime_options('{{ plugin.id }}', '{{ plugin.id }}_options_div_{{ forloop.counter }}');
-						</script>
 						{% include plugin.itemCartTemplate %}
 					</td>
 				</tr>
@@ -225,13 +197,6 @@ document.observe('dom:loaded', function() {
 			</table>
 				{% endif %}
 			{% endfor %}
-				<!--
-				<tr>
-					<td colspan="3" style="text-align: right; border: none">
-						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/proceed.gif"/>
-					</td>
-				</tr>
-				-->
 			</div>
 			{% else %}
 			<div id="emptycart_div" style="margin-top: 70px; padding: 5px;">
