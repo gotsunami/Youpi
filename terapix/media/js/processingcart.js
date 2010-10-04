@@ -707,3 +707,53 @@ function update_condor_submission_log(resp, silent) {
 
 	return true;
 }
+
+
+/*
+ * Function: build_runtime_options
+ * Builds a runtime options control panel suitable for the processing cart
+ *
+ * Returns:
+ *  Parent DOM element node
+ *
+ */ 
+function build_runtime_options() {
+	var root = new Element('div', {id: 'ro_content'});
+	var norepro = new Element('div').insert(new Element('input', {id: 'reprocess_successful_checkbox', type: 'checkbox', checked: 'checked'}))
+		.insert(new Element('label').update('Do not reprocess already successful processings'));
+	var item = new Element('div').insert(new Element('label').update('Item prefix name')).insert(new Element('input', {id: 'prefix_name_input', type: 'text'}));
+	var idefault = new Element('input', {id: 'node_policy_default', type: 'radio', checked: 'checked', name: 'policy'});
+	var icustom = new Element('input', {id: 'node_policy_custom', type: 'radio', name: 'policy'});
+
+	var custom_sel = new Element('select', {id: 'node_select'}).hide();
+	custom_sel.insert(new Element('option', {disabled: true}).addClassName('header').update("Policies"));
+	youpi_pc_meta.saved_policies.each(function(pol) {
+		var opt = new Element('option', {value: pol}).addClassName('policy').update(pol);
+		custom_sel.insert(opt);
+	});
+	custom_sel.insert(new Element('option', {disabled: true}).addClassName('header').update("Selections"));
+	youpi_pc_meta.saved_selections.each(function(sel) {
+		var opt = new Element('option', {value: sel}).addClassName('selection').update(sel);
+		custom_sel.insert(opt);
+	});
+
+	var policy = new Element('div', {id: 'ro_policy_div'}).update(new Element('label').update('Cluster node policy'))
+		.insert(new Element('div')
+			.insert(idefault)
+			.insert(new Element('label').update('Use your default Condor setup configuration')))
+		.insert(new Element('div')
+			.insert(icustom)
+			.insert(new Element('label').update('Select a custom configuration for this processing'))
+			.insert(new Element('div').addClassName('cart_item_policy').update(custom_sel)));
+	root.update(norepro).insert(item).insert(policy);
+
+	idefault.observe('click', function() {
+		$('node_select').hide();
+	});
+	icustom.observe('click', function() {
+		$('node_select').show();
+	});
+
+	return root;
+}
+
