@@ -553,7 +553,7 @@ table.shoppingCart div.submitItem {
 }
 
 table.shoppingCart tr[id]:hover {
-	background-color: #FFEBBF;
+	background-color: #FFF2E8;
 }
 
 table.shoppingCart tr.job_sent_success td {
@@ -562,6 +562,39 @@ table.shoppingCart tr.job_sent_success td {
 
 table.shoppingCart tr.job_sent_failure td {
 	color: red;
+}
+
+table.shoppingCart span.job_error, 
+table.shoppingCart span.job_sent, 
+table.shoppingCart span.job_no_data {
+	color: white;
+	background-color: red;
+	font-weight: bold;
+	margin-left: 5px;
+	padding: 3px;
+	font-size: 9px;
+	-moz-border-radius: 3px;
+}
+
+table.shoppingCart span.job_sent {
+	background-color: green;
+}
+
+table.shoppingCart span.job_no_data {
+	background-color: orange;
+}
+
+.shoppingCart .date {
+	font-size: 14px;
+	color: gray;
+	vertical-align: middle;
+	font-style: italic;
+	text-align: right;
+	padding-right: 10px;
+}
+
+.shoppingCart .pc_item_name {
+	font-weight: bold;
 }
 
 .ing-success {
@@ -1918,11 +1951,3 @@ td.grade-comment {
 	font-weight: bold;
 }
 
-.shoppingCart .date {
-	font-size: 14px;
-	color: gray;
-	vertical-align: middle;
-	font-style: italic;
-	text-align: right;
-	padding-right: 10px;
-}

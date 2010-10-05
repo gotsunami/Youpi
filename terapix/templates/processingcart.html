@@ -152,8 +152,8 @@ document.observe('dom:loaded', function() {
 						{# Invoke custom template rendering #}
 				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
 					<td class="row-num"><div>{{ forloop.counter }}</div></td>
-					<td style="width: 10%; text-align: left">
-						<span style="font-size: 13px; vertical-align: top;"><input class="item_select_input" type="checkbox"/>&nbsp;<b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b></span>
+					<td style="white-space: nowrap; width: 10%; text-align: left">
+						<span style="font-size: 13px; vertical-align: top;"><input class="item_select_input" type="checkbox"/>&nbsp;<span class="pc_item_name">{{ plugin.itemPrefix }}{{ data.itemCounter }}</span></span>
 					</td>
 					<td>
 						{% include plugin.itemCartTemplate %}

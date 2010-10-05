@@ -259,7 +259,7 @@ function real_delete_items(count, data, removeEntries) {
 			var table = trs[0].up('table.shoppingCart');
 			p.value.each(function(idx) {
 				var trNode = trs[idx];
-				trNode.remove();
+				if (removeEntries) trNode.remove();
 			});
 			// Recomputes trs after row deletion to check if empty parent
 			// table has to be deleted too
@@ -270,7 +270,8 @@ function real_delete_items(count, data, removeEntries) {
 			}
 		});
 		// Send signal once done
-		document.fire('processingCart:itemRemoved', deleted);
+		if (removeEntries)
+			document.fire('processingCart:itemRemoved', deleted);
 	});
 }
 
@@ -397,9 +398,34 @@ function real_run_items(data) {
 		null,	
 		// Custom handler for results
 		function(resp) {
-			var jobid = '100';
-			var success = true;
 			$('master_condor_log_div').update();
+			var res = resp.result;
+			if (res.CondorError || res.Error) {
+				// Submission failure
+				trNode.addClassName('job_sent_failure');
+				trNode.select('.pc_item_name')[0].up().up()
+					.insert(new Element('span', {title: res.CondorError + '\n' + res.Error}).update('Job Error').addClassName('job_error'));
+			}
+			else {
+				if (res.NoData) {
+					trNode.removeClassName('job_sent_failure');
+					trNode.select('.pc_item_name')[0].up().up()
+						.insert(new Element('span', {title: res.NoData}).update('NOP').addClassName('job_no_data'));
+				}
+				else {
+					// Success
+					try { trNode.select('input.item_select_input')[0].remove(); }
+					catch(e) {}
+					trNode.removeClassName('job_sent_failure');
+					trNode.addClassName('job_sent_success');
+					if (res.ClusterIds.length > 0) {
+						var cid = res.ClusterIds[0].clusterId;
+						trNode.select('.pc_item_name')[0].up().up()
+							.insert(new Element('span', {title: 'Success: job cluster id is ' + cid}).update(cid).addClassName('job_sent'));
+					}
+				}
+			}
+
 			if (youpi_pc_meta.action_cur_value_idx < data.get(key).length-1)
 				youpi_pc_meta.action_cur_value_idx++;
 			else {
@@ -409,19 +435,7 @@ function real_run_items(data) {
 
 			}
 			if (youpi_pc_meta.action_cur_key_idx < data.keys().length) {
-				// More items to process
-				// Hide check boxes, replace with job ID
-				/*
-				if (success) {
-					trNode.select('input.item_select_input')[0].remove();
-					trNode.addClassName('job_sent_success');
-					//real_delete_items(youpi_pc_meta.action_pb_total, data, false);
-				}
-				else {
-					trNode.addClassName('job_sent_failure');
-				}
-				*/
-
+				// More items to process?
 				youpi_pc_meta.action_pb_value++;
 				youpi_pc_meta.progressBar.setPourcentage((youpi_pc_meta.action_pb_value/youpi_pc_meta.action_pb_total)*100);
 				real_run_items(data);
@@ -430,7 +444,20 @@ function real_run_items(data) {
 				// All items are sent
 				youpi_pc_meta.progressBar.setPourcentage(100);
 				$('cart_pbar_div').fade({delay: 5.0});
-				real_delete_items(youpi_pc_meta.action_pb_total, data);
+
+				// Builds a new hash of successfully sent jobs in order to delete them from 
+				// user session (but keep them in the processing cart until page reload)
+				var pluginName = trid.sub(/_\d+$/, '');
+				var jdata = new Hash();
+				$$('.job_sent_success').each(function(tr) {
+					// -1 for the row header
+					var idx = tr.previousSiblings().length-1;
+					if (!jdata.get(pluginName))
+						jdata.set(pluginName, new Array());
+					jdata.get(pluginName).push(idx);
+				});
+				if (jdata.keys().length)
+					real_delete_items(youpi_pc_meta.action_pb_total, jdata, false);
 			}
 		}
 	);
@@ -458,6 +485,7 @@ function do_run_items(count, data) {
 			youpi_pc_meta.action_pb_value = 0;
 			youpi_pc_meta.action_pb_total = count;
 			$('cart_pbar_div').appear();
+			youpi_pc_meta.progressBar.setPourcentage(0);
 			// Real stuff
 			real_run_items(data); 
 		}
