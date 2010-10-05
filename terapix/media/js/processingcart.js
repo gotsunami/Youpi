@@ -772,11 +772,8 @@ function displayImageCount(idList, container_id) {
 	var c = 0;
 	var txt;
 	idList.length > 1 ? txt = 'Batch' : txt = 'Single';
-	var selDiv = new Element('div', {'class': 'selectionModeTitle'}).update(txt + ' selection mode:');
+	var selDiv = new Element('div').addClassName('selectionModeTitle').update(txt + ' selection mode: ');
 	container.insert(selDiv);
-
-	selDiv = new Element('div', {'class': 'listsOfSelections'});
-
 	for (var k=0; k < idList.length; k++) {
 		c = idList[k].toString().split(',').length;
 		if (idList.length > 1)
@@ -784,8 +781,7 @@ function displayImageCount(idList, container_id) {
 		else
 			txt = c + ' image' + (c > 1 ? 's' : '');
 
-		selDiv.update(txt);
-		selDiv.insert(new Element('br'));
+		selDiv.insert(new Element('span').update(txt));
 	}
 	container.insert(selDiv);
 }

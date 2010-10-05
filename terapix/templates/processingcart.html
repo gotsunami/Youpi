@@ -146,11 +146,12 @@ document.observe('dom:loaded', function() {
 				{% if plugin.hasItemsInCart %}
 			<table class="shoppingCart">
 				<tr>
-					<th colspan="3">{{ plugin.optionLabel }} - <i>{{ plugin.description }}</i> items</th>
+					<th colspan="4">{{ plugin.optionLabel }} - <i>{{ plugin.description }}</i> items ({{ plugin.getData|length }})</th>
 				</tr>
 					{% for data in plugin.getData %}
 						{# Invoke custom template rendering #}
 				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
+					<td class="row-num"><div>{{ forloop.counter }}</div></td>
 					<td style="width: 10%; text-align: left">
 						<span style="font-size: 13px; vertical-align: top;"><input class="item_select_input" type="checkbox"/>&nbsp;<b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b></span>
 					</td>

@@ -520,6 +520,27 @@ table.shoppingCart td {
 	padding: 1px;
 	vertical-align: middle;
 }
+
+table.shoppingCart td.row-num {
+	width: 20px;
+}
+
+table.shoppingCart td.row-num div {
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	color: white;
+	margin: 2px;
+	-moz-border-radius: 3px;
+	background-color: lightgray;
+	text-align: center;
+	font-size: 9px;
+}
+
+table.shoppingCart table.cleantd td {
+	padding-right: 10px;
+}
+
 table.shoppingCart img {
 	cursor: pointer;
 }
@@ -529,6 +550,10 @@ table.shoppingCart div.submitItem {
 	border: 1px solid lightgray; 
 	padding: 15px; 
 	-moz-border-radius: 5px;
+}
+
+table.shoppingCart tr[id]:hover {
+	background-color: #FFEBBF;
 }
 
 table.shoppingCart tr.job_sent_success td {
@@ -669,7 +694,11 @@ div.selectionModeTitle {
 	font-weight: bold;
 	font-size: 9px;
 	color: brown; 
-	text-decoration: underline;
+	padding-right: 15px;
+}
+
+div.selectionModeTitle span {
+	color: green;
 }
 
 .listsOfSelections, .flatMissing {
