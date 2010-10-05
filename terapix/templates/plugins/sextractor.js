@@ -118,40 +118,6 @@ var {{ plugin.id }} = {
 	},
 
 	/*
-	 * Function displayImageCount
-	 * Renders list of images to be processed as a summary (used in the processing cart plugin rendering)
-	 *
-	 * Parameters:
-	 *
-	 * imgList - array of arrays of idLists
-	 *
-	 */
-	displayImageCount: function(imgList, container_id) {
-		var container = $(container_id);
-		var imgList = eval(imgList);
-		var c = 0;
-		var txt;
-		imgList.length > 1 ? txt = 'Batch' : txt = 'Single';
-		var selDiv = new Element('div', {'class': 'selectionModeTitle'}).update(txt + ' selection mode:');
-		container.insert(selDiv);
-
-		selDiv = new Element('div', {'class': 'listsOfSelections'});
-
-		for (var k=0; k < imgList.length; k++) {
-			c = imgList[k].toString().split(',').length;
-			if (imgList.length > 1)
-				txt = 'Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '');
-			else
-				txt = c + ' image' + (c > 1 ? 's' : '');
-
-			selDiv.update(txt);
-			selDiv.insert(new Element('br'));
-		}
-		container.insert(selDiv);
-	},
-
-
-	/*
 	 * Function: run
 	 * Run processing
 	 *

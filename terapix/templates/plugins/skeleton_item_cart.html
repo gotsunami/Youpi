@@ -2,14 +2,25 @@
 
 <table class="cleantd">
 	<tr>
-		<td style="width: 100%; padding: 3px">
-			<p>This is a <b>demo-related job</b>. 5 jobs will be sent to the Condor cluster if you click on the 'Run' button.</p>
-			<p>Each job will try to execute the <tt>/usr/bin/uptime</tt> command once on cluster node.</p>
-			<table class="plugin_small">
-				<tr>
-					<td><span class="confLetter">Results output dir:</span> {{ data.userData.resultsOutputDir }}</td>
-				</tr>
-			</table>
+		<td style="padding: 3px">
+			<b>Demo job</b>
 		</td>
+		<td>
+			<a href="#" class="pc_more" title="Click to get more information">More...</a>
+			<div class="pc_more_details">
+				<table class="plugin_small">
+					<tr>
+						<td>
+							<p>This is a <b>demo-related job</b>. 5 jobs will be sent to the Condor cluster if you click on the 'Run' button.</p>
+							<p>Each job will try to execute the <tt>/usr/bin/uptime</tt> command once on cluster node.</p>
+						</td>
+					</tr>
+					<tr>
+						<td><span class="confLetter">Results output dir:</span> {{ data.userData.resultsOutputDir }}</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+		<td><tt>{{ data.userData.resultsOutputDir }}</tt></td>
 	</tr>
 </table>

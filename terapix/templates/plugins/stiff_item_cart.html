@@ -2,33 +2,31 @@
 
 <table class="cleantd">
 	<tr>
-		<td style="width: 100%; padding: 3px">
+		<td style="padding: 3px">
 			<div id="{{ plugin.id }}_{{ forloop.counter0 }}_selections_div"></div>
 			<script type="text/javascript">
-				{{ plugin.id }}.displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
+				displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
 			</script>
-			<table class="plugin_small">
-				<tr>
-					<td><span class="confLetter">Config:</span></td>
-				{% if data.userData.taskId %}
-					<td><a target="blank" href="/youpi/results/{{ plugin.id }}/{{ data.userData.taskId }}/">{{ data.userData.config }}</a></td>
-				{% else %}
-					<td>{{ data.userData.config }}</td>
-				{% endif %}
-				</tr>
-				<tr>
-					<td><span class="confLetter">Results output dir:</span></td>
-					<td>{{ data.userData.resultsOutputDir }}</td>
-				</tr>
-			</table>
-			<div id="{{ plugin.id }}_images_div_{{ forloop.counter0 }}" style="display: none;"></div>
 		</td>
-		<td style="text-align: center; vertical-align: middle">
-			<div class="submitItem">
-				<p><img src="/media/themes/{{ user.get_profile.guistyle }}/img/48x48/{{ plugin.id }}.png" style="vertical-align:middle"/></p>
-				<p><img id="{{ plugin.id }}_{{ forloop.counter0 }}_run" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/run.png" title="Submit processing to cluster" />
+		<td>
+			<a href="#" class="pc_more" title="Click to get more information">More...</a>
+			<div class="pc_more_details">
+				<table class="plugin_small">
+					<tr>
+						<td><span class="confLetter">Config:</span></td>
+					{% if data.userData.taskId %}
+						<td><a target="blank" href="/youpi/results/{{ plugin.id }}/{{ data.userData.taskId }}/">{{ data.userData.config }}</a></td>
+					{% else %}
+						<td>{{ data.userData.config }}</td>
+					{% endif %}
+					</tr>
+					<tr>
+						<td><span class="confLetter">Results output dir:</span></td>
+						<td>{{ data.userData.resultsOutputDir }}</td>
+					</tr>
+				</table>
 			</div>
-			<img id="{{ plugin.id }}_{{ forloop.counter0 }}_save" src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/save_later.png"/>
 		</td>
+		<td><tt>{{ data.userData.resultsOutputDir }}</tt></td>
 	</tr>
 </table>

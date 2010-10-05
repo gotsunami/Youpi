@@ -2,73 +2,78 @@
 
 <table class="cleantd">
 	<tr>
-		<td style="width: 100%; padding: 3px">
+		<td style="padding: 3px">
 			<div id="{{ plugin.id }}_{{ forloop.counter0 }}_selections_div"></div>
-			<table class="plugin_small">
-				<script type="text/javascript">
+			<script type="text/javascript">
 				{% ifequal data.userData.dualMode 1 %}
-						{{ plugin.id }}.displayImageCount('[[1]]', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
+					displayImageCount('[[1]]', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
 				{% else %}
-					{{ plugin.id }}.displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
+					displayImageCount('{{ data.userData.idList }}', '{{ plugin.id }}_{{ forloop.counter0 }}_selections_div');
 				{% endifequal %}
-				</script>
-				{% ifequal data.userData.dualMode 1 %}
-				<tr>
-						<td><span class="regLetter">Dual Image Mode:</span></td>
-						<td> 1 image + 1 image for measurements</td>
-				</tr>
-				{% endifequal %}
-				{% if data.userData.flagPath %}
-				<tr>
-					<td><span class="regLetter">Flag:</span></td>
-					<td>{{ data.userData.flagPath }}</td>
-				</tr>
-				{% endif %}
-				{% if data.userData.weightPath %}
-				<tr>
-					<td><span class="regLetter">Weight:</span></td>
-					<td>{{ data.userData.weightPath }}</td>
-				</tr>
-				{% endif %}
-
-				{% if data.userData.psfPath %}
-				<tr>
-					<td><span class="regLetter">Psf:</span></td>
-					<td>{{ data.userData.psfPath }}</td>
-				</tr>
-				{% endif %}
-
-				{% ifequal data.userData.dualMode 1 %}
-					{% if data.userData.dualWeightPath %}
-						<tr>
-							<td><span class="regLetter">Weight for 2nd image:</span></td>
-							<td>{{ data.userData.dualWeightPath }}</td>
-						</tr>
-						{% endif %}
-					{% if data.userData.dualFlagPath %}
-						<tr>
-							<td><span class="regLetter">Flag for 2nd image:</span></td>
-							<td>{{ data.userData.dualFlagPath }}</td>
-						</tr>
-					{% endif %}
-				{% endifequal %}
-
-				<tr>
-					<td><span class="confLetter">Config:</span></td>
-					<td>{{ data.userData.config }}</td>
-				</tr>
-
-				<tr>
-					<td><span class="confLetter">Parameters:</span></td>
-					<td>{{ data.userData.param }}</td>
-				</tr>
-
-				<tr>
-					<td><span class="confLetter">Results output dir:</span></td>
-					<td>{{ data.userData.resultsOutputDir }}</td>
-				</tr>
-			</table>
-			<div id="{{ plugin.id }}_images_div_{{ forloop.counter0 }}" style="display: none;"></div>
+			</script>
 		</td>
+		<td>
+			<a href="#" class="pc_more" title="Click to get more information">More...</a>
+			<div class="pc_more_details">
+				<table class="plugin_small">
+					{% ifequal data.userData.dualMode 1 %}
+					<tr>
+							<td><span class="regLetter">Dual Image Mode:</span></td>
+							<td> 1 image + 1 image for measurements</td>
+					</tr>
+					{% endifequal %}
+					{% if data.userData.flagPath %}
+					<tr>
+						<td><span class="regLetter">Flag:</span></td>
+						<td>{{ data.userData.flagPath }}</td>
+					</tr>
+					{% endif %}
+					{% if data.userData.weightPath %}
+					<tr>
+						<td><span class="regLetter">Weight:</span></td>
+						<td>{{ data.userData.weightPath }}</td>
+					</tr>
+					{% endif %}
+
+					{% if data.userData.psfPath %}
+					<tr>
+						<td><span class="regLetter">Psf:</span></td>
+						<td>{{ data.userData.psfPath }}</td>
+					</tr>
+					{% endif %}
+
+					{% ifequal data.userData.dualMode 1 %}
+						{% if data.userData.dualWeightPath %}
+							<tr>
+								<td><span class="regLetter">Weight for 2nd image:</span></td>
+								<td>{{ data.userData.dualWeightPath }}</td>
+							</tr>
+							{% endif %}
+						{% if data.userData.dualFlagPath %}
+							<tr>
+								<td><span class="regLetter">Flag for 2nd image:</span></td>
+								<td>{{ data.userData.dualFlagPath }}</td>
+							</tr>
+						{% endif %}
+					{% endifequal %}
+
+					<tr>
+						<td><span class="confLetter">Config:</span></td>
+						<td>{{ data.userData.config }}</td>
+					</tr>
+
+					<tr>
+						<td><span class="confLetter">Parameters:</span></td>
+						<td>{{ data.userData.param }}</td>
+					</tr>
+
+					<tr>
+						<td><span class="confLetter">Results output dir:</span></td>
+						<td>{{ data.userData.resultsOutputDir }}</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+		<td><tt>{{ data.userData.resultsOutputDir }}</tt></td>
 	</tr>
 </table>

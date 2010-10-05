@@ -62,6 +62,10 @@ document.observe('dom:loaded', function() {
 			check.checked = !check.checked;
 		});
 	});
+	$$('.pc_more').invoke('observe', 'click', function() {
+		this.next().toggle();
+	});
+	$$('.pc_more_details').invoke('hide');
 
 	new Q.Window({
 		id: 'ro_Q',
@@ -147,11 +151,10 @@ document.observe('dom:loaded', function() {
 					{% for data in plugin.getData %}
 						{# Invoke custom template rendering #}
 				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
-					<td style="text-align: left">
-						<span style="font-size: 13px; vertical-align: top;"><input class="item_select_input" type="checkbox"/>&nbsp;<b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b> - {{ data.date }}</span>
-						<div class="sc_item_numbering">{{ forloop.counter }}</div>
+					<td style="width: 10%; text-align: left">
+						<span style="font-size: 13px; vertical-align: top;"><input class="item_select_input" type="checkbox"/>&nbsp;<b>{{ plugin.itemPrefix }}{{ data.itemCounter }}</b></span>
 					</td>
-					<td colspan="2">
+					<td>
 						{% include plugin.itemCartTemplate %}
 <script type="text/javascript">
 	document.observe('dom:loaded', function() {
@@ -162,6 +165,7 @@ document.observe('dom:loaded', function() {
 	});
 </script>
 					</td>
+					<td class="date">{{ data.date }}</td>
 				</tr>
 					{% endfor %}
 			</table>
@@ -180,7 +184,7 @@ document.observe('dom:loaded', function() {
 			<p class="title">
 				Please select a type of processing by clicking on its name in order to display its saved items:
 			</p>
-			<div id="accordion" style="width: 70%; margin: auto;">
+			<div id="accordion" style="width: 90%; margin: auto;">
 			{% for plugin in plugins %}
 				<h1 class="vertical_accordion_toggle">
 					<img src="/media/themes/{{ user.get_profile.guistyle }}/img/16x16/{{ plugin.id }}.png"/>

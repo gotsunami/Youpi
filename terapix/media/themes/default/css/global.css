@@ -517,6 +517,8 @@ table.shoppingCart th:first-child, table.shoppingCart th:last-child {
 
 table.shoppingCart td {
 	border-bottom: 1px dashed lightgray;
+	padding: 1px;
+	vertical-align: middle;
 }
 table.shoppingCart img {
 	cursor: pointer;
@@ -1887,3 +1889,11 @@ td.grade-comment {
 	font-weight: bold;
 }
 
+.shoppingCart .date {
+	font-size: 14px;
+	color: gray;
+	vertical-align: middle;
+	font-style: italic;
+	text-align: right;
+	padding-right: 10px;
+}

@@ -1058,40 +1058,6 @@ var {{ plugin.id }} = {
 		ims.setTableWidget(new AdvancedTable());
 	},
 
-	/*
-	 * Function displayImageCount
-	 * Renders list of images to be processed as a summary (used in the processing cart plugin rendering)
-	 *
-	 * Parameters:
-	 *
-	 * idList - array of arrays of idLists
-	 *
-	 */
-	displayImageCount: function(idList, container_id) {
-		var container = $(container_id);
-		var idList = eval(idList);
-		var c = 0;
-		var txt;
-		idList.length > 1 ? txt = 'Batch' : txt = 'Single';
-		var selDiv = new Element('div');
-		selDiv.setAttribute('class', 'selectionModeTitle');
-		selDiv.appendChild(document.createTextNode(txt + ' selection mode:'));
-		container.appendChild(selDiv);
-	
-		selDiv = new Element('div');
-		selDiv.setAttribute('class', 'listsOfSelections');
-	
-		for (var k=0; k < idList.length; k++) {
-			c = idList[k].toString().split(',').length;
-			if (idList.length > 1)
-				selDiv.appendChild(document.createTextNode('Selection ' + (k+1) + ': ' + c + ' image' + (c > 1 ? 's' : '')));
-			else
-				selDiv.appendChild(document.createTextNode(c + ' image' + (c > 1 ? 's' : '')));
-			selDiv.appendChild(new Element('br'));
-		}
-		container.appendChild(selDiv);
-	},
-
 	reprocess_ldac_selection: function(ldac_files, taskId) {
 		var container = $('{{ plugin.id }}_xml_fields_result_div');
 	
