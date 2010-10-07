@@ -541,6 +541,10 @@ table.shoppingCart table.cleantd td {
 	padding-right: 10px;
 }
 
+table.shoppingCart table.cleantd tt {
+	font-size: 10px;
+}
+
 table.shoppingCart img {
 	cursor: pointer;
 }
@@ -1881,7 +1885,7 @@ td.grade-comment {
 	left: 30px;
 }
 
-#sel_count_div {
+.largy {
 	color: gray;
 	font-size: 16px;
 	text-align: left;
@@ -1891,6 +1895,10 @@ td.grade-comment {
 #submit_automatic_sels {
 	text-align: left;
 	width: 90%;
+}
+
+#submit_automatic_sels ul {
+	padding: 0px;
 }
 
 #cart_menu_div {
@@ -1905,7 +1913,7 @@ td.grade-comment {
 	height: 30px;
 }
 
-#cart_menu_div ul li {
+.action_button {
 	float: left;
 	list-style: none;
 	text-align: center;
@@ -1918,7 +1926,7 @@ td.grade-comment {
 	font-weight: bold;
 }
 
-#cart_menu_div ul li:hover {
+.action_button:hover {
 	background-color: #ff6600;
 }
 
