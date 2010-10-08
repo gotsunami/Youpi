@@ -402,7 +402,7 @@ def run_ingestion():
 			h_ra = getFITSField(hdulist, 'YRA')
 			h_dec = getFITSField(hdulist, 'YDEC')
 		except MissingKeywordError, fieldname:
-			debug("\tImage Skipped", WARNING)
+			debug("\tImage %s Skipped" % fitsfile, WARNING)
 			continue
 
 		try:
@@ -522,13 +522,14 @@ def run_ingestion():
 				# Option On will allow multiple ingestion(for same checksum, computation of new name)
 				if allowSeveralIngestions == 'yes':
 					fitsNoExt = freshImageName(fitsNoExt, g)
-					debug("\tImage with same name and checksum: multiple option state to ON, Ingestion...")
+					debug("\tImage %s with same name and checksum: multiple option state to ON, Ingestion..." % fitsfile)
 				
 				else:
-					debug("\tImage with same name and checksum: multiple option state to OFF, Skipping...")
+					debug("\tImage %s with same name and checksum: multiple option state to OFF, Skipping..." % fitsfile)
 					continue
 			else:
-				debug("Image already exists in database (same odometer number for different checksum, skipping...", WARNING)
+				debug("Image %s already exists in database (same odometer number for different checksum). Skipping..." % fitsfile, WARNING)
+				continue
 
 		# First gets run and channel IDs
 		try:
