@@ -495,7 +495,7 @@ def run_ingestion():
 			continue
 
 		try:
-			res = g.execute("""select name, checksum from youpi_image where name = "%s";""" % fitsNoExt);
+			res = g.execute("""select name, checksum from youpi_image where name = "%s" order by 2;""" % fitsNoExt);
 		except MySQLdb.DatabaseError, e:
 			debug(e, FATAL)
 			sendmail(1, email, duration_stime, time.time())
@@ -517,19 +517,21 @@ def run_ingestion():
 		# Image name found
 		if res:
 			# Compare checksums
-			dbchecksum = res[0][1]
-			if checksum == dbchecksum:
+			matched = False
+			for r in res:
+				dbchecksum = r[1]
+				if checksum == dbchecksum:
+					matched = True
+			if matched:
 				# Option On will allow multiple ingestion(for same checksum, computation of new name)
 				if allowSeveralIngestions == 'yes':
 					fitsNoExt = freshImageName(fitsNoExt, g)
-					debug("\tImage %s with same name and checksum: multiple option state to ON, Ingestion..." % fitsfile)
-				
+					debug("\tImage %s with same name and checksum: multiple option is ON, ingesting..." % fitsfile)
 				else:
-					debug("\tImage %s with same name and checksum: multiple option state to OFF, Skipping..." % fitsfile)
+					debug("\tImage %s with same name and checksum: multiple option state is OFF, skipping..." % fitsfile)
 					continue
 			else:
-				debug("Image %s already exists in database (same odometer number for different checksum). Skipping..." % fitsfile, WARNING)
-				continue
+				debug("Image %s already exists in the database (same name but different checksum). ingesting..." % fitsfile)
 
 		# First gets run and channel IDs
 		try:
