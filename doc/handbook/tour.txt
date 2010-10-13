@@ -510,26 +510,50 @@ will guide you to the related tab which needed to be fixed.
 The Processing Cart
 ===================
 
-.. image:: /figures/shopping.png
-   :width: 800
-   :scale: 90
+.. versionadded:: 0.7
+.. figure:: /figures/pcart_1.png
 
-The processing cart comes naturally, after adding to cart one or many processings, elaborated
-from plugins of the *processing your data* tab. It represents a visual synthesis of 
-processings, sorted by plugin and ready to be run. A summary of your parameters are shown 
-as a quick view. Then you can decide to delete, save for a later use, or run the 
-corresponding processing as *jobs*, handled by Condor. The *saved items* tab will summarize
-your saved processings with elementary informations, and an *add to cart* click will push 
-them back to the cart, ready to be computed.
+The processing cart really acts like shopping carts you're likely to find on commercial websites.
+Once processing items are created with a suitable image selection along with a configuration file 
+and various options depending on the kind of processing, they must be added to the processing cart 
+which is the last step before submitting them to the cluster.
 
-.. Note:: During your logged session, if cookies are activated, you will keep your cart
- with your items added, even if you continue browsing the Youpi interface and without 
- saving them. But it is recommended to *save for later* your items in the cart, not to be 
- punish by a simple network disconnection.
+This is the place to select which items - in which order - you want to submit first. You can also 
+specify the cluster policy to use with the current selection of items you are about to submit.
 
-Runtime options are about management of jobs through Condor. If you have set a default 
-condor configuration (i.e Condor Setup), or if you intend to provide a custom configuration 
-for a specific process, it can be managed through this dropdown box.
+Since *version 0.7*, the processing cart has been reworked to offer better UI design and 
+experience, and comes with more functionalities. The remaining material in this section describes 
+the features of *version 0.7 or later*.
+
+You can access the processing cart page by clicking on the "Processing Cart" link in the upper right 
+corner of the window (also available at the ``/youpi/cart/`` `URL`). It comes with the following 
+features:
+
+* List of all items ready to be sent to the cluster
+* For every item, a detailled description of used parameters is available
+* Basic actions for every item: deletion, saving for later use or submission to the cluster
+* Multi-selection of items: several items can be selected when using basic actions
+* Runtime options can be selected to specify a list of cluster nodes to be used when the processing 
+  jobs are running
+* Saved cart items can be reloaded into the current cart and submitted to the cluster
+* The permission model applies to saved cart items too
+
+.. figure:: /figures/pcart_2.png
+
+The processing cart's page is made of two sections or menus. The "Cart items" default menu 
+shows all cart items related to your current user session (Youpi handles sessions using cookies). 
+That means that if you log out, all items currently available on this page will be lost since your 
+user session will be deleted. To address this issue, Youpi provides a "Saved items" menu where can 
+you save items into the database for permanent storage then reload them later back to the current user 
+session at any time in order to submit them to the cluster. Let's see how they work.
+
+
+The Cart items submenu
+----------------------
+
+The Saved items submenu
+-----------------------
+
 
 Live Monitoring of Processings
 ==============================
