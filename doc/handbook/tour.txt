@@ -544,15 +544,116 @@ The processing cart's page is made of two sections or menus. The "Cart items" de
 shows all cart items related to your current user session (Youpi handles sessions using cookies). 
 That means that if you log out, all items currently available on this page will be lost since your 
 user session will be deleted. To address this issue, Youpi provides a "Saved items" menu where can 
-you save items into the database for permanent storage then reload them later back to the current user 
+you save items into the database for permanent storage then reload them back later to the current user 
 session at any time in order to submit them to the cluster. Let's see how they work.
 
 
-The Cart items submenu
+The Cart items menu
 ----------------------
 
-The Saved items submenu
------------------------
+This menu holds the items you recently added from the top-level processing menu. The following figure
+shows a processing cart with six items of three different kinds: 3 `Swarp` items, 2 `Scamps` and 1 
+`QualityFits`:
+
+.. figure:: /figures/pcart_ci_1.png
+
+As you can see, cart items are grouped by kind, one item per line:
+
+.. figure:: /figures/pcart_ci_2.png
+
+Every inline item comes with:
+
+* a line number
+* a selection checkbox whose purpose it to select the current item and use it with an `action command button`_
+* a unique item name, in uppercase, ending with a number. This unique name is provided for convenience, 
+  to help keeping track of your jobs: it's displayed later on the live `Active Monitoring` panel
+* the current selection of images that will be used for this processing
+* A ``More...`` hypertext link which diplay detailled information about the current cart item
+* the output results directory. This filesystem path will be used by Youpi to write any output data
+* the date and time the item was added to the processing cart
+
+.. _action command button:
+
+Several items can be selected at a time and different actions can be performed using the action command 
+buttons displayed at the top of the list of items:
+
+.. figure:: /figures/pcart_ci_3.png
+
+Items can be selected individually, one at a time, or they can all be selected at once by clicking on 
+the ``All`` link. You can also click on the ``None`` link to unselected all selected items, or click on 
+the ``Inverse`` link to inverse the current item selection.
+
+Once items are selected, the following actions can be performed:
+
+* delete items from the processing cart (thus the current user session) by hitting the ``Delete`` 
+  action button
+* save items for later use by hitting the ``Save for later`` action button. They will be saved to the 
+  database permanently then removed from the cart. They will be available from the ``Save items`` menu.
+* submit items to the cluster by hitting the ``Run`` action button
+* define runtime options which apply to the current item selection
+
+Runtime options provide a way to associate a custom cluster configuration for the current item 
+selections. User-defined cluster policies and selections are very useful to define a subset of cluster 
+nodes to be used as targets for running the current items you're about to submit to the cluster.
+
+Clicking on the ``Runtime options`` will raise a draggable box. The default behaviour is to use 
+your default Condor configuration setup, but you can also select a custom configuration for the 
+current item selection. In the following example, the ``MIX_ALL`` custom policy is selected and 
+will apply to the 2 `Swarp` items selected. This will ensure that those 2 jobs run on all cluster 
+nodes matching the ``MIX_ALL`` policy, which maps to all nodes with hostname matching the ``mix*`` 
+wildcard pattern in our private network:
+
+.. figure:: /figures/pcart_ci_4.png
+
+Once the jobs are submitted to the cluster by hitting the ``Run`` button, a progress bar will 
+appear and will track item submission progression in real time. Please note that depending on 
+the number of images involved in the process and all the runtime checks made by Youpi, item 
+submission can take a long time. When every selected items have been processed (the progress 
+bar is at 100%), items that are effectively running or queued on the cluster will be highlighted 
+in green:
+
+.. figure:: /figures/pcart_ci_5.png
+
+As you can see, the ``SWARP2`` and ``SWARP3`` items were successfully submitted. Note that their 
+respective checkboxes have been *removed* to prevent duplicate item submission. They are not part 
+of the processing cart anymore. They remain in the processing cart *for convenience only*, so 
+you can easily keep track of which items have already been submitted and which not. If your reload 
+the page in your browser, you will see that all successful items have disappeared.
+
+Moreover, the Condor job ID has been appended to the item name. This number can be useful for 
+tracking the job on the ``Active Monitoring`` page. In our example, the `Swarp` jobs got respectively 
+numbers 12761 and 12762.
+
+Sometimes, instead of getting the cluster job ID, you will get a ``NOP`` flag next to the item's 
+name. That means that Youpi did not submit the item to the cluster since your runtime options control 
+panel has the "Do not reprocess already successful processings" option checked. The following 
+example shows that item ``QF3`` - which is a `QualityFITS` job for 1 image - has already been processed 
+by Youpi, and indicates that there is no need to submit it one more time (since you don't want to, 
+according to the runtime option):
+
+.. figure:: /figures/pcart_ci_6.png
+
+If any error occured during item submission, the item will be highlighted in red and the ``Job Error`` 
+flag will be appended. Just move the mouse cursor on the flag to get the error message in a tooltip. In 
+our example, the cluster seems to be down for maintenance:
+
+.. figure:: /figures/pcart_ci_7.png
+
+Finally, please note that several item flags can be displayed at a time. Suppose you get an 
+error on the first try because the cluster is unavailable at this time. Then you try submitting 
+this item a second time but it appears it already has been processed by Youpi. By forcing the item 
+submission (by unchecking the related option in the `Runtime options`), the item would finally be 
+submitted to the cluster. In this case, 3 flags will be appended:
+
+.. figure:: /figures/pcart_ci_8.png
+
+The `QualityFITS` job has been successfully submitted and has ID 12763.
+
+
+The Saved items menu
+--------------------
+
+*TBW*
 
 
 Live Monitoring of Processings
