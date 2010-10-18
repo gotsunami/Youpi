@@ -458,7 +458,6 @@ var {{ plugin.id }} = {
 			td = new Element('td').insert('Dual Mode');
 			tr.insert(td);
 			tab2.insert(tr);
-			console.log(resp);
 			//Dual IMage
 			tr = new Element('tr');
 			td = new Element('td').insert('Dual Image (measurements) :');

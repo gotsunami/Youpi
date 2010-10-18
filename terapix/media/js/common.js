@@ -1709,7 +1709,6 @@ var BatchUploadWidget = Class.create({
 		cancelb._this = this;
 		cancelb.observe('click', function() {
 			boxes.confirm('Are you sure you want to cancel the import?', function() {
-				console.log(this);
 				this._cancelImport = true;
 			}.bind(this._this));
 		});
