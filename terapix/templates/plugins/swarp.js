@@ -1322,30 +1322,34 @@ var {{ plugin.id }} = {
 						alert('Please make a selection first!');
 						return;
 					}
-					if (!this.autoProgressBar) {
-						this.autoProgressBar = new ProgressBar('automatic_pb_div', 0, {
-							animate: false,
-							color: '#ffe9c4',
-							borderColor: '#ed9600',
-							width: 400,
-							height: 20,
-							captionClassName: 'swarp_caption'
-						});
-					}
-					if ($('process_sels_submit').hasClassName('PAUSE')) {
-						this.pauseAutoProcess = true;
-						$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION).removeClassName('PAUSE');
-						document.fire('notifier:notify', 'Paused, click again to resume');
-					}
-					else {
-						$('automatic_pb_div').show();
-						$('process_sels_submit').update(this.PAUSE_BUTTON_CAPTION).addClassName('PAUSE');
-						$(uidswarp + '_automatic_warning').update(this.autoWarningCount + ' warning' + (this.autoWarningCount>1?'s':''));
-						if (this.curSelectionIdx == 0)
-							$(uidswarp + '_automatic_log').update();
-						this.pauseAutoProcess = false;
-						this.autoProcessSelections();
-					}
+					boxes.confirm('Those image selections will be processed with the data paths to weight/head ' +
+						'files and output directory parameters you specifed (or with default values).<br/><br/>Proceed?'
+						, function() {
+						if (!this.autoProgressBar) {
+							this.autoProgressBar = new ProgressBar('automatic_pb_div', 0, {
+								animate: false,
+								color: '#ffe9c4',
+								borderColor: '#ed9600',
+								width: 400,
+								height: 20,
+								captionClassName: 'swarp_caption'
+							});
+						}
+						if ($('process_sels_submit').hasClassName('PAUSE')) {
+							this.pauseAutoProcess = true;
+							$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION).removeClassName('PAUSE');
+							document.fire('notifier:notify', 'Paused, click again to resume');
+						}
+						else {
+							$('automatic_pb_div').show();
+							$('process_sels_submit').update(this.PAUSE_BUTTON_CAPTION).addClassName('PAUSE');
+							$(uidswarp + '_automatic_warning').update(this.autoWarningCount + ' warning' + (this.autoWarningCount>1?'s':''));
+							if (this.curSelectionIdx == 0)
+								$(uidswarp + '_automatic_log').update();
+							this.pauseAutoProcess = false;
+							this.autoProcessSelections();
+						}
+					}.bind(this));
 				}.bind(this));
 				this.getSavedSelections(auto, function(data) {
 					$('submit_automatic_sels').show();
