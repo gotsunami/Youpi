@@ -36,6 +36,7 @@ CMD_CONVERT			= '/path/to/convert'			# FIXME
 #
 CMD_STIFF			= '/path/to/stiff'				# FIXME
 CMD_IMCOPY			= '/path/to/imcopy'				# FIXME
+CMD_GUNZIP			= '/path/to/gunzip'				# FIXME
 
 PROCESSING_OUTPUT 	= '/output/path/for/results/'	# FIXME
 FTP_URL 			= 'ftp://hostname/'				# FIXME
