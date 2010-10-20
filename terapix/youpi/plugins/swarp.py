@@ -233,7 +233,6 @@ class Swarp(ProcessingPlugin):
 		# List of all input files to be transferred (for -l option of condor_transfer.pl)
 		transferFile = "swarp-transfer-%s.rc" % time.time()
 		tf = open(os.path.join('/tmp/', transferFile), 'w')
-		tf.write(weight_files.replace(', ', '\n'))			# Weights	
 		tf.write('\n' + head_files.replace(', ', '\n'))		# Heads
 		tf.write('\n' + string.join([os.path.join(img.path, img.filename + '.fits') for img in images], '\n')) # Images
 		tf.close()
@@ -274,42 +273,18 @@ class Swarp(ProcessingPlugin):
 			pass
 
 		# Now generates the preprocessing Python script needed to be able 
-		# to uncompress all .fz weight maps
+		# to uncompress all fz/gzip weight maps
 		pf = open(preProcFile, 'w')
-		pcontent = """#!/usr/bin/env python
-
-# AUTOMATICALLY GENERATED SCRIPT. DO NOT EDIT
-
-import os, glob, sys, time
-
-def debug(msg):
-	print "[YWP@%s] %s" % ("%02d:%02d:%02d" % time.localtime(time.time())[3:6], msg)
-	sys.stdout.flush()
-
-# PRE-PROCESSING stuff go there
-fzs = glob.glob('*.fits.fz')
-for fz in fzs:
-	msg = "Swarp Preprocessing: uncompressing %s - " % fz
-	exit_code = os.system(" """[:-1] + settings.CMD_IMCOPY + """ %s %s" % (fz, fz[:-3]))
-	if exit_code == 0:
-		debug(msg + "OK")
-	else:
-		debug(msg + "ERROR code %s" % exit_code)
-
-# Finally run swarp
-"""
-		pcontent += """
-command = "%(swarp)s %(params)s @%(imgsfile)s -c %(config)s 2>&1"
-debug("Executing: " + command)
-exit_code = os.system(command)
-sys.exit(exit_code)
-""" % {
-	'swarp'			: settings.CMD_SWARP,
-	'params'		: swarp_params,
-	'imgsfile'		: os.path.basename(swarpImgsFile),
-	'config'		: os.path.basename(customrc),
-}
-		pf.write(pcontent)
+		tmplf = open('youpi/plugins/swarp-preprocessing.tmpl')
+		tmpl = string.Template(''.join(tmplf.readlines()))
+		tmplf.close()
+		pf.write(tmpl.substitute({
+			'swarp'			: settings.CMD_SWARP,
+			'params'		: swarp_params,
+			'imgsfile'		: os.path.basename(swarpImgsFile),
+			'config'		: os.path.basename(customrc),
+			'weight_files'	: weight_files.split(', '),
+		}))
 		pf.close()
 		RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO 
 		os.chmod(preProcFile, RWX_ALL)
@@ -453,7 +428,7 @@ sys.exit(exit_code)
 			# multiple instance of the same image in database, but we use the real image filename
 			# to get real weight filename on disks
 			weight_files.append([int(img.id), str(os.path.join(task.results_output_dir, img.name, 'qualityFITS', img.filename + 
-				'_weight.fits.fz'))])
+				'_weight.fits'))])
 
 		return weight_files
 

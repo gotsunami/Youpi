@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+# AUTOMATICALLY GENERATED SCRIPT USED BY THE SWARP PLUGIN FROM THE YOUPI DISTRIBUTION
+# DO NOT EDIT!
+
+import os, glob, sys, time, re
+import settings
+
+def debug(msg):
+	print "[YWP@%s] %s" % ("%02d:%02d:%02d" % time.localtime(time.time())[3:6], msg)
+	sys.stdout.flush()
+
+def handle_weights(weight_files):
+	"""
+	Handles weight maps. Will find compressed (.fz or .gzip) or uncompressed weight maps, 
+	transfer them locally on the cluster node and uncompress them when needed with the 
+	right tool (imcopy or gunzip).
+	"""
+	# Looks for weigth files, transfer them locally then optionally uncompress them
+	to_transfer = []
+	for w in weight_files:
+		wfs = glob.glob(w + '*')
+		# Analyze all candidates
+		uncompressed = False
+		for wf in wfs:
+			# If uncompressed file available, do nothing
+			if re.search(r'\.fits$$', wf):
+				debug("Already uncompressed: " + wf)
+				to_transfer.append({'file': wf, 'cmd': None})
+				uncompressed = True
+				break
+		if uncompressed:
+			continue
+		for wf in wfs:
+			if re.search(r'\.fz$$', wf):
+				# fz compression
+				algo = "FZ"
+				cmd = "%s %s %s" % (settings.CMD_IMCOPY, os.path.basename(wf), os.path.basename(wf)[:-3])
+				to_transfer.append({'file': wf, 'cmd': cmd, 'algo': algo})
+			elif re.search(r'\.gz$$', wf):
+				# gzip compression
+				algo = "GZIP"
+				cmd = "%s %s" % (settings.CMD_GUNZIP, os.path.basename(wf))
+				to_transfer.append({'file': wf, 'cmd': cmd, 'algo': algo})
+
+	# File transfer
+	of = open('weights.list', 'w')
+	of.write(chr(10).join([f['file'] for f in to_transfer]))
+	of.close()
+	debug("Transferring weight maps")
+	# We need to keep input data in place and ask condor_transfer not to delete the files (-k option)
+	# Unset TPX_CONDOR_UPLOAD_URL so that no data will be transferred back in this case
+	exit_code = os.system("TPX_CONDOR_UPLOAD_URL= %s -k -l weights.list -- ls *_weight*" % settings.CMD_CONDOR_TRANSFER)
+	msg = 'Weight transfer status: '
+	if exit_code == 0:
+		debug(msg + "OK")
+	else:
+		debug(msg + "ERROR code %s" % exit_code)
+		return exit_code
+
+	# Uncompress files
+	for f in to_transfer:
+		if f['cmd'] is not None:
+			exit_code = os.system(f['cmd'])
+			msg = "%s compression found: uncompressing %s - " % (f['algo'], os.path.basename(f['file']))
+			if exit_code == 0:
+				debug(msg + "OK")
+			else:
+				debug(msg + "ERROR code %s" % exit_code)
+				break
+
+# Variable substitution
+handle_weights(${weight_files})
+command = "${swarp} ${params} @${imgsfile} -c ${config} 2>&1"
+debug("Executing: " + command)
+exit_code = os.system(command)
+debug("Swarp over - exit code: %d" % exit_code)
+sys.exit(exit_code)
