@@ -548,8 +548,8 @@ you save items into the database for permanent storage then reload them back lat
 session at any time in order to submit them to the cluster. Let's see how they work.
 
 
-The Cart items menu
-----------------------
+The "Cart items" menu
+---------------------
 
 This menu holds the items you recently added from the top-level processing menu. The following figure
 shows a processing cart with six items of three different kinds: 3 `Swarp` items, 2 `Scamps` and 1 
@@ -650,11 +650,22 @@ submitted to the cluster. In this case, 3 flags will be appended:
 The `QualityFITS` job has been successfully submitted and has ID 12763.
 
 
-The Saved items menu
---------------------
+The "Saved items" menu
+----------------------
 
-*TBW*
+Whenever you decide to save a bunch of items for later use, hit the "Save for later" action button. 
+Items are permanently stored in the database and available from the "Saved items" menu.
 
+Saving items for later can be useful if you want to:
+
+* retreive an item from any other machine with a browser that can access Youpi. Since 
+  saved items are no more user-session dependant, they are globally available to all Youpi registered 
+  users that are allowed to view the item (more on this in the following)
+* share saved items with other teammates: different people can access other's saved items and 
+  submit them to the cluster, if they are allowed to.
+
+Every item is saved according to your default permissions policy. You can decide to share items 
+with a group of users exclusively or make it available for anyone.
 
 Live Monitoring of Processings
 ==============================
