@@ -419,6 +419,11 @@ function plugin_enableOutputDirectory(opts) {
 			p.select('tt')[0].update(pathSel.options[pathSel.selectedIndex].value + opts.suffix + input.value + '/');
 		});
 	});
+	input.observe('keydown', function(e) {
+		// Characters not allowed: ' ', '/', '\'
+		if (e.keyCode == 32 || e.keyCode == 191 || e.keyCode == 220)
+			e.stop();
+	});
 
 	p.update('All data produced will be stored into ').insert(
 		new Element('tt', {id: 'output_target_path'}).setStyle({color: 'green'}).update(opts.default_path + opts.suffix + opts.random + '/')
