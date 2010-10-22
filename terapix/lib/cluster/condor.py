@@ -244,12 +244,12 @@ class YoupiCondorCSF(CondorCSF):
 
 	def setTransferInputFiles(self, files):
 		"""
-		Adds Youpi required files such as local_conf.py, settings.py, DBGeneric.py and NOP
+		Adds Youpi required files such as local_conf.py, settings.py, lib/common.py, DBGeneric.py and NOP
 		"""
 		if type(files) != types.ListType:
 			raise TypeError, "Must be a list of path to files to transfer"
 		submit_file_path = os.path.join(settings.TRUNK, 'terapix')
-		for file in ('local_conf.py', 'settings.py', 'private_conf.py', os.path.join('script', 'DBGeneric.py'), 'NOP'): 
+		for file in ('local_conf.py', 'settings.py', 'private_conf.py', os.path.join('lib', 'common.py'), os.path.join('script', 'DBGeneric.py'), 'NOP'): 
 			files.append(os.path.join(submit_file_path, file))
 
 		super(YoupiCondorCSF, self).setTransferInputFiles(files)

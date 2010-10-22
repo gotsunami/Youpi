@@ -224,7 +224,7 @@ def processing(request):
 
 	return render_to_response('processing.html', { 	
 						'plugins' 			: manager.plugins,
-						'processing_output' : settings.PROCESSING_OUTPUT,
+						'processing_output' : list(settings.PROCESSING_OUTPUT),
 						'selected_entry_id'	: menu_id,
 						'title' 			: get_title_from_menu_id(menu_id),
 					}, 
@@ -325,7 +325,7 @@ def render_plugin(request, pluginId):
 	return render_to_response('processing_plugin.html', { 	
 						'plugin' 			: plugin,
 						'selected_entry_id'	: menu_id, 
-						'processing_output' : settings.PROCESSING_OUTPUT,
+						'processing_output' : list(settings.PROCESSING_OUTPUT),
 						'title' 			: plugin.id.capitalize(),
 						'random_seed'		: hashlib.md5(str(time.time()/random.randint(0, 100000))).hexdigest()[:8],
 					}, 

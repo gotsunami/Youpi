@@ -45,9 +45,7 @@ var {{ plugin.id }} = {
 		var msg = 'One Stiff-related job has been added to the cart. This is a DEMO plugin: it does nothing useful.';
 	
 		// Gets custom output directory
-		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
-		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidstiff + '/';
-		if (custom_dir) output_data_path += custom_dir + '/';
+		var output_data_path = $('output_target_path').innerHTML;
 	
 		// Get config file
 		var cSel = $(uidstiff + '_config_name_select');

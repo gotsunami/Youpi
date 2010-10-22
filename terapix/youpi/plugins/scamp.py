@@ -22,6 +22,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.youpi.models import *
 from terapix.exceptions import *
 from terapix.youpi.auth import read_proxy
+from lib.common import get_static_url
 import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
@@ -278,7 +279,7 @@ class Scamp(ProcessingPlugin):
 			if xslPath:
 				# This is a local (or NFS) path, Youpi will serve it
 				scamp_params = "-XSL_URL %s" % os.path.join(
-					settings.WWW_SCAMP_PREFIX, 
+					get_static_url(userData['ResultsOutputDir']), 
 					request.user.username, 
 					userData['Kind'], 
 					userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],

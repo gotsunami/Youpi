@@ -119,7 +119,7 @@ var {{ plugin.id }} = {
 		// Used when using automatic searching of weight or head files
 		var AUTO = 'AUTO';
 		// Custom output directory
-		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidswarp + '/';
+		var output_data_path = $('output_target_path').innerHTML;
 	
 		// Set mandatory structures
 		var p_data = {	plugin_name : uidswarp, 
@@ -162,11 +162,7 @@ var {{ plugin.id }} = {
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		// Gets custom output directory
-		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
-		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidswarp + '/';
-
-		if (custom_dir)
-			output_data_path += custom_dir + '/';
+		var output_data_path = $('output_target_path').innerHTML;
 
 		// Checks that all weight maps are available if EXTRA option has been selected
 		var c = $('menuitem_sub_4').update();
@@ -1173,7 +1169,7 @@ var {{ plugin.id }} = {
 	 */ 
 	autoProcessSelections: function() {
 		// Custom output directory
-		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidswarp + '/';
+		var output_data_path = $('output_target_path').innerHTML;
 	
 		// Set mandatory structures
 		var p_data = {	plugin_name : uidswarp, 
@@ -1190,11 +1186,7 @@ var {{ plugin.id }} = {
 			return;
 		}
 		// Gets custom output directory
-		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
-		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidswarp + '/';
-
-		if (custom_dir)
-			output_data_path += custom_dir + '/';
+		var output_data_path = $('output_target_path').innerHTML;
 
 		var r = new HttpRequest(
 			null,

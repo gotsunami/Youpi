@@ -76,3 +76,19 @@ class Template(object):
 		for k, v in kwords.iteritems():
 			content = content.replace("%s%s%s" % (self.__bpat, k, self.__apat), v)
 		return content
+
+def get_static_url(output_dir):
+	import types
+	try:
+		from django.conf import settings
+		PROCESSING_OUTPUT = settings.PROCESSING_OUTPUT
+		YOUPI_STATIC_URLS = settings.YOUPI_STATIC_URLS
+	except:
+		# For the WP script
+		from settings import PROCESSING_OUTPUT, YOUPI_STATIC_URLS
+	if type(output_dir) != types.StringType:
+		raise TypeError, "output_dir must be a directory path (string)"
+	for i in range(len(PROCESSING_OUTPUT)):
+		if output_dir.find(PROCESSING_OUTPUT[i]) == 0:
+			return YOUPI_STATIC_URLS[i]
+	raise ValueError, "No match, could not resolve static url for path %s" % output_dir

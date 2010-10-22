@@ -24,6 +24,11 @@
 		cf = new ConfigFileWidget('config_file_div', '{{ plugin.id }}', {type: 'config'});
 
 		// Enable user output custom directory
-		plugin_enableOutputDirectory('menuitem_sub_2', '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/', '{{ random_seed }}');
+		plugin_enableOutputDirectory({
+			container: 'menuitem_sub_2', 
+			outputdirs: {{ processing_output|safe }},
+			suffix: '{{ user.username }}/{{ plugin.id }}/', 
+			random: '{{ random_seed }}'
+		});
 	});
 </script>

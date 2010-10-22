@@ -27,6 +27,7 @@ import socket, shutil, re, glob
 sys.path.insert(0, '..')
 from settings import *
 from DBGeneric import *
+from common import get_static_url
 
 NULLSTRING = ''
 userData = {}
@@ -35,6 +36,9 @@ username = NULLSTRING
 # Hold per-user output directory
 CLUSTER_OUTPUT_PATH = NULLSTRING
 RWX_ALL = S_IRWXU | S_IRWXG | S_IRWXO 
+
+# Prefix for static results
+YOUPI_STATIC_URL = None
 
 # Custom exceptions
 class WrapperError(Exception): pass
@@ -518,7 +522,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 				g.insert(	task_id = int(task_id),
 							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
 							ldac_files = base64.encodestring(marshal.dumps(userData['LDACFiles'])).replace('\n', ''),
-							www = os.path.join(	WWW_SCAMP_PREFIX, 
+							www = os.path.join(	YOUPI_STATIC_URL, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
@@ -535,7 +539,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
 							useAutoQFITSWeights = userData['UseAutoQFITSWeights'],
 							useAutoScampHeads = userData['UseAutoScampHeads'],
-							www = os.path.join(	WWW_SWARP_PREFIX, 
+							www = os.path.join(	YOUPI_STATIC_URL, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
@@ -552,7 +556,7 @@ def task_end_log(userData, g, task_error_log, task_id, success, kind):
 				g.insert(	task_id = int(task_id),
 							config = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
 							param  = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ParamFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
-							www = os.path.join(	WWW_SEX_PREFIX, 
+							www = os.path.join(	YOUPI_STATIC_URL, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
@@ -804,7 +808,7 @@ def process(userData, kind_id, argv):
 							# To retreive data: zlib.decompress(base64.decodestring(encoded_data))
 							#
 							qfconfig = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ConfigFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
-							www = os.path.join(	WWW_FITSIN_PREFIX, 
+							www = os.path.join(	YOUPI_STATIC_URL, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
@@ -848,7 +852,7 @@ def process(userData, kind_id, argv):
 							#
 							config = base64.encodestring(zlib.compress(string.join(configContent, ''), 9)).replace('\n', ''),
 							ldac_files = base64.encodestring(marshal.dumps(userData['LDACFiles'])).replace('\n', ''),
-							www = os.path.join(	WWW_SCAMP_PREFIX, 
+							www = os.path.join(	YOUPI_STATIC_URL, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
@@ -906,7 +910,7 @@ def process(userData, kind_id, argv):
 							#
 							config = base64.encodestring(zlib.compress(string.join(configContent, ''), 9)).replace('\n', ''),
 							param  = base64.encodestring(zlib.compress(string.join(open(os.path.basename(userData['ParamFile']), 'r').readlines(), ''), 9)).replace('\n', ''),
-							www = os.path.join(	WWW_SEX_PREFIX, 
+							www = os.path.join(	YOUPI_STATIC_URL, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
@@ -1013,7 +1017,7 @@ def process(userData, kind_id, argv):
 							# Swarp config file serialization: base64 encoding over zlib compression
 							#
 							config = base64.encodestring(zlib.compress(string.join(configContent, ''), 9)).replace('\n', ''),
-							www = os.path.join(	WWW_SWARP_PREFIX, 
+							www = os.path.join(	YOUPI_STATIC_URL, 
 												username, 
 												userData['Kind'], 
 												userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:] ),
@@ -1089,7 +1093,7 @@ def process(userData, kind_id, argv):
 	sys.exit(exit_code)
 
 def init_job(userData):
-	global username
+	global username, YOUPI_STATIC_URL
 	debug("Checking/setting environment before running job")
 
 	db = DB(host = DATABASE_HOST,
@@ -1118,9 +1122,12 @@ def init_job(userData):
 	os.environ['HOSTNAME'] = socket.getfqdn()
 
 	# Build per-user output path
-	user_path = os.path.join(PROCESSING_OUTPUT, username)
-	CLUSTER_OUTPUT_PATH = os.path.join(user_path, userData['Kind'])
 	custom_dir = userData['ResultsOutputDir']
+	user_path = os.path.join(custom_dir[:custom_dir.find(os.path.join(username, userData['Kind']))], username)
+	CLUSTER_OUTPUT_PATH = os.path.join(user_path, userData['Kind'])
+
+	YOUPI_STATIC_URL = get_static_url(custom_dir)
+	debug("Youpi static URL set to " + YOUPI_STATIC_URL)
 
 	try:
 		if not os.path.isdir(CLUSTER_OUTPUT_PATH):

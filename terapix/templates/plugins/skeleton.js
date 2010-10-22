@@ -51,7 +51,7 @@ var {{ plugin.id }} = {
 		var msg = 'One Skeleton-related job has been added to the cart. This is a DEMO plugin: it does nothing useful.';
 	
 		// Custom output directory
-		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidskel + '/';
+		var output_data_path = '{{ processing_output.0|safe }}{{ user.username }}/' + uidskel + '/';
 	
 		// Set mandatory structures
 		var p_data = {	

@@ -38,20 +38,19 @@ CMD_STIFF			= '/path/to/stiff'				# FIXME
 CMD_IMCOPY			= '/path/to/imcopy'				# FIXME
 CMD_GUNZIP			= '/path/to/gunzip'				# FIXME
 
-PROCESSING_OUTPUT 	= '/output/path/for/results/'	# FIXME
+# Must be a tuple of full path directories
+PROCESSING_OUTPUT 	= ('/output/path/for/results/',)	# FIXME
+# Must be a tuble of URLs that will serve the static content from the directories 
+# listed in the PROCESSING_OUTPUT tuple. Both variables must have the same 
+# length.
+YOUPI_STATIC_URLS	= ('http://web_hostname/path1/',) # FIXME
+#
 FTP_URL 			= 'ftp://hostname/'				# FIXME
 # Path to the condor_transfer.pl Perl script
 CMD_CONDOR_TRANSFER	= '/path/to/condor_transfer'	# FIXME
 # Custom options to CMD_CONDOR_TRANSFER passed on the command line
 CONDOR_TRANSFER_OPTIONS	= ''
 CMD_FITSVERIFY		= '/path/to/fitsverify'			# FIXME
-
-# Used to build URI to QFITS html data path (image name + 'qualityFITS' directory
-# will be appended). 
-WWW_FITSIN_PREFIX 	= 'http://web_hostname/'		# FIXME
-WWW_SCAMP_PREFIX 	= WWW_FITSIN_PREFIX
-WWW_SWARP_PREFIX 	= WWW_FITSIN_PREFIX
-WWW_SEX_PREFIX 		= WWW_FITSIN_PREFIX
 
 # Administrators: put your name and email to receive notifications
 # when a problem occurs

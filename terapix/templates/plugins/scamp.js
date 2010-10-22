@@ -135,26 +135,12 @@ var {{ plugin.id }} = {
 		{{ plugin.id }}.aheadPath = mandpaths[0];
 	
 		// CHECK 4: custom output directory
-		var output_data_path = {{ plugin.id }}.getOutputDataPath();
+		var output_data_path = $('output_target_path').innerHTML;
 		log.msg_status("Using output data path '" + output_data_path + "'");
 	
 		// CHECK 5: checks for LDAC/AHEAD data
 		log.msg_status("Deeper selection(s) checks for LDAC/AHEAD data...");
 		{{ plugin.id }}.checkForSelectionLdacAheadData(pre);
-	},
-
-	getOutputDataPath: function() {
-		var custom_dir = $('output_path_input').value;
-		var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
-	
-		if (custom_dir && custom_dir.replace(/\ /g, '').length) {
-			custom_dir = custom_dir.replace(/\ /g, '');
-			if (custom_dir.length) {
-				output_data_path += custom_dir + '/';
-			}
-		}
-	
-		return output_data_path;
 	},
 
 	/*

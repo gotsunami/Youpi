@@ -391,21 +391,38 @@ function results_showDetails(pname, id, fullpage) {
  * to add output directory support to your plugin.
  *
  */
-function plugin_enableOutputDirectory(div_id, data_path, random_seed) {
-	var div = $(div_id);
-	var p = new Element('p').setStyle({marginTop: '30px', fontSize: '12px'});
-	p.update('By default, all data produced will be stored into ').insert(
-		new Element('tt').setStyle({color: 'green'}).update(data_path + random_seed + '/')
-	).insert('.');
-	div.insert(p);
+function plugin_enableOutputDirectory(opts) {
+	if (typeof opts != 'object')
+		throw "Options must be an object";
+	opts.default_path = opts.default_path || opts.outputdirs[0];
 
+	var div = $(opts.container);
 	p = new Element('p').setStyle({marginTop: '30px', fontSize: '12px', fontWeight: 'bold'});
 	p.update('For convenience, you can change the directory suffix that will be used to save output data ');
 	p.insert(new Element('u').update('for this cart item only')).insert(':').insert(new Element('br'));
 	var d = new Element('div').setStyle({width: '60%', backgroundColor: 'lightgray', padding: '10px', marginTop: '10px'});
-	var input = new Element('input', {id: 'output_path_input', type: 'text', size: '20', value: random_seed});
-	d.update(new Element('tt').update(data_path).insert(input).insert('/'));
+	var input = new Element('input', {id: 'output_path_input', type: 'text', size: '20', value: opts.random});
+	var pathSel = new Element('select');
+	opts.outputdirs.each(function(dir) {
+		var opt = new Element('option', {value: dir}).update(dir);
+		if (opts.default_path == dir)
+			opt.writeAttribute('selected', 'selected');
+		pathSel.insert(opt);
+	});
+	d.update(pathSel).insert(opts.suffix).insert(input).insert('/');
 	p.insert(d);
+	div.insert(p);
+
+	var p = new Element('p').setStyle({marginTop: '30px', fontSize: '12px'});
+	[[pathSel, 'change'], [input, 'keyup']].each(function(e) {
+		e[0].observe(e[1], function() {
+			p.select('tt')[0].update(pathSel.options[pathSel.selectedIndex].value + opts.suffix + input.value + '/');
+		});
+	});
+
+	p.update('All data produced will be stored into ').insert(
+		new Element('tt', {id: 'output_target_path'}).setStyle({color: 'green'}).update(opts.default_path + opts.suffix + opts.random + '/')
+	).insert('.');
 	div.insert(p);
 }
 

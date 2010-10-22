@@ -79,11 +79,7 @@ var {{ plugin.id }} = {
 		var param = pSel.options[pSel.selectedIndex].text;
 
 		//Gets custom output directory
-		var custom_dir = $('output_path_input').value.strip().gsub(/\ /, '');
-		var output_data_path = '{{ processing_output }}{{ user.username }}/' + uidsex + '/';
-
-		if (custom_dir) 
-			output_data_path += custom_dir + '/';
+		var output_data_path = $('output_target_path').innerHTML;
 
 		{{ plugin.id }}.do_addSelectionToCart({
 			param			: param,
@@ -454,7 +450,6 @@ var {{ plugin.id }} = {
 		tr.insert(td);
 		
 		if (resp.DualMode == '1') {
-
 			td = new Element('td').insert('Dual Mode');
 			tr.insert(td);
 			tab2.insert(tr);

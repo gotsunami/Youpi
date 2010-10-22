@@ -122,6 +122,10 @@ class ProcessingPlugin(object):
 		Builds a default output path for the user if oldPath is None.
 		If oldPath (a path to a previously processed item) is a string, then attempts to 
 		replace the old login name with the name of the current request owner.
+
+		When called only with request as first parameter, returns the concatenation of 
+		the first entry in the PROCESSING_OUTPUT list with the username and current plugin id.
+
 		@param oldPath Old output path used for processing an item
 		@param oldUserName Old owner of the processing
 		@return The full output directory path
@@ -136,7 +140,7 @@ class ProcessingPlugin(object):
 			raise TypeError, "oldUserName must be supplied along with oldPath"
 
 		if oldPath: return oldPath.replace(oldUserName, request.user.username)
-		return os.path.join(settings.PROCESSING_OUTPUT, request.user.username, self.id)
+		return os.path.join(settings.PROCESSING_OUTPUT[0], request.user.username, self.id)
 
 	def getConfigFileContent(self, request):
 		post = request.POST

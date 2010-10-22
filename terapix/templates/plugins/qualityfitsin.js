@@ -1090,15 +1090,7 @@ var {{ plugin.id }} = {
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		// CHECK 4: custom output directory
-		var custom_dir = $('output_path_input').value;
-		var output_data_path = '{{ processing_output }}{{ user.username }}/{{ plugin.id }}/';
-
-		if (custom_dir && custom_dir.replace(/\ /g, '').length) {
-			custom_dir = custom_dir.replace(/\ /g, '');
-			if (custom_dir.length) {
-				output_data_path += custom_dir + '/';
-			}
-		}
+		var output_data_path = $('output_target_path').innerHTML;
 
 		// Finally, add to the processing cart
 		var total = {{ plugin.id }}_ims.getImagesCount();

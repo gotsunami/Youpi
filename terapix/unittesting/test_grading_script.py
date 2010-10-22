@@ -22,7 +22,7 @@ from terapix.script import grading
 class TestGradingScript(unittest.TestCase):
 	def setUp(self):
 		# FIXME: do not hardcode 'fitsin' (plugin id)
-		self.res_output_dir = os.path.join(settings.PROCESSING_OUTPUT, 'fitsin')
+		self.res_output_dir = os.path.join(settings.PROCESSING_OUTPUT[0], 'fitsin')
 
 	def test_get_stats(self):
 		g = grading.get_stats()
