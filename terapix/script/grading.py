@@ -53,12 +53,34 @@ def get_stats():
 	return stats
 
 def get_grades_with_tag(tag):
+	"""
+	If tag is a list of coma-separated name, logical AND will be applied on tag names to get the image list.
+	"""
 	from django.db import connection
+	import re
 	cur = connection.cursor()
-	q = """SELECT image_id FROM youpi_rel_tagi AS tagi, youpi_tag AS t WHERE tagi.tag_id=t.id AND t.name='%s'""" % tag
-	cur.execute(q)
-	res = cur.fetchall()
-	imgList = [r[0] for r in res]
+
+	tags = re.split(',', tag)
+	if len(tags) == 1:
+		q = """SELECT image_id FROM youpi_rel_tagi AS tagi, youpi_tag AS t WHERE tagi.tag_id=t.id AND t.name='%s'""" % tags[0]
+		cur.execute(q)
+		res = cur.fetchall()
+		imgList = [r[0] for r in res]
+	else:
+		previds = []
+		for tag in tags:
+			q = """SELECT image_id FROM youpi_rel_tagi AS tagi, youpi_tag AS t WHERE tagi.tag_id=t.id AND t.name='%s'""" % tag
+			if previds:
+				q += " AND image_id IN (%s)" % ','.join(previds)
+			cur.execute(q)
+			res = cur.fetchall()
+			tmp = [str(r[0]) for r in res]
+			previds = tmp
+		imgList = [int(r) for r in tmp]
+	
+	if len(imgList) == 0:
+		print "No match."
+		return []
 	return get_grades(idList = imgList)
 
 def get_grades(res_output_dir = None, idList = None):
@@ -79,7 +101,7 @@ def get_grades(res_output_dir = None, idList = None):
 	from django.db import connection
 	cur = connection.cursor()
 	q = """
-		SELECT f.id, f.prevrelgrade, f.prevrelcomment, i.name, i.id 
+		SELECT f.id, f.prevrelgrade, f.prevrelcomment, i.name, i.id, i.checksum 
 		FROM youpi_plugin_fitsin AS f, youpi_processing_task AS t, youpi_rel_it AS r, youpi_image AS i
 		WHERE f.task_id=t.id 
 		AND r.task_id=f.task_id
@@ -105,32 +127,34 @@ def get_grades(res_output_dir = None, idList = None):
 				tmp[imgName] = []
 			# Keep custom comment in priority, if any
 			if grades[0].custom_comment:
-				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].custom_comment, grades[0].fitsin.id, r[4]))
+				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].custom_comment, grades[0].fitsin.id, r[4], r[5], grades[0].user))
 			else:
 				# Keep predefined comment
-				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].comment.comment, grades[0].fitsin.id, r[4]))
+				tmp[imgName].append((grades[0].grade, grades[0].date, grades[0].comment.comment, grades[0].fitsin.id, r[4], r[5], grades[0].user))
 
 		# Now looks for a previous release grade
 		if r[1]:
 			if not tmp.has_key(imgName):
 				tmp[imgName] = []
 			# Add a fake datetime object to make sure this grade is the older one
-			tmp[imgName].append([r[1], datetime.datetime(datetime.MINYEAR, 1, 1), r[2], r[0], r[4]])
+			tmp[imgName].append([r[1], datetime.datetime(datetime.MINYEAR, 1, 1), r[2], r[0], r[4], r[5]])
 
 	# Now, only keep the latest grade for each image
+	header = ('Image name', 'Grade', 'Datetime', 'Comment', 'Image ID', 'Fitsin ID', 'Checksum', 'Graded by',)
 	res = []
 	for imgName, grades in tmp.iteritems():
 		if len(grades) == 1:
-			res.append((imgName, grades[0][0], grades[0][2], grades[0][3], grades[0][4]))
+			res.append((imgName, grades[0][0], grades[0][1], grades[0][2], grades[0][3], grades[0][4], grades[0][5], grades[0][6]))
 			continue
 		latest = grades[0]
 		for k in range(1, len(grades)):
 			if grades[k][1] > latest[1]:
 				latest = grades[k]
-		res.append((imgName, latest[0], latest[2], latest[3], latest[4]))
+		res.append((imgName, latest[0], latest[1], latest[2], latest[3], latest[4], latest[5], grades[0][6]))
 
 	# Sort by image name
 	res.sort(cmp = lambda x,y: cmp(x[0], y[0])) 
+	res.insert(0, header)
 	return res
 
 def delete_grades(simulate, verbose = False):
@@ -492,7 +516,7 @@ def main():
 		parser.error('options -e and -t are mutually exclusive')
 	if options.export and options.filename:
 		parser.error('options -e and -i are mutually exclusive')
-
+	
 	try:
 		start = time.time()
 		if options.stats:
