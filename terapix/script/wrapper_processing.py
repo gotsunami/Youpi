@@ -27,7 +27,6 @@ import socket, shutil, re, glob
 sys.path.insert(0, '..')
 from settings import *
 from DBGeneric import *
-from common import get_static_url
 
 NULLSTRING = ''
 userData = {}
@@ -1093,6 +1092,7 @@ def process(userData, kind_id, argv):
 	sys.exit(exit_code)
 
 def init_job(userData):
+	from common import get_static_url
 	global username, YOUPI_STATIC_URL
 	debug("Checking/setting environment before running job")
 
