@@ -18,6 +18,8 @@ Version 0.6.2
 
 **Improvements**:
 
+- `Swarp` plugin: added support for custom external ``.head`` file input from `Scamp`.
+- Reporting: added support for pagination for big tables.
 - `QualityFITS`'s report "*List of all images with a selected grade*" can display the QFits result 
   page by clicking on the grade next no the image name. This report also comes with a pagination 
   system to speed up SQL queries by returning smaller result sets (using AJAX). 
@@ -41,6 +43,7 @@ Version 0.6.2
 
 **Bug fixes**:
 
+- Wrapper processing: fixed long running jobs issues with MySQL.
 - Reports: fixed file caching issue when downloading report.
 - Fixed a Condor requirement string parsing error for custom policies built upon custom selections 
   of nodes.
