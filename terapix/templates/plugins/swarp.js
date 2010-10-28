@@ -1178,6 +1178,7 @@ var {{ plugin.id }} = {
 		// Activates cart mode feature (automatic/manual)
 		document.observe('PathSelectorWidget:pathsLoaded', function() {
 			cartmode.init(uidswarp, 
+				[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)],
 				{HeadPath: this.getHeadPath(), WeightPath: this.getWeightPath()}, // extra params for autoProcessSelection() plugin call
 				function(res) {
 					if (res.qfitsdata.missingQFITS.length > 0) {

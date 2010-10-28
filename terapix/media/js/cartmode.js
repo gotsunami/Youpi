@@ -172,7 +172,8 @@ var cartmode = {
 				this.refreshCartMode(root);
 			}.bind(this));
 			d.insert(m).insert(caption).insert(a).insert(')');
-			[$(this.plugin_id + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)].invoke('show');
+			if (this.hidden_entries)
+				this.hidden_entries.invoke('show');
 			$(this.plugin_id + '_automatic_div').hide();
 			// Change menu entry caption
 			menu.getEntry(0).select('a')[0].update('Select images');
@@ -187,7 +188,8 @@ var cartmode = {
 			a = new Element('span').addClassName('cart_active_mode').update('Automatic');
 			d.insert(a).insert(caption).insert(m).insert(')');
 			// Hide/show panels
-			[$(this.plugin_id + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)].invoke('hide');
+			if (this.hidden_entries)
+				this.hidden_entries.invoke('hide');
 			var ad = $(this.plugin_id + '_automatic_div').show();
 			// Change menu entry caption
 			menu.getEntry(0).select('a')[0].update('Select selections');
@@ -277,11 +279,12 @@ var cartmode = {
 	 *
 	 * Parameters:
 	 *	plugin_id - string: unique plugin identifier
+	 *	hidden_entries - array: list of DOM nodes to hide/show when changing selector mode
 	 *	auto_params - object: extra parameters passed as is to the <autoProcessSelections> plugin function
 	 *	auto_handler - function: custom handler called on each iteration with the results as single parameter
 	 *
 	 */ 
-	init: function(plugin_id, auto_params, auto_handler) {
+	init: function(plugin_id, hidden_entries, auto_params, auto_handler) {
 		if (typeof plugin_id != 'string')
 			throw "plugin_id must be a string";
 		if (typeof auto_params != 'object')
@@ -289,6 +292,7 @@ var cartmode = {
 		if (typeof auto_handler != 'function')
 			throw "auto_handler must be a function";
 		this.plugin_id = plugin_id;
+		this.hidden_entries = hidden_entries;
 		this.auto_params = auto_params;
 		this.auto_handler = auto_handler;
 
