@@ -197,6 +197,7 @@ PROCPLUGIN_JS.extend([
 	'js/pageswitcher.js',
 	'js/advancedtable.js',
 	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js',
+	'js/cartmode.js',
 ])
 #
 RESULTS_JS = COMMON_JS[:]

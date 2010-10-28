@@ -1869,11 +1869,11 @@ td.grade-comment {
 	color: green;
 }
 
-.swarp_active_mode {
+.cart_active_mode {
 	color: green;
 }
 
-.swarp_mode {
+.cart_mode {
 	border: 1px solid #ED9600;
 	background-color: #FFE9C4;
 	-moz-border-radius: 5px;

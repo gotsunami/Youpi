@@ -1163,210 +1163,6 @@ var {{ plugin.id }} = {
 	},
 
 	/*
-	 * Function: autoProcessSelections
-	 * Auto-process selections of images
-	 *
-	 */ 
-	autoProcessSelections: function() {
-		// Custom output directory
-		var output_data_path = $('output_target_path').innerHTML;
-	
-		// Set mandatory structures
-		var p_data = {	plugin_name : uidswarp, 
-						userData : {resultsOutputDir: output_data_path}
-		};
-
-		// Finds head and weight paths
-		var headPath, weightPath;
-		try {
-			headPath = this.getHeadPath();
-			weightPath = this.getWeightPath();
-		}
-		catch(err) {
-			return;
-		}
-		// Gets custom output directory
-		var output_data_path = $('output_target_path').innerHTML;
-
-		var r = new HttpRequest(
-			null,
-			null,	
-			// Custom handler for results
-			function(resp) {
-				res = resp.result;
-				// Adds entry to processing cart
-				res.resultsOutputDir = output_data_path;
-				if (res.warning.length > 0 || res.qfitsdata.missingQFITS.length > 0) {
-					$(uidswarp + '_automatic_log').insert('<br/><br/>').insert('Selection <b>' + this.autoSelections[0][this.curSelectionIdx] + '</b>:<br/>');
-					if (res.warning.length > 0) {
-						this.autoWarningCount += res.warning.length;
-						res.warning.each(function(w) {
-							$(uidswarp + '_automatic_log').insert(w + '<br/>');
-						});
-					}
-					if (res.qfitsdata.missingQFITS.length > 0) {
-						this.autoWarningCount += res.qfitsdata.missingQFITS.length;
-						res.qfitsdata.missingQFITS.each(function(w) {
-							$(uidswarp + '_automatic_log').insert('<i>MISSING QFits</i> for image ' + w + '<br/>');
-						});
-					}
-					$(uidswarp + '_automatic_warning').update(this.autoWarningCount + ' warning' + (this.autoWarningCount>1?'s':''));
-				}
-				this.autoCurSelectionImageCount = res.imgCount;
-				// Do not send notification
-				this.do_addSelectionToCart(res, false);
-				// Prepares recursive call
-				this.curSelectionIdx++;
-				if (this.curSelectionIdx < this.autoSelections[0].length) {
-					if (!this.pauseAutoProcess)
-						this.autoProcessSelections();
-				}
-				else {
-					// All selections processed
-					this.autoProgressBar.setPourcentage(100);
-					// Reset values
-					this.curSelectionIdx = 0;
-					this.autoWarningCount = 0;
-					$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION).removeClassName('PAUSE');
-					// Send final notification message
-					document.fire('notifier:notify', 'The selection has been added to the processing cart');
-				}
-			}.bind(this)
-		);
-
-		this.autoProgressBar.setPourcentage((this.curSelectionIdx/this.autoSelections[0].length)*100);
-		var post = {
-			Plugin: uidswarp,
-			Method: 'autoProcessSelection',
-			SelName: this.autoSelections[0][this.curSelectionIdx],
-			HeadPath: headPath,
-			WeightPath: weightPath
-		};
-		// Send HTTP POST request
-		r.send('/youpi/process/plugin/', $H(post).toQueryString());
-	},
-
-	/*
-	 * Function: getSavedSelections
-	 * Gets a list of saved selections
-	 *
-	 * Parameters:
-	 *	handler - function: custum handler called with result data as parameter
-	 *
-	 */ 
-	getSavedSelections: function(container, handler) {
-		var r = new HttpRequest(
-				container,
-				null,	
-				// Custom handler for results
-				function(resp) {
-					var data = resp.data;
-					if (typeof handler == 'function')
-						handler(data);
-				}
-		);
-		r.send('/youpi/ims/collection/savedselections/');
-	},
-
-	/*
-	 * Handles Swarp's current working mode changes
-	 *
-	 */
-	refreshSwarpMode: function(root) {
-		if(this.curMode == null)
-			throw "Swarp current running mode not set";
-		var root = $(root);
-		var d = new Element('div').addClassName('swarp_mode').update('Swarp mode: ');
-		var m, a;
-		var caption = ' (change to ';
-		if (this.curMode == this.mode.MANUAL) {
-			m = new Element('span').addClassName('swarp_active_mode').update('Manual');
-			a = new Element('a', {href: '#'}).update('Automatic');
-			a.observe('click', function() {
-				this.curMode = this.mode.AUTOMATIC;
-				this.refreshSwarpMode(root);
-			}.bind(this));
-			d.insert(m).insert(caption).insert(a).insert(')');
-			[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)].invoke('show');
-			$(uidswarp + '_automatic_div').hide();
-			// Change menu entry caption
-			menu.getEntry(0).select('a')[0].update('Select images');
-		}
-		else {
-			// Automatic
-			m = new Element('a', {href: '#'}).update('Manual');
-			m.observe('click', function() {
-				this.curMode = this.mode.MANUAL;
-				this.refreshSwarpMode(root);
-			}.bind(this));
-			a = new Element('span').addClassName('swarp_active_mode').update('Automatic');
-			d.insert(a).insert(caption).insert(m).insert(')');
-			// Hide/show panels
-			[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)].invoke('hide');
-			var ad = $(uidswarp + '_automatic_div').show();
-			// Change menu entry caption
-			menu.getEntry(0).select('a')[0].update('Select selections');
-
-			var auto = $(uidswarp + '_automatic_sels').show();
-			if (auto.empty()) {
-				$('process_sels_submit').observe('click', function() {
-					if (this.autoSelections.length == 0) {
-						alert('Please make a selection first!');
-						return;
-					}
-					boxes.confirm('Those image selections will be processed with the data paths to weight/head ' +
-						'files and output directory parameters you specifed (or with default values).<br/><br/>Proceed?'
-						, function() {
-						if (!this.autoProgressBar) {
-							this.autoProgressBar = new ProgressBar('automatic_pb_div', 0, {
-								animate: false,
-								color: '#ffe9c4',
-								borderColor: '#ed9600',
-								width: 400,
-								height: 20,
-								captionClassName: 'swarp_caption'
-							});
-						}
-						if ($('process_sels_submit').hasClassName('PAUSE')) {
-							this.pauseAutoProcess = true;
-							$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION).removeClassName('PAUSE');
-							document.fire('notifier:notify', 'Paused, click again to resume');
-						}
-						else {
-							$('automatic_pb_div').show();
-							$('process_sels_submit').update(this.PAUSE_BUTTON_CAPTION).addClassName('PAUSE');
-							$(uidswarp + '_automatic_warning').update(this.autoWarningCount + ' warning' + (this.autoWarningCount>1?'s':''));
-							if (this.curSelectionIdx == 0)
-								$(uidswarp + '_automatic_log').update();
-							this.pauseAutoProcess = false;
-							this.autoProcessSelections();
-						}
-					}.bind(this));
-				}.bind(this));
-				this.getSavedSelections(auto, function(data) {
-					$('submit_automatic_sels').show();
-					var s = new Element('select', {id: uidswarp + '_sels_select', size: 25, multiple: 'multiple'}).setStyle({width: '90%'});
-					data.each(function(sel, k) {
-						s.insert(new Element('option', {value: sel}).update(new Element('span').update(k+1).addClassName('option_num')).insert(' ' + sel));
-					});
-					s.observe('change', function() {
-						var sel = new Array();
-						$A(this.options).each(function(opt) {
-							if (opt.selected) sel.push(opt.value);
-						});
-						$('sel_count_div').update('Selected ' + sel.length + ' out of ' + this.options.length);
-						document.fire('SwarpAuto:newSelection', sel); 
-					});
-					auto.update(s);
-					$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION);
-				}.bind(this));
-			}	
-		}
-		root.update(d);
-		menu.activate(0);
-	},
-
-	/*
 	 * More initialization
 	 */
 	init: function() {
@@ -1376,23 +1172,24 @@ var {{ plugin.id }} = {
 		var div = new Element('div', {id: uidswarp + '_results_div', align: 'center'}).setStyle({width: '90%'});
 		root.insert(div);
 		// Container for the ImageSelector widget
-		$(uidswarp + '_automatic_div').hide();
-		$('submit_automatic_sels').hide();
-
 		this.ims = new ImageSelector(uidswarp + '_results_div');
 		this.ims.setTableWidget(new AdvancedTable());
 
-		this.curMode = this.mode.MANUAL;
-		var d = new Element('div', {id: uidswarp + '_mode_div'});
-
-		$$('#content div')[0].insert(d);
-		this.curSelectionIdx = 0;
-		this.autoWarningCount = 0;
-		this.refreshSwarpMode(d);
-		
-		// Connects to custom signal
-		document.observe('SwarpAuto:newSelection', function(event) {
-			this.autoSelections = new Array(event.memo);
+		// Activates cart mode feature (automatic/manual)
+		document.observe('PathSelectorWidget:pathsLoaded', function() {
+			cartmode.init(uidswarp, 
+				{HeadPath: this.getHeadPath(), WeightPath: this.getWeightPath()}, // extra params for autoProcessSelection() plugin call
+				function(res) {
+					if (res.qfitsdata.missingQFITS.length > 0) {
+						res.qfitsdata.missingQFITS.each(function(w) {
+							$(uidswarp + '_automatic_log').insert('<i>MISSING QFits</i> for image ' + w + '<br/>');
+						});
+						cartmode.autoWarningCount += res.qfitsdata.missingQFITS.length;
+					}
+					// Do not send notification
+					this.do_addSelectionToCart(res, false);
+				}.bind(this)
+			);
 		}.bind(this));
 	}
 };
