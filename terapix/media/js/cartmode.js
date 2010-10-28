@@ -161,7 +161,6 @@ var cartmode = {
 		if(this.curMode == null)
 			throw "Cart current running mode not set";
 		var root = $(root);
-		//FIXME swarp_mode
 		var d = new Element('div').addClassName('cart_mode').update('Cart mode: ');
 		var m, a;
 		var caption = ' (change to ';
@@ -210,7 +209,7 @@ var cartmode = {
 								borderColor: '#ed9600',
 								width: 400,
 								height: 20,
-								captionClassName: 'swarp_caption'
+								captionClassName: 'cart_caption'
 							});
 						}
 						if ($('process_sels_submit').hasClassName('PAUSE')) {

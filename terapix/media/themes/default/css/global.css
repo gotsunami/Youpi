@@ -1655,7 +1655,7 @@ div.tags *, .dropzone * {
 	position: relative;
 }
 
-.youpi_progressBar .caption, .youpi_progressBar .swarp_caption {
+.youpi_progressBar .caption, .youpi_progressBar .cart_caption {
 	padding: 0px;
 	width: 100%;
 	text-align: center;
@@ -1666,7 +1666,7 @@ div.tags *, .dropzone * {
 	vertical-align: center;
 }
 
-.youpi_progressBar .swarp_caption {
+.youpi_progressBar .cart_caption {
 	font-size: 15px;
 	color: gray;
 	font-weight: bold;
