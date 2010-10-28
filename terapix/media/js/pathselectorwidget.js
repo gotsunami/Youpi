@@ -216,6 +216,7 @@ function PathSelectorWidget(container, pluginId)
 					}
 				}
 				if (handler) handler();
+				document.fire('PathSelectorWidget:pathsLoaded');
 			}
 		);
 
