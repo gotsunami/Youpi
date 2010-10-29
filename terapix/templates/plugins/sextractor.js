@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
+ * Copyright (c) 2008-2010 Terapix Youpi development team. All Rights Reserved.
  *                    Mathias Monnerville <monnerville@iap.fr>
  *                    Gregory Semah <semah@iap.fr>
  *
@@ -17,15 +17,16 @@
 var uidsex = '{{ plugin.id }}';
 var {{ plugin.id }} = {
 	/*
-	 * Variable: ims
+	 * Variable: ims1
 	 *
 	 * <ImageSelector> instance
 	 *
 	 */
 	ims1: null,
 	ims2: null,
-
-
+	text_single: "<b> Single Image Mode Option:</b><li>Creation of a catalogue of objects from an astronomic image<br><li>support for WeightMaps<br><li>support for FlagMaps<br>",
+	text_dual: "<b>Dual Image Mode Option:</b><li>Image1 is used for detection of sources, image2 for measurements only.<br><li>Image1 and image2 must have the same dimensions.<br><li>For most photometric parameters,image1 will use image2 pixel values, which allows one to easily measurepixel-to-pixel colours.",
+	info_dual: "<b> SExtractor is in DUAL IMAGE MODE </b><BR><br>You can specify for each image of this mode :<BR><br><li> A <b>WEIGHT MAP</b><li> A <b>FLAG MAP</b><br><br> Use the path selector to choose:<br><br><li><b>TOP</b> selection for the first image<br><li><b>BOTTOM</b> selection for the image used for measurements",
 
 	addSelectionToCart: function() {
 		var dualMode = 0;
@@ -832,14 +833,56 @@ var {{ plugin.id }} = {
 		var p_data = {	plugin_name : uidsex,
 						userData :	data
 		};
-
-	
 		s_cart.addProcessing(p_data,
-				// Custom hanlder
-				function() {
-					window.location.reload();
-				}
+			// Custom hanlder
+			function() {
+				window.location.reload();
+			}
 		);
 	},
+
+	/*
+	 * More initialization
+	 */
+	init: function() {
+		var root = $('menuitem_sub_0');
+		var root1 = $(uidsex + '_results_div');
+		var root2 = $(uidsex + '_results_div2');
+		this.ims1 = new ImageSelector(root1);
+		this.ims1.setTableWidget(new AdvancedTable());
+
+		$('selector2_div').hide();
+		$('single','dual').each(function (id) {
+			id.observe('mouseover', function(event) {
+				var el = Event.element(event);
+				$('help_mode').show();
+				var caption = el.readAttribute('id') == 'single' ? this.text_single : this.text_dual;
+				$('help_mode').update(caption);
+			}.bind(this));
+			id.observe('click', function(event) {
+				var el = Event.element(event).up();
+				$('help_mode').show();
+				$('help_mode').update(eval('this.text_' + el.readAttribute(id)));
+				if (el.id == 'dual') {
+					$('selector2_div').show();
+					if (!this.ims2) {
+						this.ims1.getTableWidget().setExclusiveSelectionMode(true);
+						this.ims2 = new ImageSelector(root2);
+						var at = new AdvancedTable();
+						at.setExclusiveSelectionMode(true);
+						this.ims2.setTableWidget(at);
+					}
+					else root2.show();
+				}
+				else if (el.id == 'single') {
+					$('selector2_div').hide();
+					if (this.ims2) {
+						root2.hide();
+						this.ims1.getTableWidget().setExclusiveSelectionMode(false);
+					}
+				}
+			}.bind(this));
+		}.bind(this));
+	}
 };
 	

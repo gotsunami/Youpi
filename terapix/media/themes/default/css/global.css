@@ -1551,6 +1551,8 @@ div.tags *, .dropzone * {
 	-moz-border-radius : 5px;
 	margin-bottom : 0.5em;
 	margin-top : 0.5em;
+	margin-right: 15px;
+	float: left;
 }
 
 .sex_mode td {
