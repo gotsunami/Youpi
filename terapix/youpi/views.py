@@ -814,11 +814,12 @@ def processing_plugin(request):
 		res = eval('plugin.' + method + '(request)')
 	except Exception, e:
 		import traceback
-		print '-' * 60
-		print '-- Processing plugin exception occured! Traceback follows'
-		print '-' * 60
-		traceback.print_exc(file = sys.stdout)
-		print '-' * 60
+		if settings.DEBUG:
+			print '-' * 60
+			print '-- Processing plugin exception occured! Traceback follows'
+			print '-' * 60
+			traceback.print_exc(file = sys.stdout)
+			print '-' * 60
 		raise PluginEvalError, e
 
 	# Response must be a JSON-like object
