@@ -19,6 +19,7 @@
  *
  */
 var cartmode = {
+	initialized: false,
 	/*
 	 * Variable: mode
 	 * 
@@ -172,8 +173,13 @@ var cartmode = {
 				this.refreshCartMode(root);
 			}.bind(this));
 			d.insert(m).insert(caption).insert(a).insert(')');
-			if (this.hidden_entries)
-				this.hidden_entries.invoke('show');
+			try {
+				if (this.hidden_entries)
+					this.hidden_entries.invoke('show');
+			}
+			catch(e) {
+				console.error('Some hidden entries are null! ' + this.hidden_entries);
+			}
 			$(this.plugin_id + '_automatic_div').hide();
 			// Change menu entry caption
 			menu.getEntry(0).select('a')[0].update('Select images');
@@ -204,6 +210,8 @@ var cartmode = {
 					boxes.confirm('Those image selections will be processed with the data paths to weight/head ' +
 						'files and output directory parameters you specifed (or with default values).<br/><br/>Proceed?'
 						, function() {
+						if (this.before_handler)
+							this.before_handler();
 						if (!this.autoProgressBar) {
 							this.autoProgressBar = new ProgressBar('automatic_pb_div', 0, {
 								animate: false,
@@ -281,19 +289,22 @@ var cartmode = {
 	 *	plugin_id - string: unique plugin identifier
 	 *	hidden_entries - array: list of DOM nodes to hide/show when changing selector mode
 	 *	auto_params - object: extra parameters passed as is to the <autoProcessSelections> plugin function
+	 *	before_handler - function: custom handler called just before doing the real stuff, and just after validating the confirm box
 	 *	auto_handler - function: custom handler called on each iteration with the results as single parameter
 	 *
 	 */ 
-	init: function(plugin_id, hidden_entries, auto_params, auto_handler) {
+	init: function(plugin_id, hidden_entries, auto_params, before_handler, auto_handler) {
 		if (typeof plugin_id != 'string')
 			throw "plugin_id must be a string";
 		if (typeof auto_params != 'object')
 			throw "auto_params must be an object";
 		if (typeof auto_handler != 'function')
 			throw "auto_handler must be a function";
+		if (this.initialized) return;
 		this.plugin_id = plugin_id;
 		this.hidden_entries = hidden_entries;
 		this.auto_params = auto_params;
+		this.before_handler = typeof before_handler == 'function' ? before_handler : null;
 		this.auto_handler = auto_handler;
 
 		this.curMode = this.mode.MANUAL;
@@ -311,6 +322,7 @@ var cartmode = {
 		document.observe('CartMode:newSelection', function(event) {
 			this.autoSelections = new Array(event.memo);
 		}.bind(this));
+		this.initialized = true;
 	}
 };
 

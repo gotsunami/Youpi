@@ -34,20 +34,6 @@ var {{ plugin.id }} = {
 	 */
 	mode: {MANUAL: 1, AUTOMATIC: 2},
 	/*
-	 * Constant: PROCESS_BUTTON_CAPTION
-	 * 
-	 * Button title
-	 *
-	 */
-	PROCESS_BUTTON_CAPTION: 'Process',
-	/*
-	 * Constant: PAUSE_BUTTON_CAPTION
-	 * 
-	 * Pause button title
-	 *
-	 */
-	PAUSE_BUTTON_CAPTION: 'Pause',
-	/*
 	 * Variable: curMode
 	 * 
 	 * Current Swarp mode (in use)
@@ -1179,7 +1165,11 @@ var {{ plugin.id }} = {
 		document.observe('PathSelectorWidget:pathsLoaded', function() {
 			cartmode.init(uidswarp, 
 				[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)],
-				{HeadPath: this.getHeadPath(), WeightPath: this.getWeightPath()}, // extra params for autoProcessSelection() plugin call
+				{}, // Not auto params during init, instead provide them later
+				function() {
+					// Before handler
+					cartmode.auto_params = {HeadPath: this.getHeadPath(), WeightPath: this.getWeightPath()}; // extra params for autoProcessSelection() plugin call (in cartmode.js)
+				}.bind(this),
 				function(res) {
 					if (res.qfitsdata.missingQFITS.length > 0) {
 						res.qfitsdata.missingQFITS.each(function(w) {
