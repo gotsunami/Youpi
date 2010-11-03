@@ -51,7 +51,7 @@ def cart_add_item(request):
 	try:
 		if userData[0] == '"' and userData[len(userData)-1] == '"':
 			userData = userData[1:-1]
-		userData = eval(userData)
+		userData = json.decode(userData)
 		if not type(userData) is DictType:
 			raise TypeError, "Should be a dictionnary, not %s" % type(userData)
 	except Exception, e:
