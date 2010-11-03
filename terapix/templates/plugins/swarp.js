@@ -1171,11 +1171,13 @@ var {{ plugin.id }} = {
 					cartmode.auto_params = {HeadPath: this.getHeadPath(), WeightPath: this.getWeightPath()}; // extra params for autoProcessSelection() plugin call (in cartmode.js)
 				}.bind(this),
 				function(res) {
-					if (res.qfitsdata.missingQFITS.length > 0) {
-						res.qfitsdata.missingQFITS.each(function(w) {
-							$(uidswarp + '_automatic_log').insert('<i>MISSING QFits</i> for image ' + w + '<br/>');
-						});
-						cartmode.autoWarningCount += res.qfitsdata.missingQFITS.length;
+					if (res.qfitsdata) {
+						if (res.qfitsdata.missingQFITS.length > 0) {
+							res.qfitsdata.missingQFITS.each(function(w) {
+								$(uidswarp + '_automatic_log').insert('<i>MISSING QFits</i> for image ' + w + '<br/>');
+							});
+							cartmode.autoWarningCount += res.qfitsdata.missingQFITS.length;
+						}
 					}
 					// Do not send notification
 					this.do_addSelectionToCart(res, false);

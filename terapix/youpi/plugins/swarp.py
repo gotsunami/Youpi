@@ -499,6 +499,7 @@ class Swarp(ProcessingPlugin):
 		else:
 			scampdata = None
 			useAutoScampHeads = 0
+			headDataPath = headPath
 
 		# The following result set will be used on the client side to add an item in 
 		# the processing cart
