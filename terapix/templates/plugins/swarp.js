@@ -1179,8 +1179,6 @@ var {{ plugin.id }} = {
 							cartmode.autoWarningCount += res.qfitsdata.missingQFITS.length;
 						}
 					}
-					// Do not send notification
-					this.do_addSelectionToCart(res, false);
 				}.bind(this)
 			);
 		}.bind(this));

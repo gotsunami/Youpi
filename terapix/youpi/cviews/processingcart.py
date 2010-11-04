@@ -37,25 +37,22 @@ def cart_cookie_check(request):
 
 	return HttpResponse(str({'data' : 'Cookie set!'}), mimetype = 'text/plain')
 
-def cart_add_item(request):
+def _cart_add_item(request, userData = None):
 	"""
-	Add one item into processing cart
+	Add one item into the processing cart
 	"""
-	try:
-		plugin = request.POST['plugin']
-		userData = request.POST['userData']
-	except Exception, e:
-		return HttpResponseServerError('Incorrect POST data.')
-
 	# Eval misc data wich has to be a dictionnary of custom data
-	try:
-		if userData[0] == '"' and userData[len(userData)-1] == '"':
-			userData = userData[1:-1]
-		userData = json.decode(userData)
-		if not type(userData) is DictType:
-			raise TypeError, "Should be a dictionnary, not %s" % type(userData)
-	except Exception, e:
-		return HttpResponseServerError("Incorrect POST data: %s" % e)
+	plugin = request.POST['plugin']
+	if userData is None:
+		userData = request.POST['userData']
+		try:
+			if userData[0] == '"' and userData[len(userData)-1] == '"':
+				userData = userData[1:-1]
+			userData = json.decode(userData)
+			if not type(userData) is DictType:
+				raise TypeError, "Should be a dictionnary, not %s" % type(userData)
+		except Exception, e:
+			return HttpResponseServerError("Incorrect POST data: %s" % e)
 
 	if 'cart' not in request.session:
 		# Maybe url has been called directly, which is NOT good
@@ -99,7 +96,35 @@ def cart_add_item(request):
 														'userData' 		: userData,
 														'itemCounter' 	: plugObj.itemCounter})
 
-	return HttpResponse(json.encode({'data' : userData, 'count': _cart_items_count(request)}), mimetype = 'text/plain')
+def cart_add_item(request):
+	try:
+		plugin = request.POST['plugin']
+		userData = request.POST['userData']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	_cart_add_item(request)
+	return HttpResponse(json.encode({'count': _cart_items_count(request)}), mimetype = 'text/plain')
+
+def cart_add_items(request):
+	"""
+	Add several items at once into the processing cart
+	"""
+	try:
+		plugin = request.POST['plugin']
+		userData = request.POST['userData']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+	
+	if 'cart' not in request.session:
+		# Maybe url has been called directly, which is NOT good
+		return HttpResponseServerError()
+
+	userData = json.decode(userData)
+	for data in userData:
+		_cart_add_item(request, data)
+
+	return HttpResponse(json.encode({'count': _cart_items_count(request)}), mimetype = 'text/plain')
 
 def cart_delete_item(request):
 	"""

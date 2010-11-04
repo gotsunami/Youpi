@@ -128,6 +128,7 @@ urlpatterns = patterns(
 	# Processing cart related
 	(r'^cart/$', 'views.cart_view'),
 	(r'^cart/additem/$', 'views.cart_add_item'),
+	(r'^cart/additems/$', 'views.cart_add_items'),
 	(r'^cart/delitem/$', 'views.cart_delete_item'),
 	(r'^cart/delitems/$', 'views.cart_delete_items'),
 	(r'^cart/itemsCount/$', 'views.cart_items_count'),

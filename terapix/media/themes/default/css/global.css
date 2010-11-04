@@ -1894,6 +1894,13 @@ td.grade-comment {
 	width: 90%;
 }
 
+#sel_count_tip {
+	color: #4c4c4c;
+	text-align: left;
+	width: 90%;
+	font-style: italic;
+}
+
 #submit_automatic_sels {
 	text-align: left;
 	width: 90%;

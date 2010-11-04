@@ -111,7 +111,6 @@ function ProcessingCart(container)
 					document.fire('processingCart:itemAlreadyExisting', resp.warning);
 					return;
 				}
-				var nb = resp.data.length;
 				itemsCount = resp.count;
 				_render();
 				// Call custom handler
@@ -125,6 +124,37 @@ function ProcessingCart(container)
 		};					
 		// Check for cookie
 		r.send('/youpi/cart/additem/', $H(post).toQueryString());
+	}
+
+	/*
+	 * Function: addProcessingsFromList
+	 * Adds several items to the processing cart (with one Ajax query)
+	 *
+	 * Parameters:
+	 *  pid - string: plugin unique ID
+	 *  itemList - array: list of items data
+	 *  handler - function: custom function to execute after an item has been added
+	 *
+	 */ 
+	this.addProcessingsFromList = function(pid, itemList, handler) {
+		var handler = typeof handler == 'function' ? handler : null;
+		if (typeof pid != 'string')
+			throw "pid must be a string";
+		var r = new HttpRequest(
+			null,
+			null,
+			function(resp) {
+				itemsCount = resp.count;
+				_render();
+				// Call custom handler
+				if (handler) handler();
+			}
+		);
+
+		var itemList = $A(itemList);
+		var post = $H({plugin: pid, userData: Object.toJSON(itemList)});
+		// Check for cookie
+		r.send('/youpi/cart/additems/', post.toQueryString());
 	}
 
 	/*

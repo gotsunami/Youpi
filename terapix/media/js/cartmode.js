@@ -19,6 +19,19 @@
  *
  */
 var cartmode = {
+	/*
+	 * Variable: cartItemsList
+	 * 
+	 * true if cartmode.init() already called once
+	 *
+	 */
+	cartItemsList: $A(),
+	/*
+	 * Variable: initialized
+	 * 
+	 * true if cartmode.init() already called once
+	 *
+	 */
 	initialized: false,
 	/*
 	 * Variable: mode
@@ -116,6 +129,9 @@ var cartmode = {
 					// Call custom handler
 					this.auto_handler(res);
 				}
+				// New cart item that will be added when auto mode is over
+				this.cartItemsList.push(res);
+			
 				if (res.warning.length > 0) {
 					$(this.plugin_id + '_automatic_log').insert('<br/><br/>').insert('Selection <b>' + this.autoSelections[0][this.curSelectionIdx] + '</b>:<br/>');
 					this.autoWarningCount += res.warning.length;
@@ -124,6 +140,7 @@ var cartmode = {
 					}.bind(this));
 				}
 				$(this.plugin_id + '_automatic_warning').update(this.autoWarningCount + ' warning' + (this.autoWarningCount>1?'s':''));
+
 				this.autoCurSelectionImageCount = res.imgCount;
 				// Prepares recursive call
 				this.curSelectionIdx++;
@@ -138,8 +155,12 @@ var cartmode = {
 					this.curSelectionIdx = 0;
 					this.autoWarningCount = 0;
 					$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION).removeClassName('PAUSE');
-					// Send final notification message
-					document.fire('notifier:notify', 'The selection has been added to the processing cart');
+
+					// Final cart adding
+					s_cart.addProcessingsFromList(this.plugin_id, this.cartItemsList, function() {
+						// Send final notification message
+						document.fire('notifier:notify', 'The selection has been added to the processing cart');
+					});
 				}
 			}.bind(this)
 		);
@@ -207,9 +228,12 @@ var cartmode = {
 						alert('Please make a selection first!');
 						return;
 					}
-					boxes.confirm('Those image selections will be processed with the data paths to weight/head ' +
-						'files and output directory parameters you specifed (or with default values).<br/><br/>Proceed?'
-						, function() {
+					if ($('process_sels_submit').hasClassName('PAUSE')) {
+						this.pauseAutoProcess = true;
+						$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION).removeClassName('PAUSE');
+						document.fire('notifier:notify', 'Paused, click again to resume');
+					}
+					else {
 						if (this.before_handler)
 							this.before_handler();
 						if (!this.autoProgressBar) {
@@ -222,21 +246,20 @@ var cartmode = {
 								captionClassName: 'cart_caption'
 							});
 						}
-						if ($('process_sels_submit').hasClassName('PAUSE')) {
-							this.pauseAutoProcess = true;
-							$('process_sels_submit').update(this.PROCESS_BUTTON_CAPTION).removeClassName('PAUSE');
-							document.fire('notifier:notify', 'Paused, click again to resume');
-						}
 						else {
-							$('automatic_pb_div').show();
-							$('process_sels_submit').update(this.PAUSE_BUTTON_CAPTION).addClassName('PAUSE');
-							$(this.plugin_id + '_automatic_warning').update(this.autoWarningCount + ' warning' + (this.autoWarningCount>1?'s':''));
-							if (this.curSelectionIdx == 0)
-								$(this.plugin_id + '_automatic_log').update();
-							this.pauseAutoProcess = false;
-							this.autoProcessSelections();
+							if (this.autoProgressBar.getPourcentage() == 0 || this.autoProgressBar.getPourcentage() == 100) {
+								// Empty list of future cart items
+								this.cartItemsList.clear();
+							}
 						}
-					}.bind(this));
+						$('automatic_pb_div').show();
+						$('process_sels_submit').update(this.PAUSE_BUTTON_CAPTION).addClassName('PAUSE');
+						$(this.plugin_id + '_automatic_warning').update(this.autoWarningCount + ' warning' + (this.autoWarningCount>1?'s':''));
+						if (this.curSelectionIdx == 0)
+							$(this.plugin_id + '_automatic_log').update();
+						this.pauseAutoProcess = false;
+						this.autoProcessSelections();
+					}
 				}.bind(this));
 				this.getSavedSelections(auto, function(data) {
 					$('submit_automatic_sels').show();
@@ -269,6 +292,9 @@ var cartmode = {
 		var c = menu.getContentNodeForEntry(menu.getEntry(0));
 		var d = new Element('div', {id: this.plugin_id + '_automatic_div'}).setStyle({width: '90%'});
 		var sc = new Element('div', {id: 'sel_count_div'}).addClassName('largy').update('Please make a selection of image selections:');
+		var tip = new Element('div', {id: 'sel_count_tip'})
+			.update('Those image selections will be processed with the data paths to weight/head ' +
+					'files and output directory parameters you specifed (or with default values).');
 		var ac = new Element('div', {id: this.plugin_id + '_automatic_sels'});
 		var sac = new Element('div', {id: 'submit_automatic_sels'});
 		var usac = new Element('ul');
@@ -279,7 +305,7 @@ var cartmode = {
 		var aw = new Element('div', {id: this.plugin_id + '_automatic_warning'}).addClassName('largy');
 		var al = new Element('div', {id: this.plugin_id + '_automatic_log'}).setStyle({height: '500px', overflow: 'auto', textAlign: 'left', color: 'brown'});
 		sac.update(usac);
-		c.insert(d.update(sc).insert(ac).insert(sac).insert(aw).insert(al));
+		c.insert(d.update(sc).insert(tip).insert(ac).insert(sac).insert(aw).insert(al));
 	},
 	/*
 	 * Function: init
