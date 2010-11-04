@@ -1,6 +1,7 @@
 {% extends "base_site.html" %}
 {% load i18n %}
 {% load compressed %}
+{% load json %}
 
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}dashboard{% endblock %}
@@ -161,7 +162,7 @@ document.observe('dom:loaded', function() {
 	document.observe('dom:loaded', function() {
 		var trid = '{{ plugin.id }}_{{ forloop.counter0 }}';
 		youpi_pc_meta[trid] = {};
-		youpi_pc_meta[trid].userData = $H(eval('(' + '{{ data.userData }}'.unescapeHTML() + ')'));
+		youpi_pc_meta[trid].userData = $H({{ data.userData|jsonify }});
 		youpi_pc_meta[trid].userData.set('ItemId', '{{ plugin.itemPrefix }}{{ data.itemCounter }}');
 	});
 </script>
