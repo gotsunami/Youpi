@@ -276,7 +276,7 @@ class Swarp(ProcessingPlugin):
 		# Now generates the preprocessing Python script needed to be able 
 		# to uncompress all fz/gzip weight maps
 		pf = open(preProcFile, 'w')
-		tmplf = open('youpi/plugins/swarp-preprocessing.tmpl')
+		tmplf = open(os.path.join(settings.TRUNK, 'terapix', 'youpi', 'plugins', 'swarp-preprocessing.tmpl'))
 		tmpl = string.Template(''.join(tmplf.readlines()))
 		tmplf.close()
 		pf.write(tmpl.substitute({
