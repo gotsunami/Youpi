@@ -99,7 +99,7 @@ def cart_add_item(request):
 														'userData' 		: userData,
 														'itemCounter' 	: plugObj.itemCounter})
 
-	return HttpResponse(str({'data' : str(userData)}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'data' : userData, 'count': _cart_items_count(request)}), mimetype = 'text/plain')
 
 def cart_delete_item(request):
 	"""
@@ -128,7 +128,7 @@ def cart_delete_item(request):
 		if len(request.session['cart']['plugins'][plugin]) == 0:
 			del request.session['cart']['plugins'][plugin]
 
-	return HttpResponse(str({'data' : 'done'}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'data' : 'done', 'count': _cart_items_count(request)}), mimetype = 'text/plain')
 
 def cart_delete_items(request):
 	"""
@@ -152,21 +152,25 @@ def cart_delete_items(request):
 		else:
 			raise ValueError, "No plugin named " + plugin
 
-	return HttpResponse(json.encode({'deleted' : deleted}), mimetype = 'text/plain')
+	return HttpResponse(json.encode({'deleted' : deleted, 'count': _cart_items_count(request)}), mimetype = 'text/plain')
 
-def cart_items_count(request):
+def _cart_items_count(request):
 	"""
-	Count items into cart
+	Count items into cart (not a view)
 	"""
-
 	if 'cart' not in request.session:
 		cart_cookie_check(request)
 
 	count = 0
 	for plugin, dataList in request.session['cart']['plugins'].iteritems():
 		count += len(dataList)
+	return count
 
-	return HttpResponse(str({'count' : count}), mimetype = 'text/plain')
+def cart_items_count(request):
+	"""
+	Count items into cart
+	"""
+	return HttpResponse(json.encode({'count' : _cart_items_count(request)}), mimetype = 'text/plain')
 
 def cart_saved_items_stats(request):
 	"""

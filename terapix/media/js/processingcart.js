@@ -66,28 +66,12 @@ function ProcessingCart(container)
 	 *
 	 */ 
 	function _render() {
-		var xhr = new HttpRequest(
-			null,
-			// Use default error handler
-			null,
-			// Custom handler for results
-			function(resp) {
-				itemsCount = resp.count;
-				var div = Builder.node('div', { id: 'shoppingCart',
-												className: 'nonempty' }, [
-								Builder.node('img', { src: '/media/themes/' + guistyle + '/img/misc/minicart.png' }),
-								_getArticlesCountMsg()
-						  ]);
-				div.observe('click', function(event) { location.href = '/youpi/cart/'; });
-
-				// Clear contents
-				_container.update();
-				_container.appendChild(div);
-			}
-		);
-
-		// Count items
-		xhr.send('/youpi/cart/itemsCount/');
+		var div = new Element('div', {id: 'shoppingCart'}).addClassName('nonempty')
+			.update(new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/minicart.png'}))
+			.insert(_getArticlesCountMsg());
+		div.observe('click', function(event) { location.href = '/youpi/cart/'; });
+		_container.update();
+		_container.insert(div);
 	}
 
 	/*
@@ -119,37 +103,28 @@ function ProcessingCart(container)
 		if (!obj.plugin_name || !obj.userData)
 			throw "Missing object attributes plugin_name or userData";
 
-		var xhr = new HttpRequest(
+		var r = new HttpRequest(
 			null,
 			null,
-			// Custom handler for results
 			function(resp) {
-				var r = new HttpRequest(
-					null,
-					null,
-					function(resp) {
-						if (resp.warning) {
-							document.fire('processingCart:itemAlreadyExisting', resp.warning);
-							return;
-						}
-						var nb = resp.data.length;
-						_render();
-						// Call custom handler
-						if (handler) handler();
-					}
-				);
-
-				var post = {
-					plugin: obj.plugin_name,
-					userData: Object.toJSON(obj.userData)
-				};					
-				// Check for cookie
-				r.send('/youpi/cart/additem/', $H(post).toQueryString());
+				if (resp.warning) {
+					document.fire('processingCart:itemAlreadyExisting', resp.warning);
+					return;
+				}
+				var nb = resp.data.length;
+				itemsCount = resp.count;
+				_render();
+				// Call custom handler
+				if (handler) handler();
 			}
 		);
 
+		var post = {
+			plugin: obj.plugin_name,
+			userData: Object.toJSON(obj.userData)
+		};					
 		// Check for cookie
-		xhr.send('/youpi/cart/cookiecheck/');
+		r.send('/youpi/cart/additem/', $H(post).toQueryString());
 	}
 
 	/*
@@ -179,6 +154,7 @@ function ProcessingCart(container)
 			// Custom handler for results
 			function(resp) {
 				var nb = resp.data.length;
+				itemsCount = resp.count;
 				_render();
 				if (handler) handler();
 			}
@@ -224,6 +200,7 @@ function ProcessingCart(container)
 			// Custom handler for results
 			function(resp) {
 				var nb = resp.deleted;
+				itemsCount = resp.count;
 				_render();
 				if (handler) handler(nb);
 			}
@@ -231,8 +208,24 @@ function ProcessingCart(container)
 		xhr.send('/youpi/cart/delitems/', $H(data).toQueryString());
 	}
 
+	function _init() {
+		var xhr = new HttpRequest(
+			null,
+			// Use default error handler
+			null,
+			// Custom handler for results
+			function(resp) {
+				itemsCount = resp.count;
+				_render();
+			}
+		);
+
+		// Count items
+		xhr.send('/youpi/cart/itemsCount/');
+	}
+	
 	// Main entry point
-	_render();
+	_init();
 }
 
 /*
