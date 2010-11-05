@@ -67,7 +67,7 @@ class Swarp(ProcessingPlugin):
 
 		cluster_ids = []
 		k = 0
-		error = condorError = '' 
+		error = condorError = info = '' 
 
 		try:
 			for imgList in idList:
@@ -81,10 +81,12 @@ class Swarp(ProcessingPlugin):
 				k += 1
 		except CondorSubmitError, e:
 				condorError = str(e)
+		except PluginAllDataAlreadyProcessed:
+				info = 'This item has already been fully processed. Nothing to do.'
 		except Exception, e:
 				error = "Error while processing list #%d: %s" % (k+1, e)
 
-		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
+		return {'ClusterIds': cluster_ids, 'NoData': info, 'Error': error, 'CondorError': condorError}
 
 	def getOutputDirStats(self, outputDir):
 		"""
@@ -157,6 +159,35 @@ class Swarp(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "Unable to use a suitable config file: %s" % e
 
+		images = Image.objects.filter(id__in = idList)
+		# Shall we skip this processing (already successful with same parameters?)
+		if not reprocessValid:
+			skip_processing = False
+			from django.db import connection
+			cur = connection.cursor()
+			cur.execute("""
+SELECT p.id FROM youpi_processing_task AS p, youpi_processing_kind AS k, youpi_rel_it AS r 
+WHERE p.kind_id = k.id 
+AND k.name = '%s' 
+AND p.success = 1
+AND r.task_id = p.id
+AND r.image_id IN (%s)
+ORDER BY p.id DESC
+""" % (self.id, ','.join([str(id) for id in idList])))
+			res = cur.fetchall()
+			if res:
+				# At least one image is involved in this sucessful Swarp selection
+				for r in res:
+					task = Processing_task.objects.get(pk = r[0])
+					swarp = Plugin_swarp.objects.get(task = task)
+					conf = str(zlib.decompress(base64.decodestring(swarp.config)))
+					if  conf == content and headPath == swarp.headPath and weightPath == swarp.weightPath:
+						skip_processing = True
+						break
+
+			if skip_processing:
+				raise PluginAllDataAlreadyProcessed
+
 		# At least step seconds between two job start
 		step = 0 							
 
@@ -170,7 +201,6 @@ class Swarp(ProcessingPlugin):
 		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 
 		# Swarp file containing a list of images to process (one per line)
-		images = Image.objects.filter(id__in = idList)
 		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % time.time())
 		imgPaths = [img.filename + '.fits' for img in images]
 		swif = open(swarpImgsFile, 'w')
