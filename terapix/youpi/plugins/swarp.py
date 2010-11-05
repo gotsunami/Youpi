@@ -176,9 +176,12 @@ ORDER BY p.id DESC
 """ % (self.id, ','.join([str(id) for id in idList])))
 			res = cur.fetchall()
 			if res:
-				# At least one image is involved in this sucessful Swarp selection
+				# Checks for current image selection
 				for r in res:
 					task = Processing_task.objects.get(pk = r[0])
+					rels = Rel_it.objects.filter(task = task)
+					reimgs = [int(re.image_id) for re in rels]
+					if reimgs != idList: continue
 					swarp = Plugin_swarp.objects.get(task = task)
 					conf = str(zlib.decompress(base64.decodestring(swarp.config)))
 					if  conf == content and headPath == swarp.headPath and weightPath == swarp.weightPath:
