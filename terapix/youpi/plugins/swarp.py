@@ -180,7 +180,7 @@ ORDER BY p.id DESC
 				for r in res:
 					task = Processing_task.objects.get(pk = r[0])
 					rels = Rel_it.objects.filter(task = task)
-					reimgs = [int(re.image_id) for re in rels]
+					reimgs = [int(rel.image_id) for rel in rels]
 					if reimgs != idList: continue
 					swarp = Plugin_swarp.objects.get(task = task)
 					conf = str(zlib.decompress(base64.decodestring(swarp.config)))
