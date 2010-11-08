@@ -119,7 +119,7 @@ INSTALLED_APPS = (
 	'django.contrib.sites',
 	'django.contrib.admin',
 	'django_evolution',
-	'terapix.compress',
+	'compress',
 	'terapix.youpi',
 )
 

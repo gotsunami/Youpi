@@ -5,6 +5,8 @@ digraph G {
 	youpi [label="Youpi software"];
 	condor [label="Condor"];
 	django [label="Django"];
+	django_evolution [label="django-evolution"];
+	django_compress [label="django-compress"];
 	modwsgi [label="Apache mod_wsgi"];
 	mysqlpython [label="MySQL-Python"];
 	python [label="Python"];
@@ -19,6 +21,8 @@ digraph G {
 	youpi -> apache;
 	youpi -> condor;
 	youpi -> django;
+	youpi -> django_evolution;
+	youpi -> django_compress;
 	youpi -> modwsgi;
 	youpi -> pythoncjson;
 	youpi -> pythonmagic;

@@ -82,6 +82,8 @@ As specified in the `Software packages`_ section, here are the packages you must
 - ``Condor transfer script``
 - ``cURL``
 - ``Django``
+- ``django-compress``
+- ``django-evolution``
 - ``Fitsverify``
 - ``Firefox``
 - ``Geos``
@@ -118,6 +120,8 @@ As specified in the `Software packages`_ section, here are the packages you must
 - ``Apache mod_wsgi``
 - ``Condor``
 - ``Django``
+- ``django-compress``
+- ``django-evolution``
 - ``Firefox``
 - ``Geos``
 - ``MySQL client only``
@@ -149,6 +153,8 @@ Software package     Supported version                          Description
 `MySQL`_             **5.x** and later                          Relational database management system 
                                                                 (RDBMS)
 |django|_            **1.1.x**                                  Python web framework
+`django-compress`_   **r98 (svn)** and later                    A Django application that automates CSS/JavaScript compression and helps in making delivery of static media more efficient
+`django-evolution`_  **r181 (svn)** and later                   Schema Evolution for the Django Project
 `Condor`_            **7.2.x** and later                        High Throughput Computing (HTC) on large 
                                                                 collections of distributively owned 
                                                                 computing resources
@@ -202,6 +208,8 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
 .. _Fitsverify: http://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/
 .. _WSGI: http://www.wsgi.org/
 .. _MySQL: http://www.mysql.com/
+.. _django-compress: http://code.google.com/p/django-compress/
+.. _django-evolution: http://code.google.com/p/django-evolution/
 .. _Condor: http://www.cs.wisc.edu/condor/
 .. _Python cjson: http://pypi.python.org/pypi/python-cjson/
 .. _PyFITS: http://www.stsci.edu/resources/software_hardware/pyfits

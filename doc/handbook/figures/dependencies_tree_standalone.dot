@@ -6,6 +6,8 @@ digraph G {
 	cfitsio	[label="CFITSIO tools"];
 	condor [label="Condor"];
 	django [label="Django"];
+	django_evolution [label="django-evolution"];
+	django_compress [label="django-compress"];
 	magic [label="Image Magick"];
 	modwsgi [label="Apache mod_wsgi"];
 	mysqlpython [label="MySQL-Python"];
@@ -37,6 +39,8 @@ digraph G {
 	youpi -> cfitsio;
 	youpi -> condor;
 	youpi -> django;
+	youpi -> django_evolution;
+	youpi -> django_compress;
 	youpi -> magic;
 	youpi -> modwsgi;
 	youpi -> pyfits;
