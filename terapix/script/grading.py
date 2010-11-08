@@ -144,17 +144,16 @@ def get_grades(res_output_dir = None, idList = None):
 	res = []
 	for imgName, grades in tmp.iteritems():
 		if len(grades) == 1:
-			res.append((imgName, grades[0][0], grades[0][1], grades[0][2], grades[0][3], grades[0][4], grades[0][5], grades[0][6]))
+			res.append((imgName, grades[0][0], grades[0][2], grades[0][3], grades[0][4], grades[0][1], grades[0][5], grades[0][6]))
 			continue
 		latest = grades[0]
 		for k in range(1, len(grades)):
 			if grades[k][1] > latest[1]:
 				latest = grades[k]
-		res.append((imgName, latest[0], latest[1], latest[2], latest[3], latest[4], latest[5], grades[0][6]))
+		res.append((imgName, latest[0], latest[2], latest[3], latest[4], latest[1], latest[5], grades[0][6]))
 
 	# Sort by image name
 	res.sort(cmp = lambda x,y: cmp(x[0], y[0])) 
-	res.insert(0, header)
 	return res
 
 def delete_grades(simulate, verbose = False):
