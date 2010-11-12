@@ -23,8 +23,11 @@
  * Signals:
  *  advancedTable:selectedImages - signal emitted when calling the <getSelectedColValues> member function
  *
+ *  Parameters:
+ *  opts - object: options: {headerClass: '', bodyClass: ''}
+ *
  */
-function AdvancedTable() {
+function AdvancedTable(opts) {
 	// Group: Constants
 	// -----------------------------------------------------------------------------------------------------------------------------
 
@@ -437,12 +440,15 @@ function AdvancedTable() {
 	 * Function: _render
 	 * Renders widget
 	 *
+	 * Renders widget with supplied options _opts
+	 *
 	 */ 
 	function _render() {
 		_container = $(_container);
-		_mainDiv = new Element('div').addClassName('advancedTable');
+		_mainDiv = new Element('div').addClassName(_opts.className ? _opts.className : 'advancedTable');
 
 		_bodyDiv = new Element('div').addClassName('body');
+		if (_opts.bodyClass) _bodyDiv.addClassName(_opts.bodyClass);
 		_bodyTab = new Element('table');
 
 		_pageDiv = new Element('div').addClassName('pagination').hide();
@@ -450,6 +456,7 @@ function AdvancedTable() {
 
 		if (_headers.length) {
 			_headerDiv = new Element('div').addClassName('header');
+			if (_opts.headerClass) _headerDiv.addClassName(_opts.headerClass);
 			_headerTab = new Element('table');
 			_mainDiv.insert(_headerDiv);
 			_headerDiv.appendChild(_headerTab);
@@ -1017,8 +1024,6 @@ function AdvancedTable() {
 	 */ 
 	function _buildPageDiv(serverPath, handler, current, total) {
 		_pageDiv.update();
-		var sall = new Element('input', {type: 'button', value: 'Select page'});
-		var uall = new Element('input', {type: 'button', value: 'Unselect page'});
 		var pdiv = new Element('span', {id: _uid + 'page_switch_div'});
 
 		// Page switcher widget
@@ -1034,15 +1039,19 @@ function AdvancedTable() {
 
 		_pageSwitcher.render(current, total);
 
-		sall.observe('click', function() {
-			_selectAll(true);
-		});
+		if (!_opts.hideSelectAllButtons) {
+			var sall = new Element('input', {type: 'button', value: 'Select page'});
+			var uall = new Element('input', {type: 'button', value: 'Unselect page'});
+			sall.observe('click', function() {
+				_selectAll(true);
+			});
 
-		uall.observe('click', function() {
-			_selectAll(false);
-		});
+			uall.observe('click', function() {
+				_selectAll(false);
+			});
 
-		_pageDiv.insert(sall).insert(uall);
+			_pageDiv.insert(sall).insert(uall);
+		}
 		_pageDiv.insert(pdiv);
 		_pageDiv.appear();
 	}
@@ -1053,6 +1062,7 @@ function AdvancedTable() {
 	 *
 	 */ 
 	function _init() {
+		_opts = typeof opts == 'object' ? opts : {};
 	}
 
 	_init();
