@@ -1968,3 +1968,43 @@ td.grade-comment {
 	font-weight: bold;
 }
 
+div.advancedTable div.noheight {
+	height: auto !important;
+}
+
+div.advjobs .body td:nth-child(2) {
+	font-style: italic;
+}
+
+div.advjobs .body td {
+	border-bottom: 1px dashed lightblue; 
+	color: black;
+	white-space: nowrap;
+	height: 26px;
+}
+
+div.advjobs .body tr:first-child td {
+	font-weight: bold;
+}
+
+div.advjobs .pagination {
+	border: 1px solid #ED9600;
+	background-color: #FFE9C4;
+	-moz-border-radius: 5px;
+	padding: 5px;
+	width: -moz-fit-content;	
+}
+
+div.advjobs label.success {
+	color: green;
+}
+
+div.advjobs label.failure {
+	color: red;
+}
+
+#job_list_refresh {
+	position: fixed;
+	top: 150px;
+	left: 30px;
+}

@@ -634,6 +634,50 @@ def history_ingestion(request):
 	# Return a JSON object
 	return HttpResponse(str(out), mimetype = 'text/plain')
 
+@login_required
+@profile
+def history_cluster_jobs(request):
+	"""
+	Returns cluster jobs information for a given page
+	"""
+
+	page = request.POST.get('Page', 1)
+	try: page = int(page)
+	except ValueError, e:
+		page = 1
+
+	# First check for permission
+#	if not request.user.has_perm('youpi.can_view_ing_logs'):
+#		return HttpResponse(str({
+#			'Error': "Sorry, you don't have permission to view ingestion logs",
+#		}), mimetype = 'text/plain')
+
+	tasks = Processing_task.objects.all().order_by('-start_date')
+	currentPage, nbPages, window = _get_pagination_attrs(page, tasks, tasks.count())
+
+	header = ['Job Label', 'Username', 'Kind', 'Start Date', 'Duration', 'Success', 'Hostname', 'Cluster Id',]
+	data = []
+	for t in window:
+		data.append([
+			str("<a target=\"_blank\" href=\"%s\">%s</a>" % (reverse('terapix.youpi.views.single_result', args = [t.kind.name, t.id]), t.title)),
+			str(t.user.username), 
+			str("<b>%s</b>" % t.kind.name.capitalize()), 
+			str(t.start_date), 
+			str(t.end_date - t.start_date), 
+			t.success, 
+			str(t.hostname), 
+			str(t.clusterId), 
+		])
+	for k in range(len(data)):
+		if data[k][5]:
+			cls = 'success'
+		else:
+			cls = 'failure'
+		data[k] = ["<label class=\"%s\">%s</label>" % (cls, r) for r in data[k]]
+	data.insert(0, header)
+	return HttpResponse(json.encode({'Headers': [], 'Content': data, 'CurrentPage': currentPage, 'TotalPages': nbPages}), mimetype = 'text/plain')
+
+
 def remap(idList):
 	"""
 	Build a list of ranges from an integer suite:
@@ -692,6 +736,31 @@ def processing_imgs_remap_ids(request):
 
 	return HttpResponse(str({'mapList' : remap(idList)}), mimetype = 'text/plain')
 
+def _get_pagination_attrs(page, full_data, data_len):
+	"""
+	Gets pagination attributes
+	"""
+	# Pagination handling
+	#count = len(full_data)
+	count = data_len
+	if page == 0:
+		currentPage = 1
+	else:
+		currentPage = int(page)
+	maxPerPage = settings.IMS_MAX_PER_PAGE
+	nbPages = count / maxPerPage
+	if count % maxPerPage > 0:
+		nbPages += 1
+
+	# Finds window boundaries
+	wmin = maxPerPage * (currentPage-1)
+	if count - wmin > maxPerPage:
+		window = full_data[wmin: wmin + maxPerPage]
+	else:
+		window = full_data[wmin:]
+
+	return currentPage, nbPages, window
+
 def processing_imgs_from_idlist_post(request):
 	"""
 	Builds an SQL query based on POST data, executes it and returns a JSON object containing results.
@@ -706,24 +775,7 @@ def processing_imgs_from_idlist_post(request):
 
 	# Build integer list from ranges
 	ids = unremap(ids).split(',')
-
-	# Pagination handling
-	count = len(ids)
-	if page == 0:
-		currentPage = 1
-	else:
-		currentPage = int(page)
-	maxPerPage = settings.IMS_MAX_PER_PAGE
-	nbPages = count / maxPerPage
-	if count % maxPerPage > 0:
-		nbPages += 1
-
-	# Finds window boundaries
-	wmin = maxPerPage * (currentPage-1)
-	if count - wmin > maxPerPage:
-		window = ids[wmin: wmin + maxPerPage]
-	else:
-		window = ids[wmin:]
+	currentPage, nbPages, window = _get_pagination_attrs(page, ids, len(ids))
 
 	# Get image data for currentPage
 	images = Image.objects.filter(id__in = window)

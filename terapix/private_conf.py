@@ -204,6 +204,7 @@ RESULTS_JS = COMMON_JS[:]
 RESULTS_JS.extend([
 	'js/gradingwidget.js',
 	'js/processinghistorywidget.js',
+	'js/advancedtable.js',
 	'js/pageswitcher.js',
 	'js/3rdParty/lightbox2/lightbox.js',
 	'js/3rdParty/modalbox/modalbox.js',

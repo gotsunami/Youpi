@@ -121,6 +121,7 @@ urlpatterns = patterns(
 	(r'^process/imgsIdsFromRelease/$', 'views.processing_get_imgs_ids_from_release'),
 
 	# History
+	(r'^history/cluster/jobs/$', 'views.history_cluster_jobs'),
 	(r'^history/ingestion/$', 'views.history_ingestion'),
 	(r'^history/ingestion/report/(.*?)/$', 'views.show_ingestion_report'),
 	(r'^history/preingestion/$', 'views.history_preingestion'),

@@ -64,11 +64,9 @@ function get_stats() {
 <div align="center">
 	<div id="pre_submenu">
 		<ul class="smart_tabnav_sub" id="tabnav2">
-			<li class="enabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_');">History</a></li>
+			<li class="enabled"><a href="#" id="link_history" onclick="swap_display(this.id, 'menuitem_history', 'tabnav2', 'menuitem_');">Processing History</a></li>
+			<li class="disabled"><a href="#" id="link_jobs" onclick="swap_display(this.id, 'menuitem_job_history', 'tabnav2', 'menuitem_')">Job History</a></li>
 			<li class="disabled"><a href="#" id="link_stats" onclick="swap_display(this.id, 'menuitem_stats', 'tabnav2', 'menuitem_')">Statistics</a></li>
-			<!--
-			<li class="disabled"><a href="#" id="link_search" onclick="swap_display(this.id, 'menuitem_search', 'tabnav2', 'menuitem_')">Advanced Search</a></li>
-			-->
 		</ul>
 	</div>
 {% if not perms.youpi.can_view_results %}
@@ -117,7 +115,7 @@ function get_stats() {
 				{% endif %}
 				</div>
 				<div id="menuitem_stats" style="display: none">
-					<div style="margin-top: 20px; width: 500px;" class="tip">
+					<div style="margin-top: 20px; width: -moz-fit-content;" class="tip">
 						To get some stats, please select an output directory used for your processings:<br/>
 						<select id="dir_select" onchange="get_stats();">
 							<option value="empty" selected="selected">---</option>
@@ -128,6 +126,10 @@ function get_stats() {
 						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/reload.gif" onclick="get_stats();" style="cursor: pointer;" title="Click to reload data..."/>
 					</div>
 					<div style="margin-top: 20px;" id="dir_stats_div"></div>
+				</div>
+				<div id="menuitem_job_history" style="display: none; margin-top: 20px;">
+					<div id="job_list_refresh"><a href="#">Refresh</a></div>
+					<div id="job_list"></div>
 				</div>
 			</td>
 		</tr>
@@ -152,6 +154,19 @@ function get_stats() {
 	{% endfor %}
 		p.render();
 	{% endif %}
+		var hist_jobs_advt;
+		$('link_jobs').observe('click', function() {
+			var d = $('job_list');
+			if (d.empty()) {
+			hist_jobs_advt = new AdvancedTable({className: 'advjobs', hideSelectAllButtons: true});
+				hist_jobs_advt.setContainer(d);
+				hist_jobs_advt.activatePagination(true);
+				hist_jobs_advt.loadDataFromQuery('/youpi/history/cluster/jobs/', '' /* No POST */, null);
+			}
+		});
+		$('job_list_refresh').observe('click', function() {
+			hist_jobs_advt.loadDataFromQuery('/youpi/history/cluster/jobs/', '' /* No POST */, null);
+		});
 	});
 </script>
 {% endblock %}
