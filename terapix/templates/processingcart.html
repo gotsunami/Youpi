@@ -26,90 +26,10 @@ var {{ plugin.id }}_item_counter = 0;
 youpi_pc_meta.saved_policies=[{% for pol in policies %}'{{ pol.label }}'{% if not forloop.last %},{% endif %}{% endfor %}];
 youpi_pc_meta.saved_selections=[{% for sel in selections %}'{{ sel.label }}'{% if not forloop.last %},{% endif %}{% endfor %}];
 
-/*
- * Slots
- *
- */
-
-document.observe('keydown', function(event) {
-	if (event.keyCode == 16) window.shiftPressed = 1;
-});
-
-document.observe('keyup', function(event) {
-	if (event.keyCode == 16 || event.which == 16) window.shiftPressed = 0;
-});
-
 // Menu handling
 var menu, sc_accordion;
-document.observe('dom:loaded', function() {
-	menu = new SubMenu('submenu', ['Cart items', 'Saved items']);
-	menu.setOnClickHandler(1, getSavedItemsStats);
-	sc_accordion = new Accordion('accordion', {
-		duration: 0.5,
-		openHandler: function(idx) {
-			var pattern = 'plugin_menuitem_sub_';
-			var pid = $$('div[id^=' + pattern + ']')[idx].readAttribute('id').sub(pattern, '');
-			eval(pid + '.showSavedItems()');	
-		}
-	});
-	$('select_all').observe('click', function() {
-		cart_select_all_items(true);
-	});
-	$('select_none').observe('click', function() {
-		cart_select_all_items(false);
-	});
-	$('select_inverse').observe('click', function() {
-		$$('table.shoppingCart input.item_select_input').each(function(check) {
-			check.checked = !check.checked;
-		});
-	});
-	$$('.pc_more').invoke('observe', 'click', function() {
-		this.next().toggle();
-	});
-	$$('.pc_more_details').invoke('hide');
-
-	new Q.Window({
-		id: 'ro_Q',
-		trigger: "runtime_options",
-		title: "Runtime Options",
-		text: build_runtime_options()
-	}); 
-
-	enable_multi_checking($$('table.shoppingCart input.item_select_input'));
-	youpi_pc_meta.progressBar = new ProgressBar('cart_pbar_div', 0, {
-		animate: false,
-		color: '#eee',
-		borderColor: '#555',
-		width: 150,
-		height: 18,
-		captionClassName: 'cart_caption'
-	});
-	$('cart_pbar_div').hide();
-	
-	['delete', 'save', 'run'].each(function(action) {
-		$(action + '_selection_img').observe('click', function() {
-			var data = find_checked_items();
-			if (data == null) {
-				alert('Please make a selection first!');
-				return;
-			}
-			var count = count_checked_items(data);
-			switch(action) {
-				case 'delete':
-					do_delete_items(count, data);
-					break;
-				case 'save':
-					do_save_items(count, data);
-					break;
-				case 'run':
-					do_run_items(count, data);
-					break;
-				default:
-					break;
-			}
-		});
-	});
-});
+{# Processing cart initialization #}
+youpi_pc.init();
 </script>
 {% endblock %}
 
@@ -147,11 +67,12 @@ document.observe('dom:loaded', function() {
 				{% if plugin.hasItemsInCart %}
 			<table class="shoppingCart">
 				<tr>
-					<th colspan="4">{{ plugin.optionLabel }} - <i>{{ plugin.description }}</i> items ({{ plugin.getData|length }})</th>
+					<th colspan="5">{{ plugin.optionLabel }} - <i>{{ plugin.description }}</i> items ({{ plugin.getData|length }})</th>
 				</tr>
 					{% for data in plugin.getData %}
 						{# Invoke custom template rendering #}
 				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
+					<td><div class="dragger" title="Drag and drop to move the line"></div></td>
 					<td class="row-num"><div>{{ forloop.counter }}</div></td>
 					<td style="white-space: nowrap; width: 10%; text-align: left">
 						<span style="font-size: 13px; vertical-align: top;"><input class="item_select_input" type="checkbox"/>&nbsp;<span class="pc_item_name">{{ plugin.itemPrefix }}{{ data.itemCounter }}</span></span>

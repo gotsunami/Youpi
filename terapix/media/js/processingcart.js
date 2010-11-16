@@ -837,3 +837,121 @@ function displayImageCount(idList, container_id) {
 	container.insert(selDiv);
 }
 
+
+var youpi_pc = {
+	/*
+	 * Function: init
+	 * Sets things up for the processing cart
+	 *
+	 */ 
+	init: function() {
+		document.observe('keydown', function(event) {
+			if (event.keyCode == 16) window.shiftPressed = 1;
+		});
+
+		document.observe('keyup', function(event) {
+			if (event.keyCode == 16 || event.which == 16) window.shiftPressed = 0;
+		});
+
+		document.observe('dom:loaded', function() {
+			menu = new SubMenu('submenu', ['Cart items', 'Saved items']);
+			menu.setOnClickHandler(1, getSavedItemsStats);
+			sc_accordion = new Accordion('accordion', {
+				duration: 0.5,
+				openHandler: function(idx) {
+					var pattern = 'plugin_menuitem_sub_';
+					var pid = $$('div[id^=' + pattern + ']')[idx].readAttribute('id').sub(pattern, '');
+					eval(pid + '.showSavedItems()');	
+				}
+			});
+			$('select_all').observe('click', function() {
+				cart_select_all_items(true);
+			});
+			$('select_none').observe('click', function() {
+				cart_select_all_items(false);
+			});
+			$('select_inverse').observe('click', function() {
+				$$('table.shoppingCart input.item_select_input').each(function(check) {
+					check.checked = !check.checked;
+				});
+			});
+			$$('.pc_more').invoke('observe', 'click', function() {
+				this.next().toggle();
+			});
+			$$('.pc_more_details').invoke('hide');
+
+			new Q.Window({
+				id: 'ro_Q',
+				trigger: "runtime_options",
+				title: "Runtime Options",
+				text: build_runtime_options()
+			}); 
+
+			enable_multi_checking($$('table.shoppingCart input.item_select_input'));
+			youpi_pc_meta.progressBar = new ProgressBar('cart_pbar_div', 0, {
+				animate: false,
+				color: '#eee',
+				borderColor: '#555',
+				width: 150,
+				height: 18,
+				captionClassName: 'cart_caption'
+			});
+			$('cart_pbar_div').hide();
+			
+			['delete', 'save', 'run'].each(function(action) {
+				$(action + '_selection_img').observe('click', function() {
+					var data = find_checked_items();
+					if (data == null) {
+						alert('Please make a selection first!');
+						return;
+					}
+					var count = count_checked_items(data);
+					switch(action) {
+						case 'delete':
+							do_delete_items(count, data);
+							break;
+						case 'save':
+							do_save_items(count, data);
+							break;
+						case 'run':
+							do_run_items(count, data);
+							break;
+						default:
+							break;
+					}
+				});
+			});
+			// Adds drag-n-drop support for cart items 
+			$$('.dragger').each(function(d) {
+				new Draggable(d, {
+					revert: true, 
+					scroll: window, 
+					ghosting: false, 
+					onStart: function(t) {
+						var iname = t.element.up('tr').select('.pc_item_name')[0].innerHTML;
+						t.element.up('tr').addClassName('draggedItem');
+						t.element.update(new Element('div').addClassName('draggingMsg').update('Moving ' + iname + ' item'));
+					},
+					onEnd: function(t) {
+						t.element.update();
+						t.element.up('tr').removeClassName('draggedItem');
+					},
+					starteffect: function() {},
+					endeffect: function() {}
+				});
+				// Droppable zones
+				Droppables.add(d.up('tr'), {
+					hoverclass: 'cartRowTarget', 
+					accept: 'dragger',
+					onDrop: function(dragged, dropped, event) {
+						trsrc = dragged.up('tr');
+						if (trsrc != dropped) {
+							dropped.insert({before: trsrc});
+							trsrc.highlight();
+						}
+					}
+				});
+			});
+		});
+	}
+};

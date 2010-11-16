@@ -2008,3 +2008,34 @@ div.advjobs label.failure {
 	top: 150px;
 	left: 30px;
 }
+
+td .dragger {
+	padding: 0px;
+}
+
+.dragger {
+	width: 10px;
+	height: 18px;
+	background: url(../img/misc/dragger.png) no-repeat center center;
+	cursor: move;
+}
+
+.draggingMsg {
+	width: -moz-fit-content;	
+	background-color: #5b80b2;
+	color: white;
+	padding: 6px;
+	font-weight: bold;
+	white-space:nowrap;
+	-moz-box-shadow: 1px 1px 12px #555; 
+	-webkit-box-shadow: 1px 1px 12px #555; 
+}
+
+.draggedItem td {
+	background-color: #5b80b2;
+	color: #fff;
+}
+
+.cartRowTarget td {
+	background-color: #e3e3e3;
+}
