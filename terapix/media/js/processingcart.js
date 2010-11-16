@@ -945,7 +945,8 @@ var youpi_pc = {
 					accept: 'dragger',
 					onDrop: function(dragged, dropped, event) {
 						trsrc = dragged.up('tr');
-						if (trsrc != dropped) {
+						// Only items of same kind (plugin type) can be dropped
+						if (trsrc != dropped && trsrc.id.sub(/_\d+$/, '') == dropped.id.sub(/_\d+$/, '')) {
 							dropped.insert({before: trsrc});
 							trsrc.highlight();
 						}
