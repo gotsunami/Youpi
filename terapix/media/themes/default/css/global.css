@@ -2016,7 +2016,7 @@ td .dragger {
 .dragger {
 	width: 10px;
 	height: 18px;
-	background: url(../img/misc/dragger.png) no-repeat center center;
+	background: url(../img/misc/dragger.png) no-repeat right center;
 	cursor: move;
 }
 
@@ -2037,5 +2037,5 @@ td .dragger {
 }
 
 .cartRowTarget td {
-	background-color: #e3e3e3;
+	background-color: #5b80b2;
 }

@@ -72,7 +72,7 @@ youpi_pc.init();
 					{% for data in plugin.getData %}
 						{# Invoke custom template rendering #}
 				<tr id="{{ plugin.id }}_{{ forloop.counter0 }}">
-					<td><div class="dragger" title="Drag and drop to move the line"></div></td>
+					<td><div class="dragger"></div></td>
 					<td class="row-num"><div>{{ forloop.counter }}</div></td>
 					<td style="white-space: nowrap; width: 10%; text-align: left">
 						<span style="font-size: 13px; vertical-align: top;"><input class="item_select_input" type="checkbox"/>&nbsp;<span class="pc_item_name">{{ plugin.itemPrefix }}{{ data.itemCounter }}</span></span>
