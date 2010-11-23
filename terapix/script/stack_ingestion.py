@@ -142,12 +142,13 @@ def run_stack_ingestion(g, stackFile, user_id):
 
 	# First, do some cleanups...
 	res = g.execute("""select name, checksum, id, ingestion_id from youpi_image where name = "%s";""" % fitsNoExt)
-	# Image name found
 	if res:
-		# Do nothing because the same physical image is already ingested
-		fitsNoExt = freshImageName(fitsNoExt, g)
-		debug("[Warning] A stack image with the same name is already ingested. The stack image will be ingested as '%s'" % fitsNoExt)
-		debug("[Warning] The IMAGEOUT_NAME value will be updated to match '%s' and the stack image will be renamed on disk" % fitsNoExt)
+		stack_already_ingested = True
+		debug("A stack image with the same name is already ingested, related info will be overwritten")
+		imageId = res[0][2]
+		ingestionId = res[0][3]
+	else:
+		stack_already_ingested = False
 
 	# Check for ingestion label
 	ing_label = 'Stack ' + os.path.basename(fitsNoExt)
@@ -156,20 +157,27 @@ def run_stack_ingestion(g, stackFile, user_id):
 		ing_label = res[0][0] + '_1'
 
 	g.setTableName('youpi_ingestion')
-	g.insert(	start_ingestion_date = getNowDateTime(duration_stime),
-				end_ingestion_date = getNowDateTime(duration_stime),
-				# FIXME
-				email = '',
-				user_id = user_id,
-				label = ing_label,
-				check_fitsverify  = 0,
-				is_validated = 1,
-				check_multiple_ingestion =0,
-				path = ipath,
-				group_id = perms['group_id'],
-				mode = perms['mode'],
-				exit_code = 0 )
-	ingestionId = g.con.insert_id()
+	ing_data = {
+		'start_ingestion_date': getNowDateTime(duration_stime),
+		'end_ingestion_date': getNowDateTime(duration_stime),
+		# FIXME
+		'email': '',
+		'user_id': user_id,
+		'label': ing_label,
+		'check_fitsverify' : 0,
+		'is_validated': 1,
+		'check_multiple_ingestion':0,
+		'path': ipath,
+		'group_id': perms['group_id'],
+		'mode': perms['mode'],
+		'exit_code': 0 
+	}
+	if not stack_already_ingested:
+		g.insert(**ing_data)
+		ingestionId = g.con.insert_id()
+	else:
+		ing_data.update({'wheres': {'id': ingestionId}})
+		g.update(**ing_data)
 
 	# Get instruments
 	res = g.execute("""select id, name from youpi_instrument;""")
@@ -233,19 +241,25 @@ def run_stack_ingestion(g, stackFile, user_id):
 
 	# Then insert image into db
 	g.setTableName('youpi_image')
-	g.insert(
-		name = fitsNoExt,
-		object = o,
-		exptime = e,
-		equinox = eq,
-		ingestion_date = getNowDateTime(),
-		checksum = checksum,
-		path = ipath,
-		channel_id = res[0][0],
-		ingestion_id = ingestionId,
-		instrument_id = res[0][1]
-	)
-	imageId = g.con.insert_id()
+	image_data = {
+		'name': fitsNoExt,
+		'object': o,
+		'exptime': e,
+		'equinox': eq,
+		'ingestion_date': getNowDateTime(),
+		'checksum': checksum,
+		'path': ipath,
+		'channel_id': res[0][0],
+		'ingestion_id': ingestionId,
+		'instrument_id': res[0][1]
+	}
+
+	if not stack_already_ingested:
+		g.insert(**image_data)
+		imageId = g.con.insert_id()
+	else:
+		image_data.update({'wheres': {'id': imageId}})
+		g.update(**image_data)
 
 	# Computing image sky footprint
 	footprint_start = time.time()
@@ -292,10 +306,10 @@ def run_stack_ingestion(g, stackFile, user_id):
 	debug("Ingested in database as '%s'" % fitsNoExt)
 
 	# Image tagging: tag the image with a 'Stack' tag
-	debug("Tagging image with the %s keyword" % TAG_STACK)
 	res = g.execute("SELECT id FROM youpi_tag WHERE name='%s'" % TAG_STACK)
 	if not res:
 		# Add new 'STACK' tag
+		debug("Tagging image with the %s keyword" % TAG_STACK)
 		g.setTableName('youpi_tag')
 		g.insert(name = TAG_STACK,
 				style = 'background-color: rgb(53, 106, 160); color:white; border:medium none -moz-use-text-color;',
@@ -308,8 +322,10 @@ def run_stack_ingestion(g, stackFile, user_id):
 		tagid = g.con.insert_id()
 	else:
 		tagid = res[0][0]
-	g.setTableName('youpi_rel_tagi')
-	g.insert(image_id = imageId, tag_id = tagid)
+
+	if not stack_already_ingested:
+		g.setTableName('youpi_rel_tagi')
+		g.insert(image_id = imageId, tag_id = tagid)
 
 	# Ingestion log
 	duration_etime = time.time()
