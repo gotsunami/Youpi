@@ -22,17 +22,18 @@ except ImportError:
 g_limit = 10
 g_kind = g_user = None
 g_delete = False
+g_title_width = 30
 
 def print_processings(tasks):
 	total = tasks.count()
-	fmt = '%-30s %-20s %-8s %-10s %3s'
+	fmt = '%-' + str(g_title_width) + 's %-20s %-8s %-10s %3s'
 	print ('%4s ' + fmt) % ('#', 'Title', 'Start', 'Duration', 'User', 'Success')
 	print '-' * 90
 	k = 1
 	for t in tasks[:g_limit]:
 		if t.success: state = 'yes'
 		else: state = 'no'
-		print ('%04d ' + fmt) % (k, t.title[:29], t.start_date, t.end_date-t.start_date, t.user, state)
+		print ('%04d ' + fmt) % (k, t.title[:g_title_width-1], t.start_date, t.end_date-t.start_date, t.user, state)
 		k += 1
 	if total > g_limit:
 		print "Filtered: latest %d results" % g_limit
@@ -140,6 +141,7 @@ AND t.name='%s'
 
 def main():
 	global g_limit, g_kind, g_user, g_delete, g_success, g_failure, g_task_id
+	global g_title_width
 
 	parser = OptionParser(description = 'Gets some info on processing results')
 	parser.add_option('-d', '--delete', 
@@ -192,12 +194,20 @@ def main():
 			dest = 'taskid',
 			help = 'Queries only one task'
 	)
-
+	parser.add_option('-w', '--title-width', 
+			default = False, 
+			action = 'store', 
+			type = 'int',
+			dest = 'twidth',
+			help = "Title column width [default: %d]" % g_title_width
+	)
 	(options, args) = parser.parse_args()
 	if len(args): parser.error('takes no argument at all')
 
 	if options.limit:
 		g_limit = options.limit
+	if options.twidth:
+		g_title_width = options.twidth
 	g_kind = options.kind
 	g_user = options.user
 	g_delete = options.delete
