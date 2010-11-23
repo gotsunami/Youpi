@@ -27,20 +27,6 @@ var Exception = {
 
 var {{ plugin.id }} = {
 	/*
-	 * Variable: mode
-	 * 
-	 * Available Swarp modes: manual (default) or automatic
-	 *
-	 */
-	mode: {MANUAL: 1, AUTOMATIC: 2},
-	/*
-	 * Variable: curMode
-	 * 
-	 * Current Swarp mode (in use)
-	 *
-	 */
-	curMode: null,
-	/*
 	 * Variable: autoProgressBar
 	 * 
 	 * Progress bar widget for automatic processing of selections
@@ -266,7 +252,7 @@ var {{ plugin.id }} = {
 	 */
 	do_addSelectionToCart: function(data, notify) {
 		var notify = typeof notify == 'boolean' ? notify : true;
-		var total = this.curMode == this.mode.MANUAL ? this.ims.getImagesCount() : this.autoCurSelectionImageCount;
+		var total = cartmode.curMode == cartmode.mode.MANUAL ? this.ims.getImagesCount() : this.autoCurSelectionImageCount;
 
 		// Add to the processing cart
 		p_data = {	
@@ -302,7 +288,7 @@ var {{ plugin.id }} = {
 		var sels, total;
 		var selArr;
 
-		if (this.curMode == this.mode.MANUAL) {
+		if (cartmode.curMode == cartmode.mode.MANUAL) {
 			sels = this.ims.getListsOfSelections();
 			total = this.ims.getImagesCount();
 			selArr = eval(sels);
@@ -311,7 +297,6 @@ var {{ plugin.id }} = {
 			selArr = this.autoSelections;
 		}
 
-		//var selArr = eval(sels);
 		var idList = selArr[this.curSelectionIdx];
 	
 		div.setStyle({textAlign: 'left'});
