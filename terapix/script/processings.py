@@ -26,9 +26,9 @@ g_title_width = 30
 
 def print_processings(tasks):
 	total = tasks.count()
-	fmt = '%-' + str(g_title_width) + 's %-20s %-8s %-10s %3s'
+	fmt = '%-' + str(g_title_width) + 's %-20s %-8s %-12s %3s'
 	print ('%4s ' + fmt) % ('#', 'Title', 'Start', 'Duration', 'User', 'Success')
-	print '-' * 90
+	print '-' * (56+g_title_width)
 	k = 1
 	for t in tasks[:g_limit]:
 		if t.success: state = 'yes'
@@ -38,7 +38,7 @@ def print_processings(tasks):
 	if total > g_limit:
 		print "Filtered: latest %d results" % g_limit
 	print "Total: %d" % total
-	print '-' * 90
+	print '-' * (56+g_title_width)
 
 def _get_kw(query):
 	if query.find('WHERE') > 0: kw = 'AND'
