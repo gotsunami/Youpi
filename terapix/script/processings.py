@@ -40,73 +40,12 @@ def print_processings(tasks):
 	print "Total: %d" % total
 	print '-' * (56+g_title_width)
 
-def _get_kw(query):
-	if query.find('WHERE') > 0: kw = 'AND'
-	else: kw = 'WHERE'
-	return kw
-
 def list_processings(tags=[]):
 	"""
 	List processing results according to parameters
 	"""
-	from django.db import connection
-	import re
-	cur = connection.cursor()
-
-	if g_task_id:
-		task_q = """
-SELECT ta.id FROM youpi_processing_task AS ta
-WHERE ta.id=%d
-""" % g_task_id
-	else:
-		if not tags:
-			task_q = """
-SELECT ta.id FROM youpi_processing_task AS ta
-"""
-		else:
-			task_q = """
-SELECT ta.id
-FROM youpi_processing_task AS ta, youpi_rel_it AS relit, youpi_rel_tagi AS tagi, youpi_tag AS t 
-WHERE tagi.tag_id=t.id 
-AND relit.image_id=tagi.image_id 
-AND ta.id=relit.task_id 
-AND t.name='%s'
-"""
-
-	if g_kind:
-		task_q = task_q.replace('youpi_processing_task AS ta', 'youpi_processing_task AS ta, youpi_processing_kind AS k')
-		task_q += "%s ta.kind_id=k.id AND k.name='%s'" % (_get_kw(task_q), g_kind)
-	if g_user:
-		task_q = task_q.replace('youpi_processing_task AS ta', 'youpi_processing_task AS ta, auth_user AS auth')
-		task_q += "%s ta.user_id=auth.id AND auth.username='%s'" % (_get_kw(task_q), g_user)
-	if g_success:
-		task_q += " %s ta.success=1" % _get_kw(task_q)
-	if g_failure:
-		task_q += " %s ta.success=0" % _get_kw(task_q)
-
-	if not tags:
-		cur.execute(task_q)
-		res = cur.fetchall()
-		res = [int(r[0]) for r in res]
-	else:
-		if len(tags) == 1:
-			cur.execute(task_q % tags[0])
-			res = [r[0] for r in cur.fetchall()]
-		else:
-			# Multiple tags
-			prevtids = []
-			for tag in tags:
-				q = task_q % tag
-				if prevtids:
-					q += " AND task_id IN (%s)" % ','.join(prevtids)
-				cur.execute(q)
-				res = cur.fetchall()
-				tmp = [str(r[0]) for r in res]
-				prevtids = tmp
-			res = [int(r) for r in tmp]
-
-	tasks = Processing_task.objects.filter(id__in=res).order_by('-start_date')
-	print_processings(tasks)
+	from terapix.lib.processing import find_tasks
+	print_processings(find_tasks(tags, g_task_id, g_kind, g_user, g_success, g_failure))
 
 	if g_delete and len(tasks) > 0:
 		rels = Rel_it.objects.filter(task__in=tasks)
