@@ -242,77 +242,28 @@ def task_filter(request):
 			'Error': "Sorry, you don't have permission to view processing results",
 		}), mimetype = 'text/plain')
 
-	anyStatus = False
-	if status == 'successful': success = 1
-	elif status == 'failed': success = 0
-	else: anyStatus = True
+	from lib.processing import find_tasks
 
-	from django.db import connection
-	cur = connection.cursor()
-	q = """
-	SELECT t.id FROM youpi_processing_task AS t, youpi_processing_kind AS k
-	WHERE t.kind_id=k.id
-	AND k.name = '%s'
-	%s
-	ORDER BY end_date DESC
-	"""
-	filtered = False
-	user_id = request.user.id
-	# Deep copy
-	dupowner = [name for name in owner]
-
-	if 'all' in dupowner:
-		if anyStatus: cur.execute(q % (kindid, ''))
-		else: cur.execute(q % (kindid, "AND t.success = %d" % success))
-
-	elif 'others' in dupowner:
-		if anyStatus: cur.execute(q % (kindid, "AND t.user_id != %d" % user_id))
-		else: cur.execute(q % (kindid, "AND t.user_id != %d AND t.success = %d" % (user_id, success)))
-
-	else:
-		if 'my' in dupowner: Mine = True
-		else: Mine = False
-		for name in ('all', 'my', 'others'): 
-			try: dupowner.remove(name)
-			except: pass
-		# Check for multi-selections of active user names
-		userIds = User.objects.filter(username__in = dupowner).values_list('id', flat = True)
-		userStr = ','.join([str(id) for id in userIds])
-		if Mine: 
-			if len(userStr):
-				userStr += ',' + str(user_id)
-			else:
-				userStr = str(user_id)
-		if anyStatus: cur.execute(q % (kindid, 'AND t.user_id in (%s)' % userStr))
-		else: cur.execute(q % (kindid, "AND t.user_id in (%s) AND t.success = %d" % (userStr, success)))
-			
-	res = cur.fetchall()
-	tasksIds = [{'id': r[0]} for r in res]
-	res = []
 	nb_suc = nb_failed = 0
-	tasksIds = [t['id'] for t in tasksIds]
+	res = []
+	# Check status
+	anyStatus = False
+	success = failure = True
+	if status == 'successful': failure = False
+	elif status == 'failed': success = False
 
-	# Filter by tag
-	if tasksIds and tags:
-		tasksTags = tasksIds
-		for t in tags:
-			q = """
-			SELECT t.id FROM youpi_processing_task AS t, youpi_rel_it AS r, youpi_rel_tagi AS ti, youpi_tag AS tag
-			WHERE tag.name='%s'
-			AND tag.id = ti.tag_id
-			AND ti.image_id = r.image_id
-			AND r.task_id = t.id
-			AND t.id IN (%s)
-			""" % (t, ','.join([str(t) for t in tasksTags]))
-			cur.execute(q)
-			tres = cur.fetchall()
-			if tres:
-				tasksTags = [r[0] for r in tres]
-			else:
-				tasksIds = []
-				break
-		tasksIds = [r[0] for r in tres]
-		
+	# Check owner
+	owner = owner[0]
+	if owner == 'my':
+		owner = request.user.username
+	elif owner == 'all':
+		owner = None
+
+	# Get tasks
+	tasks = find_tasks(tags, task_id=None, kind=kindid, user=owner, success=success, failure=failure)
+	tasksIds = [int(t.id) for t in tasks]
+	filtered = False
+
 	plugin = manager.getPluginByName(kindid)
 
 	# Plugins can optionally filter/alter the result set
