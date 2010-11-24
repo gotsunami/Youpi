@@ -69,7 +69,7 @@ function ProcessingHistoryWidget(container) {
 	 * Options titles for owner DOM select
 	 *
 	 */ 
-	var _sel_owner_options = ['all', 'my', 'others'];
+	var _sel_owner_options = ['all', 'my'];
 	/*
 	 * Var: _pluginInfos
 	 * Array or array of string describing plugins (used in combobox)
@@ -167,7 +167,7 @@ function ProcessingHistoryWidget(container) {
 		label.insert('Show');
 		tdiv.insert(label);
 
-		var sel = getSelect(_id + '_owner_select', _sel_owner_options, 4);
+		var sel = getSelect(_id + '_owner_select', _sel_owner_options, 1);
 		tdiv.insert(sel);
 
 		sel = getSelect(_id + '_status_select', _sel_status_options);
