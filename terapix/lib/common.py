@@ -78,6 +78,12 @@ class Template(object):
 		return content
 
 def get_static_url(output_dir):
+	"""
+	Returns the appropriate YOUPI_STATIC_URLS entry according to output_dir (member
+	of settings.PROCESSING_OUTPUT)
+	@param output_dir output directory
+	@return matched http URI for serving results
+	"""
 	import types
 	try:
 		from django.conf import settings
@@ -92,3 +98,22 @@ def get_static_url(output_dir):
 		if output_dir.find(PROCESSING_OUTPUT[i]) == 0:
 			return YOUPI_STATIC_URLS[i]
 	raise ValueError, "No match, could not resolve static url for path %s" % output_dir
+
+def get_tpx_condor_upload_url(output_dir):
+	"""
+	Builds a path suitable for condor_transfert.pl TPX_CONDOR_UPLOAD_URL env variable.
+	Given a supported output_dir (member of settings.PROCESSING_OUTPUT), it will return the 
+	concatenation with the matched settings.FTP_URL (same index).
+	@param output_dir output directory
+	@return URI suitable for settings.CMD_CONDOR_TRANSFER
+	"""
+	import types
+	from django.conf import settings
+
+	if type(output_dir) != types.StringType and type(output_dir) != types.UnicodeType:
+		raise TypeError, "output_dir must be a directory path (string)"
+	for i in range(len(settings.PROCESSING_OUTPUT)):
+		if output_dir.find(settings.PROCESSING_OUTPUT[i]) == 0:
+			return settings.FTP_URL[i] +  output_dir
+	raise ValueError, "No match, could not get FTP_URL for path %s" % output_dir
+

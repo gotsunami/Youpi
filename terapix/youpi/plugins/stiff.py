@@ -22,6 +22,7 @@ from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.auth import read_proxy
 import terapix.lib.cluster.condor as condor
+from lib.common import get_tpx_condor_upload_url
 #
 from django.conf import settings
 
@@ -229,7 +230,7 @@ debug("Stiff complete")
 			cluster.addQueue(
 				queue_args = str(image_args), 
 				queue_env = {
-					'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + resultsOutputDir, 
+					'TPX_CONDOR_UPLOAD_URL'	: get_tpx_condor_upload_url(resultsOutputDir), 
 					'YOUPI_USER_DATA'		: base64.encodestring(marshal.dumps(userData)).replace('\n', '')
 				}
 			)

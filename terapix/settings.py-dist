@@ -42,10 +42,11 @@ CMD_GUNZIP			= '/path/to/gunzip'				# FIXME
 PROCESSING_OUTPUT 	= ('/output/path/for/results/',)	# FIXME
 # Must be a tuble of URLs that will serve the static content from the directories 
 # listed in the PROCESSING_OUTPUT tuple. Both variables must have the same 
-# length.
+# number of elements.
 YOUPI_STATIC_URLS	= ('http://web_hostname/path1/',) # FIXME
-#
-FTP_URL 			= 'ftp://hostname/'				# FIXME
+# Must be a tuple of URLs (prefixes for condor_transfert.pl) maching the content 
+# of PROCESSING_OUTPUT (same order)
+FTP_URL 			= ('ftp://hostname/',)				# FIXME
 # Path to the condor_transfer.pl Perl script
 CMD_CONDOR_TRANSFER	= '/path/to/condor_transfer'	# FIXME
 # Custom options to CMD_CONDOR_TRANSFER passed on the command line

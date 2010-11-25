@@ -23,7 +23,7 @@ from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.auth import read_proxy
-from lib.common import get_static_url
+from lib.common import get_static_url, get_tpx_condor_upload_url
 import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
@@ -344,7 +344,7 @@ ORDER BY p.id DESC
 			}),
 			queue_env = {
 				'USERNAME'				: request.user.username,
-				'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + resultsOutputDir, 
+				'TPX_CONDOR_UPLOAD_URL'	: get_tpx_condor_upload_url(resultsOutputDir), 
 				'YOUPI_USER_DATA'		: encUserData,
 			}
 		)

@@ -20,6 +20,7 @@ import cjson as json
 from types import *
 from sets import Set
 #
+from lib.common import get_tpx_condor_upload_url
 from terapix.reporting import ReportFormat , get_report_data
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
@@ -644,7 +645,7 @@ class QualityFitsIn(ProcessingPlugin):
 			cluster.addQueue(
 				queue_args = str(image_args), 
 				queue_env = {
-					'TPX_CONDOR_UPLOAD_URL'	: settings.FTP_URL + resultsOutputDir, 
+					'TPX_CONDOR_UPLOAD_URL'	: get_tpx_condor_upload_url(resultsOutputDir), 
 					'YOUPI_USER_DATA'		: base64.encodestring(marshal.dumps(userData)).replace('\n', '')
 				}
 			)
