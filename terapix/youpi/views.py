@@ -823,7 +823,9 @@ def get_selected_ids_from_pagination(request):
 	for page in pages:
 		ps = pageStatus[k].split(',')
 		if ps[0] == 's':
-			for unchecked in ps[1:]:
+			tmp = ps[1:][:]
+			tmp.reverse()
+			for unchecked in tmp:
 				del page[int(unchecked)]
 		elif ps[0] == 'u':
 			tmp = []
