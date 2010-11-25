@@ -976,8 +976,9 @@ def process(userData, kind_id, argv):
 				finalStackName = run_stack_ingestion(g, os.path.join(userData['ResultsOutputDir'], imgout), user_id)
 				debug("Final stack ingestion complete")
 				if finalStackName != imgout:
+					# FIXME: should not be used anymore since commit 143faf45f64f
 					# Stack name has changed! 
-					# The config file IMAGEOUT_NAME must be modified
+					# The config file IMAGEOUT_NAME value must be modified
 					j = 0
 					for line in configContent:
 						if line.find('IMAGEOUT_NAME') != -1:

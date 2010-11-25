@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim:ft=python
 
 # AUTOMATICALLY GENERATED SCRIPT USED BY THE SWARP PLUGIN FROM THE YOUPI DISTRIBUTION
 # DO NOT EDIT!
@@ -9,6 +10,20 @@ import settings
 def debug(msg):
 	print "[YWP@%s] %s" % ("%02d:%02d:%02d" % time.localtime(time.time())[3:6], msg)
 	sys.stdout.flush()
+
+def delete_weights(weight_files):
+	"""
+	Deletes local weight maps
+	"""
+	# Removes local weight maps (to prevent back transfer by condor_transfert.pl)
+	debug("Removing local weight maps...")
+	wremoved = []
+	for wf in weight_files:
+		wg = glob.glob(os.path.basename(wf) + '*')
+		wremoved.extend(wg)
+		for w in wg:
+			os.remove(w)
+	debug("Done. Deleted input weights:\n%s" % '\n'.join(wremoved))
 
 def handle_weights(weight_files):
 	"""
@@ -75,4 +90,5 @@ command = "${swarp} ${params} @${imgsfile} -c ${config} 2>&1"
 debug("Executing: " + command)
 exit_code = os.system(command)
 debug("Swarp over - exit code: %d" % exit_code)
+delete_weights(${weight_files})
 sys.exit(exit_code)
