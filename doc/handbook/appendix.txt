@@ -11,8 +11,8 @@ ChangeLog
 .. contents::
    :local:
 
-Version 0.6.2
--------------
+Version 0.7
+-----------
 
 **Release Date**: *To Be Released*
 
