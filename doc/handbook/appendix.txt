@@ -18,6 +18,24 @@ Version 0.7
 
 **Improvements**:
 
+- New CLI ``script/processing.py`` for batch deletion of DB processing. `Bug #222`_
+- New Job History page on the results page which provide a list of all completed jobs. 
+  `Bug #208`_
+- Removed ``django-compress`` app from Youpi and use of standalone version. `Bug #218`_
+- `Swarp`: successful processings are not reprocessed anymore, unless forced in the runtime options
+- Added support for multiple output directories (all plugins). `Bug #217`_
+- `Swarp`: added support for automatic compression algorithm detection for weight maps. `Bug #215`_
+- New manual/automatic cart mode for Swarp: selections of images can be submitted automatically to 
+  the processing cart. `Bug #210`_
+- Added global runtime options panel in the processing cart. They now apply to the current 
+  selection of items.
+- Major processing cart redesign, which is faster and comes with 
+  :ref:`more functionalities <the_processing_cart>`. `Bug #212`_
+- Prevents processing cart items to be added twice. `Bug #211`_
+- Enhanced image information page with more information and a full processing history list of jobs 
+  related to that image. `Bug #206`_
+- CLI Grading script ``script/grading.py`` has a new ``-k`` option to list available grades in the 
+  database according to tag names.
 - `Swarp` plugin: added support for custom external ``.head`` file input from `Scamp`.
 - Reporting: added support for pagination for big tables.
 - `QualityFITS`'s report "*List of all images with a selected grade*" can display the QFits result 
@@ -38,15 +56,36 @@ Version 0.7
   will halt at the very beginning, without actually running the `QualityFITS` command itself. The job 
   will fail immediately.
 
+.. _Bug #222: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=222
+.. _Bug #208: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=208
+.. _Bug #218: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=218
+.. _Bug #217: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=217
+.. _Bug #215: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=215
+.. _Bug #210: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=210
+.. _Bug #212: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=212
+.. _Bug #211: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=211
+.. _Bug #206: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=206
 .. _STIFF: http://www.astromatic.net/software/stiff
 .. _IIPImage: http://iipimage.sourceforge.net/
 
 **Bug fixes**:
 
-- Wrapper processing: fixed long running jobs issues with MySQL.
+- `Swarp`: locally transferred weight maps are deleted once the Swarp is over to ensure they are 
+  not transferred back by ``condor_tranfert.pl`` to the results output directory.
+- Image selector: fixed bug related to image selection
+- Fixed performance issue using ``condor_transfert.pl``. `Bug #223`_
+- Fixed the processing history search engine, which is faster and more accurate.
+- `Swarp`: new final stack ingestion policy!
+- Ingestion: fixed bug related to same images with different checksums
+- Ingestion: fixed bug which raised a duplicate entry error
+- Wrapper processing script (`WPS`): better exception handling
+- `WPS`: fixed bug when using Stiff on Swarp output
+- `WPS`: fixed long running jobs issues with MySQL.
 - Reports: fixed file caching issue when downloading report.
 - Fixed a Condor requirement string parsing error for custom policies built upon custom selections 
   of nodes.
+
+.. _Bug #223: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=223
 
 **Release Notes**:
 

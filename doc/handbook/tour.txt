@@ -507,6 +507,8 @@ processing to the cart. By clicking on the ADD TO CART button (in the top right 
 interface) a message will appears to confirm that. If something is wrong an error message
 will guide you to the related tab which needed to be fixed.
 
+.. _the_processing_cart:
+
 The Processing Cart
 ===================
 
