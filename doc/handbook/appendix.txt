@@ -16,6 +16,8 @@ Version 0.7
 
 **Release Date**: *To Be Released*
 
+.. warning:: be sure to read the :ref:`release notes <release_notes_0.7>` carefully before upgrading!
+
 **Improvements**:
 
 - New CLI ``script/processing.py`` for batch deletion of DB processing. `Bug #222`_
@@ -87,6 +89,8 @@ Version 0.7
 
 .. _Bug #223: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=223
 
+.. _release_notes_0.7:
+
 **Release Notes**:
 
 In order to upgrade from 0.6.1, please do the following:
@@ -103,9 +107,46 @@ In order to upgrade from 0.6.1, please do the following:
    it will prevent Django from importing the external, site-wide installation of the ``django_evolution`` 
    application correctly.
 
-2. Make a **backup of your database**.
+2. The ``django-compress`` application has also been removed (`Bug #218`_). Please install the official 
+   ``django-compress`` release on your server::
 
-3. The database structure has changed. Just tell Youpi to inspect your installation and upgrade the database::
+	$ sudo easy_install -U django_compress
+
+   then remove the ``$YOUPI_INSTALL_DIR/terapix/compress`` directory::
+
+	$ rm -rf terapix/compress
+
+3. This release introduces support for multiple output directories (`Bug #217`_): for every plugin, 
+   users can select custom results output directories in the *Set output director* menu. Some config 
+   variables have changed, and you will have to update your ``settings.py`` or ``local_conf.py`` file 
+   accordingly:
+
+	- ``PROCESSING_OUTPUT`` is no more a string but a tuple of strings of absolute paths that will be shown on the 
+	  plugin page when selecting the job output directory.
+
+	- ``WWW_*_PREFIX`` variables have been removed and are replaced by ``YOUPI_STATIC_URLS``, which is a tuple of 
+	  network paths used to serve static content by Apache.
+
+	So, your update ``local_conf.py`` should look like this if you want to store results in two 
+	different directories::
+
+		PROCESSING_OUTPUT   = ('/my/path/for/results1/', '/my/path/for/results2/',)
+		YOUPI_STATIC_URLS   = ('http://youpi.server.tld:10000/', 'http://youpi.server.tld:11000/',)
+
+4. A performance bug has been fixed (`Bug #223`_). The ``FTP_URL`` has been converted from a string 
+   to a tuple of strings that must match the ``PROCESSING_OUTPUT`` variable, in order. According to the 
+   previous example with two directories in ``PROCESSING_OUTPUT``, ``FTP_URL`` could look like this::
+
+		FTP_URL             = ('ftp://host1/', 'ftp://host2/',)
+
+5. The ``gunzip`` program in now a requirement (on the cluster) and is used in `Swarp` to uncompress 
+   weight maps (`Bug #215`_). Please add the path to ``gunzip`` to your `Django` config file::
+
+		CMD_GUNZIP          = '/path/to/gunzip'
+
+6. Make a **backup of your database**.
+
+7. The database structure has changed. Just tell Youpi to inspect your installation and upgrade the database::
 
 	$ python manage.py checksetup
 
@@ -115,6 +156,8 @@ Everytime the database structure has to be updated, you will be prompted for con
 	Type 'yes' to continue, or 'no' to cancel:
 
 If you have made a database backup, you can safely answer: ``yes``.
+
+8. Restart/reload your web server to reload the Django instance.
 
 .. _official releases: http://code.google.com/p/django-evolution/
 
