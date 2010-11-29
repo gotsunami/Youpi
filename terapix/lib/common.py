@@ -92,7 +92,7 @@ def get_static_url(output_dir):
 	except:
 		# For the WP script
 		from settings import PROCESSING_OUTPUT, YOUPI_STATIC_URLS
-	if type(output_dir) != types.StringType:
+	if type(output_dir) != types.StringType and type(output_dir) != types.UnicodeType:
 		raise TypeError, "output_dir must be a directory path (string)"
 	for i in range(len(PROCESSING_OUTPUT)):
 		if output_dir.find(PROCESSING_OUTPUT[i]) == 0:
