@@ -91,8 +91,10 @@ AND t.name='%s'
 					q += " AND task_id IN (%s)" % ','.join(prevtids)
 				cur.execute(q)
 				res = cur.fetchall()
+				print "q %s: %d" % (tag, len(res))
 				tmp = [str(r[0]) for r in res]
 				prevtids = tmp
+				if not res: break
 			res = [int(r) for r in tmp]
 
 	return Processing_task.objects.filter(id__in=res).order_by('-start_date')
