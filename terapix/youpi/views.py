@@ -1895,7 +1895,7 @@ def ims_import_selections(request):
 			sp = line.split(',')
 			if len(sp) == 1:
 				sp[0] = sp[0].strip()
-				imgs = Image.objects.filter(name__startswith = sp[0])
+				imgs = Image.objects.filter(name__exact = sp[0])
 				if not imgs:
 					warnings.append("In %s (Line %d): image '%s' not found, will not make a selection from this file" % (os.path.basename(fileName), j+1, sp[0]))
 					break
@@ -1906,7 +1906,7 @@ def ims_import_selections(request):
 				sp[0] = sp[0].strip()
 				sp[1] = sp[1].strip()
 				namemd5.append(sp)
-				imgs = Image.objects.filter(name__startswith = sp[0], checksum = sp[1])
+				imgs = Image.objects.filter(name__exact = sp[0], checksum = sp[1])
 				if not imgs:
 					warnings.append("In %s (Line %d): image '%s' (%s) not found, will not make a selection from this file" % (os.path.basename(fileName), j+1, sp[0], sp[1]))
 					break
