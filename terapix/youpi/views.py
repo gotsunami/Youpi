@@ -1063,7 +1063,7 @@ def ims_get_image_list_from_file(request):
 		sp = line.split(',')
 		if len(sp) == 1:
 			sp[0] = sp[0].strip()
-			imgs = Image.objects.filter(name__startswith = sp[0])
+			imgs = Image.objects.filter(name__exact = sp[0])
 			if not imgs:
 				warnings.append("Line %d: image '%s' not found" % (j+1, sp[0]))
 			else:
@@ -1073,7 +1073,7 @@ def ims_get_image_list_from_file(request):
 			sp[0] = sp[0].strip()
 			sp[1] = sp[1].strip()
 			namemd5.append(sp)
-			imgs = Image.objects.filter(name__startswith = sp[0], checksum = sp[1])
+			imgs = Image.objects.filter(name__exact = sp[0], checksum = sp[1])
 			if not imgs:
 				warnings.append("Line %d: image '%s' (%s) not found" % (j+1, sp[0], sp[1]))
 			else:
