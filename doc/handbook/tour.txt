@@ -565,6 +565,7 @@ As you can see, cart items are grouped by kind, one item per line:
 
 Every inline item comes with:
 
+* a draggable part
 * a line number
 * a selection checkbox whose purpose it to select the current item and use it with an `action command button`_
 * a unique item name, in uppercase, ending with a number. This unique name is provided for convenience, 
@@ -650,6 +651,21 @@ submitted to the cluster. In this case, 3 flags will be appended:
 .. figure:: /figures/pcart_ci_8.png
 
 The `QualityFITS` job has been successfully submitted and has ID 12763.
+
+If you want to process items in a different order, just grab the line 
+
+.. figure:: /figures/pcart_ci_9.png
+
+... and move it to another place. 
+
+.. figure:: /figures/pcart_ci_10.png
+
+The ``SWARP1`` item is now second in the list:
+
+.. figure:: /figures/pcart_ci_11.png
+
+Note that line items are inserted *before* the target line entry and can only be moved to positions 
+belonging to the same plugin kind.
 
 
 The "Saved items" menu
