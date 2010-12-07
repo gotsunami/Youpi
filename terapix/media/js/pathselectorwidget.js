@@ -225,6 +225,57 @@ function PathSelectorWidget(container, pluginId)
 	}
 
 	/*
+	 * Function: getSelectNode
+	 * Gets select node related to prefix
+	 *
+	 * Parameters:
+	 *  prefix - string: registered prefix name
+	 *
+	 * See Also:
+	 *  <addPath>
+	 *
+	 */ 
+	this.getSelectNode = function(prefix) {
+		if (typeof prefix != 'string') return null;
+		return $(plugin_id + '_' + prefix + '_select');
+	}
+
+	/*
+	 * Function: getSelectPath
+	 * Gets current selected path in select or null if none selected
+	 *
+	 * Parameters:
+	 *  select - DOM node: DOM select
+	 *
+	 * See Also:
+	 *  <getSelectMode>
+	 *
+	 */ 
+	this.getSelectedPath = function(select) {
+		var s = $(select);
+		if (!s) return null;
+		var path = s.options[s.selectedIndex].text;
+		if (path == this.getNoSelectionPattern())
+			path = null;
+		return path;
+	}
+
+	/*
+	 * Function: getPath
+	 * Returns selected *prefix* path for current selector
+	 *
+	 * Parameters:
+	 *  prefix - string: prefix used in addPath()
+	 *
+	 *  See Also:
+	 *   <addPath>
+	 *
+	 */
+	this.getPath = function(prefix) {
+		return this.getSelectedPath(this.getSelectNode(prefix));
+	}
+
+	/*
 	 * Function: setDefaultEntry
 	 * Creates a new entry and selects it
 	 *
