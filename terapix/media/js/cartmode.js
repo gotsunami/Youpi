@@ -284,7 +284,6 @@ var cartmode = {
 	 */ 
 	initPanel: function() {
 		var c = menu.getContentNodeForEntry(menu.getEntry(0));
-		console.log(c);
 		var d = new Element('div', {id: this.plugin_id + '_automatic_div'}).setStyle({width: '90%'});
 		var sc = new Element('div', {id: 'sel_count_div'}).addClassName('largy').update('Please make a selection of image selections:');
 		var tip = new Element('div', {id: 'sel_count_tip'})
