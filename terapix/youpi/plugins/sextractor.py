@@ -165,9 +165,6 @@ class Sextractor(ProcessingPlugin):
 		
 		if dualMode == '1':
 			idList = eval('[[' + str(idList[0][0]) + ']]')
-
-		
-
 		try:
 			for imgList in idList:
 				if not len(imgList):
@@ -180,9 +177,10 @@ class Sextractor(ProcessingPlugin):
 				k += 1
 		except CondorSubmitError, e:
 				condorError = str(e)
+		except PluginAllDataAlreadyProcessed:
+				info = 'This item has already been fully processed. Nothing to do.'
 		except Exception, e:
 				error = "Error while processing list #%d: %s" % (k, e)
-		
 
 		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
 
@@ -207,7 +205,6 @@ class Sextractor(ProcessingPlugin):
 
 		return stats
 
-
 	def __getCondorSubmissionFile(self, request, idList):
 		"""
 		Generates a suitable Condor submission for processing /usr/bin/uptime jobs on the cluster.
@@ -216,20 +213,16 @@ class Sextractor(ProcessingPlugin):
 		configuration file content for an already processed image rather by selecting content by config 
 		file name.
 		"""
-
 		post = request.POST
 		try:
 			itemId 					= str(post['ItemId'])
-
 			weightPath 				= post['WeightPath']
 			flagPath	 			= post['FlagPath']
 			psfPath 				= post['PsfPath']
-
 			dualMode 				= post['DualMode']
 			dualImage 				= post['DualImage']
 			dualFlagPath	 		= post['DualFlagPath']
 			dualWeightPath 			= post['DualWeightPath']
-
 			config 					= post['Config']
 			param 					= post['Param']
 			taskId 					= post.get('TaskId', '')
@@ -257,7 +250,6 @@ class Sextractor(ProcessingPlugin):
 				param = ConfigFile.objects.filter(kind__name__exact = self.id, name = param, type__name__exact = 'param')[0]
 				contconf = config.content
 				contparam = param.content
-
 		except IndexError:
 			# File not found, maybe one is trying to process data from a saved item 
 			# with a delete file
@@ -283,6 +275,8 @@ class Sextractor(ProcessingPlugin):
 		# Condor submission file
 		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 		images = Image.objects.filter(id__in = idList)
+		if not images:
+			raise CondorSubmitError, 'Image list is empty: no match (are you using a selection pointing to deleted images?)'
 
 		xmlName = self.getConfigValue(contconf.split('\n'), 'XML_NAME')
 		xmlRootName = xmlName[:xmlName.rfind('.')]
@@ -333,8 +327,6 @@ class Sextractor(ProcessingPlugin):
 		#
 		userData['StartupDelay'] = step
 		userData['Warnings'] = {}
-	
-	
 
 		# One image per job
 		for img in images:
@@ -349,6 +341,8 @@ class Sextractor(ProcessingPlugin):
 					weight = os.path.join(weightPath, userData['RealImageName'] + '_weight.fits')
 				elif os.path.isfile(weightPath):
 					weight = weightPath
+				else:
+					raise CondorSubmitError, "Bad weight path '%s' for image %s" % (weightPath, img)
 
 			# flag checks
 			if flagPath:
@@ -491,6 +485,65 @@ class Sextractor(ProcessingPlugin):
 
 		cluster.write(csfPath)
 		return csfPath
+
+	def autoProcessSelection(self, request):
+		"""
+		Looks for mandatory data for being able to process an image selection with Sextractor 
+		automatically. Checks are performed in the following order:
+		1. Gets the list of images for that selection
+		2. Looks for a config file with the name of this selections and use it if found. If not, uses 
+		   the default config file for the job. Emits a warning.
+		@return a dictionary
+		"""
+		post = request.POST
+		try:
+			selName = request.POST['SelName']
+			weightPath = request.POST['WeightPath']
+			flagPath = request.POST['FlagPath']
+			psfPath = request.POST['PsfPath']
+			param = request.POST['Param']
+			dualMode = int(request.POST['DualMode'])
+			dualImage = request.POST['DualImage']
+			dualWeightPath = request.POST['DualWeightPath']
+			dualFlagPath = request.POST['DualFlagPath']
+		except Exception, e:
+			raise PluginError, "POST argument error. Unable to process data."
+
+		warnings = []
+		# 1. List of images matching that selection
+		try:
+			sel = ImageSelections.objects.filter(name = selName)[0]
+		except Exception, e:
+			raise PluginError, 'Bad selection name: ' + selName
+		idList = marshal.loads(base64.decodestring(sel.data))[0]
+
+		# 2. Looks for a config file matching the selection name
+		config = ConfigFile.objects.filter(name = selName, type__name = 'config')
+		if not config:
+			config = 'default'
+			warnings.append("Config file %s not found, using default" % selName)
+		else:
+			config = selName
+
+		# The following result set will be used on the client side to add an item in 
+		# the processing cart
+		res = {
+			'selName'				: selName,
+			'weightPath'			: weightPath,
+			'flagPath'				: flagPath,
+			'psfPath'				: psfPath,
+			'param'					: param,
+			'idList'				: str([[int(id) for id in idList]]), # Must be a list of one list of integers (not long)
+			'config'				: config,
+			'warning'				: warnings,
+			'imgCount'				: len(idList),
+			# Dual image mode
+			'dualMode'				: dualMode,
+			'dualImage'				: dualImage,
+			'dualWeightPath'		: dualWeightPath,
+			'dualFlagPath'			: dualFlagPath,
+		}
+		return res
 
 	def getTaskInfo(self, request):
 		"""

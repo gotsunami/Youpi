@@ -27,6 +27,7 @@ var {{ plugin.id }} = {
 	text_single: "<b> Single Image Mode Option:</b><li>Creation of a catalogue of objects from an astronomic image<br><li>support for WeightMaps<br><li>support for FlagMaps<br>",
 	text_dual: "<b>Dual Image Mode Option:</b><li>Image1 is used for detection of sources, image2 for measurements only.<br><li>Image1 and image2 must have the same dimensions.<br><li>For most photometric parameters,image1 will use image2 pixel values, which allows one to easily measurepixel-to-pixel colours.",
 	info_dual: "<b> SExtractor is in DUAL IMAGE MODE </b><BR><br>You can specify for each image of this mode :<BR><br><li> A <b>WEIGHT MAP</b><li> A <b>FLAG MAP</b><br><br> Use the path selector to choose:<br><br><li><b>TOP</b> selection for the first image<br><li><b>BOTTOM</b> selection for the image used for measurements",
+	paths_loaded: false,
 
 	addSelectionToCart: function() {
 		var dualMode = 0;
@@ -828,7 +829,6 @@ var {{ plugin.id }} = {
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
-
 	addToCart: function(data) {
 		var p_data = {	plugin_name : uidsex,
 						userData :	data
@@ -840,7 +840,18 @@ var {{ plugin.id }} = {
 			}
 		);
 	},
-
+	/*
+	 * Function: getWeightPath
+	 * Returns a selector's selected weight path
+	 *
+	 * Parameters:
+	 *	selector - <PathSelectorWidget> instance
+	 *	prefix - string: prefix used in addPath()
+	 *
+	 */ 
+	getPath: function(selector, prefix) {
+	   return selector.getSelectedPath(selector.getSelectNode(prefix));
+	},
 	/*
 	 * More initialization
 	 */
@@ -882,6 +893,46 @@ var {{ plugin.id }} = {
 					}
 				}
 			}.bind(this));
+		}.bind(this));
+		/*
+		 * Activates cart mode feature (automatic/manual).
+		 * This signal is emitted by the PathSelectorWidget class. Since Sextractor works with 
+		 * 2 instances of this class for config and parameter file, the signal is catched twice.
+		 * Should be only catched one time.
+		 */
+		document.observe('PathSelectorWidget:pathsLoaded', function() {
+			if (this.paths_loaded) return;
+			this.paths_loaded = true;
+			cartmode.init(uidsex, 
+				// Elements to toggle
+				[
+					$(uidsex + '_results_div'), $(uidsex + '_results_div2'), 
+					$('cartimg'), menu.getEntry(2), $$('table.sex_mode')[0], $('help_mode')
+				],
+				{}, // No auto params during init, instead provide them later
+				// Before handler
+				function() {
+					// Param config filename
+					var pSel = $(uidsex + '_param_name_select');
+					var param = pSel.options[pSel.selectedIndex].text;
+
+					// Extra params for autoProcessSelection() plugin call (in cartmode.js)
+					cartmode.auto_params = {
+						Param: param,
+						FlagPath: selector1.getPath('flags'), 
+						WeightPath: selector1.getPath('weights'),
+						PsfPath: selector1.getPath('psf'),
+						// TODO: Dual mode parameters?
+						DualMode: 0, // TODO: only supports Single mode for now
+						DualImage: '',
+						DualWeightPath: '',
+						DualFlagPath: ''
+					}; 
+				}.bind(this),
+				null
+			);
+			$('help_mode').hide();
+
 		}.bind(this));
 	}
 };
