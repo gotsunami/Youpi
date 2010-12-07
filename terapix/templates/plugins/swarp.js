@@ -1150,10 +1150,11 @@ var {{ plugin.id }} = {
 		document.observe('PathSelectorWidget:pathsLoaded', function() {
 			cartmode.init(uidswarp, 
 				[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)],
-				{}, // Not auto params during init, instead provide them later
+				{}, // No auto params during init, instead provide them later
+				// Before handler
 				function() {
-					// Before handler
-					cartmode.auto_params = {HeadPath: this.getHeadPath(), WeightPath: this.getWeightPath()}; // extra params for autoProcessSelection() plugin call (in cartmode.js)
+					// extra params for autoProcessSelection() plugin call (in cartmode.js)
+					cartmode.auto_params = {HeadPath: this.getHeadPath(), WeightPath: this.getWeightPath()}; 
 				}.bind(this),
 				function(res) {
 					if (res.qfitsdata) {
