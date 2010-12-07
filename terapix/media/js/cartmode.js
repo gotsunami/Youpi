@@ -111,12 +111,6 @@ var cartmode = {
 	autoProcessSelections: function() {
 		// Custom output directory
 		var output_data_path = $('output_target_path').innerHTML;
-	
-		// Set mandatory structures
-		var p_data = {	plugin_name : this.plugin_id, 
-						userData : {resultsOutputDir: output_data_path}
-		};
-
 		var r = new HttpRequest(
 			null,
 			null,	
@@ -290,6 +284,7 @@ var cartmode = {
 	 */ 
 	initPanel: function() {
 		var c = menu.getContentNodeForEntry(menu.getEntry(0));
+		console.log(c);
 		var d = new Element('div', {id: this.plugin_id + '_automatic_div'}).setStyle({width: '90%'});
 		var sc = new Element('div', {id: 'sel_count_div'}).addClassName('largy').update('Please make a selection of image selections:');
 		var tip = new Element('div', {id: 'sel_count_tip'})
@@ -315,8 +310,8 @@ var cartmode = {
 	 *	plugin_id - string: unique plugin identifier
 	 *	hidden_entries - array: list of DOM nodes to hide/show when changing selector mode
 	 *	auto_params - object: extra parameters passed as is to the <autoProcessSelections> plugin function
-	 *	before_handler - function: custom handler called just before doing the real stuff, and just after validating the confirm box
-	 *	auto_handler - function: custom handler called on each iteration with the results as single parameter
+	 *	before_handler - function: optional custom handler called just before doing the real stuff, and just after validating the confirm box
+	 *	auto_handler - function: optional custom handler called on each iteration with the results as single parameter
 	 *
 	 */ 
 	init: function(plugin_id, hidden_entries, auto_params, before_handler, auto_handler) {
@@ -324,14 +319,12 @@ var cartmode = {
 			throw "plugin_id must be a string";
 		if (typeof auto_params != 'object')
 			throw "auto_params must be an object";
-		if (typeof auto_handler != 'function')
-			throw "auto_handler must be a function";
 		if (this.initialized) return;
 		this.plugin_id = plugin_id;
 		this.hidden_entries = hidden_entries;
 		this.auto_params = auto_params;
 		this.before_handler = typeof before_handler == 'function' ? before_handler : null;
-		this.auto_handler = auto_handler;
+		this.auto_handler = typeof auto_handler == 'function' ? auto_handler : null;
 
 		this.curMode = this.mode.MANUAL;
 		var d = new Element('div', {id: plugin_id + '_mode_div'});
