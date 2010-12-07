@@ -45,7 +45,8 @@ def list_processings(tags=[]):
 	List processing results according to parameters
 	"""
 	from terapix.lib.processing import find_tasks
-	print_processings(find_tasks(tags, g_task_id, g_kind, g_user, g_success, g_failure))
+	tasks = find_tasks(tags, g_task_id, g_kind, g_user, g_success, g_failure)
+	print_processings(tasks)
 
 	if g_delete and len(tasks) > 0:
 		rels = Rel_it.objects.filter(task__in=tasks)
