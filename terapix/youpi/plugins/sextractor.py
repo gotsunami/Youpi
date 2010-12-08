@@ -156,7 +156,7 @@ class Sextractor(ProcessingPlugin):
 		
 		cluster_ids = []
 		k = 1
-		error = condorError = '' 
+		error = condorError = info = '' 
 		
 		try:
 			dualMode = request.POST['DualMode']
@@ -182,7 +182,7 @@ class Sextractor(ProcessingPlugin):
 		except Exception, e:
 				error = "Error while processing list #%d: %s" % (k, e)
 
-		return {'ClusterIds': cluster_ids, 'Error': error, 'CondorError': condorError}
+		return {'ClusterIds': cluster_ids, 'NoData': info, 'Error': error, 'CondorError': condorError}
 
 	def getOutputDirStats(self, outputDir):
 		"""
@@ -277,6 +277,38 @@ class Sextractor(ProcessingPlugin):
 		images = Image.objects.filter(id__in = idList)
 		if not images:
 			raise CondorSubmitError, 'Image list is empty: no match (are you using a selection pointing to deleted images?)'
+
+		# Shall we skip this processing (already successful with same parameters?)
+		if not reprocessValid:
+			skip_processing = False
+			from django.db import connection
+			cur = connection.cursor()
+			cur.execute("""
+SELECT p.id FROM youpi_processing_task AS p, youpi_processing_kind AS k, youpi_rel_it AS r 
+WHERE p.kind_id = k.id 
+AND k.name = '%s' 
+AND p.success = 1
+AND r.task_id = p.id
+AND r.image_id IN (%s)
+ORDER BY p.id DESC
+""" % (self.id, ','.join([str(id) for id in idList])))
+			res = cur.fetchall()
+			if res:
+				# Checks for current image selection
+				for r in res:
+					task = Processing_task.objects.get(pk = r[0])
+					rels = Rel_it.objects.filter(task = task)
+					reimgs = [int(rel.image_id) for rel in rels]
+					if reimgs != idList: continue
+					sex = Plugin_sex.objects.get(task = task)
+					conf = str(zlib.decompress(base64.decodestring(sex.config)))
+					par = str(zlib.decompress(base64.decodestring(sex.param)))
+					if  conf == contconf and  par == contparam and weightPath == sex.weightPath and flagPath == sex.flagPath and \
+						psfPath == sex.psfPath and dualWeightPath == sex.dualweightPath and dualImage == sex.dualImage and dualFlagPath == sex.dualflagPath:
+						skip_processing = True
+						break
+			if skip_processing:
+				raise PluginAllDataAlreadyProcessed
 
 		xmlName = self.getConfigValue(contconf.split('\n'), 'XML_NAME')
 		xmlRootName = xmlName[:xmlName.rfind('.')]
