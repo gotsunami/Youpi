@@ -179,7 +179,14 @@ function ProcessingHistoryWidget(container) {
 		// Optional tags
 		if (_sel_tag_options.length) {
 			label.insert('w/images tagged ');
-			var tsel = new Element('select', {id: _id + '_tags_select', multiple: true, size: 6}); //getSelect(_id + '_tags_select', _sel_tag_options, 4);
+			var tsel = new Element('select', {id: _id + '_tags_select', multiple: true, size: 6});
+			tsel.observe('click', function() {
+				var sd = $(_id + '_selected_tags_div').update();
+				$A(this.options).each(function(opt) {
+					if (opt.selected)
+						sd.insert(new Element('span', {style: opt.readAttribute('style')}).addClassName('tagwidget').update(opt.value));
+				});
+			});
 			var opt, chk;
 			$A(_sel_tag_options).each(function(tag) {
 				opt = new Element('option', {value: tag.label, style: tag.css}).addClassName('tagwidget').update(tag.label);
@@ -188,6 +195,10 @@ function ProcessingHistoryWidget(container) {
 			tdiv.insert(tsel);
 		}
 		form.insert(tdiv);
+		
+		// Shows selected tags
+		var pdiv = new Element('div', {id: _id + '_selected_tags_div'}).setStyle({marginBottom: '3px'});
+		form.insert(pdiv);
 
 		// Plugin-specific div (might be used by plugins for custom filtering/sorting options)
 		var pdiv = new Element('div', {id: _id + '_plugin_custom_options_div'}).addClassName('plugin-filter').addClassName('history_plugin_opts');
