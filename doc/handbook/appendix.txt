@@ -20,15 +20,18 @@ Version 0.7
 
 **Improvements**:
 
+- Results page: selected tags used to filter results are now displayed under the search criteria
+  box (for convenience). `Bug #207`_
 - New CLI ``script/processing.py`` for batch deletion of DB processing. `Bug #222`_
 - New Job History page on the results page which provide a list of all completed jobs. 
   `Bug #208`_
 - Removed ``django-compress`` app from Youpi and use of standalone version. `Bug #218`_
-- `Swarp`: successful processings are not reprocessed anymore, unless forced in the runtime options
+- `Swarp` and `SExtractor` (`Bug #226`_): successful processings are not reprocessed anymore, 
+  unless forced in the runtime options
 - Added support for multiple output directories (all plugins). `Bug #217`_
 - `Swarp`: added support for automatic compression algorithm detection for weight maps. `Bug #215`_
-- New manual/automatic cart mode for Swarp: selections of images can be submitted automatically to 
-  the processing cart. `Bug #210`_
+- New manual/automatic cart mode for Swarp (`Bug #210`_) and SExtractor (`Bug #225`_) plugins: selections 
+  of images can be submitted automatically to the processing cart.
 - Added global runtime options panel in the processing cart. They now apply to the current 
   selection of items.
 - Major processing cart redesign, which is faster and comes with 
@@ -47,7 +50,7 @@ Version 0.7
   ingestions can be changed using the permissions system.
 - `QualityFITS` grading page: added available user comments; redesigned the grading interface.
 - New `STIFF` plugin: `STIFF`_ is a program that converts scientific `FITS`  images to the more 
-  popular `TIFF` format for illustration purposes. It is already used by the `Swarp` and `Sextractor` 
+  popular `TIFF` format for illustration purposes. It is already used by the `Swarp` and `SExtractor` 
   plugins but was not available as an independant plugin. The `STIFF` plugin allows to generate 
   `TIFF` images of single images or stacks of images ingested with Youpi. Moreover, the final image 
   is viewable directly in the browser using the `IIPImage`_ open source streaming client-server system 
@@ -58,6 +61,8 @@ Version 0.7
   will halt at the very beginning, without actually running the `QualityFITS` command itself. The job 
   will fail immediately.
 
+.. _Bug #226: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=226
+.. _Bug #225: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=225
 .. _Bug #222: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=222
 .. _Bug #208: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=208
 .. _Bug #218: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=218
@@ -66,6 +71,7 @@ Version 0.7
 .. _Bug #210: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=210
 .. _Bug #212: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=212
 .. _Bug #211: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=211
+.. _Bug #207: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=207
 .. _Bug #206: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=206
 .. _STIFF: http://www.astromatic.net/software/stiff
 .. _IIPImage: http://iipimage.sourceforge.net/
@@ -73,7 +79,7 @@ Version 0.7
 **Bug fixes**:
 
 - `Swarp`: locally transferred weight maps are deleted once the Swarp is over to ensure they are 
-  not transferred back by ``condor_tranfert.pl`` to the results output directory.
+  not transferred back by ``condor_tranfert.pl`` to the results output directory. `Bug #224`_
 - Image selector: fixed bug related to image selection
 - Fixed performance issue using ``condor_transfert.pl``. `Bug #223`_
 - Fixed the processing history search engine, which is faster and more accurate.
@@ -87,6 +93,7 @@ Version 0.7
 - Fixed a Condor requirement string parsing error for custom policies built upon custom selections 
   of nodes.
 
+.. _Bug #224: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=224
 .. _Bug #223: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=223
 
 .. _release_notes_0.7:
@@ -354,7 +361,7 @@ Version 0.5.2
 - Fixed processing cart issues (session related)
 - Fixed the "Software version check" feature
 - `Swarp` plugin: fixed final stack ingestion issues; fixed bug preventing swarp item cluster submission
-- `Sextractor` plugin: fixed bad weight image name in dual image mode; fixed a data path issue
+- `SExtractor` plugin: fixed bad weight image name in dual image mode; fixed a data path issue
 - All plugins: fixed bad XSL stylesheet URI handling
 
 **Release Notes**:
