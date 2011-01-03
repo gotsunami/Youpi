@@ -6,7 +6,7 @@ Welcome to Youpi documentation!
 :Authors: Mathias Monnerville <monnerville@iap.fr>, Gregory Semah <semah@iap.fr>
 :Maintainer: Mathias Monnerville <monnerville@iap.fr>
 :Organization: Terapix, IAP
-:Copyright: 2008, 2009, 2010, 2010 Terapix, Institut d'Astrophysique de Paris
+:Copyright: 2008, 2009, 2010, 2011 Terapix, Institut d'Astrophysique de Paris
 
 :Release: |release|
 :Date: |today|
