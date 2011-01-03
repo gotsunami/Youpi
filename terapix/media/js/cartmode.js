@@ -116,15 +116,22 @@ var cartmode = {
 			null,	
 			// Custom handler for results
 			function(resp) {
-				res = resp.result;
 				// Adds entry to processing cart
+				res = resp.result;
 				res.resultsOutputDir = output_data_path;
 				if (this.auto_handler) {
 					// Call custom handler
 					this.auto_handler(res);
 				}
+				
 				// New cart item that will be added when auto mode is over
 				this.cartItemsList.push(res);
+				if (res.config == 'default' && res.addDefaultToCart != 'undefined') {
+					if (res.addDefaultToCart == 0) {
+						this.cartItemsList.pop();
+						res.warning.push('This selection has been <i>skipped</i> and not added to the cart (policy: skip selection with default config)');
+					}
+				}
 			
 				if (res.warning.length > 0) {
 					$(this.plugin_id + '_automatic_log').insert('<br/><br/>').insert('Selection <b>' + this.autoSelections[0][this.curSelectionIdx] + '</b>:<br/>');
@@ -153,8 +160,9 @@ var cartmode = {
 					// Final cart adding
 					s_cart.addProcessingsFromList(this.plugin_id, this.cartItemsList, function() {
 						// Send final notification message
-						document.fire('notifier:notify', 'The selection has been added to the processing cart');
-					});
+						if (this.cartItemsList.length > 0)
+							document.fire('notifier:notify', 'The selection has been added to the processing cart');
+					}.bind(this));
 				}
 			}.bind(this)
 		);
@@ -174,8 +182,11 @@ var cartmode = {
 	 *
 	 */
 	refreshCartMode: function(root) {
-		if(this.curMode == null)
+		if (this.curMode == null)
 			throw "Cart current running mode not set";
+		if (this.toggle_handler) {
+			this.toggle_handler(this.curMode);
+		}
 		var root = $(root);
 		var d = new Element('div').addClassName('cart_mode').update('Cart mode: ');
 		var m, a;
@@ -311,9 +322,10 @@ var cartmode = {
 	 *	auto_params - object: extra parameters passed as is to the <autoProcessSelections> plugin function
 	 *	before_handler - function: optional custom handler called just before doing the real stuff, and just after validating the confirm box
 	 *	auto_handler - function: optional custom handler called on each iteration with the results as single parameter
+	 *	toggle_handler - function: optional custom handler called on cart mode switch
 	 *
 	 */ 
-	init: function(plugin_id, hidden_entries, auto_params, before_handler, auto_handler) {
+	init: function(plugin_id, hidden_entries, auto_params, before_handler, auto_handler, toggle_handler) {
 		if (typeof plugin_id != 'string')
 			throw "plugin_id must be a string";
 		if (typeof auto_params != 'object')
@@ -324,6 +336,7 @@ var cartmode = {
 		this.auto_params = auto_params;
 		this.before_handler = typeof before_handler == 'function' ? before_handler : null;
 		this.auto_handler = typeof auto_handler == 'function' ? auto_handler : null;
+		this.toggle_handler = typeof toggle_handler == 'function' ? toggle_handler : null;
 
 		this.curMode = this.mode.MANUAL;
 		var d = new Element('div', {id: plugin_id + '_mode_div'});
