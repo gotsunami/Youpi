@@ -384,33 +384,34 @@ to check:
 	.pl`` must be installed on *all cluster nodes* accepting jobs. Put this script in the 
 	same directory on all nodes and update the ``CMD_CONDOR_TRANSFER`` variable accordingly.
 
+``CMD_FITSVERIFY``
+	Path to the ``fitsverify`` command (used during images ingestion)
+
+``CMD_GUNZIP``
+	.. versionadded:: 0.7
+	   See the :ref:`release notes <release_notes_0.7>`
+
+    Path to the ``gunzip`` command (required by the `Swarp` plugin).
+
 ``CONDOR_TRANSFER_OPTIONS``
 	Any options you might want to set on the ``CMD_CONDOR_TRANSFER`` command line. For more 
 	information, see the ``man`` page::
 
 		$ $YOUPI_INSTALL_DIR/tools/condor_transfer.pl --man
 
-``CMD_FITSVERIFY``
-	Path to the ``fitsverify`` command (used during images ingestion)
-
 ``PROCESSING_OUTPUT``
-	Path to the directory were all your processing data results are going to be stored.
-	Youpi uses a per-user per-application storage policy. Thus, John's `Scamp`_ user 
-	results will be stored in ``PROCESSING_OUTPUT/john/scamp/``. Of course, this 
-	directory can point to any remote networked path (``NFS`` for example).
+	.. versionchanged:: 0.7
+	   See the :ref:`release notes <release_notes_0.7>`
 
-``FTP_URL``
-	``URL`` for FTP transfer. To maximize performance during network transfers, all 
-	results data are transferred back to the ``PROCESSING_OUTPUT`` directory using 
-	the FTP protocol with the ``condor_transfer.pl`` tool distributed with Youpi.
-	``FTP_URL`` should only contain the name of the target host (running a FTP server)
-	that will receive the processing output data. For example, if your ``PROCESSING_OUTPUT``
-	directory is located on your ``data.example.org`` host, just set your ``FTP_URL`` 
-	this way::
+	Tuple of strings of absolute paths that will be shown on the plugin page when selecting the job 
+	output's directory. This is where all your processing data results are going to be stored. Youpi 
+	uses a per-user per-application storage policy. Thus, John's `Scamp`_ user results will be stored 
+	in ``PROCESSING_OUTPUT/john/scamp/``. 
 
-		FTP_URL = 'ftp://data.example.org/'
+``WWW_*_PREFIX``
+	.. deprecated:: 0.7
+	   See the ``YOUPI_STATIC_URLS`` variable instead (:ref:`release notes <release_notes_0.7>`)
 
-``WWW_FITSIN_PREFIX``
 	Must point to your web server responsible for serving your HTML results over HTTP. For 
 	example, all ``QualityFITS`` results will belong to a 
 	``PROCESSING_OUTPUT/USER/fitsin/OUTPUT_DIRECTORY/IMAGE_NAME/qualityFITS/`` directory. 
@@ -437,6 +438,38 @@ to check:
 	The same applies for ``WWW_FITSIN_SCAMP``, ``WWW_FITSIN_SEX`` and ``WWW_FITSIN_SWARP``. As 
 	written in the default ``settings.py-dist`` file, they have the same value as ``WWW_FITSIN_PREFIX``, 
 	which is the default behaviour since they share the same ``PROCESSING_OUTPUT`` directory.
+
+.. _YOUPI_STATIC_URLS:
+
+``YOUPI_STATIC_URLS``
+	.. versionadded:: 0.7 
+	   See the :ref:`release notes <release_notes_0.7>`
+
+	``WWW_*_PREFIX`` variables have been removed and replaced by ``YOUPI_STATIC_URLS``, which is a tuple of 
+	network paths used to serve static content by the web server.
+
+	Its content must match the paths declared in the ``PROCESSING_OUTPUT`` tuple (in order)::
+
+		PROCESSING_OUTPUT   = ('/my/path/for/results1/', '/my/path/for/results2/',)
+		YOUPI_STATIC_URLS   = ('http://youpi.server.tld:10000/', 'http://youpi.server.tld:11000/',)
+
+	This setup means that processing results stored in ``/my/path/for/results1/`` will be served at 
+	``http://youpi.server.tld:10000/`` and so on. Both ``PROCESSING_OUTPUT`` and ``YOUPI_STATIC_URLS`` 
+	variables make Youpi a little more scalable by allowing data distribution over a cluster of 
+	machines.
+
+``FTP_URL``
+	.. versionchanged:: 0.7
+	   See the :ref:`release notes <release_notes_0.7>`
+
+	Tuple of ``URLs`` for FTP transfer. To maximize performance during network transfers, all 
+	results data are transferred back to the ``PROCESSING_OUTPUT`` directory using 
+	the FTP protocol with the ``condor_transfer.pl`` tool distributed with Youpi.
+	``FTP_URL`` must contain a list of target hosts (running a FTP server) that will receive 
+	the processing output data. As for ``YOUPI_STATIC_URLS``, its content must match 
+	``PROCESSING_OUTPUT``::
+
+		FTP_URL             = ('ftp://host1/', 'ftp://host2/',)
 
 ``FILE_BROWSER_ROOT_DATA_PATH``
 	Youpi allows you to select some local or remote (NFS mounted) data path using a file browser 
