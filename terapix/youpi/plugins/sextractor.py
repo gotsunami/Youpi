@@ -538,6 +538,7 @@ ORDER BY p.id DESC
 			dualImage = request.POST['DualImage']
 			dualWeightPath = request.POST['DualWeightPath']
 			dualFlagPath = request.POST['DualFlagPath']
+			addDefaultToCart = int(request.POST['AddDefaultToCart'])
 		except Exception, e:
 			raise PluginError, "POST argument error. Unable to process data."
 
@@ -569,6 +570,7 @@ ORDER BY p.id DESC
 			'config'				: config,
 			'warning'				: warnings,
 			'imgCount'				: len(idList),
+			'addDefaultToCart'		: addDefaultToCart,
 			# Dual image mode
 			'dualMode'				: dualMode,
 			'dualImage'				: dualImage,

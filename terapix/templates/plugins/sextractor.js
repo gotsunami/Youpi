@@ -922,6 +922,7 @@ var {{ plugin.id }} = {
 						FlagPath: selector1.getPath('flags'), 
 						WeightPath: selector1.getPath('weights'),
 						PsfPath: selector1.getPath('psf'),
+						AddDefaultToCart: $(uidsex + '_add_default_to_cart_option').checked ? 0:1,
 						// TODO: Dual mode parameters?
 						DualMode: 0, // TODO: only supports Single mode for now
 						DualImage: '',
@@ -929,11 +930,16 @@ var {{ plugin.id }} = {
 						DualFlagPath: ''
 					}; 
 				}.bind(this),
-				null
+				// Auto handler
+				null,
+				// Toggle handler
+				function(mode) {
+					var e = menu.getEntry(5);
+					mode == cartmode.mode.MANUAL ? e.hide() : e.show();
+				}
 			);
 			$('help_mode').hide();
 
 		}.bind(this));
 	}
 };
-	
