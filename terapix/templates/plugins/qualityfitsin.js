@@ -441,6 +441,7 @@ var {{ plugin.id }} = {
 												'flatPath' : data.Flat, 
 												'flatNormMethod' : data.FlatNormMethod, 
 												'exitIfFlatMissing' : data.ExitIfFlatMissing, 
+												'exitIfMaskMissing' : data.ExitIfMaskMissing, 
 												'maskPath' : data.Mask, 
 												'regPath' : data.Reg,
 												'resultsOutputDir' : data.ResultsOutputDir
