@@ -194,17 +194,19 @@ ORDER BY p.id DESC
 		# At least step seconds between two job start
 		step = 0 							
 
+		# Condor submission file
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
+		csfPath = cluster.getSubmitFilePath()
+		tmpDir = os.path.dirname(csfPath)
+
 		# Swarp config file
-		customrc = self.getConfigurationFilePath()
+		customrc = cluster.getConfigFilePath()
 		swrc = open(customrc, 'w')
 		swrc.write(content)
 		swrc.close()
 
-		# Condor submission file
-		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
-
 		# Swarp file containing a list of images to process (one per line)
-		swarpImgsFile = os.path.join('/tmp/', "swarp-imglist-%s.rc" % time.time())
+		swarpImgsFile = os.path.join(tmpDir, "swarp-imglist-%s.rc" % time.time())
 		imgPaths = [img.filename + '.fits' for img in images]
 		swif = open(swarpImgsFile, 'w')
 		swif.write(string.join(imgPaths, '\n'))
@@ -240,7 +242,7 @@ ORDER BY p.id DESC
 		bigUserData = {'ImgID': idList}
 		userdataFile = "%s-userdata-%s.conf" % (self.id, time.time())
 		userData['BigUserData'] = userdataFile # Pass the name to the WP script
-		udf = open(os.path.join('/tmp/', userdataFile), 'w')
+		udf = open(os.path.join(tmpDir, userdataFile), 'w')
 		udf.write(base64.encodestring(marshal.dumps(bigUserData)).replace('\n', ''))
 		udf.close()
 
@@ -266,7 +268,7 @@ ORDER BY p.id DESC
 
 		# List of all input files to be transferred (for -l option of condor_transfer.pl)
 		transferFile = "swarp-transfer-%s.rc" % time.time()
-		tf = open(os.path.join('/tmp/', transferFile), 'w')
+		tf = open(os.path.join(tmpDir, transferFile), 'w')
 		tf.write('\n' + head_files.replace(', ', '\n'))		# Heads
 		tf.write('\n' + string.join([os.path.join(img.path, img.filename + '.fits') for img in images], '\n')) # Images
 		tf.close()
@@ -276,7 +278,7 @@ ORDER BY p.id DESC
 		# This is mandatory in order to be able to uncompress the weight maps
 		# preProcFile is filled later
 		#
-		preProcFile = os.path.join('/tmp/', "swarp-preprocessing-%s.py" % time.time())
+		preProcFile = os.path.join(tmpDir, "swarp-preprocessing-%s.py" % time.time())
 
 		# Base64 encoding + marshal serialization
 		# Will be passed as argument 1 to the wrapper script
@@ -326,13 +328,12 @@ ORDER BY p.id DESC
 		#
 		# Generate CSF
 		#
-		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([
 			os.path.join(submit_file_path, 'script', 'stack_ingestion.py'),
 			customrc,
-			os.path.join('/tmp/', userdataFile),
+			os.path.join(tmpDir, userdataFile),
 			swarpImgsFile,
-			os.path.join('/tmp/', transferFile),
+			os.path.join(tmpDir, transferFile),
 			preProcFile,
 		])
 		cluster.addQueue(

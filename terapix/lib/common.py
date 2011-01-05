@@ -11,7 +11,7 @@
 #
 ##############################################################################
 
-import os.path, types
+import os, os.path, types
 
 def get_title_from_menu_id(menuId):
 	from youpi.context_processors import appmenu
@@ -114,6 +114,27 @@ def get_tpx_condor_upload_url(output_dir):
 		raise TypeError, "output_dir must be a directory path (string)"
 	for i in range(len(settings.PROCESSING_OUTPUT)):
 		if output_dir.find(settings.PROCESSING_OUTPUT[i]) == 0:
-			return settings.FTP_URL[i] +  output_dir
+			return settings.FTP_URL[i] + output_dir
 	raise ValueError, "No match, could not get FTP_URL for path %s" % output_dir
+
+def get_temp_dir(level1, level2, addDate=True):
+	"""
+	Builds a temporary directory name from level1 and level2 args and the current date, like
+	/base_tmp/username/plugin_id/YYYY-MM-DD/ if level1=username and level2=plugin_id.
+
+	The new directory path is then created.
+	"""
+	if type(level1) not in types.StringTypes or type(level2) not in types.StringTypes:
+		raise TypeError, "Both args must be strings"
+	from datetime import date
+	from django.conf import settings
+	path = os.path.join(settings.BASE_TEMP_DIR, level1, level2)
+	if addDate:
+		path = os.path.join(path, date.today().isoformat())
+	try:
+		os.makedirs(path)
+	except OSError:
+		# Already exists
+		pass
+	return path
 

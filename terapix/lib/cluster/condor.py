@@ -20,6 +20,7 @@ import django.http
 from terapix.lib.cluster import Cluster
 from terapix.youpi.models import *
 from terapix.exceptions import *
+from lib.common import get_temp_dir
 #
 import types, time, os.path
 import os, string, re
@@ -67,11 +68,12 @@ transfer_input_files    = %(transfer)s
 		The returned name should then be used by plugins to add some content to it.
 
 		@param caption a short word that will be appended to the final file name
-		@return Path to a non existing file
+		@return Path to unique Condor submit file path
 		"""
-		if type(caption) != types.StringType:
-			raise TypeError, caption
-		return "%s/CONDOR-%s-%s.csf" % (settings.CONDOR_LOG_DIR, str(caption), time.time())
+		if type(caption) not in types.StringTypes:
+			raise TypeError, 'caption must be a string'
+		path = os.path.join(settings.BASE_TEMP_DIR, "CONDOR-%s-%s.csf" % (caption, time.time()))
+		return path
 
 	@staticmethod
 	def getLogFilenames(caption):
@@ -80,8 +82,7 @@ transfer_input_files    = %(transfer)s
 		that should be used by plugins generating Condor submission files.
 		@return Dictionnary with paths to Condor log files
 		"""
-
-		if type(caption) != types.StringType:
+		if type(caption) not in types.StringTypes:
 			raise TypeError, caption
 		pattern = os.path.join(settings.CONDOR_LOG_DIR, caption.upper() + '.%s.$(Cluster).$(Process)')
 
@@ -98,7 +99,7 @@ transfer_input_files    = %(transfer)s
 			self.__dict__[attribute] = ''
 
 		if desc:
-			if type(desc) != types.StringType:
+			if type(desc) not in types.StringTypes:
 				raise TypeError, "desc parameter must be a string"
 			self._desc = desc
 
@@ -137,14 +138,14 @@ transfer_input_files    = %(transfer)s
 		@param queue_env dictionary of variables used to define environment variables
 		@return dictionary of data associated with the newly created queue
 		"""
-		if queue_args and (type(queue_args) != types.StringType):
+		if queue_args and (type(queue_args) not in types.StringTypes):
 			raise TypeError, 'queue_args must be a string'
 
 		if queue_env:
 			if (type(queue_env) != types.DictType):
 				raise TypeError, 'queue_env must be a dictionary'
 			for k,v in queue_env.iteritems():
-				if (type(k) != types.StringType and type(k) != types.UnicodeType) or (type(v) != types.StringType and type(v) != types.UnicodeType):
+				if (type(k) not in types.StringTypes) or (type(v) not in types.StringTypes):
 					raise TypeError, 'Environment arguments keys and values must be strings:' + str(type(k)) + str(type(v))
 
 		queue_data = {}
@@ -176,7 +177,7 @@ transfer_input_files    = %(transfer)s
 		return self._csfHeader % self.data
 
 	def setExecutable(self, filename):
-		if type(filename) != types.StringType:
+		if type(filename) not in types.StringTypes:
 			raise TypeError, "Executable must be of type 'string', not %s" % type(filename)
 		self._executable = filename
 
@@ -185,7 +186,7 @@ transfer_input_files    = %(transfer)s
 			raise TypeError, "Must be a list of path to files to transfer"
 
 		for file in files:
-			if type(file) != types.StringType:
+			if type(file) not in types.StringTypes:
 				raise TypeError, "File '%s' must be of type 'string', not %s" % (file, type(file))
 
 		self._transfer_input_files = ', '.join(files)
@@ -200,7 +201,7 @@ class YoupiCondorCSF(CondorCSF):
 		CondorCSF.__init__(self, desc)
 		if not isinstance(request, HttpRequest):
 			raise TypeError, "request must be an HttpRequest object"
-		if type(pluginId) != types.StringType:
+		if type(pluginId) not in types.StringTypes:
 			raise TypeError, 'pluginId must be a string'
 
 		self.__request = request
@@ -214,6 +215,47 @@ class YoupiCondorCSF(CondorCSF):
 	@property
 	def id(self):
 		return self.__id
+
+	def getConfigFilePath(self):
+		"""
+		Returns the pathname to configuration file used for this processing
+		Each call generates a new filename so that no file gets overwritten.
+		The returned name should then be used by plugins to add some content to it.
+		@return Path to a non existing file
+		"""
+		return os.path.join(get_temp_dir(self.__request.user.username, self.__id), "%s-%s.rc" % (self.__id.upper(), time.time()))
+
+
+	def getSubmitFilePath(self):
+		"""
+		Overloads CondorCSF.getSubmitFilePath() static function
+		"""
+		return os.path.join(get_temp_dir(self.__request.user.username, self.__id), "CONDOR-%s-%s.csf" % (self.__id, time.time()))
+
+	def getLogFilenames(self, unused=None, date=None):
+		"""
+		Overloads CondorCSF.getLogFilenames() static function
+
+		Returns a dictionnary with entries for the log, error and output filenames 
+		that should be used by plugins generating Condor submission files.
+
+		@param unused parm
+		@param date use custom date instead of today (YYYY-MM-DD)
+		@return Dictionnary with paths to Condor log files
+		"""
+		import datetime
+		if date and not isinstance(date, datetime.date):
+			raise TypeError, "Bad date"
+		if date:
+			pattern = os.path.join(get_temp_dir(self.__request.user.username, self.__id, False), str(date),  self.__id.upper() + '.%s')
+		else:
+			pattern = os.path.join(get_temp_dir(self.__request.user.username, self.__id), self.__id.upper() + '.%s.$(Cluster).$(Process)')
+
+		return {
+			'log'	: pattern % "log",
+			'error'	: pattern % "err",
+			'out'	: pattern % "out",
+		}
 
 	def getSubmissionFileContent(self):
 		"""
@@ -235,7 +277,7 @@ class YoupiCondorCSF(CondorCSF):
 			'requirements'	: self.getRequirementString(),
 			'more' : "initialdir = %s\nnotify_user = %s" % (os.path.join(settings.TRUNK, 'terapix', 'script'), settings.CONDOR_NOTIFY_USER)
 		})
-		self.data.update(self.getLogFilenames(self.__id))
+		self.data.update(self.getLogFilenames())
 
 		return self._csfHeader % self.data
 
@@ -342,10 +384,10 @@ def get_requirement_string(params, vms):
 	Returns Condor's requirement string for a *POLICY*
 	For params, allowed criteria are among: MEM, DSK, HST, SLT
 
-	@params string of params like 'MEM,G,1,G'
-	@params list vms available cluster nodes
+	@param params string of params like 'MEM,G,1,G'
+	@param vms list vms available cluster nodes
 	"""
-	if type(params) != types.StringType and type(params) != types.UnicodeType:
+	if type(params) not in types.StringTypes:
 		raise TypeError, "params must be a string"
 	if type(vms) != types.ListType:
 		raise TypeError, "vms must be a list"
@@ -380,7 +422,7 @@ def get_requirement_string(params, vms):
 		if type(vm) != types.ListType:
 			raise TypeError, "Invalid node info. Should be a list, not '%s'" % vm
 		for i in vm:
-			if type(i) != types.StringType:
+			if type(i) not in types.StringTypes:
 				raise TypeError, "'%s' must be a string, not %s" % (i, type(i))
 
 	nodes = [vm[0] for vm in vms]
@@ -464,7 +506,7 @@ def get_requirement_string_from_selection(selName):
 	Returns Condor's requirement string for a *SELECTION*
 	@param selName - string: name of node selection
 	"""
-	if type(selName) != types.StringType:
+	if type(selName) not in types.StringTypes:
 		raise TypeError, 'selName must be a String'
 
 	try:
@@ -577,7 +619,7 @@ class CondorQueue(object):
 		@param globalPool Get queues of all the submitters in the Condor system
 		"""
 		if envPath:
-			if type(envPath) != types.StringType:
+			if type(envPath) not in types.StringTypes:
 				raise TypeError, "envPath must be a string"
 			self.__condor_q_bin = os.path.join(settings.CONDOR_BIN_PATH, self.__condor_q_bin)
 

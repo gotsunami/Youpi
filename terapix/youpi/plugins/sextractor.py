@@ -260,20 +260,23 @@ class Sextractor(ProcessingPlugin):
 
 		now = time.time()
 
+		# Condor submission file
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
+		csfPath = cluster.getSubmitFilePath()
+		tmpDir = os.path.dirname(csfPath)
+
 		# Sex config file
-		customrc = os.path.join('/tmp/', "sex-config-%s.rc" % now)
+		customrc = os.path.join(tmpDir, "sex-config-%s.rc" % now)
 		sexrc = open(customrc, 'w')
 		sexrc.write(contconf)
 		sexrc.close()
 	
 		# Sex param file
-		custompc = os.path.join('/tmp/', "sex-param-%s.pc" % now)
+		custompc = os.path.join(tmpDir, "sex-param-%s.pc" % now)
 		sexpc = open(custompc, 'w')
 		sexpc.write(contparam)
 		sexpc.close()
 
-		# Condor submission file
-		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 		images = Image.objects.filter(id__in = idList)
 		if not images:
 			raise CondorSubmitError, 'Image list is empty: no match (are you using a selection pointing to deleted images?)'
@@ -343,7 +346,6 @@ ORDER BY p.id DESC
 		step = 0 							# At least step seconds between two job start
 
 		# Generate CSF
-		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([
 			customrc,
 			custompc,

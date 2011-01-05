@@ -198,17 +198,17 @@ class Scamp(ProcessingPlugin):
 		# At least step seconds between two job start
 		step = 0 							
 
+		# Condor submission file
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
+		csfPath = cluster.getSubmitFilePath()
+		tmpDir = os.path.dirname(csfPath)
+
 		# Scamp configuration file
-		customrc = self.getConfigurationFilePath()
+		customrc = cluster.getConfigFilePath()
 		scamprc = open(customrc, 'w')
 		scamprc.write(content)
 		scamprc.close()
 
-		# Condor submission file
-		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
-
-		# Get filenames for Condor log files (log, error, out)
-		logs = condor.CondorCSF.getLogFilenames(self.id)
 		images = Image.objects.filter(id__in = idList)
 
 		xmlName = self.getConfigValue(content.split('\n'), 'XML_NAME')
@@ -242,13 +242,14 @@ class Scamp(ProcessingPlugin):
 		# Scamp file containing a list of images to process (one per line)
 		catalogFile = "scamp-cataloglist-%s.rc" % time.time()
 		catalogPaths = [img.filename + '.ldac' for img in images]
-		scif = open(os.path.join('/tmp/', catalogFile), 'w')
+		#MAT
+		scif = open(os.path.join(tmpDir, catalogFile), 'w')
 		scif.write(string.join(catalogPaths, '\n'))
 		scif.close()
 
 		# List of all input files to be transferred (for -l option of condor_transfer.pl)
 		transferFile = "scamp-transfer-%s.rc" % time.time()
-		tf = open(os.path.join('/tmp/', transferFile), 'w')
+		tf = open(os.path.join(tmpDir, transferFile), 'w')
 		tf.write(string.join(ldac_files, '\n'))
 		tf.write('\n' + ahead_files.replace(', ', '\n'))
 		tf.close()
@@ -261,7 +262,7 @@ class Scamp(ProcessingPlugin):
 		bigUserData = {'ImgID': idList, 'LDACFiles': ldac_files}
 		userdataFile = "%s-userdata-%s.conf" % (self.id, time.time())
 		userData['BigUserData'] = userdataFile # Pass the name to the WP script
-		udf = open(os.path.join('/tmp/', userdataFile), 'w')
+		udf = open(os.path.join(tmpDir, userdataFile), 'w')
 		udf.write(base64.encodestring(marshal.dumps(bigUserData)).replace('\n', ''))
 		udf.close()
 
@@ -296,12 +297,11 @@ class Scamp(ProcessingPlugin):
 		#
 		# Generate CSF
 		#
-		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([
 			customrc,
-			os.path.join('/tmp/', userdataFile),
-			os.path.join('/tmp/', catalogFile),
-			os.path.join('/tmp/', transferFile),
+			os.path.join(tmpDir, userdataFile),
+			os.path.join(tmpDir, catalogFile),
+			os.path.join(tmpDir, transferFile),
 		])
 		cluster.addQueue(
 			queue_args = str("%(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null" % {

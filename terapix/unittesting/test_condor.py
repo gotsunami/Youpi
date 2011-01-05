@@ -36,8 +36,10 @@ class CondorCSFTest(unittest.TestCase):
 	def test_getSubmitFilePath(self):
 		for k in (lambda x: x, 3, object()):
 			self.assertRaises(TypeError, self.csf.getSubmitFilePath, k)
-		# Output
+		kw = {'username': 'monnerville', 'plugin_id': 'scamp'}
+		self.assertRaises(TypeError, self.csf.getSubmitFilePath, 'scamp', username=1, plugin_id='scamp')
 		self.assertTrue(type(self.csf.getSubmitFilePath('mat')) == types.StringType)
+		self.assertTrue(type(self.csf.getSubmitFilePath('scamp', **kw) == types.StringType))
 
 	def test_getLogFilenames(self):
 		for k in (lambda x: x, 3, object()):

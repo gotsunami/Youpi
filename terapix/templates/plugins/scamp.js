@@ -235,7 +235,7 @@ var {{ plugin.id }} = {
 	do_addSelectionToCart: function(selIds) {
 		var cSel = $('{{ plugin.id }}_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
-		var output_data_path = {{ plugin.id }}.getOutputDataPath();
+		var output_data_path = $('output_target_path').innerHTML;
 
 		if (!selIds) {
 			// Manual selections, needs to buid an appropriate selection

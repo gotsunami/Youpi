@@ -100,8 +100,10 @@ class Skeleton(ProcessingPlugin):
 				raise PluginError, "POST argument error. Unable to process data: %s" % e
 
 		now = time.time()
+
 		# Condor submission file
-		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
+		csfPath = cluster.getSubmitFilePath()
 		csf = open(csfPath, 'w')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
@@ -119,7 +121,6 @@ class Skeleton(ProcessingPlugin):
 		#
 		# Generate CSF
 		#
-		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 
 		# Real command to perform here
 		args = ''

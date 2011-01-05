@@ -107,16 +107,6 @@ class ProcessingPlugin(object):
 
 		return []
 
-	def getConfigurationFilePath(self):
-		"""
-		Returns the pathname to configuration file used for this processing
-		Each call generates a new filename so that no file gets overwritten.
-		The returned name should then be used by plugins to add some content to it.
-		@return Path to a non existing file
-		"""
-
-		return "%s/%s-%s.rc" % (settings.CONDOR_LOG_DIR, self.id.upper(), time.time())
-
 	def getUserResultsOutputDir(self, request, oldPath = None, oldUserName = None):
 		"""
 		Builds a default output path for the user if oldPath is None.

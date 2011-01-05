@@ -148,6 +148,8 @@ CONDOR_OUTPUT 	= '/tmp/condor_ingestion.out'
 CONDOR_ERROR 	= '/tmp/condor_ingestion.error'
 CONDOR_LOG 		= '/tmp/condor_ingestion.log'
 CONDOR_LOG_DIR	= '/tmp'
+# Base temporary directory prefix for storing logs and temp config files
+BASE_TEMP_DIR	= '/tmp'
 
 # MySQL settings
 # Warning: Youpi has been tested only with MySQL

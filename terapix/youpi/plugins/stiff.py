@@ -123,15 +123,17 @@ class Stiff(ProcessingPlugin):
 
 		now = time.time()
 
+		# Condor submission file
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
+		csfPath = cluster.getSubmitFilePath()
+		tmpDir = os.path.dirname(csfPath)
+		csf = open(csfPath, 'w')
+
 		# Swarp config file
-		customrc = self.getConfigurationFilePath()
+		customrc = cluster.getConfigFilePath()
 		strc = open(customrc, 'w')
 		strc.write(content)
 		strc.close()
-
-		# Condor submission file
-		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
-		csf = open(csfPath, 'w')
 
 		# Content of YOUPI_USER_DATA env variable passed to Condor
 		# At least those 3 keys
@@ -151,7 +153,7 @@ class Stiff(ProcessingPlugin):
 		#
 		# Pre-processing script runned by condor_transfer.pl
 		#
-		preProcFile = os.path.join('/tmp/', "%s-preprocessing-%s.py" % (self.id, time.time()))
+		preProcFile = os.path.join(tmpDir, "%s-preprocessing-%s.py" % (self.id, time.time()))
 		pf = open(preProcFile, 'w')
 		pcontent = """#!/usr/bin/env python
 
@@ -190,7 +192,6 @@ debug("Stiff complete")
 		#
 		# Generate CSF
 		#
-		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
 		cluster.setTransferInputFiles([customrc, 
 			os.path.join(settings.TRUNK, 'terapix', 'lib', 'common.py'),
 			preProcFile,

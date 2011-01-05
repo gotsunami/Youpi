@@ -484,14 +484,16 @@ class QualityFitsIn(ProcessingPlugin):
 		except Exception, e:
 			raise PluginError, "Unable to use a suitable config file: %s" % e
 
+		# Generate CSF
+		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
+		# Condor submission file path
+		csfPath = cluster.getSubmitFilePath()
+
 		# QualityFITS configuration file
-		customrc = self.getConfigurationFilePath()
+		customrc = cluster.getConfigFilePath()
 		qfrc = open(customrc, 'w')
 		qfrc.write(content)
 		qfrc.close()
-
-		# Condor submission file
-		csfPath = condor.CondorCSF.getSubmitFilePath(self.id)
 
 		images = Image.objects.filter(id__in = idList)
 		# Content of YOUPI_USER_DATA env variable passed to Condor
@@ -516,13 +518,6 @@ class QualityFitsIn(ProcessingPlugin):
 		self.setDefaultCleanupFiles(userData)
 
 		step = 2 							# At least step seconds between two job start
-
-		# Generate CSF
-		cluster = condor.YoupiCondorCSF(request, self.id, desc = self.optionLabel)
-		cluster.setTransferInputFiles([customrc, 
-			os.path.join(settings.TRUNK, 'terapix', 'script', 'genimgdothead.py'), 
-			os.path.join(settings.TRUNK, 'terapix', 'lib', 'common.py'),
-		])
 
 		# Check if already successful processings
 		process_images = []
@@ -650,6 +645,10 @@ class QualityFitsIn(ProcessingPlugin):
 				}
 			)
 
+		cluster.setTransferInputFiles([customrc, 
+			os.path.join(settings.TRUNK, 'terapix', 'script', 'genimgdothead.py'), 
+			os.path.join(settings.TRUNK, 'terapix', 'lib', 'common.py'),
+		])
 		cluster.write(csfPath)
 		return csfPath
 

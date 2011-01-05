@@ -1572,18 +1572,19 @@ def get_condor_log_files_links(request):
 		raise PluginError, "POST argument error. Unable to process data."
 
 	task = Processing_task.objects.filter(id = taskId)[0]
-	pattern = os.path.join(settings.CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
-	logs = {
-		'log': pattern % 'log', 
-		'error': pattern % 'err', 
-		'out': pattern % 'out',
-	}
+
+	import terapix.lib.cluster.condor as condor
+	csf = condor.YoupiCondorCSF(request, task.kind.name)
+	logs = csf.getLogFilenames(date=task.start_date.date())
+	for k,v in logs.iteritems():
+		logs[k] = v + '.' + task.clusterId
+
 	sizes = {'log': 0, 'error': 0, 'out': 0}
 
 	for kind, path in logs.iteritems():
 		try:
 			sizes[kind] = int(os.path.getsize(path))
-			logs[kind] = str("""<a href="/youpi/cluster/log/%s/%s/" target="_blank">%s</a>""" % (kind, taskId, logs[kind][logs[kind].rfind('/')+1:]))
+			logs[kind] = str("""<a href="%s" target="_blank">%s</a>""" % (reverse('terapix.youpi.views.show_condor_log_file', args=[kind, taskId]), logs[kind][logs[kind].rfind('/')+1:]))
 		except OSError:
 			logs[kind] = ''
 
@@ -1606,13 +1607,11 @@ def show_condor_log_file(request, kind, taskId):
 	except:
 		return HttpResponseBadRequest('Bad request')
 
-	pattern = os.path.join(settings.CONDOR_LOG_DIR, task.kind.name.upper() + '.%s.' + task.clusterId)
-
-	logs = {
-		'log': pattern % 'log', 
-		'error': pattern % 'err', 
-		'out': pattern % 'out',
-	}
+	import terapix.lib.cluster.condor as condor
+	csf = condor.YoupiCondorCSF(request, task.kind.name)
+	logs = csf.getLogFilenames(date=task.start_date.date())
+	for k,v in logs.iteritems():
+		logs[k] = v + '.' + task.clusterId
 
 	try:
 		f = open(logs[kind], 'r')
