@@ -399,6 +399,15 @@ to check:
 
 		$ $YOUPI_INSTALL_DIR/tools/condor_transfer.pl --man
 
+.. _BASE_TEMP_DIR:
+
+``BASE_TEMP_DIR``
+	.. versionadded:: 0.7.1
+
+	Youpi will store all log files in ``$BASE_TEMP_DIR/username/plugin_id/YYY-MM-DD/``. That means
+	fewer files per directory, which is convenient when sending thousands of jobs on the cluster. 
+	This is also more scalable.
+
 ``PROCESSING_OUTPUT``
 	.. versionchanged:: 0.7
 	   See the :ref:`release notes <release_notes_0.7>`

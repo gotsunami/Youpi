@@ -11,6 +11,29 @@ ChangeLog
 .. contents::
    :local:
 
+Version 0.7.1
+-------------
+
+**Release Date**: *To Be Released*
+
+**Improvements**:
+
+- New temporary and Condor log files :ref:`directory tree layout <BASE_TEMP_DIR>` (better scalability). `Bug #220`_
+
+.. _Bug #220: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=220
+
+**Bug fixes**:
+
+- `QualityFITS`: fixed job reprocessing issue.
+
+**Release Notes**:
+
+In order to upgrade from 0.6.1, please do the following:
+
+1. Make a **backup of your database**.
+
+2. Restart/reload your web server to reload the Django instance.
+
 Version 0.7
 -----------
 
