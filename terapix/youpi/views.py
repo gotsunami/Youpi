@@ -1575,7 +1575,7 @@ def get_condor_log_files_links(request):
 
 	import terapix.lib.cluster.condor as condor
 	csf = condor.YoupiCondorCSF(request, task.kind.name)
-	logs = csf.getLogFilenames(date=task.start_date.date())
+	logs = csf.getLogFilenames(user=task.user, date=task.start_date.date())
 	for k,v in logs.iteritems():
 		logs[k] = v + '.' + task.clusterId
 
@@ -1609,7 +1609,7 @@ def show_condor_log_file(request, kind, taskId):
 
 	import terapix.lib.cluster.condor as condor
 	csf = condor.YoupiCondorCSF(request, task.kind.name)
-	logs = csf.getLogFilenames(date=task.start_date.date())
+	logs = csf.getLogFilenames(user=task.user, date=task.start_date.date())
 	for k,v in logs.iteritems():
 		logs[k] = v + '.' + task.clusterId
 

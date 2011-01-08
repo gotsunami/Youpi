@@ -232,7 +232,7 @@ class YoupiCondorCSF(CondorCSF):
 		"""
 		return os.path.join(get_temp_dir(self.__request.user.username, self.__id), "CONDOR-%s-%s.csf" % (self.__id, time.time()))
 
-	def getLogFilenames(self, unused=None, date=None):
+	def getLogFilenames(self, unused=None, user=None, date=None):
 		"""
 		Overloads CondorCSF.getLogFilenames() static function
 
@@ -240,16 +240,22 @@ class YoupiCondorCSF(CondorCSF):
 		that should be used by plugins generating Condor submission files.
 
 		@param unused parm
+		@param user Django user model
 		@param date use custom date instead of today (YYYY-MM-DD)
 		@return Dictionnary with paths to Condor log files
 		"""
 		import datetime
 		if date and not isinstance(date, datetime.date):
 			raise TypeError, "Bad date"
-		if date:
-			pattern = os.path.join(get_temp_dir(self.__request.user.username, self.__id, False), str(date),  self.__id.upper() + '.%s')
+
+		if user:
+			username = user.username
 		else:
-			pattern = os.path.join(get_temp_dir(self.__request.user.username, self.__id), self.__id.upper() + '.%s.$(Cluster).$(Process)')
+			username = self.__request.user.username
+		if date:
+			pattern = os.path.join(get_temp_dir(username, self.__id, False), str(date),  self.__id.upper() + '.%s')
+		else:
+			pattern = os.path.join(get_temp_dir(username, self.__id), self.__id.upper() + '.%s.$(Cluster).$(Process)')
 
 		return {
 			'log'	: pattern % "log",
