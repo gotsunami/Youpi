@@ -72,13 +72,6 @@ class ProcessingPluginTest(unittest.TestCase):
 	def test_reports(self):
 		self.assertEquals(type(self.plugin.reports()), types.ListType)
 
-	def test_getConfigurationFilePath(self):
-		p = self.plugin.getConfigurationFilePath()
-		self.assertEquals(type(p), types.StringType)
-		# Tests pseudo randomness
-		time.sleep(.1)
-		self.assertNotEquals(p, self.plugin.getConfigurationFilePath())
-
 	def test_getUserResultsOutputDir(self):
 		req = HttpRequest()
 		req.user = type('User', (object,), {'username': 'user'})()

@@ -25,6 +25,7 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.http import QueryDict
 from django.test import TestCase
+from django.conf import settings
 
 class CondorCSFTest(unittest.TestCase):
 	"""
@@ -36,10 +37,9 @@ class CondorCSFTest(unittest.TestCase):
 	def test_getSubmitFilePath(self):
 		for k in (lambda x: x, 3, object()):
 			self.assertRaises(TypeError, self.csf.getSubmitFilePath, k)
-		kw = {'username': 'monnerville', 'plugin_id': 'scamp'}
 		self.assertRaises(TypeError, self.csf.getSubmitFilePath, 'scamp', username=1, plugin_id='scamp')
 		self.assertTrue(type(self.csf.getSubmitFilePath('mat')) == types.StringType)
-		self.assertTrue(type(self.csf.getSubmitFilePath('scamp', **kw) == types.StringType))
+		self.assertTrue(self.csf.getSubmitFilePath('mat').startswith(settings.BASE_TEMP_DIR))
 
 	def test_getLogFilenames(self):
 		for k in (lambda x: x, 3, object()):
@@ -104,12 +104,15 @@ class CondorCSFTest(unittest.TestCase):
 		self.assertRaises(TypeError, self.csf.setTransferInputFiles, [1, 'a'])
 
 
-class YoupiCondorCSFTest(unittest.TestCase):
+class YoupiCondorCSFTest(TestCase):
 	"""
 	Tests the YoupiCondorCSF class
 	"""
+	fixtures = ['test_user']
+
 	def setUp(self):
 		self.request = HttpRequest()
+		self.request.user = User.objects.all()[0]
 		# TODO: fix this. getRequirementString() is complex and needs info in DB
 		# This hack is used to test the getSubmissionFileContent function
 		class LightYoupiCondorCSF(condor.YoupiCondorCSF):
@@ -125,7 +128,7 @@ class YoupiCondorCSFTest(unittest.TestCase):
 	
 	def test_getSubmissionFileContent(self):
 		content = self.csf.getSubmissionFileContent()
-		self.assertTrue(type(content) == types.StringType)
+		self.assertTrue(type(content) in types.StringTypes)
 		# Those keys must have non-empty values
 		for k in ('more', 'requirements'):
 			self.assertTrue(type(self.csf.data[k]) == types.StringType)
@@ -139,7 +142,7 @@ class YoupiCondorCSFTest(unittest.TestCase):
 		"""
 		Fake test for the moment
 		"""
-		self.assertTrue(type(self.csf.getRequirementString()) == types.StringType)
+		self.assertTrue(type(self.csf.getRequirementString()) in types.StringTypes)
 
 class CondorMiscFunctionTest(TestCase):
 	"""

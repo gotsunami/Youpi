@@ -10,6 +10,7 @@ AUP				= APP_URL_PREFIX 	# For short
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL 			= '/media/'
+DATABASE_SUPPORTS_TRANSACTIONS = True # Required for running unit tests
 
 #
 IMS_MAX_PER_PAGE	= 50
