@@ -1146,7 +1146,7 @@ function ImageSelector(container, options)
 		);
 
 		// Send HTTP POST request
-		xhr.send('/youpi/ingestion/imgCount/');
+		xhr.send('/youpi/ingestion/imgCount/', null, null, 'get');
 	}
 
 	/*
@@ -1413,7 +1413,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/object/');
+		xhr.send('/youpi/ims/collection/object/', null, null, 'get');
 	}
 
 	/*
@@ -1463,7 +1463,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/ingestionid/');
+		xhr.send('/youpi/ims/collection/ingestionid/', null, null, 'get');
 	}
 
 	/*
@@ -1513,7 +1513,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/channel/');
+		xhr.send('/youpi/ims/collection/channel/', null, null, 'get');
 	}
 
 	/*
@@ -1563,7 +1563,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/instrument/');
+		xhr.send('/youpi/ims/collection/instrument/', null, null, 'get');
 	}
 
 	/*
@@ -1613,7 +1613,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/run/');
+		xhr.send('/youpi/ims/collection/run/', null, null, 'get');
 	}
 
 	/*
@@ -1674,7 +1674,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/tag/');
+		xhr.send('/youpi/ims/collection/tag/', null, null, 'get');
 	}
 
 	/*
@@ -1734,7 +1734,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/grade/');
+		xhr.send('/youpi/ims/collection/grade/', null, null, 'get');
 	}
 
 	/*
@@ -1790,7 +1790,7 @@ function ImageSelector(container, options)
 				output.insert(selNode);
 			}
 		);
-		xhr.send('/youpi/ims/collection/savedselections/');
+		xhr.send('/youpi/ims/collection/savedselections/', null, null, 'get');
 	}
 
 	/*

@@ -31,6 +31,7 @@ from django.db import IntegrityError
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
 from django.contrib.auth.models import User
+from django.views.decorators.cache import cache_page
 #
 from terapix.youpi.auth import *
 from terapix.youpi.cviews import *
@@ -48,6 +49,7 @@ def condor_status(request):
 
 @login_required
 @profile
+@cache_page(60*15)
 def ingestion_img_count(request):
 	"""
 	Returns number of ingested images

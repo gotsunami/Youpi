@@ -28,6 +28,7 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbi
 from django.db.models import get_models
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
+from django.views.decorators.cache import cache_page
 #
 from terapix.youpi.auth import *
 from terapix.youpi.models import *
@@ -529,6 +530,8 @@ def preingestion_custom_query(request):
 
 	return HttpResponse(str({'query' : str(query), 'fields' : tableFields, 'data' : data, 'hidden' : str(hide).split(',')}), mimetype = 'text/plain')
 
+@login_required
+@cache_page(60*5)
 def ims_get_collection(request, name):
 	"""
 	Returns a collection for the image selector
