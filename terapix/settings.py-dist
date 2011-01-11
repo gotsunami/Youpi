@@ -122,6 +122,7 @@ DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 MANAGERS = ADMINS
 MAINTENANCE= False
+CACHE_BACKEND = 'locmem://'
 
 # Plugins configuration files directory
 #
