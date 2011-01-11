@@ -29,6 +29,7 @@ ul.smart_tabnav li.enabled, li.enabled_apart {
 
 ul.smart_tabnav li.enabled a, li.enabled_apart a {
    color: white;
+   text-shadow: 1px 1px #000;
 }
 
 ul.smart_tabnav li.enabled_apart {
@@ -42,6 +43,7 @@ ul.smart_tabnav li.disabled, li.disabled_apart {
 
 ul.smart_tabnav li.disabled a, li.disabled_apart a {
    color: grey;
+   text-shadow: 1px 1px #fff;
 }
 
 ul.smart_tabnav li.disabled a:hover, li.disabled_apart a:hover {

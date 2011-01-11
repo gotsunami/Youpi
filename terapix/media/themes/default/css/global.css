@@ -2039,3 +2039,7 @@ td .dragger {
 .cartRowTarget td {
 	background-color: #5b80b2;
 }
+
+#emptycart_div {
+	text-shadow: 1px 1px #ddd;
+}
