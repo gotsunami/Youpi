@@ -113,11 +113,13 @@ function HttpRequest(cont, errorHandler, resultHandler) {
 	 *  path - string: path to server-side script
 	 *  data - string for POST data (i.e. "a=2&c=try")
 	 *  async - boolean: whether the call is asynchronous [default: true]
+	 *  method - string: request method (one of 'get' or 'post') [default: post]
 	 *
 	 */
-	this.send = function(path, data, async) {
-		async = typeof async == 'boolean' ? async : true;
-		_xhr.open('post', path, async);
+	this.send = function(path, data, async, method) {
+		var method = (method != 'get' && method != 'post') ? 'post' : method; 
+		var async = typeof async == 'boolean' ? async : true;
+		_xhr.open(method, path, async);
 		_xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
 		if (async) {
