@@ -58,7 +58,7 @@ function ingestion_stats() {
 	);
 
 	// Send HTTP POST request
-	xhr.send('/youpi/stats/ingestion/');
+	xhr.send('/youpi/stats/ingestion/', null, null, 'get');
 }
 
 function get_stat_line(pbar_id, pbar_value, title, total) {
@@ -136,7 +136,7 @@ function processing_stats() {
 	);
 
 	// Send HTTP POST request
-	xhr.send('/youpi/stats/processing/');
+	xhr.send('/youpi/stats/processing/', null, null, 'get');
 }
 
 </script>

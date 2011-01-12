@@ -26,6 +26,7 @@ from django.db.models import get_models
 from django.db.models import Q
 from django.utils.datastructures import *
 from django.template import Template, Context, RequestContext
+from django.views.decorators.cache import cache_page
 #
 from terapix.lib.common import *
 from terapix.lib import pretty
@@ -1500,6 +1501,7 @@ def gen_image_header(request, image_id):
 
 @login_required
 @profile
+@cache_page(60*30)
 def stats_ingestion(request):
 	"""
 	Returns stats about ingestion
@@ -1532,6 +1534,7 @@ def stats_ingestion(request):
 
 @login_required
 @profile
+@cache_page(60*30)
 def stats_processing(request):
 	"""
 	Returns stats about processings
