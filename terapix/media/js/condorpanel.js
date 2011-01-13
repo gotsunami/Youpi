@@ -740,7 +740,7 @@ function CondorPanel(container_id, varName) {
 
 		// Send POST HTTP query
 		xhr.setBusyMsg('Getting Condor nodes information, please wait');
-		xhr.send('/youpi/cluster/status/');
+		xhr.send('/youpi/cluster/status/', null, null, 'get');
 	}
 
 	/*

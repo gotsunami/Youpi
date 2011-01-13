@@ -44,6 +44,8 @@ from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 import terapix.youpi
 
+@login_required
+@cache_page(60*5)
 def condor_status(request):
 	return HttpResponse(str({'results' : get_condor_status()}), mimetype = 'text/plain')
 
