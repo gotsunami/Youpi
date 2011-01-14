@@ -17,6 +17,8 @@ window.LightboxOptions = {
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 var currentReturnedData = null;
+// For qfits
+var youpi_can_grade = {{ perms.youpi.can_grade|stringformat:"d" }};
 
 {# Load custom plugin's javascript code if available #}
 {% for plugin in plugins %}

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
+ * Copyright (c) 2008-2011 Terapix Youpi development team. All Rights Reserved.
  *                    Mathias Monnerville <monnerville@iap.fr>
  *                    Gregory Semah <semah@iap.fr>
  *
@@ -11,20 +11,13 @@
  *
  *****************************************************************************/
 
-
 // JS code for qualityfits-in plugin
 
-// Global vars
-var {{ plugin.id }}_ims;
-var {{ plugin.id }}_gNextPage = 1;
-var {{ plugin.id }}_itemIdx = 0;
-// File browser for flats, masks and reg paths
-var {{ plugin.id }}_fm_file_browser;
-var {{ plugin.id }}_advTab;
-
-var uidfitsin = '{{ plugin.id }}';
-
-var {{ plugin.id }} = {
+var fitsin = {
+	id: 'fitsin', // Unique ID
+	ims: null,
+	itemIdx: 0,
+	advTab: null,
 	viewImageList: function(container_id, idList) {
 		var idList = eval(idList);
 		var c = '';
@@ -97,7 +90,7 @@ var {{ plugin.id }} = {
 	
 		// Adds various options
 		opts = $H(opts);
-		opts.set('Plugin', uidfitsin);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
@@ -107,19 +100,19 @@ var {{ plugin.id }} = {
 
 	sendAll: function(data) {
 		var r = new HttpRequest(
-				'{{ plugin.id}}_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
 					// removeItemFromCart(data[p][0], true);
-					{{ plugin.id }}_itemIdx++;
-					if ({{ plugin.id }}_itemIdx < data.length) {
-						{{ plugin.id }}.sendAll(data);
+					this.itemIdx++;
+					if (this._itemIdx < data.length) {
+						this.sendAll(data);
 					}
 					else {
 						// Delete all items for that plugin
 						s_cart.deleteAllPluginItems(
-							'{{ plugin.id }}',
+							this.id,
 							// Custom handler called when all items are deleted
 							function() {
 								alert('All jobs sent to cluster');
@@ -127,36 +120,16 @@ var {{ plugin.id }} = {
 							}
 						);
 					}
-				}
+				}.bind(this)
 		);
-		var post = 'Plugin={{ plugin.id }}&Method=process&IdList=' + 
-					data[{{ plugin.id }}_itemIdx][1] + '&ItemID=' + data[{{ plugin.id }}_itemIdx][2];
+		var post = 'Plugin=' + this.id + '&Method=process&IdList=' + 
+					data[this.itemIdx][1] + '&ItemID=' + data[this.itemIdx][2];
 		r.send('/youpi/process/plugin/', post);
-	},
-
-	runAll: function() {
-		var prefix = $('prefix').value.replace(/ /g, '');
-		var txt = '';
-	
-		var r = confirm('Are you sure you want to submit ALL items to the cluster?' + txt);
-		if (!r) return;
-	
-		var trNode;
-		var j=0;
-		data = new Array();
-	
-		{% for data in plugin.getData %}
-			trNode = $('{{ plugin.id }}_' + (j+1));
-			data[j] = [trNode, '{{ data.idList }}', prefix + '{{ plugin.itemPrefix }}{{ data.itemCounter }}'];
-			j++;
-		{% endfor %}
-	
-		{{ plugin.id }}.sendAll(data);
 	},
 
 	saveItemForLater: function(trid, opts, silent) {
 		opts = $H(opts);
-		opts.set('Plugin', uidfitsin);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'saveCartItem');
 
 		var runopts = get_runtime_options(trid);
@@ -176,11 +149,11 @@ var {{ plugin.id }} = {
 
 	// Mandatory function
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_{{ plugin.id }}');
+		var cdiv = $('plugin_menuitem_sub_' + this.id);
 		cdiv.innerHTML = '';
 		var div = new Element('div');
 		div.setAttribute('class', 'savedItems');
-		div.setAttribute('id', '{{ plugin.id }}_saved_items_div');
+		div.setAttribute('id', this.id + '_saved_items_div');
 		cdiv.appendChild(div);
 	
 		var r = new HttpRequest(
@@ -213,9 +186,9 @@ var {{ plugin.id }} = {
 					for (var k=0; k < resp['result'].length; k++) {
 						idList = eval(resp['result'][k]['idList']);
 						tr = new Element('tr');
-						trid = '{{ plugin.id }}_saved_item_' + k + '_tr';
+						trid = this.id + '_saved_item_' + k + '_tr';
 						tr.setAttribute('id', trid);
-						delImg = new Element('img', {id: uidfitsin + '_del_saved_item_' + k}).hide();
+						delImg = new Element('img', {id: this.id + '_del_saved_item_' + k}).hide();
 	
 						// Date
 						td = new Element('td');
@@ -307,31 +280,30 @@ var {{ plugin.id }} = {
 						// Delete
 						td = new Element('td');
 						delImg.setAttribute('style', 'margin-right: 5px');
-						delImg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png');
-						delImg.setAttribute('onclick', "{{ plugin.id }}.delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
+						delImg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/delete.png');
+						delImg.setAttribute('onclick', this.id + ".delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
 						td.insert(delImg.hide());
 
-						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
-						addImg.c_data = $H(resp.result[k]);
-						addImg.observe('click', function() {
-							{{ plugin.id }}.addToCart(this.c_data);
-						});
+						var addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});
+						addImg.observe('click', function(c_data) {
+							this.addToCart(c_data);
+						}.bind(this, $H(resp.result[k])));
 						td.insert(addImg);
 						tr.insert(td);
 		
 						table.appendChild(tr);
 					}
 					div.insert(table);
-				}
+				}.bind(this)
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
+		var post = 	'Plugin=' + this.id + '&Method=getSavedItems';
 		r.send('/youpi/process/plugin/', post);
 	},
 
 	addToCart: function(data) {
 		var p_data = {
-			plugin_name: uidfitsin,
+			plugin_name: this.id,
 			userData: data
 		};
 	
@@ -349,7 +321,7 @@ var {{ plugin.id }} = {
 	
 		var trNode = $(trid);
 		var r = new HttpRequest(
-				uidfitsin + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -365,19 +337,18 @@ var {{ plugin.id }} = {
 							node.fade({
 								afterFinish: function() {
 									node.remove();
-									if (last) eval(uidfitsin + '.showSavedItems()');
-
+									if (last) eval(this.id + '.showSavedItems()');
 									// Notify user
 									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
-								}
+								}.bind(this)
 							});
-						}
+						}.bind(this)
 					});
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			'Plugin': uidfitsin,
+			'Plugin': this.id,
 			'Method': 'deleteCartItem',
 			'Name'	: name
 		};
@@ -434,7 +405,7 @@ var {{ plugin.id }} = {
 				// Custom handler for results
 				function(resp) {
 					data = resp.result;
-					p_data = {	plugin_name : '{{ plugin.id }}', 
+					p_data = {	plugin_name : this.id, 
 								userData : { 	'config' : 'The one used for the last processing',
 												'taskId' : taskId,
 												'idList' : '[[' + data.ImageId + ']]',
@@ -456,10 +427,10 @@ var {{ plugin.id }} = {
 									'An item has been added to the processing cart.');
 							}
 					);
-				}
+				}.bind(this)
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=getReprocessingParams&TaskId=' + taskId;
+		var post = 'Plugin=' + this.id + '&Method=getReprocessingParams&TaskId=' + taskId;
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -519,7 +490,7 @@ var {{ plugin.id }} = {
 		var src;
 		resp['Success'] ? src = 'success' : src = 'error';
 		var img = new Element('img');
-		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif');
 		img.setAttribute('style', 'padding-right: 5px;');
 		tdiv.appendChild(img);
 		tdiv.appendChild(document.createTextNode(resp['Duration'] + ' on'));
@@ -616,20 +587,19 @@ var {{ plugin.id }} = {
 
 			tr = new Element('tr');
 			td = new Element('td');
-		{% if not perms.youpi.can_grade %}
-			var pgd = new Element('div').addClassName('perm_not_granted');
-			td.insert(pgd.update("You don't have permission to grade qualityFITSed images."));
-		{% endif %}
+			if (!youpi_can_grade) {
+				var pgd = new Element('div').addClassName('perm_not_granted');
+				td.insert(pgd.update("You don't have permission to grade qualityFITSed images."));
+			}
 			var nowdiv = new Element('div', 'gradenow').addClassName('gradenow').setStyle({width: '-moz-fit-content'}).update('<u>G</u>rade it now!');
 			nowdiv.insert(new Element('a', {href: '#', accesskey: 'g'}).setStyle({color: 'transparent'}));
 			nowdiv.writeAttribute('title', 'Click to grade this image on a separate page (Alt+Shift+g)');
 			nowdiv.observe('click', function() {
-		{% if perms.youpi.can_grade %}
-			window.open("/youpi/grading/{{ plugin.id }}/" + resp.FitsinId + '/', '_blank');
-		{% else %}
-			alert("You don't have permission to grade images. Please contact an administrator.");
-		{% endif %}
-			});
+			if (youpi_can_grade)
+				window.open("/youpi/grading/" + this.id + "/" + resp.FitsinId + '/', '_blank');
+			else
+				alert("You don't have permission to grade images. Please contact an administrator.");
+			}.bind(this));
 			td.insert(nowdiv);
 			tr.insert(td);
 
@@ -696,7 +666,7 @@ var {{ plugin.id }} = {
 			td = new Element('td');
 			var src = hist[k]['Success'] ? 'success' : 'error';
 			var img = new Element('img');
-			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+			img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif');
 			td.appendChild(img);
 			tr.appendChild(td);
 	
@@ -711,7 +681,7 @@ var {{ plugin.id }} = {
 			// Date-time, duration
 			td = new Element('td');
 			var a = new Element('a');
-			a.setAttribute('href', '/youpi/results/{{ plugin.id }}/' + hist[k]['TaskId'] + '/');
+			a.setAttribute('href', '/youpi/results/' + this.id + '/' + hist[k]['TaskId'] + '/');
 			a.appendChild(document.createTextNode(hist[k]['Start'] + ' (' + hist[k]['Duration'] + ')'));
 			td.appendChild(a);
 			tr.appendChild(td);
@@ -730,8 +700,8 @@ var {{ plugin.id }} = {
 			td = new Element('td');
 			td.setAttribute('class', 'reprocess');
 			img = new Element('img');
-			img.setAttribute('onclick', "{{ plugin.id }}.reprocessImage('" + hist[k]['TaskId'] + "');");
-			img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+			img.setAttribute('onclick', this.id + ".reprocessImage('" + hist[k]['TaskId'] + "');");
+			img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reprocess.gif');
 			td.appendChild(img);
 			tr.appendChild(td);
 	
@@ -882,7 +852,7 @@ var {{ plugin.id }} = {
 			td.setAttribute('style', 'border-bottom: 2px #5b80b2 solid');
 		}
 		tr.appendChild(td);
-		td.appendChild({{ plugin.id }}.getDynTable(resp['ImgInfo'], 3));
+		td.appendChild(this.getDynTable(resp['ImgInfo'], 3));
 		tab2.appendChild(tr);
 
 		// QFits information
@@ -900,7 +870,7 @@ var {{ plugin.id }} = {
 			td = new Element('td');
 			td.setAttribute('colspan', '2');
 			tr.appendChild(td);
-			td.appendChild({{ plugin.id }}.getDynTable(resp['QFitsInfo'], 4));
+			td.appendChild(this.getDynTable(resp['QFitsInfo'], 4));
 			tab2.appendChild(tr);
 		}
 
@@ -983,7 +953,7 @@ var {{ plugin.id }} = {
 	addProcessingResultsCustomOptions: function(container) {
 		var d = $(container);
 		var lab = new Element('label').update('Show ');
-		var gr = getSelect(uidfitsin + '_grading_select', ['all', 'graded', 'not graded']);
+		var gr = getSelect(this.id + '_grading_select', ['all', 'graded', 'not graded']);
 		gr.writeAttribute('name', 'GradingFilter');
 		d.update(lab).insert(gr).insert(new Element('label').update(' images'));
 	},
@@ -1007,12 +977,12 @@ var {{ plugin.id }} = {
 		var root = $('menuitem_sub_0');
 		root.writeAttribute('align', 'center');
 		// Container of the ImageSelector widget
-		var div = new Element('div', {id: '{{ plugin.id }}_results_div', align: 'center'}).setStyle({width: '90%'});
+		var div = new Element('div', {id: this.id + '_results_div', align: 'center'}).setStyle({width: '90%'});
 		root.insert(div);
 
-		{{ plugin.id }}_ims = new ImageSelector('{{ plugin.id }}_results_div');
-		{{ plugin.id }}_advTab = new AdvancedTable();
-		{{ plugin.id }}_ims.setTableWidget({{ plugin.id }}_advTab);
+		this.ims = new ImageSelector(this.id + '_results_div');
+		this.advTab = new AdvancedTable();
+		this.ims.setTableWidget(this.advTab);
 	},
 
 	// container_id is a td containing the cancel button
@@ -1029,12 +999,12 @@ var {{ plugin.id }} = {
 			}
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=cancelJob&ClusterId=' + clusterId + '&ProcId=' + procId;
+		var post = 'Plugin=' + this.id + '&Method=cancelJob&ClusterId=' + clusterId + '&ProcId=' + procId;
 		r.send('/youpi/process/plugin/', post);
 	},
 
 	doit: function() {
-		{{ plugin.id }}.selectImages();
+		this.selectImages();
 	},
 
 	/*
@@ -1045,7 +1015,7 @@ var {{ plugin.id }} = {
 	 * 
 	 */
 	addSelectionToCart: function() {
-		sels = {{ plugin.id }}_ims.getListsOfSelections();
+		sels = this.ims.getListsOfSelections();
 
 		if (!sels) {
 			alert('No images selected. Nothing to add to cart !');
@@ -1058,7 +1028,7 @@ var {{ plugin.id }} = {
 		var mandvars = selector.getMandatoryPrefixes();
 		var mandpaths = new Array();
 		for (var k=0; k < mandvars.length; k++) {
-			var selNode = $('{{ plugin.id }}_' + mandvars[k] + '_select');
+			var selNode = $(this.id + '_' + mandvars[k] + '_select');
 			var success = true;
 			var path;
 			if (!selNode)
@@ -1078,7 +1048,7 @@ var {{ plugin.id }} = {
 		}
 
 		// OPTIONAL
-		var rSel = $('{{ plugin.id }}_regs_select');
+		var rSel = $(this.id + '_regs_select');
 		var regPath = '';
 		if (rSel) {
 			var path = rSel.options[rSel.selectedIndex].text;
@@ -1087,16 +1057,16 @@ var {{ plugin.id }} = {
 		}
 
 		// CHECK 3: get config file
-		var cSel = $('{{ plugin.id }}_config_name_select');
+		var cSel = $(this.id + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		// CHECK 4: custom output directory
 		var output_data_path = $('output_target_path').innerHTML;
 
 		// Finally, add to the processing cart
-		var total = {{ plugin.id }}_ims.getImagesCount();
+		var total = this.ims.getImagesCount();
 
-		p_data = {	plugin_name: uidfitsin,
+		p_data = {	plugin_name: this.id,
 					userData: {	
 						config: config,
 						idList: sels, 
@@ -1104,10 +1074,10 @@ var {{ plugin.id }} = {
 						maskPath: mandpaths[1], 
 						regPath: regPath,
 						resultsOutputDir: output_data_path,
-						exitIfFlatMissing: $(uidfitsin + '_exit_flat_option').checked ? 1:0,
-						exitIfMaskMissing: $(uidfitsin + '_exit_mask_option').checked ? 1:0,
-						flatNormMethod: $(uidfitsin + '_flatnorm_option').checked ? 
-							$(uidfitsin + '_flatnorm_select').options[$(uidfitsin + '_flatnorm_select').selectedIndex].value : ''
+						exitIfFlatMissing: $(this.id + '_exit_flat_option').checked ? 1:0,
+						exitIfMaskMissing: $(this.id + '_exit_mask_option').checked ? 1:0,
+						flatNormMethod: $(this.id + '_flatnorm_option').checked ? 
+							$(this.id + '_flatnorm_select').options[$(this.id + '_flatnorm_select').selectedIndex].value : ''
 					}
 		};
 
@@ -1131,7 +1101,7 @@ var {{ plugin.id }} = {
 	 *
 	 */
 	reprocessAllFailedProcessings: function(tasksList) {
-		var container = $('{{ plugin.id }}_stats_info_div');
+		var container = $(this.id + '_stats_info_div');
 		var r = new HttpRequest(
 			container.id,
 			null,
@@ -1141,7 +1111,7 @@ var {{ plugin.id }} = {
 				var proc = r['Processings'];
 
 				for (var k=0; k < proc.length; k++) {
-					p_data = {	plugin_name: uidfitsin, 
+					p_data = {	plugin_name: this.id, 
 								userData: {
 									config: 'The one used for the last processing',
 									fitsinId: proc[k]['FitsinId'],
@@ -1159,15 +1129,15 @@ var {{ plugin.id }} = {
 					s_cart.addProcessing(	p_data,
 											// Custom handler
 											function() {
-												container.innerHTML = "<img src=\"/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon-yes.gif\"/> Done. A cart item for reprocessing all " + 
+												container.innerHTML = "<img src=\"/media/themes/" + guistyle + "/img/admin/icon-yes.gif\"/> Done. A cart item for reprocessing all " + 
 													tasksList.split(',').length + " images at once has been<br/>added to your <a href=\"/youpi/cart/\">processing cart</a>.";
 											}
 					);
 				}
-			}
+			}.bind(this)
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=reprocessAllFailedProcessings&TasksList=' + tasksList;
+		var post = 'Plugin=' + this.id + '&Method=reprocessAllFailedProcessings&TasksList=' + tasksList;
 		r.setBusyMsg('Adding new cart item for reprocessing ' + tasksList.split(',').length + ' images');
 		r.send('/youpi/process/plugin/', post);
 	},
@@ -1197,7 +1167,7 @@ var {{ plugin.id }} = {
 				th.appendChild(new Element('br'));
 				var rimg = new Element('img');
 				rimg.setAttribute('onclick', resp['PluginId'] + ".reprocessAllFailedProcessings('" + stats['ReprocessTaskList'] + "');");
-				rimg.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+				rimg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reprocess.gif');
 				rimg.setAttribute('style', 'cursor: pointer;');
 				th.appendChild(rimg);
 			}
@@ -1255,7 +1225,7 @@ var {{ plugin.id }} = {
 		container.appendChild(tab);
 
 		var idiv = new Element('div');
-		idiv.setAttribute('id', '{{ plugin.id }}_stats_info_div');
+		idiv.setAttribute('id', this.id + '_stats_info_div');
 		idiv.setAttribute('style', 'margin-top: 20px;');
 		container.appendChild(idiv);
 
@@ -1276,7 +1246,7 @@ var {{ plugin.id }} = {
 		imgdiv.setAttribute('style', 'float: left;');
 
 		var imgSel = new Element('select');
-		imgSel.setAttribute('id', '{{ plugin.id }}_stats_img_sel_select');
+		imgSel.setAttribute('id', this.id + '_stats_img_sel_select');
 		imgSel.setAttribute('size', 15);
 		var opt;
 		for (var k=0; k < stats['ImagesTasks'].length; k++) {
@@ -1290,17 +1260,17 @@ var {{ plugin.id }} = {
 		bdiv.appendChild(imgdiv);
 
 		var logdiv = new Element('div');
-		logdiv.setAttribute('id', '{{ plugin.id }}_stats_log_div');
+		logdiv.setAttribute('id', this.id + '_stats_log_div');
 		logdiv.setAttribute('style', 'width: 700px; height: 300px; text-align: left; overflow: auto; background-color: black; color: white; padding-left: 5px;')
 		bdiv.appendChild(logdiv);
 
 		imgSel.options[0].selected = true;
-		imgSel.setAttribute('onclick', "{{ plugin.id }}.getTaskLog('" + logdiv.id + "', this.options[this.selectedIndex].value);");
+		imgSel.setAttribute('onclick', this.id + ".getTaskLog('" + logdiv.id + "', this.options[this.selectedIndex].value);");
 
 		ldiv.appendChild(bdiv);
 		container.appendChild(ldiv);
 
-		{{ plugin.id }}.getTaskLog(logdiv.id, imgSel.options[0].value);
+		this.getTaskLog(logdiv.id, imgSel.options[0].value);
 	},
 
 	getTaskLog: function(container_id, taskId) {
@@ -1315,7 +1285,7 @@ var {{ plugin.id }} = {
 				}
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=getTaskLog&TaskId=' + taskId; 
+		var post = 'Plugin=' + this.id + '&Method=getTaskLog&TaskId=' + taskId; 
 		r.setBusyMsg('Please wait while loading error log file content');
 		r.send('/youpi/process/plugin/', post);
 	}

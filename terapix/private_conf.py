@@ -182,6 +182,8 @@ TAGS_JS.extend([
 PROCESSING_JS = COMMON_JS[:]
 PROCESSING_JS.extend(['js/3rdParty/tafelTree/Tree.js'])
 #
+PLUGINFITSIN_JS = ('js/plugins/qualityfitsin.js',)
+#
 PROCPLUGIN_JS = COMMON_JS[:]
 PROCPLUGIN_JS.extend([
 	'js/3rdParty/tafelTree/Tree.js',
@@ -282,6 +284,11 @@ COMPRESS_JS = {
 	'imageinfo'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/imageinfo.r?-min.js' },
 	'singleresult'	: { 'source_filenames': SINGLERESULT_JS, 'output_filename': 'js/singleres.r?-min.js' },
 	'softsv'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/softsv.r?-min.js' },
+	# Plugins
+	'fitsin'		: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-fitsin.r?-min.js' },
+	'scamp'			: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-scamp.r?-min.js' },
+	'swarp'			: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-swarp.r?-min.js' },
+	'sex'			: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-sex.r?-min.js' },
 }
 
 #

@@ -5,10 +5,12 @@
 {% block extrahead %}
 {% compressed_css 'procplugin' %}
 {% compressed_js 'procplugin' %}
+{% compressed_js plugin.id %}
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
-
 {# Load custom plugin's javascript code #}
+{% comment %}
+{% endcomment %}
 {% include plugin.jsSource %}
 
 // Displays both logo and 'About' menu tab
