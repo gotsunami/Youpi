@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
+ * Copyright (c) 2008-2011 Terapix Youpi development team. All Rights Reserved.
  *                    Mathias Monnerville <monnerville@iap.fr>
  *                    Gregory Semah <semah@iap.fr>
  *
@@ -35,10 +35,8 @@
  *
  */
 
-/* global */
-var uidskel = '{{ plugin.id }}';
-
-var {{ plugin.id }} = {
+var skel = {
+	id: 'skel',
 	/*
 	 * Function: addSelectionToCart
 	 * Add the current selection to cart.
@@ -51,11 +49,11 @@ var {{ plugin.id }} = {
 		var msg = 'One Skeleton-related job has been added to the cart. This is a DEMO plugin: it does nothing useful.';
 	
 		// Custom output directory
-		var output_data_path = '{{ processing_output.0|safe }}{{ user.username }}/' + uidskel + '/';
+		var output_data_path = skel_output_data;
 	
 		// Set mandatory structures
 		var p_data = {	
-			plugin_name : uidskel,
+			plugin_name : this.id,
 			userData : {resultsOutputDir: output_data_path}
 		};
 	
@@ -99,7 +97,7 @@ var {{ plugin.id }} = {
 		);
 	
 		opts = $H(opts);
-		opts.set('Plugin', uidskel);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
@@ -194,12 +192,12 @@ var {{ plugin.id }} = {
 	 */ 
 	saveItemForLater: function(trid, opts, silent) {
 		opts = $H(opts);
-		opts.set('Plugin', uidskel);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'saveCartItem');
 
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				uidskel + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -246,7 +244,7 @@ var {{ plugin.id }} = {
 		tdiv.insert(resp.Start + '<br/>');
 		tdiv.insert(resp.End + '<br/>');
 		var src = resp.Success ? 'success' : 'error';
-		var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'}).setStyle({paddingRight: '5px'});
+		var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif'}).setStyle({paddingRight: '5px'});
 		tdiv.insert(img);
 		tdiv.insert(resp.Duration);
 		tr = new Element('tr');
@@ -319,8 +317,8 @@ var {{ plugin.id }} = {
 	 *
 	 */ 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_' + uidskel).update();
-		var div = new Element('div', {id: uidskel + '_saved_items_div'}).addClassName('savedItems');
+		var cdiv = $('plugin_menuitem_sub_' + this.id).update();
+		var div = new Element('div', {id: this.id + '_saved_items_div'}).addClassName('savedItems');
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
@@ -348,16 +346,16 @@ var {{ plugin.id }} = {
 					var delImg, trid;
 					var tabi, tabitr, tabitd;
 					resp.result.each(function(res, k) {
-						trid = uidskel + '_saved_item_' + k + '_tr';
+						trid = this.id + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
 						// Delete
-						delImg = new Element('img', {	id: uidskel + '_del_saved_item_' + k,	
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
+						delImg = new Element('img', {	id: this.id + '_del_saved_item_' + k,	
+														src: '/media/themes/' + guistyle + '/img/misc/delete.png'
 						}).setStyle({marginRight: '5px'}).hide();
 						delImg.c_data = {trid: trid, name: res.name};
-						delImg.observe('click', function() {
-							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
-						});
+						delImg.observe('click', function(c_data) {
+							this.delSavedItem(c_data.trid, c_data.name);
+						}.bind(this, delImg.c_data));
 	
 						// Date
 						td = new Element('td').update(res.date);
@@ -384,22 +382,21 @@ var {{ plugin.id }} = {
 						td.insert(delImg);
 
 						// Add to cart button
-						addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
-						addImg.c_data = $H(res);
-						addImg.observe('click', function() {
-							{{ plugin.id }}.addToCart(this.c_data);
-						});
+						addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});
+						addImg.observe('click', function(c_data) {
+							this.addToCart(c_data);
+						}.bind(this, $H(res)));
 						td.insert(addImg);
 
 						tr.insert(td);
 						table.insert(tr);
-					});
+					}.bind(this));
 					div.insert(table);
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			Plugin: uidskel,
+			Plugin: this.id,
 			Method: 'getSavedItems'
 		};
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
@@ -420,7 +417,7 @@ var {{ plugin.id }} = {
 
 		var trNode = $(trid);
 		var r = new HttpRequest(
-				uidskel + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -436,19 +433,18 @@ var {{ plugin.id }} = {
 							node.fade({
 								afterFinish: function() {
 									node.remove();
-									if (last) eval(uidskel + '.showSavedItems()');
-
+									if (last) eval(this.id + '.showSavedItems()');
 									// Notify user
 									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
-								}
+								}.bind(this)
 							});
-						}
+						}.bind(this)
 					});
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			'Plugin': uidskel,
+			'Plugin': this.id,
 			'Method': 'deleteCartItem',
 			'Name'	: name
 		};
@@ -465,7 +461,7 @@ var {{ plugin.id }} = {
 	 *
 	 */ 
 	addToCart: function(data) {
-		var p_data = {	plugin_name : uidskel,
+		var p_data = {	plugin_name : this.id,
 						userData : data
 		};
 	
