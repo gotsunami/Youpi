@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
+ * Copyright (c) 2008-2011 Terapix Youpi development team. All Rights Reserved.
  *                    Mathias Monnerville <monnerville@iap.fr>
  *                    Gregory Semah <semah@iap.fr>
  *
@@ -19,11 +19,9 @@ var ldac_table_active_selections = new Array();
 var ldac_selection_last_idx;
 var xmlParser;
 
-// Used in checkForSelectionLDACData()
-var {{ plugin.id }}_curSelectionIdx = 0;
-var uidscamp = '{{ plugin.id }}';
-
-var {{ plugin.id }} = {
+var scamp = {
+	id: 'scamp', 
+	curSelectionIdx: 0,
 	/*
 	 * Variable: aheadPath
 	 * Data path to .ahead files
@@ -58,7 +56,7 @@ var {{ plugin.id }} = {
 					userData.set('taskId', taskId);
 
 					// Add to the processing cart
-					var p_data = {	plugin_name	: uidscamp,
+					var p_data = {	plugin_name	: this.id,
 									userData 	: userData,
 					};
 				
@@ -66,10 +64,10 @@ var {{ plugin.id }} = {
 						document.fire('notifier:notify', 'Scamp scheduled for reprocessing (' + total + ' ' + (total > 1 ? 'images' : 'image') + 
 							') and added to the processing cart.');
 					});
-				}
+				}.bind(this)
 		);
 
-		var post = { Plugin: '{{ plugin.id }}',
+		var post = { Plugin: this.id,
 					 Method: 'getReprocessingParams',
 					 TaskId: taskId
 		};
@@ -82,8 +80,8 @@ var {{ plugin.id }} = {
 	 */
 	addSelectionToCart: function() {
 		// Global var
-		{{ plugin.id }}_curSelectionIdx = 0;
-		{{ plugin.id }}.LdacError = 0;
+		this.curSelectionIdx = 0;
+		this.LdacError = 0;
 	
 		var container = emptyContainer('menuitem_sub_4');
 		var pre = new Element('pre');
@@ -105,7 +103,7 @@ var {{ plugin.id }} = {
 		log.msg_ok('Found ' + total + ' image' + (total > 1 ? 's' : '') + ' in selection.');
 	
 		// CHECK 2: get config file
-		var cSel = $('{{ plugin.id }}_config_name_select');
+		var cSel = $(this.id + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 		log.msg_status("Using '" + config + "' as configuration file");
 
@@ -114,7 +112,7 @@ var {{ plugin.id }} = {
 		var mandvars = selector.getMandatoryPrefixes();
 		var mandpaths = new Array();
 		for (var k=0; k < mandvars.length; k++) {
-			var selNode = $(uidscamp + '_' + mandvars[k] + '_select');
+			var selNode = $(this.id + '_' + mandvars[k] + '_select');
 			var success = true;
 			var path;
 			if (!selNode)
@@ -132,7 +130,7 @@ var {{ plugin.id }} = {
 				return;
 			}
 		}
-		{{ plugin.id }}.aheadPath = mandpaths[0];
+		this.aheadPath = mandpaths[0];
 	
 		// CHECK 4: custom output directory
 		var output_data_path = $('output_target_path').innerHTML;
@@ -140,7 +138,7 @@ var {{ plugin.id }} = {
 	
 		// CHECK 5: checks for LDAC/AHEAD data
 		log.msg_status("Deeper selection(s) checks for LDAC/AHEAD data...");
-		{{ plugin.id }}.checkForSelectionLdacAheadData(pre);
+		this.checkForSelectionLdacAheadData(pre);
 	},
 
 	/*
@@ -157,7 +155,7 @@ var {{ plugin.id }} = {
 		var sels = ims.getListsOfSelections();
 		var total = ims.getImagesCount();
 		var selArr = eval(sels);
-		var idList = selArr[{{ plugin.id }}_curSelectionIdx];
+		var idList = selArr[this.curSelectionIdx];
 	
 		div.setAttribute('style', 'color: brown; text-align: left;');
 		container.appendChild(div);
@@ -171,9 +169,9 @@ var {{ plugin.id }} = {
 					missing = resp.result.missing;
 	
 					if (missing.length > 0) {
-						log.msg_warning('Missing LDAC/AHEAD data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
+						log.msg_warning('Missing LDAC/AHEAD data for selection ' + (this.curSelectionIdx+1) + 
 							' (' + missing.length + ' image' + (missing.length > 1 ? 's' : '') + ' failed!)');
-						{{ plugin.id }}.LdacError = 1;
+						this.LdacError = 1;
 
 						var mdiv = new Element('div').setStyle({
 							marginLeft: '20px', 
@@ -185,23 +183,23 @@ var {{ plugin.id }} = {
 						missing.each(function(image) {
 							// Missing files list
 							image[1].each(function(file) {
-								var fspan = new Element('span').addClassName('file').update({{ plugin.id }}.aheadPath + file);
+								var fspan = new Element('span').addClassName('file').update(this.aheadPath + file);
 								mdiv.insert('Missing file ').insert(fspan).insert(new Element('br'));
-							});
-						});
+							}.bind(this));
+						}.bind(this));
 					}	
 					else {
-						log.msg_ok('LDAC/AHEAD data for selection ' + ({{ plugin.id }}_curSelectionIdx+1) + 
+						log.msg_ok('LDAC/AHEAD data for selection ' + (this.curSelectionIdx+1) + 
 							' (' + idList.length + ' image' + (idList.length > 1 ? 's' : '') + ') is OK');
 					}
 	
-					{{ plugin.id }}_curSelectionIdx++;
+					this.curSelectionIdx++;
 	
-					if ({{ plugin.id }}_curSelectionIdx < selArr.length) {
-						{{ plugin.id }}.checkForSelectionLDACData(container);
+					if (this.curSelectionIdx < selArr.length) {
+						this.checkForSelectionLDACData(container);
 					}
 					else {
-						if ({{ plugin.id }}.LdacError) {
+						if (this.LdacError) {
 							log.msg_error('Missing LDAC/AHEAD information. Selection(s) not added to cart!', true);
 							return;
 						}
@@ -211,29 +209,29 @@ var {{ plugin.id }} = {
 										'to the cart now for processing.');
 						if (r) {
 							log.msg_status('Please select the LDAC files you want to use for scamp processing');
-							{{ plugin.id }}.manualLDACSelection(div);
+							this.manualLDACSelection(div);
 							
 							return;
 						}
 	
-						{{ plugin.id }}.do_addSelectionToCart(sels);
+						this.do_addSelectionToCart(sels);
 					}
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			Plugin: uidscamp,
+			Plugin: this.id,
 			Method: 'checkForSelectionLdacAheadData',
 			IdList: idList.toString(),
-			AheadPath: {{ plugin.id }}.aheadPath
+			AheadPath: this.aheadPath
 		};
 		// Send query
-		r.setBusyMsg('Checking selection ' + ({{ plugin.id }}_curSelectionIdx+1) + ' (' + idList.length + ' images)');
+		r.setBusyMsg('Checking selection ' + (this.curSelectionIdx+1) + ' (' + idList.length + ' images)');
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
 
 	do_addSelectionToCart: function(selIds) {
-		var cSel = $('{{ plugin.id }}_config_name_select');
+		var cSel = $(this.id + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 		var output_data_path = $('output_target_path').innerHTML;
 
@@ -269,11 +267,11 @@ var {{ plugin.id }} = {
 			config: config,
 			idList: selIds,
 			resultsOutputDir: output_data_path,
-			aheadPath: {{ plugin.id }}.aheadPath
+			aheadPath: this.aheadPath
 		};
 
 		// Finally, add to the processing cart
-		p_data = {	plugin_name	: uidscamp,
+		p_data = {	plugin_name	: this.id,
 					userData 	: data
 		};
 	
@@ -299,9 +297,9 @@ var {{ plugin.id }} = {
 		ldac_table.setHeaders(['LDAC files to use']);
 		ldac_table.setRowIdsFromColumn(0);
 		ldac_table.attachEvent('onRowClicked', 
-			function(checked) { 
-				{{ plugin.id }}.LDACSaveCurrentSelection();
-			}
+			function(checked) {
+				this.LDACSaveCurrentSelection();
+			}.bind(this)
 		);
 	
 		var options = new Array();
@@ -316,7 +314,7 @@ var {{ plugin.id }} = {
 		var opt;
 		for (var k=0; k < selArr.length; k++) {
 			opt = selNode.childNodes[k];
-			opt.setAttribute('onclick', "{{ plugin.id }}.renderLDACSelection(" + parseInt(k) + ")");
+			opt.setAttribute('onclick', this.id + ".renderLDACSelection(" + parseInt(k) + ")");
 		}
 		
 		var ldac_tab = new Element('table');
@@ -342,7 +340,7 @@ var {{ plugin.id }} = {
 		sub.setAttribute('style', 'float: left;');
 		sub.setAttribute('type', 'button');
 		sub.setAttribute('value', 'Select all');
-		sub.setAttribute('onclick', 'ldac_table.selectAll(true); {{ plugin.id }}.LDACSaveCurrentSelection();');
+		sub.setAttribute('onclick', 'ldac_table.selectAll(true); ' + this.id + '.LDACSaveCurrentSelection();');
 		ldac_opt_div.appendChild(sub);
 			
 		// Unselect all
@@ -350,14 +348,14 @@ var {{ plugin.id }} = {
 		sub.setAttribute('style', 'float: left; margin-left: 10px;');
 		sub.setAttribute('type', 'button');
 		sub.setAttribute('value', 'Unselect all');
-		sub.setAttribute('onclick', 'ldac_table.selectAll(false); {{ plugin.id }}.LDACSaveCurrentSelection();');
+		sub.setAttribute('onclick', 'ldac_table.selectAll(false); ' + this.id + '.LDACSaveCurrentSelection();');
 		ldac_opt_div.appendChild(sub);
 	
 		// Add to cart button
 		var addc = new Element('img');
 		addc.setAttribute('style', 'cursor: pointer; float: right;');
-		addc.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/add_to_cart.png');
-		addc.setAttribute('onclick', "{{ plugin.id }}.do_addSelectionToCart();");
+		addc.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/add_to_cart.png');
+		addc.setAttribute('onclick', this.id + ".do_addSelectionToCart();");
 		ldac_opt_div.appendChild(addc);
 			
 		td = new Element('td');
@@ -366,7 +364,7 @@ var {{ plugin.id }} = {
 		td.appendChild(ldac_selection_div);
 		tr.appendChild(td);
 		
-		{{ plugin.id }}.renderLDACSelection(0);
+		this.renderLDACSelection(0);
 	},
 
 	LDACSaveCurrentSelection: function() {
@@ -393,7 +391,7 @@ var {{ plugin.id }} = {
 	
 		// Save current selection status (thus it can be restaured later)
 		if (ldac_table.rowCount())
-			{{ plugin.id }}.LDACSaveCurrentSelection();
+			this.LDACSaveCurrentSelection();
 	
 		ldac_selection_last_idx = idx;
 	
@@ -424,10 +422,10 @@ var {{ plugin.id }} = {
 		);
 	
 		var post = {
-			Plugin: uidscamp,
+			Plugin: this.id,
 			Method: 'getLDACPathsFromImageSelection',
 			IdList: selArr[idx].toString(),
-			AheadPath: {{ plugin.id }}.aheadPath
+			AheadPath: this.aheadPath
 		};
 
 		xhr.send('/youpi/process/plugin/', $H(post).toQueryString());
@@ -475,7 +473,7 @@ var {{ plugin.id }} = {
 	
 		// Adds various options
 		opts = $H(opts);
-		opts.set('Plugin', uidscamp);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
@@ -548,7 +546,7 @@ var {{ plugin.id }} = {
 
 	saveItemForLater: function(trid, opts, silent) {
 		opts = $H(opts);
-		opts.set('Plugin', uidscamp);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'saveCartItem');
 
 		var r = new HttpRequest(
@@ -609,7 +607,7 @@ var {{ plugin.id }} = {
 		var src;
 		resp['Success'] ? src = 'success' : src = 'error';
 		var img = new Element('img');
-		img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif');
+		img.setAttribute('src', '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif');
 		img.setAttribute('style', 'padding-right: 5px;');
 		tdiv.appendChild(img);
 		tdiv.appendChild(document.createTextNode(resp['Duration'] + ' on'));
@@ -730,13 +728,13 @@ var {{ plugin.id }} = {
 			// Icon
 			td = new Element('td');
 			var src = hist.Success ? 'success' : 'error';
-			var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'});
+			var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif'});
 			td.insert(img);
 			tr.insert(td);
 	
 			// Date-time, duration
 			td = new Element('td');
-			var a = new Element('a', {href: '/youpi/results/{{ plugin.id }}/' + hist.TaskId + '/'});
+			var a = new Element('a', {href: '/youpi/results/' + this.id + '/' + hist.TaskId + '/'});
 			a.insert(hist.Start + ' (' + hist.Duration + ')');
 			td.insert(a);
 			tr.insert(td);
@@ -753,11 +751,11 @@ var {{ plugin.id }} = {
 	
 			// Reprocess option
 			td = new Element('td', {'class': 'reprocess'});
-			img = new Element('img', { src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'});
+			img = new Element('img', { src: '/media/themes/' + guistyle + '/img/misc/reprocess.gif'});
 			img.taskId = hist.TaskId;
 			img.observe('click', function() {
-				{{ plugin.id }}.reprocessCalibration(this.taskId);
-			});
+				this.reprocessCalibration(this.taskId);
+			}.bind(this));
 			td.insert(img);
 			tr.insert(td);
 	
@@ -870,7 +868,7 @@ var {{ plugin.id }} = {
 		td.setAttribute('colspan', '2');
 		var d = new Element('div');
 		d.setAttribute('style', 'padding: 10px;');
-		d.setAttribute('id', '{{ plugin.id }}_xml_div');
+		d.setAttribute('id', this.id + '_xml_div');
 		td.appendChild(d);
 		tr.appendChild(td);
 		tab2.appendChild(tr);
@@ -879,11 +877,11 @@ var {{ plugin.id }} = {
 	},
 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_{{ plugin.id }}');
+		var cdiv = $('plugin_menuitem_sub_' + this.id);
 		cdiv.innerHTML = '';
 		var div = new Element('div');
 		div.setAttribute('class', 'savedItems');
-		div.setAttribute('id', '{{ plugin.id }}_saved_items_div');
+		div.setAttribute('id', this.id + '_saved_items_div');
 		cdiv.appendChild(div);
 	
 		var r = new HttpRequest(
@@ -914,12 +912,12 @@ var {{ plugin.id }} = {
 					var idList, txt;
 					resp.result.each(function(res, k) {
 						idLists = res.idList.evalJSON();
-						trid = uidscamp + '_saved_item_' + k + '_tr';
+						trid = this.id + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
 
-						delImg = new Element('img', {	id: uidscamp + '_del_saved_item_' + k,
+						delImg = new Element('img', {	id: this.id + '_del_saved_item_' + k,
 														'style': 'margin-right: 5px', 
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
+														src: '/media/themes/' + guistyle + '/img/misc/delete.png'
 						}).hide();
 	
 						// Date
@@ -956,37 +954,37 @@ var {{ plugin.id }} = {
 						// Delete
 						td = new Element('td');
 						delImg.c_data = {trid: trid, name: res.name};
-						delImg.observe('click', function() {
-							var trid = this.c_data.trid;
-							var name = this.c_data.name;
+						delImg.observe('click', function(c_data) {
+							var trid = c_data.trid;
+							var name = c_data.name;
 							boxes.confirm("Are you sure you want to delete saved item '" + name + "'?", function() {
-								{{ plugin.id }}.delSavedItem(trid, name);
-							});
-						});
+								this.delSavedItem(trid, name);
+							}.bind(this));
+						}.bind(this, delImg.c_data));
 						td.insert(delImg);
 
-						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
-						addImg.c_data = $H(res);
-						addImg.observe('click', function() {
-							{{ plugin.id }}.addToCart(this.c_data);
-						});
+						// Add to cart
+						var addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});
+						addImg.observe('click', function(c_data) {
+							this.addToCart(c_data);
+						}.bind(this, $H(res)));
 						td.insert(addImg);
 
 						tr.insert(td);
 						table.insert(tr);
-					});
+					}.bind(this));
 					div.appendChild(table);
-				}
+				}.bind(this)
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&Method=getSavedItems';
+		var post = 	'Plugin=' + this.id + '&Method=getSavedItems';
 		r.send('/youpi/process/plugin/', post);
 	},
 
 	delSavedItem: function(trid, name) {
 		var trNode = $(trid);
 		var r = new HttpRequest(
-				uidscamp + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -1002,19 +1000,18 @@ var {{ plugin.id }} = {
 							node.fade({
 								afterFinish: function() {
 									node.remove();
-									if (last) eval(uidscamp + '.showSavedItems()');
-
+									if (last) eval(this.id + '.showSavedItems()');
 									// Notify user
 									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
-								}
+								}.bind(this)
 							});
-						}
+						}.bind(this)
 					});
 				}
 		);
 	
 		var post = {
-			'Plugin': uidscamp,
+			'Plugin': this.id,
 			'Method': 'deleteCartItem',
 			'Name'	: name
 		};
@@ -1023,7 +1020,7 @@ var {{ plugin.id }} = {
 	},
 
 	addToCart: function(data) {
-		var p_data = {	plugin_name : uidscamp,
+		var p_data = {	plugin_name : this.id,
 						userData :	data
 		};
 
@@ -1045,7 +1042,7 @@ var {{ plugin.id }} = {
 	},
 
 	reprocess_ldac_selection: function(ldac_files, taskId) {
-		var container = $('{{ plugin.id }}_xml_fields_result_div');
+		var container = $(this.id + '_xml_fields_result_div');
 	
 		var xhr = new HttpRequest(
 			container,
@@ -1064,7 +1061,7 @@ var {{ plugin.id }} = {
 				idList = idList.substr(0, idList.length-1) + ']]';
 	
 				// Add to cart
-				p_data = {	plugin_name	: 	'{{ plugin.id }}', 
+				p_data = {	plugin_name	: 	this.id, 
 							userData 	: 	{	config : 'The one used for this Scamp processing',
 												idList : idList,
 												taskId : d.TaskId,
@@ -1081,10 +1078,10 @@ var {{ plugin.id }} = {
 											log.msg_ok(msg);
 										}
 				);
-			}
+			}.bind(this)
 		);
 	
-		var post = 'Plugin={{ plugin.id }}&Method=getImgIdListFromLDACFiles&TaskId=' + taskId + '&LDACFiles=' + ldac_files;
+		var post = 'Plugin=' + this.id + '&Method=getImgIdListFromLDACFiles&TaskId=' + taskId + '&LDACFiles=' + ldac_files;
 		xhr.setBusyMsg('Adding subselection to processing cart');
 		xhr.send('/youpi/process/plugin/', post);
 	}
@@ -1194,7 +1191,7 @@ function ScampXMLParser(taskId, container) {
 				}
 
 				var tab = new Element('table');
-				tab.setAttribute('id', '{{ plugin.id }}_xml_fields_tab');
+				tab.setAttribute('id', this.id + '_xml_fields_tab');
 				_container.appendChild(tab);
 
 				// Add first line
@@ -1211,12 +1208,12 @@ function ScampXMLParser(taskId, container) {
 
 				// Result div
 				rdiv = new Element('div');
-				rdiv.setAttribute('id', '{{ plugin.id }}_xml_fields_result_div');
+				rdiv.setAttribute('id', this.id + '_xml_fields_result_div');
 				_container.appendChild(rdiv);
-			}
+			}.bind(this)
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=parseScampXML&TaskId=' + _taskId;
+		var post = 'Plugin=' + this.id + '&Method=parseScampXML&TaskId=' + _taskId;
 		xhr.setBusyMsg('Build form widget');
 		xhr.send('/youpi/process/plugin/', post);
 	}
@@ -1226,9 +1223,9 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.submitQuery = function() {
-		var container = $('{{ plugin.id }}_xml_fields_result_div');
+		var container = $(this.id + '_xml_fields_result_div');
 		container.setAttribute('style', 'border-top: 3px solid #5b80b2; margin-top: 10px; padding-top: 5px;');
-		var tab = $('{{ plugin.id }}_xml_fields_tab');
+		var tab = $(this.id + '_xml_fields_tab');
 		var trs = tab.getElementsByTagName('tr');
 		var query = new Array();
 		for (var k=0; k < trs.length; k++) {
@@ -1277,26 +1274,26 @@ function ScampXMLParser(taskId, container) {
 				bdiv.setAttribute('style', 'text-align: right;');
 				var img = new Element('img');
 				img.setAttribute('style', 'cursor: pointer;');
-				img.setAttribute('onclick', "{{ plugin.id }}.reprocess_ldac_selection('" + ldac_files + "'," + d['TaskId'] + ");");
-				img.setAttribute('src', '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif');
+				img.setAttribute('onclick', this.id + ".reprocess_ldac_selection('" + ldac_files + "'," + d['TaskId'] + ");");
+				img.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/reprocess.gif');
 				bdiv.appendChild(img);
 				container.appendChild(bdiv);
-			}
+			}.bind(this)
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=processQueryOnXML&Query=' + query + '&TaskId=' + _taskId;
+		var post = 'Plugin=' + this.id + '&Method=processQueryOnXML&Query=' + query + '&TaskId=' + _taskId;
 		xhr.setBusyMsg('Sending query');
 		xhr.send('/youpi/process/plugin/', post);
 	}
 
 	function _addRow() {
 		var tr, td;
-		var tab = $('{{ plugin.id }}_xml_fields_tab');
+		var tab = $(this.id + '_xml_fields_tab');
 		var type = _fields[0][1];
 
 		tr = new Element('tr');
 		tab.appendChild(tr);
-		tr.setAttribute('id', '{{ plugin.id }}_xml_fields_tr_' + _rowIdx);
+		tr.setAttribute('id', this.id + '_xml_fields_tr_' + _rowIdx);
 
 		// - button
 		td = new Element('td');
@@ -1320,20 +1317,20 @@ function ScampXMLParser(taskId, container) {
 		tr.appendChild(td);
 
 		td = new Element('td');
-		var sel = getSelect('{{ plugin.id }}_xml_fields_select_' + _rowIdx, _fieldNames);
+		var sel = getSelect(this.id + '_xml_fields_select_' + _rowIdx, _fieldNames);
 		sel.setAttribute('onchange', "xmlParser.selectionHasChanged(" + _rowIdx + ");");
 		td.appendChild(sel);
 		tr.appendChild(td);
 
 		// Condition
 		td = new Element('td');
-		td.setAttribute('id', '{{ plugin.id }}_xml_fields_cond_td_' + _rowIdx);
+		td.setAttribute('id', this.id + '_xml_fields_cond_td_' + _rowIdx);
 		td.appendChild(_getTypeSelect(type));
 		tr.appendChild(td);
 
 		// Text field
 		td = new Element('td');
-		td.setAttribute('id', '{{ plugin.id }}_xml_fields_text_td_' + _rowIdx);
+		td.setAttribute('id', this.id + '_xml_fields_text_td_' + _rowIdx);
 		if (type != 'boolean') {
 			var txt = new Element('input');
 			txt.setAttribute('type', 'text');
@@ -1347,22 +1344,22 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.removeRow = function(rowIdx) {
-		var tr = $('{{ plugin.id }}_xml_fields_tr_' + rowIdx);
+		var tr = $(this.id + '_xml_fields_tr_' + rowIdx);
 		tr.parentNode.removeChild(tr);
 	}
 
 	function _getTypeSelect(type) {
 		var id, data;
 		if (type == 'boolean') {
-			id = '{{ plugin.id }}_xml_fields_cond_bool_select_';
+			id = this.id + '_xml_fields_cond_bool_select_';
 			data = ['True', 'False'];
 		}
 		else if (type == 'int' || type == 'float' || type == 'double') {
-			id = '{{ plugin.id }}_xml_fields_cond_number_select_';
+			id = this.id + '_xml_fields_cond_number_select_';
 			data = ['=', '<', '>', '<>'];
 		}
 		else if (type == 'char') {
-			id = '{{ plugin.id }}_xml_fields_cond_char_select_';
+			id = this.id + '_xml_fields_cond_char_select_';
 			data = ['matches', 'is different from'];
 		}
 
@@ -1370,15 +1367,15 @@ function ScampXMLParser(taskId, container) {
 	}
 
 	this.selectionHasChanged = function(curRowIdx) {
-		var sel = $('{{ plugin.id }}_xml_fields_select_' + curRowIdx);
+		var sel = $(this.id + '_xml_fields_select_' + curRowIdx);
 		var idx = sel.selectedIndex;
 		var type = _fields[idx][1];
 
-		var cond = $('{{ plugin.id }}_xml_fields_cond_td_' + curRowIdx);
+		var cond = $(this.id + '_xml_fields_cond_td_' + curRowIdx);
 		removeAllChildrenNodes(cond);
 		cond.appendChild(_getTypeSelect(type));
 
-		var text = $('{{ plugin.id }}_xml_fields_text_td_' + curRowIdx);
+		var text = $(this.id + '_xml_fields_text_td_' + curRowIdx);
 		removeAllChildrenNodes(text);
 		if (type != 'boolean') {
 			var txt = new Element('input');
@@ -1411,7 +1408,7 @@ function ScampXMLParser(taskId, container) {
 			}
 		);
 
-		var post = 'Plugin={{ plugin.id }}&Method=checkIfXMLExists&TaskId=' + _taskId;
+		var post = 'Plugin=' + this.id + '&Method=checkIfXMLExists&TaskId=' + _taskId;
 		xhr.setBusyMsg('Looking for Scamp XML output file');
 		xhr.send('/youpi/process/plugin/', post);
 	}
