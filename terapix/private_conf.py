@@ -183,6 +183,13 @@ PROCESSING_JS = COMMON_JS[:]
 PROCESSING_JS.extend(['js/3rdParty/tafelTree/Tree.js'])
 #
 PLUGINFITSIN_JS = ('js/plugins/qualityfitsin.js',)
+PLUGINSEX_JS = ('js/plugins/sextractor.js',)
+PLUGINSCAMP_JS = ('js/plugins/scamp.js',)
+PLUGINSWARP_JS = ('js/plugins/swarp.js',)
+PLUGINSTIFF_JS = ('js/plugins/stiff.js',)
+PLUGINSKEL_JS = ('js/plugins/skeleton.js',)
+# FIXME
+ALL_PLUGINS_JS = PLUGINFITSIN_JS + PLUGINSEX_JS + PLUGINSCAMP_JS + PLUGINSWARP_JS + PLUGINSTIFF_JS + PLUGINSKEL_JS
 #
 PROCPLUGIN_JS = COMMON_JS[:]
 PROCPLUGIN_JS.extend([
@@ -221,14 +228,13 @@ REPORTING_JS.extend([
 	'js/progressbar.js',
 ])
 #
-CART_JS = COMMON_JS[:]
-CART_JS.extend([
+CART_JS = tuple(COMMON_JS) + (
 	'js/3rdParty/Q/q.window.js',
 	'js/3rdParty/modalbox/modalbox.js',
 	'js/condorpanel.js',
 	'js/accordion.js',
 	'js/progressbar.js',
-])
+) + ALL_PLUGINS_JS
 #
 CONDOR_JS = COMMON_JS[:]
 CONDOR_JS.extend([
@@ -285,10 +291,12 @@ COMPRESS_JS = {
 	'singleresult'	: { 'source_filenames': SINGLERESULT_JS, 'output_filename': 'js/singleres.r?-min.js' },
 	'softsv'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/softsv.r?-min.js' },
 	# Plugins
-	'fitsin'		: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-fitsin.r?-min.js' },
-	'scamp'			: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-scamp.r?-min.js' },
-	'swarp'			: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-swarp.r?-min.js' },
-	'sex'			: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/plugin-sex.r?-min.js' },
+	'fitsin'		: { 'source_filenames': PLUGINFITSIN_JS, 'output_filename': 'js/pfitsin.r?-min.js' },
+	'scamp'			: { 'source_filenames': PLUGINSCAMP_JS, 'output_filename': 'js/pscamp.r?-min.js' },
+	'swarp'			: { 'source_filenames': PLUGINSWARP_JS, 'output_filename': 'js/pswarp.r?-min.js' },
+	'sex'			: { 'source_filenames': PLUGINSEX_JS, 'output_filename': 'js/psex.r?-min.js' },
+	'stiff'			: { 'source_filenames': PLUGINSTIFF_JS, 'output_filename': 'js/pstiff.r?-min.js' },
+	'skel'			: { 'source_filenames': PLUGINSKEL_JS, 'output_filename': 'js/pskel.r?-min.js' },
 }
 
 #

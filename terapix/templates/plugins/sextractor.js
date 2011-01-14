@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * Copyright (c) 2008-2010 Terapix Youpi development team. All Rights Reserved.
+ * Copyright (c) 2008-2011 Terapix Youpi development team. All Rights Reserved.
  *                    Mathias Monnerville <monnerville@iap.fr>
  *                    Gregory Semah <semah@iap.fr>
  *
@@ -13,9 +13,8 @@
 
 // JS code for Sextractor plugin
 
-
-var uidsex = '{{ plugin.id }}';
-var {{ plugin.id }} = {
+var sex = {
+	id: 'sex',
 	/*
 	 * Variable: ims1
 	 *
@@ -37,17 +36,17 @@ var {{ plugin.id }} = {
 			var chk = id.select('input')[0];
 			if(chk.checked) {
 				if(chk.value == 'single') {
-					sels = {{ plugin.id }}.ims1.getListsOfSelections();
+					sels = this.ims1.getListsOfSelections();
 					sels2 = null;
 				}
 				else {
 					dualMode = 1;
-					sels1 = {{ plugin.id }}.ims1.getListsOfSelections().evalJSON();
-					sels2 = {{ plugin.id }}.ims2.getListsOfSelections().evalJSON();
+					sels1 = this.ims1.getListsOfSelections().evalJSON();
+					sels2 = this.ims2.getListsOfSelections().evalJSON();
 					sels = '[[' + sels1 + ', ' + sels2 + ']]';
 				}
 			}
-		});
+		}.bind(this));
 
 		if (!sels) {
 			alert('No images selected. Nothing to add to cart !');
@@ -56,7 +55,7 @@ var {{ plugin.id }} = {
 
 		// OPTIONAL
 		var optPath = new Array();
-		var optSel = $(uidsex + '_flags_select', uidsex + '_weights_select', uidsex + '_psf_select', uidsex + '_flag_dual_select', uidsex + '_weight_dual_select');
+		var optSel = $(this.id + '_flags_select', this.id + '_weights_select', this.id + '_psf_select', this.id + '_flag_dual_select', this.id + '_weight_dual_select');
 		
 		optSel.each(function(select, j) {
 			if (optSel[j] == null) { 
@@ -70,20 +69,20 @@ var {{ plugin.id }} = {
 			}
 		});
 		
-		var total = {{ plugin.id }}.ims1.getImagesCount();
+		var total = this.ims1.getImagesCount();
 		
 		//Get config file
-		var cSel = $(uidsex + '_config_name_select');
+		var cSel = $(this.id + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		//Get parameter file
-		var pSel = $(uidsex + '_param_name_select');
+		var pSel = $(this.id + '_param_name_select');
 		var param = pSel.options[pSel.selectedIndex].text;
 
 		//Gets custom output directory
 		var output_data_path = $('output_target_path').innerHTML;
 
-		{{ plugin.id }}.do_addSelectionToCart({
+		this.do_addSelectionToCart({
 			param			: param,
 			config			: config, 
 			idList			: sels,
@@ -99,10 +98,10 @@ var {{ plugin.id }} = {
 	},
 
 	do_addSelectionToCart: function(data) {
-		var total = {{ plugin.id }}.ims1.getImagesCount();
+		var total = this.ims1.getImagesCount();
 
 		// Finally, add to the processing cart
-		p_data = {	plugin_name : uidsex , 
+		p_data = {	plugin_name : this.id , 
 					userData 	: data
 		};
 		s_cart.addProcessing(	p_data,
@@ -155,7 +154,7 @@ var {{ plugin.id }} = {
 	
 		// Adds various options
 		opts = $H(opts);
-		opts.set('Plugin', uidsex);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
@@ -221,12 +220,12 @@ var {{ plugin.id }} = {
 
 	saveItemForLater: function(trid, opts, silent) {
 		opts = $H(opts);
-		opts.set('Plugin', uidsex);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'saveCartItem');
 
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				uidsex + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -273,7 +272,7 @@ var {{ plugin.id }} = {
 		tdiv.insert(resp['End'] + '<br/>');
 		var src;
 		resp['Success'] ? src = 'success' : src = 'error';
-		var img = new Element(	'img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif',
+		var img = new Element(	'img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif',
 										style: 'padding-right: 5px;'
 		});
 		tdiv.insert(img);
@@ -380,13 +379,13 @@ var {{ plugin.id }} = {
 			// Icon
 			td = new Element('td');
 			var src = task.Success ? 'success' : 'error';
-			var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'});
+			var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif'});
 			td.insert(img);
 			tr.insert(td);
 	
 			// Date-time, duration
 			td = new Element('td');
-			var a = new Element('a', {href: '/youpi/results/' + uidsex + '/' + task.TaskId + '/'});
+			var a = new Element('a', {href: '/youpi/results/' + this.id + '/' + task.TaskId + '/'});
 			a.insert(task.Start + ' (' + task.Duration + ')');
 			td.insert(a);
 			tr.insert(td);
@@ -400,8 +399,8 @@ var {{ plugin.id }} = {
 			// Reprocess option
 			td = new Element('td', {'class': 'reprocess'});
 			img = new Element('img', {
-				onclick: uidsex + ".reprocess_image('" + task.TaskId + "');",
-				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
+				onclick: this.id + ".reprocess_image('" + task.TaskId + "');",
+				src: '/media/themes/' + guistyle + '/img/misc/reprocess.gif'
 			});
 			td.insert(img);
 			tr.insert(td);
@@ -568,8 +567,8 @@ var {{ plugin.id }} = {
 
 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_' + uidsex).update();
-		var div = new Element('div', {'class': 'savedItems', id: uidsex + '_saved_items_div'});
+		var cdiv = $('plugin_menuitem_sub_' + this.id).update();
+		var div = new Element('div', {'class': 'savedItems', id: this.id + '_saved_items_div'});
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
@@ -598,11 +597,11 @@ var {{ plugin.id }} = {
 					var tabi, tabitr, tabitd;
 					resp.result.each(function(res, k) {
 						idList = eval(res.idList);
-						trid = uidsex + '_saved_item_' + k + '_tr';
+						trid = this.id + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
-						delImg = new Element('img', {	id: uidsex + '_del_saved_item_' + k,
+						delImg = new Element('img', {	id: this.id + '_del_saved_item_' + k,
 														style: 'margin-right: 5px',
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
+														src: '/media/themes/' + guistyle + '/img/misc/delete.png'
 						}).hide();
 
 						// Date
@@ -746,13 +745,13 @@ var {{ plugin.id }} = {
 						// Delete
 						td = new Element('td');
 						delImg.c_data = {trid: trid, name: res.name};
-						delImg.observe('click', function() {
-							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
-						});
+						delImg.observe('click', function(c_data) {
+							this.delSavedItem(c_data.trid, c_data.name);
+						}.bind(this, delImg.c_data));
 						td.insert(delImg);
 
 						//Add to cart
-						var addImg = new Element('img', {	src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'
+						var addImg = new Element('img', {	src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'
 						});
 						
 
@@ -770,19 +769,19 @@ var {{ plugin.id }} = {
 										'param'					: res.param,
 						};
 
-						addImg.observe('click', function() {
-							{{ plugin.id }}.addToCart(this.c_data);
-						});
+						addImg.observe('click', function(c_data) {
+							this.addToCart(c_data);
+						}.bind(this, addImg.c_data));
 						td.insert(addImg);
 
 						tr.insert(td);
 						table.insert(tr);
-					});
+					}.bind(this));
 					div.insert(table);
-				}
+				}.bind(this)
 		);
 	
-		var post = 	'Plugin=' + uidsex + '&Method=getSavedItems';
+		var post = 	'Plugin=' + this.id + '&Method=getSavedItems';
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -793,7 +792,7 @@ var {{ plugin.id }} = {
 
 		var trNode = $(trid);
 		var r = new HttpRequest(
-				uidsex + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -809,19 +808,19 @@ var {{ plugin.id }} = {
 							node.fade({
 								afterFinish: function() {
 									node.remove();
-									if (last) eval(uidsex + '.showSavedItems()');
+									if (last) eval(this.id + '.showSavedItems()');
 
 									// Notify user
 									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
-								}
+								}.bind(this)
 							});
-						}
+						}.bind(this)
 					});
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			'Plugin': uidsex,
+			'Plugin': this.id,
 			'Method': 'deleteCartItem',
 			'Name'	: name
 		};
@@ -830,7 +829,7 @@ var {{ plugin.id }} = {
 	},
 
 	addToCart: function(data) {
-		var p_data = {	plugin_name : uidsex,
+		var p_data = {	plugin_name : this.id,
 						userData :	data
 		};
 		s_cart.addProcessing(p_data,
@@ -857,8 +856,8 @@ var {{ plugin.id }} = {
 	 */
 	init: function() {
 		var root = $('menuitem_sub_0');
-		var root1 = $(uidsex + '_results_div');
-		var root2 = $(uidsex + '_results_div2');
+		var root1 = $(this.id + '_results_div');
+		var root2 = $(this.id + '_results_div2');
 		this.ims1 = new ImageSelector(root1);
 		this.ims1.setTableWidget(new AdvancedTable());
 
@@ -903,17 +902,17 @@ var {{ plugin.id }} = {
 		document.observe('PathSelectorWidget:pathsLoaded', function() {
 			if (this.paths_loaded) return;
 			this.paths_loaded = true;
-			cartmode.init(uidsex, 
+			cartmode.init(this.id, 
 				// Elements to toggle
 				[
-					$(uidsex + '_results_div'), $(uidsex + '_results_div2'), 
+					$(this.id + '_results_div'), $(this.id + '_results_div2'), 
 					$('cartimg'), menu.getEntry(2), $$('table.sex_mode')[0], $('help_mode')
 				],
 				{}, // No auto params during init, instead provide them later
 				// Before handler
 				function() {
 					// Param config filename
-					var pSel = $(uidsex + '_param_name_select');
+					var pSel = $(this.id + '_param_name_select');
 					var param = pSel.options[pSel.selectedIndex].text;
 
 					// Extra params for autoProcessSelection() plugin call (in cartmode.js)
@@ -922,7 +921,7 @@ var {{ plugin.id }} = {
 						FlagPath: selector1.getPath('flags'), 
 						WeightPath: selector1.getPath('weights'),
 						PsfPath: selector1.getPath('psf'),
-						AddDefaultToCart: $(uidsex + '_add_default_to_cart_option').checked ? 0:1,
+						AddDefaultToCart: $(this.id + '_add_default_to_cart_option').checked ? 0:1,
 						// TODO: Dual mode parameters?
 						DualMode: 0, // TODO: only supports Single mode for now
 						DualImage: '',
