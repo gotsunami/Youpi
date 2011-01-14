@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
+ * Copyright (c) 2008-2011 Terapix Youpi development team. All Rights Reserved.
  *                    Mathias Monnerville <monnerville@iap.fr>
  *                    Gregory Semah <semah@iap.fr>
  *
@@ -17,7 +17,6 @@
  * JS code for Swarp plugin.
  *
  */
-var uidswarp = '{{ plugin.id }}';
 
 // Defines various exceptions
 var Exception = {
@@ -25,7 +24,8 @@ var Exception = {
 	HEAD_NOT_FOUND: 2001
 };
 
-var {{ plugin.id }} = {
+var swarp = {
+	id: 'swarp',
 	/*
 	 * Variable: autoProgressBar
 	 * 
@@ -79,9 +79,9 @@ var {{ plugin.id }} = {
 	 *
 	 */
 	addSelectionToCart: function() {
-		{{ plugin.id }}.curSelectionIdx = 0;
-		{{ plugin.id }}.weightMissingError = false;
-		sels = {{ plugin.id }}.ims.getListsOfSelections();
+		this.curSelectionIdx = 0;
+		this.weightMissingError = false;
+		sels = this.ims.getListsOfSelections();
 
 		if (!sels) {
 			alert('No images selected. Nothing to add to cart !');
@@ -94,12 +94,12 @@ var {{ plugin.id }} = {
 		var output_data_path = $('output_target_path').innerHTML;
 	
 		// Set mandatory structures
-		var p_data = {	plugin_name : uidswarp, 
+		var p_data = {	plugin_name : this.id, 
 						userData : {resultsOutputDir: output_data_path}
 		};
 
 		// Finds weight path
-		var wSel = $(uidswarp + '_weights_select');
+		var wSel = $(this.id + '_weights_select');
 		var weightPath = '';
 		var path = wSel.options[wSel.selectedIndex].text;
 		if (path != selector.getNoSelectionPattern()) {
@@ -114,7 +114,7 @@ var {{ plugin.id }} = {
 		}
 		
 		// Finds head path
-		var hSel = $(uidswarp + '_heads_select');
+		var hSel = $(this.id + '_heads_select');
 		var headPath = '';
 		var path = hSel.options[hSel.selectedIndex].text;
 		if (path != selector.getNoSelectionPattern()) {
@@ -127,10 +127,10 @@ var {{ plugin.id }} = {
 			return;
 		}
 
-		var total = {{ plugin.id }}.ims.getImagesCount();
+		var total = this.ims.getImagesCount();
 
 		// Get config file
-		var cSel = $(uidswarp + '_config_name_select');
+		var cSel = $(this.id + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 
 		// Gets custom output directory
@@ -146,7 +146,7 @@ var {{ plugin.id }} = {
 		if (weightPath == AUTO) {
 			// Use QFits weight maps from Youpi
 			log.msg_status('Please note that these tests DO NOT CHECK that WEIGHT files are <b>physically</b> available on disks!');
-			var sName = {{ plugin.id }}.ims.getSavedSelectionUsed() ? "<span class=\"saved_selection_used\">" + {{ plugin.id }}.ims.getSavedSelectionUsed() + "</span>" : "";
+			var sName = this.ims.getSavedSelectionUsed() ? "<span class=\"saved_selection_used\">" + this.ims.getSavedSelectionUsed() + "</span>" : "";
 			log.msg_status("Will use output data path '" + output_data_path + "'");
 			if (sName.length)
 				log.msg_status("Using '" + sName + "' for image selection (" + total + ' image' + (total > 1 ? 's' : '') + ")");
@@ -199,7 +199,7 @@ var {{ plugin.id }} = {
 			log.msg_warning('Since you have choosen <i>a custom path</i> to WEIGHT data, <b>no checks for successful QFITS are ' +
 				'made at this time</b>. ');
 			log.msg_status("Will use WEIGHT path '" + weightPath + "'");
-			var sName = {{ plugin.id }}.ims.getSavedSelectionUsed() ? "<span class=\"saved_selection_used\">" + {{ plugin.id }}.ims.getSavedSelectionUsed() + "</span>" : "";
+			var sName = this.ims.getSavedSelectionUsed() ? "<span class=\"saved_selection_used\">" + this.ims.getSavedSelectionUsed() + "</span>" : "";
 			log.msg_status("Will use output data path '" + output_data_path + "'");
 			if (sName.length)
 				log.msg_status("Using '" + sName + "' for image selection (" + total + ' image' + (total > 1 ? 's' : '') + ")");
@@ -210,8 +210,8 @@ var {{ plugin.id }} = {
 			if (headPath == AUTO) {
 				// Automatic checks for Scamp: looks for Scamp-generated .head files
 				// Checks for Scamp processings (for .head files support)
-				{{ plugin.id }}.checkForScampData(pre, function() {
-					{{ plugin.id }}.do_addSelectionToCart({
+				this.checkForScampData(pre, function() {
+					this.do_addSelectionToCart({
 						useAutoQFITSWeights: 0,
 						useAutoScampHeads: 1,
 						config: config, 
@@ -219,9 +219,9 @@ var {{ plugin.id }} = {
 						weightPath: weightPath, 
 						headPath: headPath, 
 						resultsOutputDir: output_data_path,
-						headDataPaths: {{ plugin.id }}.headDataPaths.join(',')
+						headDataPaths: this.headDataPaths.join(',')
 					});
-				});
+				}.bind(this));
 			}
 			else {
 				// Custom path to head files is provided
@@ -236,7 +236,7 @@ var {{ plugin.id }} = {
 					weightPath: weightPath, 
 					headPath: headPath, 
 					resultsOutputDir: output_data_path,
-					headDataPaths: {{ plugin.id }}.headDataPaths.join(',')
+					headDataPaths: this.headDataPaths.join(',')
 				});
 			}
 		}
@@ -256,7 +256,7 @@ var {{ plugin.id }} = {
 
 		// Add to the processing cart
 		p_data = {	
-			plugin_name	: uidswarp,
+			plugin_name	: this.id,
 			userData 	: data
 		};
 	
@@ -311,22 +311,22 @@ var {{ plugin.id }} = {
 					missing = resp.result.missingQFITS;
 	
 					if (missing.length > 0) {
-						log.msg_warning('Missing WEIGHT data for selection ' + ({{ plugin.id }}.curSelectionIdx+1) + 
+						log.msg_warning('Missing WEIGHT data for selection ' + (this.curSelectionIdx+1) + 
 							' (' + missing.length + ' image' + (missing.length > 1 ? 's' : '') + ' failed!)');
-						{{ plugin.id }}.weightMissingError = true;
+						this.weightMissingError = true;
 					}	
 					else {
-						log.msg_ok('WEIGHT data for selection ' + ({{ plugin.id }}.curSelectionIdx+1) + 
+						log.msg_ok('WEIGHT data for selection ' + (this.curSelectionIdx+1) + 
 							' (' + idList.length + ' image' + (idList.length > 1 ? 's' : '') + ') is OK');
 					}
 	
-					{{ plugin.id }}.curSelectionIdx++;
+					this.curSelectionIdx++;
 	
-					if ({{ plugin.id }}.curSelectionIdx < selArr.length) {
-						{{ plugin.id }}.checkForQFITSData(container, handler);
+					if (this.curSelectionIdx < selArr.length) {
+						this.checkForQFITSData(container, handler);
 					}
 					else {
-						if ({{ plugin.id }}.weightMissingError) {
+						if (this.weightMissingError) {
 							var c = new Element('div').setStyle({paddingLeft: '3px'});
 							div.insert(c);
 							var wm = new DropdownBox(c, 'View list of images with missing weight maps');
@@ -348,14 +348,14 @@ var {{ plugin.id }} = {
 						// All checks are OK. Executes custom handler, if any
 						if (handler) handler();
 					}
-				}
+				}.bind(this)
 		);
 	
-		var post = 	'Plugin={{ plugin.id }}&' + 
+		var post = 	'Plugin=' + this.id + '&' + 
 					'Method=checkForQFITSData&' +
 					'IdList=' + idList;
 		// Send query
-		r.setBusyMsg('Checking selection ' + ({{ plugin.id }}.curSelectionIdx+1) + ' (' + idList.length + ' images)');
+		r.setBusyMsg('Checking selection ' + (this.curSelectionIdx+1) + ' (' + idList.length + ' images)');
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -372,11 +372,11 @@ var {{ plugin.id }} = {
 		var handler = typeof handler == 'function' ? handler : null;
 		var div = new Element('div');
 		var log = new Logger(div);
-		var sels = {{ plugin.id }}.ims.getListsOfSelections();
-		var total = {{ plugin.id }}.ims.getImagesCount();
+		var sels = this.ims.getListsOfSelections();
+		var total = this.ims.getImagesCount();
 
 		var selArr = eval(sels);
-		var idList = selArr[{{ plugin.id }}.curSelectionIdx];
+		var idList = selArr[this.curSelectionIdx];
 	
 		div.setStyle({textAlign: 'left'});
 		container.insert(div);
@@ -389,20 +389,20 @@ var {{ plugin.id }} = {
 					div.update();
 					var res = resp.result;
 					if (res.Warning) {
-						log.msg_warning('Selection ' + ({{ plugin.id }}.curSelectionIdx + 1) + ': ' + res.Warning);
+						log.msg_warning('Selection ' + (this.curSelectionIdx + 1) + ': ' + res.Warning);
 						// Store empty path: no .head files
-						{{ plugin.id }}.headDataPaths.push('');
+						this.headDataPaths.push('');
 
-						{{ plugin.id }}.curSelectionIdx++;
-						if ({{ plugin.id }}.curSelectionIdx < selArr.length)
-							{{ plugin.id }}.checkForScampData(container, handler);
+						this.curSelectionIdx++;
+						if (this.curSelectionIdx < selArr.length)
+							this.checkForScampData(container, handler);
 						else {
 							// No selection left. Executes final custom handler, if any
 							if (handler) handler();
 						}
 					}
 					else {
-						log.msg_ok('Selection ' + ({{ plugin.id }}.curSelectionIdx + 1) + ': found ' + res.Tasks.length + ' matches. Please ' +
+						log.msg_ok('Selection ' + (this.curSelectionIdx + 1) + ': found ' + res.Tasks.length + ' matches. Please ' +
 							'select one in the list:');
 						var dat = new Element('div').setStyle({
 							width: '80%', 
@@ -423,46 +423,46 @@ var {{ plugin.id }} = {
 
 						// Registers rowClicked events
 						at.attachEvent('onRowClicked', function() {
-							var txt = {{ plugin.id }}.curSelectionIdx == selArr.length - 1 ? 'Validate' : 'Validate and show next selection';
+							var txt = this.curSelectionIdx == selArr.length - 1 ? 'Validate' : 'Validate and show next selection';
 							var but = new Element('input', {type: 'button', value: txt});
 
 							but.observe('click', function() {
 								var dataPath = at.getRowData(at.getSelectedRows()[0])[4];
 								// Store path
-								{{ plugin.id }}.headDataPaths.push(dataPath);
+								this.headDataPaths.push(dataPath);
 
 								this.remove();
 								dat.update();
-								log.msg_ok('Selection ' + ({{ plugin.id }}.curSelectionIdx + 1) + ': Will use <tt>' + 
+								log.msg_ok('Selection ' + (this.curSelectionIdx + 1) + ': Will use <tt>' + 
 									dataPath + '</tt> to access .head files');
 
-								{{ plugin.id }}.curSelectionIdx++;
-								if ({{ plugin.id }}.curSelectionIdx < selArr.length)
-									{{ plugin.id }}.checkForScampData(container, handler);
+								this.curSelectionIdx++;
+								if (this.curSelectionIdx < selArr.length)
+									this.checkForScampData(container, handler);
 								else {
 									// No selection left, executes final custom handler, if any
 									if (handler) handler();
 								}
-							});
+							}.bind(this));
 							bdiv.update(but);
-						});
+						}.bind(this));
 
 						div.insert(dat);
 						div.insert(bdiv);
 						at.render();
 						return;
 					}
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			Plugin: uidswarp,
+			Plugin: this.id,
 			Method: 'checkForScampData',
 			IdList: idList
 		}
 
 		// Send query
-		r.setBusyMsg('Running Scamp checks for selection ' + ({{ plugin.id }}.curSelectionIdx+1) + ' (' + 
+		r.setBusyMsg('Running Scamp checks for selection ' + (this.curSelectionIdx+1) + ' (' + 
 			idList.length + ' images)');
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
 	},
@@ -508,7 +508,7 @@ var {{ plugin.id }} = {
 	
 		// Adds various options
 		opts = $H(opts);
-		opts.set('Plugin', uidswarp);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
@@ -542,7 +542,7 @@ var {{ plugin.id }} = {
 					userData.set('taskId', taskId);
 
 					// Add to the processing cart
-					var p_data = {	plugin_name	: uidswarp,
+					var p_data = {	plugin_name	: this.id,
 								userData 	: userData,
 					};
 				
@@ -556,7 +556,7 @@ var {{ plugin.id }} = {
 				}
 		);
 
-		var post = { Plugin: '{{ plugin.id }}',
+		var post = { Plugin: this.id,
 					 Method: 'getReprocessingParams',
 					 TaskId: taskId
 		};
@@ -618,12 +618,12 @@ var {{ plugin.id }} = {
 
 	saveItemForLater: function(trid, opts, silent) {
 		opts = $H(opts);
-		opts.set('Plugin', uidswarp);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'saveCartItem');
 
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				uidswarp + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -667,7 +667,7 @@ var {{ plugin.id }} = {
 		tdiv.insert(resp['End'] + '<br/>');
 		var src;
 		resp['Success'] ? src = 'success' : src = 'error';
-		var img = new Element(	'img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif',
+		var img = new Element(	'img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif',
 										style: 'padding-right: 5px;'
 		});
 		tdiv.insert(img);
@@ -770,13 +770,13 @@ var {{ plugin.id }} = {
 			// Icon
 			td = new Element('td');
 			var src = task.Success ? 'success' : 'error';
-			var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'});
+			var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif'});
 			td.insert(img);
 			tr.insert(td);
 	
 			// Date-time, duration
 			td = new Element('td');
-			var a = new Element('a', {href: '/youpi/results/' + uidswarp + '/' + task.TaskId + '/'});
+			var a = new Element('a', {href: '/youpi/results/' + this.id + '/' + task.TaskId + '/'});
 			a.insert(task.Start + ' (' + task.Duration + ')');
 			td.insert(a);
 			tr.insert(td);
@@ -790,14 +790,14 @@ var {{ plugin.id }} = {
 			// Reprocess option
 			td = new Element('td', {'class': 'reprocess'});
 			img = new Element('img', {
-				onclick: uidswarp + ".reprocessStack('" + task.TaskId + "');",
-				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
+				onclick: this.id + ".reprocessStack('" + task.TaskId + "');",
+				src: '/media/themes/' + guistyle + '/img/misc/reprocess.gif'
 			});
 			td.insert(img);
 			tr.insert(td);
 	
 			htab.insert(tr);
-		});
+		}.bind(this));
 
 		// Run parameters
 		tr = new Element('tr');
@@ -919,8 +919,8 @@ var {{ plugin.id }} = {
 	},
 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_' + uidswarp).update();
-		var div = new Element('div', {'class': 'savedItems', id: uidswarp + '_saved_items_div'});
+		var cdiv = $('plugin_menuitem_sub_' + this.id).update();
+		var div = new Element('div', {'class': 'savedItems', id: this.id + '_saved_items_div'});
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
@@ -948,11 +948,11 @@ var {{ plugin.id }} = {
 					var tabi, tabitr, tabitd;
 					resp.result.each(function(res, k) {
 						idLists = res.idList.evalJSON();
-						trid = uidswarp + '_saved_item_' + k + '_tr';
+						trid = this.id + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
-						delImg = new Element('img', {	id: uidswarp + '_del_saved_item_' + k,
+						delImg = new Element('img', {	id: this.id + '_del_saved_item_' + k,
 														style: 'margin-right: 5px',
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
+														src: '/media/themes/' + guistyle + '/img/misc/delete.png'
 						}).hide();
 
 						// Date
@@ -1023,26 +1023,25 @@ var {{ plugin.id }} = {
 						// Delete
 						td = new Element('td');
 						delImg.c_data = {trid: trid, name: res.name};
-						delImg.observe('click', function() {
-							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
-						});
+						delImg.observe('click', function(c_data) {
+							this.delSavedItem(c_data.trid, c_data.name);
+						}.bind(this, delImg.c_data));
 						td.insert(delImg);
 
-						var addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
-						addImg.c_data = $H(res);
-						addImg.observe('click', function() {
-							{{ plugin.id }}.addToCart(this.c_data);
-						});
+						var addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});
+						addImg.observe('click', function(c_data) {
+							this.addToCart(c_data);
+						}.bind(this, $H(res)));
 						td.insert(addImg);
 
 						tr.insert(td);
 						table.insert(tr);
-					});
+					}.bind(this));
 					div.insert(table);
-				}
+				}.bind(this)
 		);
 	
-		var post = 	'Plugin=' + uidswarp + '&Method=getSavedItems';
+		var post = 	'Plugin=' + this.id + '&Method=getSavedItems';
 		r.send('/youpi/process/plugin/', post);
 	},
 
@@ -1052,7 +1051,7 @@ var {{ plugin.id }} = {
 	
 		var trNode = $(trid);
 		var r = new HttpRequest(
-				uidswarp + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -1068,19 +1067,18 @@ var {{ plugin.id }} = {
 							node.fade({
 								afterFinish: function() {
 									node.remove();
-									if (last) eval(uidswarp + '.showSavedItems()');
-
+									if (last) eval(this.id + '.showSavedItems()');
 									// Notify user
 									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
-								}
+								}.bind(this)
 							});
-						}
+						}.bind(this)
 					});
 				}
 		);
 	
 		var post = {
-			'Plugin': uidswarp,
+			'Plugin': this.id,
 			'Method': 'deleteCartItem',
 			'Name'	: name
 		};
@@ -1089,7 +1087,7 @@ var {{ plugin.id }} = {
 	},
 
 	addToCart: function(data) {
-		var p_data = {	plugin_name : uidswarp,
+		var p_data = {	plugin_name : this.id,
 						userData :	data
 		};
 	
@@ -1102,7 +1100,7 @@ var {{ plugin.id }} = {
 	},
 
 	getHeadPath: function() {
-		var hSel = $(uidswarp + '_heads_select');
+		var hSel = $(this.id + '_heads_select');
 		var headPath;
 		var path = hSel.options[hSel.selectedIndex].text;
 		if (path != selector.getNoSelectionPattern()) {
@@ -1118,7 +1116,7 @@ var {{ plugin.id }} = {
 	},
 
 	getWeightPath: function() {
-		var wSel = $(uidswarp + '_weights_select');
+		var wSel = $(this.id + '_weights_select');
 		var weightPath;
 		var path = wSel.options[wSel.selectedIndex].text;
 		if (path != selector.getNoSelectionPattern()) {
@@ -1140,16 +1138,16 @@ var {{ plugin.id }} = {
 		var root = $('menuitem_sub_0');
 		root.writeAttribute('align', 'center');
 		// Container for the ImageSelector widget
-		var div = new Element('div', {id: uidswarp + '_results_div', align: 'center'}).setStyle({width: '90%'});
+		var div = new Element('div', {id: this.id + '_results_div', align: 'center'}).setStyle({width: '90%'});
 		root.insert(div);
 		// Container for the ImageSelector widget
-		this.ims = new ImageSelector(uidswarp + '_results_div');
+		this.ims = new ImageSelector(this.id + '_results_div');
 		this.ims.setTableWidget(new AdvancedTable());
 
 		// Activates cart mode feature (automatic/manual)
 		document.observe('PathSelectorWidget:pathsLoaded', function() {
-			cartmode.init(uidswarp, 
-				[$(uidswarp + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)],
+			cartmode.init(this.id, 
+				[$(this.id + '_results_div'), $('cartimg'), menu.getEntry(2), menu.getEntry(4)],
 				{}, // No auto params during init, instead provide them later
 				// Before handler
 				function() {
@@ -1160,8 +1158,8 @@ var {{ plugin.id }} = {
 					if (res.qfitsdata) {
 						if (res.qfitsdata.missingQFITS.length > 0) {
 							res.qfitsdata.missingQFITS.each(function(w) {
-								$(uidswarp + '_automatic_log').insert('<i>MISSING QFits</i> for image ' + w + '<br/>');
-							});
+								$(this.id + '_automatic_log').insert('<i>MISSING QFits</i> for image ' + w + '<br/>');
+							}.bind(this));
 							cartmode.autoWarningCount += res.qfitsdata.missingQFITS.length;
 						}
 					}
