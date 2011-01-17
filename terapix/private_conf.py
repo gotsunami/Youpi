@@ -210,8 +210,7 @@ PROCPLUGIN_JS.extend([
 	'js/cartmode.js',
 ])
 #
-RESULTS_JS = COMMON_JS[:]
-RESULTS_JS.extend([
+RESULTS_JS = tuple(COMMON_JS) + (
 	'js/gradingwidget.js',
 	'js/processinghistorywidget.js',
 	'js/advancedtable.js',
@@ -219,7 +218,7 @@ RESULTS_JS.extend([
 	'js/3rdParty/lightbox2/lightbox.js',
 	'js/3rdParty/modalbox/modalbox.js',
 	'js/progressbar.js',
-])
+) + ALL_PLUGINS_JS
 #
 REPORTING_JS = COMMON_JS[:]
 REPORTING_JS.extend([

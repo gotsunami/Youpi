@@ -18,11 +18,6 @@ var {{ plugin.id }}_drop_box;
 var {{ plugin.id }}_item_counter = 0;
 {% endfor %}
 
-{# Load custom plugin's javascript code if available #}
-{% for plugin in plugins %}
-	{% include plugin.jsSource %}
-{% endfor %}
-
 youpi_pc_meta.saved_policies=[{% for pol in policies %}'{{ pol.label }}'{% if not forloop.last %},{% endif %}{% endfor %}];
 youpi_pc_meta.saved_selections=[{% for sel in selections %}'{{ sel.label }}'{% if not forloop.last %},{% endif %}{% endfor %}];
 
