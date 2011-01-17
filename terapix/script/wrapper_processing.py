@@ -920,6 +920,10 @@ def process(userData, kind_id, argv):
 			except Exception, e:
 				raise WrapperError, e
 
+			#img_id = userData['ImgID']
+			#imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
+			#os.chdir(imgName)
+
 			# Copy XSL stylesheet
 			try:
 				xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL'))
@@ -928,38 +932,24 @@ def process(userData, kind_id, argv):
 				# No custom XSL_URL value
 				pass
 
-			# Gets image name
-			motif = "CHECKIMAGE_NAME"
-
-			path_cf = userData['ConfigFile']
-
-			cfile = path_cf.split('/')[2]
-			f = open(cfile,'r')
-			for ligne in f :
-				if motif in ligne:
-					m = re.findall(r'(\w+\.fits)', ligne)
-			
-			f.close()
-
-			for current in m:
-				name = current.split('.')
-				cur = name[0]
-
-				if (os.path.exists(cur +'.fits')):
-
-					os.system(CMD_SWARP + " %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (cur + '.fits', os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
+			chkimg = getConfigValue(configContent, 'CHECKIMAGE_NAME')
+			if chkimg:
+				if (os.path.exists(chkimg)):
+					debug("Found check-image, running Swarp on it...")
+					base = chkimg[:chkimg.rfind('.')]
+					os.system(CMD_SWARP + " %s -SUBTRACT_BACK N -WRITE_XML N -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE 4.0 -RESAMPLING_TYPE BILINEAR -IMAGEOUT_NAME %s" % (chkimg, os.path.join(userData['ResultsOutputDir'], 'temp.fits')))
 					# Converts produced FITS image into PNG format
-					tiff = os.path.join(userData['ResultsOutputDir'], cur + '.tif')
+					debug("check-image: running Stiff on previous Swarp")
+					tiff = os.path.join(userData['ResultsOutputDir'], base + '.tif')
 					os.system("%s %s -OUTFILE_NAME %s 2>/dev/null" % (CMD_STIFF,os.path.join(userData['ResultsOutputDir'], 'temp.fits'), tiff))
 					os.remove(os.path.join(userData['ResultsOutputDir'], 'temp.fits'))
 
-					os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], cur + '.png')))
+					debug("check-image: converting raw tif to PNG")
+					os.system("%s %s %s" % (CMD_CONVERT, tiff, os.path.join(userData['ResultsOutputDir'], base + '.png')))
 					if HAS_CONVERT:
-						debug("Creating image thumbnails")
-						os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_' + cur + '.png')))
-				
+						debug("check-image: creating image thumbnails")
+						os.system("%s %s %s" % (CMD_CONVERT_THUMB, tiff, os.path.join(userData['ResultsOutputDir'] , 'tn_' + base + '.png')))
 					os.remove(tiff)
-
 
 	elif kind == 'swarp':
 		if exit_code == 0:
