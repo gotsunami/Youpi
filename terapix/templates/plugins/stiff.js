@@ -20,10 +20,8 @@
  *
  */
 
-/* global */
-var uidstiff = '{{ plugin.id }}';
-
-var {{ plugin.id }} = {
+var stiff = {
+	id: 'stiff',
 	/*
 	 * Variable: ims
 	 * 
@@ -48,12 +46,12 @@ var {{ plugin.id }} = {
 		var output_data_path = $('output_target_path').innerHTML;
 	
 		// Get config file
-		var cSel = $(uidstiff + '_config_name_select');
+		var cSel = $(this.id + '_config_name_select');
 		var config = cSel.options[cSel.selectedIndex].text;
 	
 		// Set mandatory structures
 		var p_data = {	
-			plugin_name : uidstiff,
+			plugin_name : this.id,
 			userData : {
 				resultsOutputDir: output_data_path,
 				config: config, 
@@ -103,12 +101,12 @@ var {{ plugin.id }} = {
 		);
 	
 		opts = $H(opts);
-		opts.set('Plugin', uidstiff);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'process');
 		opts.set('ReprocessValid', (runopts.reprocessValid ? 1 : 0));
 		opts = opts.merge(runopts.clusterPolicy.toQueryParams());
 
-		r.send('{% url terapix.youpi.views.processing_plugin %}', opts.toQueryString());
+		r.send('/youpi/process/plugin/', opts.toQueryString());
 	},
 
 	/*
@@ -198,12 +196,12 @@ var {{ plugin.id }} = {
 	 */ 
 	saveItemForLater: function(trid, opts, silent) {
 		opts = $H(opts);
-		opts.set('Plugin', uidstiff);
+		opts.set('Plugin', this.id);
 		opts.set('Method', 'saveCartItem');
 
 		var runopts = get_runtime_options(trid);
 		var r = new HttpRequest(
-				uidstiff + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -250,7 +248,7 @@ var {{ plugin.id }} = {
 		tdiv.insert(resp.Start + '<br/>');
 		tdiv.insert(resp.End + '<br/>');
 		var src = resp.Success ? 'success' : 'error';
-		var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'}).setStyle({paddingRight: '5px'});
+		var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif'}).setStyle({paddingRight: '5px'});
 		tdiv.insert(img);
 		tdiv.insert(resp.Duration);
 		tr = new Element('tr');
@@ -308,7 +306,7 @@ var {{ plugin.id }} = {
 
 		tr = new Element('tr');
 		td = new Element('td').setStyle({padding: '8px'});
-		td.update(new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/stiff-pyramid.png'}));
+		td.update(new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/stiff-pyramid.png'}));
 		tr.insert(td);
 		td = new Element('td').setStyle({padding: '8px'});
 		td.update(new Element('a', {href: '/youpi/image/view/' + resp.TaskId + '/'}).update('Click to see image'));
@@ -371,13 +369,13 @@ var {{ plugin.id }} = {
 			// Icon
 			td = new Element('td');
 			var src = task.Success ? 'success' : 'error';
-			var img = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/admin/icon_' + src + '.gif'});
+			var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/admin/icon_' + src + '.gif'});
 			td.insert(img);
 			tr.insert(td);
 	
 			// Date-time, duration
 			td = new Element('td');
-			var a = new Element('a', {href: '/youpi/results/' + uidstiff + '/' + task.TaskId + '/'});
+			var a = new Element('a', {href: '/youpi/results/' + this.id + '/' + task.TaskId + '/'});
 			a.insert(task.Start + ' (' + task.Duration + ')');
 			td.insert(a);
 			tr.insert(td);
@@ -391,8 +389,8 @@ var {{ plugin.id }} = {
 			// Reprocess option
 			td = new Element('td', {'class': 'reprocess'});
 			img = new Element('img', {
-				onclick: uidstiff + ".reprocessImage('" + task.TaskId + "');",
-				src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/reprocess.gif'
+				onclick: this.id + ".reprocessImage('" + task.TaskId + "');",
+				src: '/media/themes/' + guistyle + '/img/misc/reprocess.gif'
 			});
 			td.insert(img);
 			tr.insert(td);
@@ -449,8 +447,8 @@ var {{ plugin.id }} = {
 	 *
 	 */ 
 	showSavedItems: function() {
-		var cdiv = $('plugin_menuitem_sub_' + uidstiff).update();
-		var div = new Element('div', {id: uidstiff + '_saved_items_div'}).addClassName('savedItems');
+		var cdiv = $('plugin_menuitem_sub_' + this.id).update();
+		var div = new Element('div', {id: this.id + '_saved_items_div'}).addClassName('savedItems');
 		cdiv.insert(div);
 	
 		var r = new HttpRequest(
@@ -480,16 +478,16 @@ var {{ plugin.id }} = {
 					var tabi, tabitr, tabitd;
 					resp.result.each(function(res, k) {
 						idLists = res.idList.evalJSON();
-						trid = uidstiff + '_saved_item_' + k + '_tr';
+						trid = this.id + '_saved_item_' + k + '_tr';
 						tr = new Element('tr', {id: trid});
 						// Delete
-						delImg = new Element('img', {	id: uidstiff + '_del_saved_item_' + k,	
-														src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/delete.png'
+						delImg = new Element('img', {	id: this.id + '_del_saved_item_' + k,	
+														src: '/media/themes/' + guistyle + '/img/misc/delete.png'
 						}).setStyle({marginRight: '5px'}).hide();
 						delImg.c_data = {trid: trid, name: res.name};
-						delImg.observe('click', function() {
-							{{ plugin.id }}.delSavedItem(this.c_data.trid, this.c_data.name);
-						});
+						delImg.observe('click', function(c_data) {
+							this.delSavedItem(c_data.trid, c_data.name);
+						}.bind(this, delImg.c_data));
 	
 						// Date
 						td = new Element('td').update(res.date);
@@ -527,22 +525,21 @@ var {{ plugin.id }} = {
 						td.insert(delImg);
 
 						// Add to cart button
-						addImg = new Element('img', {src: '/media/themes/{{ user.get_profile.guistyle }}/img/misc/addtocart_small.png'});
-						addImg.c_data = $H(res);
-						addImg.observe('click', function() {
-							{{ plugin.id }}.addToCart(this.c_data);
-						});
+						addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});
+						addImg.observe('click', function(c_data) {
+							this.addToCart(c_data);
+						}.bind(this,  $H(res)));
 						td.insert(addImg);
 
 						tr.insert(td);
 						table.insert(tr);
-					});
+					}.bind(this));
 					div.insert(table);
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			Plugin: uidstiff,
+			Plugin: this.id,
 			Method: 'getSavedItems'
 		};
 		r.send('/youpi/process/plugin/', $H(post).toQueryString());
@@ -563,7 +560,7 @@ var {{ plugin.id }} = {
 
 		var trNode = $(trid);
 		var r = new HttpRequest(
-				uidstiff + '_result',
+				this.id + '_result',
 				null,	
 				// Custom handler for results
 				function(resp) {
@@ -579,19 +576,18 @@ var {{ plugin.id }} = {
 							node.fade({
 								afterFinish: function() {
 									node.remove();
-									if (last) eval(uidstiff + '.showSavedItems()');
-
+									if (last) eval(this.id + '.showSavedItems()');
 									// Notify user
 									document.fire('notifier:notify', "Item '" + name + "' successfully deleted");
-								}
+								}.bind(this)
 							});
-						}
+						}.bind(this)
 					});
-				}
+				}.bind(this)
 		);
 	
 		var post = {
-			'Plugin': uidstiff,
+			'Plugin': this.id,
 			'Method': 'deleteCartItem',
 			'Name'	: name
 		};
@@ -608,7 +604,7 @@ var {{ plugin.id }} = {
 	 *
 	 */ 
 	addToCart: function(data) {
-		var p_data = {	plugin_name : uidstiff,
+		var p_data = {	plugin_name : this.id,
 						userData : data
 		};
 	
@@ -629,16 +625,11 @@ var {{ plugin.id }} = {
 		var root = $('menuitem_sub_0');
 		root.writeAttribute('align', 'center');
 		// Container of the ImageSelector widget
-		var div = new Element('div', {id: uidstiff + '_results_div', align: 'center'}).setStyle({width: '90%'});
+		var div = new Element('div', {id: this.id + '_results_div', align: 'center'}).setStyle({width: '90%'});
 		root.insert(div);
 
-		/*
-		this.ims = new ImageSelector(uidstiff + '_results_div');
+		this.ims = new ImageSelector(this.id + '_results_div');
 		this.ims.setTableWidget(new AdvancedTable());
-		*/
-		{{ plugin.id }}.ims = new ImageSelector(uidstiff + '_results_div');
-		{{ plugin.id }}.ims.setTableWidget(new AdvancedTable());
-		
 	},
 
 	/*
@@ -657,7 +648,7 @@ var {{ plugin.id }} = {
 				function(resp) {
 					data = resp.result;
 					p_data = {	
-						plugin_name : uidstiff,
+						plugin_name : this.id,
 						userData : { 	
 							'config' : 'The one used for the last processing',
 							'taskId' : taskId,
@@ -674,11 +665,11 @@ var {{ plugin.id }} = {
 									'An item has been added to the processing cart.');
 							}
 					);
-				}
+				}.bind(this)
 		);
 
 		var post = {
-			Plugin: uidstiff,
+			Plugin: this.id,
 			Method: 'getReprocessingParams',
 			TaskId: taskId
 		};
