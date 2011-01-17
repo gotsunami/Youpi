@@ -136,7 +136,7 @@ COMPRESS_VERSION = True
 COMPRESS_CSS_FILTERS = ['compress.filters.yui.YUICompressorFilter']
 COMPRESS_JS_FILTERS = COMPRESS_CSS_FILTERS
 
-COMMON_JS = [
+COMMON_JS = (
 	'js/3rdParty/scriptaculous/prototype.js', 
 	'js/3rdParty/scriptaculous/scriptaculous.js', 
 	'js/3rdParty/scriptaculous/builder.js',
@@ -148,13 +148,11 @@ COMMON_JS = [
 	'js/common.js', 
 	'js/xhr.js',
 	'js/menu.js',
-]
+)
 #
-HOME_JS = COMMON_JS[:]
-HOME_JS.extend(['js/progressbar.js', 'js/sqlform.js'])
+HOME_JS = COMMON_JS + ('js/progressbar.js', 'js/sqlform.js')
 #
-INGESTION_JS = COMMON_JS[:]
-INGESTION_JS.extend([
+INGESTION_JS = COMMON_JS + (
 	'js/3rdParty/modalbox/modalbox.js', 
 	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js', 
 	'js/3rdParty/tafelTree/Tree.js', 
@@ -163,10 +161,9 @@ INGESTION_JS.extend([
 	'js/ingestion.js', 
 	'js/filebrowser.js',
 	'js/accordion.js',
-])
+)
 #
-TAGS_JS = COMMON_JS[:]
-TAGS_JS.extend([
+TAGS_JS = COMMON_JS + (
 	'js/stylepicker.js', 
 	'js/tagwidget.js', 
 	'js/tagpanel.js', 
@@ -177,10 +174,9 @@ TAGS_JS.extend([
 	'js/3rdParty/lightbox2/lightbox.js', 
 	'js/3rdParty/modalbox/modalbox.js', 
 	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js',
-])
+)
 #
-PROCESSING_JS = COMMON_JS[:]
-PROCESSING_JS.extend(['js/3rdParty/tafelTree/Tree.js'])
+PROCESSING_JS = COMMON_JS + ('js/3rdParty/tafelTree/Tree.js',)
 #
 PLUGINFITSIN_JS = ('js/plugins/qualityfitsin.js',)
 PLUGINSEX_JS = ('js/plugins/sextractor.js',)
@@ -188,11 +184,9 @@ PLUGINSCAMP_JS = ('js/plugins/scamp.js',)
 PLUGINSWARP_JS = ('js/plugins/swarp.js',)
 PLUGINSTIFF_JS = ('js/plugins/stiff.js',)
 PLUGINSKEL_JS = ('js/plugins/skeleton.js',)
-# FIXME
 ALL_PLUGINS_JS = PLUGINFITSIN_JS + PLUGINSEX_JS + PLUGINSCAMP_JS + PLUGINSWARP_JS + PLUGINSTIFF_JS + PLUGINSKEL_JS
 #
-PROCPLUGIN_JS = COMMON_JS[:]
-PROCPLUGIN_JS.extend([
+PROCPLUGIN_JS = COMMON_JS + (
 	'js/3rdParty/tafelTree/Tree.js',
 	'js/3rdParty/modalbox/modalbox.js',
 	'js/progressbar.js',
@@ -208,9 +202,9 @@ PROCPLUGIN_JS.extend([
 	'js/advancedtable.js',
 	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js',
 	'js/cartmode.js',
-])
+)
 #
-RESULTS_JS = tuple(COMMON_JS) + (
+RESULTS_JS = COMMON_JS + (
 	'js/gradingwidget.js',
 	'js/processinghistorywidget.js',
 	'js/advancedtable.js',
@@ -220,14 +214,13 @@ RESULTS_JS = tuple(COMMON_JS) + (
 	'js/progressbar.js',
 ) + ALL_PLUGINS_JS
 #
-REPORTING_JS = COMMON_JS[:]
-REPORTING_JS.extend([
+REPORTING_JS = COMMON_JS + (
 	'js/gradingwidget.js',
 	'js/processinghistorywidget.js',
 	'js/progressbar.js',
-])
+)
 #
-CART_JS = tuple(COMMON_JS) + (
+CART_JS = COMMON_JS + (
 	'js/3rdParty/Q/q.window.js',
 	'js/3rdParty/modalbox/modalbox.js',
 	'js/condorpanel.js',
@@ -235,39 +228,32 @@ CART_JS = tuple(COMMON_JS) + (
 	'js/progressbar.js',
 ) + ALL_PLUGINS_JS
 #
-CONDOR_JS = COMMON_JS[:]
-CONDOR_JS.extend([
+CONDOR_JS = COMMON_JS + (
 	'js/advancedtable.js',
 	'js/condorpanel.js',
 	'js/clusterpolicywidget.js',
 	'js/3rdParty/autoSuggest/bsn.AutoSuggest_c_2.0.js',
-])
+)
 #
-PREF_JS = COMMON_JS[:]
-PREF_JS.extend([
+PREF_JS = COMMON_JS + (
 	'js/condorpanel.js',
 	'js/3rdParty/modalbox/modalbox.js',
-])
+)
 #
-REPORT_JS = COMMON_JS[:]
-REPORT_JS.extend([
+REPORT_JS = COMMON_JS + (
 	'js/3rdParty/flotr/lib/canvas2image.js',
 	'js/3rdParty/flotr/lib/canvastext.js',
 	'js/3rdParty/flotr/flotr-0.2.0-alpha.js',
 	'js/3rdParty/modalbox/modalbox.js',
 	'js/pageswitcher.js',
-])
+)
 #
-GRADEPANEL_JS = COMMON_JS[:]
-GRADEPANEL_JS.extend([
-	'js/gradingwidget.js',
-])
+GRADEPANEL_JS = COMMON_JS + ('js/gradingwidget.js',)
 #
-SINGLERESULT_JS = COMMON_JS[:]
-SINGLERESULT_JS.extend([
+SINGLERESULT_JS = COMMON_JS + (
 	'js/gradingwidget.js',
 	'js/3rdParty/lightbox2/lightbox.js',
-])
+)
 
 COMPRESS_JS = {
 	'default'		: { 'source_filenames': COMMON_JS, 'output_filename': 'js/default.r?-min.js' },
@@ -299,85 +285,70 @@ COMPRESS_JS = {
 }
 
 #
-DEFAULT_CSS = [
+DEFAULT_CSS = (
 	'themes/default/css/global.css', 
 	'themes/default/css/dashboard.css', 
 	'themes/default/css/layout.css', 
 	'themes/default/css/menu.css',
-]
+)
 #
-ING_CSS = DEFAULT_CSS[:]
-ING_CSS.extend([
+ING_CSS = DEFAULT_CSS + (
 	'js/3rdParty/modalbox/modalbox.css',
 	'themes/default/css/history.css', 
 	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css', 
 	'js/3rdParty/tafelTree/css/tree.css', 
 	'themes/default/css/tooltip.css',
 	'themes/default/css/accordion.css',
-])
+)
 #
-TAGS_CSS = DEFAULT_CSS[:]
-TAGS_CSS.extend([
+TAGS_CSS = DEFAULT_CSS + (
 	'js/3rdParty/lightbox2/css/lightbox.css',
 	'js/3rdParty/modalbox/modalbox.css',
 	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css',
-])
+)
 #
-PROCESSING_CSS = DEFAULT_CSS[:]
-PROCESSING_CSS.extend([
+PROCESSING_CSS = DEFAULT_CSS + (
 	'js/3rdParty/tafelTree/css/tree.css',
 	'themes/default/css/tooltip.css',
-])
+)
 #
-PROCPLUGIN_CSS = DEFAULT_CSS[:]
-PROCPLUGIN_CSS.extend([
+PROCPLUGIN_CSS = DEFAULT_CSS + (
 	'js/3rdParty/tafelTree/css/tree.css',
 	'themes/default/css/tooltip.css',
 	'js/3rdParty/modalbox/modalbox.css',
 	'js/3rdParty/windows/themes/default.css',
 	'js/3rdParty/windows/themes/alphacube.css',
 	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css',
-])
+)
 #
-RESULTS_CSS = DEFAULT_CSS[:]
-RESULTS_CSS.extend([
+RESULTS_CSS = DEFAULT_CSS + (
 	'js/3rdParty/lightbox2/css/lightbox.css',
 	'js/3rdParty/modalbox/modalbox.css',
-])
+)
 #
-CART_CSS = DEFAULT_CSS[:]
-CART_CSS.extend([
+CART_CSS = DEFAULT_CSS + (
 	'themes/default/css/history.css',
 	'js/3rdParty/modalbox/modalbox.css',
 	'themes/default/css/accordion.css',
-])
+)
 #
-CONDOR_CSS = DEFAULT_CSS[:]
-CONDOR_CSS.extend([
+CONDOR_CSS = DEFAULT_CSS + (
 	'themes/default/css/tooltip.css',
 	'js/3rdParty/autoSuggest/css/autosuggest_inquisitor.css',
-])
+)
 #
-PREF_CSS = DEFAULT_CSS[:]
-PREF_CSS.extend([
+PREF_CSS = DEFAULT_CSS + (
 	'themes/default/css/history.css',
 	'js/3rdParty/modalbox/modalbox.css',
-])
+)
 #
-SINGLERES_CSS = DEFAULT_CSS[:]
-SINGLERES_CSS.extend([
+SINGLERES_CSS = DEFAULT_CSS + (
 	'js/3rdParty/lightbox2/css/lightbox.css',
-])
+)
 #
-LOGIN_CSS = DEFAULT_CSS[:]
-LOGIN_CSS.extend([
-	'themes/default/css/login.css',
-])
+LOGIN_CSS = DEFAULT_CSS + ('themes/default/css/login.css',)
 #
-REPORT_CSS = DEFAULT_CSS[:]
-REPORT_CSS.extend([
-	'js/3rdParty/modalbox/modalbox.css',
-])
+REPORT_CSS = DEFAULT_CSS + ('js/3rdParty/modalbox/modalbox.css',)
 
 COMPRESS_CSS = {
 	'default'		: { 'source_filenames': DEFAULT_CSS, 'output_filename': 'themes/default/css/default.r?-min.css' },
@@ -398,4 +369,3 @@ COMPRESS_CSS = {
 # 
 # End of django-compress app setup
 # 
-
