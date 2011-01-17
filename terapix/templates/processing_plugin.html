@@ -9,10 +9,6 @@
 <script type="text/javascript">
 var guistyle = '{{ user.get_profile.guistyle }}';
 var skel_output_data = '{{ processing_output.0|safe }}{{ user.username }}/skel/';
-{# Load custom plugin's javascript code #}
-{% comment %}
-{% endcomment %}
-{% include plugin.jsSource %}
 
 // Displays both logo and 'About' menu tab
 function show_plugin_info() {
