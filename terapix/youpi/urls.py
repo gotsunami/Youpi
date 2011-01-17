@@ -72,6 +72,7 @@ urlpatterns = patterns(
 	(r'^results/delete/$', 'views.delete_processing_task'),
 	(r'^results/filter/$', 'views.task_filter'),
 	(r'^results/stats/$', 'views.dir_stats'),
+	(r'^results/outputdirs/$', 'views.get_all_results_output_dir'),
 	(r'^results/(.*?)/(.*?)/$', 'views.single_result'),
 
 	(r'^tags/$', 'views.tags'),

@@ -226,6 +226,13 @@ def dir_stats(request):
 								'Stats'		: stats }),
 								mimetype = 'text/plain')
 
+@login_required
+@profile
+@cache_page(60*5)
+def get_all_results_output_dir(request):
+	outdirs = Processing_task.objects.values_list('results_output_dir', flat=True).distinct().order_by('results_output_dir')
+	return HttpResponse(json.encode({'output_dirs': map(str, outdirs)}), mimetype = 'text/plain')
+
 def task_filter(request):
 	try:
 		# May be a list of owners

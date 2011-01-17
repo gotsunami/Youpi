@@ -25,10 +25,7 @@ var output_dir_stats_data;
 
 // Get stats
 function get_stats() {
-	try {
-		var dirSel = document.getElementById('dir_select');
-	} catch(e) { return false; }
-
+	var dirSel = $('dir_select');
 	var dir = dirSel.options[dirSel.selectedIndex].value;
 	if (dir == 'empty') return;
 
@@ -112,15 +109,7 @@ function get_stats() {
 				{% endif %}
 				</div>
 				<div id="menuitem_stats" style="display: none">
-					<div style="margin-top: 20px; width: -moz-fit-content;" class="tip">
-						To get some stats, please select an output directory used for your processings:<br/>
-						<select id="dir_select" onchange="get_stats();">
-							<option value="empty" selected="selected">---</option>
-						{% for dir in outputDirs %}
-							<option value="{{ dir }}">{{ dir }}</option>
-						{% endfor %}
-						</select>
-						<img src="/media/themes/{{ user.get_profile.guistyle }}/img/misc/reload.gif" onclick="get_stats();" style="cursor: pointer;" title="Click to reload data..."/>
+					<div id="dirlist" style="margin-top: 20px; width: -moz-fit-content;" class="tip">
 					</div>
 					<div style="margin-top: 20px;" id="dir_stats_div"></div>
 				</div>
@@ -163,6 +152,27 @@ function get_stats() {
 		});
 		$('job_list_refresh').observe('click', function() {
 			hist_jobs_advt.loadDataFromQuery('/youpi/history/cluster/jobs/', '' /* No POST */, null);
+		});
+		$('link_stats').observe('click', function() {
+			var xhr = new HttpRequest(
+				'dirlist',
+				null, // Use default error handler
+				// Custom handler for results
+				function(resp) {
+					var d = $('dirlist');
+					var s = new Element('select', {id: 'dir_select'});
+					s.observe('change', function() { get_stats(); });
+					s.insert(new Element('option', {value: 'empty', selected: 'selected'}).update('---'));
+					resp.output_dirs.each(function(dir) {
+						s.insert(new Element('option', {value: dir}).update(dir));
+					});
+					var img = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/reload.gif', title: 'Click to reload data...'}).setStyle({cursor: 'pointer'});
+					img.observe('click', get_stats);
+					$('dirlist').update('To get some stats, please select an output directory used for your processings:<br/>')
+						.insert(s).insert(img);
+				}
+			);
+			xhr.send('/youpi/results/outputdirs/', null, null, 'get');
 		});
 	});
 </script>
