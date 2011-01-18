@@ -277,7 +277,7 @@ def results(request):
 	active_users = User.objects.filter(is_active = True)
 	menu_id = 'results'
 	return render_to_response('results.html', {	
-						'tags'				: Tag.objects.all(),
+						'tags'				: Tag.objects.all().order_by('name'),
 						'users'				: active_users,
 						'plugins' 			: manager.plugins, 
 						'selected_entry_id'	: menu_id, 
