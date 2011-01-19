@@ -198,9 +198,10 @@ rst_epilog = """
 .. _python: http://www.python.org/
 .. |terapix| replace:: TERAPIX
 .. _terapix: http://www.terapix.fr/
+.. |astromatic| replace:: Astromatic
+.. _astromatic: http://www.astromatic.net/
 """
 
-#html_theme_path = ['themes']
 html_theme = "default"
 html_theme_options = {
 	#'relbarbgcolor': '#4780b5',

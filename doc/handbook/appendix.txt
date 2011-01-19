@@ -18,12 +18,14 @@ Version 0.7.1
 
 **Improvements**:
 
+- Added support for caching (see the release notes)
 - New temporary and Condor log files :ref:`directory tree layout <BASE_TEMP_DIR>` (better scalability). `Bug #220`_
 
 .. _Bug #220: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=220
 
 **Bug fixes**:
 
+- `SExtractor`: fixed several post-processing fixes
 - `QualityFITS`: fixed job reprocessing issue.
 
 **Release Notes**:

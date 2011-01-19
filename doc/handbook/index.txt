@@ -1,7 +1,7 @@
 .. Youpi documentation master file
 
-Welcome to Youpi documentation!
-===============================
+Youpi Processing Pipeline
+=========================
 
 :Authors: Mathias Monnerville <monnerville@iap.fr>, Gregory Semah <semah@iap.fr>
 :Maintainer: Mathias Monnerville <monnerville@iap.fr>

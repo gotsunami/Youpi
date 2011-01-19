@@ -2,21 +2,46 @@
 Preface
 *******
 
-*TBW*
+To get the best possible performance and efficiency out of nowadays multi-core CPUs, data 
+reduction tools are often low-level, multi-threaded computer programs that are generally 
+used from the command line. |terapix|_ and |astromatic|_ provide such (open source)
+low-level tools for years now, and the Youpi processing pipeline is an attempt to 
+get an easy-to-use, high-level web application to handle common daily tasks such as 
+ingesting FITS images, organizing and preparing data for processing, running the jobs 
+on a cluster of machines and getting the results.
 
-Youpi Application Features
-==========================
+Youpi acts as a glue between those low-level tools. Its development line mainly focuses on 
+providing a modern graphical user interface (GUI) and the ability to easily organize and 
+share data between users.
 
-Handy features are available out of the box. With Youpi, you can:
+Youpi Features
+==============
 
-- Easily keep track of your data
-- Tag FITS images with labels
-- Prepare your tasks then save them for later processing by adding them to a processing cart
-- Define sophisticated rules to match only subsets of your Condor cluster on which you can 
-  run your processing jobs
-- Monitor and kill your jobs running on the cluster in realtime from the interface
-- Easily access all your output results
-- Get statistics and generate reports
+Youpi comes with helper tools to:
+
+Perform batch processing
+	blah blah
+
+Ingest `FITS` images
+	blah blah
+
+Organize image collections with tags
+	blah blah
+
+Prepare and define processing tasks 
+	then save them for later processing by adding them to a processing cart
+
+Define rules to match only subsets of the cluster 
+	on which you can run your processing jobs
+
+Monitor and kill jobs running on the cluster 
+	in realtime from the interface
+
+Access output results
+	blah blah
+
+Get statistics and generate reports
+	blah blah
 
 
 Organization of This Book
@@ -33,8 +58,3 @@ formats are available.
 
 .. _Youpi's website: http://youpi.terapix.fr
 
-
-Request For Comments
-====================
-
-*TBW*
