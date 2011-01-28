@@ -43,8 +43,10 @@ Documentation
 
 .. container:: dochome
 
+   .. cssclass:: toc
+
    +-----------------------------------+-----------------------------------+
-   | :doc:`Contents <contents>`        | API                               |
+   | :doc:`Contents <contents>`        | :doc:`API <api>`                  |
    |                                   |                                   |
    | Youpi Handbook                    | Application Programming Interface |
    +-----------------------------------+-----------------------------------+
@@ -57,6 +59,7 @@ Documentation
    :hidden:
    
    contents
+   api
 
 Get Youpi
 ---------
