@@ -6,5 +6,3 @@ Getting Started
 
    installation
    tour
-   cookbook
-

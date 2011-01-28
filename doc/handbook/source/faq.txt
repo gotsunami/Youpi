@@ -14,7 +14,134 @@ User FAQ
 .. contents::
    :local:
 
-*TBW*
+How to ingest images into Youpi before processing them?
+-------------------------------------------------------
+
+In order to let Youpi handling your FITS images, the first thing you have 
+to do is to indicate Youpi the location of your images in the cluster, this is 
+the ingestion.
+
+Go to the ingestion tab and click on the "run ingestion" tab 
+
+1. In the Cluster Path Browser box:
+
+    - Deploy the Network Filesystem by clicking on the "plus" icon
+    - Browse directories until reaching your FITS images location(the number between 
+      brackets is a FITS images count)
+    - Select single or multiple paths by clicking on the directories of FITS 
+      images (selected paths will be added on the box under the filesystem browser)
+
+    .. Note:: Ability to delete wrong selected path by clicking on the left red cross
+              or the "clear selection" button
+
+2. In the Ingestion parameters and options box:
+
+    *Labelize the future ingestion with identification string or number*
+        It permits to find all images ingested under this ingestion ID, for example, for 
+        later processing use or sorting issue (See the "How do i process my images?" section)
+
+    *Pay attention to the options*
+        You may want to flag your images as good or bad on the fly of the ingestion. 
+        Then choose "validated" or "observed".
+
+    There are two others options:
+        - Checking the FITS data integrity of images
+        - As images are unique by there name, calculating checksum make them unique also by 
+          content.
+
+3. Run ingestions from the selected paths box:
+
+    If you agree with your paths to images in this box you can press the "run ingestions" 
+    button.
+
+    .. note:: To have more informations on ingestion under Youpi, see :ref:`ingestion_section`
+
+How to process images with Youpi?
+---------------------------------
+
+Of course it depends of the kind of processing you want to apply to images, but for 
+all processing kind available in Youpi, the following instructions are the same.
+
+Go to the processing tab of the interface and all available processing kinds will be 
+listed (understand them as "plugins" of Youpi).
+
+After clicking on your choosen plugin, and assuming that you are aware of how they 
+globally work (in term of command line use), you have to browse the red tabs (under the 
+processing tab) from the leftest to the rightest by completing each one with your 
+parameters (those you'd use in a command line context).
+In fact, let's say roughly that each option of your command line corresponds to a plugin tab!
+
+.. image:: /figures/browsing_tabs.png
+
+**Select images**
+    First step of the configuration process, it permits to choose images that have been ingested
+    according to section above.
+
+    For example, you'd use images from ingestion with a given ingestion ID (See the "How do i put
+    my images inside Youpi" section), you just have to select the ingestion ID field in the select
+    box and you will see your ingestion ID label.
+
+    Click on the "**Find** images" button to see them appearing. All selected images (see or change
+    the check box state of the image) will be those which will be processed.
+
+    .. note:: Many others fields could be used to sort and select images, develop the select box to
+     see them.
+  
+**Select data paths**
+    As the cluster path browser box used during the ingestion, the path selector has the same goal: 
+    browse the whole cluster to target your data, and, include them as input data. Once a path 
+    is clicked, it is set in the "select path" box. Click on the desired button to assign to the right
+    type of data and. Once it's done, select it in the select box of the concerned type.
+
+    .. warning:: understand that you don't target the file itself, you 've just permit to look inside a path
+                 and Youpi will match for the right name based on differents conventions:
+
+                     - **WEIGHT**: 0123456789.fits will be processed with the 0123456789_weight.fits weight 
+                       file, contained in the path you have choosen through this tab.
+
+                     - **AHEAD**: 0123456789.fits needs the 0123456789.ahead file contained in the path you 
+                       have choosen.
+
+                     - **FLAT & MASK**: the name of the right flat and mask to use for processing, is 
+                       contained in the header of 0123456789.fits. Youpi will match the flat and mask 
+                       header's name with files contained in your choosen path.
+
+**Select a configuration file**
+    If configuration files for such softwares as SCamp, Sextractor, etc ... have no secrets for you, you can:
+        - Use the default one, provided by the soft (choose default file in the select box).
+        - Edit the default to design your own configuration file and save it in the database for later use.
+        - Import several configuration files to match by selection names from image selector (see 
+          :ref:`image_selector_section`).
+
+**Set output directory**
+    Every plugins(kind of processing) running under Youpi, create output data. You can 
+    decide to store output data in the output directory of your choice (see :ref:`output_directory_section`).
+
+    .. warning:: For now, Youpi allows only creation of one level depth directory.
+ 
+**Add to cart and run processing tasks**
+    Complete the configuration of processing by pressing the "add to cart" button. Go to 
+    the "processing cart" tab, in the top right of the interface, to see your own processing 
+    tasks added. Press the "run" button to launch your processing tasks on the cluster.
+
+How to check status of processings tasks (jobs) running on the cluster?
+-----------------------------------------------------------------------
+
+Go to the left tabs menu and press the "Active Monitoring" tab. Youpi displays all jobs 
+running on the cluster. A status is provided for each job and killing jobs is enabled 
+if they are yours.
+
+How to check results of processing?
+-----------------------------------
+
+Go to the left tabs menu and press the "Results" tab. Select the owner and the kind of
+processings you want to display, by completing criterias in the "processing history"
+panel, on the left. You can even search for the processed image name in the funnel text box.
+Click on the "start searching" button.
+
+After filtering your results by criterias, processings tasks are displayed as vertical 
+scrollbar list. Click on the box, relative to your expected image processing result, and 
+the result of the processed image will appear.
 
 
 *************
