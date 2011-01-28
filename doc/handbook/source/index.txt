@@ -1,7 +1,7 @@
 .. Youpi documentation master file
 
-Youpi Processing Pipeline
-=========================
+Youpi Processing Pipeline Documentation
+=======================================
 
 :Authors: Mathias Monnerville <monnerville@iap.fr>, Gregory Semah <semah@iap.fr>
 :Maintainer: Mathias Monnerville <monnerville@iap.fr>
@@ -11,21 +11,22 @@ Youpi Processing Pipeline
 :Release: |release|
 :Date: |today|
 
-Abstract
---------
-
 Youpi stands for "YOUpi is your processing PIpeline". It is a modern, easy 
 to use web application providing high level functionalities to perform data 
-reduction on scientific `FITS`_ images. Built on top of various open source 
-reduction tools released to the community by |terapix|_, Youpi can help 
-organize your data, manage your processing jobs on a computer cluster in real 
-time (using `Condor`_) and facilitate teamwork by allowing fine-grain sharing 
-of results and data. Built from the ground up with modularity in mind, Youpi 
-comes with plugins allowing to perform, from within a browser, various processing 
-tasks such as evaluating the quality of incoming images (using the ``QualityFITS`` 
-software package), computing astrometric and photometric solutions (using ``SCAMP``), 
-resampling and co-adding FITS images (using ``SWarp``) and extracting sources and 
-building source catalogues from astronomical images (using ``SExtractor``).  
+reduction on scientific `FITS`_ images. 
+
+Built on top of various open source reduction tools released to the community 
+by |terapix|_, Youpi can help organize your data, manage your processing jobs 
+on a computer cluster in real time (using `Condor`_) and facilitate teamwork 
+by allowing fine-grain sharing of results and data. 
+
+Built from the ground up with modularity in mind, Youpi comes with plugins allowing 
+to perform, from within a browser, various processing tasks such as evaluating the 
+quality of incoming images (using the ``QualityFITS`` software package), computing 
+astrometric and photometric solutions (using ``SCAMP``), resampling and co-adding 
+FITS images (using ``SWarp``) and extracting sources and building source catalogues 
+from astronomical images (using ``SExtractor``).  
+
 Whether you are dealing with small to medium-sized data reduction projects, 
 Youpi can be a powerful alternative to other pipeline data reduction software. 
 Youpi is free software and published under the `GNU General Public License`_.
@@ -37,23 +38,31 @@ that this manual is a work in progress. As such, some sections may be incomplete
 .. _Condor: http://www.cs.wisc.edu/condor/
 .. _GNU General Public License: http://www.gnu.org/licences/gpl-3.0.txt
 
-Table of Contents
------------------
+Documentation
+-------------
+
+.. container:: dochome
+
+   +-----------------------------------+-----------------------------------+
+   | :doc:`Contents <contents>`        | API                               |
+   |                                   |                                   |
+   | Youpi Handbook                    | Application Programming Interface |
+   +-----------------------------------+-----------------------------------+
+   | :ref:`Search Page <search>`       | :ref:`General Index <genindex>`   |
+   |                                   |                                   |
+   | Search the documentation          | All functions, classes, terms     |
+   +-----------------------------------+-----------------------------------+
 
 .. toctree::
-   :maxdepth: 3
+   :hidden:
+   
+   contents
 
-   preface
-   gettingstarted
-   administration
-   dive
-   faq
-   appendix
+Get Youpi
+---------
 
-Indices and tables
-==================
+Youpi is available as a tarball at http://youpi.terapix.fr/download/.
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+The source code from the Mercurial repository is also available at 
+https://youpi.terapix.fr/mercurial/youpi/trunk.
 
