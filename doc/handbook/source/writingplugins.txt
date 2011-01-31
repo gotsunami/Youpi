@@ -2,6 +2,9 @@
 Writing Plugins for Youpi
 *************************
 
+.. contents::
+   :local:
+
 .. warning:: Most of this chapter is currently being rewritten; some parts are 
              obsolete for the moment.
 

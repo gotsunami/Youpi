@@ -226,7 +226,7 @@ Condor tranfer       Any version distributed with Youpi         Youpi comes with
 .. _QualityFITS: http://youpi.terapix.fr/release/qualityfits-1.13.12-1.src.rpm
 .. _WCS library: http://www.atnf.csiro.au/people/mcalabre/WCS/
 .. _PSFEx: http://terapix.iap.fr/soft/psfex
-.. _WeightWatcher: http://http://astromatic.iap.fr/software/weightwatcher
+.. _WeightWatcher: http://astromatic.iap.fr/software/weightwatcher
 .. _FITS utility programs: http://heasarc.gsfc.nasa.gov/docs/software/fitsio/cexamples.html
 .. _Scamp: http://astromatic.iap.fr/software/scamp
 .. _Swarp: http://astromatic.iap.fr/software/swarp

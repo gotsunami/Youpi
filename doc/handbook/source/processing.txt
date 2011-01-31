@@ -1,0 +1,37 @@
+Processing Images
+=================
+
+.. _proc_fitsin:
+
+`QualityFITS` --- First Quality Evaluation
+------------------------------------------
+
+*TBW*
+
+.. _proc_scamp:
+
+`SCAMP` --- Astro-Photo Calibration
+-----------------------------------
+
+*TBW*
+
+.. _proc_swarp:
+
+`SWarp` --- Image Stacking
+--------------------------
+
+*TBW*
+
+.. _proc_sextractor:
+
+`SExtractor` --- Sources Extractor
+----------------------------------
+
+*TBW*
+
+.. _proc_stiff:
+
+`STIFF` --- `FITS` to `TIFF` Image convertion
+---------------------------------------------
+
+*TBW*

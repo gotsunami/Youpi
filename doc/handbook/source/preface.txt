@@ -20,13 +20,34 @@ Youpi Features
 Youpi comes with helper tools to:
 
 *Ingest FITS images*
-    blah blah
+    By providing a data path in which Youpi will find all `FITS` images, images header 
+    information is read and stored in the database. As we will see later, this 
+    information is used in almost every part of the application, from image selection 
+    to job submission on a cluster. Image ingestion is discussed later and has 
+    a :ref:`dedicated section <ingestion_section>`.
 
 *Organize image collections with tags*
-    blah blah
+    In order to be able to process a selection of images on a cluster, well, images have 
+    to be selected first. Youpi provides an integrated :ref:`image selector <image_selector_section>` 
+    widget to select images based on various criteria, mostly mapping the `FITS` image's header 
+    keywords. But what if you need a more advanced, flexible way to select bunch of (possibly 
+    unrelated) images? Youpi supports :ref:`applying tags <organize_tags_section>` --- that 
+    is, simple, easy to remember names --- to image selections, making those annotated 
+    selections easy to retrieve, at any time.
 
-*Prepare and define processing tasks*
-    then save them for later processing by adding them to a processing cart
+*Set up processing tasks*
+    Youpi supports several type of processings that can be used with image selections. 
+    The standard distribution provides plugins for :ref:`evaluating the quality <proc_fitsin>` 
+    of an image, computing :ref:`astrometric and photometric solutions <proc_scamp>` for 
+    a set of images, :ref:`resampling and co-adding <proc_swarp>` together images and building 
+    :ref:`catalogues of objects <proc_sextractor>` from an astronomical image. There is 
+    also a plugin for batch :ref:`converting FITS images to the TIFF format <proc_stiff>`.
+
+    Each of those *processing tasks* can be accomplished within Youpi in a similar way, 
+    by first making an image selection, selecting paths to external files such as 
+    weight maps, flats or masks, then selecting a proper configuration file to use with 
+    that processing and finally defining a directory where output data (products) 
+    will be stored after processing.
 
 *Define rules to match only subsets of the cluster*
     on which you can run your processing jobs

@@ -343,6 +343,7 @@ preferences for processing data, manage his style themes and define his own perm
  your navigation.It makes Youpi interface more accessible, for example concerning 
  visually impaired users.
 
+.. _organize_tags_section:
 
 Organize Data With Tags
 =======================
