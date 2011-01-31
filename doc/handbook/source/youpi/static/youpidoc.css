@@ -21,7 +21,10 @@ body {
     letter-spacing: -0.01em;
     line-height: 150%;
     text-align: center;
+    /*
     background-color: #BFD1D4;
+    */
+    background: #252c32 url('Page-BgTexture.png') repeat;
     color: black;
     padding: 0;
     border: 1px solid #aaa;
@@ -48,13 +51,19 @@ div.body {
 }
 
 div.related {
+    /*
+    background-color: #ff6600;
+    */
+    background: url('item-center.png') repeat-x left top;
     font-size: 1em;
 }
 
 div.related ul {
+    /*
     background-image: url(navigation.png);
-    height: 2em;
     border-top: 1px solid #ddd;
+    */
+    height: 2em;
     border-bottom: 1px solid #ddd;
 }
 
@@ -74,11 +83,18 @@ div.related ul li a {
     margin: 0;
     padding: 0 5px 0 5px;
     line-height: 1.75em;
+    /*
     color: #EE9816;
+    */
+    color: #181c20;
 }
 
 div.related ul li a:hover {
+    /*
     color: #3CA8E7;
+    color: #247fcc;
+    */
+    text-decoration: underline;
 }
 
 div.sphinxsidebarwrapper {
@@ -98,13 +114,20 @@ div.sphinxsidebar h3, div.sphinxsidebar h4 {
     margin: 1em 0 0.5em 0;
     font-size: 1em;
     padding: 0.1em 0 0.1em 0.5em;
-    color: white;
     border: 1px solid #86989B;
+    /*
+    color: white;
     background-color: #AFC1C4;
+    */
+    background: url('item-center.png') repeat-x left top;
+    color: #181c20;
 }
 
 div.sphinxsidebar h3 a {
+    /*
     color: white;
+    */
+    color: #181c20;
 }
 
 div.sphinxsidebar ul {
@@ -119,7 +142,10 @@ div.sphinxsidebar ul ul {
 }
 
 div.footer {
+    /*
     background-color: #E3EFF1;
+    */
+    background-color: #ddd;
     color: #86989B;
     padding: 3px 8px 3px 0;
     clear: both;
@@ -139,12 +165,18 @@ p {
 }
 
 a {
+    /*
     color: #CA7900;
+    */
+    color: #256193;
     text-decoration: none;
 }
 
 a:hover {
+    /*
     color: #2491CF;
+    */
+    color: #247fcc;
 }
 
 div.body a {
@@ -228,7 +260,10 @@ hr {
 
 a tt {
     border: 0;
+    /*
     color: #CA7900;
+    */
+    color: #256193;
 }
 
 a tt:hover {
@@ -338,6 +373,8 @@ div.viewcode-block:target {
     border-bottom: 1px solid #ac9;
 }
 
+/** Custom Youpi **/
+
 div.dochome {
     margin-top: 20px;
     margin-left: 30px;
@@ -366,4 +403,15 @@ div.dochome p {
 
 table.toc td {
     border: 1px solid #fff;
+}
+
+/* Overrides of basic.css */
+
+div.sphinxsidebar input {
+    border: 1px solid #ff6600;
+}
+
+div.sphinxsidebar input[type=submit] {
+    background-color: #ff6600;
+    color: white;
 }

@@ -2,16 +2,16 @@
 Preface
 *******
 
-To get the best possible performance and efficiency out of nowadays multi-core CPUs, data 
-reduction tools are often low-level, multi-threaded computer programs that are generally 
+To get the best possible performance and efficiency out of multi-core CPUs, we use data 
+reduction tools which are often low-level, multi-threaded computer programs generally 
 used from the command line. |terapix|_ and |astromatic|_ provide such (open source)
 low-level tools for years now, and the Youpi processing pipeline is an attempt to 
 get an easy-to-use, high-level web application to handle common daily tasks such as 
-ingesting FITS images, organizing and preparing data for processing, running the jobs 
-on a cluster of machines and getting the results.
+ingesting FITS images into a database, organizing and preparing data for processing, 
+running jobs on a cluster of machines, getting the results and generating reports.
 
-Youpi acts as a glue between those low-level tools. Its development line mainly focuses on 
-providing a modern graphical user interface (GUI) and the ability to easily organize and 
+Youpi acts as a glue between those low-level tools. Its development line mainly focuses 
+on providing a modern graphical user interface (GUI) and the ability to easily organize and 
 share data between users.
 
 Youpi Features
@@ -19,29 +19,29 @@ Youpi Features
 
 Youpi comes with helper tools to:
 
-Perform batch processing
-	blah blah
+*Ingest FITS images*
+    blah blah
 
-Ingest `FITS` images
-	blah blah
+*Organize image collections with tags*
+    blah blah
 
-Organize image collections with tags
-	blah blah
+*Prepare and define processing tasks*
+    then save them for later processing by adding them to a processing cart
 
-Prepare and define processing tasks 
-	then save them for later processing by adding them to a processing cart
+*Define rules to match only subsets of the cluster*
+    on which you can run your processing jobs
 
-Define rules to match only subsets of the cluster 
-	on which you can run your processing jobs
+*Perform batch processing*
+    blah blah
 
-Monitor and kill jobs running on the cluster 
-	in realtime from the interface
+*Monitor and kill jobs running on the cluster*
+    in realtime from the interface
 
-Access output results
-	blah blah
+*Access output results*
+    blah blah
 
-Get statistics and generate reports
-	blah blah
+*Get statistics and generate reports*
+    blah blah
 
 
 Organization of This Book

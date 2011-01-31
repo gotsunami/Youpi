@@ -2,4 +2,8 @@
 Application Programming Interface
 *********************************
 
-*TBW*
+:mod:`condor` --- Condor Library
+================================
+
+.. automodule:: terapix.lib.cluster.condor
+   :members:

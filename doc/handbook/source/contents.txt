@@ -6,7 +6,8 @@ Youpi Documentation Contents
    :maxdepth: 3
 
    preface
-   gettingstarted
+   installation
+   tour
    administration
    dive
    faq

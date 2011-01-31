@@ -45,15 +45,15 @@ Documentation
 
    .. cssclass:: toc
 
-   +-----------------------------------+-----------------------------------+
-   | :doc:`Contents <contents>`        | :doc:`API <api>`                  |
-   |                                   |                                   |
-   | Youpi Handbook                    | Application Programming Interface |
-   +-----------------------------------+-----------------------------------+
-   | :ref:`Search Page <search>`       | :ref:`General Index <genindex>`   |
-   |                                   |                                   |
-   | Search the documentation          | All functions, classes, terms     |
-   +-----------------------------------+-----------------------------------+
+   +-----------------------------------+-----------------------------------+-----------------------------------+
+   | :doc:`Contents <contents>`        | :ref:`Module Index <modindex>`    | :doc:`API <api>`                  |
+   |                                   |                                   |                                   |
+   | Youpi Handbook                    | Python Module Index               | Application Programming Interface |
+   +-----------------------------------+-----------------------------------+-----------------------------------+
+   | :ref:`Search Page <search>`       | :ref:`General Index <genindex>`   |                                   |
+   |                                   |                                   |                                   |
+   | Search the documentation          | All functions, classes, terms     |                                   |
+   +-----------------------------------+-----------------------------------+-----------------------------------+
 
 .. toctree::
    :hidden:
