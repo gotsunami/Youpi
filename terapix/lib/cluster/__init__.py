@@ -16,5 +16,9 @@
 from terapix.lib.cluster.exceptions import *
 
 class Cluster(object):
-	def __init__(self):
-		pass
+    """
+    Base cluster class definition. No interface at the moment, but cluster related 
+    modules should inherit this class.
+    """
+    def __init__(self):
+        pass

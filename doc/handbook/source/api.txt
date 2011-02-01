@@ -2,8 +2,14 @@
 Application Programming Interface
 *********************************
 
-:mod:`condor` --- Condor Library
-================================
+Library Utilities
+=================
 
 .. automodule:: terapix.lib.cluster.condor
+   :members:
+
+.. automodule:: terapix.lib.processing
+   :members:
+
+.. automodule:: terapix.lib.common
    :members:

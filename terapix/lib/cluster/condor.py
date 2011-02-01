@@ -11,6 +11,21 @@
 #
 ##############################################################################
 
+"""
+:mod:`condor` --- Condor Library
+================================
+
+This library provides convenient classes for working with the `Condor`_ clustering 
+system. The :mod:`terapix.lib.cluster.condor` module provides helper classes and 
+methods to deal with submission files (to easily generate them) and monitor running 
+jobs.
+
+.. _Condor: http://www.cs.wisc.edu/condor/
+
+.. automodule:: terapix.lib.cluster
+   :members:
+"""
+
 # vim: set ts=4
 
 from django.conf import settings
@@ -31,8 +46,9 @@ class CondorError(Exception): pass
 
 class CondorCSF(Cluster):
     """
-    Base class for generating a Condor submission file. This class can be 
-    used from the CLI.
+    Base class for generating a *Condor submission file*. This class can be 
+    used from the command line. Youpi inherits this class with 
+    :class:`terapix.lib.cluster.condor.YoupiCondorCSF`.
     """
     # Static header
     _csfHeader = """#
@@ -80,7 +96,8 @@ transfer_input_files    = %(transfer)s
         """
         Returns a dictionnary with entries for the log, error and output filenames 
         that should be used by plugins generating Condor submission files.
-        @return Dictionnary with paths to Condor log files
+
+        The returnes dictionnary has the following keys: ``log``, ``error`` and ``out``.
         """
         if type(caption) not in types.StringTypes:
             raise TypeError, caption
@@ -93,6 +110,11 @@ transfer_input_files    = %(transfer)s
         }
 
     def __init__(self, desc = None, **kargs):
+        """
+        Constructor. Initialises internal data structures.
+
+        An optional description `desc` can be supplied.
+        """
         Cluster.__init__(self)
 
         for attribute in self.attrs:
@@ -133,10 +155,14 @@ transfer_input_files    = %(transfer)s
 
     def addQueue(self, queue_args = None, queue_env = None):
         """
-        Queues a Condor job, with optional arguments queue_args and queue_env environment.
-        @param queue_args string of any argument that must be passed to the executable
-        @param queue_env dictionary of variables used to define environment variables
-        @return dictionary of data associated with the newly created queue
+        Queues a Condor job, with optional arguments `queue_args` and `queue_env`.
+        `queue_args` is a string of any argument that must be passed to the Condor executable.
+        `queue_env` is a dictionary of variables used to define environment variables to be passed 
+        to Condor at job execution.
+
+        A dictionary of data associated with the newly created queue is returned. It can be empty 
+        if no `queue_args` or `queue_env` has been provided. Or it can have ``args`` and ``env`` 
+        keys if those two input parameters have been provided.
         """
         if queue_args and (type(queue_args) not in types.StringTypes):
             raise TypeError, 'queue_args must be a string'
@@ -157,8 +183,10 @@ transfer_input_files    = %(transfer)s
 
     def removeQueue(self, idx):
         """
-        Remove queue for active Condor queue list
-        @param idx index of the queue in the list
+        Remove a queue from Condor's queue list.
+
+        `idx` is the index of the queue in the list. Raises ``IndexError`` if `idx` 
+        is out or range.
         """
         if type(idx) != types.IntType:
             raise TypeError, "idx must be a positive integer"
@@ -168,20 +196,39 @@ transfer_input_files    = %(transfer)s
             raise IndexError, "No queue at position %d to remove. Index out of range" % idx
 
     def write(self, filename):
+        """
+        Write the Condor submission file content (as returned by 
+        :func:`getSubmissionFileContent` to a file named ``filename``.
+        """
         f = open(filename, 'w')
         f.write(self.getSubmissionFileContent())
         f.close()
 
     def getSubmissionFileContent(self):
+        """
+        Return the submission file content. Always returns a valid Condor submission 
+        file structure, even if no queue was added with :func:`addQueue` (which is 
+        the default).
+        """
         self.updateData()
         return self._csfHeader % self.data
 
     def setExecutable(self, filename):
+        """
+        Set executable ``filename`` to use with Condor. Raises ``TypeError`` if it's 
+        not a string.
+        """
         if type(filename) not in types.StringTypes:
             raise TypeError, "Executable must be of type 'string', not %s" % type(filename)
         self._executable = filename
 
     def setTransferInputFiles(self, files):
+        """
+        Set a list of input ``files`` to be transferred by Condor (available 
+        as the *transfer_input_files* CSF directive).
+
+        Raises a ``TypeError`` exception if ``files`` is not a list of strings.
+        """
         if type(files) != types.ListType:
             raise TypeError, "Must be a list of path to files to transfer"
 
@@ -194,8 +241,11 @@ transfer_input_files    = %(transfer)s
 
 class YoupiCondorCSF(CondorCSF):
     """
-    Processing plugins use this class to easily generate a Condor submission file needed for 
-    submitting their jobs.
+    Processing plugins use this class to easily generate a suitable Condor submission file 
+    for submitting their jobs.
+    
+    This class implements business logic for Youpi. The default executable is set to 
+    use the :mod:`terapix.script.wrapper_processing` script.
     """
     def __init__(self, request, pluginId, desc = None):
         CondorCSF.__init__(self, desc)
@@ -210,39 +260,51 @@ class YoupiCondorCSF(CondorCSF):
 
     @property
     def request(self):
+        """
+        The Django :class:`django.http.HttpRequest` associated instance, as 
+        supplied to the constructor.
+        """
         return self.__request
 
     @property
     def id(self):
+        """
+        The plugin id, as supplied to the constructor with *pluginId*.
+        """
         return self.__id
 
     def getConfigFilePath(self):
         """
-        Returns the pathname to configuration file used for this processing
+        Return a path to a new Condor configuration file used for this processing.
         Each call generates a new filename so that no file gets overwritten.
-        The returned name should then be used by plugins to add some content to it.
-        @return Path to a non existing file
+
+        Returns a path to a new file. The returned name should then be used 
+        by plugins to add some content to it.
         """
         return os.path.join(get_temp_dir(self.__request.user.username, self.__id), "%s-%s.rc" % (self.__id.upper(), time.time()))
 
 
     def getSubmitFilePath(self):
         """
-        Overloads CondorCSF.getSubmitFilePath() static function
+        Overrides the :func:`terapix.lib.cluster.condor.CondorCSF.getSubmitFilePath` 
+        static function (not static anymore).
         """
         return os.path.join(get_temp_dir(self.__request.user.username, self.__id), "CONDOR-%s-%s.csf" % (self.__id, time.time()))
 
     def getLogFilenames(self, unused=None, user=None, date=None):
         """
-        Overloads CondorCSF.getLogFilenames() static function
+        Overrides the :func:`terapix.lib.cluster.condor.CondorCSF.getLogFilenames` 
+        static function (not static anymore).
+
+        .. todo:: fixme
+
+        The *unused* parameter is unused (here for signature constraint only), *user* is 
+        the current Django logged in :class:`django.contrib.auth.models.User`, *date* is 
+        a custom :class:`datetime.date` object.
 
         Returns a dictionnary with entries for the log, error and output filenames 
-        that should be used by plugins generating Condor submission files.
-
-        @param unused parm
-        @param user Django user model
-        @param date use custom date instead of today (YYYY-MM-DD)
-        @return Dictionnary with paths to Condor log files
+        that should be used by plugins generating Condor submission files. The 
+        dictionnary has the ``log``, ``error`` and ``out`` keys.
         """
         import datetime
         if date and not isinstance(date, datetime.date):
@@ -265,7 +327,10 @@ class YoupiCondorCSF(CondorCSF):
 
     def getSubmissionFileContent(self):
         """
-        Fully override parent definition
+        Overrides the :func:`terapix.lib.cluster.condor.CondorCSF.getSubmissionFileContent` 
+        function to provide a custom ``PATH`` environment to all defined queues.
+
+        Returns the Condor submission file content.
         """
         if not self._transfer_input_files:
             # Add at least required files
@@ -292,7 +357,9 @@ class YoupiCondorCSF(CondorCSF):
 
     def setTransferInputFiles(self, files):
         """
-        Adds Youpi required files such as local_conf.py, settings.py, lib/common.py, DBGeneric.py and NOP
+        Overrides :func:`terapix.lib.cluster.CondorCSF.setTransferInputFiles` by appending 
+        required modules to the *files* list parameter: ``local_conf.py``, ``settings.py``, 
+        ``lib/common.py``, ``script/DBGeneric.py`` and ``NOP``.
         """
         if type(files) != types.ListType:
             raise TypeError, "Must be a list of path to files to transfer"
@@ -304,7 +371,12 @@ class YoupiCondorCSF(CondorCSF):
 
     def getRequirementString(self):
         """
-        Realtime and powerful Condor requirement string generation
+        Build a requirement string suitable for Condor, using defined node policies 
+        and selection to build a dynamic list of target machines.
+
+        Returns a requirement string ready to be merged into the submission file.
+
+        .. seealso:: Function :func:`terapix.lib.cluster.condor.get_condor_status`
         """
         post = self.__request.POST
         try:
@@ -354,15 +426,15 @@ class YoupiCondorCSF(CondorCSF):
 
 def get_condor_status():
     """
-    This function is usefull to get a list of hosts attached to condor (part of the cluster) in real time.
-    A list of lists is returned : [[ vm_full_name1, state1], [vm_full_name2, state2]...]
+    Usefull to get a list of hosts attached to condor in real time (queries 
+    ``condor_status``). A list of lists is returned:: 
+    
+        [[ vm_full_name1, state1], [vm_full_name2, state2]...]
 
-    short_host_name may be one of 'mix3', 'mix4' etc.
-    state is one of 'Idle' or 'Running'.
+    ``stateN`` is either *Idle* or *Running*.
 
-    @return list of cluster nodes (vms)
+    Returns a list of cluster nodes (vms).
     """
-
     pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_status -xml'))
     data = pipe.readlines()
     pipe.close()
@@ -387,11 +459,11 @@ def get_condor_status():
 
 def get_requirement_string(params, vms):
     """
-    Returns Condor's requirement string for a *POLICY*
-    For params, allowed criteria are among: MEM, DSK, HST, SLT
+    Returns Condor's requirement string for a *POLICY*.
+    For params, allowed criteria are one of: MEM, DSK, HST, SLT
 
-    @param params string of params like 'MEM,G,1,G'
-    @param vms list vms available cluster nodes
+    *params* is a string of params like 'MEM,G,1,G'. *vms* is a list 
+    of available cluster node.
     """
     if type(params) not in types.StringTypes:
         raise TypeError, "params must be a string"
@@ -509,8 +581,10 @@ def get_requirement_string(params, vms):
 
 def get_requirement_string_from_selection(selName):
     """
-    Returns Condor's requirement string for a *SELECTION*
-    @param selName - string: name of node selection
+    Returns Condor's requirement string for a *selection*.
+    *selName* is the name of a node selection.
+
+    Raises a ``CondorError`` exception is selName is an unknown exception.
     """
     if type(selName) not in types.StringTypes:
         raise TypeError, 'selName must be a String'

@@ -27,7 +27,7 @@ from terapix.youpi import __version__
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.pngmath', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage']
+extensions = ['sphinx.ext.pngmath', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.todo']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -272,3 +272,9 @@ rst_epilog = """
 .. |astromatic| replace:: Astromatic
 .. _astromatic: http://www.astromatic.net/
 """
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/', None),
+    'django': ('http://docs.djangoproject.com/en/dev/', 'http://docs.djangoproject.com/en/dev/_objects/'),
+}

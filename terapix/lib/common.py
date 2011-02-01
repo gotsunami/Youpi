@@ -11,6 +11,11 @@
 #
 ##############################################################################
 
+"""
+:mod:`common` --- Common functions
+===================================
+"""
+
 import os, os.path, types
 
 def get_title_from_menu_id(menuId):
