@@ -49,8 +49,11 @@ Youpi comes with helper tools to:
     that processing and finally defining a directory where output data (products) 
     will be stored after processing.
 
-*Define rules to match only subsets of the cluster*
-    on which you can run your processing jobs
+*Define rules to match only subsets of a cluster*
+    Maybe you don't plan or want to use all the cluster nodes available at a time. In 
+    order to use a limited set of cluster nodes for a processing, Youpi provides flexible 
+    solutions to :ref:`define selections of nodes<condor_setup>` you want to use. Those 
+    selections can be saved and associated to a specific category of processings.
 
 *Perform batch processing*
     blah blah

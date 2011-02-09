@@ -276,6 +276,8 @@ A set of options is proposed to add a fine-grain control during ingestion:
 It adds more flexibility for searching, classifying, sorting operations which are needed 
 during the image lifetime and through the pipeline.
 
+.. _condor_setup:
+
 Deal With Condor Setup
 ======================
 
