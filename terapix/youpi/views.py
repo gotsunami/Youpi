@@ -35,7 +35,7 @@ from terapix.script.ingestion import getNowDateTime
 from terapix.youpi.auth import Permissions
 from terapix.youpi.cviews import profile
 from terapix.youpi.models import *
-from terapix.youpi.pluginmanager import manager, PluginManagerError, PluginError
+from terapix.youpi.pluginmanager import manager, ApplicationManagerError, PluginError
 
 @login_required
 @profile
@@ -85,7 +85,7 @@ def processing(request):
 def render_plugin(request, pluginId):
 	try:
 		plugin = manager.getPluginByName(pluginId)
-	except PluginManagerError, msg:
+	except ApplicationManagerError, msg:
 		return HttpResponseNotFound("Error: %s" % msg)
 
 	if not request.user.has_perm('youpi.can_use_plugin_' + pluginId):

@@ -24,7 +24,7 @@ from terapix.exceptions import *
 from terapix.reporting import ReportFormat , get_report_data
 from terapix.youpi.cviews import profile
 from terapix.youpi.forms import ReportAdvancedImageForm
-from terapix.youpi.pluginmanager import manager, PluginManagerError
+from terapix.youpi.pluginmanager import manager, ApplicationManagerError
 
 # Global (non-plugin related) reports definition
 selopts = """Select a processing type: <select name="kind_select">%s</select>""" % \
@@ -726,7 +726,7 @@ def get_report(request, pluginId, reportId, format):
 		return HttpResponseForbidden("Sorry, you don't have permission to generate reports")
 	try:
 		plugObj = manager.getPluginByName(pluginId)
-	except PluginManagerError:
+	except ApplicationManagerError:
 		# May be a global report (not plugin related)
 		if pluginId == 'global':
 			return get_global_report(request, reportId, format)

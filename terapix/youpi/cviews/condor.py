@@ -23,7 +23,7 @@ from django.views.decorators.cache import cache_page
 from terapix.youpi.auth import *
 from terapix.youpi.cviews import *
 from terapix.youpi.models import *
-from terapix.youpi.pluginmanager import PluginManagerError
+from terapix.youpi.pluginmanager import ApplicationManagerError
 from terapix.lib.cluster.condor import get_condor_status, get_requirement_string
 from terapix.exceptions import *
 #

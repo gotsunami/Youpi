@@ -34,7 +34,7 @@ class Test_processing_plugin(unittest.TestCase):
 		pass
 
 	def testBadPluginName(self):
-		#self.assertRaises(PluginManagerError, self.client.post, '/youpi/process/plugin/', {'Plugin': '_bad_name_', 'Method': 'process'})
+		#self.assertRaises(ApplicationManagerError, self.client.post, '/youpi/process/plugin/', {'Plugin': '_bad_name_', 'Method': 'process'})
 		pass
 
 	def testBadMethodCall(self):

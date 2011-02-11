@@ -515,10 +515,11 @@ class ProcessingPlugin(object):
 	def getResultEntryDescription(self, task):
 		return "My description " + str(task.id)
 
+class ApplicationManagerError(PluginError): pass
 
-class PluginManager(object):
+class ApplicationManager(object):
 	"""
-	Plugin manager responsible for loading custom processing plugins
+	Application manager responsible for loading custom processing plugins
 	"""
 	__instances = {}
 
@@ -536,13 +537,13 @@ class PluginManager(object):
 			if name.endswith('.py'): name = name[:-3]
 			try: __import__(name)
 			except ImportError:
-				raise PluginManagerError, "Unable to load plugin. No plugin named '%s.py'" % name
+				raise ApplicationManagerError, "Unable to load plugin. No plugin named '%s.py'" % name
 
 		for obj in ProcessingPlugin.__subclasses__():
 			if obj not in self.__instances:
 				self.__instances[obj] = obj()
 				if not hasattr(self.__instances[obj], 'id'):
-					raise PluginManagerError, "Plugin %s does not have an id attribute which is mandatory" % obj
+					raise ApplicationManagerError, "Plugin %s does not have an id attribute which is mandatory" % obj
 
 		# Ensure plugin id is unique
 		ids = {}
@@ -551,7 +552,7 @@ class PluginManager(object):
 			ids[plug.id].append(plug)
 		for id, plugs in ids.iteritems():
 			if len(plugs) > 1:
-				raise PluginManagerError, "The %s plugins can't have the same id attribute '%s'" % (plugs, id)
+				raise ApplicationManagerError, "The %s plugins can't have the same id attribute '%s'" % (plugs, id)
 
 	def reload(self):
 		"""
@@ -570,7 +571,7 @@ class PluginManager(object):
 		try:
 			active_plugins.sort(lambda x,y: cmp(x.index, y.index))
 		except AttributeError:
-			raise PluginManagerError, "Unable to sort plugins by index. Missing index property."
+			raise ApplicationManagerError, "Unable to sort plugins by index. Missing index property."
 		return active_plugins
 
 	def getPluginByName(self, iname):
@@ -584,7 +585,8 @@ class PluginManager(object):
 			if p.id == iname:
 				return p
 
-		raise PluginManagerError, "No plugin with id '%s' found." % iname
+		raise ApplicationManagerError, "No plugin with id '%s' found." % iname
 
 # Global plugin manager
-manager = PluginManager()
+manager = ApplicationManager()
+

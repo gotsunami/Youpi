@@ -24,7 +24,7 @@ try:
 	from django.db import IntegrityError
 	#
 	from terapix.youpi.models import *
-	from terapix.youpi.pluginmanager import PluginManager
+	from terapix.youpi.pluginmanager import ApplicationManager
 	from terapix.lib.itt.instconfig import InstrumentConfig
 except ImportError, e:
 	print "Please run this command from the terapix subdirectory: %s" % e
@@ -96,7 +96,7 @@ def setup_db():
 
 	# Default processing kinds
 	logger.log('Adding default processing kinds')
-	manager = PluginManager()
+	manager = ApplicationManager()
 
 	for plugin in manager.plugins:
 		try:

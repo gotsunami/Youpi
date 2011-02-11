@@ -1,15 +1,3 @@
-##############################################################################
-#
-# Copyright (c) 2008-2010 Terapix Youpi development team. All Rights Reserved.
-#                    Mathias Monnerville <monnerville@iap.fr>
-#                    Gregory Semah <semah@iap.fr>
-#
-# This program is Free Software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-##############################################################################
 
 """
 Tests for the plugin manager
@@ -17,15 +5,15 @@ Tests for the plugin manager
 
 import unittest, types, sys, time
 #
-from terapix.youpi.pluginmanager import PluginManager, ProcessingPlugin
+from terapix.youpi.pluginmanager import ApplicationManager, ProcessingPlugin
 from django.http import HttpRequest
 
-class PluginManagerTest(unittest.TestCase):
+class ApplicationManagerTest(unittest.TestCase):
 	"""
 	Tests the Permissions class
 	"""
 	def setUp(self):
-		self.pm = PluginManager()
+		self.pm = ApplicationManager()
 
 	def test_plugins(self):
 		plugins = self.pm.plugins

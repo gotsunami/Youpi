@@ -30,13 +30,13 @@ try:
 	from django.conf import settings
 	#
 	from terapix.youpi.models import *
-	from terapix.youpi.pluginmanager import PluginManager
+	from terapix.youpi.pluginmanager import ApplicationManager
 except ImportError:
 	print 'Please run this command from the terapix subdirectory.'
 	sys.exit(1)
 
 def check_descr(simulate):
-	manager = PluginManager()
+	manager = ApplicationManager()
 	for plugin in manager.plugins:
 		updated = 0
 		if not plugin.isAstromatic: continue
