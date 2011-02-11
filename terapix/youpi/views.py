@@ -33,9 +33,9 @@ from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 from terapix.script.ingestion import getNowDateTime
 from terapix.youpi.auth import Permissions
-from terapix.youpi.cviews import profile, manager
+from terapix.youpi.cviews import profile
 from terapix.youpi.models import *
-from terapix.youpi.pluginmanager import PluginManagerError, PluginError
+from terapix.youpi.pluginmanager import manager, PluginManagerError, PluginError
 
 @login_required
 @profile

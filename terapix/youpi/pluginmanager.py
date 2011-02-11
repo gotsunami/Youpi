@@ -585,3 +585,6 @@ class PluginManager(object):
 				return p
 
 		raise PluginManagerError, "No plugin with id '%s' found." % iname
+
+# Global plugin manager
+manager = PluginManager()

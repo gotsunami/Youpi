@@ -10,10 +10,11 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 #
 from terapix.exceptions import *
-from terapix.youpi.models import *
-from terapix.youpi.cviews import *
-from terapix.youpi.auth import read_proxy
 from terapix.lib.common import get_title_from_menu_id
+from terapix.youpi.auth import read_proxy
+from terapix.youpi.cviews import profile
+from terapix.youpi.models import *
+from terapix.youpi.pluginmanager import manager
 
 @login_required
 @profile

@@ -15,7 +15,7 @@ from terapix.youpi.models import *
 from terapix.youpi.cviews import profile 
 from terapix.youpi.views import get_entity_permissions
 from terapix.lib.common import get_title_from_menu_id
-from terapix.youpi.cviews import manager
+from terapix.youpi.pluginmanager import manager
 
 @login_required
 @profile

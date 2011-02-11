@@ -22,9 +22,9 @@ from types import *
 #
 from terapix.exceptions import *
 from terapix.reporting import ReportFormat , get_report_data
-from terapix.youpi.cviews import *
+from terapix.youpi.cviews import profile
 from terapix.youpi.forms import ReportAdvancedImageForm
-from terapix.youpi.pluginmanager import PluginManagerError
+from terapix.youpi.pluginmanager import manager, PluginManagerError
 
 # Global (non-plugin related) reports definition
 selopts = """Select a processing type: <select name="kind_select">%s</select>""" % \

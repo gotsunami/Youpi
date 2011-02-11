@@ -3,12 +3,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import Group
 from django.db import IntegrityError
 #
-from terapix.youpi.pluginmanager import PluginManager
 from terapix.youpi.models import SiteProfile
+from terapix.youpi.pluginmanager import manager
 #
 import base64, marshal
-
-manager = PluginManager()
 
 NULLSTRING = ''
 WHITESPACE = ' '
