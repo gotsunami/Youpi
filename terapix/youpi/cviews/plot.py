@@ -29,8 +29,6 @@ def rand_color():
 	randcolor = list([float(m) for m in f.split(',')])
 	return randcolor
 
-
-
 def plot_sky_selections(request):
 	"""
 	Plot sky selections.

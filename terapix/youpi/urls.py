@@ -11,167 +11,144 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns(
-	# Module that handles queries
-	'terapix.youpi',
-	
-	# Callback functions depending on urls matches
-	(r'^$', 'views.index'),
-	(r'^ingestion/$', 'views.ing'),
-	(r'^ingestion/delete/(.*?)/$', 'cviews.condor.delete_ingestion'),
-	(r'^ingestion/ingestion2/$', 'views.condor_ingestion'),
-	(r'^ingestion/imgCount/$', 'views.ingestion_img_count'),
-	(r'^ingestion/itt/content/$', 'views.get_itt_content'),
-	(r'^ingestion/itt/raw/(.*?)/$', 'views.show_raw_itt_content'),
-	(r'^ingestion/rename/(.*?)/$', 'cviews.condor.rename_ingestion'),
-	(r'^image/info/$', 'views.get_image_info'),
-	(r'^image/info/(.*?)/$', 'views.gen_image_header'),
-	(r'^image/view/(.*?)/$', 'views.view_image'),
-	(r'^processing/$', 'views.processing'),
-	(r'^processing/(.*?)/$', 'views.render_plugin'),
+    # Module that handles queries
+    'terapix.youpi',
+    
+    # Callback functions depending on urls matches
+    (r'^$', 'views.home'),
+    (r'^image/info/$', 'views.get_image_info'),
+    (r'^image/info/(.*?)/$', 'views.gen_image_header'),
+    (r'^image/view/(.*?)/$', 'views.view_image'),
+    (r'^processing/$', 'views.processing'),
+    (r'^processing/(.*?)/$', 'views.render_plugin'),
 
-	# Cluster
-	(r'^cluster/computeRequirementString/$', 'views.compute_requirement_string'),
-	(r'^cluster/delCondorNodeSelection/$', 'views.del_condor_node_selection'),
-	(r'^cluster/delCondorPolicy/$', 'views.del_condor_policy'),
-	(r'^cluster/getCondorNodeSelections/$', 'views.get_condor_node_selections'),
-	(r'^cluster/getCondorRequirementString/$', 'views.get_condor_requirement_string'),
-	(r'^cluster/getCondorSelectionMembers/$', 'views.get_condor_selection_members'),
-	(r'^cluster/getCondorPolicies/$', 'views.get_condor_policies'),
-	(r'^cluster/getPolicyData/$', 'views.get_policy_data'),
-	(r'^cluster/nodes/$', 'views.condor_hosts'),
-	(r'^cluster/saveCustomReqStr/$', 'views.save_condor_custom_reqstr'),
-	(r'^cluster/saveNodeSelection/$', 'views.save_condor_node_selection'),
-	(r'^cluster/savePolicy/$', 'views.save_condor_policy'),
-	(r'^cluster/softwares/$', 'views.condor_softs'),
-	(r'^cluster/softwares/versions/$', 'views.softs_versions'),
-	(r'^cluster/softwares/versions/refresh/$', 'views.query_condor_node_for_versions'),
-	(r'^cluster/softwares/versions/delete/$', 'views.clear_softs_versions'),
-	(r'^cluster/status/$', 'views.condor_status'),
-	(r'^cluster/logs/$', 'views.get_condor_log_files_links'),
-	(r'^cluster/log/(.*?)/(.*?)/$', 'views.show_condor_log_file'),
+    # Ingestion
+    (r'^ingestion/$', 'cviews.ingestion.home'),
+    (r'^ingestion/delete/(.*?)/$', 'cviews.ingestion.delete_ingestion'),
+    (r'^ingestion/ingestion2/$', 'cviews.condor.condor_ingestion'),
+    (r'^ingestion/imgCount/$', 'cviews.ingestion.ingestion_img_count'),
+    (r'^ingestion/itt/content/$', 'cviews.ingestion.get_itt_content'),
+    (r'^ingestion/itt/raw/(.*?)/$', 'cviews.ingestion.show_raw_itt_content'),
+    (r'^ingestion/rename/(.*?)/$', 'cviews.ingestion.rename_ingestion'),
+    (r'^populate/(.*?)/(.*?)/(.*)/$', 'cviews.ingestion.open_populate'),
+    (r'^populate_generic/(.*?)/(.*?)/(.*)/$', 'cviews.ingestion.open_populate_generic'),
+    (r'^history/ingestion/$', 'cviews.ingestion.history_ingestion'),
+    (r'^history/ingestion/report/(.*?)/$', 'cviews.ingestion.show_ingestion_report'),
+    (r'^stats/ingestion/$', 'cviews.ingestion.stats_ingestion'),
+    (r'^stats/processing/$', 'cviews.ingestion.stats_processing'),
 
-	(r'^monitoring/$', 'views.monitoring'),
-	(r'^monitoring/live/$', 'views.live_monitoring'),
-	(r'^monitoring/softwares/$', 'views.soft_version_monitoring'),
-	(r'^condor/cancel/$', 'views.job_cancel'),
-	(r'^condor/setup/$', 'views.condor_setup'),
-	(r'^results/$', 'views.results'),
-	(r'^results/delete/$', 'views.delete_processing_task'),
-	(r'^results/filter/$', 'views.task_filter'),
-	(r'^results/stats/$', 'views.dir_stats'),
-	(r'^results/outputdirs/$', 'views.get_all_results_output_dir'),
-	(r'^results/(.*?)/(.*?)/$', 'views.single_result'),
+    # Cluster
+    (r'^condor/setup/$', 'cviews.condor.home'),
+    (r'^cluster/computeRequirementString/$', 'cviews.condor.compute_requirement_string'),
+    (r'^cluster/delCondorNodeSelection/$', 'cviews.condor.del_condor_node_selection'),
+    (r'^cluster/delCondorPolicy/$', 'cviews.condor.del_condor_policy'),
+    (r'^cluster/getCondorNodeSelections/$', 'cviews.condor.get_condor_node_selections'),
+    (r'^cluster/getCondorRequirementString/$', 'cviews.condor.get_condor_requirement_string'),
+    (r'^cluster/getCondorSelectionMembers/$', 'cviews.condor.get_condor_selection_members'),
+    (r'^cluster/getCondorPolicies/$', 'cviews.condor.get_condor_policies'),
+    (r'^cluster/getPolicyData/$', 'cviews.condor.get_policy_data'),
+    (r'^cluster/nodes/$', 'cviews.condor.condor_hosts'),
+    (r'^cluster/saveCustomReqStr/$', 'cviews.condor.save_condor_custom_reqstr'),
+    (r'^cluster/saveNodeSelection/$', 'cviews.condor.save_condor_node_selection'),
+    (r'^cluster/savePolicy/$', 'cviews.condor.save_condor_policy'),
+    (r'^cluster/softwares/$', 'cviews.condor.condor_softs'),
+    (r'^cluster/softwares/versions/$', 'cviews.condor.softs_versions'),
+    (r'^cluster/softwares/versions/refresh/$', 'cviews.condor.query_condor_node_for_versions'),
+    (r'^cluster/softwares/versions/delete/$', 'cviews.condor.clear_softs_versions'),
+    (r'^cluster/status/$', 'cviews.condor.condor_status'),
+    (r'^cluster/logs/$', 'cviews.condor.get_condor_log_files_links'),
+    (r'^cluster/log/(.*?)/(.*?)/$', 'cviews.condor.show_condor_log_file'),
+    (r'^condor/cancel/$', 'cviews.condor.job_cancel'),
+    (r'^monitoring/$', 'cviews.condor.monitoring'),
+    (r'^monitoring/live/$', 'cviews.condor.live_monitoring'),
+    (r'^monitoring/softwares/$', 'cviews.condor.soft_version_monitoring'),
+    (r'^history/cluster/jobs/$', 'cviews.condor.history_cluster_jobs'),
 
-	(r'^tags/$', 'views.tags'),
-	(r'^tags/fetchtags/$', 'views.fetch_tags'),
-	(r'^tags/info/$', 'views.get_tag_info'),
-	(r'^tags/save/$', 'views.save_tag'),
-	(r'^tags/update/$', 'views.update_tag'),
-	(r'^tags/delete/$', 'views.delete_tag'),
-	(r'^tags/mark/$', 'views.tag_mark_images'),
-	(r'^tags/unmark/$', 'views.tag_unmark_images'),
-	(r'^tags/images/$', 'views.get_images_from_tags'),
+    # Tags
+    (r'^tags/$', 'cviews.tags.home'),
+    (r'^tags/images/$', 'cviews.tags.get_images_from_tags'),
+    (r'^tags/fetchtags/$', 'cviews.tags.fetch_tags'),
+    (r'^tags/info/$', 'cviews.tags.get_tag_info'),
+    (r'^tags/save/$', 'cviews.tags.save_tag'),
+    (r'^tags/update/$', 'cviews.tags.update_tag'),
+    (r'^tags/delete/$', 'cviews.tags.delete_tag'),
+    (r'^tags/mark/$', 'cviews.tags.tag_mark_images'),
+    (r'^tags/unmark/$', 'cviews.tags.tag_unmark_images'),
 
-	# Permissions
-	(r'^permissions/get/$', 'views.get_permissions'),
-	(r'^permissions/set/$', 'views.set_permissions'),
-	(r'^permissions/default/$', 'views.get_user_default_permissions'),
+    # Results
+    (r'^results/$', 'cviews.results.home'),
+    (r'^results/delete/$', 'cviews.results.delete_processing_task'),
+    (r'^results/filter/$', 'cviews.results.task_filter'),
+    (r'^results/stats/$', 'cviews.results.dir_stats'),
+    (r'^results/outputdirs/$', 'cviews.results.get_all_results_output_dir'),
+    (r'^results/(.*?)/(.*?)/$', 'cviews.results.single_result'),
 
-	# Prefs and docs
-	(r'^preferences/$', 'views.preferences'),
-	(r'^preferences/theme/set/$', 'views.set_current_theme'),
-	(r'^preferences/condor/loadCurrentConfig/$', 'views.pref_load_condor_config'),
-	(r'^preferences/condor/saveCurrentConfig/$', 'views.pref_save_condor_config'),
-	(r'^documentation/$', 'views.documentation'),
+    # Grading
+    (r'^grading/panel/(.*?)/(.*?)/$', 'cviews.results.grading_panel'),
+    (r'^grading/cancel/(.*?)/(.*?)/$', 'cviews.results.grading_cancel'),
+    (r'^grading/(.*?)/(.*?)/$', 'cviews.results.image_grading'),
 
-	# Sandbox for testing django form processing
-#	(r'^sandbox/$', 'test_form'),
+    # Permissions
+    (r'^permissions/get/$', 'cviews.perm.get_permissions'),
+    (r'^permissions/set/$', 'cviews.perm.set_permissions'),
+    (r'^permissions/default/$', 'cviews.perm.get_user_default_permissions'),
 
-	# AJAX dynamic folder populate
-	(r'^populate/(.*?)/(.*?)/(.*)/$', 'views.open_populate'),
-	(r'^populate_generic/(.*?)/(.*?)/(.*)/$', 'views.open_populate_generic'),
+    # Preferences
+    (r'^preferences/$', 'cviews.pref.home'),
+    (r'^preferences/theme/set/$', 'cviews.pref.set_current_theme'),
+    (r'^preferences/condor/loadCurrentConfig/$', 'cviews.pref.pref_load_condor_config'),
+    (r'^preferences/condor/saveCurrentConfig/$', 'cviews.pref.pref_save_condor_config'),
 
-	# Pre-ingestion
-	(r'^process/preingestion/tablescount/$', 'views.preingestion_tables_count'),
-	(r'^process/preingestion/run/$', 'views.preingestion_run'),
-	(r'^process/preingestion/tablefields/$', 'views.preingestion_table_fields'),
-	(r'^process/preingestion/query/$', 'views.preingestion_custom_query'),
+    # Image selector
+    (r'^ims/collection/(.*?)/$', 'cviews.ims.ims_get_collection'),
+    (r'^ims/images/(.*?)/$', 'cviews.ims.ims_get_images'),
+    (r'^ims/importSelections/$', 'cviews.ims.ims_import_selections'),
+    (r'^process/query/imgsFromIdList/$', 'cviews.ims.processing_imgs_from_idlist_post'),
+    (r'^process/query/idListPagination/$', 'cviews.ims.get_selected_ids_from_pagination'),
+    (r'^process/query/remapIds/$', 'cviews.ims.processing_imgs_remap_ids'),
+    (r'^process/db/saveSelection/$', 'cviews.ims.processing_save_image_selection'),
+    (r'^process/db/getSelections/$', 'cviews.ims.processing_get_image_selections'),
+    (r'^process/db/delSelection/$', 'cviews.ims.processing_delete_image_selection'),
+    (r'^process/imgsIdsFromRelease/$', 'cviews.ims.processing_get_imgs_ids_from_release'),
+    (r'^uploadFile/$', 'cviews.ims.upload_file'),
+    (r'^uploadFile/imageSelector/imageList/$', 'cviews.ims.ims_get_image_list_from_file'),
+    (r'^uploadFile/batch/parseContent/$', 'cviews.ims.batch_parse_content'),
+    (r'^uploadFile/batch/viewContent/(.*)/$', 'cviews.ims.batch_view_content'),
+    (r'^uploadFile/batch/viewSelection/$', 'cviews.ims.batch_view_selection'),
 
-	# Processing
-	(r'^process/plugin/$', 'views.processing_plugin'),
-	(r'^process/query/imgsFromIdList/$', 'views.processing_imgs_from_idlist_post'),
-	(r'^process/query/idListPagination/$', 'views.get_selected_ids_from_pagination'),
-	(r'^process/query/remapIds/$', 'views.processing_imgs_remap_ids'),
-	(r'^process/db/saveSelection/$', 'views.processing_save_image_selection'),
-	(r'^process/db/getSelections/$', 'views.processing_get_image_selections'),
-	(r'^process/db/delSelection/$', 'views.processing_delete_image_selection'),
-	(r'^process/checkConfigFileExists/$', 'views.processing_check_config_file_exists'),
-	(r'^process/imgsIdsFromRelease/$', 'views.processing_get_imgs_ids_from_release'),
+    # Processing cart 
+    (r'^cart/$', 'cviews.processingcart.home'),
+    (r'^cart/additem/$', 'cviews.processingcart.cart_add_item'),
+    (r'^cart/delitem/$', 'cviews.processingcart.cart_delete_item'),
+    (r'^cart/delitems/$', 'cviews.processingcart.cart_delete_items'),
+    (r'^cart/itemsCount/$', 'cviews.processingcart.cart_items_count'),
+    (r'^cart/savedItemsStats/$', 'cviews.processingcart.cart_saved_items_stats'),
 
-	# History
-	(r'^history/cluster/jobs/$', 'views.history_cluster_jobs'),
-	(r'^history/ingestion/$', 'views.history_ingestion'),
-	(r'^history/ingestion/report/(.*?)/$', 'views.show_ingestion_report'),
-	(r'^history/preingestion/$', 'views.history_preingestion'),
+    # Reporting
+    (r'^report/generating/(.*?)/(.*?)/$', 'cviews.reporting.generating_report'),
+    (r'^report/(.*?)/(.*?)/(.*?)/$', 'cviews.reporting.get_report'),
+    (r'^reporting/$', 'cviews.reporting.reporting'),
 
-	# Processing cart related
-	(r'^cart/$', 'views.cart_view'),
-	(r'^cart/additem/$', 'views.cart_add_item'),
-	(r'^cart/additems/$', 'views.cart_add_items'),
-	(r'^cart/delitem/$', 'views.cart_delete_item'),
-	(r'^cart/delitems/$', 'views.cart_delete_items'),
-	(r'^cart/itemsCount/$', 'views.cart_items_count'),
-	(r'^cart/savedItemsStats/$', 'views.cart_saved_items_stats'),
-
-	# Grading
-	(r'^grading/panel/(.*?)/(.*?)/$', 'views.grading_panel'),
-	(r'^grading/cancel/(.*?)/(.*?)/$', 'views.grading_cancel'),
-	(r'^grading/(.*?)/(.*?)/$', 'views.image_grading'),
-
-	# Auto-completion
-	(r'^autocompletion/(.*?)/(.*?)/$', 'views.autocomplete'),
-
-    # Admin site
+    # User authentication & admin
     (r'^admin/', include(admin.site.urls)),
-
-	# User authentication
     (r'^accounts/login/$', login),
     (r'^accounts/logout/$', logout),
 
-	(r'^uploadFile/$', 'views.upload_file'),
-	(r'^uploadFile/imageSelector/imageList/$', 'views.ims_get_image_list_from_file'),
-	(r'^uploadFile/batch/parseContent/$', 'views.batch_parse_content'),
-	(r'^uploadFile/batch/viewContent/(.*)/$', 'views.batch_view_content'),
-	(r'^uploadFile/batch/viewSelection/$', 'views.batch_view_selection'),
+    # Plots
+    (r'^plot/sky/selections/$', 'cviews.plot.plot_sky_selections'),
 
-	# Image selector
-	(r'^ims/collection/(.*?)/$', 'views.ims_get_collection'),
-	(r'^ims/images/(.*?)/$', 'views.ims_get_images'),
-	(r'^ims/importSelections/$', 'views.ims_import_selections'),
-
-	# Stats
-	(r'^stats/ingestion/$', 'views.stats_ingestion'),
-	(r'^stats/processing/$', 'views.stats_processing'),
-
-	# Plots
-	(r'^plot/sky/selections/$', 'views.plot_sky_selections'),
-
-	# API documentation
+    (r'^documentation/$', 'views.documentation'),
+    (r'^process/plugin/$', 'views.processing_plugin'),
+    (r'^process/checkConfigFileExists/$', 'views.processing_check_config_file_exists'),
+    (r'^autocompletion/(.*?)/(.*?)/$', 'views.autocomplete'),
     (r'^api/(.*)/$', 'views.browse_api'),
-
-	# Maintenance
     (r'^maintenance/$', 'views.maintenance'),
-
-	# Reporting
-	(r'^report/generating/(.*?)/(.*?)/$', 'cviews.reporting.generating_report'),
-	(r'^report/(.*?)/(.*?)/(.*?)/$', 'cviews.reporting.get_report'),
-	(r'^reporting/$', 'cviews.reporting.reporting'),
 )
 
 if settings.DEBUG:
-	urlpatterns += patterns('terapix.youpi.views',
-		(r'^test/$', 'main_test_runner'),
-		(r'^test/suite/$', 'main_test_suite'),
-		(r'^test/get/(.*?)/$', 'get_test'),
-		(r'^ping/$', 'ping'),
-	)
+    urlpatterns += patterns('terapix.youpi.views',
+        (r'^test/$', 'main_test_runner'),
+        (r'^test/suite/$', 'main_test_suite'),
+        (r'^test/get/(.*?)/$', 'get_test'),
+        (r'^ping/$', 'ping'),
+    )

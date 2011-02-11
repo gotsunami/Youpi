@@ -8,12 +8,29 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 #
 from terapix.youpi.auth import *
-from terapix.youpi.cviews import *
+#from terapix.youpi.cviews import *
 from terapix.youpi.models import *
+from terapix.youpi.cviews import profile 
+from terapix.youpi.views import get_entity_permissions
+from terapix.lib.common import get_title_from_menu_id
 #
 import cjson as json
 import time
 from types import *
+
+@login_required
+@profile
+def home(request):
+	"""
+	Related to tags page.
+	This is a callback function (as defined in django's urls.py file).
+	"""
+	menu_id = 'tags'
+	return render_to_response('tags.html', { 
+        'selected_entry_id'	: menu_id,
+        'title' 			: get_title_from_menu_id(menu_id),
+    }, 
+    context_instance = RequestContext(request))
 
 @login_required
 @profile

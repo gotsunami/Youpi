@@ -27,358 +27,30 @@ from terapix.youpi.pluginmanager import PluginManagerError
 from terapix.lib.cluster.condor import get_condor_status, get_requirement_string
 from terapix.exceptions import *
 #
+from terapix.youpi.cviews.ims import _get_pagination_attrs
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 import terapix.youpi
+from terapix.lib.common import get_title_from_menu_id
+
+@login_required
+@profile
+def home(request):
+	"""
+	Condor cluster setup
+	"""
+	menu_id = 'condorsetup'
+	return render_to_response('condorsetup.html', {	
+						'custom_condor_req' : request.user.get_profile().custom_condor_req,
+						'selected_entry_id'	: menu_id, 
+						'title' 			: get_title_from_menu_id(menu_id),
+					}, 
+					context_instance = RequestContext(request))
 
 @login_required
 @cache_page(60*5)
 def condor_status(request):
 	return HttpResponse(str({'results' : get_condor_status()}), mimetype = 'text/plain')
-
-@login_required
-@profile
-@cache_page(60*15)
-def ingestion_img_count(request):
-	"""
-	Returns number of ingested images
-	"""
-	try:
-		releaseId = request.POST.get('ReleaseId', None)
-	except KeyError, e:
-		raise HttpResponseServerError('Bad parameters')
-
-	if releaseId:
-		q = Rel_imgrel.objects.filter(release__id = int(releaseId)).count()
-	else:
-		q = Image.objects.all().count()
-
-	return HttpResponse(str({'Total' : int(q)}), mimetype = 'text/plain')
-
-@login_required
-@profile
-def delete_ingestion(request, ing_id):
-	"""
-	Delete ingestion (regarding permissions)
-	"""
-	try:
-		ing = Ingestion.objects.get(id = ing_id)
-	except:
-		return HttpResponse(json.encode({'error': "This ingestion has not been found"}), mimetype = 'text/plain')
-
-	perms = terapix.youpi.views.get_entity_permissions(request, target = 'ingestion', key = int(ing.id))
-	if not perms['currentUser']['write']:
-		return HttpResponse(json.encode({'error': "You don't have permission to delete this ingestion"}), mimetype = 'text/plain')
-
-	imgs = Image.objects.filter(ingestion = ing)
-	rels = Rel_it.objects.filter(image__in = imgs)
-	if rels:
-		# Processed images, do not delete this ingestion
-		return HttpResponse(json.encode({'error': "Some of those ingested images have been processed.<br/>This ingestion can't be deleted."}), mimetype = 'text/plain')
-	else:
-		# Images have never been processed, the ingestion can safely be deleted
-		ing.delete()	
-	return HttpResponse(json.encode({'success': True}), mimetype = 'text/plain')
-
-@login_required
-@profile
-def rename_ingestion(request, ing_id):
-	"""
-	Rename ingestion (regarding permissions)
-	"""
-	name = request.POST.get('value', None)
-	if not name:
-		# Fails silently
-		return HttpResponse(str(ing.name), mimetype = 'text/plain')
-
-	try:
-		ing = Ingestion.objects.get(id = ing_id)
-	except:
-		return HttpResponse(json.encode({'error': "This ingestion has not been found"}), mimetype = 'text/plain')
-
-	perms = terapix.youpi.views.get_entity_permissions(request, target = 'ingestion', key = int(ing.id))
-	if not perms['currentUser']['write']:
-		return HttpResponse(json.encode({'error': "You don't have permission to delete this ingestion"}), mimetype = 'text/plain')
-
-	orig = ing.label
-	try:
-		ing.label = name
-		ing.save()
-	except IntegrityError:
-		# Name not available
-		return HttpResponse(json.encode({'old': orig, 'error': "An ingestion named <b>%s</b> already exists.<br/>Cannot rename ingestion." % name}), mimetype = 'text/plain')
-
-	return HttpResponse(str(name), mimetype = 'text/plain')
-
-@login_required
-@profile
-def image_grading(request, pluginName, fitsId):
-	"""
-	Image grading template.
-	"""
-
-	plugin = manager.getPluginByName(pluginName)
-	if plugin:
-		try:
-			path = plugin.getUrlToGradingData(request, fitsId)
-		except IndexError:
-			return HttpResponseRedirect(settings.AUP + '/results/')
-	else:
-		return HttpResponseRedirect(settings.AUP + '/results/')
-
-	return render_to_response('grading.html', {'www' : path, 'pluginName' : pluginName, 'fitsId' : fitsId}, context_instance = RequestContext(request))
-
-@login_required
-@profile
-def grading_panel(request, pluginId, fitsId):
-	"""
-	Image grading panel.
-	"""
-	plugin = manager.getPluginByName(pluginId)
-	path = plugin.getUrlToGradingData(request, fitsId)
-
-	# TODO: handle cases other than qfits-in
-	# Looks for existing grade
-	f = Plugin_fitsin.objects.filter(id = int(fitsId))[0]
-	m = FirstQEval.objects.filter(user = request.user, fitsin = f)
-	evals = FirstQEval.objects.filter(fitsin = f).order_by('-date')
-	comments = FirstQComment.objects.all()
-	prev_releaseinfo =  Plugin_fitsin.objects.filter(id = int(fitsId))
-
-	if m:
-		grade = m[0].grade
-		userPCommentId = m[0].comment.id
-		customComment = m[0].custom_comment
-	else:
-		grade = None
-		userPCommentId = None
-		customComment = None
-	
-	return render_to_response('grading_panel.html', {	
-						'www' 		: path, 
-						'pluginId' 	: pluginId,
-						'fitsId' 	: fitsId,
-						'userGrade'	: grade,
-						'comments'	: comments,
-						'userPCommentId' : userPCommentId,
-						'customComment' : customComment,
-						'evals' 	: evals,
-						'prev_releaseinfo'	: prev_releaseinfo,
-					}, 
-					context_instance = RequestContext(request))
-
-@login_required
-@profile
-def grading_cancel(request, pluginId, fitsId):
-	"""
-	Cancels a grade.
-	"""
-
-	plugin = manager.getPluginByName(pluginId)
-
-	# TODO: handle cases other than qfits-in
-	# Looks for existing grade
-	f = Plugin_fitsin.objects.filter(id = int(fitsId))[0]
-	m = FirstQEval.objects.filter(user = request.user, fitsin = f)
-	evals = FirstQEval.objects.filter(fitsin = f).order_by('-date')
-	comments = FirstQComment.objects.all()
-	prev_releaseinfo =  Plugin_fitsin.objects.filter(id = int(fitsId))
-
-	if m:
-		m.delete()
-	
-	return render_to_response('grading_panel.html', {	'pluginId' 	: pluginId,
-														'fitsId' 	: fitsId,
-														'comments'	: comments,
-														'evals' 	: evals,
-														'prev_releaseinfo'	: prev_releaseinfo,
-													}, 
-													context_instance = RequestContext(request))
-
-def dir_stats(request):
-	"""
-	From the results page, return statistics about finished processing in result output dir.
-	"""
-
-	try:
-		dir = request.POST['ResultsOutputDir']
-	except KeyError, e:
-		raise HttpResponseServerError('Bad parameters')
-
-	task = Processing_task.objects.filter(results_output_dir = dir)[0]
-	plugin = manager.getPluginByName(task.kind.name)
-	stats = plugin.getOutputDirStats(dir)
-
-	return HttpResponse(str({	'PluginId' 	: str(plugin.id),
-								'Stats'		: stats }),
-								mimetype = 'text/plain')
-
-@login_required
-@profile
-@cache_page(60*5)
-def get_all_results_output_dir(request):
-	outdirs = Processing_task.objects.values_list('results_output_dir', flat=True).distinct().order_by('results_output_dir')
-	return HttpResponse(json.encode({'output_dirs': map(str, outdirs)}), mimetype = 'text/plain')
-
-def task_filter(request):
-	try:
-		# May be a list of owners
-		owner = request.POST.getlist('Owner')
-		status = request.POST['Status']
-		kindid = request.POST['Kind']
-		# Max results per page
-		maxPerPage = int(request.POST['Limit'])
-		# page # to return
-		targetPage = int(request.POST['Page'])
-		tags = request.POST.getlist('Tag')
-	except KeyError, e:
-		raise HttpResponseServerError('Bad parameters')
-
-	# First check for permission
-	if not request.user.has_perm('youpi.can_view_results'):
-		return HttpResponse(json.encode({
-			'Error': "Sorry, you don't have permission to view processing results",
-		}), mimetype = 'text/plain')
-
-	from lib.processing import find_tasks
-
-	nb_suc = nb_failed = 0
-	res = []
-	# Check status
-	anyStatus = False
-	success = failure = True
-	if status == 'successful': failure = False
-	elif status == 'failed': success = False
-
-	# Check owner
-	owner = owner[0]
-	if owner == 'my':
-		owner = request.user.username
-	elif owner == 'all':
-		owner = None
-
-	# Get tasks
-	tasks = find_tasks(tags, task_id=None, kind=kindid, user=owner, success=success, failure=failure)
-	tasksIds = [int(t.id) for t in tasks]
-	filtered = False
-
-	plugin = manager.getPluginByName(kindid)
-
-	# Plugins can optionally filter/alter the result set
-	try:
-		tasksIds = plugin.filterProcessingHistoryTasks(request, tasksIds)
-	except AttributeError:
-		# Not implemented
-		pass
-
-	lenAllTasks = len(tasksIds)
-
-	if len(tasksIds) > maxPerPage:
-		pageCount = len(tasksIds)/maxPerPage
-		if len(tasksIds) % maxPerPage > 0:
-			pageCount += 1
-	else:
-		pageCount = 1
-
-	# Tasks ids for the page
-	tasksIds = tasksIds[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
-	tasks = Processing_task.objects.filter(id__in = tasksIds).order_by('-end_date')
-	for t in tasks:
-		if t.success:
-			nb_suc += 1
-		else:
-			nb_failed += 1
-
-		tdata = {	'Success' 		: t.success,
-					'Name' 			: str(t.kind.name),
-					'Label' 		: str(t.kind.label),
-					'Id' 			: str(t.id),
-					'User' 			: str(t.user.username),
-					'Start' 		: str(t.start_date),
-					'End' 			: str(t.end_date),
-					'Duration' 		: str(t.end_date-t.start_date),
-					'Node' 			: str(t.hostname),
-					'Title'			: str(t.title),
-		}
-		
-		# Looks for plugin extra data, if any
-		try:
-			extra = plugin.getProcessingHistoryExtraData(t.id)
-			if extra:
-				tdata['Extra'] = extra
-		except AttributeError:
-			# No method for extra data
-			pass
-		res.append(tdata)
-
-	resp = {
-		'filtered' : filtered,
-		'results' : res, 
-		'Stats' : {	
-			'nb_success' 	: nb_suc, 
-			'nb_failed' 	: nb_failed, 
-			'nb_total' 		: nb_suc + nb_failed,
-			'pageCount'		: pageCount,
-			'curPage'		: targetPage,
-			'TasksIds' 		: tasksIds,
-			'nb_big_total' 	: lenAllTasks,
-		},
-	} 
-
-	# Looks for plugin extra data, if any
-	try:
-		extraHeader = plugin.getProcessingHistoryExtraHeader(request, tasks)
-		if extraHeader: resp['ExtraHeader'] = extraHeader
-	except AttributeError:
-		# No method for extra header data
-		pass
-
-	return HttpResponse(json.encode(resp), mimetype = 'text/plain')
-
-@login_required
-@profile
-def autocomplete(request, key, value):
-	"""
-	Auto-completes <input> fields
-	"""
-
-	value = value.split('=')[1]
-	res = []
-
-	if key == 'IngestionName':
-		data = Ingestion.objects.filter(label__istartswith = value)
-		for d in data:
-			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.start_ingestion_date))})
-
-	elif key == 'ImageSelections':
-		data = ImageSelections.objects.filter(name__istartswith = value)
-		for d in data:
-			res.append({'value' : str(d.name), 'info' : str("%s - %s" % (d.user.username, d.date))})
-
-	elif key == 'ConfigFile':
-		data = ConfigFile.objects.filter(name__istartswith = value)
-		for d in data:
-			res.append({'value' : str(d.name), 'info' : str("%s - %s" % (d.user.username, d.date))})
-
-	elif key == 'CondorSavedSelections':
-		data = CondorNodeSel.objects.filter(label__istartswith = value, is_policy = False)
-
-		for d in data:
-			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.date))})
-
-	elif key == 'CondorSavedPolicies':
-		data = CondorNodeSel.objects.filter(label__istartswith = value, is_policy = True)
-
-		for d in data:
-			res.append({'value' : str(d.label), 'info' : str("%s - %s" % (d.user.username, d.date))})
-
-	elif key == 'Tag':
-		data = Tag.objects.filter(name__istartswith = value).order_by('name')
-
-		for d in data:
-			res.append({'value' : str(d.name), 'info' : str("%s - %s" % (d.user.username, d.date))})
-
-	return HttpResponse(str({'results' : res}), mimetype = 'text/plain')
 
 def get_live_monitoring(request, nextPage = -1):
 	"""
@@ -474,10 +146,8 @@ def clear_softs_versions(request):
 	"""
 	Delete stored softwares versions stored into DB
 	"""
-
 	misc = MiscData.objects.filter(key = 'software_version')
 	misc.delete()
-
 	return HttpResponse(str({'Versions' : 'deleted'}), mimetype = 'text/plain')
 
 def softs_versions(request):
@@ -729,58 +399,6 @@ queue
 
 @login_required
 @profile
-def delete_processing_task(request):
-	"""
-	Delete a processing task
-	"""
-	try:
-		taskId = request.POST['TaskId']
-	except KeyError, e:
-		raise HttpResponseServerError('Bad parameters')
-
-	success = False
-	try:
-		task = Processing_task.objects.filter(id = taskId)[0]
-		rels = Rel_it.objects.filter(task = task)
-		if task.kind.name == 'fitsin':
-			data =  Plugin_fitsin.objects.filter(task = task)[0]
-			grades = FirstQEval.objects.filter(fitsin = data)
-			for g in grades:
-				g.delete()
-		elif task.kind.name == 'fitsout':
-			data =  Plugin_fitsout.objects.filter(task = task)[0]
-		elif task.kind.name == 'scamp':
-			data =  Plugin_scamp.objects.filter(task = task)[0]
-		elif task.kind.name == 'swarp':
-			data =  Plugin_swarp.objects.filter(task = task)[0]
-		elif task.kind.name == 'skel':
-			data = None
-		elif task.kind.name == 'sex':
-			data =  Plugin_sex.objects.filter(task = task)[0]
-		else:
-			raise TypeError, 'Unknown data type to delete:' + task.kind.name
-
-		for r in rels: r.delete()
-		if data: data.delete()
-		task.delete()
-		success = True
-	except IndexError:
-		# Associated data not available (should be)
-		for r in rels: r.delete()
-		task.delete()
-		success = True
-	except Exception, e:
-		return HttpResponse(str({'Error' : str(e)}), mimetype = 'text/plain')
-
-	resp = {
-		'success' 	: success,
-		'pluginId'  : task.kind.name,
-		'results_output_dir' : task.results_output_dir,
-	} 
-	return HttpResponse(json.encode(resp), mimetype = 'text/plain')
-
-@login_required
-@profile
 def get_condor_requirement_string(request):
 	"""
 	Get requirement string from saved policy
@@ -817,4 +435,349 @@ def compute_requirement_string(request):
 	vms = get_condor_status()
 	req = get_requirement_string(str(params), vms)
 	return HttpResponse(str({'ReqString': str(req)}), mimetype = 'text/plain')
+
+def del_condor_node_selection(request):
+	"""
+	Delete Condor node selection. 
+	No deletion is allowed if at least one policy is using that selection.
+	No deletion is allowed if at least Condor Default Setup rules is using that selection.
+	"""
+
+	try:
+		label = request.POST['Label']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	# First check for permission
+	if not request.user.has_perm('youpi.delete_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to delete custom selections",
+		}), mimetype = 'text/plain')
+
+	profiles = SiteProfile.objects.all()
+	for p in profiles:
+		try:
+			data = marshal.loads(base64.decodestring(str(p.dflt_condor_setup)))
+		except EOFError:
+			# No data found, unable to decodestring
+			data = None
+
+		if data:
+			for plugin in data.keys():
+				if data[plugin]['DS'] == label:
+					return HttpResponse(str({'Error' : str("Cannot delete selection '%s'. User '%s' references it in his/her default selection preferences menu." 
+								% (label, p.user.username))}), mimetype = 'text/plain')
+
+	pols = CondorNodeSel.objects.filter(is_policy = True)
+	if pols:
+		for pol in pols:
+			if pol.nodeselection.find(label) >= 0:
+				return HttpResponse(str({'Error' : str("Some policies depends on this selection. Unable to delete selection '%s'." % label)}), 
+					mimetype = 'text/plain')
+
+	sel = CondorNodeSel.objects.filter(label = label, is_policy = False)[0]
+	sel.delete()
+
+	return HttpResponse(str({'Deleted' : str(label)}), mimetype = 'text/plain')
+
+def del_condor_policy(request):
+	"""
+	Delete Condor policy
+	"""
+
+	try:
+		label = request.POST['Label']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	# First check for permission
+	if not request.user.has_perm('youpi.delete_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to delete custom policies",
+		}), mimetype = 'text/plain')
+
+	profiles = SiteProfile.objects.all()
+	for p in profiles:
+		try:
+			data = marshal.loads(base64.decodestring(str(p.dflt_condor_setup)))
+		except EOFError:
+			# No data found, unable to decodestring
+			data = None
+
+		if data:
+			for plugin in data.keys():
+				if data[plugin]['DP'].find(label) >= 0:
+					return HttpResponse(str({'Error' : str("Cannot delete policy '%s'. User '%s' references it in his/her default selection preferences menu." 
+								% (label, p.user.username))}), mimetype = 'text/plain')
+
+	sel = CondorNodeSel.objects.filter(label = label, is_policy = True)[0]
+	sel.delete()
+
+	return HttpResponse(str({'Deleted' : str(label)}), mimetype = 'text/plain')
+
+def get_condor_node_selections(request):
+	"""
+	Returns Condor nodes selections.
+	"""
+	sels = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
+	return HttpResponse(str({'Selections' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
+
+def get_condor_selection_members(request):
+	"""
+	Returns Condor selection members.
+	"""
+	try:
+		name = request.POST['Name']
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	data = CondorNodeSel.objects.filter(label = name, is_policy = False)
+	error = ''
+
+	if data:
+		members = marshal.loads(base64.decodestring(str(data[0].nodeselection)))
+		members = [str(s) for s in members]
+	else:
+		members = '';
+		error = 'No selection of that name.'
+
+	return HttpResponse(str({'Members' : members, 'Error' : error}), mimetype = 'text/plain')
+
+def get_condor_policies(request):
+	"""
+	Returns Condor policies.
+	"""
+	sels = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
+	return HttpResponse(str({'Policies' : [str(sel.label) for sel in sels]}), mimetype = 'text/plain')
+
+def get_policy_data(request):
+	"""
+	Returns policy serialized data
+	"""
+	try:
+		name = request.POST['Name']
+	except Exception, e:
+		return HttpResponseBadRequest('Incorrect POST data')
+
+	data = CondorNodeSel.objects.filter(label = name, is_policy = True)
+	error = serial = ''
+
+	if data:
+		serial = str(data[0].nodeselection)
+	else:
+		error = 'No policy of that name.'
+	return HttpResponse(str({'Serial' : serial, 'Error' : error}), mimetype = 'text/plain')
+
+def save_condor_custom_reqstr(request):
+	"""
+	Save Condor custom requirement string
+	"""
+	try:
+		reqstr = request.POST['Req']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	if not request.user.has_perm('youpi.can_change_custom_condor_req'):
+		return HttpResponseForbidden("Sorry, you don't have permission save custom Condor requirements")
+
+	try:
+		p = request.user.get_profile()
+		p.custom_condor_req = reqstr
+		p.save()
+	except Exception, e:
+		return HttpResponse(str({'Error' : "%s" % e}), mimetype = 'text/plain')
+	return HttpResponse(str({'Status' : str('saved')}), mimetype = 'text/plain')
+
+def save_condor_node_selection(request):
+	"""
+	Save Condor nodes selection
+	"""
+	try:
+		selHosts = request.POST['SelectedHosts'].split(',')
+		label = request.POST['Label']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	# First check for permission
+	if not request.user.has_perm('youpi.add_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to add custom selections",
+		}), mimetype = 'text/plain')
+
+	sels = CondorNodeSel.objects.filter(label = label, is_policy = False)
+	if sels:
+		return HttpResponse(str({'Error' : str("'%s' label is already used, please use another name." % label)}), 
+					mimetype = 'text/plain')
+
+	nodesel = base64.encodestring(marshal.dumps(selHosts)).replace('\n', '')
+	sel = CondorNodeSel(user = request.user, label = label, nodeselection = nodesel)
+	sel.save()
+
+	return HttpResponse(str({'Label' : str(label), 'SavedCount' : len(selHosts)}), mimetype = 'text/plain')
+
+def save_condor_policy(request):
+	"""
+	Save Condor custom policy
+	"""
+	try:
+		label = request.POST['Label']
+		serial = request.POST['Serial']
+	except Exception, e:
+		return HttpResponseServerError('Incorrect POST data.')
+
+	# First check for permission
+	if not request.user.has_perm('youpi.add_condornodesel'):
+		return HttpResponse(str({
+			'Error': "Sorry, you don't have permission to add custom policies",
+		}), mimetype = 'text/plain')
+
+	try:
+		sels = CondorNodeSel.objects.filter(label = label, is_policy = True)
+		if sels:
+			if sels[0].user != request.user:
+				# Only owner can update its policy
+				return HttpResponse(str({'Error' : 'Only selection owner can update its policies. Policy not overwritten.'}), mimetype = 'text/plain')
+			else:
+				sel = sels[0]
+				sel.nodeselection = serial
+		else:
+			sel = CondorNodeSel(user = request.user, label = label, nodeselection = serial, is_policy = True)
+
+		sel.save()
+		
+	except Exception, e:
+		return HttpResponse(str({'Error' : "%s" % e}), mimetype = 'text/plain')
+	return HttpResponse(str({'Label' : str(label), 'Policy' : str(serial)}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def get_condor_log_files_links(request):
+	"""
+	Returns a dictionnary with entries for the log, error and output filenames 
+	that should be used by plugins generating Condor submission files.
+	@return Dictionnary with paths to Condor log files
+	"""
+	post = request.POST
+	try:
+		taskId = post['TaskId']
+	except Exception, e:
+		raise PluginError, "POST argument error. Unable to process data."
+
+	task = Processing_task.objects.filter(id = taskId)[0]
+
+	import terapix.lib.cluster.condor as condor
+	csf = condor.YoupiCondorCSF(request, task.kind.name)
+	logs = csf.getLogFilenames(user=task.user, date=task.start_date.date())
+	for k,v in logs.iteritems():
+		logs[k] = v + '.' + task.clusterId
+
+	sizes = {'log': 0, 'error': 0, 'out': 0}
+
+	for kind, path in logs.iteritems():
+		try:
+			sizes[kind] = int(os.path.getsize(path))
+			logs[kind] = str("""<a href="%s" target="_blank">%s</a>""" % (reverse('terapix.youpi.views.show_condor_log_file', args=[kind, taskId]), logs[kind][logs[kind].rfind('/')+1:]))
+		except OSError:
+			logs[kind] = ''
+
+	return HttpResponse(str({'logs': logs, 'sizes': sizes}), mimetype = 'text/plain')
+
+@login_required
+@profile
+def show_condor_log_file(request, kind, taskId):
+	"""
+	Display Condor log file for a given kind and taskId
+	@param kind one of 'log', 'error', 'out'
+	@param taskId task Id
+	"""
+	if kind not in ('log', 'error', 'out'):
+		return HttpResponseBadRequest('Bad request')
+
+	try:
+		task = Processing_task.objects.filter(id = taskId)[0]
+	except:
+		return HttpResponseBadRequest('Bad request')
+
+	import terapix.lib.cluster.condor as condor
+	csf = condor.YoupiCondorCSF(request, task.kind.name)
+	logs = csf.getLogFilenames(user=task.user, date=task.start_date.date())
+	for k,v in logs.iteritems():
+		logs[k] = v + '.' + task.clusterId
+
+	try:
+		f = open(logs[kind], 'r')
+		data = string.join(f.readlines(), '')
+		if not data:
+			data = 'Empty file.'
+		f.close()
+	except IOError:
+		data = 'Log file not found on server (has it been deleted?)'
+	return HttpResponse(str(data), mimetype = 'text/plain')
+
+@login_required
+@profile
+def monitoring(request):
+	"""
+	Related to monitoring.
+	This is a callback function (as defined in django's urls.py file).
+	"""
+	menu_id = 'monitoring'
+	return render_to_response('monitoring.html', {	
+        'selected_entry_id'	: menu_id,
+        'title' 			: get_title_from_menu_id(menu_id),
+    }, 
+    context_instance = RequestContext(request))
+
+@login_required
+@profile
+def soft_version_monitoring(request):
+	menu_id = 'monitoring'
+	return render_to_response( 'softs_versions.html', {	
+        'report' 			: len(settings.SOFTS), 
+        'selected_entry_id'	: menu_id, 
+        'title' 			: get_title_from_menu_id(menu_id),
+    },
+    context_instance = RequestContext(request))
+
+@login_required
+@profile
+def history_cluster_jobs(request):
+	"""
+	Returns cluster jobs information for a given page
+	"""
+	page = request.POST.get('Page', 1)
+	try: page = int(page)
+	except ValueError, e:
+		page = 1
+
+	# First check for permission
+#	if not request.user.has_perm('youpi.can_view_ing_logs'):
+#		return HttpResponse(str({
+#			'Error': "Sorry, you don't have permission to view ingestion logs",
+#		}), mimetype = 'text/plain')
+
+	tasks = Processing_task.objects.all().order_by('-start_date')
+	currentPage, nbPages, window = _get_pagination_attrs(page, tasks, tasks.count())
+
+	header = ['Job Label', 'Username', 'Kind', 'Start Date', 'Duration', 'Success', 'Hostname', 'Cluster Id',]
+	data = []
+	for t in window:
+		data.append([
+			str("<a target=\"_blank\" href=\"%s\">%s</a>" % (reverse('terapix.youpi.views.single_result', args = [t.kind.name, t.id]), t.title)),
+			str(t.user.username), 
+			str("<b>%s</b>" % t.kind.name.capitalize()), 
+			str(t.start_date), 
+			str(t.end_date - t.start_date), 
+			t.success, 
+			str(t.hostname), 
+			str(t.clusterId), 
+		])
+	for k in range(len(data)):
+		if data[k][5]:
+			cls = 'success'
+		else:
+			cls = 'failure'
+		data[k] = ["<label class=\"%s\">%s</label>" % (cls, r) for r in data[k]]
+	data.insert(0, header)
+	return HttpResponse(json.encode({'Headers': [], 'Content': data, 'CurrentPage': currentPage, 'TotalPages': nbPages}), mimetype = 'text/plain')
 

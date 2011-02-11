@@ -13,6 +13,45 @@ from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.cviews import *
 from terapix.youpi.auth import read_proxy
+from terapix.lib.common import get_title_from_menu_id
+
+@login_required
+@profile
+def home(request):
+	"""
+	Renders processing cart view.
+	"""
+	cartHasData = False
+	if 'cart' not in request.session:
+		request.session['cart'] = {'plugins' : {}}
+
+	# Current items for user session
+	cart_items = []
+	for plugin, dataList in request.session['cart']['plugins'].iteritems():
+		plugObj = manager.getPluginByName(plugin)
+		if len(dataList):
+			plugObj.setData(dataList)
+			cartHasData = True
+			cart_items.append(plugObj)
+		else:
+			plugObj.removeData()
+
+	policies = CondorNodeSel.objects.filter(is_policy = True).order_by('label')
+	selections = CondorNodeSel.objects.filter(is_policy = False).order_by('label')
+
+	menu_id = 'processingcart'
+	return render_to_response('processingcart.html', {	
+        'cart_plugins' 		: cart_items, 
+        'plugins' 			: manager.plugins, 
+        'cartHasData' 		: cartHasData, 
+        # Cluster node available policies + selections
+        'policies'			: policies,
+        'selections'		: selections,
+        'selected_entry_id'	: menu_id, 
+        'misc' 				: manager,
+        'title' 			: get_title_from_menu_id(menu_id),
+    },
+    context_instance = RequestContext(request))
 
 def cart_cookie_check(request):
 	"""
@@ -187,11 +226,9 @@ def cart_saved_items_stats(request):
 	"""
 	Return some statistic on per-plugin saved items
 	"""
-
 	stats = {}
 	for plugin in manager.plugins:
 		items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = plugin.id).order_by('-date'))
 		stats[plugin.id] = len(items)
-
 	return HttpResponse(json.encode({'stats' : stats}), mimetype = 'text/plain')
 

@@ -641,7 +641,7 @@ def get_global_report(request, reportId, format):
 </div>
 </form>
 """	% (len(res), selName, "[[%s]]" % ','.join([str(r[0]) for r in res]), selName,
-	reverse('terapix.youpi.views.processing_save_image_selection'), tdata, '98%'
+	reverse('terapix.youpi.cviews.ims.processing_save_image_selection'), tdata, '98%'
 )
 
 			# Columns type in final report
