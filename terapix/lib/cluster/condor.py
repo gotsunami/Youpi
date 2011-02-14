@@ -602,6 +602,84 @@ def get_requirement_string_from_selection(selName):
 
     return req
 
+
+class CondorJob(object):
+    """
+    Define a simple Condor job entity.
+    """
+    def __init__(self, classAds):
+        """
+        @param classAds dictionary sets class ads names and values for the current Condor job
+        Every key/value is stored as a property
+        """
+        if type(classAds) != types.DictType:
+            raise TypeError, "classAds parameter must be a dictionary"
+        self.__dict__['classAds'] = classAds
+
+        for ad in ('JobStatus', 'JobStartDate'):
+            if not classAds.has_key(ad):
+                raise ValueError, "Missing %s key in the classAds" % ad
+
+        for k, v in classAds.iteritems():
+            self.__dict__[k] = v
+
+        # These values get updated by CondorQueue
+        self.RemoteHost = 'unknown'
+        self.ClusterId = '??'
+        self.ProcId = '??'
+        self.JobStatusFull = str(classAds['JobStatus'])
+
+    def __setattr__(self, name, value):
+        """
+        Prevents overwritting class Ads properties
+        """
+        if self.classAds.has_key(name):
+            raise AttributeError, "Can't set attribute (this is a Condor class ad)"
+        self.__dict__[name] = value
+
+    def __repr__(self):
+        msg = ''
+        if self.isRunning(): msg = " on %s" % self.RemoteHost
+        return "<CondorJob %s.%s is %s%s>" % (self.ClusterId, self.ProcId, self.JobStatusFull.lower(), msg)
+
+    def isRunning(self):
+        """
+        Returns ``True`` if the job is running.
+        """
+        return int(self.JobStatus) == 2
+
+    def getJobDuration(self):
+        """
+        Returns the job's runtime duration, formatted as a string matching HH:MM:SS 
+        or ``None`` if the job has been submitted but is not running yet.
+        """
+        try:
+            secs = time.time() - int(self.JobStartDate)
+        except TypeError:
+            # Job not running yet
+            return None
+
+        h = m = 0
+        s = int(secs)
+        if s > 60:
+            m = s/60
+            s = s%60
+            if m > 60:
+                h = m/60
+                m = m%60
+        return "%02d:%02d:%02d" % (h, m, s)
+
+    def remove(self):
+        """
+        Remove the job from the current Condor queue.
+        """
+        if not self.isRunning():
+            return False
+        pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_rm %s.%s"  % (self.ClusterId, self.ProcId)))
+        data = pipe.readlines()
+        pipe.close()
+        return True
+
 class CondorQueue(object):
     """
     Handles a Condor processing queue
@@ -620,74 +698,6 @@ class CondorQueue(object):
         else:
             msg = 'no job'
         return "<Condor queue, %s>" % msg
-
-    class CondorJob(object):
-        """
-        Describe a Condor job
-        """
-        def __init__(self, classAds):
-            """
-            @param classAds dictionary sets class ads names and values for the current Condor job
-            Every key/value is stored as a property
-            """
-            if type(classAds) != types.DictType:
-                raise TypeError, "classAds parameter must be a dictionary"
-            self.__dict__['classAds'] = classAds
-
-            for ad in ('JobStatus', 'JobStartDate'):
-                if not classAds.has_key(ad):
-                    raise ValueError, "Missing %s key in the classAds" % ad
-
-            for k, v in classAds.iteritems():
-                self.__dict__[k] = v
-
-        def __setattr__(self, name, value):
-            """
-            Prevents overwritting class Ads properties
-            """
-            if self.classAds.has_key(name):
-                raise AttributeError, "Can't set attribute (this is a Condor class ad)"
-            self.__dict__[name] = value
-
-        def __repr__(self):
-            msg = ''
-            if self.isRunning(): msg = " on %s since %s" % (self.RemoteHost, self.getJobDuration())
-            return "<CondorJob %s.%s is %s%s>" % (self.ClusterId, self.ProcId, self.JobStatusFull.lower(), msg)
-
-        def isRunning(self):
-            """
-            Whether the job is running
-            """
-            return int(self.JobStatus) == 2
-
-        def getJobDuration(self):
-            """
-            Returns the job runtime duration
-            """
-            try:
-                secs = time.time() - int(self.JobStartDate)
-            except TypeError:
-                # Job not running yet
-                return None
-
-            h = m = 0
-            s = int(secs)
-            if s > 60:
-                m = s/60
-                s = s%60
-                if m > 60:
-                    h = m/60
-                    m = m%60
-
-            return "%02d:%02d:%02d" % (h, m, s)
-
-        def remove(self):
-            """
-            Remove the job from the Condor queue
-            """
-            pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, "condor_rm %s.%s"  % (self.ClusterId, self.ProcId)))
-            data = pipe.readlines()
-            pipe.close()
 
     @property
     def condor_q_path(self):
@@ -759,7 +769,7 @@ class CondorQueue(object):
                 params['JobStatusFull'] = status_full
 
             # Adds new job
-            jobs.append(self.CondorJob(params))
+            jobs.append(CondorJob(params))
 
         return tuple(jobs), len(jobs)
 
@@ -768,7 +778,7 @@ class CondorQueue(object):
         Remove a job from the Condor queue.
         @param job CondorJob instance
         """
-        if not isinstance(job, self.CondorJob):
+        if not isinstance(job, CondorJob):
             raise TypeError, "job must be a CondorJob instance"
         job.remove()
 
