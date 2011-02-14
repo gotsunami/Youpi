@@ -44,7 +44,7 @@ import base64, marshal
 
 class CondorError(Exception): pass
 
-class CondorCSF(Cluster):
+class CondorCSF(object):
     """
     Base class for generating a *Condor submission file*. This class can be 
     used from the command line. Youpi inherits this class with 
@@ -115,8 +115,6 @@ transfer_input_files    = %(transfer)s
 
         An optional description `desc` can be supplied.
         """
-        Cluster.__init__(self)
-
         for attribute in self.attrs:
             self.__dict__[attribute] = ''
 
