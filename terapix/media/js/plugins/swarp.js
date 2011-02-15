@@ -431,7 +431,7 @@ var swarp = {
 								// Store path
 								this.headDataPaths.push(dataPath);
 
-								this.remove();
+								// FIXME this.remove();
 								dat.update();
 								log.msg_ok('Selection ' + (this.curSelectionIdx + 1) + ': Will use <tt>' + 
 									dataPath + '</tt> to access .head files');

@@ -1,25 +1,15 @@
-##############################################################################
-#
-# Copyright (c) 2008-2010 Terapix Youpi development team. All Rights Reserved.
-#                    Mathias Monnerville <monnerville@iap.fr>
-#                    Gregory Semah <semah@iap.fr>
-#
-# This program is Free Software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-##############################################################################
-
 """
 Tests for the built-in Condor library
 """
 
 import unittest, types, time
 import base64, marshal, sys
+from mock import Mock
 #
 from terapix.lib.cluster import condor
+from terapix.lib.cluster.condor import CondorClient, YoupiCondorClient
 from terapix.youpi.models import CondorNodeSel
+from terapix.exceptions import *
 #
 from django.contrib.auth.models import User
 from django.http import HttpRequest
@@ -235,18 +225,13 @@ class CondorJobTest(unittest.TestCase):
     """
     def setUp(self):
         # Creates a dummy running job (jobstatus = 2)
-        self.classAds = {'a': 1, 'b': 2, 'JobStatus': 2, 'JobStartDate': time.time()}
-        self.j = condor.CondorJob(self.classAds)
+        self.j = condor.CondorJob(a=1, b=2, JobStatus=2, JobStartDate=time.time())
         # Dummy not running job
-        self.nj = condor.CondorJob({'JobStatus': 0, 'JobStartDate': time.time()})
-
-    def test_init_bad_classads(self):
-        job = condor.CondorJob
-        self.assertRaises(TypeError, job, 1)
+        self.nj = condor.CondorJob(JobStatus=0, JobStartDate=time.time())
 
     def test_init_missing_ads(self):
         job = condor.CondorJob
-        self.assertRaises(ValueError, job, {'a': 1, 'b': 2})
+        self.assertRaises(ValueError, job, a=1, b=2)
 
     def test_init_check_properties(self):
         self.assertTrue(self.j.a == 1)
@@ -288,6 +273,54 @@ class YoupiCondorQueueTest(unittest.TestCase):
         jobs, count = jobs
         for j in jobs:
             self.assertTrue(hasattr(j, 'UserData'), 'Missing required userData attribute')
+
+class CondorClientTest(unittest.TestCase):
+    """
+    Test the CondorClient class.
+    """
+    def setUp(self):
+        self.c = CondorClient()
+
+    def test_submit_param_file(self):
+        self.assertRaises(TypeError, self.c.submit, 1)
+
+    def test_submit_param_shell(self):
+        self.assertRaises(TypeError, self.c.submit, 'toto', 1)
+
+    def test_submit_bad_file(self):
+        self.assertRaises(CondorSubmitError, self.c.submit, 'unknown')
+
+    def test_submit_shell_call(self):
+        cc = CondorClient()
+        cc._shell_submit = Mock(return_value=('', '', '1 job, cluster 1024.'))
+        cc.submit('file')
+        self.assertTrue(cc._shell_submit.called, 'shell_submit() not called')
+
+    def test_submit_ret_type(self):
+        # condor_submit format: (3 lines)
+        # Submitting job(s).
+        # Logging submit event(s).
+        # 1 job(s) submitted to cluster 1024.
+        cc = CondorClient()
+        cc._shell_submit = Mock(return_value=('', '', '1 job(s) submitted to cluster 1024.'))
+        self.assertEqual(cc.submit('file'), ('1', '1024'))
+
+class YoupiCondorClientTest(unittest.TestCase):
+    """
+    Test the YoupiCondorClient class.
+    """
+    def setUp(self):
+        self.c = YoupiCondorClient()
+        self.c._shell_submit = Mock(return_value=('', '', '1 job(s) submitted to cluster 1024.'))
+
+    def test_submit_ret_type(self):
+        self.assertEqual(type(self.c.submit('file')), types.DictType)
+
+    def test_submit_ret_key_count(self):
+        self.assertTrue(self.c.submit('file').has_key('count'))
+
+    def test_submit_ret_key_clusterId(self):
+        self.assertTrue(self.c.submit('file').has_key('clusterId'))
 
 
 if __name__ == '__main__':

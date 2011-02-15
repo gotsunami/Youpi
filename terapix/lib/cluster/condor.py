@@ -1,16 +1,3 @@
-##############################################################################
-#
-# Copyright (c) 2008-2009 Terapix Youpi development team. All Rights Reserved.
-#                    Mathias Monnerville <monnerville@iap.fr>
-#                    Gregory Semah <semah@iap.fr>
-#
-# This program is Free Software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-##############################################################################
-
 """
 :mod:`condor` --- Condor Library
 ================================
@@ -32,7 +19,7 @@ from django.conf import settings
 from django.http import HttpRequest
 import django.http
 #
-from terapix.lib.cluster import Cluster
+from terapix.lib.cluster import ClusterClient, ClusterQueue, ClusterJob
 from terapix.youpi.models import *
 from terapix.exceptions import *
 from terapix.lib.common import get_temp_dir
@@ -46,9 +33,8 @@ class CondorError(Exception): pass
 
 class CondorCSF(object):
     """
-    Base class for generating a *Condor submission file*. This class can be 
-    used from the command line. Youpi inherits this class with 
-    :class:`terapix.lib.cluster.condor.YoupiCondorCSF`.
+    Base class for generating a *Condor submission file*.  Youpi extends this class with 
+    :class:`~terapix.lib.cluster.condor.YoupiCondorCSF`.
     """
     # Static header
     _csfHeader = """#
@@ -244,6 +230,10 @@ class YoupiCondorCSF(CondorCSF):
     
     This class implements business logic for Youpi. The default executable is set to 
     use the :mod:`terapix.script.wrapper_processing` script.
+
+    The *request* parameter is the current :class:`~django.http.HttpRequest` instance to use.
+    The *pluginId* parameter is the plugin internal name. A class:`TypeError` exception is 
+    raised if it's not a string. The *desc* parameter is a description.
     """
     def __init__(self, request, pluginId, desc = None):
         CondorCSF.__init__(self, desc)
@@ -259,7 +249,7 @@ class YoupiCondorCSF(CondorCSF):
     @property
     def request(self):
         """
-        The Django :class:`django.http.HttpRequest` associated instance, as 
+        The Django :class:`~django.http.HttpRequest` associated instance, as 
         supplied to the constructor.
         """
         return self.__request
@@ -284,21 +274,21 @@ class YoupiCondorCSF(CondorCSF):
 
     def getSubmitFilePath(self):
         """
-        Overrides the :func:`terapix.lib.cluster.condor.CondorCSF.getSubmitFilePath` 
+        Overrides the :func:`~terapix.lib.cluster.condor.CondorCSF.getSubmitFilePath` 
         static function (not static anymore).
         """
         return os.path.join(get_temp_dir(self.__request.user.username, self.__id), "CONDOR-%s-%s.csf" % (self.__id, time.time()))
 
     def getLogFilenames(self, unused=None, user=None, date=None):
         """
-        Overrides the :func:`terapix.lib.cluster.condor.CondorCSF.getLogFilenames` 
+        Overrides the :func:`~terapix.lib.cluster.condor.CondorCSF.getLogFilenames` 
         static function (not static anymore).
 
         .. todo:: fixme
 
         The *unused* parameter is unused (here for signature constraint only), *user* is 
-        the current Django logged in :class:`django.contrib.auth.models.User`, *date* is 
-        a custom :class:`datetime.date` object.
+        the current Django logged in :class:`~django.contrib.auth.models.User`, *date* is 
+        a custom :class:`~datetime.date` object.
 
         Returns a dictionnary with entries for the log, error and output filenames 
         that should be used by plugins generating Condor submission files. The 
@@ -325,7 +315,7 @@ class YoupiCondorCSF(CondorCSF):
 
     def getSubmissionFileContent(self):
         """
-        Overrides the :func:`terapix.lib.cluster.condor.CondorCSF.getSubmissionFileContent` 
+        Overrides the :func:`~terapix.lib.cluster.condor.CondorCSF.getSubmissionFileContent` 
         function to provide a custom ``PATH`` environment to all defined queues.
 
         Returns the Condor submission file content.
@@ -355,7 +345,7 @@ class YoupiCondorCSF(CondorCSF):
 
     def setTransferInputFiles(self, files):
         """
-        Overrides :func:`terapix.lib.cluster.CondorCSF.setTransferInputFiles` by appending 
+        Overrides :func:`~terapix.lib.cluster.CondorCSF.setTransferInputFiles` by appending 
         required modules to the *files* list parameter: ``local_conf.py``, ``settings.py``, 
         ``lib/common.py``, ``script/DBGeneric.py`` and ``NOP``.
         """
@@ -374,7 +364,7 @@ class YoupiCondorCSF(CondorCSF):
 
         Returns a requirement string ready to be merged into the submission file.
 
-        .. seealso:: Function :func:`terapix.lib.cluster.condor.get_condor_status`
+        .. seealso:: Function :func:`~terapix.lib.cluster.condor.get_condor_status`
         """
         post = self.__request.POST
         try:
@@ -601,17 +591,17 @@ def get_requirement_string_from_selection(selName):
     return req
 
 
-class CondorJob(object):
+class CondorJob(ClusterJob):
     """
-    Define a simple Condor job entity.
+    Define a simple Condor job entity.  The *classAds* keyword parameters set class ads names 
+    and values for the current Condor job. They are stored as read-only properties (thus can 
+    only be set during object creation). This feature is used to ensure the jobs list returned 
+    by the :func:`~terapix.lib.cluster.condor.CondorQueue.getJobs` function cannot be altered.
+
+    .. versionchanged:: 0.7.1
+       *classAds* is a keyword parameter, no more a dictionnary.
     """
-    def __init__(self, classAds):
-        """
-        @param classAds dictionary sets class ads names and values for the current Condor job
-        Every key/value is stored as a property
-        """
-        if type(classAds) != types.DictType:
-            raise TypeError, "classAds parameter must be a dictionary"
+    def __init__(self, **classAds):
         self.__dict__['classAds'] = classAds
 
         for ad in ('JobStatus', 'JobStartDate'):
@@ -622,17 +612,18 @@ class CondorJob(object):
             self.__dict__[k] = v
 
         # These values get updated by CondorQueue
-        self.RemoteHost = 'unknown'
-        self.ClusterId = '??'
-        self.ProcId = '??'
-        self.JobStatusFull = str(classAds['JobStatus'])
+        if not hasattr(self, 'ClusterId'):
+            self.__dict__['RemoteHost'] = 'unknown'
+            self.__dict__['ClusterId'] = '??'
+            self.__dict__['ProcId'] = '??'
+            self.__dict__['JobStatusFull'] = str(classAds['JobStatus'])
 
     def __setattr__(self, name, value):
         """
         Prevents overwritting class Ads properties
         """
         if self.classAds.has_key(name):
-            raise AttributeError, "Can't set attribute (this is a Condor class ad)"
+            raise AttributeError, "Can't set attribute '%s' (this is a read-only Condor class ad)" % name
         self.__dict__[name] = value
 
     def __repr__(self):
@@ -678,9 +669,11 @@ class CondorJob(object):
         pipe.close()
         return True
 
-class CondorQueue(object):
+class CondorQueue(ClusterQueue):
     """
-    Handles a Condor processing queue
+    Handles a Condor processing queue. *envPath* is a provided path environment that can 
+    be used to locate the ``condor_q`` binary; *globalPool* is a boolean specifying whether 
+    queues of all submitters are queried.
     """
     __condor_q_bin = 'condor_q'
     # Interesting class Ads
@@ -702,10 +695,6 @@ class CondorQueue(object):
         return self.__condor_q_bin
 
     def __init__(self, envPath = None, globalPool = False):
-        """
-        @param envPath Path to the condor_q binary
-        @param globalPool Get queues of all the submitters in the Condor system
-        """
         if envPath:
             if type(envPath) not in types.StringTypes:
                 raise TypeError, "envPath must be a string"
@@ -727,9 +716,8 @@ class CondorQueue(object):
 
     def getJobs(self):
         """
-        Returns a tuple with a list of current active Condor jobs and 
+        Returns a tuple of a list of current active Condor jobs and 
         the number of jobs is that list.
-        @return Tuple (CondorJob list, jobs count)
         """
         pipe = os.popen(self.__condor_q_bin + ' ' + self.__condor_q_args)
         # Raw data
@@ -767,14 +755,13 @@ class CondorQueue(object):
                 params['JobStatusFull'] = status_full
 
             # Adds new job
-            jobs.append(CondorJob(params))
-
+            jobs.append(CondorJob(**params))
         return tuple(jobs), len(jobs)
 
     def removeJob(self, job):
         """
-        Remove a job from the Condor queue.
-        @param job CondorJob instance
+        Remove a job from the Condor queue. Raises a :class:`TypeError` exception 
+        if *job* is not a :class:`~terapix.lib.cluster.condor.CondorJob` instance.
         """
         if not isinstance(job, CondorJob):
             raise TypeError, "job must be a CondorJob instance"
@@ -808,3 +795,85 @@ class YoupiCondorQueue(CondorQueue):
             job.UserData = marshal.loads(base64.decodestring(str(userData)))
 
         return tuple(youpiJobs), count
+
+class CondorClient(ClusterClient):
+    """
+    .. versionadded:: 0.7.1
+
+    Implementation of a Condor client inheriting the :class:`~terapix.lib.cluster.ClusterClient` class.
+    """
+    def _shell_submit(self, filepath):
+        """
+        Actually executes the ``condor_submit`` program and returns all *stdout* content (
+        splitted into lines).
+        """
+        pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_submit %s 2>&1' % filepath))
+        # submit_content is a list with 3 elements of content as returned by condor_submit command 
+        # (i.e. 3 lines of plain text)
+        res = pipe.readlines()
+        pipe.close()
+        return res
+
+    def submit(self, filepath, shell_submit=None):
+        """
+        Submit a job on the cluster. *filepath* is the absolute path to the Condor submission 
+        file. By default, the job is submitted using the ``condor_submit`` program. A different 
+        action can be performed using the *shell_submit* parameter which is the name of a callable 
+        function that actually returns the expected string data, splitted into lines.
+        
+        Raises a :class:`CondorSubmitError` exception if an error occured during jobs submission 
+        or a *tuple* ``(count, cluster Id)`` where *count* is the number of single jobs submitted 
+        and *cluster Id* is the unique cluster identifier associated with that submission.
+        """
+        if type(filepath) not in types.StringTypes:
+            raise TypeError, "filepath must be a string"
+
+        if shell_submit is None:
+            shell_submit = self._shell_submit
+        else:
+            if type(shell_submit) != types.FunctionType:
+                raise TypeError, 'shell_submit must be a callable'
+
+        res = shell_submit(filepath)
+        count = cid = 0
+        try:
+            # Only third line is of interest
+            data = res[2].strip()
+            m = re.match(r'^(?P<count>\d+?) .*? (?P<cluster>\d+?)$', data[:-1])
+            count = m.group('count')
+            cid = m.group('cluster')
+        except Exception, e:
+            raise CondorSubmitError, "Condor error:\n%s" % e
+        return count, cid
+
+class YoupiCondorClient(CondorClient):
+    """
+    .. versionadded:: 0.7.1
+
+    A :class:`~terapix.lib.cluster.condor.CondorClient` version suitable for Youpi, using a 
+    :class:`~terapix.lib.cluster.condor.YoupiCondorQueue` as its default job queue. Can be 
+    easily used with the :class:`~terapix.youpi.pluginmanager.ApplicationManager`::
+
+        manager = ApplicationManager()
+        manager.setClusterClient(YoupiCondorClient()) 
+
+    This way, jobs can be submitted in a generic way::
+
+        manager.cluster.submit(csfPath)
+
+    and live monitoring of a queue is achieved with::
+
+        jobs, jobCount = manager.cluster.queue.getJobs()
+    """
+    def __init__(self):
+        CondorClient.__init__(self)
+        self.setQueue(YoupiCondorQueue())
+
+    def submit(self, filepath):
+        """
+        To be API compatible with existing code, call its super :func:`CondorClient.submit` 
+        function then returns a dictionnary  with the *count* and *clusterId* keys.
+        """
+        count, clusterId = super(YoupiCondorClient, self).submit(filepath)
+        return {'count': count, 'clusterId' : clusterId}
+

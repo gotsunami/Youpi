@@ -6,6 +6,7 @@ Tests for the plugin manager
 import unittest, types, sys, time
 #
 from terapix.youpi.pluginmanager import ApplicationManager, ProcessingPlugin
+from terapix.lib.cluster import ClusterClient
 from django.http import HttpRequest
 
 class ApplicationManagerTest(unittest.TestCase):
@@ -18,15 +19,32 @@ class ApplicationManagerTest(unittest.TestCase):
     def test_init_plugins_available(self):
         self.assertTrue(len(self.pm._ApplicationManager__instances.keys()) > 0, 'No plugins available')
 
-    def test_plugins(self):
-        plugins = self.pm.plugins
+    def test_plugins_attr(self):
         self.assertTrue(hasattr(self.pm, 'plugins'))
+
+    def test_plugins_ret_type(self):
+        plugins = self.pm.plugins
         self.assertEquals(type(plugins), types.ListType)
+
+    def test_plugins_ptype(self):
+        plugins = self.pm.plugins
         for p in plugins:
             self.assertTrue(isinstance(p, ProcessingPlugin))
 
     def test_getPluginByName(self):
         self.assertRaises(TypeError, self.pm.getPluginByName, 0)
+
+    def test_setClusterClient(self):
+        self.assertRaises(TypeError, self.pm.setClusterClient, 1)
+
+    def test_cluster_none(self):
+        self.assertEqual(self.pm.cluster, None)
+
+    def test_cluster_set(self):
+        class MyCluster(ClusterClient): pass
+        mc = MyCluster()
+        self.pm.setClusterClient(mc)
+        self.assertEqual(self.pm.cluster, mc)
 
 class ProcessingPluginTest(unittest.TestCase):
     """
