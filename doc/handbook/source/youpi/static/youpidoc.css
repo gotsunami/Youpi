@@ -415,3 +415,8 @@ div.sphinxsidebar input[type=submit] {
     background-color: #ff6600;
     color: white;
 }
+
+dl.class > dt[id]:first-child {
+    background-color: #eee;
+    padding: 5px;
+}
