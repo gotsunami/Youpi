@@ -8,6 +8,9 @@ Library Utilities
 .. automodule:: terapix.lib.cluster.condor
    :members:
 
+.. automodule:: terapix.lib.cluster.stub
+   :members:
+
 .. automodule:: terapix.lib.processing
    :members:
 
