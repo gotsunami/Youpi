@@ -151,14 +151,6 @@ class CondorMiscFunctionTest(TestCase):
         )
         sel.save()
 
-    def test_get_condor_status(self):
-        stat = condor.get_condor_status()
-        self.assertTrue(type(stat) == types.ListType)
-        for vm in stat:
-            self.assertTrue(len(vm) == 2)
-            self.assertTrue(type(vm[0]) == types.StringType)
-            self.assertTrue(type(vm[1]) == types.StringType)
-
     def test_get_requirement_string(self):
         for k in ({'k': 0}, lambda x: x, 1, object()):
             self.assertRaises(TypeError, condor.get_requirement_string, k, [])
@@ -304,6 +296,18 @@ class CondorClientTest(unittest.TestCase):
         cc = CondorClient()
         cc._shell_submit = Mock(return_value=('', '', '1 job(s) submitted to cluster 1024.'))
         self.assertEqual(cc.submit('file'), ('1', '1024'))
+
+    def test_getStatus_ret_type(self):
+        stat = self.c.getStatus()
+        self.assertTrue(type(stat) == types.ListType)
+
+    def test_getStatus_ret_type_unit(self):
+        stat = self.c.getStatus()
+        for vm in stat:
+            self.assertTrue(len(vm) == 2)
+            self.assertTrue(type(vm[0]) == types.StringType)
+            self.assertTrue(type(vm[1]) == types.StringType)
+
 
 class YoupiCondorClientTest(unittest.TestCase):
     """

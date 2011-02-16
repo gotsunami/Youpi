@@ -7,6 +7,8 @@ class ClusterJob(object):
     .. versionadded:: 0.7.1
 
     Base abstract class for cluster jobs. Has no implementation right now.
+
+    .. seealso:: :class:`~terapix.lib.cluster.condor.CondorJob`.
     """
     def isRunning(self):
         """
@@ -38,6 +40,8 @@ class ClusterQueue(object):
     .. versionadded:: 0.7.1
 
     Base abstract class for cluster jobs queue. Has no implementation right now.
+
+    .. seealso:: :class:`~terapix.lib.cluster.condor.CondorQueue`.
     """
     def getJobs(self):
         """
@@ -73,6 +77,16 @@ class ClusterClient(object):
         file. The job is submitted using the ``condor_submit`` program. *shell_submit* is a 
         callable (function) to call that actually runs the shell command and return the raw data, 
         splitted into lines.
+
+        .. note:: Not implemented, will raise a :class:`NotImplementedError` exception.
+        """
+        raise NotImplementedError
+
+    def getStatus(self):
+        """
+        Returns a list of all available nodes and status::
+
+            [[ vm_full_name1, state1], [vm_full_name2, state2]...]
 
         .. note:: Not implemented, will raise a :class:`NotImplementedError` exception.
         """

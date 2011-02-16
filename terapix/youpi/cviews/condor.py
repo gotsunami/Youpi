@@ -23,8 +23,8 @@ from django.views.decorators.cache import cache_page
 from terapix.youpi.auth import *
 from terapix.youpi.cviews import *
 from terapix.youpi.models import *
-from terapix.youpi.pluginmanager import ApplicationManagerError
-from terapix.lib.cluster.condor import get_condor_status, get_requirement_string
+from terapix.youpi.pluginmanager import ApplicationManagerError, manager
+from terapix.lib.cluster.condor import get_requirement_string
 from terapix.exceptions import *
 #
 from terapix.youpi.cviews.ims import _get_pagination_attrs
@@ -50,7 +50,7 @@ def home(request):
 @login_required
 @cache_page(60*5)
 def condor_status(request):
-    return HttpResponse(str({'results' : get_condor_status()}), mimetype = 'text/plain')
+    return HttpResponse(str({'results' : manager.cluster.getStatus()}), mimetype = 'text/plain')
 
 def get_live_monitoring(request, nextPage = -1):
     """
@@ -114,7 +114,7 @@ def live_monitoring(request):
     return HttpResponse(json.encode({'results' : res, 'JobCount' : jobCount, 'PageCount' : pageCount, 'nextPage' : nextPage}), mimetype = 'text/plain')
 
 def condor_hosts(request):
-    vms = get_condor_status()
+    vms = manager.cluster.getStatus()
     hosts = []
     for vm in vms:
         host = vm[0][vm[0].find('@')+1:]
@@ -409,7 +409,7 @@ def get_condor_requirement_string(request):
     error = req = '' 
     try:
         policy = CondorNodeSel.objects.filter(label = name, is_policy = True)[0]
-        vms = get_condor_status()
+        vms = manager.cluster.getStatus()
         req = get_requirement_string(policy.nodeselection, vms)
     except Exception, e:
         error = e
@@ -417,7 +417,6 @@ def get_condor_requirement_string(request):
     return HttpResponse(str({   'ReqStr': str(req), 
                                 'Error' : str(error)
                             }), mimetype = 'text/plain')
-
 
 @login_required
 @profile
@@ -430,7 +429,7 @@ def compute_requirement_string(request):
     except KeyError, e:
         raise HttpResponseServerError('Bad parameters')
 
-    vms = get_condor_status()
+    vms = manager.cluster.getStatus()
     req = get_requirement_string(str(params), vms)
     return HttpResponse(str({'ReqString': str(req)}), mimetype = 'text/plain')
 

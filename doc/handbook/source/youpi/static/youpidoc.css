@@ -420,3 +420,15 @@ dl.class > dt[id]:first-child {
     background-color: #eee;
     padding: 5px;
 }
+
+div.seealso {
+    border: 0;
+    background-color: transparent;
+}
+
+div.seealso p.first {
+    color: #333333;
+    background-color: transparent;
+    border: 0;
+}
+

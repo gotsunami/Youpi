@@ -364,7 +364,7 @@ class YoupiCondorCSF(CondorCSF):
 
         Returns a requirement string ready to be merged into the submission file.
 
-        .. seealso:: Function :func:`~terapix.lib.cluster.condor.get_condor_status`
+        .. seealso:: Function :func:`~terapix.lib.cluster.condor.CondorClient.getStatus`.
         """
         post = self.__request.POST
         try:
@@ -372,7 +372,8 @@ class YoupiCondorCSF(CondorCSF):
         except Exception, e:
             raise CondorError, "POST argument error. Unable to process data."
 
-        vms = get_condor_status()
+        from terapix.youpi.pluginmanager import manager
+        vms = manager.cluster.getStatus()
 
         if condorSetup == 'default':
             dflt_setup = marshal.loads(base64.decodestring(self.__request.user.get_profile().dflt_condor_setup))
@@ -411,39 +412,6 @@ class YoupiCondorCSF(CondorCSF):
 
         return req
 
-
-def get_condor_status():
-    """
-    Usefull to get a list of hosts attached to condor in real time (queries 
-    ``condor_status``). A list of lists is returned:: 
-    
-        [[ vm_full_name1, state1], [vm_full_name2, state2]...]
-
-    ``stateN`` is either *Idle* or *Running*.
-
-    Returns a list of cluster nodes (vms).
-    """
-    pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_status -xml'))
-    data = pipe.readlines()
-    pipe.close()
-
-    doc = dom.parseString(string.join(data))
-    nodes = doc.getElementsByTagName('c')
-
-    vms = []
-    cur = 0
-    for n in nodes:
-        data = n.getElementsByTagName('a')
-
-        for a in data:
-            if a.getAttribute('n') == 'Name':
-                name = a.firstChild.firstChild.nodeValue
-                vms.append([str(name), 0])
-            elif a.getAttribute('n') == 'Activity':
-                status = a.firstChild.firstChild.nodeValue
-                vms[cur][1] = str(status)
-                cur += 1
-    return vms
 
 def get_requirement_string(params, vms):
     """
@@ -564,7 +532,6 @@ def get_requirement_string(params, vms):
         req = req[:-4] + ')'
     
     req += ')'
-
     return req
 
 def get_requirement_string_from_selection(selName):
@@ -845,6 +812,42 @@ class CondorClient(ClusterClient):
         except Exception, e:
             raise CondorSubmitError, "Condor error:\n%s" % e
         return count, cid
+
+    def getStatus(self):
+        """
+        Returns a list of all available Condor nodes and status by calling the 
+        ``condor_status`` command::
+
+            [[vm_full_name1, state1], [vm_full_name2, state2], ...]
+
+        where *stateN* is either *Idle* or *Running*. This function uses Django 
+        caching facilities and caches the results for several minutes.
+        """
+        from django.core.cache import cache
+        vms = cache.get('condor_status')
+        if vms:
+            return vms
+        pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_status -xml'))
+        data = pipe.readlines()
+        pipe.close()
+
+        doc = dom.parseString(string.join(data))
+        nodes = doc.getElementsByTagName('c')
+
+        vms = []
+        cur = 0
+        for n in nodes:
+            data = n.getElementsByTagName('a')
+            for a in data:
+                if a.getAttribute('n') == 'Name':
+                    name = a.firstChild.firstChild.nodeValue
+                    vms.append([str(name), 0])
+                elif a.getAttribute('n') == 'Activity':
+                    status = a.firstChild.firstChild.nodeValue
+                    vms[cur][1] = str(status)
+                    cur += 1
+        cache.set('condor_status', vms, 60*5) # 5 minutes
+        return vms
 
 class YoupiCondorClient(CondorClient):
     """
