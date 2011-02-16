@@ -385,32 +385,6 @@ class ProcessingPlugin(object):
     def getData(self):
         return self.__data
 
-    def getClusterId(self, submit_content):
-        """
-        Returns a dictionnary with number of jobs submitted to related cluster on Condor
-        submit_content is a list with 3 elements of content as returned by condor_submit command 
-        (i.e. 3 lines of plain text)
-        """
-
-        if type(submit_content) != ListType:
-            raise TypeError, "submit_content must be a list !"
-
-        # Only third line is of interest
-        try:
-            data = submit_content[2]    
-            m = re.match(r'^(?P<count>\d+?) .*? (?P<cluster>\d+?).$', data[:-1])
-            count = m.group('count')
-            cid = m.group('cluster')
-        except IndexError:
-            count = -1
-            cid = -1
-        except AttributeError:
-            # RE issue, could be a Condor error
-            if submit_content[1].find('ERROR') == 0:
-                raise CondorSubmitError, "Condor error:\n%s" % string.join(submit_content[1:], '')
-
-        return { 'count' : count, 'clusterId' : cid, 'data' : [str(s) for s in submit_content] }
-
     def deleteCartItem(self, request):
         post = request.POST
         try:
