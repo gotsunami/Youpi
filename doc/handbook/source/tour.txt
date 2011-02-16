@@ -688,6 +688,8 @@ Saving items for later can be useful if you want to:
 Every item is saved according to your default permissions policy. You can decide to share items 
 with a group of users exclusively or make it available for anyone.
 
+.. _live_monitoring:
+
 Live Monitoring of Processings
 ==============================
 
@@ -701,6 +703,8 @@ are running, the management status, the owner. You will be able to  kill your ow
 assuming that you give data permissions to your team, they could do the same.The interface 
 for live monitoring is decomposed in pages referencing 10 running jobs per pages (pages are
 represented by the top red numbers above jobs).
+
+.. _processing_results:
 
 Processing Results
 ==================
@@ -726,6 +730,8 @@ right panel. For every plugins some of element results are the same:
 The second part is the *statistics* tab and permit, by browsing your related output directory
 processing, to resume processing images status. It is a quick way to know if 100% of your images
 group has been successfully processed.
+
+.. _reports:
 
 Generating Reports
 ==================
