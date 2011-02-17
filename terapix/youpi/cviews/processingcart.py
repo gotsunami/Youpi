@@ -225,7 +225,8 @@ def cart_items_count(request):
 
 def cart_saved_items_stats(request):
 	"""
-	Return some statistic on per-plugin saved items
+    Return some statistic on per-plugin saved items. Uses :func:`~terapix.youpi.auth.read_proxy` 
+    to filter saved items.
 	"""
 	stats = {}
 	for plugin in manager.plugins:

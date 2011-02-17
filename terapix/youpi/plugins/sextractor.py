@@ -3,6 +3,7 @@
 import sys, os.path, re, time, string, re, glob
 import marshal, base64, zlib
 import xml.dom.minidom as dom
+import cjson as json
 #
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
@@ -12,6 +13,7 @@ from lib.common import get_static_url, get_tpx_condor_upload_url
 import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response 
 from django.template import RequestContext
@@ -104,6 +106,14 @@ class Sextractor(ProcessingPlugin):
         """
         Returns a user's saved items. 
         """
+        from terapix.youpi.views import get_entity_permissions
+        # Full cart items count to be stored in the cache
+        full_count = CartItem.objects.filter(kind__name__exact = self.id).count()
+        saved = cache.get(self.id + '_saved_items')
+        if saved:
+            if cache.get(self.id + '_saved_items_num') == full_count:
+                return saved
+
         # per-user items
         items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
         res = []
@@ -125,8 +135,11 @@ class Sextractor(ProcessingPlugin):
                         'name'              : str(it.name),
                         'config'            : str(data['config']),
                         'param'             : str(data['param']),
-                        })
+                        'perms'             : json.encode(get_entity_permissions(request, 'cartitem', it.id)),
+            })
 
+        cache.set(self.id + '_saved_items_num', full_count)
+        cache.set(self.id + '_saved_items', res)
         return res 
 
     def process(self, request):

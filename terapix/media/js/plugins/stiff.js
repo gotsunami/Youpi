@@ -467,7 +467,6 @@ var stiff = {
 					var tr, th;
 
 					tr = new Element('tr');
-					//var header = $A(['Date', 'Permissions', 'Name', 'Description', 'Action']);
 					var headers = $A(['Date', 'Permissions', 'Name', '# images', 'Config', 'Action']);
 					headers.each(function(elem) {
 						tr.insert(new Element('th').update(elem));
@@ -483,7 +482,7 @@ var stiff = {
 						// Delete
 						delImg = new Element('img', {	id: this.id + '_del_saved_item_' + k,	
 														src: '/media/themes/' + guistyle + '/img/misc/delete.png'
-						}).setStyle({marginRight: '5px'}).hide();
+						}).setStyle({marginRight: '5px'});
 						delImg.c_data = {trid: trid, name: res.name};
 						delImg.observe('click', function(c_data) {
 							this.delSavedItem(c_data.trid, c_data.name);
@@ -494,11 +493,8 @@ var stiff = {
 						tr.insert(td);
 	
 						// Permissions
-						td = new Element('td').addClassName('config').update(get_permissions('cartitem', res.itemId, function(r, imgId) {
-							// imgId is the misc parameter passed to get_permissions()
-							var img = $(imgId);
-							r.currentUser.write ? img.show() : img.hide();
-						}, delImg.readAttribute('id') /* Misc data */));
+                        var perms = res.perms.evalJSON(sanitize=true);
+						td = new Element('td').addClassName('config').update(get_permissions_from_data(res.perms, 'cartitem', res.itemId));
 						tr.insert(td);
 	
 						// Name
@@ -522,7 +518,8 @@ var stiff = {
 						
 						// Insert delete button
 						td = new Element('td');
-						td.insert(delImg);
+                        if (perms.currentUser.write)
+                            td.insert(delImg);
 
 						// Add to cart button
 						addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});

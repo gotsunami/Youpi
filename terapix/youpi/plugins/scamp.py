@@ -4,6 +4,13 @@ import sys, os.path, time, string, re
 import xml.dom.minidom as dom
 import marshal, base64, zlib
 from types import *
+import cjson as json
+#
+from django.conf import settings
+from django.core.cache import cache
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.shortcuts import render_to_response 
+from django.template import RequestContext
 #
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.youpi.models import *
@@ -11,11 +18,6 @@ from terapix.exceptions import *
 from terapix.youpi.auth import read_proxy
 from lib.common import get_static_url, get_tpx_condor_upload_url
 import terapix.lib.cluster.condor as condor
-#
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from django.shortcuts import render_to_response 
-from django.template import RequestContext
 
 class Scamp(ProcessingPlugin):
     """ 
@@ -46,6 +48,13 @@ class Scamp(ProcessingPlugin):
         """
         Returns a user's saved items. 
         """
+        from terapix.youpi.views import get_entity_permissions
+        # Full cart items count to be stored in the cache
+        full_count = CartItem.objects.filter(kind__name__exact = self.id).count()
+        saved = cache.get(self.id + '_saved_items')
+        if saved:
+            if cache.get(self.id + '_saved_items_num') == full_count:
+                return saved
 
         # per-user items
         items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
@@ -60,8 +69,11 @@ class Scamp(ProcessingPlugin):
                         'name'              : str(it.name),
                         'taskId'            : str(data['taskId']), 
                         'itemId'            : str(it.id), 
+                        'perms'             : json.encode(get_entity_permissions(request, 'cartitem', it.id)),
                         'config'            : str(data['config'])})
 
+        cache.set(self.id + '_saved_items_num', full_count)
+        cache.set(self.id + '_saved_items', res)
         return res
 
     def saveCartItem(self, request):

@@ -5,6 +5,12 @@ import marshal, base64, zlib
 from stat import *
 import cjson as json
 #
+from django.conf import settings
+from django.core.cache import cache
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.shortcuts import render_to_response 
+from django.template import RequestContext
+#
 import terapix.lib.cluster.condor as condor
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
@@ -12,11 +18,6 @@ from terapix.youpi.models import *
 from terapix.youpi.auth import read_proxy
 from lib.common import get_static_url, get_tpx_condor_upload_url
 import terapix.lib.cluster.condor as condor
-#
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from django.shortcuts import render_to_response 
-from django.template import RequestContext
 
 class Swarp(ProcessingPlugin):
     """
@@ -726,6 +727,14 @@ ORDER BY p.id DESC
         """
         Returns a user's saved items for this plugin 
         """
+        from terapix.youpi.views import get_entity_permissions
+        # Full cart items count to be stored in the cache
+        full_count = CartItem.objects.filter(kind__name__exact = self.id).count()
+        saved = cache.get(self.id + '_saved_items')
+        if saved:
+            if cache.get(self.id + '_saved_items_num') == full_count:
+                return saved
+
         # per-user items
         items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
         res = []
@@ -750,8 +759,11 @@ ORDER BY p.id DESC
                         'useAutoScampHeads'     : str(data['useAutoScampHeads']),
                         'name'              : str(it.name),
                         'headDataPaths'     : string.join([str(p) for p in data['headDataPaths']], ','),
+                        'perms'             : json.encode(get_entity_permissions(request, 'cartitem', it.id)),
                         'config'            : str(data['config'])})
 
+        cache.set(self.id + '_saved_items_num', full_count)
+        cache.set(self.id + '_saved_items', res)
         return res
 
     def reports(self):

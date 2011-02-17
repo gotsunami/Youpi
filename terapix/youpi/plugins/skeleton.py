@@ -14,14 +14,16 @@
 
 import sys, os.path, re, time, string
 import marshal, base64, zlib
+import cjson as json
+#
+from django.conf import settings
+from django.core.cache import cache
 #
 from terapix.youpi.pluginmanager import ProcessingPlugin
 from terapix.exceptions import *
 from terapix.youpi.models import *
 from terapix.youpi.auth import read_proxy
 import terapix.lib.cluster.condor as condor
-#
-from django.conf import settings
 
 class Skeleton(ProcessingPlugin):
     """
@@ -206,6 +208,14 @@ class Skeleton(ProcessingPlugin):
         """
         Returns a user's saved items for this plugin 
         """
+        from terapix.youpi.views import get_entity_permissions
+        # Full cart items count to be stored in the cache
+        full_count = CartItem.objects.filter(kind__name__exact = self.id).count()
+        saved = cache.get(self.id + '_saved_items')
+        if saved:
+            if cache.get(self.id + '_saved_items_num') == full_count:
+                return saved
+
         items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
         res = []
         for it in items:
@@ -215,5 +225,10 @@ class Skeleton(ProcessingPlugin):
                         'descr'             : str(data['Descr']),
                         'itemId'            : str(it.id), 
                         'resultsOutputDir'  : str(self.getUserResultsOutputDir(request)),
+                        'perms'             : json.encode(get_entity_permissions(request, 'cartitem', it.id)),
                         'name'              : str(it.name) })
+
+        cache.set(self.id + '_saved_items_num', full_count)
+        cache.set(self.id + '_saved_items', res)
         return res
+

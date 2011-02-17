@@ -16,6 +16,7 @@ from terapix.youpi.auth import read_proxy
 import terapix.lib.cluster.condor as condor
 #
 from django.conf import settings
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response 
@@ -54,10 +55,8 @@ class QualityFitsIn(ProcessingPlugin):
 
     def saveCartItem(self, request):
         """
-        Serialize cart item into DB.
-    
-        @param request Django HTTP request object
-        @return Name of saved item when successful
+        Serialize cart item into DB.  *request* is a Django HTTP request object. Returns 
+        name of saved item when successful.
         """
         post = request.POST
         try:
@@ -107,6 +106,13 @@ class QualityFitsIn(ProcessingPlugin):
         """
         Returns a user's saved items. 
         """
+        from terapix.youpi.views import get_entity_permissions
+        # Full cart items count to be stored in the cache
+        full_count = CartItem.objects.filter(kind__name__exact = self.id).count()
+        saved = cache.get(self.id + '_saved_items')
+        if saved:
+            if cache.get(self.id + '_saved_items_num') == full_count:
+                return saved
 
         # per-user items
         items, filtered = read_proxy(request, CartItem.objects.filter(kind__name__exact = self.id).order_by('-date'))
@@ -131,8 +137,11 @@ class QualityFitsIn(ProcessingPlugin):
                         'exitIfFlatMissing' : int(data['exitIfFlatMissing']),
                         'exitIfMaskMissing' : int(data['exitIfMaskMissing']),
                         'flatNormMethod'    : str(data['flatNormMethod']),
+                        'perms'             : json.encode(get_entity_permissions(request, 'cartitem', it.id)),
                         'config'            : str(data['config'])})
 
+        cache.set(self.id + '_saved_items_num', full_count)
+        cache.set(self.id + '_saved_items', res)
         return res
 
     def hasSavedItems(self):

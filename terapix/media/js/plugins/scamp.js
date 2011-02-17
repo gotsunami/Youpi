@@ -918,18 +918,23 @@ var scamp = {
 						delImg = new Element('img', {	id: this.id + '_del_saved_item_' + k,
 														'style': 'margin-right: 5px', 
 														src: '/media/themes/' + guistyle + '/img/misc/delete.png'
-						}).hide();
+						});
 	
 						// Date
 						td = new Element('td').update(res.date);
 						tr.insert(td);
 
 						// Permissions
+                        /*
 						td = new Element('td', {'class': 'config'}).update(get_permissions('cartitem', res.itemId, function(r, imgId) {
 							// imgId is the misc parameter passed to get_permissions()
 							var img = $(imgId);
 							r.currentUser.write ? img.show() : img.hide();
-						}, delImg.readAttribute('id') /* Misc data */));
+						}, delImg.readAttribute('id') /* Misc data /));
+						tr.insert(td);
+                        */
+                        var perms = res.perms.evalJSON(sanitize=true);
+						td = new Element('td').addClassName('config').update(get_permissions_from_data(res.perms, 'cartitem', res.itemId));
 						tr.insert(td);
 	
 						// Name
@@ -961,7 +966,8 @@ var scamp = {
 								this.delSavedItem(trid, name);
 							}.bind(this));
 						}.bind(this, delImg.c_data));
-						td.insert(delImg);
+                        if (perms.currentUser.write)
+                            td.insert(delImg);
 
 						// Add to cart
 						var addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});

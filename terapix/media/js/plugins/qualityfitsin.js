@@ -182,13 +182,14 @@ var fitsin = {
 	
 					var delImg, addImg, trid;
 					var tabi, tabitr, tabitd;
-					var idList, txt;
+					var idList, txt, res;
 					for (var k=0; k < resp['result'].length; k++) {
+                        res = resp.result[k];
 						idList = eval(resp['result'][k]['idList']);
 						tr = new Element('tr');
 						trid = this.id + '_saved_item_' + k + '_tr';
 						tr.setAttribute('id', trid);
-						delImg = new Element('img', {id: this.id + '_del_saved_item_' + k}).hide();
+						delImg = new Element('img', {id: this.id + '_del_saved_item_' + k});
 	
 						// Date
 						td = new Element('td');
@@ -196,11 +197,16 @@ var fitsin = {
 						tr.appendChild(td);
 	
 						// Permissions
+                        /*
 						td = new Element('td', {'class': 'config'}).update(get_permissions('cartitem', resp['result'][k]['itemId'], function(r, imgId) {
 							// imgId is the misc parameter passed to get_permissions()
 							var img = $(imgId);
 							r.currentUser.write ? img.show() : img.hide();
-						}, delImg.readAttribute('id') /* Misc data */));
+						}, delImg.readAttribute('id') /* Misc data /));
+						tr.insert(td);
+                        */
+                        var perms = res.perms.evalJSON(sanitize=true);
+						td = new Element('td').addClassName('config').update(get_permissions_from_data(res.perms, 'cartitem', res.itemId));
 						tr.insert(td);
 	
 						// Name
@@ -282,13 +288,14 @@ var fitsin = {
 						delImg.setAttribute('style', 'margin-right: 5px');
 						delImg.setAttribute('src', '/media/themes/' + guistyle + '/img/misc/delete.png');
 						delImg.setAttribute('onclick', this.id + ".delSavedItem('" + trid + "', '" + resp['result'][k]['name'] + "')");
-						td.insert(delImg.hide());
+                        if (perms.currentUser.write)
+                            td.insert(delImg);
 
 						var addImg = new Element('img', {src: '/media/themes/' + guistyle + '/img/misc/addtocart_small.png'});
 						addImg.observe('click', function(c_data) {
 							this.addToCart(c_data);
 						}.bind(this, $H(resp.result[k])));
-						td.insert(addImg);
+                        td.insert(addImg);
 						tr.insert(td);
 		
 						table.appendChild(tr);
