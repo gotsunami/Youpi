@@ -18,23 +18,55 @@ Version 0.7.1
 
 **Improvements**:
 
-- Added support for caching (see the release notes)
+- Added support for caching. Many queries or results are cached, making Youpi running faster (see the 
+  :ref:`release notes <rel_0_7_1>`)
+- Optimized Ajax queries for saved items in processing cart. Fewer and faster queries. `Bug #230`_
 - New temporary and Condor log files :ref:`directory tree layout <BASE_TEMP_DIR>` (better scalability). `Bug #220`_
+- Better Condor client OO design (API). `Bug #229`_
+- Plugins Javascript files have been moved from ``templates/plugins/`` to ``media/js/plugins``. They are now 
+  compressed and cached
+- Lots of code refactoring, cleaner API
 
 .. _Bug #220: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=220
+.. _Bug #229: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=229
+.. _Bug #230: https://youpi.terapix.fr/bugzilla/show_bug.cgi?id=230
 
 **Bug fixes**:
 
-- `SExtractor`: fixed several post-processing fixes
-- `QualityFITS`: fixed job reprocessing issue.
+- `SExtractor`: fixed several post-processing issues
+- `QualityFITS`: fixed job reprocessing issue
+
+.. _rel_0_7_1:
 
 **Release Notes**:
 
-In order to upgrade from 0.6.1, please do the following:
+In order to upgrade from 0.7, please do the following:
 
-1. Make a **backup of your database**.
+0. Stop the running Youpi production instance.
+1. Edit your ``settings.py`` or ``local_conf.py`` file for setting up the cache system and the base 
+   location of all Youpi's related logs (Condor logs, configuration files)::
 
-2. Restart/reload your web server to reload the Django instance.
+    CACHE_BACKEND = 'locmem://'
+    BASE_TEMP_DIR = '/path/to/temp'
+
+   Please have a look at `Django's cache framework`_ documentation for setting up the cache properly. 
+   Using ``memcached`` is highly recommanded for production use. If it is running locally, you might 
+   want to add the following value::
+
+    CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+
+   .. _Django's cache framework: http://docs.djangoproject.com/en/1.2/topics/cache/
+
+2. Delete all ``.pyc`` files, they will be regenerated automatically by Python when Youpi is restarted::
+
+    $ find . -iname \*.pyc -delete
+
+3. Regenerate all compressed static files (if you skip this step, Youpi will do it automatically at 
+   runtime but this is not the recommanded way since it will slow down Youpi during file generation)::
+
+    $ python manage.py synccompress
+
+4. Restart/reload your web server to reload the Django instance.
 
 Version 0.7
 -----------
