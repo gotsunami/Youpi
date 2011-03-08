@@ -784,9 +784,10 @@ class CondorClient(ClusterClient):
     def submit(self, filepath, shell_submit=None):
         """
         Submit a job on the cluster. *filepath* is the absolute path to the Condor submission 
-        file. By default, the job is submitted using the ``condor_submit`` program. A different 
-        action can be performed using the *shell_submit* parameter which is the name of a callable 
-        function that actually returns the expected string data, splitted into lines.
+        file. By default, the job is submitted using the ``condor_submit`` program. 
+        
+        A different action can be performed using the *shell_submit* parameter which is the name of 
+        a callable function that actually returns the expected string data, splitted into lines.
         
         Raises a :class:`CondorSubmitError` exception if an error occured during jobs submission 
         or a *tuple* ``(count, cluster Id)`` where *count* is the number of single jobs submitted 

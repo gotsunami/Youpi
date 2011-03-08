@@ -29,13 +29,13 @@ class StubCondorQueue(CondorQueue):
 
     def getJobs(self):
         """
-        Override CondorQueue.getJobs() in order to keep only Youpi-related jobs.
+        Always return a list of 2 jobs, one running, the other idle.
         """
-        youpiJobs = [
-            CondorJob(RemoteHost='host1', JobStatus=2, ClusterId=1024, ProcId=0), 
-            CondorJob(RemoteHost='host2', JobStatus=0, ClusterId=1024, ProcId=1)
-        ]
-        return tuple(youpiJobs), len(youpiJobs)
+        youpiJobs = (
+            CondorJob(RemoteHost='host1', JobStatus=2, ClusterId=1024, ProcId=0, JobStartDate=time.time()), 
+            CondorJob(RemoteHost='host2', JobStatus=0, ClusterId=1024, ProcId=1, JobStartDate=time.time()),
+        )
+        return youpiJobs, len(youpiJobs)
 
 class StubCondorClient(ClusterClient):
     """
@@ -50,7 +50,7 @@ class StubCondorClient(ClusterClient):
         jobs, jobCount = manager.cluster.queue.getJobs()
     """
     def __init__(self):
-        CondorClient.__init__(self)
+        ClusterClient.__init__(self)
         self.setQueue(StubCondorQueue())
 
     def submit(self, filepath, shell_submit=None):
