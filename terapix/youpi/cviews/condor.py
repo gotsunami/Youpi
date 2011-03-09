@@ -11,6 +11,7 @@ from stat import *
 #
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
 from django.db.models import get_models
@@ -673,7 +674,7 @@ def get_condor_log_files_links(request):
     for kind, path in logs.iteritems():
         try:
             sizes[kind] = int(os.path.getsize(path))
-            logs[kind] = str("""<a href="%s" target="_blank">%s</a>""" % (reverse('terapix.youpi.views.show_condor_log_file', args=[kind, taskId]), logs[kind][logs[kind].rfind('/')+1:]))
+            logs[kind] = str("""<a href="%s" target="_blank">%s</a>""" % (reverse('terapix.youpi.cviews.condor.show_condor_log_file', args=[kind, taskId]), logs[kind][logs[kind].rfind('/')+1:]))
         except OSError:
             logs[kind] = ''
 
@@ -760,7 +761,7 @@ def history_cluster_jobs(request):
     data = []
     for t in window:
         data.append([
-            str("<a target=\"_blank\" href=\"%s\">%s</a>" % (reverse('terapix.youpi.views.single_result', args = [t.kind.name, t.id]), t.title)),
+            str("<a target=\"_blank\" href=\"%s\">%s</a>" % (reverse('terapix.youpi.cviews.results.single_result', args = [t.kind.name, t.id]), t.title)),
             str(t.user.username), 
             str("<b>%s</b>" % t.kind.name.capitalize()), 
             str(t.start_date), 
