@@ -14,7 +14,7 @@ ChangeLog
 Version 0.7.1
 -------------
 
-**Release Date**: *To Be Released*
+**Release Date**: March 9, 2011
 
 **Improvements**:
 
