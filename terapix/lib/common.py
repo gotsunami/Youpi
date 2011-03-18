@@ -17,6 +17,7 @@
 """
 
 import os, os.path, types
+NULLSTRING = ''
 
 def get_title_from_menu_id(menuId):
 	from youpi.context_processors import appmenu

@@ -32,7 +32,7 @@ from terapix.youpi.cviews.ims import _get_pagination_attrs
 from terapix.script.preingestion import preingest_table
 from terapix.script.DBGeneric import *
 import terapix.youpi
-from terapix.lib.common import get_title_from_menu_id
+from terapix.lib.common import get_title_from_menu_id, NULLSTRING
 
 @login_required
 @profile
