@@ -29,7 +29,7 @@ def _get_kw(query):
     else: kw = 'WHERE'
     return kw
 
-def find_tasks(tags=[], task_id=None, kind=None, user=None, success=False, failure=False):
+def find_tasks(tags=[], task_id=None, kind=None, user=None, success=False, failure=False, sort_by='-end_date'):
     """
     Find processing tasks matching some criteria.
 
@@ -102,4 +102,5 @@ AND t.name='%s'
                 if not res: break
             res = [int(r) for r in tmp]
 
-    return Processing_task.objects.filter(id__in=res).order_by('-start_date')
+    return Processing_task.objects.filter(id__in=res).order_by(sort_by)
+

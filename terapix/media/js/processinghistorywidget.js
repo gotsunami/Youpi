@@ -47,11 +47,17 @@ function ProcessingHistoryWidget(container) {
 	 */ 
 	var _container;
 	/*
-	 * Var: _sel_status_choices
+	 * Var: _sel_status_options
 	 * Options titles for status DOM select
 	 *
 	 */ 
 	var _sel_status_options = ['successful', 'failed', 'finished'];
+	/*
+	 * Var: _sel_sort_by_options
+	 * Options titles for sorting results
+	 *
+	 */ 
+	var _sel_sort_by_options = ['job name (A-Z)', 'date (ascending)', 'date (descending)'];
 
 
 	// Group: Variables
@@ -194,6 +200,19 @@ function ProcessingHistoryWidget(container) {
 			});
 			tdiv.insert(tsel);
 		}
+
+        // Sorting order
+		label = new Element('label');
+		label.insert('Order results by ');
+		tdiv.insert(new Element('br')).insert(label);
+		var osel = new Element('select', {id: _id + '_order_select'});
+        $A(_sel_sort_by_options).each(function(opt, k) {
+            opt = new Element('option', {value: k}).update(opt);
+            osel.insert(opt);
+        });
+		osel.options[osel.options.length-1].writeAttribute('selected', 'selected');
+        tdiv.insert(osel);
+
 		form.insert(tdiv);
 		
 		// Shows selected tags
@@ -304,6 +323,7 @@ function ProcessingHistoryWidget(container) {
 			var ownerSel = $(_id + '_owner_select');
 			var statusSel = $(_id + '_status_select');
 			var kindSel = $(_id + '_kind_select');
+            var sortSel = $(_id + '_order_select');
 		} catch(e) { return false; }
 
 		if (!pageNum || typeof pageNum != 'number')
@@ -324,6 +344,7 @@ function ProcessingHistoryWidget(container) {
 
 		var status = statusSel.options[statusSel.selectedIndex].text;
 		var kind = kindSel.options[kindSel.selectedIndex].value;
+		var sort = sortSel.options[sortSel.selectedIndex].value;
 	
 		var container = $(_id + '_tasks_div');
 		var xhr = new HttpRequest(
@@ -482,6 +503,7 @@ function ProcessingHistoryWidget(container) {
 			Status: status, 
 			Kind: kind,
 			Limit: _maxPerPage,
+			SortBy: sort,
 			Page: pageNum,
 			Tag: tags
 		});

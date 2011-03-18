@@ -94,6 +94,7 @@ def task_filter(request):
         owner = request.POST.getlist('Owner')
         status = request.POST['Status']
         kindid = request.POST['Kind']
+        sort = int(request.POST.get('SortBy', 0))
         # Max results per page
         maxPerPage = int(request.POST['Limit'])
         # page # to return
@@ -125,8 +126,13 @@ def task_filter(request):
     elif owner == 'all':
         owner = None
 
+    # Tasks ids for the page
+    order = ('title', 'end_date', '-end_date')
+    if not sort in range(len(order)):
+        sort = 0
+
     # Get tasks
-    tasks = find_tasks(tags, task_id=None, kind=kindid, user=owner, success=success, failure=failure)
+    tasks = find_tasks(tags, task_id=None, kind=kindid, user=owner, success=success, failure=failure, sort_by=order[sort])
     tasksIds = [int(t.id) for t in tasks]
     filtered = False
 
@@ -148,9 +154,8 @@ def task_filter(request):
     else:
         pageCount = 1
 
-    # Tasks ids for the page
     tasksIds = tasksIds[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
-    tasks = Processing_task.objects.filter(id__in = tasksIds).order_by('-end_date')
+    tasks = Processing_task.objects.filter(id__in = tasksIds)
     for t in tasks:
         if t.success:
             nb_suc += 1
