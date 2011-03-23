@@ -155,7 +155,7 @@ def task_filter(request):
         pageCount = 1
 
     tasksIds = tasksIds[(targetPage-1)*maxPerPage:targetPage*maxPerPage]
-    tasks = Processing_task.objects.filter(id__in = tasksIds)
+    tasks = Processing_task.objects.filter(id__in = tasksIds).order_by(order[sort])
     for t in tasks:
         if t.success:
             nb_suc += 1

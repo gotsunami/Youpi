@@ -83,7 +83,7 @@ AND t.name='%s'
     if not tags:
         cur.execute(task_q)
         res = cur.fetchall()
-        res = [int(r[0]) for r in res]
+        res = map(lambda x: int(x[0]), res)
     else:
         if len(tags) == 1:
             cur.execute(task_q % tags[0])
