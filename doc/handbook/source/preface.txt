@@ -16,6 +16,10 @@ Youpi acts as a glue between those low-level tools. Its development mainly focus
 providing a modern graphical user interface (GUI) and the ability to easily organize and 
 share data between users.
 
+Here is a very basic graph showing a general overview of Youpi's architecture:
+
+.. image:: figures/youpi-arch.png
+
 Youpi Features
 ==============
 

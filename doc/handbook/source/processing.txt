@@ -1,12 +1,27 @@
-Processing Images
-=================
+Image Processing
+================
+
+Youpi provides several plugins, each of them dedicated to a specific task. In the following 
+sections, we will see how to use the user interface (UI) to quickly build jobs ready to be 
+sent to a cluster.
 
 .. _proc_fitsin:
 
-`QualityFITS` --- First Quality Evaluation
+`QualityFITS` --- Image Quality Evaluation
 ------------------------------------------
 
-*TBW*
+Click on the the *processing* top-level tab and select the QualityFits icon. Several menus are 
+then available (from left to right):
+
+- Select images (*default*)
+- Select data paths
+- Select a configuration file
+- Set output directory
+- Options
+- About
+
+
+
 
 .. _proc_scamp:
 
