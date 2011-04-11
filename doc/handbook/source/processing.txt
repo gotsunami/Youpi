@@ -1,52 +1,191 @@
+****************
 Image Processing
-================
+****************
 
 Youpi provides several plugins, each of them dedicated to a specific task. In the following 
-sections, we will see how to use the user interface (UI) to quickly build jobs ready to be 
+sections, we will see how to use the user interface (UI) to quickly create jobs ready to be 
 sent to a cluster.
+
+Common widgets and tools
+========================
+
+Every image processing capabilities offered by Youpi's plugins are possible using a common set 
+of UI widgets dealing with image selection, configuration file selection and data path selection.
+
+.. _image_selector_section:
+
+The Image Selector
+------------------
+
+Let's first begin with the image selector. All images previously ingested in the database are 
+searchable using the image selector. Several search criteria can be combined. The result is a 
+selection of images that can later be edited (saved, reloaded, deleted, merged). As shown in the 
+following image, the image selector is made of four parts:
+
+.. image:: figures/ims-main.png
+
+The top-left part is the current *selection mode*, which is one of *single* or *batch*. The 
+single mode is the default one and, as its name implies, allows to create a single selection 
+of images. On the contrary, the batch mode automatically import and save selections defined 
+in an XML file.
+
+The three other parts (highlighted in orange) are only available in the *single* selection 
+mode.
+
+Single selection mode
+~~~~~~~~~~~~~~~~~~~~~
+
+Select search criteria from the top right search area. Available criteria are among: 
+channel, ra/dec, image grade, image name, ingestion ID, instrument, object, run name, 
+saved selection and tag:
+
+.. image:: figures/ims-criteria.png
+
+Once a criterium is selected, matched values are loaded automatically in the rightmost
+select box. For example, selecting the *Run* criterium will load a list of all available 
+runs:
+
+.. image:: figures/ims-run-criterium.png
+
+Note that depending on the selected criterium, the rightmost widget can be a multi-selection 
+box (for the *channel*, *grade*, *ingestion ID*, *object*, *run* and *tag* criterium) or a single 
+selection box (for the *instrument* and *saved selection* criterium) or a single line edit for 
+entering values manually (suitable for the *ra/dec* coordinates and the *image name* criterium). 
+All images whose names contain the string "7323" can be searched with:
+
+.. image:: figures/ims-crit-edit.png
+
+.. note:: Regular expressions are not supported in line edit fields at the moment.
+
+Only one instrument is available per line:
+
+.. image:: figures/ims-crit-single.png
+
+Finally, just hold the control key to select multiple values in a multi-selection box. Every 
+entry selected is used as a **logical OR** operation:
+
+.. image:: figures/ims-crit-multi.png
+
+We just saw selecting only one kind of criterium for retreiving images. But what if you 
+want to combine them? Well, just press the ``+`` button to get a new line with a new 
+criterium. You can use as many lines as you want. The criteria and their values (and 
+conditions) will be merged into a query and sent to Youpi when you hit the *Find Images!* 
+button. Every line is used as a **logical AND** operation. In the following example, we 
+are looking for all ``Megacam`` images in the ``g.MP9401`` filter with the ``Wide`` tag:
+
+.. image:: figures/ims-multi-line.png
+
+Of a collection of 50713 images, there are 2549 matches. Since it's a rather large results 
+set, it's splitted on several pages. Each page (except the last one generally) has the same 
+number of matches, one image per line.
+
+You can jump to any page by using the page selector widget in the results header. You can 
+select the page number directly or select the page in the list. This will fetch the results 
+automatically.
+
+.. image:: figures/ims-page-selector.png
+
+Each result line shows information about one single image. Only the name of the image is 
+displayed, along with all its tags. By default, all images in the result set are checked/selected. 
+You can unselect some of them at will. Shortcuts are available to un/select all images on a 
+page or even to un/select all images on all pages at once. Use the *Select page* or *Unselect page* 
+buttons in the page selector to respectively select or unselect all images in the current 
+page. In the following example, only the third image on page 5 is selected by first hitting 
+the *Unselect page* then checking the checkbox at the beginning of the third line:
+
+.. image:: figures/ims-single-entry.png
+
+
+
+Batch selection mode
+~~~~~~~~~~~~~~~~~~~~
+
+Batch selection grant to raise multiple selections based on coordinates on the 
+celestial sphere. You can define circles with a center and a radius and each image
+which have his center field **in** the circle, will be selected. XML files with
+a special DTD are the means to do such selections in Youpi.
+
+Here is an example::
+
+    <batch>
+        <selection>
+            <label>SEL1</label>
+            <alpha>33.1</alpha>
+            <delta>-6.3</delta>
+            <radius>0.1</radius>
+        </selection>
+        <selection>
+            <label>SEL2</label>
+            <alpha>22.0</alpha>
+            <delta>-6.3</delta>
+            <radius>0.1</radius>
+        </selection>
+        ...
+    </batch>
+
+Alpha, delta are the circle coordinates center. Each selection node is a proper one.	
+With this other method of selection, you will have one list of as many selection nodes
+as contained in the XML file.A sky visualisation of your selections in batch mode, is 
+generated (even the center of each image selected).To see this visualisation, check 
+the corresponding checkbox on the image selector in Batch selection.
+ 
+.. Note:: For all selections you have done under single or batch mode, it's possible to save, 
+          edit or delete selections from the top left panel of the image selector.
+
+.. Note:: ** saved selections matching mode **
+
 
 .. _proc_fitsin:
 
 `QualityFITS` --- Image Quality Evaluation
-------------------------------------------
+==========================================
+
+.. image:: figures/youpi-qfits.png
 
 Click on the the *processing* top-level tab and select the QualityFits icon. Several menus are 
 then available (from left to right):
 
-- Select images (*default*)
-- Select data paths
-- Select a configuration file
-- Set output directory
-- Options
-- About
+*Select images*
+    Toto
 
+*Select data paths*
+    Tata
+
+*Select a configuration file*
+    KIKI
+
+*Set output directory*
+    Poule
+
+*Options*
+    KIKI
 
 
 
 .. _proc_scamp:
 
 `SCAMP` --- Astro-Photo Calibration
------------------------------------
+===================================
 
 *TBW*
 
 .. _proc_swarp:
 
 `SWarp` --- Image Stacking
---------------------------
+==========================
 
 *TBW*
 
 .. _proc_sextractor:
 
 `SExtractor` --- Sources Extractor
-----------------------------------
+==================================
 
 *TBW*
 
 .. _proc_stiff:
 
 `STIFF` --- `FITS` to `TIFF` Image convertion
----------------------------------------------
+=============================================
 
 *TBW*
