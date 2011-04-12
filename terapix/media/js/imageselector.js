@@ -2549,10 +2549,9 @@ function ImageSelector(container, options)
 			null,
 			// Custom handler for results
 			function(resp) {
-				removeAllChildrenNodes(cnode);
-				var nb = resp['data'].length;
+                cnode.update();
 				var p = new Element('p');
-				if (nb > 0) {
+				if (resp.count > 0) {
 					// Name already exists, ask for overwriting
 					var r = confirm("A selection with that name already exists in the database.\nWould you like to overwrite it ?");
 					if (!r) return;
@@ -2564,10 +2563,10 @@ function ImageSelector(container, options)
 		);
 
 		// Get name of all saved selections
-		post = 'Table=youpi_imageselections&DisplayField=name&Lines=0&Line0Field=name&Line0Cond=is equal to&Line0Text=' + name + '&Hide=&OrderBy=id';
-
-		// Send HTTP POST request
-		xhr.send('/youpi/process/preingestion/query/', post);
+		var post = {
+			Name: name
+		};
+		xhr.send('/youpi/process/db/getSelections/', $H(post).toQueryString());
 	}
 
 	/*
