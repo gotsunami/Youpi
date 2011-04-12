@@ -432,3 +432,14 @@ div.seealso p.first {
     border: 0;
 }
 
+.capture {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    /*
+    -moz-box-shadow: 3px 3px 4px #ccc;
+    -webkit-box-shadow: 3px 3px 4px #ccc;
+    box-shadow: 3px 3px 4px #ccc;
+    */
+}
+
+

@@ -17,10 +17,10 @@ of UI widgets dealing with image selection, configuration file selection and dat
 The Image Selector
 ------------------
 
-Let's first begin with the image selector. All images previously ingested in the database are 
-searchable using the image selector. Several search criteria can be combined. The result is a 
+Let's first begin with the image selector (*IMS*). All images previously ingested in the database 
+are searchable using the IMS. Several search criteria can be combined. The result is a 
 selection of images that can later be edited (saved, reloaded, deleted, merged). As shown in the 
-following image, the image selector is made of four parts:
+following image, the IMS is made of four parts:
 
 .. image:: figures/ims-main.png
 
@@ -35,65 +35,113 @@ mode.
 Single selection mode
 ~~~~~~~~~~~~~~~~~~~~~
 
-Select search criteria from the top right search area. Available criteria are among: 
-channel, ra/dec, image grade, image name, ingestion ID, instrument, object, run name, 
-saved selection and tag:
+*Basic usage*
+    Select a search criteria from the top right search area. Available criteria are among: 
+    channel, ra/dec, image grade, image name, ingestion ID, instrument, object, run name, 
+    saved selection and tag:
 
-.. image:: figures/ims-criteria.png
+    .. image:: figures/ims-criteria.png
+       :class: capture
 
-Once a criterium is selected, matched values are loaded automatically in the rightmost
-select box. For example, selecting the *Run* criterium will load a list of all available 
-runs:
+    Once a criterium is selected, matched values are loaded automatically in the rightmost
+    select box. For example, selecting the *Run* criterium will load a list of all available 
+    runs:
 
-.. image:: figures/ims-run-criterium.png
+    .. image:: figures/ims-run-criterium.png
+       :class: capture
 
-Note that depending on the selected criterium, the rightmost widget can be a multi-selection 
-box (for the *channel*, *grade*, *ingestion ID*, *object*, *run* and *tag* criterium) or a single 
-selection box (for the *instrument* and *saved selection* criterium) or a single line edit for 
-entering values manually (suitable for the *ra/dec* coordinates and the *image name* criterium). 
-All images whose names contain the string "7323" can be searched with:
+    Note that depending on the selected criterium, the rightmost widget can be a multi-selection 
+    box (for the *channel*, *grade*, *ingestion ID*, *object*, *run* and *tag* criterium) or a single 
+    selection box (for the *instrument* and *saved selection* criterium) or a single line edit for 
+    entering values manually (suitable for the *ra/dec* coordinates and the *image name* criterium). 
+    All images whose names contain the string "7323" can be searched with:
 
-.. image:: figures/ims-crit-edit.png
+    .. image:: figures/ims-crit-edit.png
+       :class: capture
 
-.. note:: Regular expressions are not supported in line edit fields at the moment.
+    .. note:: Regular expressions are not supported in line edit fields at the moment.
 
-Only one instrument is available per line:
+    Only one instrument per line is available:
 
-.. image:: figures/ims-crit-single.png
+    .. image:: figures/ims-crit-single.png
+       :class: capture
 
-Finally, just hold the control key to select multiple values in a multi-selection box. Every 
-entry selected is used as a **logical OR** operation:
+    Finally, just hold the control key to select multiple values in a multi-selection box. Every 
+    entry selected is used as a **logical OR** operation:
 
-.. image:: figures/ims-crit-multi.png
+    .. image:: figures/ims-crit-multi.png
+       :class: capture
 
-We just saw selecting only one kind of criterium for retreiving images. But what if you 
-want to combine them? Well, just press the ``+`` button to get a new line with a new 
-criterium. You can use as many lines as you want. The criteria and their values (and 
-conditions) will be merged into a query and sent to Youpi when you hit the *Find Images!* 
-button. Every line is used as a **logical AND** operation. In the following example, we 
-are looking for all ``Megacam`` images in the ``g.MP9401`` filter with the ``Wide`` tag:
+    We just saw selecting only one kind of criterium for retreiving images. But what if you 
+    want to combine them? Well, just press the ``+`` button to get a new line with a new 
+    criterium. You can use as many lines as you want. The criteria and their values (and 
+    conditions) will be merged into a query and sent to Youpi when you hit the *Find Images!* 
+    button. Every line is used as a **logical AND** operation. In the following example, we 
+    are looking for all ``Megacam`` images in the ``g.MP9401`` filter with the ``Wide`` tag:
 
-.. image:: figures/ims-multi-line.png
+    .. image:: figures/ims-multi-line.png
+       :class: capture
 
-Of a collection of 50713 images, there are 2549 matches. Since it's a rather large results 
-set, it's splitted on several pages. Each page (except the last one generally) has the same 
-number of matches, one image per line.
+    Of a collection of 50713 images, there are 2549 matches. Since it's a rather large results 
+    set, it's splitted on several pages. Each page (except the last one generally) has the same 
+    number of matches, one image per line.
 
-You can jump to any page by using the page selector widget in the results header. You can 
-select the page number directly or select the page in the list. This will fetch the results 
-automatically.
+*Filtering results*
+    You can jump to any page by using the page selector widget in the results header. You can 
+    select the page number directly or select the page in the list. This will fetch the results 
+    automatically.
 
-.. image:: figures/ims-page-selector.png
+    .. image:: figures/ims-page-selector.png
+       :class: capture
 
-Each result line shows information about one single image. Only the name of the image is 
-displayed, along with all its tags. By default, all images in the result set are checked/selected. 
-You can unselect some of them at will. Shortcuts are available to un/select all images on a 
-page or even to un/select all images on all pages at once. Use the *Select page* or *Unselect page* 
-buttons in the page selector to respectively select or unselect all images in the current 
-page. In the following example, only the third image on page 5 is selected by first hitting 
-the *Unselect page* then checking the checkbox at the beginning of the third line:
+    Each result line shows information about one single image. Only the name of the image is 
+    displayed, along with all its tags. By default, all images in the result set are checked/selected. 
+    You can unselect some of them at will. Shortcuts are available to un/select all images on a 
+    page or even to un/select all images on all pages at once. 
 
-.. image:: figures/ims-single-entry.png
+    Use the *Select page* or *Unselect page* buttons in the page selector to respectively select or 
+    unselect all images in the current page. In the following example, only the third image on page 5 
+    is selected by first hitting the *Unselect page* then check the checkbox at the beginning of the 
+    third line:
+
+    .. image:: figures/ims-single-entry.png
+       :class: capture
+
+    You can also un/select all entries on all pages at once by hitting the appropriate button in 
+    the left panel. Suppose you want to unselect all images and select only the first 2 images on 
+    the first page:
+
+    .. image:: figures/ims-unselect-all.png
+       :class: capture
+
+*Editing selection*
+    Now that you are pretty satisfied with the current selection of images, you can save it for a 
+    later use by hitting the *Save selection* button in the left panel. You will be asked for a name, 
+    which must be unique across all saved selections:
+
+    .. image:: figures/ims-save-sel.png
+       :class: capture
+
+    You can later load this selection back by using the *Saved selection* criterium:
+
+    .. image:: figures/ims-reload-sel.png
+       :class: capture
+
+    The access permissions of a selection can also be changed, so you can decide who can view or 
+    modify a saved selection. Just hit the *Edit selection* button in the left panel, select the 
+    name of a saved selection then click on the *Change* link. You will be prompt for new permissions:
+
+    .. image:: figures/ims-edit-perms.png
+       :class: capture
+
+    Saved selections can also be deleted the same way. Hit the *Delete selection* button and select 
+    a selection to delete:
+
+    .. image:: figures/ims-del-sel.png
+       :class: capture
+
+    Finally, selections can be merged. Load back the ``CFHT-sel`` saved image selection, hit the *Find 
+    images!* button then hit the *Merge with selection* button in the left panel. 
 
 
 
@@ -127,10 +175,10 @@ Alpha, delta are the circle coordinates center. Each selection node is a proper 
 With this other method of selection, you will have one list of as many selection nodes
 as contained in the XML file.A sky visualisation of your selections in batch mode, is 
 generated (even the center of each image selected).To see this visualisation, check 
-the corresponding checkbox on the image selector in Batch selection.
+the corresponding checkbox on the IMS in Batch selection.
  
 .. Note:: For all selections you have done under single or batch mode, it's possible to save, 
-          edit or delete selections from the top left panel of the image selector.
+          edit or delete selections from the top left panel of the IMS.
 
 .. Note:: ** saved selections matching mode **
 
