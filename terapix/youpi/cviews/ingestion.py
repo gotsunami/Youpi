@@ -1,5 +1,5 @@
 
-import os.path, glob
+import os.path, glob, re
 import cjson as json
 import marshal, base64, zlib
 #
