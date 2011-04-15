@@ -3,6 +3,7 @@ import os.path, glob
 import cjson as json
 import marshal, base64, zlib
 import magic, string
+import xml.dom.minidom as dom
 #
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -58,6 +59,8 @@ def get_circle_from_multipolygon(alpha_center, delta_center, radius, p = 16):
     @param delta_center declination in degrees
     @param radius angular degree in degrees
     """
+    import math
+    from copy import deepcopy
     # Computing selection circle based (p points)
     rot = []
     p -= 1
@@ -795,7 +798,6 @@ def batch_parse_content(request):
     except Exception, e:
         return HttpResponseBadRequest('Incorrect POST data')
 
-    import xml.dom.minidom as dom
     f = '/tmp/' + request.user.username + '_' + fileName
     doc = dom.parse(f)
         
