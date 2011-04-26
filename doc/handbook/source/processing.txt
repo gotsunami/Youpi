@@ -45,17 +45,17 @@ saved selection and tag:
 .. image:: figures/ims-criteria.png
    :class: capture
 
-Once a criterium is selected, matched values are loaded automatically in the rightmost
-select box. For example, selecting the *Run* criterium will load a list of all available 
+Once a criterion is selected, matched values are loaded automatically in the rightmost
+select box. For example, selecting the *Run* criterion will load a list of all available 
 runs:
 
-.. image:: figures/ims-run-criterium.png
+.. image:: figures/ims-run-criterion.png
    :class: capture
 
-Note that depending on the selected criterium, the rightmost widget can be a multi-selection 
-box (for the *channel*, *grade*, *ingestion ID*, *object*, *run* and *tag* criterium) or a single 
-selection box (for the *instrument* and *saved selection* criterium) or a single line edit for 
-entering values manually (suitable for the *ra/dec* coordinates and the *image name* criterium). 
+Note that depending on the selected criterion, the rightmost widget can be a multi-selection 
+box (for the *channel*, *grade*, *ingestion ID*, *object*, *run* and *tag* criterion) or a single 
+selection box (for the *instrument* and *saved selection* criterion) or a single line edit for 
+entering values manually (suitable for the *ra/dec* coordinates and the *image name* criterion). 
 All images whose names contain the string "7323" can be searched with:
 
 .. image:: figures/ims-crit-edit.png
@@ -74,9 +74,9 @@ entry selected is used as a **logical OR** operation:
 .. image:: figures/ims-crit-multi.png
    :class: capture
 
-We just saw selecting only one kind of criterium for retreiving images. But what if you 
+We just saw selecting only one kind of criterion for retreiving images. But what if you 
 want to combine them? Well, just press the ``+`` button to get a new line with a new 
-criterium. You can use as many lines as you want. The criteria and their values (and 
+criterion. You can use as many lines as you want. The criteria and their values (and 
 conditions) will be merged into a query and sent to Youpi when you hit the "*Find Images!*" 
 button. Every line is used as a **logical AND** operation. In the following example, we 
 are looking for all ``Megacam`` images in the ``g.MP9401`` filter with the ``Wide`` tag:
@@ -128,7 +128,7 @@ which must be unique across all saved selections:
 .. image:: figures/ims-save-sel.png
    :class: capture
 
-You can later load this selection back by using the *Saved selection* criterium:
+You can later load this selection back by using the *Saved selection* criterion:
 
 .. image:: figures/ims-reload-sel.png
    :class: capture
@@ -185,7 +185,7 @@ The image selector reports all the files described in the uploaded file have bee
 Since the option for tagging images on the fly was checked, the 4 images have been tagged with the 
 ``imglist`` tag, which is the base name of the file, with no extension. Note that you can exit the form 
 upload display by clicking on the "*go back*" link, and that, while the current selection will be cleaned 
-if you do so, you will be able to retreive it by selecting the *Tag* criterium with the value 
+if you do so, you will be able to retreive it by selecting the *Tag* criterion with the value 
 ``imglist``:
 
 .. image:: figures/ims-upload-reload.png
@@ -214,11 +214,13 @@ and::
     1013503p
 
 Once selected, just hit the "*Import!*" button to import those two files. They will be imported as 
-new selections and available for searching.
+new selections ``sel1`` and ``sel2`` and available for searching.
 
 Batch selection mode
 ^^^^^^^^^^^^^^^^^^^^
 
+This mode was created before so many feature were available to the single selection mode. It 
+can be seen as a little deprecated, but is still supported. 
 Batch selection grant to raise multiple selections based on coordinates on the 
 celestial sphere. You can define circles with a center and a radius and each image
 which have his center field **in** the circle, will be selected. XML files with
@@ -231,15 +233,14 @@ Here is an example::
             <label>SEL1</label>
             <alpha>33.1</alpha>
             <delta>-6.3</delta>
-            <radius>0.1</radius>
+            <radius>0.6</radius>
         </selection>
         <selection>
             <label>SEL2</label>
-            <alpha>22.0</alpha>
+            <alpha>35.0</alpha>
             <delta>-6.3</delta>
-            <radius>0.1</radius>
+            <radius>0.3</radius>
         </selection>
-        ...
     </batch>
 
 Alpha, delta are the circle coordinates center. Each selection node is a proper one.	
