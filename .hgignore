@@ -10,7 +10,6 @@ deploy/youpi.conf
 doc/handbook/build
 doc/handbook/dot-error.log
 doc/handbook/figures/*.eps
-doc/handbook/figures/*.png
 doc/handbook/figures/*.ps
 doc/handbook/figures/*.svg
 terapix/local_conf.py

@@ -11,6 +11,10 @@ Common widgets and tools
 
 Every image processing capabilities offered by Youpi's plugins are possible using a common set 
 of UI widgets dealing with image selection, configuration file selection and data path selection.
+Before discussing Youpi's processing capabilities in more details, let's first review the 
+functionalities of the :ref:`image selector <image_selector_section>`, the :ref:`data path selector 
+<data_path_selector>` and the :ref:`config file selector <config_path_selector>` used accross 
+all plugins.
 
 .. _image_selector_section:
 
@@ -118,6 +122,8 @@ the first page:
 .. image:: figures/ims-unselect-all.png
    :class: capture
 
+.. _ims_edit_sel:
+
 Editing a selection
 """""""""""""""""""
 
@@ -219,14 +225,26 @@ new selections ``sel1`` and ``sel2`` and available for searching.
 Batch selection mode
 ^^^^^^^^^^^^^^^^^^^^
 
-This mode was created before so many feature were available to the single selection mode. It 
-can be seen as a little deprecated, but is still supported. 
-Batch selection grant to raise multiple selections based on coordinates on the 
-celestial sphere. You can define circles with a center and a radius and each image
-which have his center field **in** the circle, will be selected. XML files with
-a special DTD are the means to do such selections in Youpi.
+Toggle the selection mode box and select "*Batch selection*":
 
-Here is an example::
+.. image:: figures/ims-batch-select.png
+   :class: capture
+
+Making a batch selection
+""""""""""""""""""""""""
+
+This mode was created at the beginning of the implementation of the image selector --- before all 
+the features were available to the single selection mode. It can be considered as a little deprecated, 
+but is still supported. The *batch selection* mode is still useful to build selections of images from 
+coordinates on the celestial sphere (alpha, delta, radius).
+
+This way, you can define regions with a center and a radius. Every image whose center field is in 
+that circle will be matched and returned as a valid selection to the image selector.
+
+In order to make a selection, upload an XML file and hit the "*Upload and check file*" button. The XML 
+has a very simple DTD. The document root is the *batch* element. It must contain one ore more *selection* 
+elements. Each *selection* element holds exactly one *label*, *alpha*, *delta* and *radius* element. Here 
+is an example::
 
     <batch>
         <selection>
@@ -243,17 +261,43 @@ Here is an example::
         </selection>
     </batch>
 
-Alpha, delta are the circle coordinates center. Each selection node is a proper one.	
-With this other method of selection, you will have one list of as many selection nodes
-as contained in the XML file.A sky visualisation of your selections in batch mode, is 
-generated (even the center of each image selected).To see this visualisation, check 
-the corresponding checkbox on the IMS in Batch selection.
- 
-.. Note:: For all selections you have done under single or batch mode, it's possible to save, 
-          edit or delete selections from the top left panel of the IMS.
+As you can see on the following picture, there are 145 and 13 matches for the *SEL1* and *SEL2* 
+selections respectively:
 
-.. Note:: ** saved selections matching mode **
+.. image:: figures/ims-batch-upload.png
+   :class: capture
 
+Saving and loading
+""""""""""""""""""
+
+If you want to save permanently those two selections for later use, just save the current selection 
+of 145+13=158 images using the left panel, as described in the :ref:`ims_edit_sel` section:
+
+.. image:: figures/ims-batch-save.png
+   :class: capture
+
+Then reload the saved selection from the *batch selection* panel:
+
+.. image:: figures/ims-batch-reload.png
+   :class: capture
+
+.. note:: *single* and *batch* selections are saved apart. A *single* saved selection can only be 
+          retreived from the *single selection* panel. As such, the ``myrun`` *batch* selection we 
+          have just created is available for edition or deletion from the *batch mode* panel only.
+
+.. _data_path_selector:
+
+The Data Path Selector
+----------------------
+
+*TBW*
+
+.. _config_path_selector:
+
+The Config Path Selector
+------------------------
+
+*TBW*
 
 .. _proc_fitsin:
 
@@ -279,7 +323,6 @@ then available (from left to right):
 
 *Options*
     KIKI
-
 
 
 .. _proc_scamp:
