@@ -58,12 +58,11 @@ def plot_sky_selections(request):
 			 'fontsize' : '8' }
 	
 	rc('axes', labelsize = 8, edgecolor = '#6600CC', facecolor = '#F0F8FF', titlesize = '8', labelcolor = 'g', linewidth = '0.5')
-	rc('legend', fontsize = 6, shadow = False, axespad = 0.7, pad = 0.1, isaxes = False)
 	rc('xtick', labelsize = 6)
 	rc('ytick', labelsize = 6)
 		
 	fig = figure()
-	fig.add_subplot(111, projection='aitoff')
+	ax = fig.add_subplot(111, projection='aitoff')
 
 	title('Selections on sky sphere',fontsize=14)
 	xlabel('Ra',font,color='r')
