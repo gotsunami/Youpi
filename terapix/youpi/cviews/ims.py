@@ -624,10 +624,11 @@ def processing_get_image_selections(request):
 
     mode = request.POST.get('Mode', 'Single') # Single or Batch
     idList = []
+    filtered = False
 
     if not all:
         try:
-            sels, filtered = read_proxy(request, ImageSelections.objects.filter(name = name))
+            sels = ImageSelections.objects.filter(name = name)
             if sels:
                 sel = sels[0]
                 # marshal de-serialization + base64 decoding
@@ -638,7 +639,7 @@ def processing_get_image_selections(request):
             # Not found
             pass
     else:
-        sels, filtered = read_proxy(request, ImageSelections.objects.all().order_by('name'))
+        sels = ImageSelections.objects.all().order_by('name')
         for s in sels:
             sList = marshal.loads(base64.decodestring(s.data))
             if mode == 'Single' and len(sList) == 1:
