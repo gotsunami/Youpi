@@ -290,7 +290,19 @@ Then reload the saved selection from the *batch selection* panel:
 The Data Path Selector
 ----------------------
 
-*TBW*
+The data path selector is a meta widget (made of several widgets) used across all plugins to provide 
+data path information as input plugin parameter. Instead of having to enter data path manually in the 
+browser window --- this is a boring and tedious task --- it handles browsing a server-side data path 
+in real time, and takes care of saving a path to the database or loading all previously data paths in 
+order to speed up the data path selection process as much as possible.
+
+It can be considered as a meta widget because it's made of three separate but related areas. The first 
+one is labelled "*Path selector*" since it is actually the area for browsing filesystem data paths. 
+Just click on the node of the tree to open the directories, then click on a directory name to validate 
+the selection:
+
+.. image:: figures/dps-pick-dir.png
+   :class: capture
 
 .. _config_path_selector:
 
