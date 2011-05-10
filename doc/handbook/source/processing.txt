@@ -304,12 +304,55 @@ the selection:
 .. image:: figures/dps-pick-dir.png
    :class: capture
 
+Once clicked, the directory path ``/data/fcix7/raid1/matm`` is copied automatically to the second 
+area labelled "*Selected Path*".  Depending on the nature of the data paths available in the third area, 
+you can hit one of those "*Save*" buttons available right under the full path. For example, the data path 
+selector supplies three kinds of paths to the :ref:`QualityFITS plugin <proc_fitsin>` so you can provide 
+data paths for the FLAT, MASK and REG data. Let's suppose the selected directory contains all the flats 
+required for image quality evaluation with QualityFITS. Just click on the "*Save as FLATS*" button to 
+make it stored in the database and selected automatically as a default choice for the current QualityFITS 
+setup in the third area related to available data paths:
+
+.. image:: figures/dps-select-dir-qfits.png
+   :class: capture
+
+As you can see in the previous picture, required fields are marked as *mandatory*. You can't leave 
+those fields empty. In the case of QualityFITS, it needs at least a path to FLAT and MASK data to 
+proceed. 
+
+That's it! Once data paths are configured, they can be used with any processing plugin.
+
 .. _config_path_selector:
 
-The Config Path Selector
-------------------------
+The Configuration Selector
+--------------------------
 
-*TBW*
+Last but not least, the configuration selector is a simple widget for selecting a configuration file 
+to be used with a plugin. Since all Youpi plugins rely on low level command line tools that need 
+a config file to run, they can be managed at a higher level in this config selector. The following 
+features are included: creating a new config file based on the default config file supplied with the 
+active plugin, editing and saving a config file using the builtin text editor, or importing 
+a collection of config files on-the-fly from an existing directory. 
+
+Here is the big picture:
+
+.. image:: figures/cs-overview.png
+   :class: capture
+
+The "*New*" button opens the editor which is filled with the content of the default config file 
+used by the low-level tool at runtime. You can modify it then save it by hitting the "*Save config as* 
+button. Then you may want to select this new config file by name in the dropdown box to make it 
+the active configuration to use. Similarly, select a configuration in the dropdown box then hit the 
+"*Edit selected*" button to edit the selected config's content.
+
+In order to handle a large set of configuration files, you can put the config files somewhere in your 
+filesystem and import their content by selecting "*import config files*". Just open the path selector and 
+select a data path. In the following example, I created a config file called ``myconf.rc`` in the 
+``/data/fcix7/raid1/matm/conf`` directory. Please note that config files must have the ``.rc`` 
+extension. Click the "*Import!*" button to import the content of the files in the database:
+
+.. image:: figures/cs-import-path.png
+   :class: capture
 
 .. _proc_fitsin:
 
