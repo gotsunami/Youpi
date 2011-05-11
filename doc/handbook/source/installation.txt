@@ -408,6 +408,8 @@ to check:
 	fewer files per directory, which is convenient when sending thousands of jobs on the cluster. 
 	This is also more scalable.
 
+.. _PROCESSING_OUTPUT:
+
 ``PROCESSING_OUTPUT``
 	.. versionchanged:: 0.7
 	   See the :ref:`release notes <release_notes_0.7>`
