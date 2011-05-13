@@ -384,6 +384,41 @@ can be useful if you want to group processing results together.
 `QualityFITS` --- Image Quality Evaluation
 ==========================================
 
+The Command Line Tool
+---------------------
+
+*QualityFITS* is a Terapix tool for evaluating the image quality. Here is a more complete description 
+taken from its man page:
+
+[*QualityFITS*] is a pipeline which performs the following steps on preprocessed (debiased and flat-
+fielded) images (named ``base.fits``):
+
+    1. runs SExtractor for cosmic ray identification; a FITS mask is produced
+    2. runs WeightWatcher using a flat-field (weight map), the cosmic ray mask, detector mask and the 
+       input image to produce a weightmap and a flag map (a dummy constant flat field is produced if 
+       none was found)
+    3. runs SExtractor with a low threshold for stellar and galaxy count histograms, and eventually 
+       for further astrometric and photometric calibration
+    4. runs SExtractor with a higher threshold to identify bright sources to measure the instrumental 
+       PSF
+    5. runs PSFEx to construct a PSF model from the sources catalogue extracted in 4
+    6. runs Mefhisto which plots histograms of CCD backgrounds, stars and galaxy counts, and writes 
+       a FITS table containing CCD backgrounds, FWHM, number of detected sources and other useful 
+       quantities, ellipticity map.
+    7. run SWarp (resampling and stacking) on the whole mosaic to build a single FITS image.
+    8. makes PNG images of the whole mosaic of the original image, the weightmap image and the PSF 
+       model. Additional PNG images are also built for each CCD frame with a 4x4 binning factor
+    9. these images and quantites are summarized in a webpage
+
+It produces a weight map for later co-addition, a flag map (statistics on image quality), a source 
+catalogue, a FITS binary table and a summarizing webpage.
+
+QualityFITS in Youpi
+--------------------
+
+The QualityFITS plugin in Youpi allows selecting input parameters and data and generates a 
+processing job ready to be submitted to the cluster:
+
 .. image:: figures/youpi-qfits.png
 
 Click on the the *processing* top-level tab and select the QualityFits icon. Several menus are 
