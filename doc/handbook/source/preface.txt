@@ -3,7 +3,7 @@ Preface
 *******
 
 To get the best possible performance and efficiency out of multi-core CPUs in modern 
-computer architectures, low-level, multi-threaded data reduction tools are developped and 
+computer architectures, low-level and multi-threaded data reduction tools are developped and 
 generally used from the command line. |terapix|_ and |astromatic|_ provide such open 
 source low-level tools to the community for years now. 
 
