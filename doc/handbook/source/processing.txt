@@ -416,29 +416,40 @@ catalogue, a FITS binary table and a summarizing webpage.
 QualityFITS in Youpi
 --------------------
 
-The QualityFITS plugin in Youpi allows selecting input parameters and data and generates a 
-processing job ready to be submitted to the cluster:
+Using the QualityFITS plugin within Youpi is just a matter of selecting input images, defining data 
+paths to FLATs, MASKs and REGs files and set up various job parameters:
 
 .. image:: figures/youpi-qfits.png
 
-Click on the the *processing* top-level tab and select the QualityFits icon. Several menus are 
-then available (from left to right):
+Click on the "*processing*" top-level tab and select the QualityFits icon. Several submenus are 
+available (from left to right):
 
 *Select images*
-    Toto
+    First, use the :ref:`image selector <image_selector_section>` to define a selection of images to process.
 
 *Select data paths*
-    Tata
+    Next, select the data paths to the FLAT, MARK and REG data using the :ref:`path selector widget <data_path_selector>`.
+    Please note that the paths to FLAT and MASK data files are required. You will get warnings and the job 
+    will be discarded if mandatory information is not provided.
 
 *Select a configuration file*
-    KIKI
+    Select a config file to use for this processing on this set of images using the 
+    :ref:`config file selector <config_path_selector>`.
 
 *Set output directory*
-    Poule
+    Go to this tab to get the actual output directory that will be used for output results. In most cases, 
+    the default value is fine, but you may want to :ref:`set a custom output directory <output_dir_selector>` 
+    for the results.
 
 *Options*
-    KIKI
+    QualityFITS has several options that may alter the way the job is going to be processed on the 
+    cluster. The "*Force QualityFits jobs to exit if flat image not found*" and "*Force QualityFits jobs 
+    to exit if mask image not found*" are rather self-explaining. The latest option "*Single chip flat 
+    field normalization*" will apply a flat field normalization per chip.
 
+Now that everything is set, hit the "*Add to cart*" upper-right button to add the job to the 
+:ref:`processing cart <the_processing_cart>`. The job is ready to be submitted to the cluster or to 
+be saved to the databased for later processing.
 
 .. _proc_scamp:
 
