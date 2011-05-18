@@ -416,12 +416,18 @@ catalogue, a FITS binary table and a summarizing webpage.
 QualityFITS in Youpi
 --------------------
 
-Using the QualityFITS plugin within Youpi is just a matter of selecting input images, defining data 
-paths to FLATs, MASKs and REGs files and set up various job parameters:
+Using Youpi for your QualityFITS needs is a convenient place for preparing a job, sending it to a 
+cluster and accessing the results directly in a web browser.
+
+Preparing a Job
+^^^^^^^^^^^^^^^
+
+As you will see, preparing a job is really easy and is just a matter of selecting input images, 
+defining data paths to FLATs, MASKs and REGs files and set up various job parameters:
 
 .. image:: figures/youpi-qfits.png
 
-Click on the "*processing*" top-level tab and select the QualityFits icon. Several submenus are 
+In the UI, click on the "*processing*" top-level tab and select the QualityFits icon. Several submenus are 
 available (from left to right):
 
 *Select images*
@@ -449,7 +455,40 @@ available (from left to right):
 
 Now that everything is set, hit the "*Add to cart*" upper-right button to add the job to the 
 :ref:`processing cart <the_processing_cart>`. The job is ready to be submitted to the cluster or to 
-be saved to the databased for later processing.
+be saved to the database for later processing. 
+
+Please note that one cluster job per image is generated. For a list of 4 images to be QualityFITSed, 
+4 separate jobs will run on the cluster. Here is what I get on the :ref:`active monitoring <live_monitoring>` 
+page:
+
+.. image:: figures/qfits-monitor.png
+   :class: capture
+
+
+Accessing the Results
+^^^^^^^^^^^^^^^^^^^^^
+
+Once the jobs are over, go to the "*Results page*" by clicking on the top-level *Results* link. In 
+the "*Processing History*" panel on the left, select "*QualityFITS*" and "*my*" to only display your 
+latest processing results, then hit the "*Start searching!*" button:
+
+.. image:: figures/qfits-results-criteria.png
+   :class: capture
+
+You will get a list of QualityFITS results, one per line. You might want to check out the 
+:ref:`processing results <processing_results>` section for more info about using the results 
+page.
+
+Let's select a successful result entry for image ``715499p.fits``:
+
+.. image:: figures/qfits-results-entry.png
+   :class: capture
+
+
+Grading an Image
+^^^^^^^^^^^^^^^^
+
+TBW
 
 .. _proc_scamp:
 
