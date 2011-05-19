@@ -674,6 +674,32 @@ The second part is the *statistics* tab and permit, by browsing your related out
 processing, to resume processing images status. It is a quick way to know if 100% of your images
 group has been successfully processed.
 
+.. _pr_common_parts:
+
+Common Parts of A Results Page
+------------------------------
+ 
+.. _pr_job_stats:
+
+*Job Duration And Other Stats*
+    *TBW*
+
+.. _pr_user_perms:
+
+*User permissions*
+    *TBW*
+
+.. _pr_condor_job_logs:
+
+*Condor job logs*
+    *TBW*
+
+.. _pr_proc_history:
+
+*Processing history*
+    *TBW*
+
+
 .. _reports:
 
 Generating Reports
