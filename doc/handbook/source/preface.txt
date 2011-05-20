@@ -95,9 +95,9 @@ Organization of This Book
 We will first introduce some material about the :doc:`installation <installation>`, 
 configuration and software dependencies required to run Youpi.
 
-In a second part, we will start a detailled :doc:`guided tour of the functionalities <tour>`, 
+In a second part, we will start a detailled :doc:`review of the core functionalities <tour>`, 
 showing how the user interface is organized, whereas the details of image processing will 
-be deeply discussed in the :doc:`processing images <processing>` part, with some examples 
+be deeply discussed in the :doc:`processing images <processing>` part --- with some examples 
 and concrete cases.
 
 As you will see, Youpi also comes with an admin interface that can be useful to manage 

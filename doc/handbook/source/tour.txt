@@ -1,12 +1,9 @@
-******************************
-Guided Tour of Functionalities
-******************************
+********************
+Core Functionalities
+********************
 
-The Youpi web interface is splitted in tabs. Each tab corresponds to a specific
-task and, this section, will describe the functionnality related to the tab header.
-
-Before diving into Youpi, let's first introduce to the basic functionnalities of
-the pipeline.
+The Youpi web interface is splitted in tabs. Each tab maps to a specific task. Before diving into 
+Youpi, let's first introduce the core functionnalities of the pipeline.
 
 .. _ingestion_section:
 
@@ -385,6 +382,380 @@ selection.
  .. Note:: A tag is a selection parameter that you can use in the image selector in 
 	order to find all images with a specific tag, for example untag a tagged selection. 
 
+Common widgets and tools
+========================
+
+Every image processing capabilities offered by Youpi's plugins are possible using a common set 
+of UI widgets dealing with image selection, configuration file selection and data path selection.
+Before discussing Youpi's processing capabilities in more details, let's first review the 
+functionalities of the :ref:`image selector <image_selector_section>`, the :ref:`data path selector 
+<data_path_selector>`, the :ref:`config file selector <config_path_selector>` and the 
+:ref:`output directory selector <output_dir_selector>` used accross all plugins.
+
+.. _image_selector_section:
+
+The Image Selector
+------------------
+
+Let's first begin with the image selector (*IMS*). All images previously ingested in the database 
+are searchable using the IMS. Several search criteria can be combined. The result is a 
+selection of images that can later be edited (saved, reloaded, deleted, merged). As shown in the 
+following image, the IMS is made of four parts:
+
+.. image:: figures/ims-main.png
+
+The top-left part is the current *selection mode*, which is one of *single* or *batch*. The 
+single mode is the default one and, as its name implies, allows to create a single selection 
+of images. On the contrary, the batch mode automatically import and save selections defined 
+in an XML file.
+
+The three other parts (highlighted in orange) are only available in the *single* selection 
+mode.
+
+Single selection mode
+^^^^^^^^^^^^^^^^^^^^^
+
+Basic usage
+"""""""""""
+
+Select a search criteria from the top right search area. Available criteria are among: 
+channel, ra/dec, image grade, image name, ingestion ID, instrument, object, run name, 
+saved selection and tag:
+
+.. image:: figures/ims-criteria.png
+   :class: capture
+
+Once a criterion is selected, matched values are loaded automatically in the rightmost
+select box. For example, selecting the *Run* criterion will load a list of all available 
+runs:
+
+.. image:: figures/ims-run-criterion.png
+   :class: capture
+
+Note that depending on the selected criterion, the rightmost widget can be a multi-selection 
+box (for the *channel*, *grade*, *ingestion ID*, *object*, *run* and *tag* criterion) or a single 
+selection box (for the *instrument* and *saved selection* criterion) or a single line edit for 
+entering values manually (suitable for the *ra/dec* coordinates and the *image name* criterion). 
+All images whose names contain the string "7323" can be searched with:
+
+.. image:: figures/ims-crit-edit.png
+   :class: capture
+
+.. warning:: Regular expressions are not supported in line edit fields at the moment.
+
+Only one instrument per line is available:
+
+.. image:: figures/ims-crit-single.png
+   :class: capture
+
+Finally, just hold the control key to select multiple values in a multi-selection box. Every 
+entry selected is used as a **logical OR** operation:
+
+.. image:: figures/ims-crit-multi.png
+   :class: capture
+
+We just saw selecting only one kind of criterion for retreiving images. But what if you 
+want to combine them? Well, just press the ``+`` button to get a new line with a new 
+criterion. You can use as many lines as you want. The criteria and their values (and 
+conditions) will be merged into a query and sent to Youpi when you hit the "*Find Images!*" 
+button. Every line is used as a **logical AND** operation. In the following example, we 
+are looking for all ``Megacam`` images in the ``g.MP9401`` filter with the ``Wide`` tag:
+
+.. image:: figures/ims-multi-line.png
+   :class: capture
+
+Of a collection of 50713 images, there are 2549 matches. Since it's a rather large results 
+set, it's splitted on several pages. Each page (except the last one generally) has the same 
+number of matches, one image per line.
+
+Filtering results
+"""""""""""""""""
+
+You can jump to any page by using the page selector widget in the results header. You can 
+select the page number directly or select the page in the list. This will fetch the results 
+automatically.
+
+.. image:: figures/ims-page-selector.png
+   :class: capture
+
+Each result line shows information about one single image. Only the name of the image is 
+displayed, along with all its tags. By default, all images in the result set are checked/selected. 
+You can unselect some of them at will. Shortcuts are available to un/select all images on a 
+page or even to un/select all images on all pages at once. 
+
+Use the *Select page* or "*Unselect page*" buttons in the page selector to respectively select or 
+unselect all images in the current page. In the following example, only the third image on page 5 
+is selected by first hitting the *Unselect page* then check the checkbox at the beginning of the 
+third line:
+
+.. image:: figures/ims-single-entry.png
+   :class: capture
+
+You can also un/select all entries on all pages at once by hitting the appropriate button in 
+the left panel. Suppose you want to unselect all images and select only the first 2 images on 
+the first page:
+
+.. image:: figures/ims-unselect-all.png
+   :class: capture
+
+.. _ims_edit_sel:
+
+Editing a selection
+"""""""""""""""""""
+
+Now that you are pretty satisfied with the current selection of images, you can save it for a 
+later use by hitting the "*Save selection*" button in the left panel. You will be asked for a name, 
+which must be unique across all saved selections:
+
+.. image:: figures/ims-save-sel.png
+   :class: capture
+
+You can later load this selection back by using the *Saved selection* criterion:
+
+.. image:: figures/ims-reload-sel.png
+   :class: capture
+
+The access permissions of a selection can also be changed, so you can decide who can view or 
+modify a saved selection. Just hit the "*Edit selection*" button in the left panel, select the 
+name of a saved selection then click on the *Change* link. You will be prompt for new permissions:
+
+.. image:: figures/ims-edit-perms.png
+   :class: capture
+
+Saved selections can also be deleted the same way. Hit the "*Delete selection*" button and select 
+a selection to delete:
+
+.. image:: figures/ims-del-sel.png
+   :class: capture
+
+Finally, selections can be merged. Load back the ``CFHT-sel`` saved image selection, hit the "*Find 
+images!*" button then hit the "*Merge with selection*" button in the left panel. Select one or more 
+selections in the list to *merge into* the current ``CFHT-sel`` selection:
+
+.. image:: figures/ims-merge-sel.png
+   :class: capture
+
+.. note:: All images from the selected selections will be added to the current list of images, but 
+          the new expanded list will not be saved automatically. The saved selection ``CFHT-sel`` 
+          remains untouched until you manually save the new selection (can have the same name).
+
+Images selection from a file
+""""""""""""""""""""""""""""
+
+Instead of selecting images according to some criteria, you may find more convenient to upload a plain 
+text file in order to make a selection of images. You can do that by hitting the "*Select from text*" 
+button:
+
+.. image:: figures/ims-upload-file.png
+   :class: capture
+
+An upload form will popup for browsing a local text file. The plain text file has the following format:
+one image name per line (without the ``.fits`` extension), and optionnally its md5 checksum (using a 
+coma "``,``" separator)::
+
+    1013501p,3d4412ec29b24210f7c3634cca43caa4
+    1013502p,9e447830680d4b727023ef19102c0f50
+    1013502p,dd39a2b7c1b4646c59b335afe84288ff
+    1013503p
+
+Let's upload this file using default options and hit the "*upload*" button:
+
+.. image:: figures/ims-upload-over.png
+   :class: capture
+
+The image selector reports all the files described in the uploaded file have been found in the database. 
+Since the option for tagging images on the fly was checked, the 4 images have been tagged with the 
+``imglist`` tag, which is the base name of the file, with no extension. Note that you can exit the form 
+upload display by clicking on the "*go back*" link, and that, while the current selection will be cleaned 
+if you do so, you will be able to retreive it by selecting the *Tag* criterion with the value 
+``imglist``:
+
+.. image:: figures/ims-upload-reload.png
+   :class: capture
+
+Batch importing files
+"""""""""""""""""""""
+
+Here is another way to import bunch of files and make (and save) selections automatically with the 
+IMS. Hit the "*Batch import*" button then click on the line open the path selector. A dialog will 
+pop up. Select a data path on the filesystem where all your selection files are located then click 
+*OK*. In the following example, we created two selection files named ``sel1.txt`` and ``sel2.txt`` 
+available in the ``matm`` network directory:
+
+.. image:: figures/ims-batch-import1.png
+   :class: capture
+
+``sel1.txt`` and ``sel2.txt`` have the following content::
+
+    1013501p,3d4412ec29b24210f7c3634cca43caa4
+    1013502p,9e447830680d4b727023ef19102c0f50
+
+and::
+
+    1013502p,dd39a2b7c1b4646c59b335afe84288ff
+    1013503p
+
+Once selected, just hit the "*Import!*" button to import those two files. They will be imported as 
+new selections ``sel1`` and ``sel2`` and available for searching.
+
+Batch selection mode
+^^^^^^^^^^^^^^^^^^^^
+
+Toggle the selection mode box and select "*Batch selection*":
+
+.. image:: figures/ims-batch-select.png
+   :class: capture
+
+Making a batch selection
+""""""""""""""""""""""""
+
+This mode was created at the beginning of the implementation of the image selector --- before all 
+the features were available to the single selection mode. It can be considered as a little deprecated, 
+but is still supported. The *batch selection* mode is still useful to build selections of images from 
+coordinates on the celestial sphere (alpha, delta, radius).
+
+This way, you can define regions with a center and a radius. Every image whose center field is in 
+that circle will be matched and returned as a valid selection to the image selector.
+
+In order to make a selection, upload an XML file and hit the "*Upload and check file*" button. The XML 
+has a very simple DTD. The document root is the *batch* element. It must contain one ore more *selection* 
+elements. Each *selection* element holds exactly one *label*, *alpha*, *delta* and *radius* element. Here 
+is an example::
+
+    <batch>
+        <selection>
+            <label>SEL1</label>
+            <alpha>33.1</alpha>
+            <delta>-6.3</delta>
+            <radius>0.6</radius>
+        </selection>
+        <selection>
+            <label>SEL2</label>
+            <alpha>35.0</alpha>
+            <delta>-6.3</delta>
+            <radius>0.3</radius>
+        </selection>
+    </batch>
+
+As you can see on the following picture, there are 145 and 13 matches for the *SEL1* and *SEL2* 
+selections respectively:
+
+.. image:: figures/ims-batch-upload.png
+   :class: capture
+
+Saving and loading
+""""""""""""""""""
+
+If you want to save permanently those two selections for later use, just save the current selection 
+of 145+13=158 images using the left panel, as described in the :ref:`ims_edit_sel` section:
+
+.. image:: figures/ims-batch-save.png
+   :class: capture
+
+Then reload the saved selection from the *batch selection* panel:
+
+.. image:: figures/ims-batch-reload.png
+   :class: capture
+
+.. note:: *single* and *batch* selections are saved apart. A *single* saved selection can only be 
+          retreived from the *single selection* panel. As such, the ``myrun`` *batch* selection we 
+          have just created is available for edition or deletion from the *batch mode* panel only.
+
+.. _data_path_selector:
+
+The Data Path Selector
+----------------------
+
+The data path selector is a meta widget (made of several widgets) used across all plugins to provide 
+data path information as input plugin parameter. Instead of having to enter data path manually in the 
+browser window --- this is a boring and tedious task --- it handles browsing a server-side data path 
+in real time, and takes care of saving a path to the database or loading all previously data paths in 
+order to speed up the data path selection process as much as possible.
+
+It can be considered as a meta widget because it's made of three separate but related areas. The first 
+one is labelled "*Path selector*" since it is actually the area for browsing filesystem data paths. 
+Just click on the node of the tree to open the directories, then click on a directory name to validate 
+the selection:
+
+.. image:: figures/dps-pick-dir.png
+   :class: capture
+
+Once clicked, the directory path ``/data/fcix7/raid1/matm`` is copied automatically to the second 
+area labelled "*Selected Path*".  Depending on the nature of the data paths available in the third area, 
+you can hit one of those "*Save*" buttons available right under the full path. For example, the data path 
+selector supplies three kinds of paths to the :ref:`QualityFITS plugin <proc_fitsin>` so you can provide 
+data paths for the FLAT, MASK and REG data. Let's suppose the selected directory contains all the flats 
+required for image quality evaluation with QualityFITS. Just click on the "*Save as FLATS*" button to 
+make it stored in the database and selected automatically as a default choice for the current QualityFITS 
+setup in the third area related to available data paths:
+
+.. image:: figures/dps-select-dir-qfits.png
+   :class: capture
+
+As you can see in the previous picture, required fields are marked as *mandatory*. You can't leave 
+those fields empty. In the case of QualityFITS, it needs at least a path to FLAT and MASK data to 
+proceed. 
+
+That's it! Once data paths are configured, they can be used with any processing plugin.
+
+.. _config_path_selector:
+
+The Configuration Selector
+--------------------------
+
+The configuration selector is a simple widget for selecting a configuration file to be used with a 
+plugin. Since all Youpi plugins rely on low level command line tools that need a config file to run, 
+they can be managed at a higher level in this config selector. The following features are included: 
+creating a new config file based on the default config file supplied with the active plugin, editing 
+and saving a config file using the builtin text editor, or importing a collection of config files 
+on-the-fly from an existing directory. 
+
+Here is the big picture:
+
+.. image:: figures/cs-overview.png
+   :class: capture
+
+The "*New*" button opens the editor which is filled with the content of the default config file 
+used by the low-level tool at runtime. You can modify it then save it by hitting the "*Save config as* 
+button. Then you may want to select this new config file by name in the dropdown box to make it 
+the active configuration to use. Similarly, select a configuration in the dropdown box then hit the 
+"*Edit selected*" button to edit the selected config's content.
+
+In order to handle a large set of configuration files, you can put the config files somewhere in your 
+filesystem and import their content by selecting "*import config files*". Just open the path selector and 
+select a data path. In the following example, I created a config file called ``myconf.rc`` in the 
+``/data/fcix7/raid1/matm/conf`` directory. Please note that config files must have the ``.rc`` 
+extension. Click the "*Import!*" button to import the content of the files in the database:
+
+.. image:: figures/cs-import-path.png
+   :class: capture
+
+Now select the imported config file by name in the dropdown box, it will be used along with the 
+current image selection and other options during the processing.
+
+.. _output_dir_selector:
+
+The Output Directory Selector
+-----------------------------
+
+Last but not least, the output directory path for results can be set for every processing task bounded 
+to an image selection. It is filled with default values but some parts of the data path can be changed.
+Every Youpi plugin has a "*Set output directory*" top-level menu entry where you can set the output 
+data path. 
+
+Let's use the *QualityFITS* plugin as an example:
+
+.. image:: figures/od-overview.png
+   :class: capture
+
+The full path generated by Youpi is ``/data/fcix5/raid2/youpi-OUTPUT/MATDEV/monnerville/fitsin/1d54ad9b/``.
+It is made of an editable prefix, ``/data/fcix5/raid2/youpi-OUTPUT/MATDEV/``, which is one of 
+the entries of the :ref:`PROCESSING_OUTPUT <PROCESSING_OUTPUT>` tuple defined during setup in the 
+``settings.py`` file. Next is a fixed part, ``monnerville/fitsin/``, which maps to ``login_name/plugin_name/``, 
+followed by an editable suffix, ``1d54ad9b``, which is a randomly generated number. Changing the last part 
+can be useful if you want to group processing results together. 
+
+
 Processing Data
 ===============
 
@@ -400,9 +771,6 @@ plugin from the left to the right.
 The first is the selection of a subset of ingested images in Youpi. So, a powerfull 
 selection tool has been made, which allows to sort, group images by specific fields: 
 the **image selector**.
-
-Processing Data Considering Plugins
-===================================
 
 Most of plugins require specific input data, as weight maps, flat maps ahead files etc.
 The select data path tab helps you inputting such files when they don't appear to be an
@@ -697,6 +1065,11 @@ Common Parts of A Results Page
 .. _pr_proc_history:
 
 *Processing history*
+    *TBW*
+
+.. _pr_run_params:
+
+*Run parameters*
     *TBW*
 
 

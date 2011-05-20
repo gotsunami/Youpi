@@ -28,7 +28,8 @@ def findPath(file):
 
 # Looks for the condor_q path in the PATH 
 # env variable
-CONDOR_BIN_PATH = findPath('condor_q')
+#CONDOR_BIN_PATH = findPath('condor_q')
+CONDOR_BIN_PATH = '/usr/bin'
 
 # Software info (to get versioning information)
 #
