@@ -1087,3 +1087,39 @@ means that, at anytime, youpi could generate from your account, global or very s
 The reports engine works with a graphic library, and can generate statistic images including
 histogramms, plots and many others features that could enhance graphically your data results
 from the pipeline.
+
+General Reports
+---------------
+
+*TBW*
+
+.. _report_qfits:
+
+QualityFITS Reports
+-------------------
+
+.. _reports_qf_gs:
+
+*Grading statistics*
+    *TBW*
+
+.. _reports_qf_laqgwc:
+
+*List of all QualityFITS grade, with comment*
+    *TBW*
+
+.. _reports_qf_laiwsg:
+
+*List of all images with a selected grade*
+    *TBW*
+
+.. _reports_qf_langi:
+
+*List of all non graded images*
+    *TBW*
+
+.. _reports_qf_pcog:
+
+*Pie chart of grades*
+    *TBW*
+

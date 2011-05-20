@@ -99,6 +99,8 @@ Once the jobs are over, go to the "*Results page*" by clicking on the top-level 
 the "*Processing History*" panel on the left, select "*QualityFITS*" and "*my*" to only display your 
 latest processing results, then hit the "*Start searching!*" button:
 
+.. _processing_history:
+
 .. image:: figures/qfits-results-criteria.png
    :class: capture
 
@@ -180,14 +182,67 @@ the:
     .. image:: figures/qfits-results-qfinfo.png
        :class: capture
 
-We are almost done with the result page description. Now, let's go on with image grading.
+Well, we are almost done with the result page description. Now, let's go on with image grading.
 
 .. _proc_image_grading:
 
 Grading an Image
 ^^^^^^^^^^^^^^^^
 
-TBW
+Image grading is fully supported within Youpi. An image can be graded by different users and Youpi 
+will keep track of the grading history for that image. You can change your grade at anytime by 
+editing it. However, only users with the :ref:`grading permission <global_permissions>` are allowed 
+to grade images.
+
+Let's grade the image ``715499p.fits`` (used in the previous section). Click on the "*Grade it now!*" 
+link to access the QualityFITS result page. You will see the same HTML result page produced by the 
+QualityFITS command line tool, enhanced with a header dedicated to image grading:
+
+.. image:: figures/qfits-grading-header.png
+   :class: capture
+
+This header is made of two parts. The left part shows the grading history for that image. This image 
+has never been graded yet, so the grading history is empty. Can be useful to see whether it has already 
+been graded by others. The right part is where you can actually select a grade --- from A to D --- and 
+select a predefined comment or type in a custom one (both are optional).
+
+To grade the image, just move the mouse cursor over the little gray stars on the right. The grade will 
+change while you move the mouse around. Click on a star to select a grade. Let's say we want to give 
+it a B grade by clicking on the third star (from the left). Once clicked, a *commit* button will 
+appear. Hit it to save the grade permanently:
+
+.. image:: figures/qfits-grading-gradedB.png
+   :class: capture
+
+Once the grade is committed, the grading history is updated too (left part):
+
+.. image:: figures/qfits-grading-postcommit.png
+   :class: capture
+
+Now, if you go back to the results page and reload the entry for the image ``715499p.fits``, you will 
+see that the *image grading* section shows the available grades. For example, if other users graded 
+the same image at the same time, all the grades will appear:
+
+.. image:: figures/qfits-results-grades.png
+   :class: capture
+
+Also, the lowest grade is appended to the result entry in the :ref:`processing history <processing_history>` 
+panel. This can be a nice way to quickly control whether an image of the results set has been graded:
+
+.. image:: figures/qfits-results-lowestgrade.png
+   :class: capture
+
+Reporting
+^^^^^^^^^
+
+Last but not least, Youpi has a reporting module with :ref:`dedicated reports <report_qfits>` for 
+QualityFITS. Most of them are related to image grading. Here they are:
+
+- :ref:`Grading statistics <reports_qf_gs>`
+- :ref:`List of all QualityFITS grade, with comment <reports_qf_laqgwc>`
+- :ref:`List of all images with a selected grade <reports_qf_laiwsg>`
+- :ref:`List of all non graded images <reports_qf_langi>`
+- :ref:`Pie chart of grades <reports_qf_pcog>`
 
 .. _proc_scamp:
 
