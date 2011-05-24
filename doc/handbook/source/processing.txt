@@ -318,31 +318,48 @@ are available (from left to right):
 
 *Input data validation*
     The "*Add to cart*" button is missing from the *SCAMP* plugin page and is replaced by a "*Validate input data*"
-    entry. Before building the job and adding it to the processing cart, Youpi will perform various checks to 
+    entry. This is the last step before sending the prepared job to the processing cart.
+
+    Before building the job and adding it to the processing cart, Youpi will perform various checks to 
     ensure matching LDAC files are available to the *SCAMP* low-level program. Since *QualityFITS* processings 
     produce LDAC catalogues (*QualityFITS* uses *Sextractor* internally), Youpi will check, for every image in the 
     current selection, for an existing *successful* *QualityFITS* result. If any LDAC or ``.ahead`` header is 
     missing, Youpi will deny the entire selection of images. If everything is fine, a popup will ask you whether you 
     want to select manually the LDAC files to use for *SCAMP*. 
 
-    By hitting *OK*, a list of selections will be displayed along with a list of LDAC files to use (one list per selection).
-    All selected LDAC files (with the checkbox turned on at the beginning of each row) will be part of the new job that 
-    will be generated when you later click on the "*Add to cart*" button.
+    By hitting *Cancel*, Youpi will select the latest successful *QualityFITS* job available automatically 
+    in order to retreive the LDAC catalogue for every image in the selection. The new job will be added 
+    to the processing cart automatically --- there is no "*Add to cart*" button in this case.
+
+    More granular selection is available though: by hitting the *OK* button, a list of selections will be displayed 
+    along with a list of LDAC files to use (one list of LDAC files per selection). All selected LDAC files (with the 
+    checkbox turned on at the beginning of each row) will be part of the new *SCAMP* job generated when you later 
+    click on the "*Add to cart*" button.
 
     .. note:: The *SCAMP* policy in Youpi is to select the **latest successful** *QualityFITS* job to get the matching LDAC 
               catalogue. Indeed, an image can be processed with QualityFITS any number of times, even by different users
-              (remember the "*processing history*" section on the result page?). Hence the need for a LDAC selection policy.
+              (remember the :ref:`processing history <pr_proc_history>` section on the result page?). Hence the need for 
+              a LDAC selection policy.
 
-Now that everything is set, hit the "*Add to cart*" upper-right button to add the job to the 
-:ref:`processing cart <the_processing_cart>`. The job is ready to be submitted to the cluster or to 
-be saved to the database for later processing. 
+Once in the processing cart, you will notice that Youpi generates a single item for the whole *SCAMP* process. 
+There will be one single job running on the cluster.
 
 Accessing the Results
 ^^^^^^^^^^^^^^^^^^^^^
 
-Once the jobs are over, go to the "*Results page*" by clicking on the top-level *Results* link. In 
-the "*Processing History*" panel on the left, select "*QualityFITS*" and "*my*" to only display your 
+Once the job is over, go to the "*Results page*" by clicking on the top-level *Results* link. In 
+the "*Processing History*" panel on the left, select "*SCAMP*" and "*my*" to only display your 
 latest processing results, then hit the "*Start searching!*" button:
+
+The Command Line Tool
+---------------------
+
+*TBW*
+
+SCAMP in Youpi
+--------------
+
+*TBW*
 
 .. _proc_swarp:
 
