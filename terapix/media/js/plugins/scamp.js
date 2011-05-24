@@ -17,7 +17,6 @@ var advTable;
 var ldac_table;
 var ldac_table_active_selections = new Array();
 var ldac_selection_last_idx;
-var xmlParser;
 
 var scamp = {
 	id: 'scamp', 
@@ -873,7 +872,7 @@ var scamp = {
 		tr.appendChild(td);
 		tab2.appendChild(tr);
 	
-		xmlParser = new ScampXMLParser(resp['TaskId'], d, 'xmlParser');
+		ScampXMLParser.parse(resp['TaskId'], d);
 	},
 
 	showSavedItems: function() {
@@ -1094,64 +1093,42 @@ var scamp = {
 };
 
 /*
- * Class: ScampXMLParser
  * Scamp XML Parser facilities
- *
- * Note:
- *
- * Please note that this page documents Javascript code. <FileBrowser> is a pseudo-class, 
- * it provides encapsulation and basic public/private features.
- *
- * For convenience, private data member names (both variables and functions) start with an underscore.
- *
- * Constructor Parameters:
- *
- * taskId - string or int: processing task Id
- * container - string, DOM node: parent container
- *
  */
-function ScampXMLParser(taskId, container) {
-	// Group: Variables
-	// -----------------------------------------------------------------------------------------------------------------------------
-
-
+var  ScampXMLParser = {
 	/*
-	 * Var: _rowIdx
+	 * Var: id
+	 * Plugin id for SCAMP (compat)
+	 *
+	 */
+    id: scamp.id,
+	/*
+	 * Var: rowIdx
 	 * Current row index in table
 	 *
 	 */
-	var _rowIdx = 0;
-
-
-	// Group: Constants
-	// -----------------------------------------------------------------------------------------------------------------------------
-
-
-	// Group: Variables
-	// -----------------------------------------------------------------------------------------------------------------------------
-
-
+	rowIdx: 0,
 	/*
-	 * Var: _container
+	 * Var: container
 	 * Parent DOM container
 	 *
 	 */
-	var _container;
+	container: null,
 	/*
-	 * Var: _taskId
+	 * Var: taskId
 	 * Processing task Id
 	 *
 	 */
-	var _taskId;
+	taskId: 0,
 	/*
-	 * Var: _fields
+	 * Var: fields
 	 * Array of available FIELDS element in XML file
 	 *
 	 * Format:
 	 *  [['Field1', 'Type1'], ...]
 	 *
 	 */
-	var _fields;
+	fields: [],
 	/*
 	 * Var: _fieldNames
 	 * Array of available FIELDS (names only)
@@ -1160,75 +1137,64 @@ function ScampXMLParser(taskId, container) {
 	 *  ['Field1', 'Field2', ...]
 	 *
 	 */
-	var _fieldNames;
-
-
-	// Group: Functions
-	// -----------------------------------------------------------------------------------------------------------------------------
-
-
+	fieldNames: [],
 	/*
-	 * Function: _error
+	 * Function: error
 	 * Displays custom error message
 	 *
 	 */ 
-	function _error(msg) {
+	error: function(msg) {
 		console.error(msg);
-	}
-
+	},
 	/*
-	 * Function: _renderFrom
+	 * Function: renderFrom
 	 * Renders form when XML file has been found
 	 *
 	 */ 
-	function _renderForm() {
+    renderForm: function() {
 		var xhr = new HttpRequest(
-			container,
+			this.container,
 			null,	
 			// Custom handler for results
 			function(resp) {
 				var d = resp['result'];
-				_fields = d['Fields'];
-				_container.innerHTML = '';
+				this.fields = d['Fields'];
+				this.container.update();
+				this.fieldNames = new Array();
 
-				_fieldNames = new Array();
-				for (var k=0; k < _fields.length; k++) {
-					_fieldNames[k] = _fields[k][0];
+				for (var k=0; k < this.fields.length; k++) {
+					this.fieldNames[k] = this.fields[k][0];
 				}
 
 				var tab = new Element('table');
 				tab.setAttribute('id', this.id + '_xml_fields_tab');
-				_container.appendChild(tab);
+				this.container.appendChild(tab);
 
 				// Add first line
-				_addRow();
+				this.addRow();
 
 				var div = new Element('div');
 				div.setAttribute('style', 'text-align: right;');
-				var but = new Element('input');
-				but.setAttribute('type', 'button');
-				but.setAttribute('value', 'Find Matches');
-				but.setAttribute('onclick', 'xmlParser.submitQuery()');
+				var but = new Element('input', {type: 'button', 'value': 'Find Matches'});
+                but.observe('click', function() {
+                    this.submitQuery();
+                }.bind(this));
 				div.appendChild(but);
-				_container.appendChild(div);
+				this.container.appendChild(div);
 
 				// Result div
 				rdiv = new Element('div');
 				rdiv.setAttribute('id', this.id + '_xml_fields_result_div');
-				_container.appendChild(rdiv);
+				this.container.appendChild(rdiv);
 			}.bind(this)
 		);
 
-		var post = 'Plugin=' + this.id + '&Method=parseScampXML&TaskId=' + _taskId;
+		var post = 'Plugin=' + this.id + '&Method=parseScampXML&TaskId=' + this.taskId;
 		xhr.setBusyMsg('Build form widget');
 		xhr.send('/youpi/process/plugin/', post);
-	}
+	},
 
-	this.addRow = function() {
-		_addRow();
-	}
-
-	this.submitQuery = function() {
+	submitQuery: function() {
 		var container = $(this.id + '_xml_fields_result_div');
 		container.setAttribute('style', 'border-top: 3px solid #5b80b2; margin-top: 10px; padding-top: 5px;');
 		var tab = $(this.id + '_xml_fields_tab');
@@ -1239,7 +1205,7 @@ function ScampXMLParser(taskId, container) {
 			var sel = tds[2].firstChild;
 			var condSel = tds[3].firstChild;
 			var idx = sel.selectedIndex;
-			var type = _fields[idx][1];
+			var type = this.fields[idx][1];
 
 			query[k] = new Array();
 			query[k][0] = sel.selectedIndex;
@@ -1287,27 +1253,27 @@ function ScampXMLParser(taskId, container) {
 			}.bind(this)
 		);
 
-		var post = 'Plugin=' + this.id + '&Method=processQueryOnXML&Query=' + query + '&TaskId=' + _taskId;
+		var post = 'Plugin=' + this.id + '&Method=processQueryOnXML&Query=' + query + '&TaskId=' + this.taskId;
 		xhr.setBusyMsg('Sending query');
 		xhr.send('/youpi/process/plugin/', post);
-	}
+	},
 
-	function _addRow() {
+    addRow: function() {
 		var tr, td;
 		var tab = $(this.id + '_xml_fields_tab');
-		var type = _fields[0][1];
+		var type = this.fields[0][1];
 
 		tr = new Element('tr');
 		tab.appendChild(tr);
-		tr.setAttribute('id', this.id + '_xml_fields_tr_' + _rowIdx);
+		tr.setAttribute('id', this.id + '_xml_fields_tr_' + this.rowIdx);
 
 		// - button
 		td = new Element('td');
-		if (_rowIdx > 0) {
-			var addb = new Element('input');
-			addb.setAttribute('type', 'button');
-			addb.setAttribute('value', '-');
-			addb.setAttribute('onclick', "xmlParser.removeRow(" + _rowIdx + ");");
+		if (this.rowIdx > 0) {
+			var addb = new Element('input', {type: 'button', value: '-'});
+            addb.observe('click', function() {
+                this.up('tr').remove();
+            });
 			td.appendChild(document.createTextNode('and '));
 			td.appendChild(addb);
 		}
@@ -1315,28 +1281,30 @@ function ScampXMLParser(taskId, container) {
 
 		// + button
 		td = new Element('td');
-		addb = new Element('input');
-		addb.setAttribute('type', 'button');
-		addb.setAttribute('value', '+');
-		addb.setAttribute('onclick', "xmlParser.addRow();");
+		addb = new Element('input', {type: 'button', value: '+'});
+        addb.observe('click', function() {
+            this.addRow();
+        }.bind(this));
 		td.appendChild(addb);
 		tr.appendChild(td);
 
 		td = new Element('td');
-		var sel = getSelect(this.id + '_xml_fields_select_' + _rowIdx, _fieldNames);
-		sel.setAttribute('onchange', "xmlParser.selectionHasChanged(" + _rowIdx + ");");
+		var sel = getSelect(this.id + '_xml_fields_select_' + this.rowIdx, this.fieldNames);
+        sel.observe('change', function(select) {
+            this.selectionHasChanged(select.up('tr').previousSiblings().length);
+        }.bind(this, sel));
 		td.appendChild(sel);
 		tr.appendChild(td);
 
 		// Condition
 		td = new Element('td');
-		td.setAttribute('id', this.id + '_xml_fields_cond_td_' + _rowIdx);
-		td.appendChild(_getTypeSelect(type));
+		td.setAttribute('id', this.id + '_xml_fields_cond_td_' + this.rowIdx);
+		td.appendChild(this.getTypeSelect(type));
 		tr.appendChild(td);
 
 		// Text field
 		td = new Element('td');
-		td.setAttribute('id', this.id + '_xml_fields_text_td_' + _rowIdx);
+		td.setAttribute('id', this.id + '_xml_fields_text_td_' + this.rowIdx);
 		if (type != 'boolean') {
 			var txt = new Element('input');
 			txt.setAttribute('type', 'text');
@@ -1346,15 +1314,10 @@ function ScampXMLParser(taskId, container) {
 		}
 		tr.appendChild(td);
 
-		_rowIdx++;
-	}
+		this.rowIdx++;
+	},
 
-	this.removeRow = function(rowIdx) {
-		var tr = $(this.id + '_xml_fields_tr_' + rowIdx);
-		tr.parentNode.removeChild(tr);
-	}
-
-	function _getTypeSelect(type) {
+    getTypeSelect: function(type) {
 		var id, data;
 		if (type == 'boolean') {
 			id = this.id + '_xml_fields_cond_bool_select_';
@@ -1369,17 +1332,17 @@ function ScampXMLParser(taskId, container) {
 			data = ['matches', 'is different from'];
 		}
 
-		return getSelect(id + _rowIdx, data);
-	}
+		return getSelect(id + this.rowIdx, data);
+	},
 
-	this.selectionHasChanged = function(curRowIdx) {
+	selectionHasChanged: function(curRowIdx) {
 		var sel = $(this.id + '_xml_fields_select_' + curRowIdx);
 		var idx = sel.selectedIndex;
-		var type = _fields[idx][1];
+		var type = this.fields[idx][1];
 
 		var cond = $(this.id + '_xml_fields_cond_td_' + curRowIdx);
 		removeAllChildrenNodes(cond);
-		cond.appendChild(_getTypeSelect(type));
+		cond.appendChild(this.getTypeSelect(type));
 
 		var text = $(this.id + '_xml_fields_text_td_' + curRowIdx);
 		removeAllChildrenNodes(text);
@@ -1390,45 +1353,46 @@ function ScampXMLParser(taskId, container) {
 			text.appendChild(txt);
 			txt.focus();
 		}
-	}
+	},
 
 	/*
-	 * Function: _render
+	 * Function: render
 	 * Renders widget
 	 *
 	 */ 
-	function _render() {
+    render: function() {
 		var xhr = new HttpRequest(
-			container,
+			this.container,
 			null,	
 			// Custom handler for results
 			function(resp) {
 				var d = resp['result'];
 				filePath = d['FilePath'];
 				if (filePath == -1)
-					_container.innerHTML = 'NOT Found!';
+					this.container.innerHTML = 'NOT Found!';
 				else {
 					// Form can be rendered
-					_renderForm();
+					this.renderForm();
 				}
-			}
+			}.bind(this)
 		);
 
-		var post = 'Plugin=' + this.id + '&Method=checkIfXMLExists&TaskId=' + _taskId;
+		var post = {
+            Plugin: this.id,
+            Method: 'checkIfXMLExists',
+            TaskId: this.taskId
+        };
 		xhr.setBusyMsg('Looking for Scamp XML output file');
-		xhr.send('/youpi/process/plugin/', post);
-	}
+		xhr.send('/youpi/process/plugin/', $H(post).toQueryString());
+	},
 
-	function _main() {
+    parse: function(taskId, container) {
 		if (typeof container == 'string') {
-			_container = $(container);
+			this.container = $(container);
 		}
 		else
-			_container = container;
-
-		_taskId = taskId;
-		_render();
+			this.container = container;
+		this.taskId = taskId;
+		this.render();
 	}
-
-	_main();
-}
+};
