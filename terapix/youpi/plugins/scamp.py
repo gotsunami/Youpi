@@ -576,7 +576,8 @@ class Scamp(ProcessingPlugin):
         tmp = query.split(',')
         query = []
         for i in range(0, len(tmp), 3):
-            query.append(tmp[i:i+3])
+            if tmp[i+2] != '':
+                query.append(tmp[i:i+3])
 
         fields = self.parseScampXML(request)['Fields']
 
