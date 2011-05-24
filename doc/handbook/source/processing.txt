@@ -14,10 +14,10 @@ sent to a cluster.
 The Command Line Tool
 ---------------------
 
-*QualityFITS* is a Terapix tool for evaluating the image quality. Here is a more complete description 
+QualityFITS is a Terapix tool for evaluating the image quality. Here is a more complete description 
 taken from its man page:
 
-[*QualityFITS*] is a pipeline which performs the following steps on preprocessed (debiased and flat-
+[QualityFITS] is a pipeline which performs the following steps on preprocessed (debiased and flat-
 fielded) images (named ``base.fits``):
 
     1. runs SExtractor for cosmic ray identification; a FITS mask is produced
@@ -96,10 +96,10 @@ Accessing the Results
 ^^^^^^^^^^^^^^^^^^^^^
 
 Once the jobs are over, go to the "*Results page*" by clicking on the top-level *Results* link. In 
-the "*Processing History*" panel on the left, select "*QualityFITS*" and "*my*" to only display your 
+the "*Processing History*" panel on the left, select "QualityFITS" and "*my*" to only display your 
 latest processing results, then hit the "*Start searching!*" button:
 
-.. _processing_history:
+.. _qf_processing_history:
 
 .. image:: figures/qfits-results-criteria.png
    :class: capture
@@ -226,7 +226,7 @@ the same image at the same time, all the grades will appear:
 .. image:: figures/qfits-results-grades.png
    :class: capture
 
-Also, the lowest grade is appended to the result entry in the :ref:`processing history <processing_history>` 
+Also, the lowest grade is appended to the result entry in the :ref:`processing history <qf_processing_history>` 
 panel. This can be a nice way to quickly control whether an image of the results set has been graded:
 
 .. image:: figures/qfits-results-lowestgrade.png
@@ -276,20 +276,20 @@ documenation):
 SCAMP in Youpi
 --------------
 
-Using *SCAMP* in Youpi is a convenient place for preparing a job, sending it to a cluster and accessing the results 
+Using SCAMP in Youpi is a convenient place for preparing a job, sending it to a cluster and accessing the results 
 directly in a web browser. As you will see, Youpi also performs some sanity checks to validate input data before 
 creating the job.
 
 Preparing a Job
 ^^^^^^^^^^^^^^^
 
-Preparing a *SCAMP* job is just a matter of selecting input data (data paths, config and job parameters). As you 
+Preparing a SCAMP job is just a matter of selecting input data (data paths, config and job parameters). As you 
 can see in the following chart, an *input data validation step* is performed before adding the job to the 
 processing cart:
 
 .. image:: figures/youpi-scamp.png
 
-Open the *SCAMP* page by clicking on the "*processing*" top-level tab and select the *SCAMP* icon. Several submenus 
+Open the SCAMP page by clicking on the "*processing*" top-level tab and select the SCAMP icon. Several submenus 
 are available (from left to right):
 
 *Select images*
@@ -300,7 +300,7 @@ are available (from left to right):
     Please note that this path is required. You will get a warning and the job will be discarded if 
     it is not provided.
 
-    .. note:: Altough Youpi requires a path to ``.ahead`` files, the low-level *SCAMP* does not. *SCAMP* will use ``.head`` 
+    .. note:: Altough Youpi requires a path to ``.ahead`` files, the low-level SCAMP does not. SCAMP will use ``.head`` 
               information --- only if available --- to override or add header keywords. This is currently a limitation 
               of Youpi that should be removed in the future. Please check out the "**.head header files**" section in 
               the official `SCAMP documentation`_ (section 5.1.2) for more information.
@@ -317,49 +317,100 @@ are available (from left to right):
     for the results.
 
 *Input data validation*
-    The "*Add to cart*" button is missing from the *SCAMP* plugin page and is replaced by a "*Validate input data*"
+    The "*Add to cart*" button is missing from the SCAMP plugin page and is replaced by a "*Validate input data*"
     entry. This is the last step before sending the prepared job to the processing cart.
 
     Before building the job and adding it to the processing cart, Youpi will perform various checks to 
-    ensure matching LDAC files are available to the *SCAMP* low-level program. Since *QualityFITS* processings 
-    produce LDAC catalogues (*QualityFITS* uses *Sextractor* internally), Youpi will check, for every image in the 
-    current selection, for an existing *successful* *QualityFITS* result. If any LDAC or ``.ahead`` header is 
+    ensure matching LDAC files are available to the SCAMP low-level program. Since QualityFITS processings 
+    produce LDAC catalogues (QualityFITS uses *Sextractor* internally), Youpi will check, for every image in the 
+    current selection, for an existing *successful* QualityFITS result. If any LDAC or ``.ahead`` header is 
     missing, Youpi will deny the entire selection of images. If everything is fine, a popup will ask you whether you 
-    want to select manually the LDAC files to use for *SCAMP*. 
+    want to select manually the LDAC files to use for SCAMP. 
 
-    By hitting *Cancel*, Youpi will select the latest successful *QualityFITS* job available automatically 
+    By hitting *Cancel*, Youpi will select the latest successful QualityFITS job available automatically 
     in order to retreive the LDAC catalogue for every image in the selection. The new job will be added 
     to the processing cart automatically --- there is no "*Add to cart*" button in this case.
 
     More granular selection is available though: by hitting the *OK* button, a list of selections will be displayed 
     along with a list of LDAC files to use (one list of LDAC files per selection). All selected LDAC files (with the 
-    checkbox turned on at the beginning of each row) will be part of the new *SCAMP* job generated when you later 
+    checkbox turned on at the beginning of each row) will be part of the new SCAMP job generated when you later 
     click on the "*Add to cart*" button.
 
-    .. note:: The *SCAMP* policy in Youpi is to select the **latest successful** *QualityFITS* job to get the matching LDAC 
+    .. note:: The SCAMP policy in Youpi is to select the **latest successful** QualityFITS job to get the matching LDAC 
               catalogue. Indeed, an image can be processed with QualityFITS any number of times, even by different users
               (remember the :ref:`processing history <pr_proc_history>` section on the result page?). Hence the need for 
               a LDAC selection policy.
 
-Once in the processing cart, you will notice that Youpi generates a single item for the whole *SCAMP* process. 
+Once in the processing cart, you will notice that Youpi generates a single item for the whole SCAMP process. 
 There will be one single job running on the cluster.
 
 Accessing the Results
 ^^^^^^^^^^^^^^^^^^^^^
 
 Once the job is over, go to the "*Results page*" by clicking on the top-level *Results* link. In 
-the "*Processing History*" panel on the left, select "*SCAMP*" and "*my*" to only display your 
-latest processing results, then hit the "*Start searching!*" button:
+the "*Processing History*" panel on the left, select "SCAMP" and "*my*" to only display your 
+latest processing results, then hit the "*Start searching!*" button (same as for 
+:ref:`QualityFITS <qf_processing_history>`).
 
-The Command Line Tool
----------------------
+You will get a list of SCAMP results, one per line. You might want to check out the 
+:ref:`processing results <processing_results>` section for more info about using the results 
+page. Similarly, I will only describe interesting parts of the result page related to a SCAMP 
+processing: the :ref:`common parts <pr_common_parts>` are better covered in the 
+:ref:`processing results <processing_results>` section too.
 
-*TBW*
+Let's select a successful result entry from the list. In the following example, user ``goranova`` 
+ran a SCAMP from 114 SExctractor catalogues on cluster node ``mix22``:
 
-SCAMP in Youpi
---------------
+.. image:: figures/scamp-results-entry.png
+   :class: capture
 
-*TBW*
+On the right side of the window, the following sections --- from top to bottom --- are:
+
+- :ref:`Job duration, owner and exit status <pr_job_stats>`
+- Screenshots and thumbnails of the products
+- :ref:`User permissions <pr_user_perms>`
+- :ref:`Condor job logs <pr_condor_job_logs>`
+- This job's :ref:`processing history <pr_proc_history>`
+- :ref:`Run parameters <pr_run_params>`
+- XML filtering (for reprocessing)
+
+*Screenshots and thumbnails*
+    This area is a collection of a bigger image on the left and some smaller, grid-aligned thumbnails 
+    of the bitmap products:
+
+    .. image:: figures/scamp-results-thumbs.png
+       :class: capture
+
+    Just click on the image on the leftmost side to access the full SCAMP web page, that is 
+    the same original page generated by SCAMP from the command line. If you already know this 
+    tool, you may have noticed that this image is actually a thumbnailed version of the HTML page 
+    produced after processing. Thumbnails in the grid layout can be clicked to get a bigger version.
+
+*XML filtering*
+    SCAMP generates an XML file (diagnostic file, see the official `SCAMP documentation`_ section 5.2.3) 
+    providing a processing summary and various statistics. Youpi parses this XML file and allows 
+    dynamic XML content filtering: keywords and values can be set to select only a subset of the original 
+    catalogue files used during processing and candidate for automatic reprocessing:
+
+    .. image:: figures/scamp-results-xmlfilter.png
+       :class: capture
+
+    Empty filtering content will lead to no filtering at all, the 114 original LDAC files will be matched:
+
+    .. image:: figures/scamp-results-nofilter.png
+       :class: capture
+
+    If we want to select only catalogues with names matching the ``79381`` string (not a RegExp), Youpi 
+    will find only 6 LDAC files:
+
+    .. image:: figures/scamp-results-filtering.png
+       :class: capture
+
+    We can now reprocess the filtered selection by hitting the "*Reprocess*" button. A new SCAMP job using 
+    those 6 LDAC catalogues is added to the processing cart:
+
+    .. image:: figures/scamp-results-filter-reprocess.png
+       :class: capture
 
 .. _proc_swarp:
 
