@@ -389,8 +389,7 @@ function ConfigFileWidget(container, pluginId, options)
 			// Custom handler for results
 			function(resp) {
 				cdiv.update();
-				var confs = resp.result.configs;
-				var selNode = getSelect(plugin_id + '_' + _options.type +'_name_select', confs.map(function(conf) { return conf.name; }), 1, true);
+				var selNode = getSelect(plugin_id + '_' + _options.type +'_name_select', resp.result.configs, 1, true);
 				selNode.observe('change', _displayCurrentConfUsed);
 				// Set as default
 				var defopt = selNode.select("option[value=\"default\"]")[0];

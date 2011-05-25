@@ -151,14 +151,10 @@ class ProcessingPlugin(object):
         if not dfltconfig:
             self.__saveDefaultConfigFileToDB(request)
 
-        # Always append 'default' config file
-        dfltconfig = ConfigFile.objects.filter(kind__name__exact = self.id, name = 'default', type__name = type)
-        res = [{'name': 'default', 'type': str(type)}]
-
         configs = ConfigFile.objects.filter(kind__name__exact = self.id, type__name = type)
-        for config in configs:
-            if config.name != 'default':
-                res.append({'name': str(config.name), 'type': str(config.type.name)})
+        res = [str(config.name) for config in configs if config.name != 'default']
+        # Always append 'default' config file
+        res.insert(0, 'default')
 
         return {'configs': res}
 
