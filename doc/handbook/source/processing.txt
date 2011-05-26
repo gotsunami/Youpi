@@ -255,7 +255,7 @@ The Command Line Tool
 `SCAMP`_ (Software for Calibrating AstroMetry and Photometry) is a program that computes astrometric 
 projection parameters from source catalogues derived from FITS images. The computed solution is 
 expressed according to the WCS standard. The main features of SCAMP are (taken from the official 
-documenation):
+documentation):
 
 - Compatibility with SExtractor FITS or MEF catalogue format in input,
 - Generation of WCS-compliant and Swarp-compatible FITS image headers in output,
@@ -417,7 +417,110 @@ On the right side of the window, the following sections --- from top to bottom -
 `SWarp` --- Image Stacking
 ==========================
 
+The Command Line Tool
+---------------------
+
+`SWarp`_ is a program that resamples and co-adds together FITS images using any arbitrary astrometric
+projection defined in the WCS standard. The main features are (taken from the official documentation):
+
+- FITS format (including multi-extensions) in input and output
+- Full handling of weight-maps in input and output
+- Ability to work with very large images
+- Works with array in up to 9 dimensions
+- Compatible with WCS and TNX (IRAF) astrometric descriptions
+- Support for equatorial galactic and equatorial coordinate systems
+- Astrometric and photometric parameters are read from FITS headers or external ASCII files
+- Built-in background substraction
+- Built-in noise-level measurement for automatic weighting
+- Automatic centring and sizing functions of the output field
+- XML VOTable-compliant output of meta-data
+
+.. _SWarp: http://www.astromatic.net/software/swarp
+
+
+SWarp in Youpi
+--------------
+
+Using SWarp in Youpi is a convenient place for preparing a job, sending it to a cluster and accessing the results 
+directly in a web browser. As you will see, Youpi also performs sanity checks (the same kind as :ref:`SCAMP <proc_scamp>`) 
+to validate input data before creating the job.
+
+Preparing a Job
+^^^^^^^^^^^^^^^
+
+Preparing a SWarp job is just a matter of selecting input data (data paths, config and job parameters). As you 
+can see in the following chart, an *input data validation step* is performed before adding the job to the 
+processing cart:
+
+.. image:: figures/youpi-swarp.png
+
+Open the SWarp page by clicking on the "*processing*" top-level tab and select the SWarp icon. Several submenus 
+are available. However, the number of submenus will vary depending on the value of the current cart's mode. It can 
+be either *Manual* (the default) or *Automatic*. We will see in the following how the selected cart mode controls 
+the way selections of images are added to the processing cart.
+
+The Manual Cart Mode
+""""""""""""""""""""
+
+    .. image:: figures/swarp-cart-manual.png
+       :class: capture
+
+    *Select images*
+        Use the :ref:`image selector <image_selector_section>` to define a selection of images to process.
+
+    *Select data paths*
+        Select the data path to ``.ahead`` files using the :ref:`path selector widget <data_path_selector>`.
+        Please note that this path is required. You will get a warning and the job will be discarded if 
+        it is not provided.
+
+        .. note:: Altough Youpi requires a path to ``.ahead`` files, the low-level SCAMP does not. SCAMP will use ``.head`` 
+                  information --- only if available --- to override or add header keywords. This is currently a limitation 
+                  of Youpi that should be removed in the future. Please check out the "**.head header files**" section in 
+                  the official `SCAMP documentation`_ (section 5.1.2) for more information.
+        
+        .. _SCAMP documentation: https://www.astromatic.net/pubsvn/software/scamp/trunk/doc/scamp.pdf
+
+    *Select a configuration file*
+        Select a config file to use for this processing on this set of images using the 
+        :ref:`config file selector <config_path_selector>`.
+
+    *Set output directory*
+        Go to this tab to get the actual output directory that will be used for output results. In most cases, 
+        the default value is fine, but you may want to :ref:`set a custom output directory <output_dir_selector>` 
+        for the results.
+
+    *Input data validation*
+        The "*Add to cart*" button is missing from the SCAMP plugin page and is replaced by a "*Validate input data*"
+        entry. This is the last step before sending the prepared job to the processing cart.
+
+        Before building the job and adding it to the processing cart, Youpi will perform various checks to 
+        ensure matching LDAC files are available to the SCAMP low-level program. Since QualityFITS processings 
+        produce LDAC catalogues (QualityFITS uses *Sextractor* internally), Youpi will check, for every image in the 
+        current selection, for an existing *successful* QualityFITS result. If any LDAC or ``.ahead`` header is 
+        missing, Youpi will deny the entire selection of images. If everything is fine, a popup will ask you whether you 
+        want to select manually the LDAC files to use for SCAMP. 
+
+        By hitting *Cancel*, Youpi will select the latest successful QualityFITS job available automatically 
+        in order to retreive the LDAC catalogue for every image in the selection. The new job will be added 
+        to the processing cart automatically --- there is no "*Add to cart*" button in this case.
+
+        More granular selection is available though: by hitting the *OK* button, a list of selections will be displayed 
+        along with a list of LDAC files to use (one list of LDAC files per selection). All selected LDAC files (with the 
+        checkbox turned on at the beginning of each row) will be part of the new SCAMP job generated when you later 
+        click on the "*Add to cart*" button.
+
+        .. note:: The SCAMP policy in Youpi is to select the **latest successful** QualityFITS job to get the matching LDAC 
+                  catalogue. Indeed, an image can be processed with QualityFITS any number of times, even by different users
+                  (remember the :ref:`processing history <pr_proc_history>` section on the result page?). Hence the need for 
+                  a LDAC selection policy.
+
+The Automatic Cart Mode
+"""""""""""""""""""""""
+
 *TBW*
+
+Once in the processing cart, you will notice that Youpi generates a single item for the whole SCAMP process. 
+There will be one single job running on the cluster.
 
 .. _proc_sextractor:
 

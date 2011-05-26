@@ -17,6 +17,7 @@ For the moment, two configurations can be considered while setting up a Youpi en
   don't plan to setup a more complex installation involving several cluster nodes for 
   processing your data.
 
+.. NOT AVAILABLE YET:
   .. note:: We provide a *standalone installation* on a `Live DVD`_ , available from 
             `Youpi's website`_. This is the quickest and easiest way to give Youpi a try. All 
             software packages are installed and are already configured for immediate use. 

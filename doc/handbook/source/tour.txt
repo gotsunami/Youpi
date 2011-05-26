@@ -141,8 +141,8 @@ look for in the FITS image header during ingestion.
 
 .. _automatic_head_section:
 
-Automatic ``.head`` File Generation
-===================================
+Automatic .head File Generation
+===============================
 
 .. versionadded:: 0.6.1
 
@@ -183,7 +183,8 @@ has the following parameters::
 	...
 
 During image processing, Youpi will generate a ``v20091023_00238.head`` file in the same 
-working directory as the source image with the following content::
+working directory as the source image (actually the local copy of the image on the node) 
+with the following content::
 
 	FILTER = 'Y'
 	IMRED_FF = 'Y_flat_20091016.fit[16].fits'
