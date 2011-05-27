@@ -459,60 +459,59 @@ are available. However, the number of submenus will vary depending on the value 
 be either *Manual* (the default) or *Automatic*. We will see in the following how the selected cart mode controls 
 the way selections of images are added to the processing cart.
 
+.. _manual_cart_mode:
+
 The Manual Cart Mode
 """"""""""""""""""""
+
+This is the default cart mode for SWarp and it is actually the *same default behaviour* used accross all other 
+Youpi plugins: image selelection is performed using the image selector, data paths and config files are 
+selected and the item is finally added to the processing cart. The cart mode widget switcher is available 
+at the top of every submenu:
 
     .. image:: figures/swarp-cart-manual.png
        :class: capture
 
-    *Select images*
-        Use the :ref:`image selector <image_selector_section>` to define a selection of images to process.
+*Select images*
+    Use the :ref:`image selector <image_selector_section>` to define a selection of images to process.
+    Since you need to build a list of images for SWarp processings, the most common use of the image selector 
+    in this case is to select the "*Saved selection*" criterion to load any pre-built list of images. If you 
+    just need to run some SWarp jobs from a limited set of image selections, the manual cart mode will perfectly 
+    suit your needs. But if you intend to submit hundreds of jobs, you will certainly benefit from the 
+    :ref:`automatic cart mode <auto_cart_mode>` instead.
 
-    *Select data paths*
-        Select the data path to ``.ahead`` files using the :ref:`path selector widget <data_path_selector>`.
-        Please note that this path is required. You will get a warning and the job will be discarded if 
-        it is not provided.
+*Select data paths*
+    In order to run, Youpi SWarp needs a way to locate the weight maps from a previous QualityFITS run. This 
+    also applies to SCAMP-generated head files. Fortunately, Youpi can automate this process: while those two 
+    locations are required, the default values "*Use QualityFITS-generated WEIGHT maps*" and 
+    "*Use SCAMP-generated HEAD files*" will instruct Youpi to locate those files automatically during the 
+    input data validation step.
 
-        .. note:: Altough Youpi requires a path to ``.ahead`` files, the low-level SCAMP does not. SCAMP will use ``.head`` 
-                  information --- only if available --- to override or add header keywords. This is currently a limitation 
-                  of Youpi that should be removed in the future. Please check out the "**.head header files**" section in 
-                  the official `SCAMP documentation`_ (section 5.1.2) for more information.
-        
-        .. _SCAMP documentation: https://www.astromatic.net/pubsvn/software/scamp/trunk/doc/scamp.pdf
+*Select a configuration file*
+    Select a config file to use for this processing on this set of images using the 
+    :ref:`config file selector <config_path_selector>`.
 
-    *Select a configuration file*
-        Select a config file to use for this processing on this set of images using the 
-        :ref:`config file selector <config_path_selector>`.
+*Set output directory*
+    Go to this tab to get the actual output directory that will be used for output results. In most cases, 
+    the default value is fine, but you may want to :ref:`set a custom output directory <output_dir_selector>` 
+    for the results.
 
-    *Set output directory*
-        Go to this tab to get the actual output directory that will be used for output results. In most cases, 
-        the default value is fine, but you may want to :ref:`set a custom output directory <output_dir_selector>` 
-        for the results.
+*Input data validation*
+    This is the last step before sending the prepared job to the processing cart. Before building the job and 
+    adding it to the processing cart, Youpi will perform various checks to ensure matching weight maps and head 
+    files are available to the SWarp low-level program. By hitting the "*Add to cart*" button, Youpi will run 
+    those checks, looking for successful QualityFITS and SCAMP processings in the database.
 
-    *Input data validation*
-        The "*Add to cart*" button is missing from the SCAMP plugin page and is replaced by a "*Validate input data*"
-        entry. This is the last step before sending the prepared job to the processing cart.
+    .. note:: The SWarp policy in Youpi is to select the **latest successful** QualityFITS job to get the path to the 
+              weight map. Indeed, an image can be processed with QualityFITS any number of times, even by different users
+              (remember the :ref:`processing history <pr_proc_history>` section on the result page?). Hence the need for 
+              a weight map selection policy.
+                
+              This is also true for ``.head`` file selection but a bit different: Youpi looks for all successful 
+              SCAMPs matching the image selection and will let you select one of them in the UI before adding the 
+              job to the cart.
 
-        Before building the job and adding it to the processing cart, Youpi will perform various checks to 
-        ensure matching LDAC files are available to the SCAMP low-level program. Since QualityFITS processings 
-        produce LDAC catalogues (QualityFITS uses *Sextractor* internally), Youpi will check, for every image in the 
-        current selection, for an existing *successful* QualityFITS result. If any LDAC or ``.ahead`` header is 
-        missing, Youpi will deny the entire selection of images. If everything is fine, a popup will ask you whether you 
-        want to select manually the LDAC files to use for SCAMP. 
-
-        By hitting *Cancel*, Youpi will select the latest successful QualityFITS job available automatically 
-        in order to retreive the LDAC catalogue for every image in the selection. The new job will be added 
-        to the processing cart automatically --- there is no "*Add to cart*" button in this case.
-
-        More granular selection is available though: by hitting the *OK* button, a list of selections will be displayed 
-        along with a list of LDAC files to use (one list of LDAC files per selection). All selected LDAC files (with the 
-        checkbox turned on at the beginning of each row) will be part of the new SCAMP job generated when you later 
-        click on the "*Add to cart*" button.
-
-        .. note:: The SCAMP policy in Youpi is to select the **latest successful** QualityFITS job to get the matching LDAC 
-                  catalogue. Indeed, an image can be processed with QualityFITS any number of times, even by different users
-                  (remember the :ref:`processing history <pr_proc_history>` section on the result page?). Hence the need for 
-                  a LDAC selection policy.
+.. _auto_cart_mode:
 
 The Automatic Cart Mode
 """""""""""""""""""""""

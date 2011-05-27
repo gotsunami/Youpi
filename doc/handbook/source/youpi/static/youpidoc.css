@@ -162,6 +162,7 @@ div.footer a {
 
 p {    
     margin: 0.8em 0 0.5em 0;
+    text-align: justify;
 }
 
 a {
