@@ -341,6 +341,10 @@ are available (from left to right):
               (remember the :ref:`processing history <pr_proc_history>` section on the result page?). Hence the need for 
               a LDAC selection policy.
 
+    .. warning:: During input data validation checks, Youpi will **only** ensure that required paths to data are available 
+                 in the database. It will not try to check if data is physically available on the disks! If data have 
+                 been moved and Youpi is not aware of its new location, the job will fail at runtime.
+
 Once in the processing cart, you will notice that Youpi generates a single item for the whole SCAMP process. 
 There will be one single job running on the cluster.
 
@@ -480,6 +484,12 @@ at the top of every submenu:
     suit your needs. But if you intend to submit hundreds of jobs, you will certainly benefit from the 
     :ref:`automatic cart mode <auto_cart_mode>` instead.
 
+    .. note:: For convenience, Youpi will select a config file automatically if you make an image selection using 
+              the *saved selection* criterion. In order for this to work, the saved selection and the the configuration 
+              file names must match exactly. It can saves a lot of time if you have hundreds of selections and config 
+              files to handle. If there is a match, you will be notified in the UI. Otherwise, the default config file 
+              will remain selected, the matching failure being silently ignored.
+
 *Select data paths*
     In order to run, Youpi SWarp needs a way to locate the weight maps from a previous QualityFITS run. This 
     also applies to SCAMP-generated head files. Fortunately, Youpi can automate this process: while those two 
@@ -511,6 +521,28 @@ at the top of every submenu:
               SCAMPs matching the image selection and will let you select one of them in the UI before adding the 
               job to the cart.
 
+    Once the checks are over (you will get warnings if anything goes wrong), hit the *Validate* button to send the 
+    job to the processing cart. In the following example, I used a very small *mat* selection of two images and let 
+    Youpi perform the validation checks with the default values for the data paths, config files etc. Here is what 
+    you get once the input parameters are validated:
+
+        .. image:: figures/swarp-checks-over.png
+           :class: capture
+
+    .. warning:: During input data validation checks, Youpi will **only** ensure that required paths to data are available 
+                 in the database. It will not try to check if data is physically available on the disks! If data have 
+                 been moved and Youpi is not aware of its new location, the job will fail at runtime.
+
+Once in the processing cart, you will notice that Youpi generates a single item for the whole SWarp process. 
+There will be one single job running on the cluster.
+
+Well, we just had a look to the menu entries related to the default *manual* cart mode. It can gets a Swarp 
+job ready in just a few clicks (6 mouse clicks at a minimun) . But what if you have to repeat this operation 
+for hundreds of selections? Would you have to click so many times? No one wants to do that.
+
+Fortunately, Youpi provides a full *automatic* cart mode, more suitable for easily handling hundreds of 
+image selections.
+
 .. _auto_cart_mode:
 
 The Automatic Cart Mode
@@ -518,8 +550,6 @@ The Automatic Cart Mode
 
 *TBW*
 
-Once in the processing cart, you will notice that Youpi generates a single item for the whole SCAMP process. 
-There will be one single job running on the cluster.
 
 .. _proc_sextractor:
 
