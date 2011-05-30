@@ -519,7 +519,8 @@ at the top of every submenu:
                 
               This is also true for ``.head`` file selection but a bit different: Youpi looks for all successful 
               SCAMPs matching the image selection and will let you select one of them in the UI before adding the 
-              job to the cart.
+              job to the cart. If no related Scamp processing is found for a selection of images, Youpi will issue 
+              a warning and the job will be added to the processing cart anyway. This is non-blocking.
 
     Once the checks are over (you will get warnings if anything goes wrong), hit the *Validate* button to send the 
     job to the processing cart. In the following example, I used a very small *mat* selection of two images and let 
@@ -541,15 +542,53 @@ job ready in just a few clicks (6 mouse clicks at a minimun) . But what if you h
 for hundreds of selections? Would you have to click so many times? No one wants to do that.
 
 Fortunately, Youpi provides a full *automatic* cart mode, more suitable for easily handling hundreds of 
-image selections.
+image selections at once.
 
 .. _auto_cart_mode:
 
 The Automatic Cart Mode
 """""""""""""""""""""""
 
-*TBW*
+.. image:: figures/swarp-cart-auto.png
+   :class: capture
 
+The *automatic* cart mode in SWarp provides a way to automate the job submission as much as possible. No more 
+image selections with the image selector, no more config file selection. The only submenus left are, in order: 
+"*Select selections*", "*Select data paths*" and "*Set output directory*". Since you have to select the data 
+paths and the output directory only once for the entire run, you only have to select the selections to process 
+and hit the *Process* button.
+
+Selecting the automatic mode will replace the image selector with a list of all saved selections. You can select 
+multiple selections by holding --- as usual --- the *Ctrl* key while clicking on a name or using the *Shift* key 
+and selecting the beginnning then the end of selection.
+
+After hitting the *Process* button, Youpi will try to select, for each selection of images in the set, a 
+matching configuration file and will perform the input data validation automatically according to the 
+following rules:
+
+- If the current selection's name does not match (by name) any saved selection, the *default* config file will 
+  be used
+- If no related Scamp processing is found for that image selection (i.e. no ``.head`` files available), a 
+  warning will be shown and the job will be added to processing cart anyway.
+
+Youpi will add one job per selection to the processing cart.
+
+.. note:: If you are not sure whether a list of selections of images has already been added to the processing cart, 
+          feel free to resubmit the whole set: Youpi will detect if a selection is already in the processing cart 
+          and will not add duplicate items.
+
+Accessing the Results
+^^^^^^^^^^^^^^^^^^^^^
+
+Once the job is over, go to the "*Results page*" by clicking on the top-level *Results* link. In 
+the "*Processing History*" panel on the left, select "SWarp" and "*my*" to only display your 
+latest processing results, then hit the "*Start searching!*" button (same as for 
+:ref:`QualityFITS <qf_processing_history>`).
+
+You will get a list of SWarp results. You might want to check out the :ref:`processing results <processing_results>` 
+section for more info about using the results page. Similarly, I will only describe interesting parts of 
+the result page related to a SWarp processing: the :ref:`common parts <pr_common_parts>` are better covered in 
+the :ref:`processing results <processing_results>` section too.
 
 .. _proc_sextractor:
 
