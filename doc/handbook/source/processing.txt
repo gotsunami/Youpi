@@ -590,6 +590,22 @@ section for more info about using the results page. Similarly, I will only descr
 the result page related to a SWarp processing: the :ref:`common parts <pr_common_parts>` are better covered in 
 the :ref:`processing results <processing_results>` section too.
 
+Let's select a successful result entry from the list. In the following example, user ``goranova`` 
+ran a SWarp of 3 images on host ``mix11``:
+
+.. image:: figures/swarp-results-entry.png
+   :class: capture
+
+On the right side of the window, the following sections --- from top to bottom --- are:
+
+- :ref:`Job duration, owner and exit status <pr_job_stats>`
+- Screenshots and thumbnails of the products
+- :ref:`User permissions <pr_user_perms>`
+- :ref:`Condor job logs <pr_condor_job_logs>`
+- This job's :ref:`processing history <pr_proc_history>`
+- :ref:`Run parameters <pr_run_params>`
+- Stack Image
+
 .. _proc_sextractor:
 
 `SExtractor` --- Sources Extractor
