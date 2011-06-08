@@ -463,7 +463,7 @@ are available. However, the number of submenus will vary depending on the value 
 be either *Manual* (the default) or *Automatic*. We will see in the following how the selected cart mode controls 
 the way selections of images are added to the processing cart.
 
-.. _manual_cart_mode:
+.. _swarp_manual_cart_mode:
 
 The Manual Cart Mode
 """"""""""""""""""""
@@ -628,13 +628,95 @@ On the right side of the window, the following sections --- from top to bottom -
     .. image:: figures/swarp-results-stack-tag.png
        :class: capture
 
-
 .. _proc_sextractor:
 
 `SExtractor` --- Sources Extractor
 ==================================
 
-*TBW*
+The Command Line Tool
+---------------------
+
+(*From the official* `SExtractor manual`_)
+
+SExtractor (Source-Extractor) is a program that builds a catalogue of objects from an astronomical image. 
+It is particularly oriented towards reduction of large scale galaxy-survey data, but it also performs well 
+on moderately crowded star fields. Its main features are:
+
+- Support for multi-extension FITS.
+- Speed: typically 1 Mpixel/s with a 2GHz processor.
+- Ability to work with very large images (up to 65k × 65k pixels on 32 bit machines, or 2G × 2G pixels on 
+  64 bit machines), thanks to buffered image access.
+- Robust deblending of overlapping extended objects.
+- Real-time filtering of images to improve detectability.
+- Neural-Network-based star/galaxy classifier.
+- Flexible catalogue output of desired parameters only.
+- Pixel-to-pixel photometry in dual-image mode.
+- Handling of weight-maps and flag-maps.
+- Optimum handling of images with variable S/N.
+- Special mode for photographic scans.
+- XML VOTable-compliant catalog output.
+
+.. _SExtractor manual: https://www.astromatic.net/pubsvn/software/sextractor/trunk/doc/sextractor.pdf
+
+SExtractor in Youpi
+-------------------
+
+Using Youpi for your SExtractor needs is a convenient place for preparing a job, sending it to a 
+cluster and accessing the results directly in a web browser.
+
+Preparing a Job
+^^^^^^^^^^^^^^^
+
+As you will see, preparing a job is really easy and is just a matter of selecting input images, 
+defining data paths to (optional) FLAG, WEIGHT and PSF files and set up various job parameters:
+
+.. image:: figures/youpi-sex.png
+
+In the UI, click on the "*processing*" top-level tab and select the SExtractor icon. Several submenus are 
+available. However, as for the :ref:`SWarp plugin <swarp_manual_cart_mode>`, the number of submenus will vary 
+depending on the value of the current cart’s mode. It can be either Manual (the default) or Automatic. 
+We will see in the following how the selected cart mode controls the way selections of images are added 
+to the processing cart.
+
+The Manual Cart Mode
+""""""""""""""""""""
+
+This is the default cart mode for SExtractor and it is actually the *same default behaviour* used accross the 
+other Youpi plugins: image selelection is performed using the image selector, data paths and config files are 
+selected and the item is finally added to the processing cart. The cart mode widget switcher is available 
+at the top of every submenu:
+
+    .. image:: figures/swarp-cart-manual.png
+       :class: capture
+
+*Select images*
+    Use the :ref:`image selector <image_selector_section>` to define a selection of images to process.
+
+*Select data paths*
+    Select the data paths to the FLAT, MARK and REG data using the :ref:`path selector widget <data_path_selector>`.
+    Please note that the paths to FLAT and MASK data files are required. You will get warnings and the job 
+    will be discarded if mandatory information is not provided.
+
+*Select a configuration file*
+    Select a config file to use for this processing on this set of images using the 
+    :ref:`config file selector <config_path_selector>`.
+
+*Select a parameter file*
+    Select a config file to use for this processing on this set of images using the 
+    :ref:`config file selector <config_path_selector>`.
+
+*Set output directory*
+    Go to this tab to get the actual output directory that will be used for output results. In most cases, 
+    the default value is fine, but you may want to :ref:`set a custom output directory <output_dir_selector>` 
+    for the results.
+
+Now that everything is set, hit the "*Add to cart*" upper-right button to add the job to the 
+:ref:`processing cart <the_processing_cart>`. The job is ready to be submitted to the cluster or to 
+be saved to the database for later processing. 
+
+Please note that one cluster job per image is generated. For a list of 4 images to be QualityFITSed, 
+4 separate jobs will run on the cluster. Here is what I get on the :ref:`active monitoring <live_monitoring>` 
+page:
 
 .. _proc_stiff:
 
