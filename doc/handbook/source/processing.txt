@@ -469,7 +469,7 @@ The Manual Cart Mode
 """"""""""""""""""""
 
 This is the default cart mode for SWarp and it is actually the *same default behaviour* used accross all other 
-Youpi plugins: image selelection is performed using the image selector, data paths and config files are 
+Youpi plugins: image selection is performed using the image selector, data paths and config files are 
 selected and the item is finally added to the processing cart. The cart mode widget switcher is available 
 at the top of every submenu:
 
@@ -674,7 +674,7 @@ defining data paths to (optional) FLAG, WEIGHT and PSF files and set up various 
 
 In the UI, click on the "*processing*" top-level tab and select the SExtractor icon. Several submenus are 
 available. However, as for the :ref:`SWarp plugin <swarp_manual_cart_mode>`, the number of submenus will vary 
-depending on the value of the current cart’s mode. It can be either Manual (the default) or Automatic. 
+depending on the value of the current cart's mode. It can be either Manual (the default) or Automatic. 
 We will see in the following how the selected cart mode controls the way selections of images are added 
 to the processing cart.
 
@@ -682,7 +682,7 @@ The Manual Cart Mode
 """"""""""""""""""""
 
 This is the default cart mode for SExtractor and it is actually the *same default behaviour* used accross the 
-other Youpi plugins: image selelection is performed using the image selector, data paths and config files are 
+other Youpi plugins: image selection is performed using the image selector, data paths and config files are 
 selected and the item is finally added to the processing cart. The cart mode widget switcher is available 
 at the top of every submenu:
 
@@ -693,9 +693,17 @@ at the top of every submenu:
     Use the :ref:`image selector <image_selector_section>` to define a selection of images to process.
 
 *Select data paths*
-    Select the data paths to the FLAT, MARK and REG data using the :ref:`path selector widget <data_path_selector>`.
-    Please note that the paths to FLAT and MASK data files are required. You will get warnings and the job 
-    will be discarded if mandatory information is not provided.
+    Select the data paths to the FLAG, WEIGHT and PSF data using the :ref:`path selector widget <data_path_selector>`.
+    Please note that all these paths are optional. They will be searched by Youpi when generating the 
+    Condor submission file. Here is the file selection policy, for *every* single image in the selection:
+
+    - given a FLAG path, Youpi will search for a matching ``_flag.fits`` file with the same basename and 
+      will use the ``-FLAG_IMAGE`` parameter on the command line.
+    - given a WEIGHT path, Youpi will search for a matching ``_weight.fits`` file with the same basename 
+      and will use the ``-WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE`` parameters on the 
+      command line.
+    - given a PSF path, Youpi will search for a matching ``.psf`` file with the same basename and 
+      will use the ``-PSF_NAME`` parameter on the command line.
 
 *Select a configuration file*
     Select a config file to use for this processing on this set of images using the 
@@ -714,9 +722,8 @@ Now that everything is set, hit the "*Add to cart*" upper-right button to add th
 :ref:`processing cart <the_processing_cart>`. The job is ready to be submitted to the cluster or to 
 be saved to the database for later processing. 
 
-Please note that one cluster job per image is generated. For a list of 4 images to be QualityFITSed, 
-4 separate jobs will run on the cluster. Here is what I get on the :ref:`active monitoring <live_monitoring>` 
-page:
+Please note that one cluster job per image is generated. For a list of n images, n separate jobs will run 
+on the cluster. Here is what I get on the :ref:`active monitoring <live_monitoring>` page:
 
 .. _proc_stiff:
 
