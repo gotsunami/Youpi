@@ -468,7 +468,7 @@ the way selections of images are added to the processing cart.
 The Manual Cart Mode
 """"""""""""""""""""
 
-This is the default cart mode for SWarp and it is actually the *same default behaviour* used accross all other 
+This is the default cart mode for SWarp and it has actually the *same default behaviour* used accross all other 
 Youpi plugins: image selection is performed using the image selector, data paths and config files are 
 selected and the item is finally added to the processing cart. The cart mode widget switcher is available 
 at the top of every submenu:
@@ -681,7 +681,7 @@ to the processing cart.
 The Manual Cart Mode
 """"""""""""""""""""
 
-This is the default cart mode for SExtractor and it is actually the *same default behaviour* used accross the 
+This is the default cart mode for SExtractor and it has actually the *same default behaviour* used accross the 
 other Youpi plugins: image selection is performed using the image selector, data paths and config files are 
 selected and the item is finally added to the processing cart. The cart mode widget switcher is available 
 at the top of every submenu:
@@ -690,7 +690,18 @@ at the top of every submenu:
        :class: capture
 
 *Select images*
+
+    .. image:: figures/sex-image-mode.png
+       :class: capture
+
     Use the :ref:`image selector <image_selector_section>` to define a selection of images to process.
+    Since two different images can be provided to SExtractor (the so-called *double-image mode*), Youpi 
+    can let you select between the *single* image mode --- which is the default --- and the *dual* image 
+    mode. Choosing the later option will display another image selector widget on the screen. Use the upper 
+    one to select the image(s) for detection of sources and the lower one for selecting *one* image for 
+    measurements only.
+
+    .. note:: *image1* and *image2* must have the same dimensions. More info in the `SExtractor manual`_, section 4.1.
 
 *Select data paths*
     Select the data paths to the FLAG, WEIGHT and PSF data using the :ref:`path selector widget <data_path_selector>`.
@@ -710,8 +721,10 @@ at the top of every submenu:
     :ref:`config file selector <config_path_selector>`.
 
 *Select a parameter file*
-    Select a config file to use for this processing on this set of images using the 
-    :ref:`config file selector <config_path_selector>`.
+    Select a catalog parameter file to use for this processing on this set of images (same behaviour as the 
+    :ref:`config file selector <config_path_selector>`). The catalog parameter file is need by SExtractor 
+    and contains the list of parameters that will be listed in the output for every detection. It is 
+    specified along with the ``PARAMETERS_NAME`` config parameter.
 
 *Set output directory*
     Go to this tab to get the actual output directory that will be used for output results. In most cases, 
@@ -723,7 +736,50 @@ Now that everything is set, hit the "*Add to cart*" upper-right button to add th
 be saved to the database for later processing. 
 
 Please note that one cluster job per image is generated. For a list of n images, n separate jobs will run 
-on the cluster. Here is what I get on the :ref:`active monitoring <live_monitoring>` page:
+on the cluster.
+
+The Automatic Cart Mode
+"""""""""""""""""""""""
+
+.. image:: figures/swarp-cart-auto.png
+   :class: capture
+
+The *automatic* cart mode in SExtractor provides a way to automate the job submission as much as possible. Please 
+read the SWarp section about the :ref:`automatic cart mode <auto_cart_mode>` for further details.
+
+Accessing the Results
+^^^^^^^^^^^^^^^^^^^^^
+
+Once the job is over, go to the "*Results page*" by clicking on the top-level *Results* link. In 
+the "*Processing History*" panel on the left, select "SExtractor" and "*my*" to only display your 
+latest processing results, then hit the "*Start searching!*" button (same as for 
+:ref:`QualityFITS <qf_processing_history>`).
+
+You will get a list of SExtractor results. You might want to check out the :ref:`processing results <processing_results>` 
+section for more info about using the results page. Similarly, I will only describe interesting parts of 
+the result page related to a SExtractor processing: the :ref:`common parts <pr_common_parts>` are better covered in 
+the :ref:`processing results <processing_results>` section too.
+
+Let's select a successful result entry from the list. In the following example, user ``goranova`` 
+ran a SExtractor on a selection of images on host ``mix21``:
+
+.. image:: figures/sex-results-entry.png
+   :class: capture
+
+On the right side of the window, the following sections --- from top to bottom --- are:
+
+- :ref:`Job duration, owner and exit status <pr_job_stats>`
+- Screenshots and thumbnails of the products
+- :ref:`User permissions <pr_user_perms>`
+- :ref:`Condor job logs <pr_condor_job_logs>`
+- This job's :ref:`processing history <pr_proc_history>`
+- :ref:`Run parameters <pr_run_params>`
+
+*Screenshots and thumbnails*
+    Just click on the image on the leftmost side to access the full SExtractor page result, that is 
+    the same original page generated by SExtractor from the command line. If you already know this 
+    tool, you may have noticed that this image is actually a thumbnailed version of the HTML page 
+    produced after processing. 
 
 .. _proc_stiff:
 
