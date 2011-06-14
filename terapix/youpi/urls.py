@@ -119,6 +119,7 @@ urlpatterns = patterns(
     # Processing cart 
     (r'^cart/$', 'cviews.processingcart.home'),
     (r'^cart/additem/$', 'cviews.processingcart.cart_add_item'),
+    (r'^cart/additems/$', 'cviews.processingcart.cart_add_items'),
     (r'^cart/delitem/$', 'cviews.processingcart.cart_delete_item'),
     (r'^cart/delitems/$', 'cviews.processingcart.cart_delete_items'),
     (r'^cart/itemsCount/$', 'cviews.processingcart.cart_items_count'),
