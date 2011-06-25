@@ -24,6 +24,7 @@ urlpatterns = patterns(
 
     # Ingestion
     (r'^ingestion/$', 'cviews.ingestion.home'),
+    (r'^ingestion/exists/(.*?)/$', 'cviews.ingestion.ingestion_exists'),
     (r'^ingestion/delete/(.*?)/$', 'cviews.ingestion.delete_ingestion'),
     (r'^ingestion/ingestion2/$', 'cviews.condor.condor_ingestion'),
     (r'^ingestion/imgCount/$', 'cviews.ingestion.ingestion_img_count'),

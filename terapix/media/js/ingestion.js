@@ -203,25 +203,16 @@ function process_form() {
 			null,
 			// Custom handler for results
 			function(resp) {
-				var nb = resp.data.length;
-				if (nb > 0) {
-					// Do not allow to submit ingestion if ingestion names already exists
-					var alike = new Array();
-					resp.data.each(function(name) {
-						if (new RegExp('^' + iid + '_\\d+').test(name[0]))
-							alike.push(name[0]);
-					});
-					if (alike.length) {
-						// ID already exists: not allowed
-						alert("This ingestion ID has been already used for ingestion" + (alike.length > 1 ? 's' : '') + '\n' + 
-								alike + '\nPlease choose another ingestion ID.');
-						ing_id.highlight({ afterFinish: 
-							function() { 
-								ing_id.focus();
-								ing_id.select();
-							}
-						});
-					}
+                if (resp.Exists) {
+                    // ID already exists: not allowed
+                    alert("This ingestion ID has been already used for ingestion" + (alike.length > 1 ? 's' : '') + '\n' + 
+                            alike + '\nPlease choose another ingestion ID.');
+                    ing_id.highlight({ afterFinish: 
+                        function() { 
+                            ing_id.focus();
+                            ing_id.select();
+                        }
+                    });
 				}
 				else  {
 					var d = $('cluster_log_div');
@@ -253,20 +244,7 @@ function process_form() {
 				}
 			}
 		);
-
-		var post = {
-			Table		: 'youpi_ingestion',
-			DisplayField: 'label',
-			Lines		: 0,
-			Line0Field	: 'label',
-			Line0Cond	: 'contains',
-			Line0Text	: iid + '_%',
-			Hide		: '',
-			OrderBy		: 'id'
-		};
-
-		// Send HTTP POST request
-		xhr.send('/youpi/process/preingestion/query/', $H(post).toQueryString());
+		xhr.send('/youpi/ingestion/exists/' + iid + '/', null, true, 'get');
 	}
 
 	return false;
