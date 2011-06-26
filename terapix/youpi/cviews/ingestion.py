@@ -11,10 +11,12 @@ from django.db import IntegrityError
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 #
+from terapix.youpi.auth import read_proxy, Permissions
 from terapix.youpi.models import *
 from terapix.youpi.cviews import profile 
 from terapix.youpi.views import get_entity_permissions
 from terapix.lib.common import get_title_from_menu_id
+from terapix.lib import pretty
 
 @login_required
 @profile
