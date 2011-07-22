@@ -42,7 +42,7 @@ def ims_get_collection(request, name):
     elif name == 'grade':
         data = [g[0] for g in GRADE_SET]
     elif name == 'savedselections':
-        sels = ImageSelections.objects.all().order_by('date')
+        sels = ImageSelections.objects.all().order_by('-date')
         data = []
         for s in sels:
             sList = marshal.loads(base64.decodestring(s.data))

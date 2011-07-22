@@ -270,7 +270,7 @@ var cartmode = {
 					$('submit_automatic_sels').show();
 					var s = new Element('select', {id: this.plugin_id + '_sels_select', size: 25, multiple: 'multiple'}).setStyle({width: '90%'});
 					data.each(function(sel, k) {
-						s.insert(new Element('option', {value: sel}).update(new Element('span').update(k+1).addClassName('option_num')).insert(' ' + sel));
+						s.insert(new Element('option', {value: sel}).update(new Element('span').update(data.length-k).addClassName('option_num')).insert(' ' + sel));
 					});
 					s.observe('change', function() {
 						var sel = new Array();
