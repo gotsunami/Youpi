@@ -641,6 +641,8 @@ ORDER BY p.id DESC
         if data.thumbnails:
             thumbs = [ thumb for thumb in thumbs]
 
+        config = zlib.decompress(base64.decodestring(data.config))
+
         return {    'TaskId'                : str(taskid),
                     'Title'                 : str("%s" % task.title),
                     'User'                  : str(task.user.username),
@@ -649,6 +651,7 @@ ORDER BY p.id DESC
                     'End'                   : str(task.end_date),
                     'Duration'              : str(task.end_date-task.start_date),
                     'WWW'                   : str(data.www),
+                    'Index'                 : str(self.getConfigValue(config.split('\n'), 'XML_NAME')),
                     'ResultsOutputDir'      : str(task.results_output_dir),
                     'ResultsLog'            : sexlog,
                     'Config'                : str(zlib.decompress(base64.decodestring(data.config))),
