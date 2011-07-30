@@ -37,6 +37,16 @@ def debug(msg):
     print "[YWP@%s] %s" % (getNowDateTime()[-8:], msg)
     sys.stdout.flush()
 
+def getDefaultXSLPath(plugin_id):
+    """
+    Returns absolute path to default XSL stylesheet (not supported 
+    by the QFits plugin) by greping XSL_URL from cmd -dd.
+    """
+    if plugin_id == 'fitsin':
+        raise ValueError, "QualityFITS does not support XSL files. Bad plugin id."
+    path = re.sub(r'^.*file://', '', os.popen("%s -dd|grep XSL_URL" % plugin_id).read())
+    return path[:-1] # Removes trailing \n
+
 def getNowDateTime(lt = None):
     """
     Returns local date time
@@ -726,6 +736,18 @@ def process(userData, kind_id, argv):
                 debug("Sextractor Preprocessing: uncompressing %s" % fz)
                 os.system("%s %s %s" % (CMD_IMCOPY, fz, fz[:-3]))
 
+        # Handles copying of XSL stylesheets for sextractor, swarp, scamp, stiff
+        # Add an entry to support XSL copying for another plugin!
+        if kind in ('sex', 'swarp', 'scamp', 'stiff'):
+            # Copy XSL stylesheet
+            debug("Copying XSL stylesheet")
+            try:
+                xslPath = getDefaultXSLPath(kind)
+                copyFileChmodAll(xslPath, "%s.xsl" % kind)
+            except Exception, e:
+                # No custom XSL_URL value
+                debug("[Warning] %s: %s" % ('Could not copy XSL stylesheet', e))
+
     except WrapperError, e:
         exit_code = 1
         debug("Error during pre-processing stage")
@@ -907,18 +929,6 @@ def process(userData, kind_id, argv):
                 sex_id = g.con.insert_id()
             except Exception, e:
                 raise WrapperError, e
-
-            #img_id = userData['ImgID']
-            #imgName = g.execute("SELECT name FROM youpi_image WHERE id='%s'" % img_id)[0][0]
-            #os.chdir(imgName)
-
-            # Copy XSL stylesheet
-            try:
-                xslPath = re.search(r'file://(.*)$', getConfigValue(configContent, 'XSL_URL'))
-                if xslPath: copyFileChmodAll(xslPath.group(1), userData['ResultsOutputDir'])
-            except TypeError, e:
-                # No custom XSL_URL value
-                pass
 
             chkimg = getConfigValue(configContent, 'CHECKIMAGE_NAME')
             if chkimg:

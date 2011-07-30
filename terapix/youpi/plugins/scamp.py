@@ -270,26 +270,8 @@ class Scamp(ProcessingPlugin):
         except ValueError:
             raise ValueError, userData
 
-        scamp_params = ''
-        try:
-            url = self.getConfigValue(content.split('\n'), 'XSL_URL')
-            xslPath = re.search(r'file://(.*)$', url)
-            if xslPath:
-                # This is a local (or NFS) path, Youpi will serve it
-                scamp_params = "-XSL_URL %s" % os.path.join(
-                    get_static_url(userData['ResultsOutputDir']), 
-                    request.user.username, 
-                    userData['Kind'], 
-                    userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
-                    os.path.basename(xslPath.group(1))
-                )
-            else:
-                # Copy attribute as is
-                if url: scamp_params = "-XSL_URL " + url
-        except TypeError, e:
-            pass
-        except AttributeError, e:
-            pass
+        # Get -XSL_URL param
+        scamp_params = self.getXSLParam()
 
         #
         # Generate CSF
@@ -301,7 +283,7 @@ class Scamp(ProcessingPlugin):
             os.path.join(tmpDir, transferFile),
         ])
         cluster.addQueue(
-            queue_args = str("%(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -c %(config)s @%(ldacsfile)s 2>/dev/null" % {
+            queue_args = str("%(encuserdata)s %(condor_transfer)s -l %(transferfile)s -- %(scamp)s %(params)s -WRITE_XML Y -c %(config)s @%(ldacsfile)s 2>/dev/null" % {
                 'encuserdata'       : encUserData, 
                 'condor_transfer'   : "%s %s" % (settings.CMD_CONDOR_TRANSFER, settings.CONDOR_TRANSFER_OPTIONS),
                 'transferfile'      : transferFile,

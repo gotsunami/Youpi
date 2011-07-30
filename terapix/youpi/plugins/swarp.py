@@ -273,26 +273,8 @@ ORDER BY p.id DESC
         except ValueError:
             raise ValueError, userData
 
-        swarp_params = ''
-        try:
-            url = self.getConfigValue(content.split('\n'), 'XSL_URL')
-            xslPath = re.search(r'file://(.*)$', url)
-            if xslPath:
-                # This is a local (or NFS) path, Youpi will serve it
-                swarp_params = "-XSL_URL %s" % os.path.join(
-                    get_static_url(userData['ResultsOutputDir']),
-                    request.user.username, 
-                    userData['Kind'], 
-                    userData['ResultsOutputDir'][userData['ResultsOutputDir'].find(userData['Kind'])+len(userData['Kind'])+1:],
-                    os.path.basename(xslPath.group(1))
-                )
-            else:
-                # Copy attribute as is
-                if url: swarp_params = "-XSL_URL " + url
-        except TypeError, e:
-            pass
-        except AttributeError, e:
-            pass
+        # Get -XSL_URL param
+        swarp_params = self.getXSLParam()
 
         # Now generates the preprocessing Python script needed to be able 
         # to uncompress all fz/gzip weight maps

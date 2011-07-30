@@ -158,6 +158,16 @@ class ProcessingPlugin(object):
 
         return {'configs': res}
 
+    def getXSLParam(self):
+        """
+        Returns the -XSL_PARAM parameter for the command line. Note: the fistin 
+        plugin does not support such a parameter.
+        """
+        if self.id == 'fitsin': 
+            raise ValueError, "QualityFITS does not support XSL files. Bad plugin id."
+
+        return "-XSL_URL %s.xsl" % self.id
+
     def importConfigFiles(self, request):
         """
         Import all configuration files in a directory. File names are matched against 

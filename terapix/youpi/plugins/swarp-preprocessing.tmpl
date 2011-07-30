@@ -86,7 +86,7 @@ def handle_weights(weight_files):
 
 # Variable substitution
 handle_weights(${weight_files})
-command = "${swarp} ${params} @${imgsfile} -c ${config} 2>&1"
+command = "${swarp} ${params} @${imgsfile} -c ${config} -WRITE_XML Y 2>&1"
 debug("Executing: " + command)
 exit_code = os.system(command)
 debug("Swarp over - exit code: %d" % exit_code)
