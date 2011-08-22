@@ -775,8 +775,8 @@ class CondorClient(ClusterClient):
         splitted into lines).
         """
         pipe = os.popen(os.path.join(settings.CONDOR_BIN_PATH, 'condor_submit %s 2>&1' % filepath))
-        # submit_content is a list with 3 elements of content as returned by condor_submit command 
-        # (i.e. 3 lines of plain text)
+        # submit_content is a list with 2 or 3 elements of content as returned by condor_submit command 
+        # (i.e. 2 or 3 lines of plain text)
         res = pipe.readlines()
         pipe.close()
         return res
@@ -805,13 +805,13 @@ class CondorClient(ClusterClient):
         res = shell_submit(filepath)
         count = cid = 0
         try:
-            # Only third line is of interest
-            data = res[2].strip()
+            # Only last line is of interest
+            data = res[-1].strip()
             m = re.match(r'^(?P<count>\d+?) .*? (?P<cluster>\d+?)$', data[:-1])
             count = m.group('count')
             cid = m.group('cluster')
         except Exception, e:
-            raise CondorSubmitError, "Condor error:\n%s" % e
+            raise CondorSubmitError, "Condor error in submit():\n%s" % e
         return count, cid
 
     def getStatus(self):
