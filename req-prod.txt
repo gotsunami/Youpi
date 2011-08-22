@@ -10,3 +10,4 @@ python-cjson==1.0.5
 matplotlib==1.0.1
 python-magic==0.4.0
 pyfits==2.4.0
+python-memcached==1.47
