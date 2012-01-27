@@ -1,6 +1,4 @@
 # Ignore file for Youpi project
-syntax: glob
-
 *.pyc
 *~
 *-min.css

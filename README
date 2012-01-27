@@ -1,10 +1,10 @@
 Youpi stands for “YOUpi is your processing PIpeline”. It is a modern, 
 easy to use yet powerful web application providing high level functionalities 
 to perform data reduction on scientific FITS images. Built on top of various 
-open source reduction tools released to the community by TERAPIX (http://terapix.iap.fr), 
-Youpi can help organize your data, manage your processing jobs on a computer 
-cluster in real time (using Condor) and facilitate teamwork by allowing 
-fine-grain sharing of results and data.
+open source reduction tools released to the community by TERAPIX 
+(http://terapix.iap.fr), Youpi can help organize your data, manage your 
+processing jobs on a computer cluster in real time (using Condor) and 
+facilitate teamwork by allowing fine-grain sharing of results and data.
 
 Built from the ground up with modularity in mind, Youpi comes with plugins 
 allowing to perform, from within a browser, various processing tasks such as 
