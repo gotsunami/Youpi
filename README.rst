@@ -1,3 +1,6 @@
+About
+=====
+
 Youpi stands for “YOUpi is your processing PIpeline”. It is a modern, 
 easy to use yet powerful web application providing high level functionalities 
 to perform data reduction on scientific FITS images. Built on top of various 
