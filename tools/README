@@ -1,4 +1,0 @@
-
-doxypy.py		Converts Python source files to something Doxygen can understand
-js2doxy.pl		Converts Javascript source files to something Doxygen can understand
-jsmin.py		Reduce Javascript file size (use it for deployment)
