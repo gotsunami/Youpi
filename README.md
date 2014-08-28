@@ -1,5 +1,4 @@
-About
-=====
+## About
 
 Youpi stands for “YOUpi is your processing PIpeline”. It is a modern, 
 easy to use yet powerful web application providing high level functionalities 
